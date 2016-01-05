@@ -47,7 +47,7 @@ bool EmberGenome(EmberOptions& opt)
 	std::cout.imbue(std::locale(""));
 
 	if (opt.DumpArgs())
-		cerr << opt.GetValues(OPT_USE_GENOME) << endl;
+		cerr << opt.GetValues(eOptionUse::OPT_USE_GENOME) << endl;
 
 	if (opt.OpenCLInfo())
 	{
@@ -79,7 +79,7 @@ bool EmberGenome(EmberOptions& opt)
 	EmberReport emberReport, emberReport2;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
 	unique_ptr<RenderProgress<T>> progress(new RenderProgress<T>());
-	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? OPENCL_RENDERER : CPU_RENDERER, devices, false, 0, emberReport));
+	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));
 	vector<string> errorReport = emberReport.ErrorReport();
 	os.imbue(std::locale(""));
@@ -117,7 +117,7 @@ bool EmberGenome(EmberOptions& opt)
 	}
 
 	//SheepTools will own the created renderer and will take care of cleaning it up.
-	SheepTools<T, float> tools(opt.PalettePath(), CreateRenderer<T>(opt.EmberCL() ? OPENCL_RENDERER : CPU_RENDERER, devices, false, 0, emberReport2));
+	SheepTools<T, float> tools(opt.PalettePath(), CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport2));
 	tools.SetSpinParams(!opt.UnsmoothEdge(),
 						T(opt.Stagger()),
 						T(opt.OffsetX()),
@@ -138,18 +138,18 @@ bool EmberGenome(EmberOptions& opt)
 	//Specify reasonable defaults if nothing is specified.
 	if (opt.UseVars() == "" && opt.DontUseVars() == "")
 	{
-		noVars.push_back(VAR_NOISE);
-		noVars.push_back(VAR_BLUR);
-		noVars.push_back(VAR_GAUSSIAN_BLUR);
-		noVars.push_back(VAR_RADIAL_BLUR);
-		noVars.push_back(VAR_NGON);
-		noVars.push_back(VAR_SQUARE);
-		noVars.push_back(VAR_RAYS);
-		noVars.push_back(VAR_CROSS);
-		noVars.push_back(VAR_PRE_BLUR);
-		noVars.push_back(VAR_SEPARATION);
-		noVars.push_back(VAR_SPLIT);
-		noVars.push_back(VAR_SPLITS);
+		noVars.push_back(eVariationId::VAR_NOISE);
+		noVars.push_back(eVariationId::VAR_BLUR);
+		noVars.push_back(eVariationId::VAR_GAUSSIAN_BLUR);
+		noVars.push_back(eVariationId::VAR_RADIAL_BLUR);
+		noVars.push_back(eVariationId::VAR_NGON);
+		noVars.push_back(eVariationId::VAR_SQUARE);
+		noVars.push_back(eVariationId::VAR_RAYS);
+		noVars.push_back(eVariationId::VAR_CROSS);
+		noVars.push_back(eVariationId::VAR_PRE_BLUR);
+		noVars.push_back(eVariationId::VAR_SEPARATION);
+		noVars.push_back(eVariationId::VAR_SPLIT);
+		noVars.push_back(eVariationId::VAR_SPLITS);
 
 		//Loop over the novars and set ivars to the complement.
 		for (i = 0; i < varList.Size(); i++)
@@ -554,25 +554,25 @@ bool EmberGenome(EmberOptions& opt)
 					aselp1 = nullptr;
 
 					if (opt.Method() == "")
-						mutMeth = MUTATE_NOT_SPECIFIED;
+						mutMeth = eMutateMode::MUTATE_NOT_SPECIFIED;
 					else if (opt.Method() == "all_vars")
-						mutMeth = MUTATE_ALL_VARIATIONS;
+						mutMeth = eMutateMode::MUTATE_ALL_VARIATIONS;
 					else if (opt.Method() == "one_xform")
-						mutMeth = MUTATE_ONE_XFORM_COEFS;
+						mutMeth = eMutateMode::MUTATE_ONE_XFORM_COEFS;
 					else if (opt.Method() == "add_symmetry")
-						mutMeth = MUTATE_ADD_SYMMETRY;
+						mutMeth = eMutateMode::MUTATE_ADD_SYMMETRY;
 					else if (opt.Method() == "post_xforms")
-						mutMeth = MUTATE_POST_XFORMS;
+						mutMeth = eMutateMode::MUTATE_POST_XFORMS;
 					else if (opt.Method() == "color_palette")
-						mutMeth = MUTATE_COLOR_PALETTE;
+						mutMeth = eMutateMode::MUTATE_COLOR_PALETTE;
 					else if (opt.Method() == "delete_xform")
-						mutMeth = MUTATE_DELETE_XFORM;
+						mutMeth = eMutateMode::MUTATE_DELETE_XFORM;
 					else if (opt.Method() == "all_coefs")
-						mutMeth = MUTATE_ALL_COEFS;
+						mutMeth = eMutateMode::MUTATE_ALL_COEFS;
 					else
 					{
 						cerr << "method " << opt.Method() << " not defined for mutate. Defaulting to random." << endl;
-						mutMeth = MUTATE_NOT_SPECIFIED;
+						mutMeth = eMutateMode::MUTATE_NOT_SPECIFIED;
 					}
 
 					os << tools.Mutate(orig, mutMeth, vars, opt.Symmetry(), T(opt.Speed()), MAX_CL_VARS);
@@ -598,17 +598,17 @@ bool EmberGenome(EmberOptions& opt)
 					aselp1 = &selp1;
 
 					if (opt.Method() == "")
-						crossMeth = CROSS_NOT_SPECIFIED;
+						crossMeth = eCrossMode::CROSS_NOT_SPECIFIED;
 					else if (opt.Method() == "union")
-						crossMeth = CROSS_UNION;
+						crossMeth = eCrossMode::CROSS_UNION;
 					else if (opt.Method() == "interpolate")
-						crossMeth = CROSS_INTERPOLATE;
+						crossMeth = eCrossMode::CROSS_INTERPOLATE;
 					else if (opt.Method() == "alternate")
-						crossMeth = CROSS_ALTERNATE;
+						crossMeth = eCrossMode::CROSS_ALTERNATE;
 					else
 					{
 						cerr << "method '" << opt.Method() << "' not defined for cross. Defaulting to random." << endl;
-						crossMeth = CROSS_NOT_SPECIFIED;
+						crossMeth = eCrossMode::CROSS_NOT_SPECIFIED;
 					}
 
 					tools.Cross(embers[i0], embers2[i1], orig, crossMeth);
@@ -765,7 +765,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
 #endif
 
-	if (!opt.Populate(argc, argv, OPT_USE_GENOME))
+	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_GENOME))
 	{
 #ifdef DO_DOUBLE
 

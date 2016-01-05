@@ -17,7 +17,7 @@ namespace EmberNs
 /// Bit position specifying the presence of each type of 3D parameter.
 /// One, none, some or all of these can be present.
 /// </summary>
-enum class eProjBits : size_t
+enum class eProjBits : et
 {
 	PROJBITS_ZPOS = 1,
 	PROJBITS_PERSP = 2,
@@ -493,16 +493,16 @@ public:
 			m_CamMat[1][2] =  std::sin(m_CamPitch) * std::cos(-m_CamYaw);
 			m_CamMat[2][2] =  std::cos(m_CamPitch);
 
-			if (projBits & size_t(eProjBits::PROJBITS_BLUR))
+			if (projBits & et(eProjBits::PROJBITS_BLUR))
 			{
-				if (projBits & size_t(eProjBits::PROJBITS_YAW))
+				if (projBits & et(eProjBits::PROJBITS_YAW))
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitchYawDepthBlur;
 				else
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitchDepthBlur;
 			}
-			else if ((projBits & size_t(eProjBits::PROJBITS_PITCH)) || (projBits & size_t(eProjBits::PROJBITS_YAW)))
+			else if ((projBits & et(eProjBits::PROJBITS_PITCH)) || (projBits & et(eProjBits::PROJBITS_YAW)))
 			{
-				if (projBits & size_t(eProjBits::PROJBITS_YAW))
+				if (projBits & et(eProjBits::PROJBITS_YAW))
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitchYaw;
 				else
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitch;
@@ -677,9 +677,9 @@ public:
 
 		while (auto xform = GetTotalXform(xformIndex++))
 		{
-			unflattened |= xform->DeleteVariationById(VAR_PRE_FLATTEN);
-			unflattened |= xform->DeleteVariationById(VAR_FLATTEN);
-			unflattened |= xform->DeleteVariationById(VAR_POST_FLATTEN);
+			unflattened |= xform->DeleteVariationById(eVariationId::VAR_PRE_FLATTEN);
+			unflattened |= xform->DeleteVariationById(eVariationId::VAR_FLATTEN);
+			unflattened |= xform->DeleteVariationById(eVariationId::VAR_POST_FLATTEN);
 		}
 
 		return unflattened;
@@ -1136,15 +1136,15 @@ public:
 	{
 		size_t val = 0;
 
-		if (m_CamZPos != 0) val |= size_t(eProjBits::PROJBITS_ZPOS);
+		if (m_CamZPos != 0) val |= et(eProjBits::PROJBITS_ZPOS);
 
-		if (m_CamPerspective != 0) val |= size_t(eProjBits::PROJBITS_PERSP);
+		if (m_CamPerspective != 0) val |= et(eProjBits::PROJBITS_PERSP);
 
-		if (m_CamPitch != 0) val |= size_t(eProjBits::PROJBITS_PITCH);
+		if (m_CamPitch != 0) val |= et(eProjBits::PROJBITS_PITCH);
 
-		if (m_CamYaw != 0) val |= size_t(eProjBits::PROJBITS_YAW);
+		if (m_CamYaw != 0) val |= et(eProjBits::PROJBITS_YAW);
 
-		if (m_CamDepthBlur != 0) val |= size_t(eProjBits::PROJBITS_BLUR);
+		if (m_CamDepthBlur != 0) val |= et(eProjBits::PROJBITS_BLUR);
 
 		return val;
 	}

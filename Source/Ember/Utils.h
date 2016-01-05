@@ -19,7 +19,7 @@ namespace EmberNs
 /// <summary>
 /// Enum to encapsulate and add type safety to the thread priority defines.
 /// </summary>
-enum eThreadPriority
+enum class eThreadPriority : int
 {
 	LOWEST       = THREAD_PRIORITY_LOWEST,//-2
 	BELOW_NORMAL = THREAD_PRIORITY_BELOW_NORMAL,//-1
@@ -227,7 +227,7 @@ public:
 	\
 	private: \
 	x(const x& other) = delete; \
-    const x& operator=(const x& other) = delete//Semicolon deliberately omitted to force it on the caller.
+	const x& operator=(const x& other) = delete//Semicolon deliberately omitted to force it on the caller.
 
 //Use this if the body of the destructor is empty and is will be implemented inline in the header file.
 #define SINGLETON_DERIVED_IMPL(x) \
@@ -237,7 +237,7 @@ public:
 	\
 	private: \
 	x(const x& other) = delete; \
-    const x& operator=(const x& other) = delete
+	const x& operator=(const x& other) = delete
 
 /// <summary>
 /// Open a file in binary mode and read its entire contents into a vector of bytes. Optionally null terminate.

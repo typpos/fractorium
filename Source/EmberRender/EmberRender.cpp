@@ -17,7 +17,7 @@ bool EmberRender(EmberOptions& opt)
 	std::cout.imbue(std::locale(""));
 
 	if (opt.DumpArgs())
-		cout << opt.GetValues(OPT_USE_RENDER) << endl;
+		cout << opt.GetValues(eOptionUse::OPT_USE_RENDER) << endl;
 
 	if (opt.OpenCLInfo())
 	{
@@ -47,7 +47,7 @@ bool EmberRender(EmberOptions& opt)
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> randVec;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
 	unique_ptr<RenderProgress<T>> progress(new RenderProgress<T>());
-	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? OPENCL_RENDERER : CPU_RENDERER, devices, false, 0, emberReport));
+	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	vector<string> errorReport = emberReport.ErrorReport();
 
 	if (!errorReport.empty())
@@ -59,7 +59,7 @@ bool EmberRender(EmberOptions& opt)
 		return false;
 	}
 
-	if (opt.EmberCL() && renderer->RendererType() != OPENCL_RENDERER)//OpenCL init failed, so fall back to CPU.
+	if (opt.EmberCL() && renderer->RendererType() != eRendererType::OPENCL_RENDERER)//OpenCL init failed, so fall back to CPU.
 		opt.EmberCL(false);
 
 	if (!InitPaletteList<T>(opt.PalettePath()))
@@ -343,7 +343,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
 #endif
 
-	if (!opt.Populate(argc, argv, OPT_USE_RENDER))
+	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_RENDER))
 	{
 #ifdef DO_DOUBLE
 

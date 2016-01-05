@@ -880,7 +880,7 @@ public:
 	{
 		bool shouldFlatten = true;
 
-		if (GetVariationById(VAR_FLATTEN) == nullptr)
+		if (GetVariationById(eVariationId::VAR_FLATTEN) == nullptr)
 		{
 			AllVarsFunc([&] (vector<Variation<T>*>& variations, bool & keepGoing)
 			{
@@ -943,15 +943,15 @@ public:
 
 		switch (varType)
 		{
-			case VARTYPE_REG:
-			case VARTYPE_PRE:
+			case eVariationType::VARTYPE_REG:
+			case eVariationType::VARTYPE_PRE:
 				s =
 					"\tvIn.x = transX;\n"
 					"\tvIn.y = transY;\n"
 					"\tvIn.z = transZ;\n";
 				break;
 
-			case VARTYPE_POST:
+			case eVariationType::VARTYPE_POST:
 			default:
 				s =
 					"\tvIn.x = outPoint->m_X;\n"
@@ -972,7 +972,7 @@ public:
 	{
 		switch (assignType)
 		{
-			case ASSIGNTYPE_SET:
+			case eVariationAssignType::ASSIGNTYPE_SET:
 			{
 				helper.m_TransX = helper.Out.x;
 				helper.m_TransY = helper.Out.y;
@@ -980,7 +980,7 @@ public:
 				break;
 			}
 
-			case ASSIGNTYPE_SUM:
+			case eVariationAssignType::ASSIGNTYPE_SUM:
 			default:
 			{
 				helper.m_TransX += helper.Out.x;
@@ -1000,7 +1000,7 @@ public:
 	{
 		switch (assignType)
 		{
-			case ASSIGNTYPE_SET:
+			case eVariationAssignType::ASSIGNTYPE_SET:
 			{
 				outPoint.m_X = helper.Out.x;
 				outPoint.m_Y = helper.Out.y;
@@ -1008,7 +1008,7 @@ public:
 				break;
 			}
 
-			case ASSIGNTYPE_SUM:
+			case eVariationAssignType::ASSIGNTYPE_SUM:
 			default:
 			{
 				outPoint.m_X += helper.Out.x;
@@ -1031,7 +1031,7 @@ public:
 
 		switch (varType)
 		{
-			case VARTYPE_REG:
+			case eVariationType::VARTYPE_REG:
 			{
 				s =
 					"\toutPoint->m_X += vOut.x;\n"
@@ -1040,11 +1040,11 @@ public:
 				break;
 			}
 
-			case VARTYPE_PRE:
+			case eVariationType::VARTYPE_PRE:
 			{
 				switch (assignType)
 				{
-					case ASSIGNTYPE_SET:
+					case eVariationAssignType::ASSIGNTYPE_SET:
 					{
 						s =
 							"\ttransX = vOut.x;\n"
@@ -1053,7 +1053,7 @@ public:
 						break;
 					}
 
-					case ASSIGNTYPE_SUM:
+					case eVariationAssignType::ASSIGNTYPE_SUM:
 					default:
 					{
 						s =
@@ -1067,12 +1067,12 @@ public:
 				break;
 			}
 
-			case VARTYPE_POST:
+			case eVariationType::VARTYPE_POST:
 			default:
 			{
 				switch (assignType)
 				{
-					case ASSIGNTYPE_SET:
+					case eVariationAssignType::ASSIGNTYPE_SET:
 					{
 						s =
 							"\toutPoint->m_X = vOut.x;\n"
@@ -1081,7 +1081,7 @@ public:
 						break;
 					}
 
-					case ASSIGNTYPE_SUM:
+					case eVariationAssignType::ASSIGNTYPE_SUM:
 					default:
 					{
 						s =

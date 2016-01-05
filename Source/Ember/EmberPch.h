@@ -53,6 +53,7 @@
 #include <sys/stat.h>
 #include <thread>
 #include <time.h>
+#include <type_traits>
 #include <vector>
 #include <unordered_map>
 

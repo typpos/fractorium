@@ -9,22 +9,22 @@
 /// <summary>
 /// Use/draw pre or post affine transform.
 /// </summary>
-enum eAffineType   { AffinePre, AffinePost };
+enum class eAffineType : et { AffinePre, AffinePost };
 
 /// <summary>
 /// Hovering over nothing, the x axis, the y axis or the center.
 /// </summary>
-enum eHoverType	   { HoverNone, HoverXAxis, HoverYAxis, HoverTranslation };
+enum class eHoverType : et { HoverNone, HoverXAxis, HoverYAxis, HoverTranslation };
 
 /// <summary>
 /// Dragging an affine transform or panning, rotating or scaling the image.
 /// </summary>
-enum eDragState    { DragNone, DragPanning, DragDragging, DragRotateScale };
+enum class eDragState : et { DragNone, DragPanning, DragDragging, DragRotateScale };
 
 /// <summary>
 /// Dragging with no keys pressed, shift, control or alt.
 /// </summary>
-enum eDragModifier { DragModNone = 0x00, DragModShift = 0x01, DragModControl = 0x02, DragModAlt = 0x04 };
+enum class eDragModifier : et { DragModNone = 0x00, DragModShift = 0x01, DragModControl = 0x02, DragModAlt = 0x04 };
 
 /// <summary>
 /// GLController, FractoriumEmberController, GLWidget and Fractorium need each other, but each can't all include the other.
@@ -50,7 +50,15 @@ public:
 
 	void ClearDrag();
 	bool Allocate(bool force = false);
-
+	bool GetAlt();
+	bool GetShift();
+	bool GetControl();
+	void SetAlt();
+	void SetShift();
+	void SetControl();
+	void ClearAlt();
+	void ClearShift();
+	void ClearControl();
 	virtual void DrawImage() { }
 	virtual void DrawAffines(bool pre, bool post) { }
 	virtual void ClearWindow() { }
@@ -129,7 +137,7 @@ private:
 	v3T m_DragHandlePos;
 	v3T m_DragHandleOffset;
 	v3T m_HoverHandlePos;
-	
+
 	m4T m_Modelview;
 	m4T m_Projection;
 

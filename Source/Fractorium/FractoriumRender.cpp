@@ -246,7 +246,7 @@ void FractoriumEmberController<T>::ClearUndo()
 {
 	m_UndoIndex = 0;
 	m_UndoList.clear();
-	m_EditState = REGULAR_EDIT;
+	m_EditState = eEditUndoState::REGULAR_EDIT;
 	m_LastEditWasUndoRedo = false;
 	m_Fractorium->ui.ActionUndo->setEnabled(false);
 	m_Fractorium->ui.ActionRedo->setEnabled(false);
@@ -276,7 +276,7 @@ bool FractoriumEmberController<T>::SyncSizes()
 		gl->Allocate();
 		gl->SetViewport();
 
-		if (m_Renderer->RendererType() == OPENCL_RENDERER && (rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get())))
+		if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER && (rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get())))
 			rendererCL->SetOutputTexture(gl->OutputTexID());
 
 		m_Fractorium->CenterScrollbars();
@@ -325,7 +325,7 @@ bool FractoriumEmberController<T>::Render()
 
 	action = CondenseAndClearProcessActions();//Combine with all other previously requested actions.
 
-	if (m_Renderer->RendererType() == OPENCL_RENDERER)
+	if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 		rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get());
 
 	//Force temporal samples to always be 1. Perhaps change later when animation is implemented.
@@ -370,9 +370,9 @@ bool FractoriumEmberController<T>::Render()
 
 	if (iterBegin)
 	{
-		if (m_Renderer->RendererType() == CPU_RENDERER)
+		if (m_Renderer->RendererType() == eRendererType::CPU_RENDERER)
 			m_SubBatchCount = m_Fractorium->m_Settings->CpuSubBatch();
-		else if (m_Renderer->RendererType() == OPENCL_RENDERER)
+		else if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 			m_SubBatchCount = m_Fractorium->m_Settings->OpenCLSubBatch();
 
 		m_Fractorium->m_ProgressBar->setValue(0);
@@ -387,7 +387,7 @@ bool FractoriumEmberController<T>::Render()
 		{
 			//The amount to increment sub batch while rendering proceeds is purely empirical.
 			//Change later if better values can be derived/observed.
-			if (m_Renderer->RendererType() == OPENCL_RENDERER)
+			if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 			{
 				if (m_SubBatchCount < (4 * m_Devices.size()))//More than 3 with OpenCL gives a sluggish UI.
 					m_SubBatchCount += m_Devices.size();
@@ -410,7 +410,7 @@ bool FractoriumEmberController<T>::Render()
 				m_Fractorium->m_ProgressBar->setValue(100);
 
 				//Only certain stats can be reported with OpenCL.
-				if (m_Renderer->RendererType() == OPENCL_RENDERER)
+				if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 				{
 					m_Fractorium->m_RenderStatusLabel->setText("Iters: " + iters + ". Scaled quality: " + scaledQuality + ". Total time: " + QString::fromStdString(renderTime) + ".");
 				}
@@ -424,9 +424,9 @@ bool FractoriumEmberController<T>::Render()
 
 				if (m_LastEditWasUndoRedo && (m_UndoIndex == m_UndoList.size() - 1))//Traversing through undo list, reached the end, so put back in regular edit mode.
 				{
-					m_EditState = REGULAR_EDIT;
+					m_EditState = eEditUndoState::REGULAR_EDIT;
 				}
-				else if (m_EditState == REGULAR_EDIT)//Regular edit, just add to the end of the undo list.
+				else if (m_EditState == eEditUndoState::REGULAR_EDIT)//Regular edit, just add to the end of the undo list.
 				{
 					m_UndoList.push_back(m_Ember);
 					m_UndoIndex = m_UndoList.size() - 1;
@@ -551,7 +551,7 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 	{
 		m_RenderType = m_Renderer->RendererType();
 
-		if (m_RenderType == OPENCL_RENDERER)
+		if (m_RenderType == eRendererType::OPENCL_RENDERER)
 		{
 			auto val = 30 * m_Fractorium->m_Settings->Devices().size();
 			m_Fractorium->m_QualitySpin->DoubleClickZero(val);
@@ -628,7 +628,7 @@ bool Fractorium::CreateRendererFromOptions()
 	auto v = Devices(m_Settings->Devices());
 
 	//The most important option to process is what kind of renderer is desired, so do it first.
-	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? OPENCL_RENDERER : CPU_RENDERER, v))
+	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v))
 	{
 		//If using OpenCL, will only get here if creating RendererCL failed, but creating a backup CPU Renderer succeeded.
 		ShowCritical("Renderer Creation Error", "Error creating renderer, most likely a GPU problem. Using CPU instead.");

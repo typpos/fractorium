@@ -11,7 +11,7 @@ namespace EmberNs
 /// <summary>
 /// The types of temporal filters available.
 /// </summary>
-enum class eTemporalFilterType : size_t
+enum class eTemporalFilterType : et
 {
 	BOX_TEMPORAL_FILTER,
 	GAUSSIAN_TEMPORAL_FILTER,

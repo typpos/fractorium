@@ -587,10 +587,10 @@ size_t RendererBase::ThreadCount() const { return m_ThreadsToUse; }
 
 /// <summary>
 /// Get the renderer type enum.
-/// CPU_RENDERER for this class, other values for derived classes.
+/// eRendererType::CPU_RENDERER for this class, other values for derived classes.
 /// </summary>
-/// <returns>CPU_RENDERER</returns>
-eRendererType RendererBase::RendererType() const { return CPU_RENDERER; }
+/// <returns>eRendererType::CPU_RENDERER</returns>
+eRendererType RendererBase::RendererType() const { return eRendererType::CPU_RENDERER; }
 
 /// <summary>
 /// //Non-virtual threading control.

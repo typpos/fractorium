@@ -10,12 +10,10 @@
 /// <param name="f">The window flags. Default: 0.</param>
 FractoriumVariationsDialog::FractoriumVariationsDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f)
 	: QDialog(p, f),
-	m_Settings(settings)
+	  m_Settings(settings)
 {
 	ui.setupUi(this);
-
 	auto table = ui.VariationsTable;
-
 	m_Vars = m_Settings->Variations();
 	Populate();
 	OnSelectAllButtonClicked(true);
@@ -37,7 +35,6 @@ void FractoriumVariationsDialog::ForEachCell(std::function<void(QTableWidgetItem
 	auto table = ui.VariationsTable;
 	auto rows = table->rowCount();
 	auto cols = table->columnCount();
-
 	table->model()->blockSignals(true);
 
 	for (auto row = 0; row < rows; row++)
@@ -57,10 +54,9 @@ void FractoriumVariationsDialog::ForEachSelectedCell(std::function<void(QTableWi
 {
 	auto table = ui.VariationsTable;
 	QList<QTableWidgetItem*> selectedItems = table->selectedItems();
-
 	table->model()->blockSignals(true);
 
-	foreach(QTableWidgetItem* item, selectedItems)
+	foreach (QTableWidgetItem* item, selectedItems)
 		if (item)
 			func(item);
 
@@ -74,13 +70,11 @@ void FractoriumVariationsDialog::ForEachSelectedCell(std::function<void(QTableWi
 void FractoriumVariationsDialog::SyncSettings()
 {
 	QMap<QString, QVariant> m;
-
-	ForEachCell([&](QTableWidgetItem* cb)
+	ForEachCell([&](QTableWidgetItem * cb)
 	{
 		if (!cb->text().isEmpty())
 			m[cb->text()] = cb->checkState() == Qt::CheckState::Checked;
 	});
-
 	m_Settings->Variations(m);
 }
 
@@ -100,7 +94,7 @@ const QMap<QString, QVariant>& FractoriumVariationsDialog::Map()
 /// <param name="checked">Ignored</param>
 void FractoriumVariationsDialog::OnSelectAllButtonClicked(bool checked)
 {
-	ForEachCell([&](QTableWidgetItem* cb) { cb->setCheckState(Qt::CheckState::Checked); });
+	ForEachCell([&](QTableWidgetItem * cb) { cb->setCheckState(Qt::CheckState::Checked); });
 }
 
 /// <summary>
@@ -109,7 +103,7 @@ void FractoriumVariationsDialog::OnSelectAllButtonClicked(bool checked)
 /// <param name="checked">Ignored</param>
 void FractoriumVariationsDialog::OnInvertSelectionButtonClicked(bool checked)
 {
-	ForEachCell([&](QTableWidgetItem* cb)
+	ForEachCell([&](QTableWidgetItem * cb)
 	{
 		if (cb->checkState() != Qt::CheckState::Checked)
 			cb->setCheckState(Qt::CheckState::Checked);
@@ -124,7 +118,7 @@ void FractoriumVariationsDialog::OnInvertSelectionButtonClicked(bool checked)
 /// <param name="checked">Ignored</param>
 void FractoriumVariationsDialog::OnSelectNoneButtonClicked(bool checked)
 {
-	ForEachCell([&](QTableWidgetItem* cb) { cb->setCheckState(Qt::CheckState::Unchecked); });
+	ForEachCell([&](QTableWidgetItem * cb) { cb->setCheckState(Qt::CheckState::Unchecked); });
 }
 
 /// <summary>
@@ -134,7 +128,6 @@ void FractoriumVariationsDialog::Populate()
 {
 	auto table = ui.VariationsTable;
 	auto size = std::max<size_t>(std::max<size_t>(m_VariationList.RegSize(), m_VariationList.PreSize()), m_VariationList.PostSize());
-
 	table->setRowCount(size);
 
 	for (size_t i = 0; i < size; i++)
@@ -152,7 +145,7 @@ void FractoriumVariationsDialog::Populate()
 			table->setItem(i, 1, cb);
 			SetCheckFromMap(cb, reg);
 		}
-		
+
 		if (auto post = m_VariationList.GetVariation(i, eVariationType::VARTYPE_POST))
 		{
 			auto cb = new QTableWidgetItem(post->Name().c_str());
@@ -174,7 +167,7 @@ void FractoriumVariationsDialog::OnVariationsTableItemChanged(QTableWidgetItem* 
 	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
 	if (ctrl)
-		ForEachSelectedCell([&](QTableWidgetItem* cb) { cb->setCheckState(item->checkState()); });
+		ForEachSelectedCell([&](QTableWidgetItem * cb) { cb->setCheckState(item->checkState()); });
 }
 
 /// <summary>
@@ -213,7 +206,7 @@ void FractoriumVariationsDialog::showEvent(QShowEvent* e)
 /// </summary>
 void FractoriumVariationsDialog::DataToGui()
 {
-	ForEachCell([&](QTableWidgetItem* cb)
+	ForEachCell([&](QTableWidgetItem * cb)
 	{
 		if (auto var = m_VariationList.GetVariation(cb->text().toStdString()))
 			SetCheckFromMap(cb, var);
@@ -225,7 +218,7 @@ void FractoriumVariationsDialog::DataToGui()
 /// </summary>
 void FractoriumVariationsDialog::GuiToData()
 {
-	ForEachCell([&](QTableWidgetItem* cb)
+	ForEachCell([&](QTableWidgetItem * cb)
 	{
 		if (auto var = m_VariationList.GetVariation(cb->text().toStdString()))
 			m_Vars[cb->text()] = (cb->checkState() == Qt::Checked);
@@ -247,7 +240,6 @@ void FractoriumVariationsDialog::SetCheckFromMap(QTableWidgetItem* cb, const Var
 	else
 	{
 		bool chk = m_Vars[var->Name().c_str()].toBool();
-
 		cb->setCheckState(chk ? Qt::Checked : Qt::Unchecked);
 	}
 }

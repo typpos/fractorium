@@ -12,7 +12,7 @@ template <typename T>
 class EMBER_API DCBubbleVariation : public ParametricVariation<T>
 {
 public:
-	DCBubbleVariation(T weight = 1.0) : ParametricVariation<T>("dc_bubble", VAR_DC_BUBBLE, weight, true)
+	DCBubbleVariation(T weight = 1.0) : ParametricVariation<T>("dc_bubble", eVariationId::VAR_DC_BUBBLE, weight, true)
 	{
 		Init();
 	}
@@ -29,7 +29,7 @@ public:
 		helper.Out.z = m_Weight * (2 / r4_1 - 1);
 		T sumX, sumY;
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			sumX = helper.In.x;
 			sumY = helper.In.y;
@@ -66,7 +66,7 @@ public:
 		   << "\n"
 		   << "\t\treal_t sumX, sumY;\n\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\tsumX = vIn.x;\n"
@@ -123,7 +123,7 @@ template <typename T>
 class EMBER_API DCCarpetVariation : public ParametricVariation<T>
 {
 public:
-	DCCarpetVariation(T weight = 1.0) : ParametricVariation<T>("dc_carpet", VAR_DC_CARPET, weight)
+	DCCarpetVariation(T weight = 1.0) : ParametricVariation<T>("dc_carpet", eVariationId::VAR_DC_CARPET, weight)
 	{
 		Init();
 	}
@@ -140,7 +140,7 @@ public:
 		T h = -m_H + (1 - x0_xor_y0) * m_H;
 		helper.Out.x = m_Weight * (m_Xform->m_Affine.A() * x + m_Xform->m_Affine.B() * y + m_Xform->m_Affine.E());
 		helper.Out.y = m_Weight * (m_Xform->m_Affine.C() * x + m_Xform->m_Affine.D() * y + m_Xform->m_Affine.F());
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 		outPoint.m_ColorX = fmod(fabs(outPoint.m_ColorX * T(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * T(0.5)), T(1.0));
 	}
 
@@ -162,7 +162,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (xform->m_A * x + xform->m_B * y + xform->m_E);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_C * x + xform->m_D * y + xform->m_F);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t\toutPoint->m_ColorX = fmod(fabs(outPoint->m_ColorX * (real_t)(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * (real_t)(0.5)), (real_t)(1.0));\n"
 		   << "\t}\n";
 		return ss.str();
@@ -194,7 +194,7 @@ template <typename T>
 class EMBER_API DCCubeVariation : public ParametricVariation<T>
 {
 public:
-	DCCubeVariation(T weight = 1.0) : ParametricVariation<T>("dc_cube", VAR_DC_CUBE, weight)
+	DCCubeVariation(T weight = 1.0) : ParametricVariation<T>("dc_cube", eVariationId::VAR_DC_CUBE, weight)
 	{
 		Init();
 	}
@@ -384,7 +384,7 @@ template <typename T>
 class EMBER_API DCCylinderVariation : public ParametricVariation<T>
 {
 public:
-	DCCylinderVariation(T weight = 1.0) : ParametricVariation<T>("dc_cylinder", VAR_DC_CYLINDER, weight)
+	DCCylinderVariation(T weight = 1.0) : ParametricVariation<T>("dc_cylinder", eVariationId::VAR_DC_CYLINDER, weight)
 	{
 		Init();
 	}
@@ -402,7 +402,7 @@ public:
 		helper.Out.z = m_Weight * std::cos(helper.In.x + r * cr);
 		T sumX, sumY;
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			sumX = helper.In.x;
 			sumY = helper.In.y;
@@ -445,7 +445,7 @@ public:
 		   << "\n"
 		   << "\t\treal_t sumX, sumY;\n\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\tsumX = vIn.x;\n"
@@ -511,7 +511,7 @@ template <typename T>
 class EMBER_API DCGridOutVariation : public Variation<T>
 {
 public:
-	DCGridOutVariation(T weight = 1.0) : Variation<T>("dc_gridout", VAR_DC_GRIDOUT, weight) { }
+	DCGridOutVariation(T weight = 1.0) : Variation<T>("dc_gridout", eVariationId::VAR_DC_GRIDOUT, weight) { }
 
 	VARCOPY(DCGridOutVariation)
 
@@ -688,7 +688,7 @@ template <typename T>
 class EMBER_API DCLinearVariation : public ParametricVariation<T>
 {
 public:
-	DCLinearVariation(T weight = 1.0) : ParametricVariation<T>("dc_linear", VAR_DC_LINEAR, weight)
+	DCLinearVariation(T weight = 1.0) : ParametricVariation<T>("dc_linear", eVariationId::VAR_DC_LINEAR, weight)
 	{
 		Init();
 	}
@@ -702,7 +702,7 @@ public:
 		helper.Out.z = m_Weight * helper.In.z;
 		T sumX, sumY;
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			sumX = helper.In.x;
 			sumY = helper.In.y;
@@ -738,7 +738,7 @@ public:
 		   << "\n"
 		   << "\t\treal_t sumX, sumY;\n\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\tsumX = vIn.x;\n"
@@ -798,7 +798,7 @@ template <typename T>
 class EMBER_API DCTriangleVariation : public ParametricVariation<T>
 {
 public:
-	DCTriangleVariation(T weight = 1.0) : ParametricVariation<T>("dc_triangle", VAR_DC_TRIANGLE, weight)
+	DCTriangleVariation(T weight = 1.0) : ParametricVariation<T>("dc_triangle", eVariationId::VAR_DC_TRIANGLE, weight)
 	{
 		Init();
 	}
@@ -987,8 +987,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_ScatterArea, prefix + "dc_triangle_scatter_area", 0, REAL, -1, 1));//Params.
-		m_Params.push_back(ParamWithName<T>(&m_ZeroEdges,   prefix + "dc_triangle_zero_edges", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_ScatterArea, prefix + "dc_triangle_scatter_area", 0, eParamType::REAL, -1, 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_ZeroEdges,   prefix + "dc_triangle_zero_edges", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_A,     prefix + "dc_triangle_a"));//Precalc.
 	}
 
@@ -1007,7 +1007,7 @@ template <typename T>
 class EMBER_API DCZTranslVariation : public ParametricVariation<T>
 {
 public:
-	DCZTranslVariation(T weight = 1.0) : ParametricVariation<T>("dc_ztransl", VAR_DC_ZTRANSL, weight)
+	DCZTranslVariation(T weight = 1.0) : ParametricVariation<T>("dc_ztransl", eVariationId::VAR_DC_ZTRANSL, weight)
 	{
 		Init();
 	}
@@ -1073,11 +1073,11 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_X0,        prefix + "dc_ztransl_x0", 0, REAL, 0, 1));//Params.
-		m_Params.push_back(ParamWithName<T>(&m_X1,        prefix + "dc_ztransl_x1", 1, REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_X0,        prefix + "dc_ztransl_x0", 0, eParamType::REAL, 0, 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_X1,        prefix + "dc_ztransl_x1", 1, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Factor,    prefix + "dc_ztransl_factor", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Overwrite, prefix + "dc_ztransl_overwrite", 1, INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Clamp,     prefix + "dc_ztransl_clamp", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Overwrite, prefix + "dc_ztransl_overwrite", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Clamp,     prefix + "dc_ztransl_clamp", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_X0_,     prefix + "dc_ztransl_x0_"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_X1_,     prefix + "dc_ztransl_x1_"));
 		m_Params.push_back(ParamWithName<T>(true, &m_X1_m_x0, prefix + "dc_ztransl_x1_m_x0"));
@@ -1112,7 +1112,7 @@ template <typename T>
 class EMBER_API DCPerlinVariation : public ParametricVariation <T>
 {
 public:
-	DCPerlinVariation(T weight = 1.0) : ParametricVariation<T>("dc_perlin", VAR_DC_PERLIN, weight)
+	DCPerlinVariation(T weight = 1.0) : ParametricVariation<T>("dc_perlin", eVariationId::VAR_DC_PERLIN, weight)
 	{
 		Init();
 	}
@@ -1158,7 +1158,7 @@ public:
 					break;
 
 				case SHAPE_BLUR:
-            default:
+				default:
 					r = (1 + m_Edge) * rand.Frand01<T>();
 
 					if (r > 1 - m_Edge)
@@ -1215,7 +1215,7 @@ public:
 					break;
 
 				case MAP_BUBBLE2:
-            default:
+				default:
 					r = T(0.25) - (SQR(vx) + SQR(vy));
 
 					if (r < 0)
@@ -1242,7 +1242,7 @@ public:
 		// Add blur effect to transform
 		helper.Out.x = m_Weight * vx;
 		helper.Out.y = m_Weight * vy;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 		col = m_Centre + m_Range * p;
 		outPoint.m_ColorX = col - Floor<T>(col);
 	}
@@ -1393,7 +1393,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vx; \n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vy; \n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t\tcol = " << centre << " + " << range << " * p; \n"
 		   << "\t\toutPoint->m_ColorX = col - floor(col); \n"
 		   << "\t}\n";
@@ -1416,19 +1416,19 @@ protected:
 		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.reserve(15);
-		m_Params.push_back(ParamWithName<T>(&m_Shape,		  prefix + "dc_perlin_shape", 0, INTEGER, 0, 2));//Params.
-		m_Params.push_back(ParamWithName<T>(&m_Map,			  prefix + "dc_perlin_map", 0, INTEGER, 0, 5));
-		m_Params.push_back(ParamWithName<T>(&m_SelectCentre,  prefix + "dc_perlin_select_centre", 0, REAL, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_SelectRange,   prefix + "dc_perlin_select_range", 1, REAL, T(0.1), 2));
+		m_Params.push_back(ParamWithName<T>(&m_Shape,		  prefix + "dc_perlin_shape", 0, eParamType::INTEGER, 0, 2));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Map,			  prefix + "dc_perlin_map", 0, eParamType::INTEGER, 0, 5));
+		m_Params.push_back(ParamWithName<T>(&m_SelectCentre,  prefix + "dc_perlin_select_centre", 0, eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_SelectRange,   prefix + "dc_perlin_select_range", 1, eParamType::REAL, T(0.1), 2));
 		m_Params.push_back(ParamWithName<T>(&m_Centre,		  prefix + "dc_perlin_centre", T(0.25)));
 		m_Params.push_back(ParamWithName<T>(&m_Range,		  prefix + "dc_perlin_range", T(0.25)));
 		m_Params.push_back(ParamWithName<T>(&m_Edge,		  prefix + "dc_perlin_edge"));
 		m_Params.push_back(ParamWithName<T>(&m_Scale,		  prefix + "dc_perlin_scale", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Octaves,		  prefix + "dc_perlin_octaves", 2, INTEGER, 1, 5));
+		m_Params.push_back(ParamWithName<T>(&m_Octaves,		  prefix + "dc_perlin_octaves", 2, eParamType::INTEGER, 1, 5));
 		m_Params.push_back(ParamWithName<T>(&m_Amps,		  prefix + "dc_perlin_amps", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Freqs,		  prefix + "dc_perlin_freqs", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Z,			  prefix + "dc_perlin_z"));
-		m_Params.push_back(ParamWithName<T>(&m_SelectBailout, prefix + "dc_perlin_select_bailout", 10, INTEGER, 2, 1000));
+		m_Params.push_back(ParamWithName<T>(&m_SelectBailout, prefix + "dc_perlin_select_bailout", 10, eParamType::INTEGER, 2, 1000));
 		m_Params.push_back(ParamWithName<T>(true, &m_NotchBottom, prefix + "dc_perlin_notch_bottom"));
 		m_Params.push_back(ParamWithName<T>(true, &m_NotchTop,	  prefix + "dc_perlin_notch_top"));
 	}
@@ -1453,7 +1453,7 @@ private:
 
 MAKEPREPOSTPARVAR(DCBubble, dc_bubble, DC_BUBBLE)
 MAKEPREPOSTPARVAR(DCCarpet, dc_carpet, DC_CARPET)
-MAKEPREPOSTPARVARASSIGN(DCCube, dc_cube, DC_CUBE, ASSIGNTYPE_SUM)
+MAKEPREPOSTPARVARASSIGN(DCCube, dc_cube, DC_CUBE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(DCCylinder, dc_cylinder, DC_CYLINDER)
 MAKEPREPOSTVAR(DCGridOut, dc_gridout, DC_GRIDOUT)
 MAKEPREPOSTPARVAR(DCLinear, dc_linear, DC_LINEAR)

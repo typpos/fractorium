@@ -11,7 +11,7 @@ namespace EmberNs
 /// <summary>
 /// The types of spatial filters available.
 /// </summary>
-enum class eSpatialFilterType : size_t
+enum class eSpatialFilterType : et
 {
 	GAUSSIAN_SPATIAL_FILTER,
 	HERMITE_SPATIAL_FILTER,

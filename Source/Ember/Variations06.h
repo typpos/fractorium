@@ -11,7 +11,7 @@ template <typename T>
 class EMBER_API HexesVariation : public ParametricVariation<T>
 {
 public:
-	HexesVariation(T weight = 1.0) : ParametricVariation<T>("hexes", VAR_HEXES, weight)
+	HexesVariation(T weight = 1.0) : ParametricVariation<T>("hexes", eVariationId::VAR_HEXES, weight)
 	{
 		Init();
 	}
@@ -130,7 +130,7 @@ public:
 		//Finally add values in.
 		helper.Out.x = m_Weight * v.x;
 		helper.Out.y = m_Weight * v.y;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -232,7 +232,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * Vx;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * Vy;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -321,7 +321,7 @@ class EMBER_API NblurVariation : public ParametricVariation<T>
 	};
 
 public:
-	NblurVariation(T weight = 1.0) : ParametricVariation<T>("nBlur", VAR_NBLUR, weight)
+	NblurVariation(T weight = 1.0) : ParametricVariation<T>("nBlur", eVariationId::VAR_NBLUR, weight)
 	{
 		Init();
 	}
@@ -366,7 +366,7 @@ public:
 		params.Y = m_Sina * xTmp + m_Cosa * yTmp;
 		helper.Out.x = m_AdjustedWeight * params.X;
 		helper.Out.y = m_AdjustedWeight * params.Y;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -441,7 +441,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = " << adjustedWeight << " * params.X;\n"
 		   << "\t\tvOut.y = " << adjustedWeight << " * params.Y;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -821,14 +821,14 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.reserve(25);
-		m_Params.push_back(ParamWithName<T>(&m_NumEdges,	   prefix + "nBlur_numEdges", 3, INTEGER));
-		m_Params.push_back(ParamWithName<T>(&m_NumStripes,	   prefix + "nBlur_numStripes", 0, INTEGER));
-		m_Params.push_back(ParamWithName<T>(&m_RatioStripes,   prefix + "nBlur_ratioStripes", 1, REAL, 0, 2));
-		m_Params.push_back(ParamWithName<T>(&m_RatioHole,	   prefix + "nBlur_ratioHole", 0, REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_CircumCircle,   prefix + "nBlur_circumCircle", 0, INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_AdjustToLinear, prefix + "nBlur_adjustToLinear", 1, INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_EqualBlur,	   prefix + "nBlur_equalBlur", 1, INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_ExactCalc,	   prefix + "nBlur_exactCalc", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_NumEdges,	   prefix + "nBlur_numEdges", 3, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_NumStripes,	   prefix + "nBlur_numStripes", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_RatioStripes,   prefix + "nBlur_ratioStripes", 1, eParamType::REAL, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_RatioHole,	   prefix + "nBlur_ratioHole", 0, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_CircumCircle,   prefix + "nBlur_circumCircle", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_AdjustToLinear, prefix + "nBlur_adjustToLinear", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_EqualBlur,	   prefix + "nBlur_equalBlur", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_ExactCalc,	   prefix + "nBlur_exactCalc", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_HighlightEdges, prefix + "nBlur_highlightEdges", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_RatioComplement, prefix + "nBlur_ratioComplement"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_MidAngle,		  prefix + "nBlur_midAngle"));
@@ -1135,7 +1135,7 @@ template <typename T>
 class EMBER_API OctapolVariation : public ParametricVariation<T>
 {
 public:
-	OctapolVariation(T weight = 1.0) : ParametricVariation<T>("octapol", VAR_OCTAPOL, weight)
+	OctapolVariation(T weight = 1.0) : ParametricVariation<T>("octapol", eVariationId::VAR_OCTAPOL, weight)
 	{
 		Init();
 	}
@@ -1176,7 +1176,7 @@ public:
 
 		if (clear)
 		{
-			if (m_VarType == VARTYPE_PRE)
+			if (m_VarType == eVariationType::VARTYPE_PRE)
 			{
 				helper.m_TransX = 0;
 				helper.m_TransY = 0;
@@ -1267,7 +1267,7 @@ public:
 		   << "\t\tif (clear)\n"
 		   << "\t\t{\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\t	transX = 0;\n"
@@ -1474,7 +1474,7 @@ template <typename T>
 class EMBER_API CrobVariation : public ParametricVariation<T>
 {
 public:
-	CrobVariation(T weight = 1.0) : ParametricVariation<T>("crob", VAR_CROB, weight)
+	CrobVariation(T weight = 1.0) : ParametricVariation<T>("crob", eVariationId::VAR_CROB, weight)
 	{
 		Init();
 	}
@@ -1489,12 +1489,12 @@ public:
 		{
 			if (m_Blur == 0)
 			{
-				if (m_VarType == VARTYPE_PRE)//Setting input point.
+				if (m_VarType == eVariationType::VARTYPE_PRE)//Setting input point.
 				{
 					helper.m_TransX = 0;
 					helper.m_TransY = 0;
 				}
-				else if (m_VarType == VARTYPE_REG)
+				else if (m_VarType == eVariationType::VARTYPE_REG)
 				{
 					helper.In.x = 0;
 					helper.In.y = 0;
@@ -1541,12 +1541,12 @@ public:
 						xTmp = m_Left + m_Right - xTmp;
 				}
 
-				if (m_VarType == VARTYPE_PRE)
+				if (m_VarType == eVariationType::VARTYPE_PRE)
 				{
 					helper.m_TransX = xTmp;
 					helper.m_TransY = yTmp;
 				}
-				else if (m_VarType == VARTYPE_REG)
+				else if (m_VarType == eVariationType::VARTYPE_REG)
 				{
 					helper.In.x = xTmp;
 					helper.In.y = yTmp;
@@ -1559,12 +1559,12 @@ public:
 			}
 		}
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			helper.Out.x = helper.m_TransX;
 			helper.Out.y = helper.m_TransY;
 		}
-		else if (m_VarType == VARTYPE_REG)
+		else if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			helper.Out.x = helper.In.x;
 			helper.Out.y = helper.In.y;
@@ -1575,7 +1575,7 @@ public:
 			helper.Out.y = outPoint.m_Y;
 		}
 
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -1620,13 +1620,13 @@ public:
 		   << "\t\t	if (" << blur << " == 0)\n"
 		   << "\t\t	{\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\t		transX = 0;\n"
 					<< "\t\t		transY = 0;\n";
 		}
-		else if (m_VarType == VARTYPE_REG)
+		else if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss
 					<< "\t\t		vIn.x = 0;\n"
@@ -1676,13 +1676,13 @@ public:
 				<< "\t\t		}\n"
 				<< "\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\t		transX = xTmp;\n"
 					<< "\t\t		transY = yTmp;\n";
 		}
-		else if (m_VarType == VARTYPE_REG)
+		else if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss
 					<< "\t\t		vIn.x = xTmp;\n"
@@ -1700,13 +1700,13 @@ public:
 				<< "\t\t}\n"
 				<< "\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
 					<< "\t\tvOut.x = transX;\n"
 					<< "\t\tvOut.y = transY;\n";
 		}
-		else if (m_VarType == VARTYPE_REG)
+		else if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss
 					<< "\t\tvOut.x = vIn.x;\n"
@@ -1720,7 +1720,7 @@ public:
 		}
 
 		ss
-				<< "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+				<< "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 				<< "\t}\n";
 		return ss.str();
 	}
@@ -1814,8 +1814,8 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Bottom,	   prefix + "crob_bottom", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Left,	   prefix + "crob_left", -1));
 		m_Params.push_back(ParamWithName<T>(&m_Right,	   prefix + "crob_right", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Blur,	   prefix + "crob_blur", 1, INTEGER));
-		m_Params.push_back(ParamWithName<T>(&m_RatioBlur,  prefix + "crob_ratioBlur", T(0.5), REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,	   prefix + "crob_blur", 1, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_RatioBlur,  prefix + "crob_ratioBlur", T(0.5), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_DirectBlur, prefix + "crob_directBlur", 2));
 		m_Params.push_back(ParamWithName<T>(true, &m_XInterval,		prefix + "crob_xinterval"));
 		m_Params.push_back(ParamWithName<T>(true, &m_YInterval,		prefix + "crob_yinterval"));
@@ -1878,7 +1878,7 @@ template <typename T>
 class EMBER_API BubbleT3DVariation : public ParametricVariation<T>
 {
 public:
-	BubbleT3DVariation(T weight = 1.0) : ParametricVariation<T>("bubbleT3D", VAR_BUBBLET3D, weight, true)
+	BubbleT3DVariation(T weight = 1.0) : ParametricVariation<T>("bubbleT3D", eVariationId::VAR_BUBBLET3D, weight, true)
 	{
 		Init();
 	}
@@ -2331,12 +2331,12 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.reserve(14);
-		m_Params.push_back(ParamWithName<T>(&m_NumberStripes, prefix + "bubbleT3D_number_of_stripes", 0, INTEGER));
-		m_Params.push_back(ParamWithName<T>(&m_RatioStripes,  prefix + "bubbleT3D_ratio_of_stripes", 1, REAL, 0, 2));
-		m_Params.push_back(ParamWithName<T>(&m_AngleHole,	  prefix + "bubbleT3D_angle_of_hole", 0, REAL, -360, 360));
+		m_Params.push_back(ParamWithName<T>(&m_NumberStripes, prefix + "bubbleT3D_number_of_stripes", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_RatioStripes,  prefix + "bubbleT3D_ratio_of_stripes", 1, eParamType::REAL, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_AngleHole,	  prefix + "bubbleT3D_angle_of_hole", 0, eParamType::REAL, -360, 360));
 		m_Params.push_back(ParamWithName<T>(&m_ExponentZ,	  prefix + "bubbleT3D_exponentZ", 1));
-		m_Params.push_back(ParamWithName<T>(&m_SymmetryZ,	  prefix + "bubbleT3D_symmetryZ", 0, INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_ModusBlur,	  prefix + "bubbleT3D_modusBlur", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_SymmetryZ,	  prefix + "bubbleT3D_symmetryZ", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_ModusBlur,	  prefix + "bubbleT3D_modusBlur", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsNumberStripes, prefix + "bubbleT3D_abs_number_of_stripes"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_AngleHoleTemp,	   prefix + "bubbleT3D_ang_hole_temp"));
 		m_Params.push_back(ParamWithName<T>(true, &m_AngStrip,		   prefix + "bubbleT3D_ang_strip"));
@@ -2432,7 +2432,7 @@ template <typename T>
 class EMBER_API SynthVariation : public ParametricVariation<T>
 {
 public:
-	SynthVariation(T weight = 1.0) : ParametricVariation<T>("synth", VAR_SYNTH, weight, true, true, false, true)
+	SynthVariation(T weight = 1.0) : ParametricVariation<T>("synth", eVariationId::VAR_SYNTH, weight, true, true, false, true)
 	{
 		Init();
 	}
@@ -2749,7 +2749,7 @@ public:
 				break;
 		}
 
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -3048,7 +3048,7 @@ public:
 		   << "\t\t	break;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -3314,40 +3314,40 @@ protected:
 		m_Params.clear();
 		m_Params.reserve(34);
 		m_Params.push_back(ParamWithName<T>(&m_SynthA,		prefix + "synth_a"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthMode,	prefix + "synth_mode", 3, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthMode,	prefix + "synth_mode", 3, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthPower,	prefix + "synth_power", -2));
 		m_Params.push_back(ParamWithName<T>(&m_SynthMix,	prefix + "synth_mix"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthSmooth, prefix + "synth_smooth", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthSmooth, prefix + "synth_smooth", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthB,		prefix + "synth_b"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthBType,	prefix + "synth_b_type", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthBType,	prefix + "synth_b_type", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthBSkew,	prefix + "synth_b_skew"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthBFrq,	prefix + "synth_b_frq", 1, REAL));
+		m_Params.push_back(ParamWithName<T>(&m_SynthBFrq,	prefix + "synth_b_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthBPhs,	prefix + "synth_b_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthBLayer, prefix + "synth_b_layer", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthBLayer, prefix + "synth_b_layer", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthC,		prefix + "synth_c"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthCType,	prefix + "synth_c_type", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthCType,	prefix + "synth_c_type", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthCSkew,	prefix + "synth_c_skew"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthCFrq,	prefix + "synth_c_frq", 1, REAL));
+		m_Params.push_back(ParamWithName<T>(&m_SynthCFrq,	prefix + "synth_c_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthCPhs,	prefix + "synth_c_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthCLayer, prefix + "synth_c_layer", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthCLayer, prefix + "synth_c_layer", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthD,		prefix + "synth_d"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthDType,	prefix + "synth_d_type", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthDType,	prefix + "synth_d_type", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthDSkew,	prefix + "synth_d_skew"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthDFrq,	prefix + "synth_d_frq", 1, REAL));
+		m_Params.push_back(ParamWithName<T>(&m_SynthDFrq,	prefix + "synth_d_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthDPhs,	prefix + "synth_d_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthDLayer, prefix + "synth_d_layer", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthDLayer, prefix + "synth_d_layer", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthE,		prefix + "synth_e"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthEType,	prefix + "synth_e_type", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthEType,	prefix + "synth_e_type", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthESkew,	prefix + "synth_e_skew"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthEFrq,	prefix + "synth_e_frq", 1, REAL));
+		m_Params.push_back(ParamWithName<T>(&m_SynthEFrq,	prefix + "synth_e_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthEPhs,	prefix + "synth_e_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthELayer, prefix + "synth_e_layer", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthELayer, prefix + "synth_e_layer", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthF,		prefix + "synth_f"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthFType,	prefix + "synth_f_type", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthFType,	prefix + "synth_f_type", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthFSkew,	prefix + "synth_f_skew"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthFFrq,	prefix + "synth_f_frq", 1, REAL));
+		m_Params.push_back(ParamWithName<T>(&m_SynthFFrq,	prefix + "synth_f_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthFPhs,	prefix + "synth_f_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthFLayer, prefix + "synth_f_layer", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthFLayer, prefix + "synth_f_layer", 0, eParamType::INTEGER));
 	}
 
 private:
@@ -3641,7 +3641,7 @@ template <typename T>
 class EMBER_API CrackleVariation : public ParametricVariation<T>
 {
 public:
-	CrackleVariation(T weight = 1.0) : ParametricVariation<T>("crackle", VAR_CRACKLE, weight)
+	CrackleVariation(T weight = 1.0) : ParametricVariation<T>("crackle", eVariationId::VAR_CRACKLE, weight)
 	{
 		Init();
 	}
@@ -3701,7 +3701,7 @@ public:
 		dO += p[4];
 		helper.Out.x = m_Weight * dO.x;
 		helper.Out.y = m_Weight * dO.y;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
@@ -3799,7 +3799,7 @@ public:
 		   << "\t\tdO += p[4];\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * dO.x;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * dO.y;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 		return ss.str();
 	}

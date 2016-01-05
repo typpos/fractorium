@@ -74,6 +74,7 @@ namespace EmberNs
 #define FLOAT_MIN_TAN -FLOAT_MAX_TAN
 #define EMPTYFIELD -9999
 typedef std::chrono::high_resolution_clock Clock;
+typedef uint et;
 
 /// <summary>
 /// Thin wrapper around getting the current time in milliseconds.
@@ -119,17 +120,17 @@ static inline size_t NowMs()
 	#define m23T glm::detail::tmat2x3<T, glm::defaultp>
 #endif
 
-enum class eInterp : uint { EMBER_INTERP_LINEAR = 0, EMBER_INTERP_SMOOTH = 1 };
-enum class eAffineInterp : uint { AFFINE_INTERP_LINEAR = 0, AFFINE_INTERP_LOG = 1, AFFINE_INTERP_COMPAT = 2, AFFINE_INTERP_OLDER = 3 };
-enum class ePaletteMode : uint { PALETTE_STEP = 0, PALETTE_LINEAR = 1 };
-enum class ePaletteInterp : uint { INTERP_HSV = 0, INTERP_SWEEP = 1 };
-enum class eMotion : uint { MOTION_SIN = 1, MOTION_TRIANGLE = 2, MOTION_HILL = 3, MOTION_SAW = 4 };
-enum class eProcessAction : uint { NOTHING = 0, ACCUM_ONLY = 1, FILTER_AND_ACCUM = 2, KEEP_ITERATING = 3, FULL_RENDER = 4 };
-enum class eProcessState : uint { NONE = 0, ITER_STARTED = 1, ITER_DONE = 2, FILTER_DONE = 3, ACCUM_DONE = 4 };
-enum class eInteractiveFilter : uint { FILTER_LOG = 0, FILTER_DE = 1 };
-enum class eScaleType : uint { SCALE_NONE = 0, SCALE_WIDTH = 1, SCALE_HEIGHT = 2 };
-enum class eRenderStatus : uint { RENDER_OK = 0, RENDER_ERROR = 1, RENDER_ABORT = 2 };
-enum class eEmberMotionParam : uint//These must remain in this order forever.
+enum class eInterp : et { EMBER_INTERP_LINEAR = 0, EMBER_INTERP_SMOOTH = 1 };
+enum class eAffineInterp : et { AFFINE_INTERP_LINEAR = 0, AFFINE_INTERP_LOG = 1, AFFINE_INTERP_COMPAT = 2, AFFINE_INTERP_OLDER = 3 };
+enum class ePaletteMode : et { PALETTE_STEP = 0, PALETTE_LINEAR = 1 };
+enum class ePaletteInterp : et { INTERP_HSV = 0, INTERP_SWEEP = 1 };
+enum class eMotion : et { MOTION_SIN = 1, MOTION_TRIANGLE = 2, MOTION_HILL = 3, MOTION_SAW = 4 };
+enum class eProcessAction : et { NOTHING = 0, ACCUM_ONLY = 1, FILTER_AND_ACCUM = 2, KEEP_ITERATING = 3, FULL_RENDER = 4 };
+enum class eProcessState : et { NONE = 0, ITER_STARTED = 1, ITER_DONE = 2, FILTER_DONE = 3, ACCUM_DONE = 4 };
+enum class eInteractiveFilter : et { FILTER_LOG = 0, FILTER_DE = 1 };
+enum class eScaleType : et { SCALE_NONE = 0, SCALE_WIDTH = 1, SCALE_HEIGHT = 2 };
+enum class eRenderStatus : et { RENDER_OK = 0, RENDER_ERROR = 1, RENDER_ABORT = 2 };
+enum class eEmberMotionParam : et//These must remain in this order forever.
 {
 	FLAME_MOTION_NONE,
 	FLAME_MOTION_ZOOM,

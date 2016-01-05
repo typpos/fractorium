@@ -571,11 +571,11 @@ bool RendererCL<T, bucketT>::CreateSpatialFilter(bool& newAlloc)
 /// <summary>
 /// Get the renderer type enum.
 /// </summary>
-/// <returns>OPENCL_RENDERER</returns>
+/// <returns>eRendererType::OPENCL_RENDERER</returns>
 template <typename T, typename bucketT>
 eRendererType RendererCL<T, bucketT>::RendererType() const
 {
-	return OPENCL_RENDERER;
+	return eRendererType::OPENCL_RENDERER;
 }
 
 /// <summary>

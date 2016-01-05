@@ -82,7 +82,7 @@ bool FinalRenderEmberControllerBase::CreateRendererFromGUI()
 {
 	bool useOpenCL = m_Info->Ok() && m_FinalRenderDialog->OpenCL();
 	auto v = Devices(m_FinalRenderDialog->Devices());
-	return CreateRenderer((useOpenCL && !v.empty()) ? OPENCL_RENDERER : CPU_RENDERER,
+	return CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER,
 						  v,
 						  false);//Not shared.
 }
@@ -583,7 +583,7 @@ bool FinalRenderEmberController<T>::SyncGuiToRenderer()
 
 	if (m_Renderer.get())
 	{
-		if (m_Renderer->RendererType() == OPENCL_RENDERER)
+		if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 			channels = 4;//Always using 4 since the GL texture is RGBA.
 
 		m_Renderer->Callback(this);
@@ -598,7 +598,7 @@ bool FinalRenderEmberController<T>::SyncGuiToRenderer()
 	{
 		for (size_t i = 0; i < m_Renderers.size(); i++)
 		{
-			if (m_Renderers[i]->RendererType() == OPENCL_RENDERER)
+			if (m_Renderers[i]->RendererType() == eRendererType::OPENCL_RENDERER)
 				channels = 4;//Always using 4 since the GL texture is RGBA.
 
 			m_Renderers[i]->Callback(!i ? this : nullptr);

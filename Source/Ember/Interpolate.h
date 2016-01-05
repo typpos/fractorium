@@ -106,7 +106,7 @@ public:
 				{
 					size_t found = 0;
 					//Remove linear.
-					destXform->DeleteVariationById(VAR_LINEAR);
+					destXform->DeleteVariationById(eVariationId::VAR_LINEAR);
 
 					//Only do the next substitution for log interpolation.
 					if ((i == 0 && destEmbers[i].m_AffineInterp == eAffineInterp::AFFINE_INTERP_LOG) ||
@@ -128,13 +128,13 @@ public:
 							//Interpolate these against a 180 degree rotated identity
 							//with weight -1.
 							//Added JULIAN/JULIASCOPE to get rid of black wedges.
-							if (destOtherXform->GetVariationById(VAR_SPHERICAL) ||
-									destOtherXform->GetVariationById(VAR_NGON) ||
-									destOtherXform->GetVariationById(VAR_JULIAN) ||
-									destOtherXform->GetVariationById(VAR_JULIASCOPE) ||
-									destOtherXform->GetVariationById(VAR_POLAR) ||
-									destOtherXform->GetVariationById(VAR_WEDGE_SPH) ||
-									destOtherXform->GetVariationById(VAR_WEDGE_JULIA))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_SPHERICAL) ||
+									destOtherXform->GetVariationById(eVariationId::VAR_NGON) ||
+									destOtherXform->GetVariationById(eVariationId::VAR_JULIAN) ||
+									destOtherXform->GetVariationById(eVariationId::VAR_JULIASCOPE) ||
+									destOtherXform->GetVariationById(eVariationId::VAR_POLAR) ||
+									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_SPH) ||
+									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_JULIA))
 							{
 								destXform->AddVariation(new LinearVariation<T>(-1));
 								//Set the coefs appropriately.
@@ -163,7 +163,7 @@ public:
 
 							destOtherXform = destEmbers[i + ii].GetTotalXform(xf);
 
-							if (destOtherXform->GetVariationById(VAR_RECTANGLES))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_RECTANGLES))
 							{
 								RectanglesVariation<T>* var = new RectanglesVariation<T>();
 								var->SetParamVal("rectangles_x", 0);
@@ -172,7 +172,7 @@ public:
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_RINGS2))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS2))
 							{
 								Rings2Variation<T>* var = new Rings2Variation<T>();
 								var->SetParamVal("rings2_val", 0);
@@ -180,14 +180,14 @@ public:
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_FAN2))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN2))
 							{
 								Fan2Variation<T>* var = new Fan2Variation<T>();
 								destXform->AddVariation(var);
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_BLOB))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_BLOB))
 							{
 								BlobVariation<T>* var = new BlobVariation<T>();
 								var->SetParamVal("blob_low", 1);
@@ -195,14 +195,14 @@ public:
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_PERSPECTIVE))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_PERSPECTIVE))
 							{
 								PerspectiveVariation<T>* var = new PerspectiveVariation<T>();
 								destXform->AddVariation(var);
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_CURL))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_CURL))
 							{
 								CurlVariation<T>* var = new CurlVariation<T>();
 								var->SetParamVal("curl_c1", 0);
@@ -210,7 +210,7 @@ public:
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_SUPER_SHAPE))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_SUPER_SHAPE))
 							{
 								SuperShapeVariation<T>* var = new SuperShapeVariation<T>();
 								var->SetParamVal("super_shape_n1", 2);
@@ -237,13 +237,13 @@ public:
 
 							destOtherXform = destEmbers[i + ii].GetTotalXform(xf);
 
-							if (destOtherXform->GetVariationById(VAR_FAN))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN))
 							{
 								destXform->AddVariation(new FanVariation<T>());
 								found++;
 							}
 
-							if (destOtherXform->GetVariationById(VAR_RINGS))
+							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS))
 							{
 								destXform->AddVariation(new RingsVariation<T>());
 								found++;

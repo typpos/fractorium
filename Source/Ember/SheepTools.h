@@ -14,7 +14,7 @@ namespace EmberNs
 /// <summary>
 /// Mutation mode enum.
 /// </summary>
-enum eMutateMode
+enum class eMutateMode : int
 {
 	MUTATE_NOT_SPECIFIED   = -1,
 	MUTATE_ALL_VARIATIONS  = 0,
@@ -29,7 +29,7 @@ enum eMutateMode
 /// <summary>
 /// Cross mode enum.
 /// </summary>
-enum eCrossMode
+enum class eCrossMode : int
 {
 	CROSS_NOT_SPECIFIED = -1,
 	CROSS_UNION         = 0,
@@ -179,7 +179,7 @@ public:
 	/// <param name="mode">The mutation mode</param>
 	/// <param name="useVars">The variations to use if the mutation mode is random</param>
 	/// <param name="sym">The type of symmetry to add if random specified. If 0, it will be added randomly.</param>
-	/// <param name="speed">The speed to multiply the pre affine transforms by if the mutate mode is MUTATE_ALL_COEFS, else ignored.</param>
+	/// <param name="speed">The speed to multiply the pre affine transforms by if the mutate mode is eMutateMode::MUTATE_ALL_COEFS, else ignored.</param>
 	/// <param name="maxVars">The maximum number of variations to allow in any single xform in the ember.</param>
 	/// <returns>A string describing what was done</returns>
 	string Mutate(Ember<T>& ember, eMutateMode mode, vector<eVariationId>& useVars, intmax_t sym, T speed, size_t maxVars)
@@ -192,27 +192,27 @@ public:
 		mutation.Clear();
 
 		//If mutate_mode = -1, choose a random mutation mode.
-		if (mode == MUTATE_NOT_SPECIFIED)
+		if (mode == eMutateMode::MUTATE_NOT_SPECIFIED)
 		{
 			randSelect = m_Rand.Frand01<T>();
 
 			if (randSelect < T(0.1))
-				mode = MUTATE_ALL_VARIATIONS;
+				mode = eMutateMode::MUTATE_ALL_VARIATIONS;
 			else if (randSelect < T(0.3))
-				mode = MUTATE_ONE_XFORM_COEFS;
+				mode = eMutateMode::MUTATE_ONE_XFORM_COEFS;
 			else if (randSelect < T(0.5))
-				mode = MUTATE_ADD_SYMMETRY;
+				mode = eMutateMode::MUTATE_ADD_SYMMETRY;
 			else if (randSelect < T(0.6))
-				mode = MUTATE_POST_XFORMS;
+				mode = eMutateMode::MUTATE_POST_XFORMS;
 			else if (randSelect < T(0.7))
-				mode = MUTATE_COLOR_PALETTE;
+				mode = eMutateMode::MUTATE_COLOR_PALETTE;
 			else if (randSelect < T(0.8))
-				mode = MUTATE_DELETE_XFORM;
+				mode = eMutateMode::MUTATE_DELETE_XFORM;
 			else
-				mode = MUTATE_ALL_COEFS;
+				mode = eMutateMode::MUTATE_ALL_COEFS;
 		}
 
-		if (mode == MUTATE_ALL_VARIATIONS)
+		if (mode == eMutateMode::MUTATE_ALL_VARIATIONS)
 		{
 			os << "mutate all variations";
 
@@ -248,7 +248,7 @@ public:
 			}
 			while (!done);
 		}
-		else if (mode == MUTATE_ONE_XFORM_COEFS)
+		else if (mode == eMutateMode::MUTATE_ONE_XFORM_COEFS)
 		{
 			//Generate a 2-xform random.
 			Random(mutation, useVars, sym, 2, maxVars);
@@ -271,12 +271,12 @@ public:
 						xform1->m_Affine.m_Mat[i][j] = xform2->m_Affine.m_Mat[i][j];
 			}
 		}
-		else if (mode == MUTATE_ADD_SYMMETRY)
+		else if (mode == eMutateMode::MUTATE_ADD_SYMMETRY)
 		{
 			os << "mutate symmetry";
 			ember.AddSymmetry(0, m_Rand);
 		}
-		else if (mode == MUTATE_POST_XFORMS)
+		else if (mode == eMutateMode::MUTATE_POST_XFORMS)
 		{
 			bool same = (m_Rand.Rand() & 3) > 0;//25% chance of using the same post for all of them.
 			size_t b = 1 + m_Rand.Rand() % 6;
@@ -353,7 +353,7 @@ public:
 				}
 			}
 		}
-		else if (mode == MUTATE_COLOR_PALETTE)
+		else if (mode == eMutateMode::MUTATE_COLOR_PALETTE)
 		{
 			T s = m_Rand.Frand01<T>();
 
@@ -384,7 +384,7 @@ public:
 				}
 			}
 		}
-		else if (mode == MUTATE_DELETE_XFORM)
+		else if (mode == eMutateMode::MUTATE_DELETE_XFORM)
 		{
 			size_t nx = m_Rand.Rand() % ember.TotalXformCount();
 			os << "mutate delete xform " << nx;
@@ -392,7 +392,7 @@ public:
 			if (ember.TotalXformCount() > 1)
 				ember.DeleteTotalXform(nx);
 		}
-		else if (mode == MUTATE_ALL_COEFS)
+		else if (mode == eMutateMode::MUTATE_ALL_COEFS)
 		{
 			os << "mutate all coefs";
 			Random(mutation, useVars, sym, ember.TotalXformCount(), maxVars);
@@ -422,7 +422,7 @@ public:
 	/// <param name="emberOut">The result ember</param>
 	/// <param name="crossMode">The cross mode</param>
 	/// <returns>A string describing what was done</returns>
-	string Cross(Ember<T>& ember0, Ember<T>& ember1, Ember<T>& emberOut, int crossMode)
+	string Cross(Ember<T>& ember0, Ember<T>& ember1, Ember<T>& emberOut, eCrossMode crossMode)
 	{
 		uint rb;
 		size_t i;
@@ -430,19 +430,19 @@ public:
 		ostringstream os;
 		char ministr[32];
 
-		if (crossMode == CROSS_NOT_SPECIFIED)
+		if (crossMode == eCrossMode::CROSS_NOT_SPECIFIED)
 		{
 			T s = m_Rand.Frand01<T>();
 
 			if (s < 0.1)
-				crossMode = CROSS_UNION;
+				crossMode = eCrossMode::CROSS_UNION;
 			else if (s < 0.2)
-				crossMode = CROSS_INTERPOLATE;
+				crossMode = eCrossMode::CROSS_INTERPOLATE;
 			else
-				crossMode = CROSS_ALTERNATE;
+				crossMode = eCrossMode::CROSS_ALTERNATE;
 		}
 
-		if (crossMode == CROSS_UNION)
+		if (crossMode == eCrossMode::CROSS_UNION)
 		{
 			//Make a copy of the first ember.
 			emberOut = ember0;
@@ -453,7 +453,7 @@ public:
 
 			os << "cross union";
 		}
-		else if (crossMode == CROSS_INTERPOLATE)
+		else if (crossMode == eCrossMode::CROSS_INTERPOLATE)
 		{
 			//Linearly interpolate somewhere between the two.
 			Ember<T> parents[2];
@@ -640,8 +640,8 @@ public:
 			}
 		}
 
-		//If first input variation is -1 random choose one to use or decide to use multiple.
-		if (useVars.empty() || useVars[0] == -1)
+		//If useVars is empty, randomly choose one to use or decide to use multiple.
+		if (useVars.empty())
 			var = m_Rand.RandBit() ? m_Rand.Rand() % varCount : -1;
 		else
 			var = -2;

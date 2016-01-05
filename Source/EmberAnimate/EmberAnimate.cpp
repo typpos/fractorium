@@ -15,7 +15,7 @@ bool EmberAnimate(EmberOptions& opt)
 	std::cout.imbue(std::locale(""));
 
 	if (opt.DumpArgs())
-		cout << opt.GetValues(OPT_USE_ANIMATE) << endl;
+		cout << opt.GetValues(eOptionUse::OPT_USE_ANIMATE) << endl;
 
 	if (opt.OpenCLInfo())
 	{
@@ -44,7 +44,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 	if (opt.EmberCL())
 	{
-		renderers = CreateRenderers<T>(OPENCL_RENDERER, devices, false, 0, emberReport);
+		renderers = CreateRenderers<T>(eRendererType::OPENCL_RENDERER, devices, false, 0, emberReport);
 		errorReport = emberReport.ErrorReport();
 
 		if (!errorReport.empty())
@@ -89,7 +89,7 @@ bool EmberAnimate(EmberOptions& opt)
 	}
 	else
 	{
-		unique_ptr<Renderer<T, float>> tempRenderer(CreateRenderer<T>(CPU_RENDERER, devices, false, 0, emberReport));
+		unique_ptr<Renderer<T, float>> tempRenderer(CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 		errorReport = emberReport.ErrorReport();
 
 		if (!errorReport.empty())
@@ -457,7 +457,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
 #endif
 
-	if (!opt.Populate(argc, argv, OPT_USE_ANIMATE))
+	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_ANIMATE))
 	{
 #ifdef DO_DOUBLE
 

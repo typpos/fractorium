@@ -15,7 +15,7 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_Shared = true;
 	m_FailedRenders = 0;
 	m_UndoIndex = 0;
-	m_RenderType = CPU_RENDERER;
+	m_RenderType = eRendererType::CPU_RENDERER;
 	m_OutputTexID = 0;
 	m_SubBatchCount = 1;//Will be ovewritten by the options on first render.
 	m_Fractorium = fractorium;
@@ -226,7 +226,7 @@ void FractoriumEmberController<T>::Update(std::function<void (void)> func, bool 
 /// If no xforms are selected via the checkboxes, and the update type is UPDATE_SELECTED, then the function will be called only on the currently selected xform.
 /// </summary>
 /// <param name="func">The function to call</param>
-/// <param name="updateType">Whether to apply this update operation on the current, all or selected xforms. Default: UPDATE_CURRENT.</param>
+/// <param name="updateType">Whether to apply this update operation on the current, all or selected xforms. Default: eXformUpdate::UPDATE_CURRENT.</param>
 /// <param name="updateRender">True to update renderer, else false. Default: true.</param>
 /// <param name="action">The action to add to the rendering queue. Default: eProcessAction::FULL_RENDER.</param>
 template <typename T>

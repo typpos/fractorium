@@ -269,7 +269,7 @@ static Renderer<T, float>* CreateRenderer(eRendererType renderType, const vector
 
 	try
 	{
-		if (renderType == OPENCL_RENDERER && !devices.empty())
+		if (renderType == eRendererType::OPENCL_RENDERER && !devices.empty())
 		{
 			s = "OpenCL";
 			renderer = unique_ptr<Renderer<T, float>>(new RendererCL<T, float>(devices, shared, texId));
@@ -321,7 +321,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 
 	try
 	{
-		if (renderType == OPENCL_RENDERER && !devices.empty())
+		if (renderType == eRendererType::OPENCL_RENDERER && !devices.empty())
 		{
 			s = "OpenCL";
 			v.reserve(devices.size());
@@ -348,7 +348,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 		else
 		{
 			s = "CPU";
-			v.push_back(std::move(unique_ptr<Renderer<T, float>>(::CreateRenderer<T>(CPU_RENDERER, devices, shared, texId, errorReport))));
+			v.push_back(std::move(unique_ptr<Renderer<T, float>>(::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, shared, texId, errorReport))));
 		}
 	}
 	catch (const std::exception& e)
@@ -365,7 +365,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 		try
 		{
 			s = "CPU";
-			v.push_back(std::move(unique_ptr<Renderer<T, float>>(::CreateRenderer<T>(CPU_RENDERER, devices, shared, texId, errorReport))));
+			v.push_back(std::move(unique_ptr<Renderer<T, float>>(::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, shared, texId, errorReport))));
 		}
 		catch (const std::exception& e)
 		{

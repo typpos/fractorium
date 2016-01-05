@@ -82,7 +82,7 @@ public:
 /// Add more in the future as different rendering methods are experimented with.
 /// Possible values might be: CPU+OpenGL, Particle, Inverse.
 /// </summary>
-enum eRendererType { CPU_RENDERER, OPENCL_RENDERER };
+enum class eRendererType : et { CPU_RENDERER, OPENCL_RENDERER };
 
 /// <summary>
 /// A base class with virtual functions to allow both templating and polymorphism to work together.

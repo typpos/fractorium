@@ -13,9 +13,9 @@ GLEmberControllerBase::GLEmberControllerBase(Fractorium* fractorium, GLWidget* g
 {
 	m_Fractorium = fractorium;
 	m_GL = glWidget;
-	m_AffineType = AffinePre;
-	m_HoverType = HoverNone;
-	m_DragState = DragNone;
+	m_AffineType = eAffineType::AffinePre;
+	m_HoverType = eHoverType::HoverNone;
+	m_DragState = eDragState::DragNone;
 	m_DragModifier = 0;
 }
 
@@ -37,7 +37,6 @@ GLEmberController<T>::GLEmberController(Fractorium* fractorium, GLWidget* glWidg
 {
 	GridStep = T(1.0 / 8.0);
 	m_FractoriumEmberController = controller;
-
 	m_HoverXform = nullptr;
 	m_SelectedXform = nullptr;
 	m_CenterDownX = 0;
@@ -68,7 +67,7 @@ bool GLEmberController<T>::CheckForSizeMismatch(int w, int h)
 template <typename T>
 void GLEmberController<T>::ResetMouseState()
 {
-	m_HoverType = HoverNone;
+	m_HoverType = eHoverType::HoverNone;
 	m_HoverXform = nullptr;
 	m_SelectedXform = nullptr;
 }
@@ -86,10 +85,8 @@ T GLEmberController<T>::CalcScale()
 	v2T windowCenter(T(m_GL->width()) / T(2), T(m_GL->height()) / T(2));
 	v2T windowMousePosDistanceFromCenter(m_MousePos.x - windowCenter.x, m_MousePos.y - windowCenter.y);
 	v2T windowMouseDownDistanceFromCenter(m_MouseDownPos.x - windowCenter.x, m_MouseDownPos.y - windowCenter.y);
-
 	T lengthMousePosFromCenterInPixels = glm::length(windowMousePosDistanceFromCenter);
 	T lengthMouseDownFromCenterInPixels = glm::length(windowMouseDownDistanceFromCenter);
-
 	return lengthMousePosFromCenterInPixels - lengthMouseDownFromCenterInPixels;
 }
 
@@ -103,7 +100,6 @@ T GLEmberController<T>::CalcRotation()
 {
 	T rotStart = NormalizeDeg180<T>(T(90) - (atan2(-m_MouseDownWorldPos.y, m_MouseDownWorldPos.x) * RAD_2_DEG_T));
 	T rot = NormalizeDeg180<T>(T(90) - (atan2(-m_MouseWorldPos.y, m_MouseWorldPos.x) * RAD_2_DEG_T));
-
 	return rotStart - rot;
 }
 
@@ -116,10 +112,8 @@ template <typename T>
 typename v3T GLEmberController<T>::SnapToGrid(v3T& vec)
 {
 	v3T ret;
-
 	ret.x = glm::round(vec.x / GridStep) * GridStep;
 	ret.y = glm::round(vec.y / GridStep) * GridStep;
-	
 	return ret;
 }
 
@@ -135,7 +129,6 @@ typename v3T GLEmberController<T>::SnapToNormalizedAngle(v3T& vec, uint division
 	T rsq, theta;
 	T bestRsq = numeric_limits<T>::max();
 	v3T c, best;
-
 	best.x = 1;
 	best.y = 0;
 
@@ -167,7 +160,6 @@ typename v3T GLEmberController<T>::WindowToWorld(v3T& v, bool flip)
 {
 	v3T mouse(v.x, flip ? m_Viewport[3] - v.y : v.y, 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	v3T newCoords = glm::unProject(mouse, m_Modelview, m_Projection, m_Viewport);//Perform the calculation.
-
 	newCoords.z = 0;//For some reason, unProject() always comes back with the z coordinate as something other than 0. It should be 0 at all times.
 	return newCoords;
 }
@@ -234,7 +226,6 @@ void GLEmberController<T>::QueryMatrices(bool print)
 	{
 		double unitX = fabs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0;
 		double unitY = fabs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0;
-		
 		m_GL->glMatrixMode(GL_PROJECTION);
 		m_GL->glPushMatrix();
 		m_GL->glLoadIdentity();
@@ -242,9 +233,7 @@ void GLEmberController<T>::QueryMatrices(bool print)
 		m_GL->glMatrixMode(GL_MODELVIEW);
 		m_GL->glPushMatrix();
 		m_GL->glLoadIdentity();
-
 		QueryVMP();
-
 		m_GL->glMatrixMode(GL_PROJECTION);
 		m_GL->glPopMatrix();
 		m_GL->glMatrixMode(GL_MODELVIEW);

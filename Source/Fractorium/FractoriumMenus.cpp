@@ -17,7 +17,6 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionSaveCurrentToOpenedFile,	  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentToOpenedFile(bool)),	  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentScreen,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentScreen(bool)),			  Qt::QueuedConnection);
 	connect(ui.ActionExit,						  SIGNAL(triggered(bool)), this, SLOT(OnActionExit(bool)),						  Qt::QueuedConnection);
-
 	//Edit menu.
 	connect(ui.ActionUndo,				  SIGNAL(triggered(bool)), this, SLOT(OnActionUndo(bool)),				  Qt::QueuedConnection);
 	connect(ui.ActionRedo,				  SIGNAL(triggered(bool)), this, SLOT(OnActionRedo(bool)),				  Qt::QueuedConnection);
@@ -28,10 +27,8 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionCopySelectedXforms,  SIGNAL(triggered(bool)), this, SLOT(OnActionCopySelectedXforms(bool)),  Qt::QueuedConnection);
 	connect(ui.ActionPasteSelectedXforms, SIGNAL(triggered(bool)), this, SLOT(OnActionPasteSelectedXforms(bool)), Qt::QueuedConnection);
 	ui.ActionPasteSelectedXforms->setEnabled(false);
-
 	//View menu.
 	connect(ui.ActionResetWorkspace, SIGNAL(triggered(bool)), this, SLOT(OnActionResetWorkspace(bool)), Qt::QueuedConnection);
-
 	//Tools menu.
 	connect(ui.ActionAddReflectiveSymmetry, SIGNAL(triggered(bool)), this, SLOT(OnActionAddReflectiveSymmetry(bool)), Qt::QueuedConnection);
 	connect(ui.ActionAddRotationalSymmetry, SIGNAL(triggered(bool)), this, SLOT(OnActionAddRotationalSymmetry(bool)), Qt::QueuedConnection);
@@ -44,7 +41,6 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionFinalRender,			SIGNAL(triggered(bool)), this, SLOT(OnActionFinalRender(bool)),			  Qt::QueuedConnection);
 	connect(m_FinalRenderDialog,			SIGNAL(finished(int)),   this, SLOT(OnFinalRenderClose(int)),			  Qt::QueuedConnection);
 	connect(ui.ActionOptions,				SIGNAL(triggered(bool)), this, SLOT(OnActionOptions(bool)),				  Qt::QueuedConnection);
-
 	//Help menu.
 	connect(ui.ActionAbout, SIGNAL(triggered(bool)), this, SLOT(OnActionAbout(bool)), Qt::QueuedConnection);
 }
@@ -57,7 +53,6 @@ template <typename T>
 void FractoriumEmberController<T>::NewFlock(size_t count)
 {
 	Ember<T> ember;
-
 	StopPreviewRender();
 	m_EmberFile.Clear();
 	m_EmberFile.m_Embers.reserve(count);
@@ -98,7 +93,6 @@ void FractoriumEmberController<T>::NewEmptyFlameInCurrentFile()
 	Ember<T> ember;
 	Xform<T> xform;
 	QDateTime local(QDateTime::currentDateTime());
-
 	StopPreviewRender();
 	ParamsToEmber(ember);
 	xform.m_Weight = T(0.25);
@@ -124,7 +118,6 @@ template <typename T>
 void FractoriumEmberController<T>::NewRandomFlameInCurrentFile()
 {
 	Ember<T> ember;
-
 	StopPreviewRender();
 	m_SheepTools->Random(ember, m_FilteredVariations, static_cast<int>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand->Frand<T>(-2, 2)), 0, MAX_CL_VARS);
 	ParamsToEmber(ember);
@@ -147,7 +140,6 @@ template <typename T>
 void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 {
 	Ember<T> ember = m_Ember;
-
 	StopPreviewRender();
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
 	ember.m_Index = m_EmberFile.Size();
@@ -181,11 +173,10 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 		XmlToEmber<T> parser;
 		vector<Ember<T>> embers;
 		uint previousSize = append ? m_EmberFile.Size() : 0;
-
 		StopPreviewRender();
 		emberFile.m_Filename = filenames[0];
 
-		foreach(const QString& filename, filenames)
+		foreach (const QString& filename, filenames)
 		{
 			embers.clear();
 
@@ -209,12 +200,11 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 			else
 			{
 				vector<string> errors = parser.ErrorReport();
-
 				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 				m_Fractorium->ShowCritical("Open Failed", "Could not open file, see info tab for details.");
 			}
 		}
-		
+
 		if (append)
 		{
 			if (m_EmberFile.m_Filename == "")
@@ -273,14 +263,13 @@ void FractoriumEmberController<T>::SaveCurrentAsXml()
 		else
 			filename = m_Fractorium->SetupSaveXmlDialog(QString::fromStdString(m_Ember.m_Name));//More than one ember present, use individual ember name.
 	}
-	
+
 	if (filename != "")
 	{
 		Ember<T> ember = m_Ember;
 		EmberToXml<T> writer;
 		QFileInfo fileInfo(filename);
 		xmlDocPtr tempEdit = ember.m_Edits;
-
 		SaveCurrentToOpenedFile();//Save the current ember back to the opened file before writing to disk.
 		ApplyXmlSavingTemplate(ember);
 		ember.m_Edits = writer.CreateNewEditdoc(&ember, nullptr, "edit", s->Nick().toStdString(), s->Url().toStdString(), s->Id().toStdString(), "", 0, 0);
@@ -319,13 +308,12 @@ void FractoriumEmberController<T>::SaveEntireFileAsXml()
 		filename = m_LastSaveAll;
 	else
 		filename = m_Fractorium->SetupSaveXmlDialog(m_EmberFile.m_Filename);
-	
+
 	if (filename != "")
 	{
 		EmberFile<T> emberFile;
 		EmberToXml<T> writer;
 		QFileInfo fileInfo(filename);
-
 		SaveCurrentToOpenedFile();//Save the current ember back to the opened file before writing to disk.
 		emberFile = m_EmberFile;
 
@@ -384,7 +372,7 @@ void FractoriumEmberController<T>::SaveCurrentToOpenedFile()
 	for (i = 0; i < m_EmberFile.Size(); i++)
 	{
 		if ((m_Ember.m_Name == m_EmberFile.m_Embers[i].m_Name) &&//Check both to be extra sure.
-			(m_Ember.m_Index == m_EmberFile.m_Embers[i].m_Index))
+				(m_Ember.m_Index == m_EmberFile.m_Embers[i].m_Index))
 		{
 			m_EmberFile.m_Embers[i] = m_Ember;
 			fileFound = true;
@@ -426,12 +414,11 @@ void FractoriumEmberController<T>::Undo()
 	if (m_UndoList.size() > 1 && m_UndoIndex > 0)
 	{
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
-
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::max(0u, m_UndoIndex - 1u);
 		SetEmber(m_UndoList[m_UndoIndex], true);
-		m_EditState = UNDO_REDO;
-		
+		m_EditState = eEditUndoState::UNDO_REDO;
+
 		if (index >= 0)
 			m_Fractorium->CurrentXform(index);
 
@@ -451,12 +438,11 @@ void FractoriumEmberController<T>::Redo()
 	if (m_UndoList.size() > 1 && m_UndoIndex < m_UndoList.size() - 1)
 	{
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
-
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::min<uint>(m_UndoIndex + 1, m_UndoList.size() - 1);
 		SetEmber(m_UndoList[m_UndoIndex], true);
-		m_EditState = UNDO_REDO;
-		
+		m_EditState = eEditUndoState::UNDO_REDO;
+
 		if (index >= 0)
 			m_Fractorium->CurrentXform(index);
 
@@ -477,7 +463,6 @@ void FractoriumEmberController<T>::CopyXml()
 	Ember<T> ember = m_Ember;
 	EmberToXml<T> emberToXml;
 	FractoriumSettings* settings = m_Fractorium->m_Settings;
-
 	ember.m_Quality         = settings->XmlQuality();
 	ember.m_Supersample     = settings->XmlSupersample();
 	ember.m_TemporalSamples = settings->XmlTemporalSamples();
@@ -496,13 +481,11 @@ void FractoriumEmberController<T>::CopyAllXml()
 	ostringstream os;
 	EmberToXml<T> emberToXml;
 	FractoriumSettings* settings = m_Fractorium->m_Settings;
-
 	os << "<flames>\n";
 
 	for (auto& e : m_EmberFile.m_Embers)
 	{
 		Ember<T> ember = e;
-
 		ApplyXmlSavingTemplate(ember);
 		os << emberToXml.ToString(ember, "", 0, false, false, true);
 	}
@@ -529,7 +512,6 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 	vector<Ember<T>> embers;
 	QTextCodec* codec = QTextCodec::codecForName("UTF-8");
 	QByteArray b = codec->fromUnicode(QApplication::clipboard()->text());
-
 	s.reserve(b.size());
 
 	for (i = 0; i < b.size(); i++)
@@ -554,7 +536,7 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 		{
 			embers[i].m_Index = m_EmberFile.Size();
 			ConstrainDimensions(embers[i]);//Do not exceed the max texture size.
-		
+
 			//Also ensure it has a name.
 			if (embers[i].m_Name == "" || embers[i].m_Name == "No name")
 				embers[i].m_Name = ToString<qulonglong>(embers[i].m_Index).toStdString();
@@ -584,9 +566,8 @@ void FractoriumEmberController<T>::PasteXmlOver()
 	Ember<T> backupEmber = m_EmberFile.m_Embers[0];
 	QTextCodec* codec = QTextCodec::codecForName("UTF-8");
 	QByteArray b = codec->fromUnicode(QApplication::clipboard()->text());
-	
 	s.reserve(b.size());
-	
+
 	for (i = 0; i < b.size(); i++)
 	{
 		if (uint(b[i]) < 128u)
@@ -610,7 +591,7 @@ void FractoriumEmberController<T>::PasteXmlOver()
 		{
 			m_EmberFile.m_Embers[i].m_Index = i;
 			ConstrainDimensions(m_EmberFile.m_Embers[i]);//Do not exceed the max texture size.
-		
+
 			//Also ensure it has a name.
 			if (m_EmberFile.m_Embers[i].m_Name == "" || m_EmberFile.m_Embers[i].m_Name == "No name")
 				m_EmberFile.m_Embers[i].m_Name = ToString<qulonglong>(m_EmberFile.m_Embers[i].m_Index).toStdString();
@@ -639,14 +620,13 @@ void FractoriumEmberController<T>::CopySelectedXforms()
 {
 	m_CopiedXforms.clear();
 	m_CopiedFinalXform.Clear();
-
 	UpdateXform([&](Xform<T>* xform)
 	{
 		if (m_Ember.IsFinalXform(xform))
 			m_CopiedFinalXform = *xform;
 		else
 			m_CopiedXforms.push_back(*xform);
-	}, UPDATE_SELECTED, false);
+	}, eXformUpdate::UPDATE_SELECTED, false);
 	m_Fractorium->ui.ActionPasteSelectedXforms->setEnabled(true);
 }
 
@@ -715,7 +695,6 @@ template <typename T>
 void FractoriumEmberController<T>::AddReflectiveSymmetry()
 {
 	QComboBox* combo = m_Fractorium->ui.CurrentXformCombo;
-
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-1, m_Rand);
@@ -734,7 +713,6 @@ template <typename T>
 void FractoriumEmberController<T>::AddRotationalSymmetry()
 {
 	QComboBox* combo = m_Fractorium->ui.CurrentXformCombo;
-
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(2, m_Rand);
@@ -753,7 +731,6 @@ template <typename T>
 void FractoriumEmberController<T>::AddBothSymmetry()
 {
 	QComboBox* combo = m_Fractorium->ui.CurrentXformCombo;
-
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-2, m_Rand);
@@ -771,7 +748,7 @@ void Fractorium::OnActionAddBothSymmetry(bool checked) { m_Controller->AddBothSy
 template <typename T>
 void FractoriumEmberController<T>::Flatten() { UpdateXform([&] (Xform<T>* xform) { m_Ember.Flatten(XmlToEmber<T>::m_FlattenNames); FillVariationTreeWithXform(xform); }); }
 void Fractorium::OnActionFlatten(bool checked) { m_Controller->Flatten(); }
-	
+
 /// <summary>
 /// Removes pre/reg/post FlattenVariation from every xform in the current ember.
 /// Resets the rendering process.
@@ -875,5 +852,5 @@ void Fractorium::OnActionAbout(bool checked)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-	template class FractoriumEmberController<double>;
+template class FractoriumEmberController<double>;
 #endif

@@ -11,7 +11,7 @@ template <typename T>
 class EMBER_API FunnelVariation : public ParametricVariation<T>
 {
 public:
-	FunnelVariation(T weight = 1.0) : ParametricVariation<T>("funnel", VAR_FUNNEL, weight)
+	FunnelVariation(T weight = 1.0) : ParametricVariation<T>("funnel", eVariationId::VAR_FUNNEL, weight)
 	{
 		Init();
 	}
@@ -21,7 +21,6 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T temp = 1 / Zeps(cos(helper.In.y)) + m_Effect * T(M_PI);
-
 		helper.Out.x = m_Weight * (tanh(helper.In.x) * temp);
 		helper.Out.y = m_Weight * (tanh(helper.In.y) * temp);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -34,7 +33,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string effect = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t temp = 1 / Zeps(cos(vIn.y)) + " << effect << " * M_PI;\n"
 		   << "\n"
@@ -42,7 +40,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (tanh(vIn.y) * temp);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -55,9 +52,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Effect, prefix + "funnel_effect", 8, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_Effect, prefix + "funnel_effect", 8, eParamType::INTEGER));
 	}
 
 private:
@@ -71,7 +67,7 @@ template <typename T>
 class EMBER_API Linear3DVariation : public Variation<T>
 {
 public:
-	Linear3DVariation(T weight = 1.0) : Variation<T>("linear3D", VAR_LINEAR3D, weight) { }
+	Linear3DVariation(T weight = 1.0) : Variation<T>("linear3D", eVariationId::VAR_LINEAR3D, weight) { }
 
 	VARCOPY(Linear3DVariation)
 
@@ -86,13 +82,11 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 };
@@ -104,7 +98,7 @@ template <typename T>
 class EMBER_API PowBlockVariation : public ParametricVariation<T>
 {
 public:
-	PowBlockVariation(T weight = 1.0) : ParametricVariation<T>("pow_block", VAR_POW_BLOCK, weight, true, false, false, false, true)
+	PowBlockVariation(T weight = 1.0) : ParametricVariation<T>("pow_block", eVariationId::VAR_POW_BLOCK, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -115,7 +109,6 @@ public:
 	{
 		T r2 = std::pow(helper.m_PrecalcSumSquares, m_Power * T(0.5)) * m_Weight;
 		T ran = (helper.m_PrecalcAtanyx / Zeps(m_Denominator) + (m_Root * M_2PI * Floor<T>(rand.Frand01<T>() * m_Denominator) / Zeps(m_Denominator))) * m_Numerator;
-
 		helper.Out.x = r2 * std::cos(ran);
 		helper.Out.y = r2 * std::sin(ran);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -133,7 +126,6 @@ public:
 		string correctN    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string correctD    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t r2 = pow(precalcSumSquares, " << power << " * (real_t)(0.5)) * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\treal_t ran = (precalcAtanyx / Zeps(" << denominator << ") + (" << root << " * M_2PI * floor(MwcNext01(mwc) * " << denominator << ") / Zeps(" << denominator << "))) * " << numerator << ";\n"
@@ -142,7 +134,6 @@ public:
 		   << "\t\tvOut.y = r2 * sin(ran);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -160,7 +151,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Numerator,   prefix + "pow_block_numerator", 3));//Original used a prefix of pow_, which is incompatible with Ember's design.
 		m_Params.push_back(ParamWithName<T>(&m_Denominator, prefix + "pow_block_denominator", 2));
@@ -186,7 +176,7 @@ template <typename T>
 class EMBER_API SquirrelVariation : public ParametricVariation<T>
 {
 public:
-	SquirrelVariation(T weight = 1.0) : ParametricVariation<T>("squirrel", VAR_SQUIRREL, weight)
+	SquirrelVariation(T weight = 1.0) : ParametricVariation<T>("squirrel", eVariationId::VAR_SQUIRREL, weight)
 	{
 		Init();
 	}
@@ -196,7 +186,6 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T u = std::sqrt(ClampGte0<T>(Zeps(m_A) * SQR(helper.In.x) + Zeps(m_B) * SQR(helper.In.y)));//Original did not clamp.
-
 		helper.Out.x = std::cos(u) * SafeTan<T>(helper.In.x) * m_Weight;
 		helper.Out.y = std::sin(u) * SafeTan<T>(helper.In.y) * m_Weight;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -210,7 +199,6 @@ public:
 		string index = ss2.str();
 		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t u = sqrt(ClampGte(Zeps(" << a << ") * SQR(vIn.x) + Zeps(" << b << ") * SQR(vIn.y), (real_t)(0.0)));\n"
 		   << "\n"
@@ -218,7 +206,6 @@ public:
 		   << "\t\tvOut.y = sin(u) * tan(vIn.y) * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -231,7 +218,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "squirrel_a", 1));
 		m_Params.push_back(ParamWithName<T>(&m_B, prefix + "squirrel_b", 1));
@@ -249,7 +235,7 @@ template <typename T>
 class EMBER_API EnnepersVariation : public Variation<T>
 {
 public:
-	EnnepersVariation(T weight = 1.0) : Variation<T>("ennepers", VAR_ENNEPERS, weight) { }
+	EnnepersVariation(T weight = 1.0) : Variation<T>("ennepers", eVariationId::VAR_ENNEPERS, weight) { }
 
 	VARCOPY(EnnepersVariation)
 
@@ -264,13 +250,11 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x - ((SQR(vIn.x) * vIn.x) / 3)) + vIn.x * SQR(vIn.y);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (vIn.y - ((SQR(vIn.y) * vIn.y) / 3)) + vIn.y * SQR(vIn.x);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 };
@@ -282,7 +266,7 @@ template <typename T>
 class EMBER_API SphericalNVariation : public ParametricVariation<T>
 {
 public:
-	SphericalNVariation(T weight = 1.0) : ParametricVariation<T>("SphericalN", VAR_SPHERICALN, weight, true, true, false, false, true)
+	SphericalNVariation(T weight = 1.0) : ParametricVariation<T>("SphericalN", eVariationId::VAR_SPHERICALN, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -296,7 +280,6 @@ public:
 		T alpha = helper.m_PrecalcAtanyx + n * M_2PI / Zeps<T>(T(Floor<T>(m_Power)));
 		T sina = std::sin(alpha);
 		T cosa = std::cos(alpha);
-
 		helper.Out.x = m_Weight * cosa / r;
 		helper.Out.y = m_Weight * sina / r;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -310,7 +293,6 @@ public:
 		string index = ss2.str();
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t r = Zeps(pow(precalcSqrtSumSquares, " << dist << "));\n"
 		   << "\t\tint n = floor(" << power << " * MwcNext01(mwc));\n"
@@ -322,7 +304,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sina / r;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -335,7 +316,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "SphericalN_Power", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Dist,  prefix + "SphericalN_Dist",  1));
@@ -353,7 +333,7 @@ template <typename T>
 class EMBER_API KaleidoscopeVariation : public ParametricVariation<T>
 {
 public:
-	KaleidoscopeVariation(T weight = 1.0) : ParametricVariation<T>("Kaleidoscope", VAR_KALEIDOSCOPE, weight)
+	KaleidoscopeVariation(T weight = 1.0) : ParametricVariation<T>("Kaleidoscope", eVariationId::VAR_KALEIDOSCOPE, weight)
 	{
 		Init();
 	}
@@ -364,7 +344,6 @@ public:
 	{
 		T sin45 = std::sin(45 * DEG_2_RAD_T);//Was 45 radians? They probably meant to convert this from degrees.
 		T cos45 = std::cos(45 * DEG_2_RAD_T);
-
 		helper.Out.x = ((m_Rotate * helper.In.x) * cos45 - helper.In.y * sin45 +  m_LineUp) + m_X;
 
 		//The if function splits the plugin in two.
@@ -387,7 +366,6 @@ public:
 		string lineUp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string x      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t sin45 = sin(45 * DEG_2_RAD);\n"
 		   << "\t\treal_t cos45 = cos(45 * DEG_2_RAD);\n"
@@ -401,7 +379,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -409,7 +386,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Pull,   prefix + "Kaleidoscope_pull"));
 		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "Kaleidoscope_rotate",  1));
@@ -433,7 +409,7 @@ template <typename T>
 class EMBER_API GlynnSim1Variation : public ParametricVariation<T>
 {
 public:
-	GlynnSim1Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim1", VAR_GLYNNSIM1, weight, true, true)
+	GlynnSim1Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim1", eVariationId::VAR_GLYNNSIM1, weight, true, true)
 	{
 		Init();
 	}
@@ -497,7 +473,6 @@ public:
 		string pow       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string x1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t x, y, z;\n"
 		   << "\n"
@@ -539,7 +514,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -569,7 +543,6 @@ public:
 		T val = DEG_2_RAD_T * m_Phi1;
 		T sinPhi1 = std::sin(val);
 		T cosPhi1 = std::cos(val);
-
 		m_Pow = fabs(m_Pow);
 		m_X1 = m_Radius * cosPhi1;
 		m_Y1 = m_Radius * sinPhi1;
@@ -579,14 +552,13 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Radius,    prefix + "GlynnSim1_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Radius1,   prefix + "GlynnSim1_radius1", T(0.1)));
 		m_Params.push_back(ParamWithName<T>(&m_Phi1,      prefix + "GlynnSim1_phi1"));
-		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim1_thickness", T(0.1), REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim1_thickness", T(0.1), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Contrast,  prefix + "GlynnSim1_contrast", T(1.5)));
-		m_Params.push_back(ParamWithName<T>(&m_Pow,       prefix + "GlynnSim1_pow", T(0.5), REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Pow,       prefix + "GlynnSim1_pow", T(0.5), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_X1,  prefix + "GlynnSim1_x1"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Y1,  prefix + "GlynnSim1_y1"));
 	}
@@ -598,7 +570,6 @@ private:
 		T phi = M_2PI * rand.Frand01<T>();
 		T sinPhi = std::sin(phi);
 		T cosPhi = std::cos(phi);
-
 		*x = r * cosPhi + m_X1;
 		*y = r * sinPhi + m_Y1;
 	}
@@ -620,7 +591,7 @@ template <typename T>
 class EMBER_API GlynnSim2Variation : public ParametricVariation<T>
 {
 public:
-	GlynnSim2Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim2", VAR_GLYNNSIM2, weight, true, true)
+	GlynnSim2Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim2", eVariationId::VAR_GLYNNSIM2, weight, true, true)
 	{
 		Init();
 	}
@@ -633,7 +604,7 @@ public:
 
 		if (helper.m_PrecalcSqrtSumSquares < m_Radius)
 		{
-			Circle(rand, &x,&y);
+			Circle(rand, &x, &y);
 			helper.Out.x = m_Weight * x;
 			helper.Out.y = m_Weight * y;
 		}
@@ -672,7 +643,6 @@ public:
 		string phi20     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string gamma     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string delta     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t x, y;\n"
 		   << "\n"
@@ -700,7 +670,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -738,11 +707,10 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Radius,    prefix + "GlynnSim2_radius", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim2_thickness", T(0.1), REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Contrast,  prefix + "GlynnSim2_contrast", T(0.5), REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim2_thickness", T(0.1), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast,  prefix + "GlynnSim2_contrast", T(0.5), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Pow,       prefix + "GlynnSim2_pow", T(1.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Phi1,      prefix + "GlynnSim2_Phi1"));
 		m_Params.push_back(ParamWithName<T>(&m_Phi2,      prefix + "GlynnSim2_Phi2", 360));
@@ -759,7 +727,6 @@ private:
 		T phi = m_Phi10 + m_Delta * rand.Frand01<T>();
 		T sinPhi = std::sin(phi);
 		T cosPhi = std::cos(phi);
-
 		*x = r * cosPhi;
 		*y = r * sinPhi;
 	}
@@ -783,7 +750,7 @@ template <typename T>
 class EMBER_API GlynnSim3Variation : public ParametricVariation<T>
 {
 public:
-	GlynnSim3Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim3", VAR_GLYNNSIM3, weight, true, true)
+	GlynnSim3Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim3", eVariationId::VAR_GLYNNSIM3, weight, true, true)
 	{
 		Init();
 	}
@@ -796,7 +763,7 @@ public:
 
 		if (helper.m_PrecalcSqrtSumSquares < m_Radius1)
 		{
-			Circle(rand, &x,&y);
+			Circle(rand, &x, &y);
 			helper.Out.x = m_Weight * x;
 			helper.Out.y = m_Weight * y;
 		}
@@ -833,7 +800,6 @@ public:
 		string radius1    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string radius2    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string gamma      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t x, y;\n"
 		   << "\n"
@@ -861,7 +827,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -902,12 +867,11 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Radius,     prefix + "GlynnSim3_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness,  prefix + "GlynnSim3_thickness", T(0.1)));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness2, prefix + "GlynnSim3_thickness2", T(0.1)));
-		m_Params.push_back(ParamWithName<T>(&m_Contrast,   prefix + "GlynnSim3_contrast", T(0.5), REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast,   prefix + "GlynnSim3_contrast", T(0.5), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Pow,        prefix + "GlynnSim3_pow", T(1.5)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Radius1, prefix + "GlynnSim3_radius1"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Radius2, prefix + "GlynnSim3_radius2"));
@@ -948,7 +912,7 @@ template <typename T>
 class EMBER_API StarblurVariation : public ParametricVariation<T>
 {
 public:
-	StarblurVariation(T weight = 1.0) : ParametricVariation<T>("starblur", VAR_STARBLUR, weight)
+	StarblurVariation(T weight = 1.0) : ParametricVariation<T>("starblur", eVariationId::VAR_STARBLUR, weight)
 	{
 		Init();
 	}
@@ -959,9 +923,7 @@ public:
 	{
 		T f = rand.Frand01<T>() * m_Power * 2;
 		T angle = T(int(f));
-
 		f -= angle;
-
 		T x = f * m_Length;
 		T z = std::sqrt(1 + SQR(x) - 2 * x * std::cos(m_Alpha));
 
@@ -971,9 +933,7 @@ public:
 			angle = M_2PI / m_Power * (int(angle) / 2) - std::asin(std::sin(m_Alpha) * x / z);
 
 		z *= std::sqrt(rand.Frand01<T>());
-
 		T temp = angle - T(M_PI_2);
-
 		helper.Out.x = m_Weight * z * std::cos(temp);
 		helper.Out.y = m_Weight * z * std::sin(temp);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -989,7 +949,6 @@ public:
 		string range  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string length = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string alpha  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t f = MwcNext01(mwc) * " << power << " * 2;\n"
 		   << "\t\treal_t angle = (real_t)(int)(f);\n"
@@ -1012,7 +971,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * z * sin(temp);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1027,9 +985,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "starblur_power", 5, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "starblur_power", 5, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_Range, prefix + "starblur_range", T(0.4016228317)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Length, prefix + "starblur_length"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,  prefix + "starblur_alpha"));
@@ -1049,7 +1006,7 @@ template <typename T>
 class EMBER_API SineblurVariation : public ParametricVariation<T>
 {
 public:
-	SineblurVariation(T weight = 1.0) : ParametricVariation<T>("sineblur", VAR_SINEBLUR, weight)
+	SineblurVariation(T weight = 1.0) : ParametricVariation<T>("sineblur", eVariationId::VAR_SINEBLUR, weight)
 	{
 		Init();
 	}
@@ -1062,7 +1019,6 @@ public:
 		T s = std::sin(ang);
 		T c = std::cos(ang);
 		T r = m_Weight * (m_Power == 1 ? std::acos(rand.Frand01<T>() * 2 - 1) / T(M_PI) : std::acos(std::exp(std::log(rand.Frand01<T>()) * m_Power) * 2 - 1) / T(M_PI));
-
 		helper.Out.x = r * c;
 		helper.Out.y = r * s;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -1075,7 +1031,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t ang = MwcNext01(mwc) * M_2PI;\n"
 		   << "\t\treal_t s = sin(ang);\n"
@@ -1086,7 +1041,6 @@ public:
 		   << "\t\tvOut.y = r * s;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1094,9 +1048,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "sineblur_power", 1, REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "sineblur_power", 1, eParamType::REAL, 0));
 	}
 
 private:
@@ -1110,7 +1063,7 @@ template <typename T>
 class EMBER_API CircleblurVariation : public Variation<T>
 {
 public:
-	CircleblurVariation(T weight = 1.0) : Variation<T>("circleblur", VAR_CIRCLEBLUR, weight) { }
+	CircleblurVariation(T weight = 1.0) : Variation<T>("circleblur", eVariationId::VAR_CIRCLEBLUR, weight) { }
 
 	VARCOPY(CircleblurVariation)
 
@@ -1118,7 +1071,6 @@ public:
 	{
 		T rad = std::sqrt(rand.Frand01<T>());
 		T temp = rand.Frand01<T>() * M_2PI;
-
 		helper.Out.x = m_Weight * std::cos(temp) * rad;
 		helper.Out.y = m_Weight * std::sin(temp) * rad;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -1128,7 +1080,6 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\treal_t rad = sqrt(MwcNext01(mwc));\n"
 		   << "\t\treal_t temp = MwcNext01(mwc) * M_2PI;\n"
@@ -1137,7 +1088,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(temp) * rad;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 };
@@ -1149,7 +1099,7 @@ template <typename T>
 class EMBER_API DepthVariation : public ParametricVariation<T>
 {
 public:
-	DepthVariation(T weight = 1.0) : ParametricVariation<T>("depth", VAR_DEPTH, weight)
+	DepthVariation(T weight = 1.0) : ParametricVariation<T>("depth", eVariationId::VAR_DEPTH, weight)
 	{
 		Init();
 	}
@@ -1175,7 +1125,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t coeff = fabs(vIn.z);\n"
 		   << "\n"
@@ -1186,7 +1135,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (transY + vIn.y * coeff);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (transZ + vIn.z * coeff);\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1194,7 +1142,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "depth_power", 1));
 	}
@@ -1210,7 +1157,7 @@ template <typename T>
 class EMBER_API CropNVariation : public ParametricVariation<T>
 {
 public:
-	CropNVariation(T weight = 1.0) : ParametricVariation<T>("cropn", VAR_CROPN, weight, true, true, false, false, true)
+	CropNVariation(T weight = 1.0) : ParametricVariation<T>("cropn", eVariationId::VAR_CROPN, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -1220,10 +1167,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T xang = (helper.m_PrecalcAtanyx + T(M_PI)) / m_Alpha;
-
 		xang = (xang - int(xang)) * m_Alpha;
 		xang = std::cos((xang < m_Alpha / 2) ? xang : m_Alpha - xang);
-
 		T xr = xang > 0 ? m_Radius / xang : 1;
 
 		if ((helper.m_PrecalcSqrtSumSquares > xr) == (m_Power > 0))
@@ -1235,7 +1180,6 @@ public:
 			else
 			{
 				T rdc = xr + (rand.Frand01<T>() * T(0.5) * m_ScatterDist);
-
 				helper.Out.x = m_Weight * rdc * std::cos(helper.m_PrecalcAtanyx);
 				helper.Out.y = m_Weight * rdc * std::sin(helper.m_PrecalcAtanyx);
 			}
@@ -1261,7 +1205,6 @@ public:
 		string zero        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string workPower   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string alpha       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t xang = (precalcAtanyx + M_PI) / " << alpha << ";\n"
 		   << "\n"
@@ -1292,14 +1235,12 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
 	virtual void Precalc() override
 	{
 		bool mode = m_Power > 0;
-
 		m_WorkPower = mode ? m_Power : -m_Power;
 		ClampGteRef<T>(m_WorkPower, 2);
 		m_Alpha = M_2PI / m_WorkPower;
@@ -1309,12 +1250,11 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Power,       prefix + "cropn_power", -5));
 		m_Params.push_back(ParamWithName<T>(&m_Radius,      prefix + "cropn_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_ScatterDist, prefix + "cropn_scatterdist"));
-		m_Params.push_back(ParamWithName<T>(&m_Zero,        prefix + "cropn_zero", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero,        prefix + "cropn_zero", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_WorkPower, prefix + "cropn_workpower"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,     prefix + "cropn_alpha"));
 	}
@@ -1335,7 +1275,7 @@ template <typename T>
 class EMBER_API ShredRadVariation : public ParametricVariation<T>
 {
 public:
-	ShredRadVariation(T weight = 1.0) : ParametricVariation<T>("shredrad", VAR_SHRED_RAD, weight, true, true, false, false, true)
+	ShredRadVariation(T weight = 1.0) : ParametricVariation<T>("shredrad", eVariationId::VAR_SHRED_RAD, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -1346,7 +1286,6 @@ public:
 	{
 		T xang = (helper.m_PrecalcAtanyx + M_3PI + m_Alpha / 2) / m_Alpha;
 		T zang = ((xang - int(xang)) * m_Width + int(xang)) * m_Alpha - T(M_PI) - m_Alpha / 2 * m_Width;
-
 		helper.Out.x = m_Weight * helper.m_PrecalcSqrtSumSquares * std::cos(zang);
 		helper.Out.y = m_Weight * helper.m_PrecalcSqrtSumSquares * std::sin(zang);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -1361,7 +1300,6 @@ public:
 		string n     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t xang = (precalcAtanyx + M_3PI + " << alpha << " / 2) / " << alpha << ";\n"
 		   << "\t\treal_t zang = ((xang - (int)xang) * " << width << " + (int)xang) * " << alpha << " - M_PI - " << alpha << " / 2 * " << width << ";\n"
@@ -1370,7 +1308,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares * sin(zang);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1383,10 +1320,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_N,     prefix + "shredrad_n", 4, REAL_NONZERO));
-		m_Params.push_back(ParamWithName<T>(&m_Width, prefix + "shredrad_width", T(0.5), REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_N,     prefix + "shredrad_n", 4, eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Width, prefix + "shredrad_width", T(0.5), eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "shredrad_alpha"));//Precalc.
 	}
 
@@ -1403,7 +1339,7 @@ template <typename T>
 class EMBER_API Blob2Variation : public ParametricVariation<T>
 {
 public:
-	Blob2Variation(T weight = 1.0) : ParametricVariation<T>("blob2", VAR_BLOB2, weight, true, true, false, false, true)
+	Blob2Variation(T weight = 1.0) : ParametricVariation<T>("blob2", eVariationId::VAR_BLOB2, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -1428,7 +1364,6 @@ public:
 				delta = std::exp(m_Prescale * std::log(delta * positive)) * m_Postscale * positive;
 
 			T rad = m_Radius + (helper.m_PrecalcSqrtSumSquares - m_Radius) * delta;
-
 			helper.Out.x = m_Weight * rad * std::cos(helper.m_PrecalcAtanyx);
 			helper.Out.y = m_Weight * rad * std::sin(helper.m_PrecalcAtanyx);
 			helper.Out.z = m_Weight * helper.In.z;
@@ -1450,7 +1385,6 @@ public:
 		string symmetry  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string comp      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dataHelp  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\tif (precalcSqrtSumSquares < " << radius << ")\n"
 		   << "\t\t{\n"
@@ -1475,7 +1409,6 @@ public:
 		   //<< "\t\t	transZ += xform->m_VariationWeights[" << varIndex << "] * outPoint->m_Z;\n"//Original had this which is probably wrong.
 		   << "\t\t}\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1488,15 +1421,14 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Mode,         prefix + "blob2_mode", 0, INTEGER, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_N,            prefix + "blob2_n", 5, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_Mode,         prefix + "blob2_mode", 0, eParamType::INTEGER, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_N,            prefix + "blob2_n", 5, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_Radius,       prefix + "blob2_radius"));
 		m_Params.push_back(ParamWithName<T>(&m_Prescale,     prefix + "blob2_prescale", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Postscale,    prefix + "blob2_postscale", T(0.5)));
-		m_Params.push_back(ParamWithName<T>(&m_Symmetry,     prefix + "blob2_symmetry", 0, REAL, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Compensation, prefix + "blob2_compensation", 0, REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Symmetry,     prefix + "blob2_symmetry", 0, eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Compensation, prefix + "blob2_compensation", 0, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_DeltaHelp, prefix + "blob2_deltahelp"));//Precalc.
 	}
 
@@ -1518,7 +1450,7 @@ template <typename T>
 class EMBER_API Julia3DVariation : public ParametricVariation<T>
 {
 public:
-	Julia3DVariation(T weight = 1.0) : ParametricVariation<T>("julia3D", VAR_JULIA3D, weight, true, true, false, false, true)
+	Julia3DVariation(T weight = 1.0) : ParametricVariation<T>("julia3D", eVariationId::VAR_JULIA3D, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -1531,7 +1463,6 @@ public:
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares + SQR(z), m_Cn);
 		T tmp = r * helper.m_PrecalcSqrtSumSquares;
 		T ang = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(uint(m_AbsN))) / m_N;
-
 		helper.Out.x = tmp * std::cos(ang);
 		helper.Out.y = tmp * std::sin(ang);
 		helper.Out.z = r * z;
@@ -1546,7 +1477,6 @@ public:
 		string n    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t z = vIn.z / " << absn << ";\n"
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * pow(precalcSumSquares + SQR(z), " << cn << ");\n"
@@ -1557,7 +1487,6 @@ public:
 		   << "\t\tvOut.y = tmp * sin(ang);\n"
 		   << "\t\tvOut.z = r * z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1579,9 +1508,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "julia3D_power", 2, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "julia3D_power", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsN, prefix + "julia3D_absn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn,   prefix + "julia3D_cn"));
 	}
@@ -1599,7 +1527,7 @@ template <typename T>
 class EMBER_API Julia3DzVariation : public ParametricVariation<T>
 {
 public:
-	Julia3DzVariation(T weight = 1.0) : ParametricVariation<T>("julia3Dz", VAR_JULIA3DZ, weight, true, true, false, false, true)
+	Julia3DzVariation(T weight = 1.0) : ParametricVariation<T>("julia3Dz", eVariationId::VAR_JULIA3DZ, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -1610,7 +1538,6 @@ public:
 	{
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
 		T temp = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(uint(m_AbsN))) / m_N;
-
 		helper.Out.x = r * std::cos(temp);
 		helper.Out.y = r * std::sin(temp);
 		helper.Out.z = r * helper.In.z / (helper.m_PrecalcSqrtSumSquares * m_AbsN);
@@ -1625,7 +1552,6 @@ public:
 		string n    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * pow(precalcSumSquares, " << cn << ");\n"
 		   << "\t\treal_t temp = (precalcAtanyx + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) / " << n << ";\n"
@@ -1634,7 +1560,6 @@ public:
 		   << "\t\tvOut.y = r * sin(temp);\n"
 		   << "\t\tvOut.z = r * vIn.z / (precalcSqrtSumSquares * " << absn << ");\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1656,9 +1581,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "julia3Dz_power", 2, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "julia3Dz_power", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsN, prefix + "julia3Dz_absn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn,   prefix + "julia3Dz_cn"));
 	}
@@ -1676,7 +1600,7 @@ template <typename T>
 class EMBER_API LinearTVariation : public ParametricVariation<T>
 {
 public:
-	LinearTVariation(T weight = 1.0) : ParametricVariation<T>("linearT", VAR_LINEAR_T, weight)
+	LinearTVariation(T weight = 1.0) : ParametricVariation<T>("linearT", eVariationId::VAR_LINEAR_T, weight)
 	{
 		Init();
 	}
@@ -1687,7 +1611,7 @@ public:
 	{
 		helper.Out.x = SignNz<T>(helper.In.x) * std::pow(fabs(helper.In.x), m_PowX) * m_Weight;
 		helper.Out.y = SignNz<T>(helper.In.y) * std::pow(fabs(helper.In.y), m_PowY) * m_Weight;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -1698,13 +1622,11 @@ public:
 		string index = ss2.str();
 		string powx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\tvOut.x = SignNz(vIn.x) * pow(fabs(vIn.x), " << powx << ") * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\tvOut.y = SignNz(vIn.y) * pow(fabs(vIn.y), " << powy << ") * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1717,7 +1639,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_PowX, prefix + "linearT_powX", 1));//Original used a prefix of lT, which is incompatible with Ember's design.
 		m_Params.push_back(ParamWithName<T>(&m_PowY, prefix + "linearT_powY", 1));
@@ -1735,7 +1656,7 @@ template <typename T>
 class EMBER_API LinearT3DVariation : public ParametricVariation<T>
 {
 public:
-	LinearT3DVariation(T weight = 1.0) : ParametricVariation<T>("linearT3D", VAR_LINEAR_T3D, weight)
+	LinearT3DVariation(T weight = 1.0) : ParametricVariation<T>("linearT3D", eVariationId::VAR_LINEAR_T3D, weight)
 	{
 		Init();
 	}
@@ -1758,13 +1679,11 @@ public:
 		string powx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powz = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\tvOut.x = (real_t)(vIn.x < 0 ? -1 : 1) * pow(fabs(vIn.x), " << powx << ") * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\tvOut.y = (real_t)(vIn.y < 0 ? -1 : 1) * pow(fabs(vIn.y), " << powy << ") * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\tvOut.z = (real_t)(vIn.z < 0 ? -1 : 1) * pow(fabs(vIn.z), " << powz << ") * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1772,7 +1691,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_PowX, prefix + "linearT3D_powX", 1));
 		m_Params.push_back(ParamWithName<T>(&m_PowY, prefix + "linearT3D_powY", 1));
@@ -1792,7 +1710,7 @@ template <typename T>
 class EMBER_API OvoidVariation : public ParametricVariation<T>
 {
 public:
-	OvoidVariation(T weight = 1.0) : ParametricVariation<T>("ovoid", VAR_OVOID, weight, true)
+	OvoidVariation(T weight = 1.0) : ParametricVariation<T>("ovoid", eVariationId::VAR_OVOID, weight, true)
 	{
 		Init();
 	}
@@ -1802,10 +1720,9 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T r = m_Weight / Zeps(helper.m_PrecalcSumSquares);
-
 		helper.Out.x = helper.In.x * r * m_X;
 		helper.Out.y = helper.In.y * r * m_Y;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -1816,15 +1733,13 @@ public:
 		string index = ss2.str();
 		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares);\n"
 		   << "\n"
 		   << "\t\tvOut.x = vIn.x * r * " << x << ";\n"
 		   << "\t\tvOut.y = vIn.y * r * " << y << ";\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1837,7 +1752,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "ovoid_x", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "ovoid_y", 1));
@@ -1855,7 +1769,7 @@ template <typename T>
 class EMBER_API Ovoid3DVariation : public ParametricVariation<T>
 {
 public:
-	Ovoid3DVariation(T weight = 1.0) : ParametricVariation<T>("ovoid3d", VAR_OVOID3D, weight, true)
+	Ovoid3DVariation(T weight = 1.0) : ParametricVariation<T>("ovoid3d", eVariationId::VAR_OVOID3D, weight, true)
 	{
 		Init();
 	}
@@ -1865,7 +1779,6 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T r = m_Weight / Zeps(helper.m_PrecalcSumSquares + SQR(helper.In.z));
-
 		helper.Out.x = helper.In.x * r * m_X;
 		helper.Out.y = helper.In.y * r * m_Y;
 		helper.Out.z = helper.In.z * r * m_Z;
@@ -1880,7 +1793,6 @@ public:
 		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares + SQR(vIn.z));\n"
 		   << "\n"
@@ -1888,7 +1800,6 @@ public:
 		   << "\t\tvOut.y = vIn.y * r * " << y << ";\n"
 		   << "\t\tvOut.z = vIn.z * r * " << z << ";\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1901,7 +1812,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "ovoid3d_x", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "ovoid3d_y", 1));
@@ -1921,7 +1831,7 @@ template <typename T>
 class EMBER_API SpirographVariation : public ParametricVariation<T>
 {
 public:
-	SpirographVariation(T weight = 1.0) : ParametricVariation<T>("Spirograph", VAR_SPIROGRAPH, weight)
+	SpirographVariation(T weight = 1.0) : ParametricVariation<T>("Spirograph", eVariationId::VAR_SPIROGRAPH, weight)
 	{
 		Init();
 	}
@@ -1934,7 +1844,6 @@ public:
 		T y = (m_YMax - m_YMin) * rand.Frand01<T>() + m_YMin;
 		T x1 = (m_A + m_B) * std::cos(t) - m_C1 * std::cos((m_A + m_B) / m_B * t);
 		T y1 = (m_A + m_B) * std::sin(t) - m_C2 * std::sin((m_A + m_B) / m_B * t);
-
 		helper.Out.x = m_Weight * (x1 + m_D * std::cos(t) + y);
 		helper.Out.y = m_Weight * (y1 + m_D * std::sin(t) + y);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -1955,7 +1864,6 @@ public:
 		string ymax = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c1   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t t = (" << tmax << " - " << tmin << ") * MwcNext01(mwc) + " << tmin << ";\n"
 		   << "\t\treal_t y = (" << ymax << " - " << ymin << ") * MwcNext01(mwc) + " << ymin << ";\n"
@@ -1966,7 +1874,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y1 + " << d << " * sin(t) + y);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -1974,7 +1881,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_A,    prefix + "Spirograph_a", 3));
 		m_Params.push_back(ParamWithName<T>(&m_B,    prefix + "Spirograph_b", 2));
@@ -2006,7 +1912,7 @@ template <typename T>
 class EMBER_API PetalVariation : public Variation<T>
 {
 public:
-	PetalVariation(T weight = 1.0) : Variation<T>("petal", VAR_PETAL, weight) { }
+	PetalVariation(T weight = 1.0) : Variation<T>("petal", eVariationId::VAR_PETAL, weight) { }
 
 	VARCOPY(PetalVariation)
 
@@ -2017,7 +1923,6 @@ public:
 		T cosY = std::cos(helper.In.y);
 		T bx = Cube(cosX * cosY);
 		T by = Cube(sinX * cosY);
-
 		helper.Out.x = m_Weight * cosX * bx;
 		helper.Out.y = m_Weight * cosX * by;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2027,7 +1932,6 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\treal_t sinX = sin(vIn.x);\n"
 		   << "\t\treal_t cosX = cos(vIn.x);\n"
@@ -2040,7 +1944,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * cosX * by;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2057,14 +1960,13 @@ template <typename T>
 class EMBER_API RoundSpherVariation : public Variation<T>
 {
 public:
-	RoundSpherVariation(T weight = 1.0) : Variation<T>("roundspher", VAR_ROUNDSPHER, weight, true) { }
+	RoundSpherVariation(T weight = 1.0) : Variation<T>("roundspher", eVariationId::VAR_ROUNDSPHER, weight, true) { }
 
 	VARCOPY(RoundSpherVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T e = 1 / helper.m_PrecalcSumSquares + SQR(T(M_2_PI));
-
 		helper.Out.x = m_Weight * (m_Weight / helper.m_PrecalcSumSquares * helper.In.x / e);
 		helper.Out.y = m_Weight * (m_Weight / helper.m_PrecalcSumSquares * helper.In.y / e);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2074,7 +1976,6 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\treal_t e = 1 / precalcSumSquares + SQR(M_2_PI);\n"
 		   << "\n"
@@ -2082,7 +1983,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / precalcSumSquares * vIn.y / e);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 };
@@ -2094,7 +1994,7 @@ template <typename T>
 class EMBER_API RoundSpher3DVariation : public Variation<T>
 {
 public:
-	RoundSpher3DVariation(T weight = 1.0) : Variation<T>("roundspher3D", VAR_ROUNDSPHER3D, weight, true, true) { }
+	RoundSpher3DVariation(T weight = 1.0) : Variation<T>("roundspher3D", eVariationId::VAR_ROUNDSPHER3D, weight, true, true) { }
 
 	VARCOPY(RoundSpher3DVariation)
 
@@ -2103,7 +2003,7 @@ public:
 		T inZ, otherZ, tempTz, tempPz;
 		inZ = helper.In.z;
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 			otherZ = helper.m_TransZ;
 		else
 			otherZ = outPoint.m_Z;
@@ -2117,14 +2017,14 @@ public:
 		{
 			tempPz = std::cos(helper.m_PrecalcSqrtSumSquares);
 
-			if (m_VarType == VARTYPE_PRE)
+			if (m_VarType == eVariationType::VARTYPE_PRE)
 				helper.m_TransZ = 0;
 			else
 				outPoint.m_Z = 0;
 		}
 		else
 		{
-			if (m_VarType == VARTYPE_PRE)
+			if (m_VarType == eVariationType::VARTYPE_PRE)
 			{
 				tempPz = helper.m_TransZ;
 				helper.m_TransZ = 0;
@@ -2138,7 +2038,6 @@ public:
 
 		T d = helper.m_PrecalcSumSquares + SQR(tempTz);
 		T e = 1 / d + SQR(T(M_2_PI));
-
 		helper.Out.x = m_Weight * (m_Weight / d * helper.In.x / e);
 		helper.Out.y = m_Weight * (m_Weight / d * helper.In.y / e);
 		helper.Out.z = tempPz + m_Weight * (m_Weight / d * tempTz / e);
@@ -2148,62 +2047,61 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\treal_t inZ, otherZ, tempTz, tempPz;\n"
 		   << "\t\tinZ = vIn.z;\n"
 		   << "\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 			ss << "\t\totherZ = transZ;\n";
 		else
 			ss << "\t\totherZ = outPoint->m_Z;\n";
-		ss
-		   << "\n"
-		   << "\t\tif (inZ == 0)\n"
-		   << "\t\t	tempTz = cos(precalcSqrtSumSquares);\n"
-		   << "\t\telse\n"
-		   << "\t\t	tempTz = vIn.z;\n"
-		   << "\n"
-		   << "\t\tif (otherZ == 0)\n"
-		   << "\t\t{\n"
-		   << "\t\t	tempPz = cos(precalcSqrtSumSquares);\n"
-		   << "\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		ss
+				<< "\n"
+				<< "\t\tif (inZ == 0)\n"
+				<< "\t\t	tempTz = cos(precalcSqrtSumSquares);\n"
+				<< "\t\telse\n"
+				<< "\t\t	tempTz = vIn.z;\n"
+				<< "\n"
+				<< "\t\tif (otherZ == 0)\n"
+				<< "\t\t{\n"
+				<< "\t\t	tempPz = cos(precalcSqrtSumSquares);\n"
+				<< "\n";
+
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 			ss << "\t\t	transZ = 0;\n";
 		else
 			ss << "\t\t	outPoint->m_Z = 0;\n";
 
 		ss
-		   << "\t\t}\n"
-		   << "\t\telse\n"
-		   << "\t\t{\n";
+				<< "\t\t}\n"
+				<< "\t\telse\n"
+				<< "\t\t{\n";
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss
-				<< "\t\t		tempPz = transZ;\n"
-				<< "\t\t		transZ = 0;\n";
+					<< "\t\t		tempPz = transZ;\n"
+					<< "\t\t		transZ = 0;\n";
 		}
 		else
 		{
 			ss
-				<< "\t\t		tempPz = outPoint->m_Z;\n"
-				<< "\t\t		outPoint->m_Z = 0;\n";
+					<< "\t\t		tempPz = outPoint->m_Z;\n"
+					<< "\t\t		outPoint->m_Z = 0;\n";
 		}
 
 		ss
-		   << "\t\t}\n"
-		   << "\n"
-		   << "\t\treal_t d = precalcSumSquares + SQR(tempTz);\n"
-		   << "\t\treal_t e = 1 / d + SQR(M_2_PI);\n"
-		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * vIn.x / e);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * vIn.y / e);\n"
-		   << "\t\tvOut.z = tempPz + xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * tempTz / e);\n"
-		   << "\t}\n";
-
+				<< "\t\t}\n"
+				<< "\n"
+				<< "\t\treal_t d = precalcSumSquares + SQR(tempTz);\n"
+				<< "\t\treal_t e = 1 / d + SQR(M_2_PI);\n"
+				<< "\n"
+				<< "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * vIn.x / e);\n"
+				<< "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * vIn.y / e);\n"
+				<< "\t\tvOut.z = tempPz + xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * tempTz / e);\n"
+				<< "\t}\n";
 		return ss.str();
 	}
 };
@@ -2215,7 +2113,7 @@ template <typename T>
 class EMBER_API SpiralWingVariation : public Variation<T>
 {
 public:
-	SpiralWingVariation(T weight = 1.0) : Variation<T>("spiralwing", VAR_SPIRAL_WING, weight, true) { }
+	SpiralWingVariation(T weight = 1.0) : Variation<T>("spiralwing", eVariationId::VAR_SPIRAL_WING, weight, true) { }
 
 	VARCOPY(SpiralWingVariation)
 
@@ -2224,7 +2122,6 @@ public:
 		T d = Zeps(helper.m_PrecalcSumSquares);
 		T c1 = Zeps(SQR(helper.In.x));
 		T c2 = Zeps(SQR(helper.In.y));
-
 		helper.Out.x = m_Weight * ((1 / d) * std::cos(c1) * std::sin(c2));
 		helper.Out.y = m_Weight * ((1 / d) * std::sin(c1) * std::sin(c2));
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2234,7 +2131,6 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\treal_t d = Zeps(precalcSumSquares);\n"
 		   << "\t\treal_t c1 = Zeps(SQR(vIn.x));\n"
@@ -2244,7 +2140,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (((real_t)(1.0) / d) * sin(c1) * sin(c2));\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2261,7 +2156,7 @@ template <typename T>
 class EMBER_API SquarizeVariation : public Variation<T>
 {
 public:
-	SquarizeVariation(T weight = 1.0) : Variation<T>("squarize", VAR_SQUARIZE, weight, true, true, false, false, true) { }
+	SquarizeVariation(T weight = 1.0) : Variation<T>("squarize", eVariationId::VAR_SQUARIZE, weight, true, true, false, false, true) { }
 
 	VARCOPY(SquarizeVariation)
 
@@ -2307,7 +2202,6 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
 		   << "\n"
@@ -2344,7 +2238,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 };
@@ -2356,7 +2249,7 @@ template <typename T>
 class EMBER_API SschecksVariation : public ParametricVariation<T>
 {
 public:
-	SschecksVariation(T weight = 1.0) : ParametricVariation<T>("sschecks", VAR_SSCHECKS, weight, true)
+	SschecksVariation(T weight = 1.0) : ParametricVariation<T>("sschecks", eVariationId::VAR_SSCHECKS, weight, true)
 	{
 		Init();
 	}
@@ -2395,7 +2288,6 @@ public:
 		string size    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rand    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string invSize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
-
 		ss << "\t{\n"
 		   << "\t\treal_t dx, dy, r = xform->m_VariationWeights[" << varIndex << "] / (precalcSumSquares + EPS);\n"
 		   << "\t\tint isXY = LRint(vIn.x * " << invSize << ") + LRint(vIn.y * " << invSize << ");\n"
@@ -2415,7 +2307,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (sin(vIn.y) * r + dy);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2433,7 +2324,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_X,    prefix + "sschecks_x", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Y,    prefix + "sschecks_y", T(0.5)));
@@ -2457,7 +2347,7 @@ template <typename T>
 class EMBER_API PhoenixJuliaVariation : public ParametricVariation<T>
 {
 public:
-	PhoenixJuliaVariation(T weight = 1.0) : ParametricVariation<T>("phoenix_julia", VAR_PHOENIX_JULIA, weight, true)
+	PhoenixJuliaVariation(T weight = 1.0) : ParametricVariation<T>("phoenix_julia", eVariationId::VAR_PHOENIX_JULIA, weight, true)
 	{
 		Init();
 	}
@@ -2470,7 +2360,6 @@ public:
 		T preY = helper.In.y * (m_YDistort + 1);
 		T temp = std::atan2(preY, preX) * m_InvN + rand.Rand() * m_Inv2PiN;
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
-
 		helper.Out.x = r * std::cos(temp);
 		helper.Out.y = r * std::sin(temp);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2489,7 +2378,6 @@ public:
 		string cN       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string invN     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string inv2PiN  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t preX = vIn.x * (" << xDistort << " + 1);\n"
 		   << "\t\treal_t preY = vIn.y * (" << yDistort << " + 1);\n"
@@ -2500,7 +2388,6 @@ public:
 		   << "\t\tvOut.y = r * sin(temp);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2515,7 +2402,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Power,    prefix + "phoenix_julia_power", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Dist,     prefix + "phoenix_julia_dist", 1));
@@ -2543,7 +2429,7 @@ template <typename T>
 class EMBER_API MobiusVariation : public ParametricVariation<T>
 {
 public:
-	MobiusVariation(T weight = 1.0) : ParametricVariation<T>("Mobius", VAR_MOBIUS, weight)
+	MobiusVariation(T weight = 1.0) : ParametricVariation<T>("Mobius", eVariationId::VAR_MOBIUS, weight)
 	{
 		Init();
 	}
@@ -2557,7 +2443,6 @@ public:
 		T vRe = m_Re_C * helper.In.x - m_Im_C * helper.In.y + m_Re_D;
 		T vIm = m_Re_C * helper.In.y + m_Im_C * helper.In.x + m_Im_D;
 		T vDenom = Zeps(SQR(vRe) + SQR(vIm));
-
 		helper.Out.x = m_Weight * (uRe * vRe + uIm * vIm) / vDenom;
 		helper.Out.y = m_Weight * (uIm * vRe - uRe * vIm) / vDenom;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2577,7 +2462,6 @@ public:
 		string imC = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string reD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string imD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t uRe = " << reA << " * vIn.x - " << imA << " * vIn.y + " << reB << ";\n"
 		   << "\t\treal_t uIm = " << reA << " * vIn.y + " << imA << " * vIn.x + " << imB << ";\n"
@@ -2589,7 +2473,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (uIm * vRe - uRe * vIm) / vDenom;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2602,7 +2485,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Re_A, prefix + "Mobius_Re_A", 1));//Original omitted Mobius_ prefix, which is incompatible with Ember's design.
 		m_Params.push_back(ParamWithName<T>(&m_Im_A, prefix + "Mobius_Im_A"));
@@ -2632,7 +2514,7 @@ template <typename T>
 class EMBER_API MobiusNVariation : public ParametricVariation<T>
 {
 public:
-	MobiusNVariation(T weight = 1.0) : ParametricVariation<T>("MobiusN", VAR_MOBIUSN, weight, true, true, false, false, true)
+	MobiusNVariation(T weight = 1.0) : ParametricVariation<T>("MobiusN", eVariationId::VAR_MOBIUSN, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -2642,7 +2524,6 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		intmax_t n;
-
 		T z = 4 * m_Dist / m_Power;
 		T r = std::pow(helper.m_PrecalcSqrtSumSquares, z);
 		T alpha = helper.m_PrecalcAtanyx * m_Power;
@@ -2653,15 +2534,12 @@ public:
 		T reV = m_Re_C * x - m_Im_C * y + m_Re_D;
 		T imV = m_Re_C * y + m_Im_C * x + m_Im_D;
 		T radV = reV * reV + imV * imV;
-
 		x = (reU * reV + imU * imV) / radV;
 		y = (imU * reV - reU * imV) / radV;
-
 		z = 1 / z;
 		r = std::pow(std::sqrt(SQR(x) + SQR(y)), z);
 		n = Floor<T>(m_Power * rand.Frand01<T>());
 		alpha = (std::atan2(y, x) + n * M_2PI) / Floor<T>(m_Power);
-
 		helper.Out.x = m_Weight * r * std::cos(alpha);
 		helper.Out.y = m_Weight * r * std::sin(alpha);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2683,7 +2561,6 @@ public:
 		string imD   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\tint n;\n"
 		   << "\n"
@@ -2710,7 +2587,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * r * sin(alpha);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2724,7 +2600,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Re_A,  prefix + "MobiusNRe_A", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Im_A,  prefix + "MobiusNIm_A"));
@@ -2760,7 +2635,7 @@ template <typename T>
 class EMBER_API MobiusStripVariation : public ParametricVariation<T>
 {
 public:
-	MobiusStripVariation(T weight = 1.0) : ParametricVariation<T>("mobius_strip", VAR_MOBIUS_STRIP, weight)
+	MobiusStripVariation(T weight = 1.0) : ParametricVariation<T>("mobius_strip", eVariationId::VAR_MOBIUS_STRIP, weight)
 	{
 		Init();
 	}
@@ -2771,7 +2646,6 @@ public:
 	{
 		T s, t, mx, my, mz, rx, ry, rz;
 		T deltaT, deltaS;
-
 		t = helper.In.x;
 
 		//Put t in range -rectX to +rectX, then map that to 0 - 2pi.
@@ -2804,17 +2678,14 @@ public:
 		mx = (m_Radius + s * std::cos(t / 2)) * std::cos(t);
 		my = (m_Radius + s * std::cos(t / 2)) * std::sin(t);
 		mz = s * sin(t / 2);
-
 		//Rotate around X axis (change y & z) and store temporarily in R variables.
 		rx = mx;
 		ry = my * m_RotyCos + mz * m_RotySin;
 		rz = mz * m_RotyCos - my * m_RotySin;
-
 		//Rotate around Y axis (change x & z) and store back in M variables.
 		mx = rx * m_RotxCos - rz * m_RotxSin;
 		my = ry;
 		mz = rz * m_RotxCos + rx * m_RotxSin;
-
 		//Add final values in to variations totals.
 		helper.Out.x = m_Weight * mx;
 		helper.Out.y = m_Weight * my;
@@ -2837,7 +2708,6 @@ public:
 		string rotxCos = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotySin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotyCos = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t s, t, mx, my, mz, rx, ry, rz;\n"
 		   << "\t\treal_t deltaT, deltaS;\n"
@@ -2884,7 +2754,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * my;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2900,7 +2769,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Radius,  prefix + "mobius_strip_radius", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Width,   prefix + "mobius_strip_width", 1));
@@ -2934,7 +2802,7 @@ template <typename T>
 class EMBER_API LissajousVariation : public ParametricVariation<T>
 {
 public:
-	LissajousVariation(T weight = 1.0) : ParametricVariation<T>("Lissajous", VAR_LISSAJOUS, weight)
+	LissajousVariation(T weight = 1.0) : ParametricVariation<T>("Lissajous", eVariationId::VAR_LISSAJOUS, weight)
 	{
 		Init();
 	}
@@ -2947,7 +2815,6 @@ public:
 		T y = rand.Frand01<T>() - T(0.5);
 		T x1 = sin(m_A * t + m_D);
 		T y1 = sin(m_B * t);
-
 		helper.Out.x = m_Weight * (x1 + m_C * t + m_E * y);
 		helper.Out.y = m_Weight * (y1 + m_C * t + m_E * y);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2966,7 +2833,6 @@ public:
 		string c   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string d   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string e   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t t = (" << max << " - " << min << ") * MwcNext01(mwc) + " << min << ";\n"
 		   << "\t\treal_t y = MwcNext01(mwc) - (real_t)(0.5);\n"
@@ -2977,7 +2843,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y1 + " << c << " * t + " << e << " * y);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -2985,7 +2850,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Min, prefix + "Lissajous_tmin", -T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_Max, prefix + "Lissajous_tmax", T(M_PI)));
@@ -3013,7 +2877,7 @@ template <typename T>
 class EMBER_API SvfVariation : public ParametricVariation<T>
 {
 public:
-	SvfVariation(T weight = 1.0) : ParametricVariation<T>("svf", VAR_SVF, weight)
+	SvfVariation(T weight = 1.0) : ParametricVariation<T>("svf", eVariationId::VAR_SVF, weight)
 	{
 		Init();
 	}
@@ -3027,7 +2891,6 @@ public:
 		T cx = std::cos(helper.In.x);
 		T sy = std::sin(helper.In.y);
 		T cy = std::cos(helper.In.y);
-
 		helper.Out.x = m_Weight * (cy * (cn * cx));
 		helper.Out.y = m_Weight * (cy * (cn * sx));
 		helper.Out.z = m_Weight * (sy * cn);
@@ -3040,7 +2903,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t cn = cos(" << n << " * vIn.y);\n"
 		   << "\t\treal_t sx = sin(vIn.x);\n"
@@ -3052,7 +2914,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (cy * (cn * sx));\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (sy * cn);\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3060,7 +2921,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "svf_n", 2));
 	}
@@ -3076,7 +2936,7 @@ template <typename T>
 class EMBER_API TargetVariation : public ParametricVariation<T>
 {
 public:
-	TargetVariation(T weight = 1.0) : ParametricVariation<T>("target", VAR_TARGET, weight, true, true, false, false, true)
+	TargetVariation(T weight = 1.0) : ParametricVariation<T>("target", eVariationId::VAR_TARGET, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -3113,7 +2973,6 @@ public:
 		string odd      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string size     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string sizeDiv2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
 		   << "\t\treal_t t = log(precalcSqrtSumSquares);\n"
@@ -3132,7 +2991,6 @@ public:
 		   << "\t\tvOut.y = precalcSqrtSumSquares * sin(a);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3145,11 +3003,10 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Even, prefix + "target_even", 0, REAL_CYCLIC, 0, M_2PI));
-		m_Params.push_back(ParamWithName<T>(&m_Odd,  prefix + "target_odd",  0, REAL_CYCLIC, 0, M_2PI));
-		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "target_size", 1, REAL, EPS, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Even, prefix + "target_even", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Odd,  prefix + "target_odd",  0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "target_size", 1, eParamType::REAL, EPS, TMAX));
 		m_Params.push_back(ParamWithName<T>(true, &m_SizeDiv2, prefix + "target_size_2"));//Precalc.
 	}
 
@@ -3167,7 +3024,7 @@ template <typename T>
 class EMBER_API TaurusVariation : public ParametricVariation<T>
 {
 public:
-	TaurusVariation(T weight = 1.0) : ParametricVariation<T>("taurus", VAR_TAURUS, weight)
+	TaurusVariation(T weight = 1.0) : ParametricVariation<T>("taurus", eVariationId::VAR_TAURUS, weight)
 	{
 		Init();
 	}
@@ -3181,7 +3038,6 @@ public:
 		T sy = std::sin(helper.In.y);
 		T cy = std::cos(helper.In.y);
 		T ir = m_InvTimesR + (m_1MinusInv * (m_R * std::cos(m_N * helper.In.x)));
-
 		helper.Out.x = m_Weight * (cx * (ir + sy));
 		helper.Out.y = m_Weight * (sx * (ir + sy));
 		helper.Out.z = m_Weight * (m_Sor * cy) + (m_1MinusSor * helper.In.y);
@@ -3200,7 +3056,6 @@ public:
 		string invTimesR   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneMinusInv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneMinusSor = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t sx = sin(vIn.x);\n"
 		   << "\t\treal_t cx = cos(vIn.x);\n"
@@ -3212,7 +3067,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (sx * (ir + sy));\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (" << sor << " * cy) + (" << oneMinusSor << " * vIn.y);\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3227,7 +3081,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_R,   prefix + "taurus_r",   3));
 		m_Params.push_back(ParamWithName<T>(&m_N,   prefix + "taurus_n",   5));
@@ -3255,7 +3108,7 @@ template <typename T>
 class EMBER_API CollideoscopeVariation : public ParametricVariation<T>
 {
 public:
-	CollideoscopeVariation(T weight = 1.0) : ParametricVariation<T>("collideoscope", VAR_COLLIDEOSCOPE, weight, true, true, false, false, true)
+	CollideoscopeVariation(T weight = 1.0) : ParametricVariation<T>("collideoscope", eVariationId::VAR_COLLIDEOSCOPE, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -3304,7 +3157,6 @@ public:
 		string knpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string kakn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string pikn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\tint alt;\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
@@ -3333,7 +3185,6 @@ public:
 		   << "\t\tvOut.y = r * sin(a);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3350,10 +3201,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "collideoscope_a",   0, REAL_CYCLIC, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "collideoscope_num", 1, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "collideoscope_a",   0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "collideoscope_num", 1, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ka,   prefix + "collideoscope_ka"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_KnPi, prefix + "collideoscope_kn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_KaKn, prefix + "collideoscope_ka_kn"));
@@ -3376,7 +3226,7 @@ template <typename T>
 class EMBER_API BModVariation : public ParametricVariation<T>
 {
 public:
-	BModVariation(T weight = 1.0) : ParametricVariation<T>("bMod", VAR_BMOD, weight)
+	BModVariation(T weight = 1.0) : ParametricVariation<T>("bMod", eVariationId::VAR_BMOD, weight)
 	{
 		Init();
 	}
@@ -3392,7 +3242,6 @@ public:
 			tau = fmod(tau + m_Radius + m_Distance * m_Radius, 2 * m_Radius) - m_Radius;
 
 		T temp = std::cosh(tau) - std::cos(sigma);
-
 		helper.Out.x = m_Weight * std::sinh(tau) / temp;
 		helper.Out.y = m_Weight * std::sin(sigma) / temp;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -3406,7 +3255,6 @@ public:
 		string index = ss2.str();
 		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y)));\n"
 		   << "\t\treal_t sigma = M_PI - atan2(vIn.y, vIn.x + (real_t)(1.0)) - atan2(vIn.y, (real_t)(1.0) - vIn.x);\n"
@@ -3420,7 +3268,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3433,10 +3280,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "bMod_radius",   1, REAL, 0, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "bMod_distance", 0, REAL_CYCLIC, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "bMod_radius",   1, eParamType::REAL, 0, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "bMod_distance", 0, eParamType::REAL_CYCLIC, 0, 2));
 	}
 
 private:
@@ -3451,7 +3297,7 @@ template <typename T>
 class EMBER_API BSwirlVariation : public ParametricVariation<T>
 {
 public:
-	BSwirlVariation(T weight = 1.0) : ParametricVariation<T>("bSwirl", VAR_BSWIRL, weight)
+	BSwirlVariation(T weight = 1.0) : ParametricVariation<T>("bSwirl", eVariationId::VAR_BSWIRL, weight)
 	{
 		Init();
 	}
@@ -3462,11 +3308,8 @@ public:
 	{
 		T tau = T(0.5) * (std::log(Sqr(helper.In.x + 1) + SQR(helper.In.y)) - std::log(Sqr(helper.In.x - 1) + SQR(helper.In.y)));
 		T sigma = T(M_PI) - std::atan2(helper.In.y, helper.In.x + 1) - std::atan2(helper.In.y, 1 - helper.In.x);
-
 		sigma = sigma + tau * m_Out + m_In / tau;
-
 		T temp = std::cosh(tau) - std::cos(sigma);
-
 		helper.Out.x = m_Weight * std::sinh(tau) / temp;
 		helper.Out.y = m_Weight * std::sin(sigma) / temp;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -3480,7 +3323,6 @@ public:
 		string index = ss2.str();
 		string in  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string out = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y)));\n"
 		   << "\t\treal_t sigma = M_PI - atan2(vIn.y, vIn.x + (real_t)(1.0)) - atan2(vIn.y, (real_t)(1.0) - vIn.x);\n"
@@ -3493,7 +3335,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3506,7 +3347,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_In,  prefix + "bSwirl_in"));
 		m_Params.push_back(ParamWithName<T>(&m_Out, prefix + "bSwirl_out"));
@@ -3524,7 +3364,7 @@ template <typename T>
 class EMBER_API BTransformVariation : public ParametricVariation<T>
 {
 public:
-	BTransformVariation(T weight = 1.0) : ParametricVariation<T>("bTransform", VAR_BTRANSFORM, weight)
+	BTransformVariation(T weight = 1.0) : ParametricVariation<T>("bTransform", eVariationId::VAR_BTRANSFORM, weight)
 	{
 		Init();
 	}
@@ -3535,7 +3375,6 @@ public:
 	{
 		T tau = T(0.5) * (std::log(Sqr(helper.In.x + 1) + SQR(helper.In.y)) - std::log(Sqr(helper.In.x - 1) + SQR(helper.In.y))) / m_Power + m_Move;
 		T sigma = T(M_PI) - std::atan2(helper.In.y, helper.In.x + 1) - std::atan2(helper.In.y, 1 - helper.In.x) + m_Rotate;
-
 		sigma = sigma / m_Power + M_2PI / m_Power * Floor<T>(rand.Frand01<T>() * m_Power);
 
 		if (helper.In.x >= 0)
@@ -3544,7 +3383,6 @@ public:
 			tau -= m_Split;
 
 		T temp = std::cosh(tau) - std::cos(sigma);
-
 		helper.Out.x = m_Weight * std::sinh(tau) / temp;
 		helper.Out.y = m_Weight * std::sin(sigma) / temp;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -3560,7 +3398,6 @@ public:
 		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string move   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string split  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y))) / " << power << " + " << move << ";\n"
 		   << "\t\treal_t sigma = M_PI - atan2(vIn.y, vIn.x + (real_t)(1.0)) - atan2(vIn.y, (real_t)(1.0) - vIn.x) + " << rotate << ";\n"
@@ -3578,7 +3415,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3591,10 +3427,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "bTransform_rotate"));
-		m_Params.push_back(ParamWithName<T>(&m_Power,  prefix + "bTransform_power", 1, INTEGER, 1, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_Power,  prefix + "bTransform_power", 1, eParamType::INTEGER, 1, T(INT_MAX)));
 		m_Params.push_back(ParamWithName<T>(&m_Move,   prefix + "bTransform_move"));
 		m_Params.push_back(ParamWithName<T>(&m_Split,  prefix + "bTransform_split"));
 	}
@@ -3613,7 +3448,7 @@ template <typename T>
 class EMBER_API BCollideVariation : public ParametricVariation<T>
 {
 public:
-	BCollideVariation(T weight = 1.0) : ParametricVariation<T>("bCollide", VAR_BCOLLIDE, weight)
+	BCollideVariation(T weight = 1.0) : ParametricVariation<T>("bCollide", eVariationId::VAR_BCOLLIDE, weight)
 	{
 		Init();
 	}
@@ -3632,7 +3467,6 @@ public:
 			sigma = alt * m_PiCn + fmod(sigma - m_CaCn, m_PiCn);
 
 		T temp = std::cosh(tau) - std::cos(sigma);
-
 		helper.Out.x = m_Weight * sinh(tau) / temp;
 		helper.Out.y = m_Weight * sin(sigma) / temp;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -3650,7 +3484,6 @@ public:
 		string cnPi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string caCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string piCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y)));\n"
 		   << "\t\treal_t sigma = M_PI - atan2(vIn.y, vIn.x + (real_t)(1.0)) - atan2(vIn.y, (real_t)(1.0) - vIn.x);\n"
@@ -3667,7 +3500,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3688,10 +3520,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "bCollide_a",   0, REAL_CYCLIC, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "bCollide_num", 1, INTEGER, 1, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "bCollide_a",   0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "bCollide_num", 1, eParamType::INTEGER, 1, T(INT_MAX)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ca,   prefix + "bCollide_ca"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CnPi, prefix + "bCollide_cn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CaCn, prefix + "bCollide_ca_cn"));
@@ -3714,7 +3545,7 @@ template <typename T>
 class EMBER_API EclipseVariation : public ParametricVariation<T>
 {
 public:
-	EclipseVariation(T weight = 1.0) : ParametricVariation<T>("eclipse", VAR_ECLIPSE, weight)
+	EclipseVariation(T weight = 1.0) : ParametricVariation<T>("eclipse", eVariationId::VAR_ECLIPSE, weight)
 	{
 		Init();
 	}
@@ -3761,7 +3592,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t x, c2;\n"
 		   << "\n"
@@ -3793,7 +3623,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3801,9 +3630,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "eclipse_shift", 0, REAL_CYCLIC, -2, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "eclipse_shift", 0, eParamType::REAL_CYCLIC, -2, 2));
 	}
 
 private:
@@ -3817,7 +3645,7 @@ template <typename T>
 class EMBER_API FlipCircleVariation : public ParametricVariation<T>
 {
 public:
-	FlipCircleVariation(T weight = 1.0) : ParametricVariation<T>("flipcircle", VAR_FLIP_CIRCLE, weight, true)
+	FlipCircleVariation(T weight = 1.0) : ParametricVariation<T>("flipcircle", eVariationId::VAR_FLIP_CIRCLE, weight, true)
 	{
 		Init();
 	}
@@ -3843,7 +3671,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string ww = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
 		   << "\n"
@@ -3854,7 +3681,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -3867,7 +3693,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(true, &m_WeightSquared, prefix + "flipcircle_weight_squared"));
 	}
@@ -3883,7 +3708,7 @@ template <typename T>
 class EMBER_API FlipYVariation : public Variation<T>
 {
 public:
-	FlipYVariation(T weight = 1.0) : Variation<T>("flipy", VAR_FLIP_Y, weight) { }
+	FlipYVariation(T weight = 1.0) : Variation<T>("flipy", eVariationId::VAR_FLIP_Y, weight) { }
 
 	VARCOPY(FlipYVariation)
 
@@ -3903,7 +3728,6 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
-
 		ss << "\t{\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
 		   << "\n"
@@ -3914,7 +3738,6 @@ public:
 		   << "\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 };
@@ -3926,7 +3749,7 @@ template <typename T>
 class EMBER_API ECollideVariation : public ParametricVariation<T>
 {
 public:
-	ECollideVariation(T weight = 1.0) : ParametricVariation<T>("eCollide", VAR_ECOLLIDE, weight, true)
+	ECollideVariation(T weight = 1.0) : ParametricVariation<T>("eCollide", eVariationId::VAR_ECOLLIDE, weight, true)
 	{
 		Init();
 	}
@@ -3983,7 +3806,6 @@ public:
 		string cnPi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string caCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string piCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4020,7 +3842,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4041,10 +3862,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "eCollide_a",   0, REAL_CYCLIC, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "eCollide_num", 1, INTEGER, 1, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "eCollide_a",   0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "eCollide_num", 1, eParamType::INTEGER, 1, T(INT_MAX)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ca,   prefix + "eCollide_ca"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CnPi, prefix + "eCollide_cn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CaCn, prefix + "eCollide_ca_cn"));
@@ -4067,7 +3887,7 @@ template <typename T>
 class EMBER_API EJuliaVariation : public ParametricVariation<T>
 {
 public:
-	EJuliaVariation(T weight = 1.0) : ParametricVariation<T>("eJulia", VAR_EJULIA, weight, true)
+	EJuliaVariation(T weight = 1.0) : ParametricVariation<T>("eJulia", eVariationId::VAR_EJULIA, weight, true)
 	{
 		Init();
 	}
@@ -4091,9 +3911,7 @@ public:
 		T tmp = r2 + 1;
 		T tmp2 = 2 * x;
 		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
-
 		ClampGteRef<T>(xmax, 1);
-
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(x / xmax, -1, 1));//-Pi < nu < Pi.
 
@@ -4102,7 +3920,6 @@ public:
 
 		nu = nu / m_Power + M_2PI / m_Power * Floor<T>(rand.Frand01<T>() * m_Power);
 		mu /= m_Power;
-
 		helper.Out.x = m_Weight * std::cosh(mu) * std::cos(nu);
 		helper.Out.y = m_Weight * std::sinh(mu) * std::sin(nu);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -4116,7 +3933,6 @@ public:
 		string index = ss2.str();
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string sign  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t x, r2 = precalcSumSquares;\n"
 		   << "\n"
@@ -4150,7 +3966,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4171,9 +3986,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "eJulia_power", 2, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "eJulia_power", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_Sign, prefix + "eJulia_sign"));//Precalc.
 	}
 
@@ -4189,7 +4003,7 @@ template <typename T>
 class EMBER_API EModVariation : public ParametricVariation<T>
 {
 public:
-	EModVariation(T weight = 1.0) : ParametricVariation<T>("eMod", VAR_EMOD, weight, true)
+	EModVariation(T weight = 1.0) : ParametricVariation<T>("eMod", eVariationId::VAR_EMOD, weight, true)
 	{
 		Init();
 	}
@@ -4201,9 +4015,7 @@ public:
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
 		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
-
 		ClampGteRef<T>(xmax, 1);
-
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
 
@@ -4231,7 +4043,6 @@ public:
 		string index = ss2.str();
 		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4258,7 +4069,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4271,10 +4081,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "eMod_radius",   1, REAL, 0, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "eMod_distance", 0, REAL_CYCLIC, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "eMod_radius",   1, eParamType::REAL, 0, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "eMod_distance", 0, eParamType::REAL_CYCLIC, 0, 2));
 	}
 
 private:
@@ -4289,7 +4098,7 @@ template <typename T>
 class EMBER_API EMotionVariation : public ParametricVariation<T>
 {
 public:
-	EMotionVariation(T weight = 1.0) : ParametricVariation<T>("eMotion", VAR_EMOTION, weight, true)
+	EMotionVariation(T weight = 1.0) : ParametricVariation<T>("eMotion", eVariationId::VAR_EMOTION, weight, true)
 	{
 		Init();
 	}
@@ -4301,9 +4110,7 @@ public:
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
 		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
-
 		ClampGteRef<T>(xmax, 1);
-
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
 
@@ -4322,7 +4129,6 @@ public:
 		}
 
 		nu += m_Rotate;
-
 		helper.Out.x = m_Weight * std::cosh(mu) * std::cos(nu);
 		helper.Out.y = m_Weight * std::sinh(mu) * std::sin(nu);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -4336,7 +4142,6 @@ public:
 		string index = ss2.str();
 		string move   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4368,7 +4173,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4381,10 +4185,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Move,   prefix + "eMotion_move"));
-		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "eMotion_rotate", 0, REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "eMotion_rotate", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
 	}
 
 private:
@@ -4399,7 +4202,7 @@ template <typename T>
 class EMBER_API EPushVariation : public ParametricVariation<T>
 {
 public:
-	EPushVariation(T weight = 1.0) : ParametricVariation<T>("ePush", VAR_EPUSH, weight, true)
+	EPushVariation(T weight = 1.0) : ParametricVariation<T>("ePush", eVariationId::VAR_EPUSH, weight, true)
 	{
 		Init();
 	}
@@ -4411,9 +4214,7 @@ public:
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
 		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
-
 		ClampGteRef<T>(xmax, 1);
-
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
 
@@ -4423,7 +4224,6 @@ public:
 		nu += m_Rotate;
 		mu *= m_Dist;
 		mu += m_Push;
-
 		helper.Out.x = m_Weight * std::cosh(mu) * std::cos(nu);
 		helper.Out.y = m_Weight * std::sinh(mu) * std::sin(nu);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -4438,7 +4238,6 @@ public:
 		string push   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4461,7 +4260,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4474,11 +4272,10 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Push,   prefix + "ePush_push"));
 		m_Params.push_back(ParamWithName<T>(&m_Dist,   prefix + "ePush_dist", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "ePush_rotate", 0, REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "ePush_rotate", 0, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
 	}
 
 private:
@@ -4494,7 +4291,7 @@ template <typename T>
 class EMBER_API ERotateVariation : public ParametricVariation<T>
 {
 public:
-	ERotateVariation(T weight = 1.0) : ParametricVariation<T>("eRotate", VAR_EROTATE, weight, true)
+	ERotateVariation(T weight = 1.0) : ParametricVariation<T>("eRotate", eVariationId::VAR_EROTATE, weight, true)
 	{
 		Init();
 	}
@@ -4516,7 +4313,6 @@ public:
 			nu *= -1;
 
 		nu = fmod(nu + m_Rotate + T(M_PI), M_2PI) - T(M_PI);
-
 		helper.Out.x = m_Weight * xmax * std::cos(nu);
 		helper.Out.y = m_Weight * std::sqrt(xmax - 1) * std::sqrt(xmax + 1) * std::sin(nu);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -4529,7 +4325,6 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4549,7 +4344,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4562,9 +4356,8 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "eRotate_rotate", 0, REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "eRotate_rotate", 0, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
 	}
 
 private:
@@ -4578,7 +4371,7 @@ template <typename T>
 class EMBER_API EScaleVariation : public ParametricVariation<T>
 {
 public:
-	EScaleVariation(T weight = 1.0) : ParametricVariation<T>("eScale", VAR_ESCALE, weight, true)
+	EScaleVariation(T weight = 1.0) : ParametricVariation<T>("eScale", eVariationId::VAR_ESCALE, weight, true)
 	{
 		Init();
 	}
@@ -4590,9 +4383,7 @@ public:
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
 		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
-
 		ClampGteRef<T>(xmax, 1);
-
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
 
@@ -4621,7 +4412,6 @@ public:
 		string index = ss2.str();
 		string scale   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string angle   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4649,7 +4439,6 @@ public:
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
-
 		return ss.str();
 	}
 
@@ -4662,10 +4451,9 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "eScale_scale", 1, REAL_NONZERO, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "eScale_angle", 0, REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "eScale_scale", 1, eParamType::REAL_NONZERO, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "eScale_angle", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
 	}
 
 private:
@@ -4683,9 +4471,9 @@ MAKEPREPOSTPARVAR(Kaleidoscope, Kaleidoscope, KALEIDOSCOPE)
 MAKEPREPOSTPARVAR(GlynnSim1, GlynnSim1, GLYNNSIM1)
 MAKEPREPOSTPARVAR(GlynnSim2, GlynnSim2, GLYNNSIM2)
 MAKEPREPOSTPARVAR(GlynnSim3, GlynnSim3, GLYNNSIM3)
-MAKEPREPOSTPARVARASSIGN(Starblur, starblur, STARBLUR, ASSIGNTYPE_SUM)
-MAKEPREPOSTPARVARASSIGN(Sineblur, sineblur, SINEBLUR, ASSIGNTYPE_SUM)
-MAKEPREPOSTVARASSIGN(Circleblur, circleblur, CIRCLEBLUR, ASSIGNTYPE_SUM)
+MAKEPREPOSTPARVARASSIGN(Starblur, starblur, STARBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
+MAKEPREPOSTPARVARASSIGN(Sineblur, sineblur, SINEBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
+MAKEPREPOSTVARASSIGN(Circleblur, circleblur, CIRCLEBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Depth, depth, DEPTH)
 MAKEPREPOSTPARVAR(CropN, cropn, CROPN)
 MAKEPREPOSTPARVAR(ShredRad, shredrad, SHRED_RAD)
@@ -4696,7 +4484,7 @@ MAKEPREPOSTPARVAR(LinearT, linearT, LINEAR_T)
 MAKEPREPOSTPARVAR(LinearT3D, linearT3D, LINEAR_T3D)
 MAKEPREPOSTPARVAR(Ovoid, ovoid, OVOID)
 MAKEPREPOSTPARVAR(Ovoid3D, ovoid3d, OVOID3D)
-MAKEPREPOSTPARVARASSIGN(Spirograph, Spirograph, SPIROGRAPH, ASSIGNTYPE_SUM)
+MAKEPREPOSTPARVARASSIGN(Spirograph, Spirograph, SPIROGRAPH, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVAR(Petal, petal, PETAL)
 MAKEPREPOSTVAR(RoundSpher, roundspher, ROUNDSPHER)
 MAKEPREPOSTVAR(RoundSpher3D, roundspher3D, ROUNDSPHER3D)
@@ -4707,7 +4495,7 @@ MAKEPREPOSTPARVAR(PhoenixJulia, phoenix_julia, PHOENIX_JULIA)
 MAKEPREPOSTPARVAR(Mobius, Mobius, MOBIUS)
 MAKEPREPOSTPARVAR(MobiusN, MobiusN, MOBIUSN)
 MAKEPREPOSTPARVAR(MobiusStrip, mobius_strip, MOBIUS_STRIP)
-MAKEPREPOSTPARVARASSIGN(Lissajous, Lissajous, LISSAJOUS, ASSIGNTYPE_SUM)
+MAKEPREPOSTPARVARASSIGN(Lissajous, Lissajous, LISSAJOUS, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Svf, svf, SVF)
 MAKEPREPOSTPARVAR(Target, target, TARGET)
 MAKEPREPOSTPARVAR(Taurus, taurus, TAURUS)

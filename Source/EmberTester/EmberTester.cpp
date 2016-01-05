@@ -120,14 +120,14 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 
 	while (index < varList.RegSize())
 	{
-		/*  if (index != VAR_SYNTH)
+		/*  if (index != eVariationId::VAR_SYNTH)
 		    {
 			index++;
 			continue;
 		    }
 		*/
 		Ember<T> ember1;
-		unique_ptr<Variation<T>> regVar(varList.GetVariationCopy(index, VARTYPE_REG));
+		unique_ptr<Variation<T>> regVar(varList.GetVariationCopy(index, eVariationType::VARTYPE_REG));
 		unique_ptr<Variation<T>> preVar(varList.GetVariationCopy("pre_" + regVar->Name()));
 		unique_ptr<Variation<T>> postVar(varList.GetVariationCopy("post_" + regVar->Name()));
 		ember1.m_FinalRasW = 640;
@@ -342,7 +342,7 @@ static vector<Variation<T>*> FindVarsWith(vector<string>& stringVec, bool findAl
 
 	while (index < vl.RegSize())
 	{
-		auto regVar = vl.GetVariation(index, VARTYPE_REG);
+		auto regVar = vl.GetVariation(index, eVariationType::VARTYPE_REG);
 
 		if (SearchVar(regVar, stringVec, false))
 		{
@@ -363,18 +363,18 @@ bool TestVarCounts()
 	VariationList<float> vlf;
 #ifdef DO_DOUBLE
 	VariationList<double> vld;
-	bool success ((vlf.Size() == vld.Size()) && (vlf.Size() == LAST_VAR));
+	bool success((vlf.Size() == vld.Size()) && (vlf.Size() == size_t(eVariationId::LAST_VAR)));
 #else
 	bool success = true;
 #endif
-	uint start = (uint)VAR_ARCH;
+	uint start = et(eVariationId::VAR_ARCH);
 
 	if (!success)
 	{
-		cout << "Variation list size " << vlf.Size() << " does not equal the max var ID enum " << (uint)LAST_VAR << "." << endl;
+		cout << "Variation list size " << vlf.Size() << " does not equal the max var ID enum " << et(eVariationId::LAST_VAR) << "." << endl;
 	}
 
-	for (; start < (uint)LAST_VAR; start++)
+	for (; start < et(eVariationId::LAST_VAR); start++)
 	{
 		auto var = vlf.GetVariation((eVariationId)start);
 
@@ -480,13 +480,13 @@ bool TestVarEqual(const Variation<sT>* var1, const Variation<dT>* var2)
 
 	if (var1->VariationId() != var2->VariationId())
 	{
-		cout << "Variation IDs were not equal: " << var1->VariationId() << " != " << var2->VariationId() << endl;
+		cout << "Variation IDs were not equal: " << et(var1->VariationId()) << " != " << et(var2->VariationId()) << endl;
 		success = false;
 	}
 
 	if (var1->VarType() != var2->VarType())
 	{
-		cout << "Variation types were not equal: " << var1->VarType() << " != " << var2->VarType() << endl;
+		cout << "Variation types were not equal: " << et(var1->VarType()) << " != " << et(var2->VarType()) << endl;
 		success = false;
 	}
 
@@ -587,7 +587,7 @@ bool TestVarPrePostNames()
 		auto var = vlf.GetVariation(i);
 		string name = var->Name();
 
-		if (var->VarType() == VARTYPE_REG)
+		if (var->VarType() == eVariationType::VARTYPE_REG)
 		{
 			if (name.find("pre_") == 0)
 			{
@@ -601,7 +601,7 @@ bool TestVarPrePostNames()
 				success = false;
 			}
 		}
-		else if (var->VarType() == VARTYPE_PRE)
+		else if (var->VarType() == eVariationType::VARTYPE_PRE)
 		{
 			if (name.find("pre_") != 0)
 			{
@@ -609,7 +609,7 @@ bool TestVarPrePostNames()
 				success = false;
 			}
 		}
-		else if (var->VarType() == VARTYPE_POST)
+		else if (var->VarType() == eVariationType::VARTYPE_POST)
 		{
 			if (name.find("post_") != 0)
 			{
@@ -734,7 +734,7 @@ bool TestVarRegPrePost()
 
 	for (size_t i = 0; i < vlf.RegSize(); i++)
 	{
-		auto regVar = vlf.GetVariation(i, VARTYPE_REG);
+		auto regVar = vlf.GetVariation(i, eVariationType::VARTYPE_REG);
 
 		if (regVar)
 		{
@@ -978,9 +978,9 @@ bool TestVarAssignTypes()
 		string s = var->OpenCLString();
 
 		//Only test pre and post. The assign type for regular is ignored, and will always be summed.
-		if (var->VarType() != VARTYPE_REG)
+		if (var->VarType() != eVariationType::VARTYPE_REG)
 		{
-			if (var->AssignType() == ASSIGNTYPE_SET)
+			if (var->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
 			{
 				if (!SearchVar(var, vset, false))
 				{
@@ -988,7 +988,7 @@ bool TestVarAssignTypes()
 					success = false;
 				}
 			}
-			else if (var->AssignType() == ASSIGNTYPE_SUM)
+			else if (var->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
 			{
 				if (SearchVar(var, vsum, false))
 				{
@@ -998,7 +998,7 @@ bool TestVarAssignTypes()
 			}
 			else
 			{
-				cout << "Variation " << var->Name() << " had an invalid assign type of " << var->AssignType() << endl;
+				cout << "Variation " << var->Name() << " had an invalid assign type of " << et(var->AssignType()) << endl;
 			}
 		}
 	}
@@ -1147,7 +1147,7 @@ void TestXformsInOutPoints()
 	while (index < varList.RegSize())
 	{
 		vector<Xform<float>> xforms;
-		unique_ptr<Variation<float>> regVar(varList.GetVariationCopy(index, VARTYPE_REG));
+		unique_ptr<Variation<float>> regVar(varList.GetVariationCopy(index, eVariationType::VARTYPE_REG));
 		string s = regVar->OpenCLString() + regVar->OpenCLFuncsString();
 
 		if (s.find("MwcNext") == string::npos)
@@ -1263,7 +1263,7 @@ void TestVarTime()
 	{
 		double sum = 0;
 		Xform<T> xform;
-		Variation<T>* var = vlf.GetVariationCopy(i, VARTYPE_REG);
+		Variation<T>* var = vlf.GetVariationCopy(i, eVariationType::VARTYPE_REG);
 		xform.AddVariation(var);
 
 		for (int iter = 0; iter < iters; iter++)
@@ -1371,7 +1371,7 @@ void TestVarsSimilar()
 	{
 		double diff = 0, highest = TMAX;
 		Xform<T> xform;
-		Variation<T>* var = vlf.GetVariationCopy(i, VARTYPE_REG);
+		Variation<T>* var = vlf.GetVariationCopy(i, eVariationType::VARTYPE_REG);
 		pair<string, double> match("", TMAX);
 		compIndex = 0;
 		xform.AddVariation(var);
@@ -1386,7 +1386,7 @@ void TestVarsSimilar()
 
 			double sum = 0, xdiff = 0, ydiff = 0, zdiff = 0;
 			Xform<T> xformComp;
-			Variation<T>* varComp = vlf.GetVariationCopy(compIndex, VARTYPE_REG);
+			Variation<T>* varComp = vlf.GetVariationCopy(compIndex, eVariationType::VARTYPE_REG);
 			xformComp.AddVariation(varComp);
 			ParametricVariation<T>* parVar = dynamic_cast<ParametricVariation<T>*>(var);
 			ParametricVariation<T>* parVarComp = dynamic_cast<ParametricVariation<T>*>(varComp);
@@ -1430,7 +1430,7 @@ void TestVarsSimilar()
 				}
 
 				//For debugging.
-				if (var->VariationId() == VAR_BWRAPS && varComp->VariationId() == VAR_ECLIPSE)
+				if (var->VariationId() == eVariationId::VAR_BWRAPS && varComp->VariationId() == eVariationId::VAR_ECLIPSE)
 				{
 					//cout << "Break." << endl;
 				}
@@ -1515,7 +1515,7 @@ template <typename T>
 void TestCpuGpuResults(size_t platform, size_t device)
 {
 	bool breakOnBad = true;
-	int i = 0;//(int)VAR_TARGET;//Start at the one you want to test.
+	int i = 0;//(int)eVariationId::VAR_TARGET;//Start at the one you want to test.
 	int iters = 10;
 	int skipped = 0;
 	T thresh = T(1e-3);
@@ -1531,7 +1531,7 @@ void TestCpuGpuResults(size_t platform, size_t device)
 	{
 		bool bad = false;
 		double sum = 0;
-		Variation<T>* var = vlf.GetVariation(i, VARTYPE_REG);
+		Variation<T>* var = vlf.GetVariation(i, eVariationType::VARTYPE_REG);
 		string s = var->OpenCLString() + var->OpenCLFuncsString();
 
 		if (s.find("MwcNext") != string::npos)
@@ -1622,7 +1622,7 @@ void TestGpuVectorRead(size_t platform, size_t device)
 	vector<pair<size_t, size_t>> devices{ std::make_pair(platform, device) };
 	RendererCL<T, float> renderer(devices);
 	points.resize(renderer.TotalIterKernelCount());
-	Variation<T>* var = vlf.GetVariation(VAR_LINEAR);
+	Variation<T>* var = vlf.GetVariation(eVariationId::VAR_LINEAR);
 	bool newAlloc = false;
 	Point<T> p, p2;
 	Ember<T> ember;

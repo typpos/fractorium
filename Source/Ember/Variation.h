@@ -20,7 +20,7 @@ template <typename T> class Xform;
 /// <summary>
 /// The type of variation: regular, pre or post.
 /// </summary>
-enum eVariationType
+enum class eVariationType : et
 {
 	VARTYPE_REG,
 	VARTYPE_PRE,
@@ -33,7 +33,7 @@ enum eVariationType
 /// to the output. However, if they did not involve the input points, they should be added
 /// to the output.
 /// </summary>
-enum eVariationAssignType
+enum class eVariationAssignType : et
 {
 	ASSIGNTYPE_SET,
 	ASSIGNTYPE_SUM
@@ -42,7 +42,7 @@ enum eVariationAssignType
 /// <summary>
 /// Complete list of every variation class ID.
 /// </summary>
-enum eVariationId
+enum class eVariationId : et
 {
 	VAR_ARCH           ,
 	VAR_AUGER		   ,
@@ -520,8 +520,8 @@ enum eVariationId
 	VAR_PRE_LINEAR,
 	VAR_PRE_LINEAR_T,
 	VAR_PRE_LINEAR_T3D,
-	//VAR_PRE_LINEAR_XZ,
-	//VAR_PRE_LINEAR_YZ,
+	//eVariationId::VAR_PRE_LINEAR_XZ,
+	//eVariationId::VAR_PRE_LINEAR_YZ,
 	VAR_PRE_LINEAR3D,
 	VAR_PRE_LISSAJOUS,
 	VAR_PRE_LOG,
@@ -1002,7 +1002,7 @@ enum eVariationId
 	VAR_POST_DC_TRIANGLE,
 	VAR_POST_DC_ZTRANSL,
 
-	LAST_VAR = VAR_POST_DC_ZTRANSL + 1
+	LAST_VAR = eVariationId::VAR_POST_DC_ZTRANSL + 1
 };
 
 /// <summary>
@@ -1077,7 +1077,7 @@ public:
 			m_NeedPrecalcSqrtSumSquares = true;
 		}
 
-		m_AssignType = ASSIGNTYPE_SET;
+		m_AssignType = eVariationAssignType::ASSIGNTYPE_SET;
 		SetType();
 	}
 
@@ -1150,7 +1150,7 @@ public:
 	/// <param name="point">The point to read values from in the case of post, ignored for pre.</param>
 	void PrecalcHelper(IteratorHelper<T>& iteratorHelper, Point<T>* point)
 	{
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			if (m_NeedPrecalcSumSquares)
 			{
@@ -1174,7 +1174,7 @@ public:
 			if (m_NeedPrecalcAtanYX)
 				iteratorHelper.m_PrecalcAtanyx = atan2(iteratorHelper.m_TransY, iteratorHelper.m_TransX);
 		}
-		else if (m_VarType == VARTYPE_POST)
+		else if (m_VarType == eVariationType::VARTYPE_POST)
 		{
 			if (m_NeedPrecalcSumSquares)
 			{
@@ -1208,7 +1208,7 @@ public:
 	{
 		ostringstream ss;
 
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			if (m_NeedPrecalcSumSquares)
 			{
@@ -1232,7 +1232,7 @@ public:
 			if (m_NeedPrecalcAtanYX)
 				ss << "\tprecalcAtanyx = atan2(transY, transX);\n";
 		}
-		else if (m_VarType == VARTYPE_POST)
+		else if (m_VarType == eVariationType::VARTYPE_POST)
 		{
 			if (m_NeedPrecalcSumSquares)
 			{
@@ -1385,9 +1385,9 @@ public:
 	/// <returns>pre_, post_ or the empty string</returns>
 	string Prefix() const
 	{
-		if (m_VarType == VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_PRE)
 			return "pre_";
-		else if (m_VarType == VARTYPE_POST)
+		else if (m_VarType == eVariationType::VARTYPE_POST)
 			return "post_";
 		else
 			return "";
@@ -1427,11 +1427,11 @@ protected:
 	void SetType()
 	{
 		if (m_Name.find("pre_") == 0)
-			m_VarType = VARTYPE_PRE;
+			m_VarType = eVariationType::VARTYPE_PRE;
 		else if (m_Name.find("post_") == 0)
-			m_VarType = VARTYPE_POST;
+			m_VarType = eVariationType::VARTYPE_POST;
 		else
-			m_VarType = VARTYPE_REG;
+			m_VarType = eVariationType::VARTYPE_REG;
 	}
 
 	Xform<T>* m_Xform;//The parent Xform that this variation is a child of.
@@ -1452,7 +1452,7 @@ private:
 /// The type of parameter represented by ParamWithName<T>.
 /// This allows restricting of certain parameters to sensible values.
 /// </summary>
-enum eParamType
+enum class eParamType : et
 {
 	REAL,
 	REAL_CYCLIC,
@@ -1460,6 +1460,44 @@ enum eParamType
 	INTEGER,
 	INTEGER_NONZERO
 };
+
+/// <summary>
+/// Thin wrapper to allow << operator on param type.
+/// </summary>
+/// <param name="stream">The stream to insert into</param>
+/// <param name="t">The type whose string representation will be inserted into the stream</param>
+/// <returns></returns>
+static std::ostream& operator<<(std::ostream& stream, const eParamType& t)
+{
+	switch (t)
+	{
+		case eParamType::REAL:
+			stream << "real";
+			break;
+
+		case eParamType::REAL_CYCLIC:
+			stream << "cyclic";
+			break;
+
+		case eParamType::REAL_NONZERO:
+			stream << "non-zero";
+			break;
+
+		case eParamType::INTEGER:
+			stream << "integer";
+			break;
+
+		case eParamType::INTEGER_NONZERO:
+			stream << "integer non-zero";
+			break;
+
+		default:
+			stream << "error";
+			break;
+	}
+
+	return stream;
+}
 
 template <typename T> class ParametricVariation;
 
@@ -1487,7 +1525,7 @@ public:
 	/// </summary>
 	ParamWithName()
 	{
-		Init(nullptr, "", 0, REAL, TLOW, TMAX);
+		Init(nullptr, "", 0, eParamType::REAL, TLOW, TMAX);
 	}
 
 	/// <summary>
@@ -1502,7 +1540,7 @@ public:
 				  string name,
 				  size_t size = sizeof(T))
 	{
-		Init(param, name, 0, REAL, TLOW, TMAX, true, false, size);
+		Init(param, name, 0, eParamType::REAL, TLOW, TMAX, true, false, size);
 	}
 
 	/// <summary>
@@ -1517,7 +1555,7 @@ public:
 				  T* param,
 				  string name)
 	{
-		Init(param, name, 0, REAL, TLOW, TMAX, true, true);
+		Init(param, name, 0, eParamType::REAL, TLOW, TMAX, true, true);
 	}
 
 	/// <summary>
@@ -1529,7 +1567,7 @@ public:
 	/// <param name="type">The type of the parameter</param>
 	/// <param name="min">The minimum value the parameter can be</param>
 	/// <param name="max">The maximum value the parameter can be</param>
-	ParamWithName(T* param, const string& name, T def = 0, eParamType type = REAL, T min = TLOW, T max = TMAX)
+	ParamWithName(T* param, const string& name, T def = 0, eParamType type = eParamType::REAL, T min = TLOW, T max = TMAX)
 	{
 		Init(param, name, def, type, min, max);
 	}
@@ -1586,7 +1624,7 @@ public:
 	/// <param name="isPrecalc">Whether the parameter is actually a precalculated value. Default: false.</param>
 	/// <param name="isState">Whether the parameter changes state between iterations. Default: false.</param>
 	/// <param name="size">The length of the underlying memory in bytes. Needed for array types. Default: sizeof(T).</param>
-	void Init(T* param, const string& name, T def = 0, eParamType type = REAL, T min = TLOW, T max = TMAX, bool isPrecalc = false, bool isState = false, size_t size = sizeof(T))
+	void Init(T* param, const string& name, T def = 0, eParamType type = eParamType::REAL, T min = TLOW, T max = TMAX, bool isPrecalc = false, bool isState = false, size_t size = sizeof(T))
 	{
 		m_Param = param;
 		m_Def = def;
@@ -1610,13 +1648,13 @@ public:
 	{
 		switch (m_Type)
 		{
-			case REAL :
+			case eParamType::REAL:
 			{
 				*m_Param = std::max(std::min(val, m_Max), m_Min);
 				break;
 			}
 
-			case REAL_CYCLIC :
+			case eParamType::REAL_CYCLIC :
 			{
 				if (val > m_Max)
 					*m_Param = m_Min + fmod(val - m_Min, m_Max - m_Min);
@@ -1628,7 +1666,7 @@ public:
 				break;
 			}
 
-			case REAL_NONZERO :
+			case eParamType::REAL_NONZERO :
 			{
 				T vd = std::max(std::min(val, m_Max), m_Min);
 
@@ -1640,13 +1678,13 @@ public:
 				break;
 			}
 
-			case INTEGER :
+			case eParamType::INTEGER :
 			{
 				*m_Param = T(int(std::max(std::min<T>(T(Floor<T>(val + T(0.5))), m_Max), m_Min)));
 				break;
 			}
 
-			case INTEGER_NONZERO :
+			case eParamType::INTEGER_NONZERO :
 			default:
 			{
 				int vi = int(std::max(std::min<T>(T(Floor<T>(val + T(0.5))), m_Max), m_Min));
@@ -2098,7 +2136,7 @@ protected:
 /// Assign type defaults to set.
 /// </summary>
 
-#define MAKEPREPOSTVAR(varName, stringName, enumName) MAKEPREPOSTVARASSIGN(varName, stringName, enumName, ASSIGNTYPE_SET)
+#define MAKEPREPOSTVAR(varName, stringName, enumName) MAKEPREPOSTVARASSIGN(varName, stringName, enumName, eVariationAssignType::ASSIGNTYPE_SET)
 #define MAKEPREPOSTVARASSIGN(varName, stringName, enumName, assignType) \
 	template <typename T> \
 	class EMBER_API Pre##varName##Variation : public varName##Variation<T> \
@@ -2107,7 +2145,7 @@ protected:
 	public: \
 		Pre##varName##Variation(T weight = 1.0) : varName##Variation<T>(weight) \
 		{ \
-			m_VariationId = VAR_PRE_##enumName; \
+			m_VariationId = eVariationId::VAR_PRE_##enumName; \
 			m_Name = "pre_"#stringName; \
 			m_AssignType = assignType; \
 			SetType(); \
@@ -2123,7 +2161,7 @@ protected:
 	public:\
 		Post##varName##Variation(T weight = 1.0) : varName##Variation<T>(weight) \
 		{ \
-			m_VariationId = VAR_POST_##enumName; \
+			m_VariationId = eVariationId::VAR_POST_##enumName; \
 			m_Name = "post_"#stringName; \
 			m_AssignType = assignType; \
 			SetType(); \
@@ -2217,7 +2255,7 @@ protected:
 /// avoid having to change the constructor arguments for about 300 variations.
 /// </summary>
 
-#define MAKEPREPOSTPARVAR(varName, stringName, enumName) MAKEPREPOSTPARVARASSIGN(varName, stringName, enumName, ASSIGNTYPE_SET)
+#define MAKEPREPOSTPARVAR(varName, stringName, enumName) MAKEPREPOSTPARVARASSIGN(varName, stringName, enumName, eVariationAssignType::ASSIGNTYPE_SET)
 #define MAKEPREPOSTPARVARASSIGN(varName, stringName, enumName, assignType) \
 	template <typename T> \
 	class EMBER_API Pre##varName##Variation : public varName##Variation <T> \
@@ -2228,7 +2266,7 @@ protected:
 	public:\
 		Pre##varName##Variation(T weight = 1.0) : varName##Variation<T>(weight) \
 		{ \
-			m_VariationId = VAR_PRE_##enumName; \
+			m_VariationId = eVariationId::VAR_PRE_##enumName; \
 			m_Name = "pre_"#stringName; \
 			m_AssignType = assignType; \
 			SetType(); \
@@ -2247,7 +2285,7 @@ protected:
 	public:\
 		Post##varName##Variation(T weight = 1.0) : varName##Variation<T>(weight) \
 		{ \
-			m_VariationId = VAR_POST_##enumName; \
+			m_VariationId = eVariationId::VAR_POST_##enumName; \
 			m_Name = "post_"#stringName; \
 			m_AssignType = assignType; \
 			SetType(); \

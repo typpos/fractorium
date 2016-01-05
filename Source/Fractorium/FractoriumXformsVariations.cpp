@@ -7,14 +7,12 @@
 void Fractorium::InitXformsVariationsUI()
 {
 	auto tree = ui.VariationsTree;
-
 	tree->clear();
 	tree->header()->setSectionsClickable(true);
 	connect(tree->header(),					SIGNAL(sectionClicked(int)),		 this, SLOT(OnTreeHeaderSectionClicked(int)));
 	connect(ui.VariationsFilterLineEdit,	SIGNAL(textChanged(const QString&)), this, SLOT(OnVariationsFilterLineEditTextChanged(const QString&)));
 	connect(ui.VariationsFilterClearButton, SIGNAL(clicked(bool)),				 this, SLOT(OnVariationsFilterClearButtonClicked(bool)));
 	connect(ui.ActionVariationsDialog,		SIGNAL(triggered(bool)),			 this, SLOT(OnActionVariationsDialog(bool)), Qt::QueuedConnection);
-
 	//Setting dimensions in the designer with a layout is futile, so must hard code here.
 	tree->setColumnWidth(0, 160);
 	tree->setColumnWidth(1, 23);
@@ -47,7 +45,6 @@ void FractoriumEmberController<T>::Filter(const QString& text)
 	auto& ids = m_Fractorium->m_VarDialog->Map();
 	auto tree = m_Fractorium->ui.VariationsTree;
 	auto xform = CurrentXform();
-
 	tree->setUpdatesEnabled(false);
 
 	for (int i = 0; i < tree->topLevelItemCount(); i++)
@@ -55,7 +52,7 @@ void FractoriumEmberController<T>::Filter(const QString& text)
 		if (auto item = dynamic_cast<VariationTreeWidgetItem*>(tree->topLevelItem(i)))
 		{
 			auto varName = item->text(0);
-			
+
 			if (xform && xform->GetVariationById(item->Id()))//If it's present then show it no matter what the filter is.
 			{
 				item->setHidden(false);
@@ -84,7 +81,6 @@ template <typename T>
 void FractoriumEmberController<T>::FilteredVariations()
 {
 	auto& map = m_Fractorium->m_VarDialog->Map();
-
 	m_FilteredVariations.clear();
 	m_FilteredVariations.reserve(map.size());
 
@@ -108,7 +104,6 @@ void FractoriumEmberController<T>::SetupVariationTree()
 	QSize hint0(75, 16);
 	QSize hint1(30, 16);
 	auto tree = m_Fractorium->ui.VariationsTree;
-
 	tree->clear();
 	tree->blockSignals(true);
 
@@ -116,11 +111,9 @@ void FractoriumEmberController<T>::SetupVariationTree()
 	{
 		auto var = m_VariationList.GetVariation(i);
 		auto parVar = dynamic_cast<const ParametricVariation<T>*>(var);
-
 		//First add the variation, with a spinner for its weight.
 		auto item = new VariationTreeWidgetItem(var->VariationId(), tree);
 		auto spinBox = new VariationTreeDoubleSpinBox(tree, item, var->VariationId(), "");
-
 		item->setText(0, QString::fromStdString(var->Name()));
 		item->setSizeHint(0, hint0);
 		item->setSizeHint(1, hint1);
@@ -144,7 +137,6 @@ void FractoriumEmberController<T>::SetupVariationTree()
 				{
 					auto paramWidget = new VariationTreeWidgetItem(var->VariationId(), item);
 					auto varSpinBox = new VariationTreeDoubleSpinBox(tree, paramWidget, parVar->VariationId(), params[j].Name());
-
 					paramWidget->setText(0, params[j].Name().c_str());
 					paramWidget->setSizeHint(0, hint0);
 					paramWidget->setSizeHint(1, hint1);
@@ -154,7 +146,7 @@ void FractoriumEmberController<T>::SetupVariationTree()
 					varSpinBox->DoubleClickZero(1);
 					varSpinBox->DoubleClickNonZero(0);
 
-					if (params[j].Type() == INTEGER || params[j].Type() == INTEGER_NONZERO)
+					if (params[j].Type() == eParamType::INTEGER || params[j].Type() == eParamType::INTEGER_NONZERO)
 					{
 						varSpinBox->setSingleStep(1);
 						varSpinBox->Step(1);
@@ -185,7 +177,6 @@ void FractoriumEmberController<T>::ClearVariationsTree()
 	{
 		QTreeWidgetItem* item = tree->topLevelItem(i);
 		auto* spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(tree->itemWidget(item, 1));
-
 		spinBox->SetValueStealth(0);
 
 		for (int j = 0; j < item->childCount(); j++)//Iterate through all of the children, which will be the params.
@@ -252,7 +243,6 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 					//If the item wasn't a param and the xform did not contain this variation,
 					//it means they went from zero to a non-zero weight, so add a new copy of this xform.
 					auto newVar = var->Copy();//Create a new one with default values.
-
 					newVar->m_Weight = d;
 					xform->AddVariation(newVar);
 					widgetItem->setBackgroundColor(0, QColor(200, 200, 200));//Set background to gray when a variation has non-zero weight in this xform.
@@ -262,7 +252,7 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 					if (parVar)
 					{
 						auto newParVar = dynamic_cast<ParametricVariation<T>*>(newVar);
-					
+
 						for (int i = 0; i < widgetItem->childCount(); i++)//Iterate through all of the children, which will be the params.
 						{
 							auto childItem = widgetItem->child(i);//Get the child.
@@ -271,7 +261,6 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 							if (auto spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget))//Cast the widget to the VariationTreeDoubleSpinBox type.
 							{
 								string s = childItem->text(0).toStdString();//Use the name of the child, and the value of the spinner widget to assign the param.
-
 								newParVar->SetParamVal(s.c_str(), spinBox->value());
 							}
 						}
@@ -295,7 +284,6 @@ template <typename T>
 void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 {
 	auto tree = m_Fractorium->ui.VariationsTree;
-
 	tree->blockSignals(true);
 	m_Fractorium->Filter();
 
@@ -385,5 +373,5 @@ void Fractorium::OnVariationsFilterClearButtonClicked(bool checked)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-	template class FractoriumEmberController<double>;
+template class FractoriumEmberController<double>;
 #endif

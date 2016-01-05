@@ -13,18 +13,15 @@ GLWidget::GLWidget(QWidget* p)
 	: QOpenGLWidget(p)
 {
 	QSurfaceFormat qsf;
-
 	m_Init = false;
 	m_Drawing = false;
 	m_TexWidth = 0;
 	m_TexHeight = 0;
 	m_OutputTexID = 0;
 	m_Fractorium = nullptr;
-
 	qsf.setSwapInterval(1);//Vsync.
 	qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	qsf.setVersion(2, 0);
-
 	setFormat(qsf);
 }
 
@@ -45,11 +42,9 @@ void GLWidget::InitGL()
 	{
 		int w = m_Fractorium->ui.GLParentScrollArea->width();
 		int h = m_Fractorium->ui.GLParentScrollArea->height();
-
 		SetDimensions(w, h);
 		m_Fractorium->m_WidthSpin->setValue(w);
 		m_Fractorium->m_HeightSpin->setValue(h);
-
 		//Start with a flock of 10 random embers. Can't do this until now because the window wasn't maximized yet, so the sizes would have been off.
 		m_Fractorium->OnActionNewFlock(false);
 		m_Fractorium->m_Controller->DelayedStartRenderTimer();
@@ -77,7 +72,7 @@ void GLWidget::DrawQuad()
 	if (m_OutputTexID != 0 && finalImage && !finalImage->empty())
 	{
 		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);//The texture to draw to.
-		
+
 		//Only draw if the dimensions match exactly.
 		if (m_TexWidth == width() && m_TexHeight == height() && ((m_TexWidth * m_TexHeight * 4) == GLint(finalImage->size())))
 		{
@@ -90,16 +85,14 @@ void GLWidget::DrawQuad()
 			glLoadIdentity();
 
 			//Copy data from CPU to OpenGL if using a CPU renderer. This is not needed when using OpenCL.
-			if (renderer->RendererType() == CPU_RENDERER)
+			if (renderer->RendererType() == eRendererType::CPU_RENDERER)
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_UNSIGNED_BYTE, finalImage->data());
 
 			glBegin(GL_QUADS);//This will need to be converted to a shader at some point in the future.
-
 			glTexCoord2f(0.0, 0.0); glVertex2f(0.0, 0.0);
 			glTexCoord2f(0.0, 1.0); glVertex2f(0.0, 1.0);
 			glTexCoord2f(1.0, 1.0); glVertex2f(1.0, 1.0);
 			glTexCoord2f(1.0, 0.0); glVertex2f(1.0, 0.0);
-			
 			glEnd();
 			glMatrixMode(GL_PROJECTION);
 			glPopMatrix();
@@ -120,13 +113,27 @@ void GLWidget::DrawQuad()
 void GLEmberControllerBase::ClearDrag()
 {
 	m_DragModifier = 0;
-	m_DragState = DragNone;
+	m_DragState = eDragState::DragNone;
 }
 
 /// <summary>
 /// Wrapper around Allocate() call on the GL widget.
 /// </summary>
 bool GLEmberControllerBase::Allocate(bool force) { return m_GL->Allocate(force); }
+
+/// <summary>
+/// Helpers to set/get/clear which keys are pressed while dragging.
+/// </summary>
+/// <returns>bool</returns>
+bool GLEmberControllerBase::GetAlt()     { return (m_DragModifier & et(eDragModifier::DragModAlt)) == et(eDragModifier::DragModAlt); }
+bool GLEmberControllerBase::GetShift()   { return (m_DragModifier & et(eDragModifier::DragModShift)) == et(eDragModifier::DragModShift); }
+bool GLEmberControllerBase::GetControl() { return (m_DragModifier & et(eDragModifier::DragModControl)) == et(eDragModifier::DragModControl); }
+void GLEmberControllerBase::SetAlt() { m_DragModifier |= et(eDragModifier::DragModAlt); }
+void GLEmberControllerBase::SetShift() { m_DragModifier |= et(eDragModifier::DragModShift); }
+void GLEmberControllerBase::SetControl() { m_DragModifier |= et(eDragModifier::DragModControl); }
+void GLEmberControllerBase::ClearAlt() { m_DragModifier &= ~et(eDragModifier::DragModAlt); }
+void GLEmberControllerBase::ClearShift() { m_DragModifier &= ~et(eDragModifier::DragModShift); }
+void GLEmberControllerBase::ClearControl() { m_DragModifier &= ~et(eDragModifier::DragModControl); }
 
 /// <summary>
 /// Clear the OpenGL output window to be the background color of the current ember.
@@ -136,7 +143,6 @@ template <typename T>
 void GLEmberController<T>::ClearWindow()
 {
 	Ember<T>* ember = m_FractoriumEmberController->CurrentEmber();
-	
 	m_GL->makeCurrent();
 	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_GL->glClearColor(ember->m_Background.r, ember->m_Background.g, ember->m_Background.b, 1.0);
@@ -191,11 +197,9 @@ void GLWidget::initializeGL()
 	if (!m_Init && initializeOpenGLFunctions() && m_Fractorium)
 	{
 		glClearColor(0.0, 0.0, 0.0, 1.0);
-
 		glEnable(GL_TEXTURE_2D);
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_MaxTexSize);
 		glDisable(GL_TEXTURE_2D);
-
 		m_Fractorium->m_WidthSpin->setMaximum(m_MaxTexSize);
 		m_Fractorium->m_HeightSpin->setMaximum(m_MaxTexSize);
 	}
@@ -213,22 +217,18 @@ void GLWidget::paintGL()
 	if (controller && controller->Renderer() && controller->RenderTimerRunning())
 	{
 		RendererBase* renderer = controller->Renderer();
-
 		m_Drawing = true;
 		controller->GLController()->DrawImage();
-		
 		//Affine drawing.
 		bool pre = m_Fractorium->ui.PreAffineGroupBox->isChecked();
 		bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
 		float unitX = fabs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f;
 		float unitY = fabs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f;
-
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
@@ -236,21 +236,16 @@ void GLWidget::paintGL()
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
-
 		glDisable(GL_DEPTH_TEST);
-
 		controller->GLController()->DrawAffines(pre, post);
-
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 		glDisable(GL_LINE_SMOOTH);
 		glDisable(GL_POINT_SMOOTH);
-
 		m_Drawing = false;
 	}
 }
@@ -263,23 +258,21 @@ void GLEmberController<T>::DrawImage()
 {
 	RendererBase* renderer = m_FractoriumEmberController->Renderer();
 	Ember<T>* ember = m_FractoriumEmberController->CurrentEmber();
-	
 	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_GL->glClearColor(ember->m_Background.r, ember->m_Background.g, ember->m_Background.b, 1.0);
 	m_GL->glDisable(GL_DEPTH_TEST);
-	
 	renderer->EnterFinalAccum();//Lock, may not be necessary, but just in case.
 	renderer->EnterResize();
-		
+
 	if (SizesMatch())//Ensure all sizes are correct. If not, do nothing.
 	{
 		vector<byte>* finalImage = m_FractoriumEmberController->FinalImage();
-	
-		if (renderer->RendererType() == OPENCL_RENDERER || finalImage)//Final image only matters for CPU renderer.
-			if (renderer->RendererType() == OPENCL_RENDERER || finalImage->size() == renderer->FinalBufferSize())
+
+		if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage)//Final image only matters for CPU renderer.
+			if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage->size() == renderer->FinalBufferSize())
 				m_GL->DrawQuad();//Output image is drawn here.
 	}
-	
+
 	renderer->LeaveResize();//Unlock, may not be necessary.
 	renderer->LeaveFinalAccum();
 }
@@ -294,10 +287,10 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 {
 	QueryVMP();//Resolves to float or double specialization function depending on T.
 	Ember<T>* ember = m_FractoriumEmberController->CurrentEmber();
-	bool dragging = m_DragState == DragDragging;
+	bool dragging = m_DragState == eDragState::DragDragging;
 
 	//Draw grid if control key is pressed.
-	if (m_GL->hasFocus() && ((m_DragModifier & DragModControl) == DragModControl))
+	if (m_GL->hasFocus() && GetControl())
 	{
 		m_GL->glLineWidth(1.0f);
 		m_GL->DrawGrid();
@@ -307,7 +300,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 	if (!m_Fractorium->m_Settings->ShowAllXforms() && dragging)
 	{
 		if (m_SelectedXform)
-			DrawAffine(m_SelectedXform, m_AffineType == AffinePre, true);
+			DrawAffine(m_SelectedXform, m_AffineType == eAffineType::AffinePre, true);
 	}
 	else//Show all while dragging, or not dragging just hovering/mouse move.
 	{
@@ -317,7 +310,6 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			{
 				Xform<T>* xform = ember->GetTotalXform(i);
 				bool selected = dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform);
-
 				DrawAffine(xform, true, selected);
 			}
 		}
@@ -332,7 +324,6 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			{
 				Xform<T>* xform = ember->GetTotalXform(i);
 				bool selected = dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform);
-
 				DrawAffine(xform, false, selected);
 			}
 		}
@@ -351,7 +342,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		m_GL->glEnd();
 		m_GL->glPointSize(1.0f);//Restore point size.
 	}
-	else if (m_HoverType != HoverNone && m_HoverXform == m_SelectedXform)//Draw large turquoise dot on hover if they are hovering over the selected xform.
+	else if (m_HoverType != eHoverType::HoverNone && m_HoverXform == m_SelectedXform)//Draw large turquoise dot on hover if they are hovering over the selected xform.
 	{
 		m_GL->glPointSize(6.0f);
 		m_GL->glBegin(GL_POINTS);
@@ -369,24 +360,26 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 bool GLEmberControllerBase::KeyPress_(QKeyEvent* e)
 {
 #ifdef OLDDRAG
+
 	if (e->key() == Qt::Key_Shift)
-		m_DragModifier |= DragModShift;
+		SetShift();
 	else if (e->key() == Qt::Key_Control || e->key() == Qt::Key_C)
-		m_DragModifier |= DragModControl;
+		SetControl();
 	else if (e->key() == Qt::Key_Alt || e->key() == Qt::Key_A)
-		m_DragModifier |= DragModAlt;
+		SetAlt();
 	else
 		return false;
 
 	return true;
 #else
+
 	if (e->key() == Qt::Key_Control)
 	{
-		m_DragModifier |= DragModControl;
+		SetControl();
 		return true;
 	}
-#endif
 
+#endif
 	return false;
 }
 
@@ -409,24 +402,26 @@ void GLWidget::keyPressEvent(QKeyEvent* e)
 bool GLEmberControllerBase::KeyRelease_(QKeyEvent* e)
 {
 #ifdef OLDDRAG
+
 	if (e->key() == Qt::Key_Shift)
-		m_DragModifier &= ~DragModShift;
+		ClearShift();
 	else if (e->key() == Qt::Key_Control || e->key() == Qt::Key_C)
-		m_DragModifier &= ~DragModControl;
+		ClearControl();
 	else if (e->key() == Qt::Key_Alt || e->key() == Qt::Key_A)
-		m_DragModifier &= ~DragModAlt;
+		ClearAlt();
 	else
 		return false;
 
 	return true;
 #else
+
 	if (e->key() == Qt::Key_Control)
 	{
-		m_DragModifier &= ~DragModControl;
+		ClearControl();
 		return true;
 	}
-#endif
 
+#endif
 	return false;
 }
 
@@ -435,7 +430,7 @@ bool GLEmberControllerBase::KeyRelease_(QKeyEvent* e)
 /// </summary>
 /// <param name="e">The event</param>
 void GLWidget::keyReleaseEvent(QKeyEvent* e)
-{	
+{
 	if (!GLController() || !GLController()->KeyRelease_(e))
 		QOpenGLWidget::keyReleaseEvent(e);
 
@@ -466,18 +461,20 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 	m_BoundsDown.x = renderer->LowerLeftY(false);
 	m_BoundsDown.y = renderer->UpperRightX(false);
 	m_BoundsDown.z = renderer->UpperRightY(false);
-
 #ifndef OLDDRAG
 	Qt::KeyboardModifiers mod = e->modifiers();
-	
+
 	if (mod.testFlag(Qt::ShiftModifier))
-		m_DragModifier |= DragModShift;
+		SetShift();
+
 	//if (mod.testFlag(Qt::ControlModifier))// || mod.testFlag(Qt::Key_C))
 	//	m_DragModifier |= DragModControl;
 	if (mod.testFlag(Qt::AltModifier))// || mod.testFlag(Qt::Key_A))
-		m_DragModifier |= DragModAlt;
+		SetAlt();
+
 #endif
-	if (m_DragState == DragNone)//Only take action if the user wasn't already dragging.
+
+	if (m_DragState == eDragState::DragNone)//Only take action if the user wasn't already dragging.
 	{
 		m_MouseDownWorldPos = m_MouseWorldPos;//Set the mouse down position to the current position.
 
@@ -488,14 +485,12 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 			if (m_HoverXform && xformIndex != -1)
 			{
 				m_SelectedXform = m_HoverXform;
-				m_DragSrcTransform = Affine2D<T>(m_AffineType == AffinePre ? m_SelectedXform->m_Affine : m_SelectedXform->m_Post);//Copy the affine of the xform that was selected.
+				m_DragSrcTransform = Affine2D<T>(m_AffineType == eAffineType::AffinePre ? m_SelectedXform->m_Affine : m_SelectedXform->m_Post);//Copy the affine of the xform that was selected.
 				m_DragHandlePos = m_HoverHandlePos;
 				m_DragHandleOffset = m_DragHandlePos - m_MouseWorldPos;
-				m_DragState = DragDragging;
-				
+				m_DragState = eDragState::DragDragging;
 				//The user has selected an xform by clicking on it, so update the main GUI by selecting this xform in the combo box.
 				m_Fractorium->CurrentXform(xformIndex);
-
 				//Draw large yellow dot on select or drag.
 				m_GL->glPointSize(6.0f);
 				m_GL->glBegin(GL_POINTS);
@@ -508,14 +503,14 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 			else//Nothing was selected.
 			{
 				//m_SelectedXform = nullptr;
-				m_DragState = DragNone;
+				m_DragState = eDragState::DragNone;
 			}
 		}
 		else if (e->button() == Qt::MiddleButton)//Middle button does whole image translation.
 		{
 			m_CenterDownX = ember->m_CenterX;//Capture where the center of the image is because this value will change when panning.
 			m_CenterDownY = ember->m_CenterY;
-			m_DragState = DragPanning;
+			m_DragState = eDragState::DragPanning;
 		}
 		else if (e->button() == Qt::RightButton)//Right button does whole image rotation and scaling.
 		{
@@ -525,7 +520,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 			m_CenterDownY = ember->m_CenterY;
 			m_RotationDown = ember->m_Rotate;
 			m_ScaleDown = ember->m_PixelsPerUnit;
-			m_DragState = DragRotateScale;
+			m_DragState = eDragState::DragRotateScale;
 		}
 	}
 }
@@ -553,18 +548,15 @@ template <typename T>
 void GLEmberController<T>::MouseRelease(QMouseEvent* e)
 {
 	v3T mouseFlipped(e->x() * m_GL->devicePixelRatio(), m_Viewport[3] - e->y() * m_GL->devicePixelRatio(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
-
 	m_MouseWorldPos = WindowToWorld(mouseFlipped, false);
-	
-	if (m_DragState == DragDragging && (e->button() & Qt::LeftButton))
+
+	if (m_DragState == eDragState::DragDragging && (e->button() & Qt::LeftButton))
 		UpdateHover(mouseFlipped);
 
-	m_DragState = DragNone;
-
+	m_DragState = eDragState::DragNone;
 #ifndef OLDDRAG
 	m_DragModifier = 0;
 #endif
-
 	m_GL->repaint();//Force immediate redraw.
 }
 
@@ -594,7 +586,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 	glm::ivec2 mouse(e->x() * m_GL->devicePixelRatio(), e->y() * m_GL->devicePixelRatio());
 	v3T mouseFlipped(e->x() * m_GL->devicePixelRatio(), m_Viewport[3] - e->y() * m_GL->devicePixelRatio(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	Ember<T>* ember = m_FractoriumEmberController->CurrentEmber();
-	
+
 	//First check to see if the mouse actually moved.
 	if (mouse == m_MousePos)
 		return;
@@ -607,43 +599,39 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 	if (m_Fractorium->m_Controller->RenderTimerRunning())
 		m_Fractorium->SetCoordinateStatus(e->x() * m_GL->devicePixelRatio(), e->y() * m_GL->devicePixelRatio(), m_MouseWorldPos.x, m_MouseWorldPos.y);
 
-	if (m_SelectedXform && m_DragState == DragDragging)//Dragging and affine.
+	if (m_SelectedXform && m_DragState == eDragState::DragDragging)//Dragging and affine.
 	{
-		bool pre = m_AffineType == AffinePre;
+		bool pre = m_AffineType == eAffineType::AffinePre;
 		Affine2D<T>* affine = pre ? &m_SelectedXform->m_Affine : &m_SelectedXform->m_Post;//Determine pre or post affine.
 
-		if (m_HoverType == HoverTranslation)
+		if (m_HoverType == eHoverType::HoverTranslation)
 			*affine = CalcDragTranslation();
-		else if (m_HoverType == HoverXAxis)
+		else if (m_HoverType == eHoverType::HoverXAxis)
 			*affine = CalcDragXAxis();
-		else if (m_HoverType == HoverYAxis)
+		else if (m_HoverType == eHoverType::HoverYAxis)
 			*affine = CalcDragYAxis();
 
 		m_FractoriumEmberController->FillAffineWithXform(m_SelectedXform, pre);//Update the spinners in the affine tab of the main window.
 		m_FractoriumEmberController->UpdateRender();//Restart the rendering process.
 	}
-	else if (m_DragState == DragPanning)//Translating the whole image.
+	else if (m_DragState == eDragState::DragPanning)//Translating the whole image.
 	{
 		T x = -(m_MouseWorldPos.x - m_MouseDownWorldPos.x);
 		T y = (m_MouseWorldPos.y - m_MouseDownWorldPos.y);
 		Affine2D<T> rotMat;
-
 		rotMat.C(m_CenterDownX);
 		rotMat.F(m_CenterDownY);
 		rotMat.Rotate(ember->m_Rotate);
-
 		v2T v1(x, y);
 		v2T v2 = rotMat.TransformVector(v1);
-
 		ember->m_CenterX = v2.x;
 		ember->m_CenterY = ember->m_RotCenterY = v2.y;
 		m_FractoriumEmberController->SetCenter(ember->m_CenterX, ember->m_CenterY);//Will restart the rendering process.
 	}
-	else if (m_DragState == DragRotateScale)//Rotating and scaling the whole image.
+	else if (m_DragState == eDragState::DragRotateScale)//Rotating and scaling the whole image.
 	{
 		T rot = CalcRotation();
 		T scale = CalcScale();
-
 		ember->m_Rotate = NormalizeDeg180<T>(m_RotationDown + rot);
 		m_Fractorium->SetRotation(ember->m_Rotate, true);
 		ember->m_PixelsPerUnit = m_ScaleDown + scale;
@@ -660,7 +648,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		//In that case, nothing needs to be done.
 		if (UpdateHover(mouseFlipped) == -1)
 			draw = false;
-		
+
 		//Xform<T>* previousHover = m_HoverXform;
 		//
 		//if (UpdateHover(mouseFlipped) == -1)
@@ -669,12 +657,13 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		//if (m_HoverXform == previousHover)
 		//	draw = false;
 	}
-	
+
 	//Only update if the user was dragging or hovered over a point.
 	//Use repaint() to update immediately for a more responsive feel.
-	if ((m_DragState != DragNone) || draw)
+	if ((m_DragState != eDragState::DragNone) || draw)
 		m_GL->update();
-		//m_GL->repaint();
+
+	//m_GL->repaint();
 }
 
 /// <summary>
@@ -684,10 +673,10 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 void GLWidget::mouseMoveEvent(QMouseEvent* e)
 {
 	setFocus();//Must do this so that this window gets keyboard events.
-	
+
 	if (GLEmberControllerBase* controller = GLController())
 		controller->MouseMove(e);
-	
+
 	QOpenGLWidget::mouseMoveEvent(e);
 }
 
@@ -715,7 +704,7 @@ void GLWidget::wheelEvent(QWheelEvent* e)
 {
 	if (GLEmberControllerBase* controller = GLController())
 		controller->Wheel(e);
-	
+
 	//Do not call QOpenGLWidget::wheelEvent(e) because this should only affect the scale and not the position of the scroll bars.
 }
 
@@ -773,7 +762,6 @@ bool GLWidget::Allocate(bool force)
 
 		glGenTextures(1, &m_OutputTexID);
 		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//Fractron had this as GL_LINEAR_MIPMAP_LINEAR for OpenCL and Cuda.
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -781,7 +769,7 @@ bool GLWidget::Allocate(bool force)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		alloc = true;
 	}
-	
+
 	if (alloc)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -835,14 +823,13 @@ template <typename T>
 bool GLEmberController<T>::SizesMatch()
 {
 	Ember<T>* ember = m_FractoriumEmberController->CurrentEmber();
-
 	return (ember &&
-		ember->m_FinalRasW == m_GL->width() &&
-		ember->m_FinalRasH == m_GL->height() &&
-		m_GL->width() == m_GL->m_TexWidth &&
-		m_GL->height() == m_GL->m_TexHeight &&
-		m_GL->m_TexWidth == m_GL->m_ViewWidth &&
-		m_GL->m_TexHeight == m_GL->m_ViewHeight);
+			ember->m_FinalRasW == m_GL->width() &&
+			ember->m_FinalRasH == m_GL->height() &&
+			m_GL->width() == m_GL->m_TexWidth &&
+			m_GL->height() == m_GL->m_TexHeight &&
+			m_GL->m_TexWidth == m_GL->m_ViewWidth &&
+			m_GL->m_TexHeight == m_GL->m_ViewHeight);
 }
 
 /// <summary>
@@ -860,7 +847,6 @@ void GLWidget::DrawGrid()
 	float xHigh = ceil(unitX);
 	float yLow =  floor(-unitY);
 	float yHigh = ceil(unitY);
-			
 	glBegin(GL_LINES);
 
 	if (rad <= 8.0f)
@@ -920,21 +906,19 @@ void GLWidget::DrawUnitSquare()
 	glLineWidth(1.0f);
 	glBegin(GL_LINES);
 	glColor4f(1.0f, 1.0f, 1.0f, 0.25f);
-	glVertex2f(-1,-1);
-	glVertex2f( 1,-1);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
 	glVertex2f(-1, 1);
 	glVertex2f( 1, 1);
-
-	glVertex2f(-1,-1);
+	glVertex2f(-1, -1);
 	glVertex2f(-1, 1);
-	glVertex2f( 1,-1);
+	glVertex2f( 1, -1);
 	glVertex2f( 1, 1);
-			
 	glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
 	glVertex2f(-1, 0);
 	glVertex2f( 1, 0);
 	glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
-	glVertex2f( 0,-1);
+	glVertex2f( 0, -1);
 	glVertex2f( 0, 1);
 	glEnd();
 }
@@ -956,21 +940,17 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	size_t size = ember->m_Palette.m_Entries.size();
 	v4T color = ember->m_Palette.m_Entries[Clamp<T>(xform->m_ColorX * size, 0, size - 1)];
 	Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
-	
 	//For some incredibly strange reason, even though glm and OpenGL use matrices with a column-major
 	//data layout, nothing will work here unless they are flipped to row major order. This is how it was
 	//done in Fractron.
 	m4T mat = affine->ToMat4RowMajor();
-
 	m_GL->glPushMatrix();
 	m_GL->glLoadIdentity();
 	MultMatrix(mat);
 	m_GL->glLineWidth(3.0f);//One 3px wide, colored black, except green on x axis for post affine.
 	m_GL->DrawAffineHelper(index, selected, pre, final, true);
-
 	m_GL->glLineWidth(1.0f);//Again 1px wide, colored white, to give a white middle with black outline effect.
 	m_GL->DrawAffineHelper(index, selected, pre, final, false);
-
 	m_GL->glPointSize(5.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
 	m_GL->glBegin(GL_POINTS);
 	m_GL->glColor4f(0.0f, 0.0f, 0.0f, selected ? 1.0f : 0.5f);
@@ -978,14 +958,12 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_GL->glVertex2f(1.0f, 0.0f);
 	m_GL->glVertex2f(0.0f, 1.0f);
 	m_GL->glEnd();
-
 	m_GL->glLineWidth(2.0f);//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
 	m_GL->glBegin(GL_LINES);
 	m_GL->glColor4f(color.r, color.g, color.b, 1.0f);
 	m_GL->glVertex2f(0.0f, 0.0f);
 	m_GL->glVertex2f(0.0f, 1.0f);
 	m_GL->glEnd();
-
 	m_GL->glPointSize(3.0f);//Draw smaller white points, to give a black outline effect.
 	m_GL->glBegin(GL_POINTS);
 	m_GL->glColor4f(1.0f, 1.0f, 1.0f, selected ? 1.0f : 0.5f);
@@ -1010,7 +988,6 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool pre, bool final, 
 	float px = 1.0f;
 	float py = 0.0f;
 	QColor col = final ? m_Fractorium->m_FinalXformComboColor : m_Fractorium->m_XformComboColors[index % XFORM_COLOR_COUNT];
-
 	glBegin(GL_LINES);
 
 	//Circle part.
@@ -1030,7 +1007,6 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool pre, bool final, 
 			float theta = float(M_PI) * 2.0f * float(i % 64) / 64.0f;
 			float fx = float(cos(theta));
 			float fy = float(sin(theta));
-
 			glVertex2f(px, py);
 			glVertex2f(fx, fy);
 			px = fx;
@@ -1054,13 +1030,12 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool pre, bool final, 
 	//The lines from the center to the circle.
 	glVertex2f(0.0f, 0.0f);//X axis.
 	glVertex2f(1.0f, 0.0f);
-	
+
 	if (background)
 		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 
 	glVertex2f(0.0f, 0.0f);//Y axis.
 	glVertex2f(0.0f, 1.0f);
-
 	glEnd();
 }
 
@@ -1080,8 +1055,7 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 	uint bestIndex = -1;
 	T bestDist = 10;
 	Ember<T>* ember = m_FractoriumEmberController->CurrentEmber();
-
-	m_HoverType = HoverNone;
+	m_HoverType = eHoverType::HoverNone;
 
 	//If there's a selected/current xform, check it first so it gets precedence over the others.
 	if (m_SelectedXform)
@@ -1154,42 +1128,41 @@ bool GLEmberController<T>::CheckXformHover(Xform<T>* xform, v3T& glCoords, T& be
 		v3T xAxisScreen = glm::project(translation + xAxis, m_Modelview, m_Projection, m_Viewport);
 		v3T yAxis(xform->m_Affine.B(), xform->m_Affine.E(), 0);
 		v3T yAxisScreen = glm::project(translation + yAxis, m_Modelview, m_Projection, m_Viewport);
-
 		pos = translation;
 		dist = glm::distance(glCoords, transScreen);
 
 		if (dist < bestDist)
 		{
 			bestDist = dist;
-			m_HoverType = HoverTranslation;
+			m_HoverType = eHoverType::HoverTranslation;
 			m_HoverHandlePos = pos;
 			preFound = true;
 		}
 
 		pos = translation + xAxis;
 		dist = glm::distance(glCoords, xAxisScreen);
-	
+
 		if (dist < bestDist)
 		{
 			bestDist = dist;
-			m_HoverType = HoverXAxis;
+			m_HoverType = eHoverType::HoverXAxis;
 			m_HoverHandlePos = pos;
 			preFound = true;
 		}
 
 		pos = translation + yAxis;
 		dist = glm::distance(glCoords, yAxisScreen);
-	
+
 		if (dist < bestDist)
 		{
 			bestDist = dist;
-			m_HoverType = HoverYAxis;
+			m_HoverType = eHoverType::HoverYAxis;
 			m_HoverHandlePos = pos;
 			preFound = true;
 		}
 
 		if (preFound)
-			m_AffineType = AffinePre;
+			m_AffineType = eAffineType::AffinePre;
 	}
 
 	if (post)
@@ -1200,42 +1173,41 @@ bool GLEmberController<T>::CheckXformHover(Xform<T>* xform, v3T& glCoords, T& be
 		v3T xAxisScreen = glm::project(translation + xAxis, m_Modelview, m_Projection, m_Viewport);
 		v3T yAxis(xform->m_Post.B(), xform->m_Post.E(), 0);
 		v3T yAxisScreen = glm::project(translation + yAxis, m_Modelview, m_Projection, m_Viewport);
-
 		pos = translation;
 		dist = glm::distance(glCoords, transScreen);
 
 		if (dist < bestDist)
 		{
 			bestDist = dist;
-			m_HoverType = HoverTranslation;
+			m_HoverType = eHoverType::HoverTranslation;
 			m_HoverHandlePos = pos;
 			postFound = true;
 		}
 
 		pos = translation + xAxis;
 		dist = glm::distance(glCoords, xAxisScreen);
-	
+
 		if (dist < bestDist)
 		{
 			bestDist = dist;
-			m_HoverType = HoverXAxis;
+			m_HoverType = eHoverType::HoverXAxis;
 			m_HoverHandlePos = pos;
 			postFound = true;
 		}
 
 		pos = translation + yAxis;
 		dist = glm::distance(glCoords, yAxisScreen);
-	
+
 		if (dist < bestDist)
 		{
 			bestDist = dist;
-			m_HoverType = HoverYAxis;
+			m_HoverType = eHoverType::HoverYAxis;
 			m_HoverHandlePos = pos;
 			postFound = true;
 		}
 
 		if (postFound)
-			m_AffineType = AffinePost;
+			m_AffineType = eAffineType::AffinePost;
 	}
 
 	return preFound || postFound;
@@ -1264,23 +1236,21 @@ Affine2D<T> GLEmberController<T>::CalcDragXAxis()
 {
 	v3T t3, newAxis, newPos;
 	Affine2D<T> result = m_DragSrcTransform;
-	bool worldPivotShiftAlt =  !m_Fractorium->LocalPivot() &&
-							  ((m_DragModifier & DragModShift) == DragModShift) &&
-							  ((m_DragModifier & DragModAlt) == DragModAlt);
+	bool worldPivotShiftAlt = !m_Fractorium->LocalPivot() && GetShift() && GetAlt();
 
 	if (worldPivotShiftAlt)
 		t3 = v3T(0, 0, 0);
 	else
 		t3 = v3T(m_DragSrcTransform.O(), 0);
 
-	if ((m_DragModifier & DragModShift) == DragModShift)
+	if (GetShift())
 	{
 		v3T targetAxis = m_MouseWorldPos - t3;
 		v3T norm = glm::normalize(targetAxis);
 
-		if ((m_DragModifier & DragModControl) == DragModControl)
+		if (GetControl())
 			norm = SnapToNormalizedAngle(norm, 24);
-		
+
 		if (worldPivotShiftAlt)
 			newAxis = norm * glm::length(m_DragSrcTransform.O() + m_DragSrcTransform.X());
 		else
@@ -1288,7 +1258,7 @@ Affine2D<T> GLEmberController<T>::CalcDragXAxis()
 	}
 	else
 	{
-		if ((m_DragModifier & DragModControl) == DragModControl)
+		if (GetControl())
 			newPos = SnapToGrid(m_MouseWorldPos);
 		else
 			newPos = m_MouseWorldPos + m_DragHandleOffset;
@@ -1296,7 +1266,7 @@ Affine2D<T> GLEmberController<T>::CalcDragXAxis()
 		newAxis = newPos - t3;
 	}
 
-	if ((m_DragModifier & DragModAlt) == DragModAlt)
+	if (GetAlt())
 	{
 		if (worldPivotShiftAlt)
 			result.X(v2T(newAxis) - m_DragSrcTransform.O());
@@ -1309,7 +1279,6 @@ Affine2D<T> GLEmberController<T>::CalcDragXAxis()
 	}
 
 	m_DragHandlePos = v3T(result.O() + result.X(), 0);
-
 	return result;
 }
 
@@ -1336,21 +1305,19 @@ Affine2D<T> GLEmberController<T>::CalcDragYAxis()
 {
 	v3T t3, newAxis, newPos;
 	Affine2D<T> result = m_DragSrcTransform;
-	bool worldPivotShiftAlt =  !m_Fractorium->LocalPivot() &&
-							  ((m_DragModifier & DragModShift) == DragModShift) &&
-							  ((m_DragModifier & DragModAlt) == DragModAlt);
+	bool worldPivotShiftAlt = !m_Fractorium->LocalPivot() && GetShift() && GetAlt();
 
 	if (worldPivotShiftAlt)
 		t3 = v3T(0, 0, 0);
 	else
 		t3 = v3T(m_DragSrcTransform.O(), 0);
 
-	if ((m_DragModifier & DragModShift) == DragModShift)
+	if (GetShift())
 	{
 		v3T targetAxis = m_MouseWorldPos - t3;
 		v3T norm = glm::normalize(targetAxis);
 
-		if ((m_DragModifier & DragModControl) == DragModControl)
+		if (GetControl())
 			norm = SnapToNormalizedAngle(norm, 24);
 
 		if (worldPivotShiftAlt)
@@ -1360,7 +1327,7 @@ Affine2D<T> GLEmberController<T>::CalcDragYAxis()
 	}
 	else
 	{
-		if ((m_DragModifier & DragModControl) == DragModControl)
+		if (GetControl())
 			newPos = SnapToGrid(m_MouseWorldPos);
 		else
 			newPos = m_MouseWorldPos + m_DragHandleOffset;
@@ -1368,7 +1335,7 @@ Affine2D<T> GLEmberController<T>::CalcDragYAxis()
 		newAxis = newPos - t3;
 	}
 
-	if ((m_DragModifier & DragModAlt) == DragModAlt)
+	if (GetAlt())
 	{
 		if (worldPivotShiftAlt)
 			result.Y(v2T(newAxis) - m_DragSrcTransform.O());
@@ -1381,7 +1348,6 @@ Affine2D<T> GLEmberController<T>::CalcDragYAxis()
 	}
 
 	m_DragHandlePos = v3T(result.O() + result.Y(), 0);
-
 	return result;
 }
 
@@ -1404,15 +1370,15 @@ Affine2D<T> GLEmberController<T>::CalcDragTranslation()
 {
 	v3T newPos, newX, newY;
 	Affine2D<T> result = m_DragSrcTransform;
-	bool worldPivotShift = !m_Fractorium->LocalPivot() && ((m_DragModifier & DragModShift) == DragModShift);
+	bool worldPivotShift = !m_Fractorium->LocalPivot() && GetShift();
 
-	if ((m_DragModifier & DragModShift) == DragModShift)
+	if (GetShift())
 	{
 		v3T norm = glm::normalize(m_MouseWorldPos);
-		
-		if ((m_DragModifier & DragModControl) == DragModControl)
+
+		if (GetControl())
 			norm = SnapToNormalizedAngle(norm, 12);
-		
+
 		newPos = glm::length(m_DragSrcTransform.O()) * norm;
 
 		if (worldPivotShift)
@@ -1420,13 +1386,12 @@ Affine2D<T> GLEmberController<T>::CalcDragTranslation()
 			T startAngle = atan2(m_DragSrcTransform.O().y, m_DragSrcTransform.O().x);
 			T endAngle = atan2(newPos.y, newPos.x);
 			T angle = startAngle - endAngle;
-			
 			result.Rotate(angle * RAD_2_DEG);
 		}
 	}
 	else
 	{
-		if ((m_DragModifier & DragModControl) == DragModControl)
+		if (GetControl())
 			newPos = SnapToGrid(m_MouseWorldPos);
 		else
 			newPos = m_MouseWorldPos + m_DragHandleOffset;
@@ -1434,7 +1399,6 @@ Affine2D<T> GLEmberController<T>::CalcDragTranslation()
 
 	result.O(v2T(newPos));
 	m_DragHandlePos = newPos;
-
 	return result;
 }
 
@@ -1453,5 +1417,5 @@ GLEmberControllerBase* GLWidget::GLController()
 template class GLEmberController<float>;
 
 #ifdef DO_DOUBLE
-	template class GLEmberController<double>;
+template class GLEmberController<double>;
 #endif

@@ -11,12 +11,12 @@
 /// <summary>
 /// An enum representing the type of edit being done.
 /// </summary>
-enum eEditUndoState : uint { REGULAR_EDIT, UNDO_REDO, EDIT_UNDO };
+enum class eEditUndoState : et { REGULAR_EDIT, UNDO_REDO, EDIT_UNDO };
 
 /// <summary>
 /// An enum representing which xforms an update should be applied to.
 /// </summary>
-enum eXformUpdate : uint { UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
+enum class eXformUpdate : et { UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
 
 /// <summary>
 /// FractoriumEmberController and Fractorium need each other, but each can't include the other.

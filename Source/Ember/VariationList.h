@@ -36,7 +36,7 @@ public:
 	/// </summary>
 	VariationList()
 	{
-		m_Variations.reserve(eVariationId::LAST_VAR);
+		m_Variations.reserve(size_t(eVariationId::LAST_VAR));
 		ADDPREPOSTREGVAR(Linear)
 		ADDPREPOSTREGVAR(Sinusoidal)
 		ADDPREPOSTREGVAR(Spherical)
@@ -363,17 +363,19 @@ public:
 		m_PostVariations.reserve(m_Variations.size() / 3);
 		m_ParametricVariations.reserve(size_t(m_Variations.size() * .90));//This is a rough guess at how many are parametric.
 
-		for (auto var : m_Variations) if (var->VarType() == VARTYPE_REG)  m_RegVariations.push_back(var);
-
-		for (auto var : m_Variations) if (var->VarType() == VARTYPE_PRE)  m_PreVariations.push_back(var);
-
-		for (auto var : m_Variations) if (var->VarType() == VARTYPE_POST) m_PostVariations.push_back(var);
-
-		//Keep a list of which variations derive from ParametricVariation.
+		//Place pointers to variations in vectors specific to their type.
+		//Many of the elements in m_ParametricVariations will be present in the reg, pre and post vectors.
 		//Note that these are not new copies, rather just pointers to the original instances in m_Variations.
-		for (size_t i = 0; i < m_Variations.size(); i++)
+		for (auto var : m_Variations)
 		{
-			if (ParametricVariation<T>* parVar = dynamic_cast<ParametricVariation<T>*>(m_Variations[i]))
+			if (var->VarType() == eVariationType::VARTYPE_REG)
+				m_RegVariations.push_back(var);
+			else if (var->VarType() == eVariationType::VARTYPE_PRE)
+				m_PreVariations.push_back(var);
+			else if (var->VarType() == eVariationType::VARTYPE_POST)
+				m_PostVariations.push_back(var);
+
+			if (auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
 				m_ParametricVariations.push_back(parVar);
 		}
 	}
@@ -401,14 +403,24 @@ public:
 	/// <returns>A pointer to the variation of the specified type at the index if in range, else nullptr.</returns>
 	const Variation<T>* GetVariation(size_t index, eVariationType varType) const
 	{
-		if (varType == VARTYPE_REG)
-			return index < m_RegVariations.size() ? m_RegVariations[index] : nullptr;
-		else if (varType == VARTYPE_PRE)
-			return index < m_PreVariations.size() ? m_PreVariations[index] : nullptr;
-		else if (varType == VARTYPE_POST)
-			return index < m_PostVariations.size() ? m_PostVariations[index] : nullptr;
-		else
-			return nullptr;
+		switch (varType)
+		{
+			case eVariationType::VARTYPE_REG:
+				return index < m_RegVariations.size() ? m_RegVariations[index] : nullptr;
+				break;
+
+			case eVariationType::VARTYPE_PRE:
+				return index < m_PreVariations.size() ? m_PreVariations[index] : nullptr;
+				break;
+
+			case eVariationType::VARTYPE_POST:
+				return index < m_PostVariations.size() ? m_PostVariations[index] : nullptr;
+				break;
+
+			default:
+				return nullptr;
+				break;
+		}
 	}
 
 	/// <summary>
@@ -428,9 +440,9 @@ public:
 	/// <returns>A pointer to the variation if found, else nullptr.</returns>
 	const Variation<T>* GetVariation(eVariationId id) const
 	{
-		for (size_t i = 0; i < m_Variations.size() && m_Variations[i]; i++)
-			if (id == m_Variations[i]->VariationId())
-				return m_Variations[i];
+		for (auto var : m_Variations)
+			if (var && id == var->VariationId())
+				return var;
 
 		return nullptr;
 	}
@@ -451,9 +463,9 @@ public:
 	/// <returns>A pointer to the variation if found, else nullptr.</returns>
 	const Variation<T>* GetVariation(const string& name) const
 	{
-		for (size_t i = 0; i < m_Variations.size() && m_Variations[i]; i++)
-			if (!_stricmp(name.c_str(), m_Variations[i]->Name().c_str()))
-				return m_Variations[i];
+		for (auto var : m_Variations)
+			if (var && !_stricmp(name.c_str(), var->Name().c_str()))
+				return var;
 
 		return nullptr;
 	}
@@ -482,9 +494,9 @@ public:
 	/// <returns>The parametric variation with a matching name, else nullptr.</returns>
 	const ParametricVariation<T>* GetParametricVariation(const string& name) const
 	{
-		for (size_t i = 0; i < m_ParametricVariations.size() && m_ParametricVariations[i]; i++)
-			if (!_stricmp(name.c_str(), m_ParametricVariations[i]->Name().c_str()))
-				return m_ParametricVariations[i];
+		for (auto var : m_ParametricVariations)
+			if (var && !_stricmp(name.c_str(), var->Name().c_str()))
+				return var;
 
 		return nullptr;
 	}
@@ -524,7 +536,7 @@ private:
 	{
 		if (var)
 		{
-			Variation<T>* var2 = var->Copy();
+			auto var2 = var->Copy();
 			var2->m_Weight = weight;
 			return var2;
 		}

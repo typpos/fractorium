@@ -10,7 +10,7 @@ class EllipseItem;
 /// <summary>
 /// Enumeration used for setting values on a specific curve.
 /// </summary>
-enum CurveIndex
+enum class CurveIndex : et
 {
 	ALL,
 	RED,
@@ -82,14 +82,13 @@ public:
 	/// <param name="pointIndex">The point index within the curve</param>
 	/// <param name="viewParent">The graphics view this point is displayed on</param>
 	/// <param name="p">The parent widget of this item</param>
-	EllipseItem(const QRectF &rect, int curveIndex, int pointIndex, CurvesGraphicsView* viewParent, QGraphicsItem *parent = 0)
+	EllipseItem(const QRectF& rect, int curveIndex, int pointIndex, CurvesGraphicsView* viewParent, QGraphicsItem* parent = 0)
 		: QGraphicsEllipseItem(rect, parent)
 	{
 		setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setFlag(QGraphicsItem::ItemIsMovable);
 		setPen(Qt::NoPen);
-
 		m_CurveIndex = curveIndex;
 		m_PointIndex = pointIndex;
 		m_ViewParent = viewParent;
@@ -108,7 +107,7 @@ protected:
 	/// <param name="painter">Unused and just passed to QGraphicsEllipseItem::paint()</param>
 	/// <param name="option">Drawing options used which will have the QStyle::State_Selected flag unset</param>
 	/// <param name="widget">Unused and just passed to QGraphicsEllipseItem::paint()</param>
-	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override
+	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
 	{
 		QStyleOptionGraphicsItem myOption(*option);
 		myOption.state &= ~QStyle::State_Selected;
@@ -122,7 +121,7 @@ protected:
 	/// <param name="change">Action is only taken if this value equals ItemPositionChange</param>
 	/// <param name="value">The new position. This will be clamped to the scene rect.</param>
 	/// <returns>The new position</returns>
-	virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override
+	virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override
 	{
 		if (change == ItemPositionChange && scene())
 		{
@@ -136,7 +135,7 @@ protected:
 				newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
 				newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
 			}
-			
+
 			m_ViewParent->PointChanged(m_CurveIndex, m_PointIndex, newPos);
 			return newPos;
 		}

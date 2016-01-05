@@ -11,7 +11,7 @@ template <typename T>
 class EMBER_API HemisphereVariation : public Variation<T>
 {
 public:
-	HemisphereVariation(T weight = 1.0) : Variation<T>("hemisphere", VAR_HEMISPHERE, weight, true) { }
+	HemisphereVariation(T weight = 1.0) : Variation<T>("hemisphere", eVariationId::VAR_HEMISPHERE, weight, true) { }
 
 	VARCOPY(HemisphereVariation)
 
@@ -48,7 +48,7 @@ template <typename T>
 class EMBER_API EpispiralVariation : public ParametricVariation<T>
 {
 public:
-	EpispiralVariation(T weight = 1.0) : ParametricVariation<T>("epispiral", VAR_EPISPIRAL, weight, false, false, false, false, true)
+	EpispiralVariation(T weight = 1.0) : ParametricVariation<T>("epispiral", eVariationId::VAR_EPISPIRAL, weight, false, false, false, false, true)
 	{
 		Init();
 	}
@@ -130,7 +130,7 @@ template <typename T>
 class EMBER_API BwrapsVariation : public ParametricVariation<T>
 {
 public:
-	BwrapsVariation(T weight = 1.0) : ParametricVariation<T>("bwraps", VAR_BWRAPS, weight)
+	BwrapsVariation(T weight = 1.0) : ParametricVariation<T>("bwraps", eVariationId::VAR_BWRAPS, weight)
 	{
 		Init();
 	}
@@ -297,7 +297,7 @@ template <typename T>
 class EMBER_API BlurCircleVariation : public Variation<T>
 {
 public:
-	BlurCircleVariation(T weight = 1.0) : Variation<T>("blur_circle", VAR_BLUR_CIRCLE, weight) { }
+	BlurCircleVariation(T weight = 1.0) : Variation<T>("blur_circle", eVariationId::VAR_BLUR_CIRCLE, weight) { }
 
 	VARCOPY(BlurCircleVariation)
 
@@ -404,7 +404,7 @@ template <typename T>
 class EMBER_API BlurZoomVariation : public ParametricVariation<T>
 {
 public:
-	BlurZoomVariation(T weight = 1.0) : ParametricVariation<T>("blur_zoom", VAR_BLUR_ZOOM, weight)
+	BlurZoomVariation(T weight = 1.0) : ParametricVariation<T>("blur_zoom", eVariationId::VAR_BLUR_ZOOM, weight)
 	{
 		Init();
 	}
@@ -465,7 +465,7 @@ template <typename T>
 class EMBER_API BlurPixelizeVariation : public ParametricVariation<T>
 {
 public:
-	BlurPixelizeVariation(T weight = 1.0) : ParametricVariation<T>("blur_pixelize", VAR_BLUR_PIXELIZE, weight)
+	BlurPixelizeVariation(T weight = 1.0) : ParametricVariation<T>("blur_pixelize", eVariationId::VAR_BLUR_PIXELIZE, weight)
 	{
 		Init();
 	}
@@ -517,7 +517,7 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_BlurPixelizeSize,  prefix + "blur_pixelize_size", T(0.1), REAL, EPS));
+		m_Params.push_back(ParamWithName<T>(&m_BlurPixelizeSize,  prefix + "blur_pixelize_size", T(0.1), eParamType::REAL, EPS));
 		m_Params.push_back(ParamWithName<T>(&m_BlurPixelizeScale, prefix + "blur_pixelize_scale", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_V,	      prefix + "blur_pixelize_v"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_InvSize, prefix + "blur_pixelize_inv_size"));
@@ -537,7 +537,7 @@ template <typename T>
 class EMBER_API CropVariation : public ParametricVariation<T>
 {
 public:
-	CropVariation(T weight = 1.0) : ParametricVariation<T>("crop", VAR_CROP, weight)
+	CropVariation(T weight = 1.0) : ParametricVariation<T>("crop", eVariationId::VAR_CROP, weight)
 	{
 		Init();
 	}
@@ -659,8 +659,8 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Y0, prefix + "crop_top", -1));
 		m_Params.push_back(ParamWithName<T>(&m_X1, prefix + "crop_right", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Y1, prefix + "crop_bottom", 1));
-		m_Params.push_back(ParamWithName<T>(&m_S,  prefix + "crop_scatter_area", 0, REAL, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Z,  prefix + "crop_zero", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_S,  prefix + "crop_scatter_area", 0, eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Z,  prefix + "crop_zero", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_X0_, prefix + "crop_x0_"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Y0_, prefix + "crop_y0_"));
 		m_Params.push_back(ParamWithName<T>(true, &m_X1_, prefix + "crop_x1_"));
@@ -691,7 +691,7 @@ template <typename T>
 class EMBER_API BCircleVariation : public ParametricVariation<T>
 {
 public:
-	BCircleVariation(T weight = 1.0) : ParametricVariation<T>("bcircle", VAR_BCIRCLE, weight)
+	BCircleVariation(T weight = 1.0) : ParametricVariation<T>("bcircle", eVariationId::VAR_BCIRCLE, weight)
 	{
 		Init();
 	}
@@ -800,7 +800,7 @@ template <typename T>
 class EMBER_API BlurLinearVariation : public ParametricVariation<T>
 {
 public:
-	BlurLinearVariation(T weight = 1.0) : ParametricVariation<T>("blur_linear", VAR_BLUR_LINEAR, weight)
+	BlurLinearVariation(T weight = 1.0) : ParametricVariation<T>("blur_linear", eVariationId::VAR_BLUR_LINEAR, weight)
 	{
 		Init();
 	}
@@ -850,7 +850,7 @@ protected:
 
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_BlurLinearLength, prefix + "blur_linear_length"));
-		m_Params.push_back(ParamWithName<T>(&m_BlurLinearAngle,  prefix + "blur_linear_angle", 0, REAL_CYCLIC, 0, T(M_2PI)));
+		m_Params.push_back(ParamWithName<T>(&m_BlurLinearAngle,  prefix + "blur_linear_angle", 0, eParamType::REAL_CYCLIC, 0, T(M_2PI)));
 		m_Params.push_back(ParamWithName<T>(true, &m_S, prefix + "blur_linear_s"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_C, prefix + "blur_linear_c"));
 	}
@@ -869,7 +869,7 @@ template <typename T>
 class EMBER_API BlurSquareVariation : public ParametricVariation<T>
 {
 public:
-	BlurSquareVariation(T weight = 1.0) : ParametricVariation<T>("blur_square", VAR_BLUR_SQUARE, weight)
+	BlurSquareVariation(T weight = 1.0) : ParametricVariation<T>("blur_square", eVariationId::VAR_BLUR_SQUARE, weight)
 	{
 		Init();
 	}
@@ -926,13 +926,13 @@ template <typename T>
 class EMBER_API FlattenVariation : public Variation<T>
 {
 public:
-	FlattenVariation(T weight = 1.0) : Variation<T>("flatten", VAR_FLATTEN, weight) { }
+	FlattenVariation(T weight = 1.0) : Variation<T>("flatten", eVariationId::VAR_FLATTEN, weight) { }
 
 	VARCOPY(FlattenVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		if (m_VarType == VARTYPE_REG)//Rare and different usage of in/out.
+		if (m_VarType == eVariationType::VARTYPE_REG)//Rare and different usage of in/out.
 		{
 			helper.Out.x = helper.Out.y = helper.Out.z = 0;
 			outPoint.m_Z = 0;
@@ -949,7 +949,7 @@ public:
 	{
 		ostringstream ss;
 
-		if (m_VarType == VARTYPE_REG)
+		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss << "\t{\n"
 			   << "\t\tvOut.x = 0;\n"
@@ -979,7 +979,7 @@ template <typename T>
 class EMBER_API ZblurVariation : public Variation<T>
 {
 public:
-	ZblurVariation(T weight = 1.0) : Variation<T>("zblur", VAR_ZBLUR, weight) { }
+	ZblurVariation(T weight = 1.0) : Variation<T>("zblur", eVariationId::VAR_ZBLUR, weight) { }
 
 	VARCOPY(ZblurVariation)
 
@@ -1011,7 +1011,7 @@ template <typename T>
 class EMBER_API ZScaleVariation : public Variation<T>
 {
 public:
-	ZScaleVariation(T weight = 1.0) : Variation<T>("zscale", VAR_ZSCALE, weight) { }
+	ZScaleVariation(T weight = 1.0) : Variation<T>("zscale", eVariationId::VAR_ZSCALE, weight) { }
 
 	VARCOPY(ZScaleVariation)
 
@@ -1043,7 +1043,7 @@ template <typename T>
 class EMBER_API ZTranslateVariation : public Variation<T>
 {
 public:
-	ZTranslateVariation(T weight = 1.0) : Variation<T>("ztranslate", VAR_ZTRANSLATE, weight) { }
+	ZTranslateVariation(T weight = 1.0) : Variation<T>("ztranslate", eVariationId::VAR_ZTRANSLATE, weight) { }
 
 	VARCOPY(ZTranslateVariation)
 
@@ -1075,13 +1075,13 @@ template <typename T>
 class EMBER_API ZConeVariation : public Variation<T>
 {
 public:
-	ZConeVariation(T weight = 1.0) : Variation<T>("zcone", VAR_ZCONE, weight, true, true) { }
+	ZConeVariation(T weight = 1.0) : Variation<T>("zcone", eVariationId::VAR_ZCONE, weight, true, true) { }
 
 	VARCOPY(ZConeVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		if (m_VarType == VARTYPE_REG)//Rare and different usage of in/out.
+		if (m_VarType == eVariationType::VARTYPE_REG)//Rare and different usage of in/out.
 		{
 			helper.Out.x = helper.Out.y = 0;
 		}
@@ -1101,7 +1101,7 @@ public:
 
 		ss << "\t{\n";
 
-		if (m_VarType == VARTYPE_REG)
+		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss << "\t\tvOut.x = vOut.y = 0;\n";
 		}
@@ -1125,7 +1125,7 @@ template <typename T>
 class EMBER_API Blur3DVariation : public Variation<T>
 {
 public:
-	Blur3DVariation(T weight = 1.0) : Variation<T>("blur3D", VAR_BLUR3D, weight) { }
+	Blur3DVariation(T weight = 1.0) : Variation<T>("blur3D", eVariationId::VAR_BLUR3D, weight) { }
 
 	VARCOPY(Blur3DVariation)
 
@@ -1174,7 +1174,7 @@ template <typename T>
 class EMBER_API Spherical3DVariation : public Variation<T>
 {
 public:
-	Spherical3DVariation(T weight = 1.0) : Variation<T>("Spherical3D", VAR_SPHERICAL3D, weight, true) { }
+	Spherical3DVariation(T weight = 1.0) : Variation<T>("Spherical3D", eVariationId::VAR_SPHERICAL3D, weight, true) { }
 
 	VARCOPY(Spherical3DVariation)
 
@@ -1216,7 +1216,7 @@ template <typename T>
 class EMBER_API Curl3DVariation : public ParametricVariation<T>
 {
 public:
-	Curl3DVariation(T weight = 1.0) : ParametricVariation<T>("curl3D", VAR_CURL3D, weight, true)
+	Curl3DVariation(T weight = 1.0) : ParametricVariation<T>("curl3D", eVariationId::VAR_CURL3D, weight, true)
 	{
 		Init();
 	}
@@ -1304,7 +1304,7 @@ template <typename T>
 class EMBER_API Disc3DVariation : public ParametricVariation<T>
 {
 public:
-	Disc3DVariation(T weight = 1.0) : ParametricVariation<T>("disc3d", VAR_DISC3D, weight, true, true, false, true, false)
+	Disc3DVariation(T weight = 1.0) : ParametricVariation<T>("disc3d", eVariationId::VAR_DISC3D, weight, true, true, false, true, false)
 	{
 		Init();
 	}
@@ -1372,7 +1372,7 @@ template <typename T>
 class EMBER_API Boarders2Variation : public ParametricVariation<T>
 {
 public:
-	Boarders2Variation(T weight = 1.0) : ParametricVariation<T>("boarders2", VAR_BOARDERS2, weight)
+	Boarders2Variation(T weight = 1.0) : ParametricVariation<T>("boarders2", eVariationId::VAR_BOARDERS2, weight)
 	{
 		Init();
 	}
@@ -1525,7 +1525,7 @@ template <typename T>
 class EMBER_API CardioidVariation : public ParametricVariation<T>
 {
 public:
-	CardioidVariation(T weight = 1.0) : ParametricVariation<T>("cardioid", VAR_CARDIOID, weight, true, true, true, false, true)
+	CardioidVariation(T weight = 1.0) : ParametricVariation<T>("cardioid", eVariationId::VAR_CARDIOID, weight, true, true, true, false, true)
 	{
 		Init();
 	}
@@ -1580,7 +1580,7 @@ template <typename T>
 class EMBER_API ChecksVariation : public ParametricVariation<T>
 {
 public:
-	ChecksVariation(T weight = 1.0) : ParametricVariation<T>("checks", VAR_CHECKS, weight)
+	ChecksVariation(T weight = 1.0) : ParametricVariation<T>("checks", eVariationId::VAR_CHECKS, weight)
 	{
 		Init();
 	}
@@ -1703,7 +1703,7 @@ template <typename T>
 class EMBER_API CirclizeVariation : public ParametricVariation<T>
 {
 public:
-	CirclizeVariation(T weight = 1.0) : ParametricVariation<T>("circlize", VAR_CIRCLIZE, weight)
+	CirclizeVariation(T weight = 1.0) : ParametricVariation<T>("circlize", eVariationId::VAR_CIRCLIZE, weight)
 	{
 		Init();
 	}
@@ -1816,7 +1816,7 @@ template <typename T>
 class EMBER_API Circlize2Variation : public ParametricVariation<T>
 {
 public:
-	Circlize2Variation(T weight = 1.0) : ParametricVariation<T>("circlize2", VAR_CIRCLIZE2, weight)
+	Circlize2Variation(T weight = 1.0) : ParametricVariation<T>("circlize2", eVariationId::VAR_CIRCLIZE2, weight)
 	{
 		Init();
 	}
@@ -1921,7 +1921,7 @@ template <typename T>
 class EMBER_API CosWrapVariation : public ParametricVariation<T>
 {
 public:
-	CosWrapVariation(T weight = 1.0) : ParametricVariation<T>("coswrap", VAR_COS_WRAP, weight)
+	CosWrapVariation(T weight = 1.0) : ParametricVariation<T>("coswrap", eVariationId::VAR_COS_WRAP, weight)
 	{
 		Init();
 	}
@@ -1939,7 +1939,7 @@ public:
 
 		helper.Out.x = -1 + m_Vv2 * Lerp<T>(Lerp(x, Fosc(x, T(4), m_Px), oscnapx), Fosc(bx, T(4), m_Px), oscnapx);//Original did a direct assignment to outPoint, which is incompatible with Ember's design.
 		helper.Out.y = -1 + m_Vv2 * Lerp<T>(Lerp(y, Fosc(y, T(4), m_Py), oscnapy), Fosc(by, T(4), m_Py), oscnapy);
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -1970,7 +1970,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = -1 + " << vv2 << " * Lerp(Lerp(x, Fosc(x, 4, " << px << "), oscnapx), Fosc(bx, 4, " << px << "), oscnapx);\n"
 		   << "\t\tvOut.y = -1 + " << vv2 << " * Lerp(Lerp(y, Fosc(y, 4, " << py << "), oscnapy), Fosc(by, 4, " << py << "), oscnapy);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 
 		return ss.str();
@@ -1997,11 +1997,11 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Repeat,  prefix + "coswrap_repeat", 1, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Repeat,  prefix + "coswrap_repeat", 1, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_AmountX, prefix + "coswrap_amount_x"));
 		m_Params.push_back(ParamWithName<T>(&m_AmountY, prefix + "coswrap_amount_y"));
-		m_Params.push_back(ParamWithName<T>(&m_PhaseX,  prefix + "coswrap_phase_x", 0, REAL_CYCLIC, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_PhaseY,  prefix + "coswrap_phase_y", 0, REAL_CYCLIC, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_PhaseX,  prefix + "coswrap_phase_x", 0, eParamType::REAL_CYCLIC, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_PhaseY,  prefix + "coswrap_phase_y", 0, eParamType::REAL_CYCLIC, -1, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ax,  prefix + "coswrap_ax"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Ay,  prefix + "coswrap_ay"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Px,  prefix + "coswrap_px"));
@@ -2034,7 +2034,7 @@ template <typename T>
 class EMBER_API DeltaAVariation : public Variation<T>
 {
 public:
-	DeltaAVariation(T weight = 1.0) : Variation<T>("deltaa", VAR_DELTA_A, weight) { }
+	DeltaAVariation(T weight = 1.0) : Variation<T>("deltaa", eVariationId::VAR_DELTA_A, weight) { }
 
 	VARCOPY(DeltaAVariation)
 
@@ -2077,7 +2077,7 @@ template <typename T>
 class EMBER_API ExpoVariation : public ParametricVariation<T>
 {
 public:
-	ExpoVariation(T weight = 1.0) : ParametricVariation<T>("expo", VAR_EXPO, weight)
+	ExpoVariation(T weight = 1.0) : ParametricVariation<T>("expo", eVariationId::VAR_EXPO, weight)
 	{
 		Init();
 	}
@@ -2153,7 +2153,7 @@ template <typename T>
 class EMBER_API ExtrudeVariation : public ParametricVariation<T>
 {
 public:
-	ExtrudeVariation(T weight = 1.0) : ParametricVariation<T>("extrude", VAR_EXTRUDE, weight)
+	ExtrudeVariation(T weight = 1.0) : ParametricVariation<T>("extrude", eVariationId::VAR_EXTRUDE, weight)
 	{
 		Init();
 	}
@@ -2162,7 +2162,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		if (m_VarType == VARTYPE_REG)
+		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			helper.Out.x = helper.Out.y = helper.Out.z = 0;
 
@@ -2191,7 +2191,7 @@ public:
 		string index = ss2.str();
 		string rootFace = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 
-		if (m_VarType == VARTYPE_REG)
+		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss << "\t{\n"
 			   << "\t\tvOut.x = vOut.y = vOut.z = 0;\n"
@@ -2238,7 +2238,7 @@ template <typename T>
 class EMBER_API FDiscVariation : public Variation<T>
 {
 public:
-	FDiscVariation(T weight = 1.0) : Variation<T>("fdisc", VAR_FDISC, weight, true, true, false, false, true) { }
+	FDiscVariation(T weight = 1.0) : Variation<T>("fdisc", eVariationId::VAR_FDISC, weight, true, true, false, false, true) { }
 
 	VARCOPY(FDiscVariation)
 
@@ -2281,7 +2281,7 @@ template <typename T>
 class EMBER_API FibonacciVariation : public ParametricVariation<T>
 {
 public:
-	FibonacciVariation(T weight = 1.0) : ParametricVariation<T>("fibonacci", VAR_FIBONACCI, weight)
+	FibonacciVariation(T weight = 1.0) : ParametricVariation<T>("fibonacci", eVariationId::VAR_FIBONACCI, weight)
 	{
 		Init();
 	}
@@ -2360,7 +2360,7 @@ template <typename T>
 class EMBER_API Fibonacci2Variation : public ParametricVariation<T>
 {
 public:
-	Fibonacci2Variation(T weight = 1.0) : ParametricVariation<T>("fibonacci2", VAR_FIBONACCI2, weight)
+	Fibonacci2Variation(T weight = 1.0) : ParametricVariation<T>("fibonacci2", eVariationId::VAR_FIBONACCI2, weight)
 	{
 		Init();
 	}
@@ -2445,7 +2445,7 @@ template <typename T>
 class EMBER_API GlynniaVariation : public ParametricVariation<T>
 {
 public:
-	GlynniaVariation(T weight = 1.0) : ParametricVariation<T>("glynnia", VAR_GLYNNIA, weight, true, true)
+	GlynniaVariation(T weight = 1.0) : ParametricVariation<T>("glynnia", eVariationId::VAR_GLYNNIA, weight, true, true)
 	{
 		Init();
 	}
@@ -2567,7 +2567,7 @@ template <typename T>
 class EMBER_API GridOutVariation : public Variation<T>
 {
 public:
-	GridOutVariation(T weight = 1.0) : Variation<T>("gridout", VAR_GRIDOUT, weight) { }
+	GridOutVariation(T weight = 1.0) : Variation<T>("gridout", eVariationId::VAR_GRIDOUT, weight) { }
 
 	VARCOPY(GridOutVariation)
 
@@ -2725,7 +2725,7 @@ template <typename T>
 class EMBER_API HoleVariation : public ParametricVariation<T>
 {
 public:
-	HoleVariation(T weight = 1.0) : ParametricVariation<T>("hole", VAR_HOLE, weight, true, true, true, false, true)
+	HoleVariation(T weight = 1.0) : ParametricVariation<T>("hole", eVariationId::VAR_HOLE, weight, true, true, true, false, true)
 	{
 		Init();
 	}
@@ -2778,7 +2778,7 @@ protected:
 
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "hole_a", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Inside, prefix + "hole_inside", 0, INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Inside, prefix + "hole_inside", 0, eParamType::INTEGER, 0, 1));
 	}
 
 private:
@@ -2793,7 +2793,7 @@ template <typename T>
 class EMBER_API HypertileVariation : public ParametricVariation<T>
 {
 public:
-	HypertileVariation(T weight = 1.0) : ParametricVariation<T>("hypertile", VAR_HYPERTILE, weight)
+	HypertileVariation(T weight = 1.0) : ParametricVariation<T>("hypertile", eVariationId::VAR_HYPERTILE, weight)
 	{
 		Init();
 	}
@@ -2810,7 +2810,7 @@ public:
 
 		helper.Out.x = vr * (a * c + b * d);
 		helper.Out.y = vr * (b * c - a * d);
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -2834,7 +2834,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = vr * (a * c + b * d);\n"
 		   << "\t\tvOut.y = vr * (b * c - a * d);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 
 		return ss.str();
@@ -2862,9 +2862,9 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile_p", 3, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile_q", 7, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "hypertile_n", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "hypertile_n", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(true, &m_Real, prefix + "hypertile_real"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Imag, prefix + "hypertile_imag"));
 	}
@@ -2884,7 +2884,7 @@ template <typename T>
 class EMBER_API Hypertile1Variation : public ParametricVariation<T>
 {
 public:
-	Hypertile1Variation(T weight = 1.0) : ParametricVariation<T>("hypertile1", VAR_HYPERTILE1, weight)
+	Hypertile1Variation(T weight = 1.0) : ParametricVariation<T>("hypertile1", eVariationId::VAR_HYPERTILE1, weight)
 	{
 		Init();
 	}
@@ -2906,7 +2906,7 @@ public:
 
 		helper.Out.x = vr * (a * c + b * d);
 		helper.Out.y = vr * (b * c - a * d);
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -2934,7 +2934,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = vr * (a * c + b * d);\n"
 		   << "\t\tvOut.y = vr * (b * c - a * d);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 
 		return ss.str();
@@ -2959,8 +2959,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile1_p", 3, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile1_q", 7, INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile1_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile1_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa, prefix + "hypertile1_pa"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_R, prefix  + "hypertile1_r"));
 	}
@@ -2979,7 +2979,7 @@ template <typename T>
 class EMBER_API Hypertile2Variation : public ParametricVariation<T>
 {
 public:
-	Hypertile2Variation(T weight = 1.0) : ParametricVariation<T>("hypertile2", VAR_HYPERTILE2, weight)
+	Hypertile2Variation(T weight = 1.0) : ParametricVariation<T>("hypertile2", eVariationId::VAR_HYPERTILE2, weight)
 	{
 		Init();
 	}
@@ -3001,7 +3001,7 @@ public:
 
 		helper.Out.x = vr * (x * cosa + y * sina);
 		helper.Out.y = vr * (y * cosa - x * sina);
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -3029,7 +3029,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = vr * (x * cosa + y * sina);\n"
 		   << "\t\tvOut.y = vr * (y * cosa - x * sina);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 
 		return ss.str();
@@ -3054,8 +3054,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile2_p", 3, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile2_q", 7, INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile2_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile2_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa, prefix + "hypertile2_pa"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_R, prefix  + "hypertile2_r"));
 	}
@@ -3074,7 +3074,7 @@ template <typename T>
 class EMBER_API Hypertile3DVariation : public ParametricVariation<T>
 {
 public:
-	Hypertile3DVariation(T weight = 1.0) : ParametricVariation<T>("hypertile3D", VAR_HYPERTILE3D, weight, true)
+	Hypertile3DVariation(T weight = 1.0) : ParametricVariation<T>("hypertile3D", eVariationId::VAR_HYPERTILE3D, weight, true)
 	{
 		Init();
 	}
@@ -3155,9 +3155,9 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile3D_p", 3, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile3D_q", 7, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "hypertile3D_n", 0, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile3D_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile3D_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "hypertile3D_n", 0, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(true, &m_Cx,  prefix + "hypertile3D_cx"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cy,  prefix + "hypertile3D_cy"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Cz,  prefix + "hypertile3D_cz"));
@@ -3193,7 +3193,7 @@ template <typename T>
 class EMBER_API Hypertile3D1Variation : public ParametricVariation<T>
 {
 public:
-	Hypertile3D1Variation(T weight = 1.0) : ParametricVariation<T>("hypertile3D1", VAR_HYPERTILE3D1, weight, true)
+	Hypertile3D1Variation(T weight = 1.0) : ParametricVariation<T>("hypertile3D1", eVariationId::VAR_HYPERTILE3D1, weight, true)
 	{
 		Init();
 	}
@@ -3272,8 +3272,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile3D1_p", 3, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile3D1_q", 7, INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile3D1_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile3D1_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa,  prefix + "hypertile3D1_pa"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_R,   prefix + "hypertile3D1_r"));
 		m_Params.push_back(ParamWithName<T>(true, &m_C2,  prefix + "hypertile3D1_c2"));
@@ -3296,7 +3296,7 @@ template <typename T>
 class EMBER_API Hypertile3D2Variation : public ParametricVariation<T>
 {
 public:
-	Hypertile3D2Variation(T weight = 1.0) : ParametricVariation<T>("hypertile3D2", VAR_HYPERTILE3D2, weight, true)
+	Hypertile3D2Variation(T weight = 1.0) : ParametricVariation<T>("hypertile3D2", eVariationId::VAR_HYPERTILE3D2, weight, true)
 	{
 		Init();
 	}
@@ -3379,8 +3379,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile3D2_p", 3, INTEGER, 3, T(0x7fffffff)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile3D2_q", 7, INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile3D2_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile3D2_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa,  prefix + "hypertile3D2_pa"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cx,  prefix + "hypertile3D2_cx"));
 		m_Params.push_back(ParamWithName<T>(true, &m_C2,  prefix + "hypertile3D2_c2"));
@@ -3409,7 +3409,7 @@ template <typename T>
 class EMBER_API IDiscVariation : public ParametricVariation<T>
 {
 public:
-	IDiscVariation(T weight = 1.0) : ParametricVariation<T>("idisc", VAR_IDISC, weight, true, true, false, false, true)
+	IDiscVariation(T weight = 1.0) : ParametricVariation<T>("idisc", eVariationId::VAR_IDISC, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -3475,7 +3475,7 @@ template <typename T>
 class EMBER_API Julian2Variation : public ParametricVariation<T>
 {
 public:
-	Julian2Variation(T weight = 1.0) : ParametricVariation<T>("julian2", VAR_JULIAN2, weight)
+	Julian2Variation(T weight = 1.0) : ParametricVariation<T>("julian2", eVariationId::VAR_JULIAN2, weight)
 	{
 		Init();
 	}
@@ -3550,7 +3550,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_D,     prefix + "julian2_d", 1));
 		m_Params.push_back(ParamWithName<T>(&m_E,     prefix + "julian2_e"));
 		m_Params.push_back(ParamWithName<T>(&m_F,     prefix + "julian2_f"));
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "julian2_power", 2, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "julian2_power", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_Dist,  prefix + "julian2_dist", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsN, prefix + "julian2_absn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn,   prefix + "julian2_cn"));
@@ -3576,7 +3576,7 @@ template <typename T>
 class EMBER_API JuliaQVariation : public ParametricVariation<T>
 {
 public:
-	JuliaQVariation(T weight = 1.0) : ParametricVariation<T>("juliaq", VAR_JULIAQ, weight, true, false, false, false, true)
+	JuliaQVariation(T weight = 1.0) : ParametricVariation<T>("juliaq", eVariationId::VAR_JULIAQ, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -3592,7 +3592,7 @@ public:
 
 		helper.Out.x = r * cosa;
 		helper.Out.y = r * sina;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -3615,7 +3615,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = r * cosa;\n"
 		   << "\t\tvOut.y = r * sina;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 
 		return ss.str();
@@ -3634,8 +3634,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power,   prefix + "juliaq_power", 3, INTEGER_NONZERO));
-		m_Params.push_back(ParamWithName<T>(&m_Divisor, prefix + "juliaq_divisor", 2, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power,   prefix + "juliaq_power", 3, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Divisor, prefix + "juliaq_divisor", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_HalfInvPower, prefix + "juliaq_half_inv_power"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_InvPower,     prefix + "juliaq_inv_power"));
 		m_Params.push_back(ParamWithName<T>(true, &m_InvPower2pi,  prefix + "juliaq_inv_power_2pi"));
@@ -3656,7 +3656,7 @@ template <typename T>
 class EMBER_API MurlVariation : public ParametricVariation<T>
 {
 public:
-	MurlVariation(T weight = 1.0) : ParametricVariation<T>("murl", VAR_MURL, weight, true, false, false, false, true)
+	MurlVariation(T weight = 1.0) : ParametricVariation<T>("murl", eVariationId::VAR_MURL, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -3725,7 +3725,7 @@ protected:
 
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_C,     prefix + "murl_c"));
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "murl_power", 2, INTEGER, 2, T(0x7fffffff)));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "murl_power", 2, eParamType::INTEGER, 2, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Cp, prefix + "murl_cp"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_P2, prefix + "murl_p2"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vp, prefix + "murl_vp"));
@@ -3746,7 +3746,7 @@ template <typename T>
 class EMBER_API Murl2Variation : public ParametricVariation<T>
 {
 public:
-	Murl2Variation(T weight = 1.0) : ParametricVariation<T>("murl2", VAR_MURL2, weight, true, false, false, false, true)
+	Murl2Variation(T weight = 1.0) : ParametricVariation<T>("murl2", eVariationId::VAR_MURL2, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -3832,8 +3832,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_C,     prefix + "murl2_c", 0, REAL, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "murl2_power", 1, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_C,     prefix + "murl2_c", 0, eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "murl2_power", 1, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_P2,    prefix + "murl2_p2"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_InvP,  prefix + "murl2_invp"));
 		m_Params.push_back(ParamWithName<T>(true, &m_InvP2, prefix + "murl2_invp2"));
@@ -3856,7 +3856,7 @@ template <typename T>
 class EMBER_API NPolarVariation : public ParametricVariation<T>
 {
 public:
-	NPolarVariation(T weight = 1.0) : ParametricVariation<T>("npolar", VAR_NPOLAR, weight, true, false, false, true, false)
+	NPolarVariation(T weight = 1.0) : ParametricVariation<T>("npolar", eVariationId::VAR_NPOLAR, weight, true, false, false, true, false)
 	{
 		Init();
 	}
@@ -3928,8 +3928,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Parity, prefix + "npolar_parity", 0, INTEGER));
-		m_Params.push_back(ParamWithName<T>(&m_N,      prefix + "npolar_n", 1, INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_Parity, prefix + "npolar_parity", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_N,      prefix + "npolar_n", 1, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(true, &m_Nnz,   prefix + "npolar_nnz"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Vvar,  prefix + "npolar_vvar"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vvar2, prefix + "npolar_vvar_2"));
@@ -3956,7 +3956,7 @@ template <typename T>
 class EMBER_API OrthoVariation : public ParametricVariation<T>
 {
 public:
-	OrthoVariation(T weight = 1.0) : ParametricVariation<T>("ortho", VAR_ORTHO, weight, true, false, false, false, true)
+	OrthoVariation(T weight = 1.0) : ParametricVariation<T>("ortho", eVariationId::VAR_ORTHO, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -4152,8 +4152,8 @@ protected:
 		string prefix = Prefix();
 
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_In,  prefix + "ortho_in",  0, REAL_CYCLIC, T(-M_PI), T(M_PI)));
-		m_Params.push_back(ParamWithName<T>(&m_Out, prefix + "ortho_out", 0, REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_In,  prefix + "ortho_in",  0, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_Out, prefix + "ortho_out", 0, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
 	}
 
 private:
@@ -4168,7 +4168,7 @@ template <typename T>
 class EMBER_API PoincareVariation : public ParametricVariation<T>
 {
 public:
-	PoincareVariation(T weight = 1.0) : ParametricVariation<T>("poincare", VAR_POINCARE, weight)
+	PoincareVariation(T weight = 1.0) : ParametricVariation<T>("poincare", eVariationId::VAR_POINCARE, weight)
 	{
 		Init();
 	}
@@ -4232,9 +4232,9 @@ protected:
 
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_C1r, prefix + "poincare_c1r", 1));
-		m_Params.push_back(ParamWithName<T>(&m_C1a, prefix + "poincare_c1a", -1, REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_C1a, prefix + "poincare_c1a", -1, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_C2r, prefix + "poincare_c2r", 1));
-		m_Params.push_back(ParamWithName<T>(&m_C2a, prefix + "poincare_c2a", 1, REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_C2a, prefix + "poincare_c2a", 1, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(true, &m_C1x, prefix + "poincare_c1x"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_C1y, prefix + "poincare_c1y"));
 		m_Params.push_back(ParamWithName<T>(true, &m_C2x, prefix + "poincare_c2x"));
@@ -4263,7 +4263,7 @@ template <typename T>
 class EMBER_API Poincare3DVariation : public ParametricVariation<T>
 {
 public:
-	Poincare3DVariation(T weight = 1.0) : ParametricVariation<T>("poincare3D", VAR_POINCARE3D, weight, true)
+	Poincare3DVariation(T weight = 1.0) : ParametricVariation<T>("poincare3D", eVariationId::VAR_POINCARE3D, weight, true)
 	{
 		Init();
 	}
@@ -4386,7 +4386,7 @@ template <typename T>
 class EMBER_API PolynomialVariation : public ParametricVariation<T>
 {
 public:
-	PolynomialVariation(T weight = 1.0) : ParametricVariation<T>("polynomial", VAR_POLYNOMIAL, weight)
+	PolynomialVariation(T weight = 1.0) : ParametricVariation<T>("polynomial", eVariationId::VAR_POLYNOMIAL, weight)
 	{
 		Init();
 	}
@@ -4464,7 +4464,7 @@ template <typename T>
 class EMBER_API PSphereVariation : public ParametricVariation<T>
 {
 public:
-	PSphereVariation(T weight = 1.0) : ParametricVariation<T>("psphere", VAR_PSPHERE, weight)
+	PSphereVariation(T weight = 1.0) : ParametricVariation<T>("psphere", eVariationId::VAR_PSPHERE, weight)
 	{
 		Init();
 	}
@@ -4538,7 +4538,7 @@ template <typename T>
 class EMBER_API Rational3Variation : public ParametricVariation<T>
 {
 public:
-	Rational3Variation(T weight = 1.0) : ParametricVariation<T>("rational3", VAR_RATIONAL3, weight)
+	Rational3Variation(T weight = 1.0) : ParametricVariation<T>("rational3", eVariationId::VAR_RATIONAL3, weight)
 	{
 		Init();
 	}
@@ -4636,7 +4636,7 @@ template <typename T>
 class EMBER_API RippleVariation : public ParametricVariation<T>
 {
 public:
-	RippleVariation(T weight = 1.0) : ParametricVariation<T>("ripple", VAR_RIPPLE, weight)
+	RippleVariation(T weight = 1.0) : ParametricVariation<T>("ripple", eVariationId::VAR_RIPPLE, weight)
 	{
 		Init();
 	}
@@ -4674,7 +4674,7 @@ public:
 		//invert the multiplication with scale from before.
 		helper.Out.x = m_Weight * Lerp<T>(u1, u2, m_P) * m_Is;//Original did a direct assignment to outPoint, which is incompatible with Ember's design.
 		helper.Out.y = m_Weight * Lerp<T>(v1, v2, m_P) * m_Is;
-		helper.Out.z = (m_VarType == VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
 	virtual string OpenCLString() const override
@@ -4720,7 +4720,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * Lerp(u1, u2, " << p << ") * " << is << ";\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * Lerp(v1, v2, " << p << ") * " << is << ";\n"
-		   << "\t\tvOut.z = " << ((m_VarType == VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 		   << "\t}\n";
 
 		return ss.str();
@@ -4793,7 +4793,7 @@ template <typename T>
 class EMBER_API SigmoidVariation : public ParametricVariation<T>
 {
 public:
-	SigmoidVariation(T weight = 1.0) : ParametricVariation<T>("sigmoid", VAR_SIGMOID, weight)
+	SigmoidVariation(T weight = 1.0) : ParametricVariation<T>("sigmoid", eVariationId::VAR_SIGMOID, weight)
 	{
 		Init();
 	}
@@ -4913,7 +4913,7 @@ template <typename T>
 class EMBER_API SinusGridVariation : public ParametricVariation<T>
 {
 public:
-	SinusGridVariation(T weight = 1.0) : ParametricVariation<T>("sinusgrid", VAR_SINUS_GRID, weight)
+	SinusGridVariation(T weight = 1.0) : ParametricVariation<T>("sinusgrid", eVariationId::VAR_SINUS_GRID, weight)
 	{
 		Init();
 	}
@@ -5013,7 +5013,7 @@ template <typename T>
 class EMBER_API StwinVariation : public ParametricVariation<T>
 {
 public:
-	StwinVariation(T weight = 1.0) : ParametricVariation<T>("stwin", VAR_STWIN, weight)
+	StwinVariation(T weight = 1.0) : ParametricVariation<T>("stwin", eVariationId::VAR_STWIN, weight)
 	{
 		Init();
 	}
@@ -5095,7 +5095,7 @@ template <typename T>
 class EMBER_API TwoFaceVariation : public Variation<T>
 {
 public:
-	TwoFaceVariation(T weight = 1.0) : Variation<T>("twoface", VAR_TWO_FACE, weight, true) { }
+	TwoFaceVariation(T weight = 1.0) : Variation<T>("twoface", eVariationId::VAR_TWO_FACE, weight, true) { }
 
 	VARCOPY(TwoFaceVariation)
 
@@ -5138,7 +5138,7 @@ template <typename T>
 class EMBER_API UnpolarVariation : public ParametricVariation<T>
 {
 public:
-	UnpolarVariation(T weight = 1.0) : ParametricVariation<T>("unpolar", VAR_UNPOLAR, weight)
+	UnpolarVariation(T weight = 1.0) : ParametricVariation<T>("unpolar", eVariationId::VAR_UNPOLAR, weight)
 	{
 		Init();
 	}
@@ -5202,7 +5202,7 @@ template <typename T>
 class EMBER_API WavesNVariation : public ParametricVariation<T>
 {
 public:
-	WavesNVariation(T weight = 1.0) : ParametricVariation<T>("wavesn", VAR_WAVESN, weight, true, false, false, false, true)
+	WavesNVariation(T weight = 1.0) : ParametricVariation<T>("wavesn", eVariationId::VAR_WAVESN, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -5285,7 +5285,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_ScaleY, prefix + "wavesn_scaley", 1));
 		m_Params.push_back(ParamWithName<T>(&m_IncX,   prefix + "wavesn_incx"));
 		m_Params.push_back(ParamWithName<T>(&m_IncY,   prefix + "wavesn_incy"));
-		m_Params.push_back(ParamWithName<T>(&m_Power,  prefix + "wavesn_power", 1, INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power,  prefix + "wavesn_power", 1, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsN, prefix + "wavesn_absn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn,   prefix + "wavesn_cn"));
 	}
@@ -5309,7 +5309,7 @@ template <typename T>
 class EMBER_API XHeartVariation : public ParametricVariation<T>
 {
 public:
-	XHeartVariation(T weight = 1.0) : ParametricVariation<T>("xheart", VAR_XHEART, weight, true)
+	XHeartVariation(T weight = 1.0) : ParametricVariation<T>("xheart", eVariationId::VAR_XHEART, weight, true)
 	{
 		Init();
 	}
@@ -5418,7 +5418,7 @@ template <typename T>
 class EMBER_API BarycentroidVariation : public ParametricVariation<T>
 {
 public:
-	BarycentroidVariation(T weight = 1.0) : ParametricVariation<T>("barycentroid", VAR_BARYCENTROID, weight)
+	BarycentroidVariation(T weight = 1.0) : ParametricVariation<T>("barycentroid", eVariationId::VAR_BARYCENTROID, weight)
 	{
 		Init();
 	}
@@ -5513,7 +5513,7 @@ template <typename T>
 class EMBER_API BiSplitVariation : public ParametricVariation<T>
 {
 public:
-	BiSplitVariation(T weight = 1.0) : ParametricVariation<T>("bisplit", VAR_BISPLIT, weight)
+	BiSplitVariation(T weight = 1.0) : ParametricVariation<T>("bisplit", eVariationId::VAR_BISPLIT, weight)
 	{
 		Init();
 	}
@@ -5569,7 +5569,7 @@ template <typename T>
 class EMBER_API CrescentsVariation : public Variation<T>
 {
 public:
-	CrescentsVariation(T weight = 1.0) : Variation<T>("crescents", VAR_CRESCENTS, weight) { }
+	CrescentsVariation(T weight = 1.0) : Variation<T>("crescents", eVariationId::VAR_CRESCENTS, weight) { }
 
 	VARCOPY(CrescentsVariation)
 
@@ -5617,7 +5617,7 @@ template <typename T>
 class EMBER_API MaskVariation : public Variation<T>
 {
 public:
-	MaskVariation(T weight = 1.0) : Variation<T>("mask", VAR_MASK, weight, true) { }
+	MaskVariation(T weight = 1.0) : Variation<T>("mask", eVariationId::VAR_MASK, weight, true) { }
 
 	VARCOPY(MaskVariation)
 
@@ -5667,7 +5667,7 @@ template <typename T>
 class EMBER_API Cpow2Variation : public ParametricVariation<T>
 {
 public:
-	Cpow2Variation(T weight = 1.0) : ParametricVariation<T>("cpow2", VAR_CPOW2, weight, true, false, false, false, true)
+	Cpow2Variation(T weight = 1.0) : ParametricVariation<T>("cpow2", eVariationId::VAR_CPOW2, weight, true, false, false, false, true)
 	{
 		Init();
 	}
@@ -5757,8 +5757,8 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_R,       prefix + "cpow2_r", 1));
 		m_Params.push_back(ParamWithName<T>(&m_A,       prefix + "cpow2_a"));
-		m_Params.push_back(ParamWithName<T>(&m_Divisor, prefix + "cpow2_divisor", 1, INTEGER_NONZERO));
-		m_Params.push_back(ParamWithName<T>(&m_Spread,  prefix + "cpow2_spread",  1, INTEGER, 1, T(0x7FFFFFFF)));
+		m_Params.push_back(ParamWithName<T>(&m_Divisor, prefix + "cpow2_divisor", 1, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Spread,  prefix + "cpow2_spread",  1, eParamType::INTEGER, 1, T(0x7FFFFFFF)));
 		m_Params.push_back(ParamWithName<T>(true, &m_C,          prefix + "cpow2_c"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_HalfC,      prefix + "cpow2_halfc"));
 		m_Params.push_back(ParamWithName<T>(true, &m_D,          prefix + "cpow2_d"));
@@ -5785,18 +5785,18 @@ private:
 MAKEPREPOSTVAR(Hemisphere, hemisphere, HEMISPHERE)
 MAKEPREPOSTPARVAR(Epispiral, epispiral, EPISPIRAL)
 MAKEPREPOSTPARVAR(Bwraps, bwraps, BWRAPS)
-MAKEPREPOSTVARASSIGN(BlurCircle, blur_circle, BLUR_CIRCLE, ASSIGNTYPE_SUM)
+MAKEPREPOSTVARASSIGN(BlurCircle, blur_circle, BLUR_CIRCLE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(BlurZoom, blur_zoom, BLUR_ZOOM)
 MAKEPREPOSTPARVAR(BlurPixelize, blur_pixelize, BLUR_PIXELIZE)
 MAKEPREPOSTPARVAR(Crop, crop, CROP)
 MAKEPREPOSTPARVAR(BCircle, bcircle, BCIRCLE)
 MAKEPREPOSTPARVAR(BlurLinear, blur_linear, BLUR_LINEAR)
-MAKEPREPOSTPARVARASSIGN(BlurSquare, blur_square, BLUR_SQUARE, ASSIGNTYPE_SUM)
+MAKEPREPOSTPARVARASSIGN(BlurSquare, blur_square, BLUR_SQUARE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVAR(Flatten, flatten, FLATTEN)
-MAKEPREPOSTVARASSIGN(Zblur, zblur, ZBLUR, ASSIGNTYPE_SUM)
-MAKEPREPOSTVARASSIGN(Blur3D, blur3D, BLUR3D, ASSIGNTYPE_SUM)
-MAKEPREPOSTVARASSIGN(ZScale, zscale, ZSCALE, ASSIGNTYPE_SUM)
-MAKEPREPOSTVARASSIGN(ZTranslate, ztranslate, ZTRANSLATE, ASSIGNTYPE_SUM)
+MAKEPREPOSTVARASSIGN(Zblur, zblur, ZBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
+MAKEPREPOSTVARASSIGN(Blur3D, blur3D, BLUR3D, eVariationAssignType::ASSIGNTYPE_SUM)
+MAKEPREPOSTVARASSIGN(ZScale, zscale, ZSCALE, eVariationAssignType::ASSIGNTYPE_SUM)
+MAKEPREPOSTVARASSIGN(ZTranslate, ztranslate, ZTRANSLATE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVAR(ZCone, zcone, ZCONE)
 MAKEPREPOSTVAR(Spherical3D, Spherical3D, SPHERICAL3D)
 MAKEPREPOSTPARVAR(Curl3D, curl3D, CURL3D)

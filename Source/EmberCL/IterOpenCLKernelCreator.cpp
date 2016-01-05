@@ -123,9 +123,9 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 					{
 						xformFuncs << "\n\t//" << var->Name() << ".\n";
 						xformFuncs << var->PrecalcOpenCLString();
-						xformFuncs << xform->ReadOpenCLString(VARTYPE_PRE) << "\n";
+						xformFuncs << xform->ReadOpenCLString(eVariationType::VARTYPE_PRE) << "\n";
 						xformFuncs << var->OpenCLString() << "\n";
-						xformFuncs << xform->WriteOpenCLString(VARTYPE_PRE, var->AssignType()) << "\n";
+						xformFuncs << xform->WriteOpenCLString(eVariationType::VARTYPE_PRE, var->AssignType()) << "\n";
 					}
 				}
 			}
@@ -154,7 +154,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 				xformFuncs << "\n\toutPoint->m_Y = 0;";
 				xformFuncs << "\n\toutPoint->m_Z = 0;\n";
 				xformFuncs << "\n\t//Apply each of the " << xform->VariationCount() << " regular variations in this xform.\n\n";
-				xformFuncs << xform->ReadOpenCLString(VARTYPE_REG);
+				xformFuncs << xform->ReadOpenCLString(eVariationType::VARTYPE_REG);
 				varCount += xform->VariationCount();
 
 				//Output the code for each regular variation in this xform.
@@ -164,7 +164,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 					{
 						xformFuncs << "\n\t//" << var->Name() << ".\n"
 								   << var->OpenCLString() << (varIndex == varCount - 1 ? "\n" : "\n\n")
-								   << xform->WriteOpenCLString(VARTYPE_REG, ASSIGNTYPE_SUM);
+								   << xform->WriteOpenCLString(eVariationType::VARTYPE_REG, eVariationAssignType::ASSIGNTYPE_SUM);
 					}
 				}
 			}
@@ -189,9 +189,9 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 				{
 					xformFuncs << "\n\t//" << var->Name() << ".\n";
 					xformFuncs << var->PrecalcOpenCLString();
-					xformFuncs << xform->ReadOpenCLString(VARTYPE_POST) << "\n";
+					xformFuncs << xform->ReadOpenCLString(eVariationType::VARTYPE_POST) << "\n";
 					xformFuncs << var->OpenCLString() << "\n";
-					xformFuncs << xform->WriteOpenCLString(VARTYPE_POST, var->AssignType()) << (varIndex == varCount - 1 ? "\n" : "\n\n");
+					xformFuncs << xform->WriteOpenCLString(eVariationType::VARTYPE_POST, var->AssignType()) << (varIndex == varCount - 1 ? "\n" : "\n\n");
 				}
 			}
 		}

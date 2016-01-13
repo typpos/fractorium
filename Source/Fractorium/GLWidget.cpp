@@ -222,8 +222,8 @@ void GLWidget::paintGL()
 		//Affine drawing.
 		bool pre = m_Fractorium->ui.PreAffineGroupBox->isChecked();
 		bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
-		float unitX = fabs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f;
-		float unitY = fabs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f;
+		float unitX = std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f;
+		float unitY = std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f;
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glEnable(GL_LINE_SMOOTH);
@@ -840,8 +840,8 @@ bool GLEmberController<T>::SizesMatch()
 void GLWidget::DrawGrid()
 {
 	RendererBase* renderer = m_Fractorium->m_Controller->Renderer();
-	float unitX = fabs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f;
-	float unitY = fabs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f;
+	float unitX = std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f;
+	float unitY = std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f;
 	float rad = std::max(unitX, unitY);
 	float xLow =  floor(-unitX);
 	float xHigh = ceil(unitX);

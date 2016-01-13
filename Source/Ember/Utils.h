@@ -704,7 +704,7 @@ static inline T Spread(T x, T y)
 template <typename T>
 static inline T Powq4(T x, T y)
 {
-	return std::pow(std::fabs(x), y) * SignNz(x);
+	return std::pow(std::abs(x), y) * SignNz(x);
 }
 
 /// <summary>

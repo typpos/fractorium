@@ -11,7 +11,10 @@ unix|macx {
 }
 
 # When loaded by QtCreator
-EMBER_ROOT = $$(PWD)/../../..
+#This cannot be this...
+#EMBER_ROOT = $$(PWD)/../../..
+#It must be this...
+EMBER_ROOT = ./../../../
 
 # When compiling from project root
 autobuild {
@@ -28,11 +31,11 @@ LOCAL_INCLUDE_DIR = $$(PWD)/../../include
 
 CONFIG(release, debug|release) {
   CONFIG += warn_off
-  DESTDIR = $$(PWD)/../../../Bin/release
+  DESTDIR = $$EMBER_ROOT/Bin/release
 }
 
 CONFIG(debug, debug|release) {
-  DESTDIR = $$(PWD)/../../../Bin/debug
+  DESTDIR = $$EMBER_ROOT/Bin/debug
 }
 
 macx {

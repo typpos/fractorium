@@ -57,13 +57,12 @@ private:
 		double weight1 = 0, weight2 = 0;
 		VariationTreeWidgetItem* varItemWidget;
 		VariationTreeDoubleSpinBox* spinBox1, *spinBox2;
-
 		auto itemWidget1 = treeWidget()->itemWidget(const_cast<VariationTreeWidgetItem*>(this), 1);//Get the widget for the second column.
-		
+
 		if ((spinBox1 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget1)))//Cast the widget to the VariationTreeDoubleSpinBox type.
 		{
 			auto itemWidget2 = treeWidget()->itemWidget(const_cast<QTreeWidgetItem*>(&other), 1);//Get the widget for the second column of the widget item passed in.
-			
+
 			if ((spinBox2 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget2)))//Cast the widget to the VariationTreeDoubleSpinBox type.
 			{
 				if (spinBox1->IsParam() || spinBox2->IsParam())//Do not sort params, their order will always remain the same.
@@ -83,11 +82,11 @@ private:
 					if (IsNearZero(weight1) && IsNearZero(weight2))
 						return index1 > index2;
 					else
-						return fabs(weight1) < fabs(weight2);
+						return std::abs(weight1) < fabs(weight2);
 				}
 			}
 		}
-		
+
 		return false;
 	}
 

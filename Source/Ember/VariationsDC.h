@@ -42,7 +42,7 @@ public:
 
 		T tempX = helper.Out.x + sumX;
 		T tempY = helper.Out.y + sumY;
-		outPoint.m_ColorX = fmod(fabs(m_Bdcs * (Sqr<T>(tempX + m_CenterX) + Sqr<T>(tempY + m_CenterY))), T(1.0));
+		outPoint.m_ColorX = fmod(std::abs(m_Bdcs * (Sqr<T>(tempX + m_CenterX) + Sqr<T>(tempY + m_CenterY))), T(1.0));
 	}
 
 	virtual string OpenCLString() const override
@@ -141,7 +141,7 @@ public:
 		helper.Out.x = m_Weight * (m_Xform->m_Affine.A() * x + m_Xform->m_Affine.B() * y + m_Xform->m_Affine.E());
 		helper.Out.y = m_Weight * (m_Xform->m_Affine.C() * x + m_Xform->m_Affine.D() * y + m_Xform->m_Affine.F());
 		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
-		outPoint.m_ColorX = fmod(fabs(outPoint.m_ColorX * T(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * T(0.5)), T(1.0));
+		outPoint.m_ColorX = fmod(std::abs(outPoint.m_ColorX * T(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * T(0.5)), T(1.0));
 	}
 
 	virtual string OpenCLString() const override
@@ -415,7 +415,7 @@ public:
 
 		T tempX = helper.Out.x + sumX;
 		T tempY = helper.Out.y + sumY;
-		outPoint.m_ColorX = fmod(fabs(T(0.5) * (m_Ldcs * ((m_Cosa * tempX + m_Sina * tempY + m_Offset)) + 1)), T(1.0));
+		outPoint.m_ColorX = fmod(std::abs(T(0.5) * (m_Ldcs * ((m_Cosa * tempX + m_Sina * tempY + m_Offset)) + 1)), T(1.0));
 	}
 
 	virtual string OpenCLString() const override
@@ -715,7 +715,7 @@ public:
 
 		T tempX = helper.Out.x + sumX;
 		T tempY = helper.Out.y + sumY;
-		outPoint.m_ColorX = fmod(fabs(T(0.5) * (m_Ldcs * ((m_Cosa * tempX + m_Sina * tempY + m_Offset)) + T(1.0))), T(1.0));
+		outPoint.m_ColorX = fmod(std::abs(T(0.5) * (m_Ldcs * ((m_Cosa * tempX + m_Sina * tempY + m_Offset)) + T(1.0))), T(1.0));
 	}
 
 	virtual string OpenCLString() const override
@@ -885,7 +885,7 @@ public:
 		helper.Out.x = m_Weight * (ox + u * xx + v * yx);
 		helper.Out.y = m_Weight * (oy + u * xy + v * yy);
 		helper.Out.z = m_Weight * helper.In.z;
-		outPoint.m_ColorX = fmod(fabs(u + v), T(1.0));
+		outPoint.m_ColorX = fmod(std::abs(u + v), T(1.0));
 	}
 
 	virtual string OpenCLString() const override

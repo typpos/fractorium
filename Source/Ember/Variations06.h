@@ -745,10 +745,7 @@ public:
 			m_HasStripes = 1;
 
 			if (m_NumStripes < 0)
-			{
 				m_NegStripes = 1;
-				//m_NumStripes *= -1;
-			}
 			else
 				m_NegStripes = 0;
 		}
@@ -758,7 +755,7 @@ public:
 			m_NegStripes = 0;
 		}
 
-		m_AbsStripes = std::fabs(m_NumStripes);
+		m_AbsStripes = std::abs(m_NumStripes);
 		m_MidAngle = M_2PI / m_NumEdges;
 
 		if (m_HasStripes == 1)
@@ -780,18 +777,12 @@ public:
 		if (m_AdjustToLinear == 1)
 		{
 			if (int(m_NumEdges) % 4 == 0)
-			{
 				m_AdjustedWeight = m_Weight / (std::sqrt(2 - 2 * std::cos(m_MidAngle * (m_NumEdges / 2 - 1))) / 2);
-			}
 			else
-			{
 				m_AdjustedWeight = m_Weight / (std::sqrt(2 - 2 * std::cos(m_MidAngle * std::floor((m_NumEdges / 2)))) / 2);
-			}
 		}
 		else
-		{
 			m_AdjustedWeight = m_Weight;
-		}
 
 		if (m_CircumCircle == 1)
 		{
@@ -854,7 +845,7 @@ private:
 		T angXY, angMem, angTmp;
 		T ratioTmp, ratioTmpNum, ratioTmpDen;
 		T xTmp, yTmp;
-		T ranTmp;
+		T ranTmp, x;
 		int count;
 
 		if (params.ExactCalc == 1)
@@ -926,14 +917,15 @@ private:
 
 				if (((count & 1) == 0) && (params.RatioStripes < 1))
 				{
-					if ((std::fabs(angXY - angTmp) > params.SpeedCalc2) && (count != params.MaxStripes))
+					if ((std::abs(angXY - angTmp) > params.SpeedCalc2) && (count != params.MaxStripes))
 					{
 						if ((angXY - angTmp) > params.SpeedCalc2)
 						{
 							ratioTmpNum = (angXY - (angTmp + params.SpeedCalc2)) * params.SpeedCalc2;
 							ratioTmpDen = params.AngStart - params.SpeedCalc2;
 							ratioTmp = ratioTmpNum / ratioTmpDen;
-							sincos((angMem - angXY + angTmp + ratioTmp), &params.X, &params.Y);
+							x = angMem - angXY + angTmp + ratioTmp;
+							sincos(x, &params.X, &params.Y);
 							angXY = angTmp + ratioTmp;
 						}
 
@@ -942,7 +934,8 @@ private:
 							ratioTmpNum = (angTmp - params.SpeedCalc2 - angXY) * params.SpeedCalc2;
 							ratioTmpDen = params.AngStart - params.SpeedCalc2;
 							ratioTmp = ratioTmpNum / ratioTmpDen;
-							sincos((angMem - angXY + angTmp - ratioTmp), &params.X, &params.Y);
+							x = angMem - angXY + angTmp - ratioTmp;
+							sincos(x, &params.X, &params.Y);
 							angXY = angTmp - ratioTmp;
 						}
 					}
@@ -954,7 +947,8 @@ private:
 							ratioTmpNum = (angTmp - params.SpeedCalc2 - angXY) * params.SpeedCalc2;
 							ratioTmpDen = params.AngStart - params.SpeedCalc2;
 							ratioTmp = ratioTmpNum / ratioTmpDen;
-							sincos((angMem - angXY + angTmp - ratioTmp), &params.X, &params.Y);
+							x = angMem - angXY + angTmp - ratioTmp;
+							sincos(x, &params.X, &params.Y);
 							angXY = angTmp - ratioTmp;
 						}
 					}
@@ -1003,14 +997,15 @@ private:
 
 				if (((count & 1) == 1) && (params.RatioStripes < 1))
 				{
-					if ((std::fabs(angXY - angTmp) > params.SpeedCalc2) && (count != params.MaxStripes))
+					if ((std::abs(angXY - angTmp) > params.SpeedCalc2) && (count != params.MaxStripes))
 					{
 						if ((angXY - angTmp) > params.SpeedCalc2)
 						{
 							ratioTmpNum = (angXY - (angTmp + params.SpeedCalc2)) * params.SpeedCalc2;
 							ratioTmpDen = params.AngStart - params.SpeedCalc2;
 							ratioTmp = ratioTmpNum / ratioTmpDen;
-							sincos((angMem - angXY + angTmp + ratioTmp), &params.X, &params.Y);
+							x = angMem - angXY + angTmp + ratioTmp;
+							sincos(x, &params.X, &params.Y);
 							angXY = angTmp + ratioTmp;
 						}
 
@@ -1019,7 +1014,8 @@ private:
 							ratioTmpNum = (angTmp - params.SpeedCalc2 - angXY) * params.SpeedCalc2;
 							ratioTmpDen = params.AngStart - params.SpeedCalc2;
 							ratioTmp = ratioTmpNum / ratioTmpDen;
-							sincos((angMem - angXY + angTmp - ratioTmp), &params.X, &params.Y);
+							x = angMem - angXY + angTmp - ratioTmp;
+							sincos(x, &params.X, &params.Y);
 							angXY = angTmp - ratioTmp;
 						}
 					}
@@ -1033,7 +1029,8 @@ private:
 							ratioTmpNum = (angTmp - params.SpeedCalc2 - angXY) * params.SpeedCalc2;
 							ratioTmpDen = params.AngStart - params.SpeedCalc2;
 							ratioTmp = ratioTmpNum / ratioTmpDen;
-							sincos((angMem - angXY + angTmp - ratioTmp), &params.X, &params.Y);
+							x = angMem - angXY + angTmp - ratioTmp;
+							sincos(x, &params.X, &params.Y);
 							angXY = angTmp - ratioTmp;
 						}
 					}
@@ -1344,10 +1341,10 @@ public:
 	virtual void Precalc() override
 	{
 		static const T DENOM_SQRT2 = T(0.707106781);
-		m_AbsS = std::fabs(m_S);
-		m_AbsT = std::fabs(m_T);
+		m_AbsS = std::abs(m_S);
+		m_AbsT = std::abs(m_T);
 		m_St = m_AbsS * T(0.5) + m_AbsT;
-		m_TempRad = DENOM_SQRT2 * m_AbsS * std::fabs(m_Radius);
+		m_TempRad = DENOM_SQRT2 * m_AbsS * std::abs(m_Radius);
 		m_A = { -T(0.5)* m_AbsS, T(0.5)* m_AbsS + m_AbsT };
 		m_B = { T(0.5)* m_AbsS, T(0.5)* m_AbsS + m_AbsT };
 		m_C = { m_AbsT, T(0.5)* m_AbsS };
@@ -1409,7 +1406,7 @@ private:
 
 	int HitsSquareAroundOrigin(T a, v2T& p)
 	{
-		return (std::fabs(p.x) <= a && std::fabs(p.y) <= a);
+		return (std::abs(p.x) <= a && std::abs(p.y) <= a);
 	}
 
 	int HitsCircleAroundOrigin(T radius, v2T& p, T& r)
@@ -1481,6 +1478,12 @@ public:
 
 	PARVARCOPY(CrobVariation)
 
+	/// <summary>
+	/// Functions the specified helper.
+	/// </summary>
+	/// <param name="helper">The helper.</param>
+	/// <param name="outPoint">The out point.</param>
+	/// <param name="rand">The rand.</param>
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T gradTmp, secTmp, xTmp, yTmp;
@@ -1489,20 +1492,10 @@ public:
 		{
 			if (m_Blur == 0)
 			{
-				if (m_VarType == eVariationType::VARTYPE_PRE)//Setting input point.
+				if (m_VarType == eVariationType::VARTYPE_REG)
 				{
-					helper.m_TransX = 0;
-					helper.m_TransY = 0;
-				}
-				else if (m_VarType == eVariationType::VARTYPE_REG)
-				{
-					helper.In.x = 0;
-					helper.In.y = 0;
-				}
-				else
-				{
-					outPoint.m_X = 0;
-					outPoint.m_Y = 0;
+					helper.In.x = helper.m_TransX = 0;//This will not only overwrite the current output point running sum, but also set
+					helper.In.y = helper.m_TransY = 0;//the affine transformed point so that any future variation that uses it directly will get the updated value.
 				}
 			}
 			else
@@ -1541,40 +1534,16 @@ public:
 						xTmp = m_Left + m_Right - xTmp;
 				}
 
-				if (m_VarType == eVariationType::VARTYPE_PRE)
+				if (m_VarType == eVariationType::VARTYPE_REG)
 				{
-					helper.m_TransX = xTmp;
-					helper.m_TransY = yTmp;
-				}
-				else if (m_VarType == eVariationType::VARTYPE_REG)
-				{
-					helper.In.x = xTmp;
-					helper.In.y = yTmp;
-				}
-				else
-				{
-					outPoint.m_X = xTmp;
-					outPoint.m_Y = yTmp;
+					helper.In.x = helper.m_TransX = xTmp;//This will not only overwrite the current output point running sum, but also set
+					helper.In.y = helper.m_TransY = yTmp;//the affine transformed point so that any future variation that uses it directly will get the updated value.
 				}
 			}
 		}
 
-		if (m_VarType == eVariationType::VARTYPE_PRE)
-		{
-			helper.Out.x = helper.m_TransX;
-			helper.Out.y = helper.m_TransY;
-		}
-		else if (m_VarType == eVariationType::VARTYPE_REG)
-		{
-			helper.Out.x = helper.In.x;
-			helper.Out.y = helper.In.y;
-		}
-		else
-		{
-			helper.Out.x = outPoint.m_X;
-			helper.Out.y = outPoint.m_Y;
-		}
-
+		helper.Out.x = xTmp;
+		helper.Out.y = yTmp;
 		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
@@ -1620,23 +1589,11 @@ public:
 		   << "\t\t	if (" << blur << " == 0)\n"
 		   << "\t\t	{\n";
 
-		if (m_VarType == eVariationType::VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss
-					<< "\t\t		transX = 0;\n"
-					<< "\t\t		transY = 0;\n";
-		}
-		else if (m_VarType == eVariationType::VARTYPE_REG)
-		{
-			ss
-					<< "\t\t		vIn.x = 0;\n"
-					<< "\t\t		vIn.y = 0;\n";
-		}
-		else
-		{
-			ss
-					<< "\t\t		outPoint->m_X = 0;\n"
-					<< "\t\t		outPoint->m_Y = 0;\n";
+					<< "\t\t		vIn.x = transX = 0;\n"
+					<< "\t\t		vIn.y = transY = 0;\n";
 		}
 
 		ss
@@ -1676,50 +1633,19 @@ public:
 				<< "\t\t		}\n"
 				<< "\n";
 
-		if (m_VarType == eVariationType::VARTYPE_PRE)
+		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss
-					<< "\t\t		transX = xTmp;\n"
-					<< "\t\t		transY = yTmp;\n";
-		}
-		else if (m_VarType == eVariationType::VARTYPE_REG)
-		{
-			ss
-					<< "\t\t		vIn.x = xTmp;\n"
-					<< "\t\t		vIn.y = yTmp;\n";
-		}
-		else
-		{
-			ss
-					<< "\t\t		outPoint->m_X = xTmp;\n"
-					<< "\t\t		outPoint->m_Y = yTmp;\n";
+					<< "\t\t		vIn.x = transX = xTmp;\n"
+					<< "\t\t		vIn.y = transY = yTmp;\n";
 		}
 
 		ss
 				<< "\t\t\t}\n"
 				<< "\t\t}\n"
-				<< "\n";
-
-		if (m_VarType == eVariationType::VARTYPE_PRE)
-		{
-			ss
-					<< "\t\tvOut.x = transX;\n"
-					<< "\t\tvOut.y = transY;\n";
-		}
-		else if (m_VarType == eVariationType::VARTYPE_REG)
-		{
-			ss
-					<< "\t\tvOut.x = vIn.x;\n"
-					<< "\t\tvOut.y = vIn.y;\n";
-		}
-		else
-		{
-			ss
-					<< "\t\tvOut.x = outPoint->m_X;\n"
-					<< "\t\tvOut.y = outPoint->m_Y;\n";
-		}
-
-		ss
+				<< "\n"
+				<< "\t\tvOut.x = xTmp;\n"
+				<< "\t\tvOut.y = yTmp;\n"
 				<< "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
 				<< "\t}\n";
 		return ss.str();
@@ -1751,8 +1677,8 @@ public:
 		if (m_Blur != 0)
 			m_Blur = 1;
 
-		m_XInterval = std::fabs(m_Right) - m_Left;
-		m_YInterval = std::fabs(m_Bottom) - m_Top;
+		m_XInterval = std::abs(m_Right) - m_Left;
+		m_YInterval = std::abs(m_Bottom) - m_Top;
 		m_XInt2 = m_XInterval / 2;
 		m_YInt2 = m_YInterval / 2;
 
@@ -1889,7 +1815,7 @@ public:
 	{
 		T x = helper.In.x, y = helper.In.y, z = helper.In.z;
 		T xTmp, yTmp, angTmp, angRot, fac;
-		T rad = helper.m_PrecalcSumSquares / 4 + 1;
+		T rad = Zeps<T>(helper.m_PrecalcSumSquares / 4 + 1);
 		T angXY, angZ;
 		T c, s;
 		angXY = std::atan2(x, y);
@@ -1924,7 +1850,7 @@ public:
 						}
 						else
 						{
-							angRot = (angXY - m_AngStrip1) / (m_AngStrip2 - m_AngStrip1);
+							angRot = (angXY - m_AngStrip1) / Zeps<T>(m_AngStrip2 - m_AngStrip1);
 							angRot = angXY - angRot * m_AngStrip1;
 							sincos(angRot, &s, &c);
 							xTmp = c * x - s * y;
@@ -1976,9 +1902,9 @@ public:
 			z = 2 / std::pow(rad, m_ExponentZ) - 1;
 
 			if (m_ExponentZ <= 2)
-				angZ = T(M_PI) - std::acos((z / (Sqr(x) + Sqr(y) + Sqr(z))));
+				angZ = T(M_PI) - std::acos((z / (SQR(x) + SQR(y) + SQR(z))));
 			else
-				angZ = T(M_PI) - std::atan2(Sqr(Sqr(x) + Sqr(y)), z);
+				angZ = T(M_PI) - std::atan2(Sqr(SQR(x) + SQR(y)), z);
 		}
 		else
 		{
@@ -2000,12 +1926,12 @@ public:
 					}
 					else
 					{
-						angTmp = (T(M_PI) - angZ) / m_AngHoleComp * m_AngleHoleTemp - T(M_PI_2);
+						angTmp = (T(M_PI) - angZ) / Zeps<T>(m_AngHoleComp * m_AngleHoleTemp - T(M_PI_2));
 						angZ -= T(M_PI_2);
 						fac = std::cos(angTmp) / std::cos(angZ);
-						x = x * fac;
-						y = y * fac;
-						z = z * (std::sin(angTmp) / std::sin(angZ));
+						x *= fac;
+						y *= fac;
+						z *= (std::sin(angTmp) / std::sin(angZ));
 					}
 				}
 			}
@@ -2021,12 +1947,12 @@ public:
 					}
 					else
 					{
-						angTmp = T(M_PI) - angZ / m_AngHoleComp * m_AngleHoleTemp - T(M_PI_2);
+						angTmp = T(M_PI) - angZ / Zeps<T>(m_AngHoleComp * m_AngleHoleTemp - T(M_PI_2));
 						angZ -= T(M_PI_2);
 						fac = std::cos(angTmp) / std::cos(angZ);
-						x = x * fac;
-						y = y * fac;
-						z = z * (std::sin(angTmp) / std::sin(angZ));
+						x *= fac;
+						y *= fac;
+						z *= (std::sin(angTmp) / std::sin(angZ));
 					}
 				}
 			}
@@ -2044,19 +1970,15 @@ public:
 				else
 				{
 					if (angZ > m_AngleHoleTemp)
-					{
 						angTmp = (T(M_PI) - angZ) / m_AngHoleComp * (T(M_PI) - 2 * m_AngHoleComp) + m_AngHoleComp - T(M_PI_2);
-					}
 					else
-					{
 						angTmp = T(M_PI_2) - (angZ / m_AngHoleComp * (T(M_PI) - 2 * m_AngHoleComp) + m_AngHoleComp);
-					}
 
 					angZ -= T(M_PI_2);
 					fac = std::cos(angTmp) / std::cos(angZ);
-					x = x * fac;
-					y = y * fac;
-					z = z * (std::sin(angTmp) / std::sin(angZ));
+					x *= fac;
+					y *= fac;
+					z *= (std::sin(angTmp) / std::sin(angZ));
 				}
 			}
 		}
@@ -2091,7 +2013,7 @@ public:
 		ss << "\t{\n"
 		   "\t\treal_t x = vIn.x, y = vIn.y, z = vIn.z;\n"
 		   "\t\treal_t xTmp, yTmp, angTmp, angRot, fac;\n"
-		   "\t\treal_t rad = precalcSumSquares / 4 + 1;\n"
+		   "\t\treal_t rad = Zeps(precalcSumSquares / 4 + 1);\n"
 		   "\t\treal_t angXY, angZ;\n"
 		   "\t\treal_t c, s;\n"
 		   "\t\t\n"
@@ -2127,7 +2049,7 @@ public:
 		   "\t\t				}\n"
 		   "\t\t				else\n"
 		   "\t\t				{\n"
-		   "\t\t					angRot = (angXY - " << angStrip1 << ") / (" << angStrip2 << " - " << angStrip1 << ");\n"
+		   "\t\t					angRot = (angXY - " << angStrip1 << ") / Zeps(" << angStrip2 << " - " << angStrip1 << ");\n"
 		   "\t\t					angRot = angXY - angRot * " << angStrip1 << ";\n"
 		   "\t\t					s = sincos(angRot, &c);\n"
 		   "\t\t					xTmp = c * x - s * y;\n"
@@ -2179,9 +2101,9 @@ public:
 		   "\t\t	z = 2 / pow(rad, " << exponentZ << ") - 1;\n"
 		   "\t\t\n"
 		   "\t\t	if (" << exponentZ << " <= 2)\n"
-		   "\t\t		angZ = M_PI - acos((z / (Sqr(x) + Sqr(y) + Sqr(z))));\n"
+		   "\t\t		angZ = M_PI - acos((z / (SQR(x) + SQR(y) + SQR(z))));\n"
 		   "\t\t	else\n"
-		   "\t\t		angZ = M_PI - atan2(Sqr(Sqr(x) + Sqr(y)), z);\n"
+		   "\t\t		angZ = M_PI - atan2(Sqr(SQR(x) + SQR(y)), z);\n"
 		   "\t\t}\n"
 		   "\t\telse\n"
 		   "\t\t{\n"
@@ -2203,12 +2125,12 @@ public:
 		   "\t\t			}\n"
 		   "\t\t			else\n"
 		   "\t\t			{\n"
-		   "\t\t				angTmp = (M_PI - angZ) / " << angHoleComp << " * " << angHoleTemp << " - M_PI_2;\n"
+		   "\t\t				angTmp = (M_PI - angZ) / Zeps(" << angHoleComp << " * " << angHoleTemp << " - M_PI_2);\n"
 		   "\t\t				angZ -= M_PI_2;\n"
 		   "\t\t				fac = cos(angTmp) / cos(angZ);\n"
-		   "\t\t				x = x * fac;\n"
-		   "\t\t				y = y * fac;\n"
-		   "\t\t				z = z * (sin(angTmp) / sin(angZ));\n"
+		   "\t\t				x *= fac;\n"
+		   "\t\t				y *= fac;\n"
+		   "\t\t				z *= (sin(angTmp) / sin(angZ));\n"
 		   "\t\t			}\n"
 		   "\t\t		}\n"
 		   "\t\t	}\n"
@@ -2224,12 +2146,12 @@ public:
 		   "\t\t			}\n"
 		   "\t\t			else\n"
 		   "\t\t			{\n"
-		   "\t\t				angTmp = M_PI - angZ / " << angHoleComp << " * " << angHoleTemp << " - M_PI_2;\n"
+		   "\t\t				angTmp = M_PI - angZ / Zeps(" << angHoleComp << " * " << angHoleTemp << " - M_PI_2);\n"
 		   "\t\t				angZ -= M_PI_2;\n"
 		   "\t\t				fac = cos(angTmp) / cos(angZ);\n"
-		   "\t\t				x = x * fac;\n"
-		   "\t\t				y = y * fac;\n"
-		   "\t\t				z = z * (sin(angTmp) / sin(angZ));\n"
+		   "\t\t				x *= fac;\n"
+		   "\t\t				y *= fac;\n"
+		   "\t\t				z *= (sin(angTmp) / sin(angZ));\n"
 		   "\t\t			}\n"
 		   "\t\t		}\n"
 		   "\t\t	}\n"
@@ -2247,19 +2169,15 @@ public:
 		   "\t\t		else\n"
 		   "\t\t		{\n"
 		   "\t\t			if (angZ > " << angHoleTemp << ")\n"
-		   "\t\t			{\n"
 		   "\t\t				angTmp = (M_PI - angZ) / " << angHoleComp << " * (M_PI - 2 * " << angHoleComp << ") + " << angHoleComp << " - M_PI_2;\n"
-		   "\t\t			}\n"
 		   "\t\t			else\n"
-		   "\t\t			{\n"
 		   "\t\t				angTmp = M_PI_2 - (angZ / " << angHoleComp << " * (M_PI - 2 * " << angHoleComp << ") + " << angHoleComp << ");\n"
-		   "\t\t			}\n"
-		   "\t\t\n"
+		   "\n"
 		   "\t\t			angZ -= M_PI_2;\n"
 		   "\t\t			fac = cos(angTmp) / cos(angZ);\n"
-		   "\t\t			x = x * fac;\n"
-		   "\t\t			y = y * fac;\n"
-		   "\t\t			z = z * (sin(angTmp) / sin(angZ));\n"
+		   "\t\t			x *= fac;\n"
+		   "\t\t			y *= fac;\n"
+		   "\t\t			z *= (sin(angTmp) / sin(angZ));\n"
 		   "\t\t		}\n"
 		   "\t\t	}\n"
 		   "\t\t}\n"
@@ -2273,14 +2191,14 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr" };
+		return vector<string> { "Sqr", "Zeps" };
 	}
 
 	virtual void Precalc() override
 	{
 		if (m_NumberStripes < 0)
 		{
-			m_AbsNumberStripes = std::fabs(m_NumberStripes);
+			m_AbsNumberStripes = std::abs(m_NumberStripes);
 			m_InvStripes = 1;
 		}
 		else
@@ -2295,13 +2213,13 @@ public:
 			m_AngStrip2 = 2 * m_AngStrip;
 			sincos(m_AngStrip, &m_S, &m_C);
 			ClampRef<T>(m_RatioStripes, T(0.01), T(1.99));
-			m_AngStrip1 = m_RatioStripes * m_AngStrip;
+			m_AngStrip1 = Zeps<T>(m_RatioStripes * m_AngStrip);
 		}
 
 		if (m_SymmetryZ == 1)
 		{
 			if (m_AngleHole < 0)
-				m_AngleHoleTemp = std::fabs(m_AngleHole);
+				m_AngleHoleTemp = std::abs(m_AngleHole);
 			else if (m_AngleHole > T(179.9))
 				m_AngleHoleTemp = T(179.9);
 			else
@@ -2312,7 +2230,7 @@ public:
 
 		if (m_AngleHoleTemp < 0)
 		{
-			m_AngleHoleTemp = std::fabs(m_AngleHole);
+			m_AngleHoleTemp = std::abs(m_AngleHole);
 			m_InvHole = 1;
 			m_AngleHoleTemp = (m_AngleHoleTemp / 360 * M_2PI) / 2;
 		}
@@ -3520,7 +3438,7 @@ private:
 			// Control points are (0,0), (m,m) and (1,m)
 			t = x; // Special case when m == 0.5
 
-			if (std::fabs(m - T(0.5)) > 1e-10)
+			if (std::abs(m - T(0.5)) > 1e-10)
 				t = (-1 * m + std::sqrt(m * m + (1 - 2 * m) * x)) / (1 - 2 * m);
 
 			return a * (x + (m - 1) * t * t);
@@ -3533,7 +3451,7 @@ private:
 			// Control points are (0,0), (iM,iM) and (1,m)
 			t = x; // Special case when m == 2
 
-			if (std::fabs(m - 2) > 1e-10)
+			if (std::abs(m - 2) > 1e-10)
 				t = (-1 * iM + std::sqrt(iM * iM + (1 - 2 * iM) * x)) / (1 - 2 * iM);
 
 			return a * (x + (m - 1) * t * t);
@@ -3650,12 +3568,11 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		int di, dj;
 		int i = 0;
 		T l, r, trgL;
 		v2T u, dO;
 		glm::ivec2 cv;
-		v2T p[VORONOI_MAXPOINTS];
+		v2T p[VORONOI_MAXPOINTS] = { v2T(0), v2T(0), v2T(0), v2T(0), v2T(0), v2T(0), v2T(0), v2T(0), v2T(0), v2T(0) };
 
 		if (m_CellSize == 0)
 			return;
@@ -3667,9 +3584,9 @@ public:
 		cv.x = int(std::floor(u.x / m_HalfCellSize));
 		cv.y = int(std::floor(u.y / m_HalfCellSize));
 
-		for (di = -1; di < 2; di++)
+		for (int di = -1; di < 2; di++)
 		{
-			for (dj = -1; dj < 2; dj++)
+			for (int dj = -1; dj < 2; dj++)
 			{
 				CachedPosition(m_C, cv.x + di, cv.y + dj, m_Z, m_HalfCellSize, m_Distort, p[i]);
 				i++;
@@ -3677,16 +3594,16 @@ public:
 		}
 
 		int q = m_VarFuncs->Closest(p, 9, u);
-		glm::ivec2 offset[9] = { { -1, -1 }, { -1, 0 }, { -1, 1 },
+		static glm::ivec2 offset[9] = { { -1, -1 }, { -1, 0 }, { -1, 1 },
 			{ 0, -1 }, { 0, 0 }, { 0, 1 },
 			{ 1, -1 }, { 1, 0 }, { 1, 1 }
 		};
 		cv += offset[q];
 		i = 0;
 
-		for (di = -1; di < 2; di++)
+		for (int di = -1; di < 2; di++)
 		{
-			for (dj = -1; dj < 2; dj++)
+			for (int dj = -1; dj < 2; dj++)
 			{
 				CachedPosition(m_C, cv.x + di, cv.y + dj, m_Z, m_HalfCellSize, m_Distort, p[i]);
 				i++;
@@ -3695,7 +3612,7 @@ public:
 
 		l = m_VarFuncs->Voronoi(p, 9, 4, u);
 		dO = u - p[4];
-		trgL = std::pow(Zeps<T>(l), m_Power) * m_Scale;
+		trgL = std::pow(std::abs(Zeps<T>(l)), m_Power) * m_Scale;
 		r = trgL / Zeps<T>(l);
 		dO *= r;
 		dO += p[4];
@@ -3793,7 +3710,7 @@ public:
 		   << "\n"
 		   << "\t\tl = Voronoi(p, 9, 4, &u);\n"
 		   << "\t\tdO = u - p[4];\n"
-		   << "\t\ttrgL = pow(Zeps(l), " << power << ") * " << scale << ";\n"
+		   << "\t\ttrgL = pow(fabs(Zeps(l)), " << power << ") * " << scale << ";\n"
 		   << "\t\tr = trgL / Zeps(l);\n"
 		   << "\t\tdO *= r;\n"
 		   << "\t\tdO += p[4];\n"
@@ -3806,11 +3723,10 @@ public:
 
 	virtual void Precalc() override
 	{
-		int x, y;
 		m_HalfCellSize = Zeps<T>(m_CellSize / 2);
 
-		for (x = -CACHE_NUM; x <= CACHE_NUM; x++)
-			for (y = -CACHE_NUM; y <= CACHE_NUM; y++)
+		for (int x = -CACHE_NUM; x <= CACHE_NUM; x++)
+			for (int y = -CACHE_NUM; y <= CACHE_NUM; y++)
 				Position(x, y, m_Z, m_HalfCellSize, m_Distort, m_C[x + CACHE_NUM][y + CACHE_NUM]);
 	}
 
@@ -3861,6 +3777,513 @@ private:
 	T m_HalfCellSize;//Precalc
 	v2T m_C[CACHE_WIDTH][CACHE_WIDTH];//Not kept as a precalc because it crashes Nvidia GPUs.
 	std::shared_ptr<VarFuncs<T>> m_VarFuncs;
+};
+
+/// <summary>
+/// post_smartcrop.
+/// This variation is special in that it only exists as a post_.
+/// </summary>
+template <typename T>
+class EMBER_API PostSmartcropVariation : public ParametricVariation<T>
+{
+public:
+	PostSmartcropVariation(T weight = 1.0) : ParametricVariation<T>("post_smartcrop", eVariationId::VAR_POST_SMARTCROP, weight, true)
+	{
+		m_AssignType = eVariationAssignType::ASSIGNTYPE_SET;
+		m_VarType = eVariationType::VARTYPE_POST;//Very special usage, post only.
+		Init();
+	}
+
+	PARVARCOPY(PostSmartcropVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		bool lastPart = true;
+		T xi, yi, zi;
+		int iMode = int(m_Mode);
+
+		//Extremely strange usage, where a post variation wants the original affine transformed points.
+		if (m_Static > 1)
+		{
+			xi = helper.In.x;
+			yi = helper.In.y;
+			zi = helper.In.z;
+		}
+		else
+		{
+			xi = helper.m_TransX;
+			yi = helper.m_TransY;
+			zi = helper.m_TransZ;
+		}
+
+		T ang = std::atan2(yi, xi);
+		T rad = std::sqrt(SQR(xi) + SQR(yi));
+
+		if (m_Radial)
+		{
+			T edge = m_Edge * (rand.Frand01<T>() - T(0.5));
+			T xang = ang / M_2PI + 1 + edge;
+			xang = (xang - int(xang)) * M_2PI;
+
+			if (int(xang > m_WorkPower) == iMode)
+			{
+				if (m_Cropmode == 2)
+				{
+					if (m_Static > 1 || m_Static == -1)
+					{
+						helper.Out.x = m_X;//This is post only with an assign type of SET, so no need to set m_* to 0 after these (or any other) direct assignments.
+						helper.Out.y = m_Y;
+						helper.Out.z = m_Z;
+					}
+					else
+					{
+						helper.Out.x = helper.In.x + m_X;//Original specifically summed the running sum point.
+						helper.Out.y = helper.In.y + m_Y;
+						helper.Out.z = helper.In.z + m_Z;
+					}
+
+					outPoint.m_ColorX = m_C;
+				}
+				else
+				{
+					T x, s, c;
+					x = ((int)(rand.Frand01<T>() * 2)) ? m_WorkPower + (rand.Frand01<T>() * m_Scatter + m_Offset + edge) * T(M_PI) : -(rand.Frand01<T>() * m_Scatter + m_Offset + edge) * T(M_PI);
+					sincos(x, &s, &c);
+
+					if (m_Static > 1 || m_Static == -1)
+					{
+						helper.Out.x = m_Weight * rad * c;
+						helper.Out.y = m_Weight * rad * s;
+						helper.Out.z = m_Weight * zi;
+					}
+					else
+					{
+						helper.Out.x = helper.In.x + (m_Weight * rad * c);//Original specifically summed the running sum point.
+						helper.Out.y = helper.In.y + (m_Weight * rad * s);
+						helper.Out.z = helper.In.z + (m_Weight * zi);
+					}
+				}
+
+				lastPart = false;
+			}
+		}
+		else
+		{
+			T coeff;
+
+			if (m_Distortion == 0)
+			{
+				coeff = 1;
+			}
+			else
+			{
+				T xang = (ang + T(M_PI)) / m_Alpha;
+				xang = xang - int(xang);
+				xang = (xang < T(0.5)) ? xang : 1 - xang;
+				coeff = 1 / std::cos(xang * m_Alpha);
+
+				if (m_Roundstr != 0)
+				{
+					T wwidth = ((m_Roundwidth != 1) ? std::exp(std::log(xang * 2) * m_Roundwidth) : (xang * 2)) * m_RoundCoeff;
+					coeff = abs((1 - wwidth) * coeff + wwidth);
+				}
+
+				if (m_Distortion != 1)
+					coeff = std::exp(std::log(coeff) * m_Distortion);
+			}
+
+			T xr = coeff * ((m_Edge != 0) ? m_WorkRadius + m_Edge * (rand.Frand01<T>() - T(0.5)) : m_WorkRadius);
+
+			if ((rad > xr) == iMode)
+			{
+				if (m_Cropmode)
+				{
+					if (m_Cropmode == 2)
+					{
+						if (m_Static > 1 || m_Static == -1)
+						{
+							helper.Out.x = m_X;
+							helper.Out.y = m_Y;
+							helper.Out.z = m_Z;
+						}
+						else
+						{
+							helper.Out.x = helper.In.x + m_X;//Original specifically summed the running sum point.
+							helper.Out.y = helper.In.y + m_Y;
+							helper.Out.z = helper.In.z + m_Z;
+						}
+
+						outPoint.m_ColorX = m_C;
+					}
+					else
+					{
+						T rdc = (m_Cropmode == -1) ? rad : xr + coeff * (rand.Frand01<T>() * m_Scatter + m_Offset);
+						T x, s, c;
+						x = ang + m_WorkRotation;
+						sincos(x, &s, &c);
+
+						if (m_Static > 1 || m_Static == -1)
+						{
+							helper.Out.x = m_Weight * rdc * c;
+							helper.Out.y = m_Weight * rdc * s;
+							helper.Out.z = m_Weight * zi;
+						}
+						else
+						{
+							helper.Out.x = helper.In.x + (m_Weight * rdc * c);
+							helper.Out.y = helper.In.y + (m_Weight * rdc * s);
+							helper.Out.z = helper.In.z + (m_Weight * zi);
+						}
+					}
+				}
+				else
+				{
+					if (m_Static > 1 || m_Static == -1)
+					{
+						helper.Out.x = 0;
+						helper.Out.y = 0;
+						helper.Out.z = 0;
+					}
+				}
+
+				lastPart = false;
+			}
+		}
+
+		if (lastPart)
+		{
+			if (m_Static == 3)
+			{
+				m_X = m_Weight * helper.m_TransX;//Another case where it wants the original affine transformed points.
+				m_Y = m_Weight * helper.m_TransY;
+				m_Z = m_Weight * helper.m_TransZ;
+			}
+			else
+			{
+				m_X = m_Weight * xi;
+				m_Y = m_Weight * yi;
+				m_Z = m_Weight * zi;
+			}
+
+			if (m_Cropmode == 2)
+				m_C = outPoint.m_ColorX;
+
+			if (m_Static > 0)
+			{
+				helper.Out.x = m_X;
+				helper.Out.y = m_Y;
+				helper.Out.z = m_Z;
+			}
+			else
+			{
+				helper.Out.x = helper.In.x + m_X;//Original specifically summed the running sum point.
+				helper.Out.y = helper.In.y + m_Y;
+				helper.Out.z = helper.In.z + m_Z;
+			}
+		}
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber();
+		string index = ss2.str() + "]";
+		string stateIndex = ss2.str();
+		string power        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string roundstr     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string roundwidth   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string distortion   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string edge         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scatter      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string offset       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rotation     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cropmode     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string staticc      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mode         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radial       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string workradius   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string workpower    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string roundcoeff   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string workrotation = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x = "varState->" + m_Params[i++].Name() + stateIndex;//State.
+		string y = "varState->" + m_Params[i++].Name() + stateIndex;
+		string z = "varState->" + m_Params[i++].Name() + stateIndex;
+		string c = "varState->" + m_Params[i++].Name() + stateIndex;
+		ss << "\t{\n"
+		   << "\t\tint lastPart = 1;\n"
+		   << "\t\treal_t xi, yi, zi;\n"
+		   << "\t\tint iMode = (int)" << mode << ";\n"
+		   << "\n"
+		   << "\t\tif (" << staticc << " > 1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	xi = vIn.x;\n"
+		   << "\t\t	yi = vIn.y;\n"
+		   << "\t\t	zi = vIn.z;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	xi = transX;\n"
+		   << "\t\t	yi = transY;\n"
+		   << "\t\t	zi = transZ;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\treal_t ang = atan2(yi, xi);\n"
+		   << "\t\treal_t rad = sqrt(SQR(xi) + SQR(yi));\n"
+		   << "\n"
+		   << "\t\tif (" << radial << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t edge = " << edge << " * (MwcNext01(mwc) - 0.5);\n"
+		   << "\t\t	real_t xang = ang / M_2PI + 1 + edge;\n"
+		   << "\t\t	xang = (xang - (int)xang) * M_2PI;\n"
+		   << "\n"
+		   << "\t\t	if ((int)(xang > " << workpower << ") == iMode)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		if (" << cropmode << " == 2)\n"
+		   << "\t\t		{\n"
+		   << "\t\t			if (" << staticc << " > 1 || " << staticc << " == -1)\n"
+		   << "\t\t			{\n"
+		   << "\t\t				vOut.x = " << x << ";\n"
+		   << "\t\t				vOut.y = " << y << ";\n"
+		   << "\t\t				vOut.z = " << z << ";\n"
+		   << "\t\t			}\n"
+		   << "\t\t			else\n"
+		   << "\t\t			{\n"
+		   << "\t\t				vOut.x = vIn.x + " << x << ";\n"
+		   << "\t\t				vOut.y = vIn.y + " << y << ";\n"
+		   << "\t\t				vOut.z = vIn.z + " << z << ";\n"
+		   << "\t\t			}\n"
+		   << "\n"
+		   << "\t\t			outPoint->m_ColorX = " << c << ";\n"
+		   << "\t\t		}\n"
+		   << "\t\t		else\n"
+		   << "\t\t		{\n"
+		   << "\t\t			real_t x, s, c;\n"
+		   << "\t\t			x = ((int)(MwcNext01(mwc) * 2)) ? " << workpower << " + (MwcNext01(mwc) * " << scatter << " + " << offset << " + edge) * M_PI : -(MwcNext01(mwc) * " << scatter << " + " << offset << " + edge) * M_PI;\n"
+		   << "\t\t			s = sincos(x, &c);\n"
+		   << "\n"
+		   << "\t\t			if (" << staticc << " > 1 || " << staticc << " == -1)\n"
+		   << "\t\t			{\n"
+		   << "\t\t				vOut.x = xform->m_VariationWeights[" << varIndex << "] * rad * c;\n"
+		   << "\t\t				vOut.y = xform->m_VariationWeights[" << varIndex << "] * rad * s;\n"
+		   << "\t\t				vOut.z = xform->m_VariationWeights[" << varIndex << "] * zi;\n"
+		   << "\t\t			}\n"
+		   << "\t\t			else\n"
+		   << "\t\t			{\n"
+		   << "\t\t				vOut.x = vIn.x + (xform->m_VariationWeights[" << varIndex << "] * rad * c);\n"
+		   << "\t\t				vOut.y = vIn.y + (xform->m_VariationWeights[" << varIndex << "] * rad * s);\n"
+		   << "\t\t				vOut.z = vIn.z + (xform->m_VariationWeights[" << varIndex << "] * zi);\n"
+		   << "\t\t			}\n"
+		   << "\t\t		}\n"
+		   << "\n"
+		   << "\t\t		lastPart = 0;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t coeff;\n"
+		   << "\n"
+		   << "\t\t	if (" << distortion << " == 0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		coeff = 1;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t xang = (ang + M_PI) / " << alpha << ";\n"
+		   << "\t\t		xang = xang - (int)xang;\n"
+		   << "\t\t		xang = (xang < 0.5) ? xang : 1 - xang;\n"
+		   << "\t\t		coeff = 1 / cos(xang * " << alpha << ");\n"
+		   << "\n"
+		   << "\t\t		if (" << roundstr << " != 0)\n"
+		   << "\t\t		{\n"
+		   << "\t\t			real_t wwidth = ((" << roundwidth << " != 1) ? exp(log(xang * 2) * " << roundwidth << ") : (xang * 2)) * " << roundcoeff << ";\n"
+		   << "\t\t			coeff = fabs((1 - wwidth) * coeff + wwidth);\n"
+		   << "\t\t		}\n"
+		   << "\n"
+		   << "\t\t		if (" << distortion << " != 1)\n"
+		   << "\t\t			coeff = exp(log(coeff) * " << distortion << ");\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	real_t xr = coeff * ((" << edge << " != 0) ? " << workradius << " + " << edge << " * (MwcNext01(mwc) - 0.5) : " << workradius << ");\n"
+		   << "\n"
+		   << "\t\t	if ((int)(rad > xr) == iMode)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		if (" << cropmode << ")\n"
+		   << "\t\t		{\n"
+		   << "\t\t			if (" << cropmode << " == 2)\n"
+		   << "\t\t			{\n"
+		   << "\t\t				if (" << staticc << " > 1 || " << staticc << " == -1)\n"
+		   << "\t\t				{\n"
+		   << "\t\t					vOut.x = " << x << ";\n"
+		   << "\t\t					vOut.y = " << y << ";\n"
+		   << "\t\t					vOut.z = " << z << ";\n"
+		   << "\t\t				}\n"
+		   << "\t\t				else\n"
+		   << "\t\t				{\n"
+		   << "\t\t					vOut.x = vIn.x + " << x << ";\n"
+		   << "\t\t					vOut.y = vIn.y + " << y << ";\n"
+		   << "\t\t					vOut.z = vIn.z + " << z << ";\n"
+		   << "\t\t				}\n"
+		   << "\n"
+		   << "\t\t				outPoint->m_ColorX = " << c << ";\n"
+		   << "\t\t			}\n"
+		   << "\t\t			else\n"
+		   << "\t\t			{\n"
+		   << "\t\t				real_t rdc = (" << cropmode << " == -1) ? rad : xr + coeff * (MwcNext01(mwc) * " << scatter << " + " << offset << ");\n"
+		   << "\t\t				real_t x, s, c;\n"
+		   << "\t\t				x = ang + " << workrotation << ";\n"
+		   << "\t\t				s = sincos(x, &c);\n"
+		   << "\n"
+		   << "\t\t				if (" << staticc << " > 1 || " << staticc << " == -1)\n"
+		   << "\t\t				{\n"
+		   << "\t\t					vOut.x = xform->m_VariationWeights[" << varIndex << "] * rdc * c;\n"
+		   << "\t\t					vOut.y = xform->m_VariationWeights[" << varIndex << "] * rdc * s;\n"
+		   << "\t\t					vOut.z = xform->m_VariationWeights[" << varIndex << "] * zi;\n"
+		   << "\t\t				}\n"
+		   << "\t\t				else\n"
+		   << "\t\t				{\n"
+		   << "\t\t					vOut.x = vIn.x + (xform->m_VariationWeights[" << varIndex << "] * rdc * c);\n"
+		   << "\t\t					vOut.y = vIn.y + (xform->m_VariationWeights[" << varIndex << "] * rdc * s);\n"
+		   << "\t\t					vOut.z = vIn.z + (xform->m_VariationWeights[" << varIndex << "] * zi);\n"
+		   << "\t\t				}\n"
+		   << "\t\t			}\n"
+		   << "\t\t		}\n"
+		   << "\t\t		else\n"
+		   << "\t\t		{\n"
+		   << "\t\t			if (" << staticc << " > 1 || " << staticc << " == -1)\n"
+		   << "\t\t			{\n"
+		   << "\t\t				vOut.x = 0;\n"
+		   << "\t\t				vOut.y = 0;\n"
+		   << "\t\t				vOut.z = 0;\n"
+		   << "\t\t			}\n"
+		   << "\t\t		}\n"
+		   << "\n"
+		   << "\t\t		lastPart = 0;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (lastPart)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (" << staticc << " == 3)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		" << x << " = xform->m_VariationWeights[" << varIndex << "] * transX;\n"
+		   << "\t\t		" << y << " = xform->m_VariationWeights[" << varIndex << "] * transY;\n"
+		   << "\t\t		" << z << " = xform->m_VariationWeights[" << varIndex << "] * transZ;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		" << x << " = xform->m_VariationWeights[" << varIndex << "] * xi;\n"
+		   << "\t\t		" << y << " = xform->m_VariationWeights[" << varIndex << "] * yi;\n"
+		   << "\t\t		" << z << " = xform->m_VariationWeights[" << varIndex << "] * zi;\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	if (" << cropmode << " == 2)\n"
+		   << "\t\t		" << c << " = outPoint->m_ColorX;\n"
+		   << "\n"
+		   << "\t\t	if (" << staticc << " > 0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = " << x << ";\n"
+		   << "\t\t		vOut.y = " << y << ";\n"
+		   << "\t\t		vOut.z = " << z << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = vIn.x + " << x << ";\n"
+		   << "\t\t		vOut.y = vIn.y + " << y << ";\n"
+		   << "\t\t		vOut.z = vIn.z + " << z << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual string StateInitOpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		ss2 << "_" << XformIndexInEmber();
+		string stateIndex = ss2.str();
+		string prefix = Prefix();
+		ss << "\n\t\tvarState." << prefix << "smartcrop_x" << stateIndex << " = 0;";
+		ss << "\n\t\tvarState." << prefix << "smartcrop_y" << stateIndex << " = 0;";
+		ss << "\n\t\tvarState." << prefix << "smartcrop_z" << stateIndex << " = 0;";
+		ss << "\n\t\tvarState." << prefix << "smartcrop_c" << stateIndex << " = 0;";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Mode = T(((m_Power > 0) == (m_Radius > 0)) ? 1 : 0);
+		m_WorkRadius = std::abs(m_Radius);
+		m_WorkPower = std::abs(Zeps<T>(m_Power));
+
+		if (m_WorkPower < 2)
+		{
+			m_WorkPower = m_WorkPower * T(M_PI);
+			m_Radial = 1;
+		}
+		else
+		{
+			m_Radial = 0;
+			m_Alpha = M_2PI / m_WorkPower;
+			m_RoundCoeff = m_Roundstr / Zeps<T>(std::sin(m_Alpha / 2)) / m_WorkPower * 2;
+			m_WorkRotation = m_Rotation * m_Alpha;
+		}
+
+		m_X = m_Y = m_Z = m_C = 0;
+	}
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power     , prefix + "smartcrop_power", 4)); //Original used a prefix of scrop_, which is incompatible with Ember's design.
+		m_Params.push_back(ParamWithName<T>(&m_Radius    , prefix + "smartcrop_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Roundstr  , prefix + "smartcrop_roundstr"));
+		m_Params.push_back(ParamWithName<T>(&m_Roundwidth, prefix + "smartcrop_roundwidth", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Distortion, prefix + "smartcrop_distortion", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Edge      , prefix + "smartcrop_edge"));
+		m_Params.push_back(ParamWithName<T>(&m_Scatter   , prefix + "smartcrop_scatter"));
+		m_Params.push_back(ParamWithName<T>(&m_Offset    , prefix + "smartcrop_offset"));
+		m_Params.push_back(ParamWithName<T>(&m_Rotation  , prefix + "smartcrop_rotation"));
+		m_Params.push_back(ParamWithName<T>(&m_Cropmode  , prefix + "smartcrop_cropmode", 1, eParamType::INTEGER, -1, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Static	 , prefix + "smartcrop_static", 1, eParamType::INTEGER, -1, 3));
+		m_Params.push_back(ParamWithName<T>(true, &m_Mode,         prefix + "smartcrop_mode"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Radial,       prefix + "smartcrop_radial"));
+		m_Params.push_back(ParamWithName<T>(true, &m_WorkRadius,   prefix + "smartcrop_work_radius"));
+		m_Params.push_back(ParamWithName<T>(true, &m_WorkPower,    prefix + "smartcrop_work_power"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,        prefix + "smartcrop_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_RoundCoeff,   prefix + "smartcrop_round_coeff"));
+		m_Params.push_back(ParamWithName<T>(true, &m_WorkRotation, prefix + "smartcrop_work_rotation"));
+		m_Params.push_back(ParamWithName<T>(true, true, &m_X, prefix + "smartcrop_x"));//State.
+		m_Params.push_back(ParamWithName<T>(true, true, &m_Y, prefix + "smartcrop_y"));
+		m_Params.push_back(ParamWithName<T>(true, true, &m_Z, prefix + "smartcrop_z"));
+		m_Params.push_back(ParamWithName<T>(true, true, &m_C, prefix + "smartcrop_c"));
+	}
+private:
+	T m_Power;
+	T m_Radius;
+	T m_Roundstr;
+	T m_Roundwidth;
+	T m_Distortion;
+	T m_Edge;
+	T m_Scatter;
+	T m_Offset;
+	T m_Rotation;
+	T m_Cropmode;
+	T m_Static;
+	T m_Mode;//Precalc.
+	T m_Radial;
+	T m_WorkRadius;
+	T m_WorkPower;
+	T m_Alpha;
+	T m_RoundCoeff;
+	T m_WorkRotation;
+	T m_X;//State.
+	T m_Y;
+	T m_Z;
+	T m_C;
 };
 
 MAKEPREPOSTPARVAR(Hexes, hexes, HEXES)

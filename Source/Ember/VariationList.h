@@ -342,6 +342,7 @@ public:
 		ADDPREPOSTREGVAR(BubbleT3D)
 		ADDPREPOSTREGVAR(Synth)
 		ADDPREPOSTREGVAR(Crackle)
+		m_Variations.push_back(new PostSmartcropVariation<T>());//Post only
 		//ADDPREPOSTREGVAR(LinearXZ)
 		//ADDPREPOSTREGVAR(LinearYZ)
 		//DC are special.

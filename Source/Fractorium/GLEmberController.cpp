@@ -224,8 +224,8 @@ void GLEmberController<T>::QueryMatrices(bool print)
 
 	if (renderer)
 	{
-		double unitX = fabs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0;
-		double unitY = fabs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0;
+		double unitX = std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0;
+		double unitY = std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0;
 		m_GL->glMatrixMode(GL_PROJECTION);
 		m_GL->glPushMatrix();
 		m_GL->glLoadIdentity();

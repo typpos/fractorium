@@ -428,7 +428,7 @@ public:
 		}
 		else
 		{
-			T alpha = fabs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));//Original did not fabs().
+			T alpha = std::abs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));//Original did not std::abs().
 
 			if (rand.Frand01<T>() > m_Contrast * std::pow(alpha, m_Pow))
 			{
@@ -543,7 +543,7 @@ public:
 		T val = DEG_2_RAD_T * m_Phi1;
 		T sinPhi1 = std::sin(val);
 		T cosPhi1 = std::cos(val);
-		m_Pow = fabs(m_Pow);
+		m_Pow = std::abs(m_Pow);
 		m_X1 = m_Radius * cosPhi1;
 		m_Y1 = m_Radius * sinPhi1;
 	}
@@ -610,7 +610,7 @@ public:
 		}
 		else
 		{
-			T alpha = fabs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));//Original did not fabs().
+			T alpha = std::abs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));//Original did not std::abs().
 
 			if (rand.Frand01<T>() > m_Contrast * std::pow(alpha, m_Pow))
 			{
@@ -696,7 +696,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_Pow = fabs(m_Pow);
+		m_Pow = std::abs(m_Pow);
 		m_Phi10 = T(M_PI) * m_Phi1 / 180;
 		m_Phi20 = T(M_PI) * m_Phi2 / 180;
 		m_Gamma = m_Thickness * (2 * m_Radius + m_Thickness) / Zeps(m_Radius + m_Thickness);
@@ -769,7 +769,7 @@ public:
 		}
 		else
 		{
-			T alpha = fabs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));//Original did not fabs().
+			T alpha = std::abs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));//Original did not std::abs().
 
 			if (rand.Frand01<T>() > m_Contrast * std::pow(alpha, m_Pow))
 			{
@@ -1108,7 +1108,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T coeff = fabs(helper.In.z);
+		T coeff = std::abs(helper.In.z);
 
 		if (coeff != 0 && m_Power != 1)
 			coeff = std::exp(log(coeff) * m_Power);
@@ -1492,7 +1492,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_AbsN = fabs(m_N);
+		m_AbsN = std::abs(m_N);
 		m_Cn = (1 / m_N - 1) / 2;
 	}
 
@@ -1565,7 +1565,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_AbsN = fabs(m_N);
+		m_AbsN = std::abs(m_N);
 		m_Cn = 1 / m_N / 2;
 	}
 
@@ -1609,8 +1609,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		helper.Out.x = SignNz<T>(helper.In.x) * std::pow(fabs(helper.In.x), m_PowX) * m_Weight;
-		helper.Out.y = SignNz<T>(helper.In.y) * std::pow(fabs(helper.In.y), m_PowY) * m_Weight;
+		helper.Out.x = SignNz<T>(helper.In.x) * std::pow(std::abs(helper.In.x), m_PowX) * m_Weight;
+		helper.Out.y = SignNz<T>(helper.In.y) * std::pow(std::abs(helper.In.y), m_PowY) * m_Weight;
 		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
 	}
 
@@ -1665,9 +1665,9 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		helper.Out.x = T(helper.In.x < 0 ? -1 : 1) * std::pow(fabs(helper.In.x), m_PowX) * m_Weight;
-		helper.Out.y = T(helper.In.y < 0 ? -1 : 1) * std::pow(fabs(helper.In.y), m_PowY) * m_Weight;
-		helper.Out.z = T(helper.In.z < 0 ? -1 : 1) * std::pow(fabs(helper.In.z), m_PowZ) * m_Weight;
+		helper.Out.x = T(helper.In.x < 0 ? -1 : 1) * std::pow(std::abs(helper.In.x), m_PowX) * m_Weight;
+		helper.Out.y = T(helper.In.y < 0 ? -1 : 1) * std::pow(std::abs(helper.In.y), m_PowY) * m_Weight;
+		helper.Out.z = T(helper.In.z < 0 ? -1 : 1) * std::pow(std::abs(helper.In.z), m_PowZ) * m_Weight;
 	}
 
 	virtual string OpenCLString() const override
@@ -2592,7 +2592,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		if (fabs(m_Power) < 1)
+		if (std::abs(m_Power) < 1)
 			m_Power = 1;
 	}
 
@@ -2951,7 +2951,7 @@ public:
 		if (t < 0)
 			t -= m_SizeDiv2;
 
-		t = fmod(fabs(t), m_Size);
+		t = fmod(std::abs(t), m_Size);
 
 		if (t < m_SizeDiv2)
 			a += m_Even;
@@ -3556,15 +3556,15 @@ public:
 	{
 		T x, c2;
 
-		if (fabs(helper.In.y) <= m_Weight)
+		if (std::abs(helper.In.y) <= m_Weight)
 		{
 			c2 = std::sqrt(SQR(m_Weight) - SQR(helper.In.y));
 
-			if (fabs(helper.In.x) <= c2)
+			if (std::abs(helper.In.x) <= c2)
 			{
 				x = helper.In.x + m_Shift * m_Weight;
 
-				if (fabs(x) >= c2)
+				if (std::abs(x) >= c2)
 					helper.Out.x = -(m_Weight * helper.In.x);
 				else
 					helper.Out.x = m_Weight * x;

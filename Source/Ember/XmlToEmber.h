@@ -174,6 +174,17 @@ public:
 			m_BadParamNames["exponentZ"]		 = "bubbleT3D_exponentZ";
 			m_BadParamNames["_symmetryZ"]		 = "bubbleT3D_symmetryZ";
 			m_BadParamNames["_modusBlur"]		 = "bubbleT3D_modusBlur";
+			m_BadParamNames["post_scrop_power"]      = "post_smartcrop_power";
+			m_BadParamNames["post_scrop_radius"]     = "post_smartcrop_radius";
+			m_BadParamNames["post_scrop_roundstr"]   = "post_smartcrop_roundstr";
+			m_BadParamNames["post_scrop_roundwidth"] = "post_smartcrop_roundwidth";
+			m_BadParamNames["post_scrop_distortion"] = "post_smartcrop_distortion";
+			m_BadParamNames["post_scrop_edge"]       = "post_smartcrop_edge";
+			m_BadParamNames["post_scrop_scatter"]    = "post_smartcrop_scatter";
+			m_BadParamNames["post_scrop_offset"]     = "post_smartcrop_offset";
+			m_BadParamNames["post_scrop_rotation"]   = "post_smartcrop_rotation";
+			m_BadParamNames["post_scrop_cropmode"]   = "post_smartcrop_cropmode";
+			m_BadParamNames["post_scrop_static"]     = "post_smartcrop_static";
 			m_FlattenNames.reserve(24);
 			m_FlattenNames.push_back("pre_crop");
 			m_FlattenNames.push_back("pre_falloff2");
@@ -201,7 +212,7 @@ public:
 			m_FlattenNames.push_back("curl3D_cz");
 			//This is a vector of the param names as they are in the legacy, badly named flam3/Apophysis code.
 			vector<string> badParams;
-			badParams.reserve(6);
+			badParams.reserve(11);
 			badParams.push_back("bwraps7_cellsize");
 			badParams.push_back("bwraps7_space");
 			badParams.push_back("bwraps7_gain");
@@ -244,6 +255,19 @@ public:
 			badParams.push_back("post_dcztransl_overwrite");
 			badParams.push_back("post_dcztransl_clamp");
 			m_BadVariationNames.push_back(make_pair(make_pair(string("post_dcztransl"), string("post_dc_ztransl")), badParams));
+			badParams.clear();
+			badParams.push_back("post_scrop_power");
+			badParams.push_back("post_scrop_radius");
+			badParams.push_back("post_scrop_roundstr");
+			badParams.push_back("post_scrop_roundwidth");
+			badParams.push_back("post_scrop_distortion");
+			badParams.push_back("post_scrop_edge");
+			badParams.push_back("post_scrop_scatter");
+			badParams.push_back("post_scrop_offset");
+			badParams.push_back("post_scrop_rotation");
+			badParams.push_back("post_scrop_cropmode");
+			badParams.push_back("post_scrop_static");
+			m_BadVariationNames.push_back(make_pair(make_pair(string("post_scrop"), string("post_smartcrop")), badParams));
 			badParams.clear();
 			m_BadVariationNames.push_back(make_pair(make_pair(string("pre_blur"),    string("pre_gaussian_blur")), badParams));//No other special params for these.
 			m_BadVariationNames.push_back(make_pair(make_pair(string("pre_spin_z"),  string("pre_rotate_z")),      badParams));

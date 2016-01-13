@@ -92,11 +92,11 @@ public:
 		T t;       // Temp double
 		// Convert input co-ordinates ( x, y, z ) to
 		// integer-based simplex grid ( i, j, k )
-		T skewIn = (v.x + v.y + v.z) * T(0.3333);
+		T skewIn = (v.x + v.y + v.z) * T(0.333333);
 		intmax_t i = Floor<T>(v.x + skewIn);
 		intmax_t j = Floor<T>(v.y + skewIn);
 		intmax_t k = Floor<T>(v.z + skewIn);
-		t = (i + j + k) * T(0.16666);
+		t = (i + j + k) * T(0.1666666);
 		// Cell origin co-ordinates in input space (x,y,z)
 		T x0 = i - t;
 		T y0 = j - t;
@@ -154,17 +154,17 @@ public:
 		// A step of 1i in (i,j,k) is a step of (1-T(0.16666), -T(0.16666), -T(0.16666)) in (x,y,z),
 		// and this is similar for j and k . . .
 		// Offsets for second corner in (x,y,z) coords
-		c[1].x = c[0].x - i1 + T(0.16666);
-		c[1].y = c[0].y - j1 + T(0.16666);
-		c[1].z = c[0].z - k1 + T(0.16666);
+		c[1].x = c[0].x - i1 + T(0.1666666);
+		c[1].y = c[0].y - j1 + T(0.1666666);
+		c[1].z = c[0].z - k1 + T(0.1666666);
 		// Offsets for third corner in (x,y,z) coords
-		c[2].x = c[0].x - i2 + 2 * T(0.16666);
-		c[2].y = c[0].y - j2 + 2 * T(0.16666);
-		c[2].z = c[0].z - k2 + 2 * T(0.16666);
+		c[2].x = c[0].x - i2 + 2 * T(0.1666666);
+		c[2].y = c[0].y - j2 + 2 * T(0.1666666);
+		c[2].z = c[0].z - k2 + 2 * T(0.1666666);
 		// Offsets for last corner in (x,y,z) coords
-		c[3].x = c[0].x - 1 + 3 * T(0.16666);
-		c[3].y = c[0].y - 1 + 3 * T(0.16666);
-		c[3].z = c[0].z - 1 + 3 * T(0.16666);
+		c[3].x = c[0].x - 1 + 3 * T(0.1666666);
+		c[3].y = c[0].y - 1 + 3 * T(0.1666666);
+		c[3].z = c[0].z - 1 + 3 * T(0.1666666);
 		// Work out the hashed gradient indices of the four simplex corners
 		int ii = i & 0x3ff;
 		int jj = j & 0x3ff;
@@ -175,9 +175,9 @@ public:
 		gi[3] = m_P[ii + 1 + m_P[jj + 1 + m_P[kk + 1]]];
 
 		// Calculate the contribution from the four corners, and add to total
-		for (int corner = 0; corner < 4; corner++)
+		for (uint corner = 0u; corner < 4u; corner++)
 		{
-			t = T(0.6) - c[corner].x * c[corner].x - c[corner].y * c[corner].y - c[corner].z * c[corner].z;
+			t = T(0.6) - Sqr(c[corner].x) - Sqr(c[corner].y) - Sqr(c[corner].z);
 
 			if (t > 0)
 			{
@@ -202,13 +202,12 @@ public:
 	/// <returns>T</returns>
 	T PerlinNoise3D(v3T& v, T aScale, T fScale, int octaves)
 	{
-		int i;
 		T n = 0, a = 1;
 		v3T u = v;
 
-		for (i = 0; i < octaves; i++)
+		for (int i = 0; i < octaves; i++)
 		{
-			n += SimplexNoise3D(u) / a;
+			n += SimplexNoise3D(u) / Zeps(a);
 			a *= aScale;
 			u.x *= fScale;
 			u.y *= fScale;
@@ -253,22 +252,20 @@ public:
 	{
 		v2T pmq = p - q;
 
-		if (pmq.x == 0 || pmq.y == 0)
+		if (pmq.x == 0 && pmq.y == 0)
 			return 1;
 
-		return 2 * ((u.x - q.x) * pmq.x + (u.y - q.y) * pmq.y) / (pmq.x * pmq.x + pmq.y * pmq.y);
+		return 2 * ((u.x - q.x) * pmq.x + (u.y - q.y) * pmq.y) / (SQR(pmq.x) + SQR(pmq.y));
 	}
 
 	/// <summary>
 	/// Unsure.
 	/// </summary>
-	static T Voronoi(v2T* p, int n, int q, v2T& u)
+	static T Voronoi(v2T* p, int n, int q, const v2T& u)
 	{
-		T ratio;
-		T ratiomax = TLOW;
-		int i;
+		T ratio, ratiomax = TLOW;
 
-		for (i = 0; i < n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			if (i != q)
 			{
@@ -293,7 +290,7 @@ private:
 		m_P = InitInts();
 		m_Grad = InitGrad();
 		m_GlobalMap["NOISE_INDEX"] = make_pair(m_PFloats.data(), m_PFloats.size());
-        m_GlobalMap["NOISE_POINTS"] = make_pair(static_cast<T*>(&(m_Grad[0].x)), SizeOf(m_Grad) / sizeof(T));
+		m_GlobalMap["NOISE_POINTS"] = make_pair(static_cast<T*>(&(m_Grad[0].x)), SizeOf(m_Grad) / sizeof(T));
 	}
 
 	/// <summary>

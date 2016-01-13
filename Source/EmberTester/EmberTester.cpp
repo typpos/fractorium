@@ -1445,9 +1445,9 @@ void TestVarsSimilar()
 				varComp->Precalc();
 				varComp->Func(helper, pComp, rand);
 				v4T varCompOut = helper.Out;
-				xdiff += fabs(varOut.x - varCompOut.x);
-				ydiff += fabs(varOut.y - varCompOut.y);
-				zdiff += fabs(varOut.z - varCompOut.z);
+				xdiff += std::abs(varOut.x - varCompOut.x);
+				ydiff += std::abs(varOut.y - varCompOut.y);
+				zdiff += std::abs(varOut.z - varCompOut.z);
 			}
 
 			sum = (xdiff + ydiff + zdiff) / iters;
@@ -1578,9 +1578,9 @@ void TestCpuGpuResults(size_t platform, size_t device)
 			renderer.WritePoints(points);
 			renderer.Iterate(1, 0, 1);
 			renderer.ReadPoints(points);
-			T xdiff = fabs(p2.m_X - points[0].m_X);
-			T ydiff = fabs(p2.m_Y - points[0].m_Y);
-			T zdiff = fabs(p2.m_Z - points[0].m_Z);
+			T xdiff = std::abs(p2.m_X - points[0].m_X);
+			T ydiff = std::abs(p2.m_Y - points[0].m_Y);
+			T zdiff = std::abs(p2.m_Z - points[0].m_Z);
 
 			if (xdiff > thresh || ydiff > thresh || zdiff > thresh)
 			{
@@ -1744,7 +1744,7 @@ void TestCross(T x, T y, T weight)
 	T outX = x * r;
 	T outY = y * r;
 	cout << "First way, outX, outY == " << outX << ", " << outY << endl;
-	r = fabs((x - y) * (x + y) + EPS);
+	r = std::abs((x - y) * (x + y) + EPS);
 
 	if (r < 0)
 		r = -r;
@@ -2015,7 +2015,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//cout << pow(-1, 5.1) << endl;
 	/*  for (i = 0; i < 2500000000; i++)
 	    {
-		double d = fabs(RandD(rand));
+		double d = std::abs(RandD(rand));
 
 		if (d >= 0.5)
 			cout << d << endl;

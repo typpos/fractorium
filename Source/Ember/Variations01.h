@@ -1659,7 +1659,7 @@ public:
 	virtual void Precalc() override
 	{
 		m_Power = Zeps(m_Power);
-		m_Rn = fabs(m_Power);
+		m_Rn = std::abs(m_Power);
 		m_Cn = m_Dist / m_Power / 2;
 	}
 
@@ -1770,7 +1770,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_Rn = fabs(m_Power);
+		m_Rn = std::abs(m_Power);
 		m_Cn = m_Dist / m_Power / 2;
 	}
 
@@ -2566,7 +2566,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T r = m_Weight / Zeps(fabs((helper.In.x - helper.In.y) * (helper.In.x + helper.In.y)));
+		T r = m_Weight / Zeps(std::abs((helper.In.x - helper.In.y) * (helper.In.x + helper.In.y)));
 		helper.Out.x = helper.In.x * r;
 		helper.Out.y = helper.In.y * r;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2706,9 +2706,9 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T theta = m_Pm4 * helper.m_PrecalcAtanyx + T(M_PI_4);
-		T t1 = fabs(std::cos(theta));
+		T t1 = std::abs(std::cos(theta));
 		t1 = std::pow(t1, m_N2);
-		T t2 = fabs(std::sin(theta));
+		T t2 = std::abs(std::sin(theta));
 		t2 = std::pow(t2, m_N3);
 		T r = m_Weight * ((m_Rnd * rand.Frand01<T>() + (1 - m_Rnd) * helper.m_PrecalcSqrtSumSquares) - m_Holes)
 			  * std::pow(t1 + t2, m_PNeg1N1) / helper.m_PrecalcSqrtSumSquares;
@@ -3235,7 +3235,7 @@ public:
 		}
 		else
 		{
-			if (fabs(offsetX) >= fabs(offsetY))
+			if (std::abs(offsetX) >= std::abs(offsetY))
 			{
 				if (offsetX >= 0.0)
 				{
@@ -3332,7 +3332,7 @@ public:
 	{
 		T wx = m_Weight * T(1.3029400317411197908970256609023);//This precision came from the original.
 		T y2 = helper.In.y * 2;
-		T r = wx * std::sqrt(fabs(helper.In.y * helper.In.x) / Zeps(SQR(helper.In.x) + SQR(y2)));
+		T r = wx * std::sqrt(std::abs(helper.In.y * helper.In.x) / Zeps(SQR(helper.In.x) + SQR(y2)));
 		helper.Out.x = r * helper.In.x;
 		helper.Out.y = r * y2;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -4263,9 +4263,9 @@ public:
 		if (m_Damping == 0.0)
 			t = m_Amplitude * std::cos(m_2PiFreq * helper.In.x) + m_Separation;
 		else
-			t = m_Amplitude * std::exp(-fabs(helper.In.x) * m_Damping) * std::cos(m_2PiFreq * helper.In.x) + m_Separation;
+			t = m_Amplitude * std::exp(-std::abs(helper.In.x) * m_Damping) * std::cos(m_2PiFreq * helper.In.x) + m_Separation;
 
-		if (fabs(helper.In.y) <= t)
+		if (std::abs(helper.In.y) <= t)
 		{
 			helper.Out.x = m_Weight * helper.In.x;
 			helper.Out.y = -(m_Weight * helper.In.y);
@@ -4984,7 +4984,7 @@ public:
 	virtual void Precalc() override
 	{
 		m_Cf = 1 - m_Angle * m_Count * T(M_1_PI) * T(0.5);
-		m_Rn = fabs(m_Power);
+		m_Rn = std::abs(m_Power);
 		m_Cn = m_Dist / m_Power / 2;
 	}
 
@@ -5835,8 +5835,8 @@ public:
 	{
 		T s = std::sin(m_Freq * helper.In.x);
 		T t = std::sin(m_Freq * helper.In.y);
-		T dy = helper.In.y + m_AugerWeight * (m_Scale * s / 2 + fabs(helper.In.y) * s);
-		T dx = helper.In.x + m_AugerWeight * (m_Scale * t / 2 + fabs(helper.In.x) * t);
+		T dy = helper.In.y + m_AugerWeight * (m_Scale * s / 2 + std::abs(helper.In.y) * s);
+		T dx = helper.In.x + m_AugerWeight * (m_Scale * t / 2 + std::abs(helper.In.x) * t);
 		helper.Out.x = m_Weight * (helper.In.x + m_Symmetry * (dx - helper.In.x));
 		helper.Out.y = m_Weight * dy;
 		helper.Out.z = m_Weight * helper.In.z;

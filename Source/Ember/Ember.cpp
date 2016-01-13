@@ -379,6 +379,7 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(BubbleT3D, T) \
 	EXPORTPREPOSTREGVAR(Synth, T) \
 	EXPORTPREPOSTREGVAR(Crackle, T) \
+	template EMBER_API class PostSmartcropVariation<T>; /*Only implemented as post.*/ \
 	EXPORTPREPOSTREGVAR(DCBubble, T) \
 	EXPORTPREPOSTREGVAR(DCCarpet, T) \
 	EXPORTPREPOSTREGVAR(DCCube, T) \

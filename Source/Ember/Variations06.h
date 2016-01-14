@@ -2312,6 +2312,11 @@ private:
 #define MODE_BLUR_RING 19
 #define MODE_BLUR_RING2 20
 #define MODE_SHIFTTHETA 21
+#define MODE_SHIFTNSTRETCH 22
+#define MODE_SHIFTTANGENT 23
+#define MODE_XMIRROR 24
+#define MODE_XYMIRROR 25
+#define MODE_SPHERICAL2 26
 
 // -------------------------------------------------------------
 // Wave types
@@ -2363,6 +2368,7 @@ public:
 		T thetaFactor;          // Evaluation of synth() function for current point
 		T s, c, mu;              // Handy temp variables, s & c => sine & cosine, mu = generic temp param
 		int synthMode = int(m_SynthMode);
+		int synthSmooth = int(m_SynthSmooth);
 		SynthStruct synth;
 		synth.SynthA = m_SynthA;
 		synth.SynthB = m_SynthB;
@@ -2407,7 +2413,7 @@ public:
 				// Get angle and angular factor
 				theta = helper.m_PrecalcAtanxy;
 				thetaFactor = SynthValue(synth, theta);
-				radius = Interpolate(radius, thetaFactor, synthMode);
+				radius = Interpolate(radius, thetaFactor, synthSmooth);
 				sincos(theta, &s, &c);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * radius * s;
@@ -2422,7 +2428,7 @@ public:
 				// Get angle and angular factor
 				theta = helper.m_PrecalcAtanxy;
 				thetaFactor = SynthValue(synth, theta);
-				radius = Interpolate(radius, thetaFactor, synthMode);
+				radius = Interpolate(radius, thetaFactor, synthSmooth);
 				sincos(theta, &s, &c);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * radius * s;
@@ -2438,7 +2444,7 @@ public:
 				radius = std::pow(Zeps<T>(radius * radius), m_SynthPower / 2);
 				// Get angle and angular factor
 				thetaFactor = SynthValue(synth, theta);
-				radius = m_Weight * Interpolate(radius, thetaFactor, synthMode);
+				radius = m_Weight * Interpolate(radius, thetaFactor, synthSmooth);
 				// Write back to running totals for new vector
 				helper.Out.x = Vx * radius;
 				helper.Out.y = Vy * radius;
@@ -2453,7 +2459,7 @@ public:
 				// Get angular factor defining the shape
 				thetaFactor = SynthValue(synth, theta);
 				// Get final radius after synth applied
-				radius = Interpolate(radius, thetaFactor, synthMode);
+				radius = Interpolate(radius, thetaFactor, synthSmooth);
 				sincos(theta, &s, &c);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * radius * s;
@@ -2469,7 +2475,7 @@ public:
 				// Get angular factor defining the shape
 				thetaFactor = SynthValue(synth, theta);
 				// Get new location
-				Vy = Interpolate(Vy, thetaFactor, synthMode);
+				Vy = Interpolate(Vy, thetaFactor, synthSmooth);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * (theta / T(M_PI));
 				helper.Out.y = m_Weight * (Vy - 1);
@@ -2481,7 +2487,7 @@ public:
 				theta = helper.m_PrecalcAtanxy;
 				// Calculate new radius
 				thetaFactor = SynthValue(synth, theta);
-				radius = Interpolate(radius, thetaFactor, synthMode);
+				radius = Interpolate(radius, thetaFactor, synthSmooth);
 				sincos(theta, &s, &c);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * radius * s;
@@ -2495,7 +2501,7 @@ public:
 				// x value will be mapped according to synth(y) value
 				thetaFactor = SynthValue(synth, Vy);
 				// Write to running totals for transform
-				helper.Out.x = m_Weight * Interpolate(Vx, thetaFactor, synthMode);
+				helper.Out.x = m_Weight * Interpolate(Vx, thetaFactor, synthSmooth);
 				helper.Out.y = m_Weight * Vy;
 				break;
 
@@ -2507,7 +2513,7 @@ public:
 				thetaFactor = SynthValue(synth, Vx);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * Vx;
-				helper.Out.y = m_Weight * Interpolate(Vy, thetaFactor, synthMode);
+				helper.Out.y = m_Weight * Interpolate(Vy, thetaFactor, synthSmooth);
 				break;
 
 			case MODE_RAWXY:  // Power NO, Smooth YES
@@ -2516,10 +2522,10 @@ public:
 				Vy = helper.In.y;
 				// x value will be mapped according to synth(y) value
 				thetaFactor = SynthValue(synth, Vy);
-				helper.Out.x = m_Weight * Interpolate(Vx, thetaFactor, synthMode);
+				helper.Out.x = m_Weight * Interpolate(Vx, thetaFactor, synthSmooth);
 				// y value will be mapped according to synth(x) value
 				thetaFactor = SynthValue(synth, Vx);
-				helper.Out.y = m_Weight * Interpolate(Vy, thetaFactor, synthMode);
+				helper.Out.y = m_Weight * Interpolate(Vy, thetaFactor, synthSmooth);
 				break;
 
 			case MODE_SHIFTX:  // Power NO, Smooth YES
@@ -2562,7 +2568,7 @@ public:
 				Vy = helper.In.y;
 				radius = std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
 				// Synth-modified sine & cosine
-				SynthSinCos(synth, radius, s, c, synthMode);
+				SynthSinCos(synth, radius, s, c, synthSmooth);
 				helper.Out.x = m_Weight * (s * Vx - c * Vy);
 				helper.Out.y = m_Weight * (c * Vx + s * Vy);
 				break;
@@ -2573,7 +2579,7 @@ public:
 				radius = std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
 				theta = helper.m_PrecalcAtanxy;
 				// Synth-modified sine & cosine
-				SynthSinCos(synth, theta, s, c, synthMode);
+				SynthSinCos(synth, theta, s, c, synthSmooth);
 				helper.Out.x = m_Weight * s / radius;
 				helper.Out.y = m_Weight * c * radius;
 				break;
@@ -2588,7 +2594,7 @@ public:
 					theta += T(M_PI);
 
 				// Synth-modified sine & cosine
-				SynthSinCos(synth, theta, s, c, synthMode);
+				SynthSinCos(synth, theta, s, c, synthSmooth);
 				helper.Out.x = m_Weight * radius * c;
 				helper.Out.y = m_Weight * radius * s;
 				break;
@@ -2599,7 +2605,7 @@ public:
 				theta = helper.m_PrecalcAtanxy / T(M_PI);
 				radius = T(M_PI) * std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
 				// Synth-modified sine & cosine
-				SynthSinCos(synth, radius, s, c, synthMode);
+				SynthSinCos(synth, radius, s, c, synthSmooth);
 				helper.Out.x = m_Weight * s * theta;
 				helper.Out.y = m_Weight * c * theta;
 				break;
@@ -2611,7 +2617,7 @@ public:
 				theta = helper.m_PrecalcAtanxy;
 				mu = Zeps<T>(SQR(m_SynthPower));
 				radius += -2 * mu * int((radius + mu) / (2 * mu)) + radius * (1 - mu);
-				SynthSinCos(synth, radius, s, c, synthMode);
+				SynthSinCos(synth, radius, s, c, synthSmooth);
 				helper.Out.x = m_Weight * s * theta;
 				helper.Out.y = m_Weight * c * theta;
 				break;
@@ -2621,7 +2627,7 @@ public:
 				Vy = helper.In.y;
 				radius = std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
 				// Modified sine only used here
-				SynthSinCos(synth, Vx, s, c, synthMode);
+				SynthSinCos(synth, Vx, s, c, synthSmooth);
 				helper.Out.x = m_Weight * radius * s;
 				helper.Out.y = m_Weight * radius * Vy;
 				break;
@@ -2633,7 +2639,7 @@ public:
 				// Get angular factor defining the shape
 				thetaFactor = SynthValue(synth, theta);
 				// Get final radius after synth applied
-				radius = Interpolate(radius, thetaFactor, synthMode);
+				radius = Interpolate(radius, thetaFactor, synthSmooth);
 				sincos(theta, &s, &c);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * radius * s;
@@ -2653,13 +2659,77 @@ public:
 				helper.Out.y = m_Weight * radius * c;
 				break;
 
-			default:
 			case MODE_SHIFTTHETA:  // Power YES, Smooth NO
 				// Use (adjusted) radius to move point around circle
 				Vx = helper.In.x;
 				Vy = helper.In.y;
 				radius = std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
 				theta = helper.m_PrecalcAtanxy - 1 + SynthValue(synth, radius);
+				sincos(theta, &s, &c);
+				// Write to running totals for transform
+				helper.Out.x = m_Weight * radius * s;
+				helper.Out.y = m_Weight * radius * c;
+				break;
+
+			case MODE_SHIFTNSTRETCH:
+				// Use (adjusted) radius to move point around circle
+				Vx = helper.In.x;
+				Vy = helper.In.y;
+				radius = std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
+				theta = helper.m_PrecalcAtanxy - 1 + SynthValue(synth, radius);
+				sincos(theta, &s, &c);
+				// Write to running totals for transform
+				helper.Out.x = m_Weight * radius * s;
+				helper.Out.y = m_Weight * radius * c;
+				break;
+
+			case MODE_SHIFTTANGENT:
+				// Use (adjusted) radius to move point tangentially to circle
+				Vx = helper.In.x;
+				Vy = helper.In.y;
+				radius = std::pow(Zeps<T>(helper.m_PrecalcSumSquares), m_SynthPower / 2);
+				sincos(helper.m_PrecalcAtanxy, &s, &c);
+				// Adjust  Vx and Vy directly
+				mu = SynthValue(synth, radius) - 1;
+				Vx += mu * c;
+				Vy -= mu * s;
+				// Write to running totals for transform
+				helper.Out.x = m_Weight * Vx;
+				helper.Out.y = m_Weight * Vy;
+				break;
+
+			case MODE_XMIRROR:
+				Vx = helper.In.x;
+				Vy = helper.In.y;
+				// Modified sine only used here
+				mu = SynthValue(synth, Vx) - 1;
+				Vy = 2 * mu - Vy;
+				helper.Out.x = m_Weight * Vx;
+				helper.Out.y = m_Weight * Vy;
+				break;
+
+			case MODE_XYMIRROR:
+				Vx = helper.In.x;
+				Vy = helper.In.y;
+				// radius sneakily being used to represent something completely different, sorry!
+				mu = SynthValue(synth, Vx) - 1;
+				radius = SynthValue(synth, Vy) - 1;
+				Vy = 2 * mu - Vy;
+				Vx = 2 * radius - Vx;
+				helper.Out.x = m_Weight * Vx;
+				helper.Out.y = m_Weight * Vy;
+				break;
+
+			case MODE_SPHERICAL2:
+			default:
+				Vx = helper.In.x;
+				Vy = helper.In.y;
+				radius = helper.m_PrecalcSqrtSumSquares;
+				// Get angle and angular factor
+				theta = helper.m_PrecalcAtanxy;
+				thetaFactor = SynthValue(synth, theta);
+				radius = Interpolate(radius, thetaFactor, synthSmooth);
+				radius = std::pow(radius, m_SynthPower);
 				sincos(theta, &s, &c);
 				// Write to running totals for transform
 				helper.Out.x = m_Weight * radius * s;
@@ -2716,6 +2786,7 @@ public:
 		   << "\t\treal_t thetaFactor;\n"
 		   << "\t\treal_t s, c, mu;\n"
 		   << "\t\tint synthMode = (int)" << synthMode << ";\n"
+		   << "\t\tint synthSmooth = (int)" << synthSmooth << ";\n"
 		   << "\t\tSynthStruct synth;\n"
 		   << "\n"
 		   << "\t\tsynth.SynthA = " << synthA << ";\n"
@@ -2759,7 +2830,7 @@ public:
 		   << "\t\t	radius = pow(Zeps(precalcSumSquares), (" << synthPower << " + 1) / 2);\n"
 		   << "\t\t	theta = precalcAtanxy;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthMode);\n"
+		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
@@ -2771,7 +2842,7 @@ public:
 		   << "\t\t	radius = precalcSqrtSumSquares / (precalcSumSquares / 4 + 1);\n"
 		   << "\t\t	theta = precalcAtanxy;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthMode);\n"
+		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
@@ -2784,7 +2855,7 @@ public:
 		   << "\t\t	Vy = radius * cos(theta);\n"
 		   << "\t\t	radius = pow(Zeps(radius * radius), " << synthPower << " / 2);\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	radius = xform->m_VariationWeights[" << varIndex << "] * Interpolate(radius, thetaFactor, synthMode);\n"
+		   << "\t\t	radius = xform->m_VariationWeights[" << varIndex << "] * Interpolate(radius, thetaFactor, synthSmooth);\n"
 		   << "\t\t	vOut.x = Vx * radius;\n"
 		   << "\t\t	vOut.y = Vy * radius;\n"
 		   << "\t\t	break;\n"
@@ -2794,7 +2865,7 @@ public:
 		   << "\t\t	theta = M_2PI * MwcNext01(mwc) - M_PI;\n"
 		   << "\t\t	radius = pow(Zeps(SQR(radius)), -" << synthPower << " / 2);\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthMode);\n"
+		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
@@ -2804,7 +2875,7 @@ public:
 		   << "\t\t	Vy = 1 + 0.1 * (MwcNext01(mwc) + MwcNext01(mwc) - 1) * " << synthPower << ";\n"
 		   << "\t\t	theta = 2 * asin((MwcNext01(mwc) - 0.5) * 2);\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	Vy = Interpolate(Vy, thetaFactor, synthMode);\n"
+		   << "\t\t	Vy = Interpolate(Vy, thetaFactor, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * (theta / M_PI);\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * (Vy - 1);\n"
 		   << "\t\t	break;\n"
@@ -2813,7 +2884,7 @@ public:
 		   << "\t\t	radius = precalcSqrtSumSquares;\n"
 		   << "\t\t	theta = precalcAtanxy;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthMode);\n"
+		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
@@ -2823,7 +2894,7 @@ public:
 		   << "\t\t	Vx = vIn.x;\n"
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, Vy);\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vx, thetaFactor, synthMode);\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vx, thetaFactor, synthSmooth);\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Vy;\n"
 		   << "\t\t	break;\n"
 		   << "\n"
@@ -2832,16 +2903,16 @@ public:
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, Vx);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Vx;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vy, thetaFactor, synthMode);\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vy, thetaFactor, synthSmooth);\n"
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_RAWXY:\n"
 		   << "\t\t	Vx = vIn.x;\n"
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, Vy);\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vx, thetaFactor, synthMode);\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vx, thetaFactor, synthSmooth);\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, Vx);\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vy, thetaFactor, synthMode);\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Interpolate(Vy, thetaFactor, synthSmooth);\n"
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_SHIFTX:\n"
@@ -2876,7 +2947,7 @@ public:
 		   << "\t\t	Vx = vIn.x;\n"
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
-		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthMode);\n"
+		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * (s * Vx - c * Vy);\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * (c * Vx + s * Vy);\n"
 		   << "\t\t	break;\n"
@@ -2886,7 +2957,7 @@ public:
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
 		   << "\t\t	theta = precalcAtanxy;\n"
-		   << "\t\t	SynthSinCos(&synth, theta, &s, &c, synthMode);\n"
+		   << "\t\t	SynthSinCos(&synth, theta, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * s / radius;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * c * radius;\n"
 		   << "\t\t	break;\n"
@@ -2900,7 +2971,7 @@ public:
 		   << "\t\t	if (MwcNext01(mwc) < 0.5)\n"
 		   << "\t\t		theta += M_PI;\n"
 		   << "\n"
-		   << "\t\t	SynthSinCos(&synth, theta, &s, &c, synthMode);\n"
+		   << "\t\t	SynthSinCos(&synth, theta, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	break;\n"
@@ -2910,7 +2981,7 @@ public:
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	theta = precalcAtanxy / M_PI;\n"
 		   << "\t\t	radius = M_PI * pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
-		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthMode);\n"
+		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * s * theta;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * c * theta;\n"
 		   << "\t\t	break;\n"
@@ -2922,7 +2993,7 @@ public:
 		   << "\t\t	theta = precalcAtanxy;\n"
 		   << "\t\t	mu = Zeps(SQR(" << synthPower << "));\n"
 		   << "\t\t	radius += -2 * mu * (int)((radius + mu) / (2 * mu)) + radius * (1 - mu);\n"
-		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthMode);\n"
+		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * s * theta;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * c * theta;\n"
 		   << "\t\t	break;\n"
@@ -2931,7 +3002,7 @@ public:
 		   << "\t\t	Vx = vIn.x;\n"
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
-		   << "\t\t	SynthSinCos(&synth, Vx, &s, &c, synthMode);\n"
+		   << "\t\t	SynthSinCos(&synth, Vx, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * Vy;\n"
 		   << "\t\t	break;\n"
@@ -2940,7 +3011,7 @@ public:
 		   << "\t\t	radius = 1 + 0.1 * (MwcNext01(mwc) + MwcNext01(mwc) - 1) * " << synthPower << ";\n"
 		   << "\t\t	theta = M_2PI * MwcNext01(mwc) - M_PI;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
-		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthMode);\n"
+		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
@@ -2960,6 +3031,61 @@ public:
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
 		   << "\t\t	theta = precalcAtanxy - 1 + SynthValue(&synth, radius);\n"
+		   << "\t\t	s = sincos(theta, &c);\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
+		   << "\t\t	break;\n"
+		   << "\t\tcase MODE_SHIFTNSTRETCH:\n"
+		   << "\t\t	Vx = vIn.x;\n"
+		   << "\t\t	Vy = vIn.y;\n"
+		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
+		   << "\t\t	theta = precalcAtanxy - 1 + SynthValue(&synth, radius);\n"
+		   << "\t\t	s = sincos(theta, &c);\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
+		   << "\t\t	break;\n"
+		   << "\n"
+		   << "\t\tcase MODE_SHIFTTANGENT:\n"
+		   << "\t\t	Vx = vIn.x;\n"
+		   << "\t\t	Vy = vIn.y;\n"
+		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
+		   << "\t\t	s = sincos(precalcAtanxy, &c);\n"
+		   << "\t\t	mu = SynthValue(&synth, radius) - 1;\n"
+		   << "\t\t	Vx += mu * c;\n"
+		   << "\t\t	Vy -= mu * s;\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Vx;\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Vy;\n"
+		   << "\t\t	break;\n"
+		   << "\n"
+		   << "\t\tcase MODE_XMIRROR:\n"
+		   << "\t\t	Vx = vIn.x;\n"
+		   << "\t\t	Vy = vIn.y;\n"
+		   << "\t\t	mu = SynthValue(&synth, Vx) - 1;\n"
+		   << "\t\t	Vy = 2 * mu - Vy;\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Vx;\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Vy;\n"
+		   << "\t\t	break;\n"
+		   << "\n"
+		   << "\t\tcase MODE_XYMIRROR:\n"
+		   << "\t\t	Vx = vIn.x;\n"
+		   << "\t\t	Vy = vIn.y;\n"
+		   << "\t\t	mu = SynthValue(&synth, Vx) - 1;\n"
+		   << "\t\t	radius = SynthValue(&synth, Vy) - 1;\n"
+		   << "\t\t	Vy = 2 * mu - Vy;\n"
+		   << "\t\t	Vx = 2 * radius - Vx;\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * Vx;\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * Vy;\n"
+		   << "\t\t	break;\n"
+		   << "\n"
+		   << "\t\tcase MODE_SPHERICAL2:\n"
+		   << "\t\tdefault:\n"
+		   << "\t\t	Vx = vIn.x;\n"
+		   << "\t\t	Vy = vIn.y;\n"
+		   << "\t\t	radius = precalcSqrtSumSquares;\n"
+		   << "\t\t	theta = precalcAtanxy;\n"
+		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
+		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
+		   << "\t\t	radius = pow(radius, " << synthPower << ");\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * radius * s;\n"
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * radius * c;\n"
@@ -3001,6 +3127,11 @@ public:
 			"#define MODE_BLUR_RING 19\n"
 			"#define MODE_BLUR_RING2 20\n"
 			"#define MODE_SHIFTTHETA 21\n"
+			"#define MODE_SHIFTNSTRETCH 22\n"
+			"#define MODE_SHIFTTANGENT 23\n"
+			"#define MODE_XMIRROR 24\n"
+			"#define MODE_XYMIRROR 25\n"
+			"#define MODE_SPHERICAL2 26\n"
 			"#define WAVE_SIN 0\n"
 			"#define WAVE_COS 1\n"
 			"#define WAVE_SQUARE 2\n"
@@ -3232,40 +3363,40 @@ protected:
 		m_Params.clear();
 		m_Params.reserve(34);
 		m_Params.push_back(ParamWithName<T>(&m_SynthA,		prefix + "synth_a"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthMode,	prefix + "synth_mode", 3, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthMode,   prefix + "synth_mode", 3, eParamType::INTEGER, MODE_SPHERICAL, MODE_SPHERICAL2));
 		m_Params.push_back(ParamWithName<T>(&m_SynthPower,	prefix + "synth_power", -2));
 		m_Params.push_back(ParamWithName<T>(&m_SynthMix,	prefix + "synth_mix"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthSmooth, prefix + "synth_smooth", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthSmooth, prefix + "synth_smooth", 0, eParamType::INTEGER, LERP_LINEAR, LERP_BEZIER));
 		m_Params.push_back(ParamWithName<T>(&m_SynthB,		prefix + "synth_b"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthBType,	prefix + "synth_b_type", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthBType,  prefix + "synth_b_type", 0, eParamType::INTEGER, WAVE_SIN, WAVE_INGON));
 		m_Params.push_back(ParamWithName<T>(&m_SynthBSkew,	prefix + "synth_b_skew"));
 		m_Params.push_back(ParamWithName<T>(&m_SynthBFrq,	prefix + "synth_b_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthBPhs,	prefix + "synth_b_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthBLayer, prefix + "synth_b_layer", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthBLayer, prefix + "synth_b_layer", 0, eParamType::INTEGER, LAYER_ADD, LAYER_MIN));
 		m_Params.push_back(ParamWithName<T>(&m_SynthC,		prefix + "synth_c"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthCType,	prefix + "synth_c_type", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthCType,  prefix + "synth_c_type", 0, eParamType::INTEGER, WAVE_SIN, WAVE_INGON));
 		m_Params.push_back(ParamWithName<T>(&m_SynthCSkew,	prefix + "synth_c_skew"));
 		m_Params.push_back(ParamWithName<T>(&m_SynthCFrq,	prefix + "synth_c_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthCPhs,	prefix + "synth_c_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthCLayer, prefix + "synth_c_layer", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthCLayer, prefix + "synth_c_layer", 0, eParamType::INTEGER, LAYER_ADD, LAYER_MIN));
 		m_Params.push_back(ParamWithName<T>(&m_SynthD,		prefix + "synth_d"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthDType,	prefix + "synth_d_type", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthDType,  prefix + "synth_d_type", 0, eParamType::INTEGER, WAVE_SIN, WAVE_INGON));
 		m_Params.push_back(ParamWithName<T>(&m_SynthDSkew,	prefix + "synth_d_skew"));
 		m_Params.push_back(ParamWithName<T>(&m_SynthDFrq,	prefix + "synth_d_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthDPhs,	prefix + "synth_d_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthDLayer, prefix + "synth_d_layer", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthDLayer, prefix + "synth_d_layer", 0, eParamType::INTEGER, LAYER_ADD, LAYER_MIN));
 		m_Params.push_back(ParamWithName<T>(&m_SynthE,		prefix + "synth_e"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthEType,	prefix + "synth_e_type", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthEType,  prefix + "synth_e_type", 0, eParamType::INTEGER, WAVE_SIN, WAVE_INGON));
 		m_Params.push_back(ParamWithName<T>(&m_SynthESkew,	prefix + "synth_e_skew"));
 		m_Params.push_back(ParamWithName<T>(&m_SynthEFrq,	prefix + "synth_e_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthEPhs,	prefix + "synth_e_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthELayer, prefix + "synth_e_layer", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthELayer, prefix + "synth_e_layer", 0, eParamType::INTEGER, LAYER_ADD, LAYER_MIN));
 		m_Params.push_back(ParamWithName<T>(&m_SynthF,		prefix + "synth_f"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthFType,	prefix + "synth_f_type", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthFType,  prefix + "synth_f_type", 0, eParamType::INTEGER, WAVE_SIN, WAVE_INGON));
 		m_Params.push_back(ParamWithName<T>(&m_SynthFSkew,	prefix + "synth_f_skew"));
 		m_Params.push_back(ParamWithName<T>(&m_SynthFFrq,	prefix + "synth_f_frq", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_SynthFPhs,	prefix + "synth_f_phs"));
-		m_Params.push_back(ParamWithName<T>(&m_SynthFLayer, prefix + "synth_f_layer", 0, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_SynthFLayer, prefix + "synth_f_layer", 0, eParamType::INTEGER, LAYER_ADD, LAYER_MIN));
 	}
 
 private:

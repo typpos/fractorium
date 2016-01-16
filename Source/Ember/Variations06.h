@@ -239,7 +239,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Zeps", "Sqr", "Vratio", "Closest", "Vratio" };
+		return vector<string> { "Zeps", "Sqr", "Vratio", "Voronoi", "Closest" };
 	}
 
 	virtual string OpenCLFuncsString() const override

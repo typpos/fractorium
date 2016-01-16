@@ -4735,7 +4735,7 @@ public:
 		else
 			helper.Out.y = m_Weight * (helper.In.y - m_Y);
 
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = m_Weight * helper.In.z;//Original does *not* have this. search through all for this and sync.//TODO!
 	}
 
 	virtual string OpenCLString() const override

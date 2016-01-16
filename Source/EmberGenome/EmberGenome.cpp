@@ -386,16 +386,26 @@ bool EmberGenome(EmberOptions& opt)
 		{
 			if (opt.Loops() > 0)
 			{
-				for (frame = 0; frame < round(T(opt.Frames()) * opt.Loops()); frame++)
+				for (frame = 0; frame < std::round(opt.Frames() * opt.Loops()); frame++)
 				{
 					blend = T(frame) / T(opt.Frames());
 					tools.Spin(embers[i], pTemplate, result, frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 				}
+
+				//The loop above will have rotated just shy of a complete rotation.
+				//Rotate the next step and save in result, but do not print.
+				//result will be the starting point for the interp phase below.
+				frame = size_t(std::round(opt.Frames() * opt.Loops()));
+				blend = T(frame) / T(opt.Frames());
+				tools.Spin(embers[i], pTemplate, result, frameCount, blend);//Do not increment frameCount here.
 			}
 
 			if (i < embers.size() - 1)
 			{
+				if (opt.Loops() > 0)//Store the last result as the flame to interpolate from. This applies for whole or fractional values of opt.Loops().
+					embers[i] = result;
+
 				for (frame = 0; frame < opt.Frames(); frame++)
 				{
 					seqFlag = (frame == 0 || frame == opt.Frames() - 1);

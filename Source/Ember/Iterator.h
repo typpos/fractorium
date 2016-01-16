@@ -159,16 +159,13 @@ public:
 				}
 			}
 
-#ifdef _DEBUG
-
-			//Ensure every element of the distribution was populated.
-			if (j < CHOOSE_XFORM_GRAIN)
-				throw "Not all distribution elements set, undefined behavior.";
-
-#endif
+			//If probability was zero, then nothing was filled in, so make all zero.
+			//If it was non zero but for some reason didn't fill all elements, then just make the remaining
+			//elements have the index of the last xform.
+			byte val = j ? byte(i - 1) : 0;
 
 			for (; j < CHOOSE_XFORM_GRAIN; j++)//Make absolutely sure they are set to a valid value.
-				m_XformDistributions[(distrib * CHOOSE_XFORM_GRAIN) + j] = byte(i - 1);
+				m_XformDistributions[(distrib * CHOOSE_XFORM_GRAIN) + j] = val;
 
 			//Flam3 did this, which gives the same result.
 			//T t = xforms[0].m_Weight;

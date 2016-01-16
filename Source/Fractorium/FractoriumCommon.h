@@ -66,6 +66,19 @@ static QWidget* SetTabOrder(QWidget* p, QWidget* w1, QWidget* w2)
 }
 
 /// <summary>
+/// Truncates the precision of the value to the specified number of digits
+/// after the decimal place.
+/// </summary>
+/// <param name="val">The value to truncate</param>
+/// <param name="digits">The number of digits to leave after the decimal place</param>
+/// <returns>The truncated value</returns>
+static double TruncPrecision(double val, uint digits)
+{
+	double mult = std::pow(10, digits);
+	return std::round(mult * val) / mult;
+}
+
+/// <summary>
 /// Wrapper around QLocale::system().toDouble().
 /// </summary>
 /// <param name="s">The string to convert</param>

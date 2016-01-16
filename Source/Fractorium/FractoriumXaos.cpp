@@ -1,26 +1,24 @@
 #include "FractoriumPch.h"
 #include "Fractorium.h"
 
+#define XAOS_PREC 6
+
 /// <summary>
 /// Initialize the xforms xaos UI.
 /// </summary>
 void Fractorium::InitXaosUI()
 {
 	int spinHeight = 20;
-
 	ui.XaosTableView->verticalHeader()->setSectionsClickable(true);
 	ui.XaosTableView->horizontalHeader()->setSectionsClickable(true);
-
 	m_XaosSpinBox = new DoubleSpinBox(nullptr, spinHeight, 0.1);
 	m_XaosSpinBox->DoubleClick(true);
 	m_XaosSpinBox->DoubleClickZero(1);
 	m_XaosSpinBox->DoubleClickNonZero(0);
-	m_XaosSpinBox->setDecimals(6);
+	m_XaosSpinBox->setDecimals(XAOS_PREC);
 	m_XaosSpinBox->setObjectName("XaosSpinBox");
-
 	m_XaosTableModel = nullptr;
 	m_XaosTableItemDelegate = new DoubleSpinBoxTableItemDelegate(m_XaosSpinBox, this);
-
 	connect(m_XaosSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnXaosChanged(double)), Qt::QueuedConnection);
 	connect(ui.ClearXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnClearXaosButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.RandomXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnRandomXaosButtonClicked(bool)), Qt::QueuedConnection);
@@ -60,7 +58,6 @@ QString FractoriumEmberController<T>::MakeXaosNameString(uint i)
 {
 	Xform<T>* xform = m_Ember.GetXform(i);
 	QString name;
-
 	//if (xform)
 	//{
 	//	int indexPlus1 = m_Ember.GetXformIndex(xform) + 1;//GUI is 1 indexed to avoid confusing the user.
@@ -77,7 +74,6 @@ QString FractoriumEmberController<T>::MakeXaosNameString(uint i)
 	//		//	name = name + " (" + QString::fromStdString(xform->m_Name) + ")";
 	//	}
 	//}
-
 	return name;
 }
 
@@ -94,9 +90,11 @@ QString FractoriumEmberController<T>::MakeXaosNameString(uint i)
 template <typename T>
 void FractoriumEmberController<T>::XaosChanged(int x, int y, double val)
 {
-	if (Xform<T>* xform = m_Ember.GetXform(x))
-		if (!IsClose<T>(val, xform->Xaos(y), 1e-10))//Ensure it actually changed.
-			Update([&] { xform->SetXaos(y, val); });
+	auto newVal = TruncPrecision(val, XAOS_PREC);//Sometimes 0 comes in as a very small number, so round.
+
+	if (auto xform = m_Ember.GetXform(x))
+		if (!IsClose<T>(newVal, xform->Xaos(y), 1e-7))
+			Update([&] { xform->SetXaos(y, newVal); });
 }
 
 void Fractorium::OnXaosChanged(double d)
@@ -104,7 +102,6 @@ void Fractorium::OnXaosChanged(double d)
 	if (auto* senderSpinBox = qobject_cast<DoubleSpinBox*>(this->sender()))
 	{
 		auto p = senderSpinBox->property("tableindex").toPoint();
-
 		m_Controller->XaosChanged(p.x(), p.y(), d);
 	}
 }
@@ -122,7 +119,6 @@ void Fractorium::FillXaosTable()
 	int count = int(m_Controller->XformCount());
 	QStringList hl, vl;
 	auto oldModel = m_XaosTableModel;
-
 	hl.reserve(count);
 	vl.reserve(count);
 	m_XaosTableModel = new QStandardItemModel(count, count, this);
@@ -132,7 +128,6 @@ void Fractorium::FillXaosTable()
 	for (int i = 0; i < count; i++)
 	{
 		auto s = QString::number(i + 1);
-
 		hl.push_back("F" + s);
 		vl.push_back("T" + s);
 	}
@@ -144,7 +139,7 @@ void Fractorium::FillXaosTable()
 	SetTabOrder(this, ui.ClearXaosButton, ui.RandomXaosButton);
 	m_Controller->FillXaos();
 	ui.XaosTableView->blockSignals(false);
-	
+
 	if (oldModel)
 		delete oldModel;
 
@@ -192,7 +187,6 @@ void FractoriumEmberController<T>::RandomXaos()
 			}
 		}
 	});
-	
 	FillXaos();
 }
 
@@ -225,5 +219,5 @@ void Fractorium::OnXaosColDoubleClicked(int logicalIndex)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-	template class FractoriumEmberController<double>;
+template class FractoriumEmberController<double>;
 #endif

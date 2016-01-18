@@ -1495,6 +1495,15 @@ bool TestAllVarsCLBuild(size_t platform, size_t device, bool printSuccess = true
 	{
 		renderer.SetEmber(it);
 
+		if (platform != 0 &&
+				((it.GetXform(0)->GetVariationById(eVariationId::VAR_SYNTH) != nullptr) ||//Nvidia OpenCL driver crashes when building too many synths.
+				 (it.GetXform(0)->GetVariationById(eVariationId::VAR_PRE_SYNTH) != nullptr) ||
+				 (it.GetXform(0)->GetVariationById(eVariationId::VAR_POST_SYNTH) != nullptr)))
+		{
+			cout << "Skipping synth.\n";
+			continue;
+		}
+
 		if (renderer.BuildIterProgramForEmber())
 		{
 			if (printSuccess)
@@ -1954,6 +1963,8 @@ void DistribTester()
 	}
 }
 
+#define DO_NVIDIA 1
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	//int i;
@@ -2152,16 +2163,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	//t.Tic();
 	//TestCpuGpuResults<float>();
 	//t.Toc("TestCpuGpuResults<float>()");
-
-	//t.Tic();
-	//b = TestAllVarsCLBuild<float>(0, 0, true);
-	//t.Toc("TestAllVarsCLBuild<float>()");
+	t.Tic();
+	b = TestAllVarsCLBuild<float>(0, 0, true);
+	t.Toc("TestAllVarsCLBuild<float>()");
 
 	if (b)
 	{
+#ifdef DO_NVIDIA
 		t.Tic();
 		b = TestAllVarsCLBuild<float>(1, 0, true);
 		t.Toc("TestAllVarsCLBuild<float>()");
+#endif
 	}
 
 #ifdef DO_DOUBLE
@@ -2177,9 +2189,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		if (b)
 		{
+#ifdef DO_NVIDIA
 			t.Tic();
 			TestAllVarsCLBuild<double>(1, 0, true);
 			t.Toc("TestAllVarsCLBuild<double>()");
+#endif
 		}
 	}
 

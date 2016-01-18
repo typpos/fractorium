@@ -1,3 +1,52 @@
+0.9.9.3 01/17/2016
+--User changes
+	-Add new variations: crackle, dc_perlin and post_smartcrop.
+	-Make default palette interp mode be linear instead of step.
+	-Make summary tab the selected one in the Info tab.
+	-Allow for highlight power of up to 10. It was previously limited to 2.
+	-Add the following modes to synth:
+		-MODE_SHIFTNSTRETCH 14
+		-MODE_SHIFTTANGENT 15
+		-MODE_XMIRROR 17
+		-MODE_XYMIRROR 18
+		-MODE_SPHERICAL2 19
+	-Clamp synth_mode, synth_*_type and synth_*_layer to valid values.
+	
+--Bug fixes
+	-Crash on linux when saving style due to null pointer in m_Theme variable.
+	-Omit duplicate entries in error reports.
+	-Properly report missing palette file in command line programs.
+	-Direct color calculations were wrong.
+	-Flattening was not applied to final xform.
+	-Fix "pure virtual function call" error on shutdown.
+	-Wrong point assignment in hexaplay3D, hexnix3D.
+	-Improper Z assignment in rblur.
+	-Fix inconsistency with original in circlecrop.
+	-synth was broken due to passing synth_mode to Interpolate, rather than synth_smooth.
+	-Changes in the xaos grid were not always being processed due to rounding.
+	-Long standing animation looping but that goes all the way back to flam3.
+	
+--Code changes
+	-Qualify math function with std::
+	-Allow for array precalc params in variations by adding a size member to the ParamWithName class.
+	-In IterOpenCLKernelCreator, memcpy precalc params instead of a direct assign since they can now be of variable length.
+	-Add new file VarFuncs to consolidate some functions that are common to multiple variations. This also contains texture data for crackle and dc_perlin.
+	-Place OpenCL versions of these functions in the FunctionMapper class in the EmberCL project.
+	-Add new Singleton class that uses CRTP, is thread safe, and deletes after the last reference goes away. This fixes the usual "delete after main()" problem with singletons that use the static local function variable pattern.
+	-Began saving files with AStyle autoformatter turned on. This will eventually touch all files as they are worked on.
+	-Add missing backslash to CUDA include and library paths for builds on Nvidia systems.
+	-Add missing gl.h include for Windows.
+	-Remove glew include paths from Fractorium, it's not used.
+	-Remove any Nvidia specific #defines and build targets, they are no longer needed with OpenCL 1.2.
+	-Fix bad paths on linux build.
+	-Convert all enums to class enum to be consistent with C++11 style.
+	-Convert some if/else statements in filter classes to case statements.
+	-Add overloaded stream operators to print various enums.
+	-Optimize crob, nBlur.
+	-Fix weird assignment statement in falloff3.
+	-Replace fabs() with std::abs().
+	-General cleanup.
+	
 0.9.9.2 11/22/2015
 --User changes
 	-Add a new dialog for editing QSS stylesheets. Allow for saving, reloading and setting styles as default.

@@ -3918,7 +3918,7 @@ template <typename T>
 class EMBER_API PostSmartcropVariation : public ParametricVariation<T>
 {
 public:
-	PostSmartcropVariation(T weight = 1.0) : ParametricVariation<T>("post_smartcrop", eVariationId::VAR_POST_SMARTCROP, weight, true)
+	PostSmartcropVariation(T weight = 1.0) : ParametricVariation<T>("post_smartcrop", eVariationId::VAR_POST_SMARTCROP, weight)
 	{
 		m_AssignType = eVariationAssignType::ASSIGNTYPE_SET;
 		m_VarType = eVariationType::VARTYPE_POST;//Very special usage, post only.

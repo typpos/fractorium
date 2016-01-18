@@ -1249,7 +1249,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Zeps", "SimplexNoise3D", "PerlinNoise3D" };
+		return vector<string> { "Zeps", "Sqr", "SimplexNoise3D", "PerlinNoise3D" };
 	}
 
 	virtual vector<string> OpenCLGlobalDataNames() const override

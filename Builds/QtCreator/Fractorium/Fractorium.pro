@@ -26,9 +26,11 @@ INSTALLS += themes
 
 icon.path = $$SHARE_INSTALL_DIR
 icon.files = $$ASSETS_DIR/Fractorium.png
+INSTALLS += icon
 
 launcher.path = $$LAUNCHER_INSTALL_DIR
 launcher.files = $$ASSETS_DIR/Fractorium.desktop
+INSTALLS += launcher
 
 macx:ICON = $$ASSETS_DIR/Fractorium.icns
 

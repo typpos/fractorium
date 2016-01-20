@@ -1,14 +1,8 @@
-fractorium (0.9.9.3a-0ubuntu1) wily; urgency=low
+fractorium (0.9.9.3b-0ubuntu1) wily; urgency=low
 
-  * include flam3-palettes.xml, add menu icon
+  * release 0.9.9.3b
 
- -- Gambhiro Bhikkhu <gambhiro.bhikkhu.85@gmail.com>  Wed, 20 Jan 2016 15:13:27 +0000
-
-fractorium (0.9.9.3-0ubuntu1) wily; urgency=low
-
-  * release 0.9.9.3
-
- -- Gambhiro Bhikkhu <gambhiro.bhikkhu.85@gmail.com>  Tue, 19 Jan 2016 09:32:21 +0000
+ -- Gambhiro Bhikkhu <gambhiro.bhikkhu.85@gmail.com>  Wed, 20 Jan 2016 17:08:30 +0000
 
 fractorium (0.9.9.2e-0ubuntu1) wily; urgency=low
 

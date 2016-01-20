@@ -19,7 +19,7 @@ Enable `universe` in the Ubuntu Software Center:
 - select Software Sources...
 - enable "Community maintained ... `universe`"
 
-Add the Ubuntu PPA and install:
+Add the [Fractorium Ubuntu PPA](https://launchpad.net/~fractorium/+archive/ubuntu/ppa) and install:
 
 ```
 sudo apt-add-repository ppa:fractorium/ppa

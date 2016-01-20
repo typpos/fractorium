@@ -13,6 +13,8 @@ Download: [Fractorium_Beta_0.9.9.3.msi](https://drive.google.com/file/d/0Bws5xPb
 
 ## Linux
 
+### Install from PPA
+
 Enable `universe` in the Ubuntu Software Center:
 
 - open the Edit menu
@@ -25,6 +27,15 @@ Add the [Fractorium Ubuntu PPA](https://launchpad.net/~fractorium/+archive/ubunt
 sudo apt-add-repository ppa:fractorium/ppa
 sudo apt-get update
 sudo apt-get install fractorium
+```
+
+### Install from .deb
+
+Download: [fractorium_0.9.9.3b-0ubuntu1_amd64.deb](https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_0.9.9.3b-0ubuntu1_amd64.deb)
+
+```
+cd ~/Downloads
+sudo dpkg -i fractorium_0.9.9.3b-0ubuntu1_amd64.deb
 ```
 
 ## Mac OS/X (10.9+)

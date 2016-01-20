@@ -25,7 +25,7 @@ themes.files = $$ASSETS_DIR/dark.qss
 INSTALLS += themes
 
 icon.path = $$SHARE_INSTALL_DIR
-icon.files = $$ASSETS_DIR/Fractorium.png
+icon.files = $$EMBER_ROOT/Source/Fractorium/Icons/Fractorium.png
 INSTALLS += icon
 
 launcher.path = $$LAUNCHER_INSTALL_DIR

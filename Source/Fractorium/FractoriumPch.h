@@ -1,3 +1,6 @@
+#ifndef FRACTORIUM_PCH
+#define FRACTORIUM_PCH
+
 #define GL_GLEXT_PROTOTYPES 1
 #define XFORM_COLOR_COUNT 14
 
@@ -81,3 +84,5 @@
 using namespace std;
 using namespace EmberNs;
 using namespace EmberCLns;
+
+#endif

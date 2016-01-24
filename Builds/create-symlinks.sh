@@ -23,14 +23,28 @@ if [[ ! -e $linkpath && -e $targetpath ]]; then
     ln -s "$targetpath" "$linkpath"
 fi
 
-targetpath=$(ls -d1 /usr/include/*/GL | head -n 1)
+targetpath=""
+
+if [ -d /usr/include/*/GL ]; then
+    targetpath=$(ls -d1 /usr/include/*/GL | head -n 1)
+elif [ -d /usr/include/GL ]; then
+    targetpath="/usr/include/GL"
+fi
+
 linkpath="$LOCAL_INCLUDE_DIR/GL"
 
 if [[ ! -e $linkpath && -e $targetpath ]]; then
     ln -s "$targetpath" "$linkpath"
 fi
 
-targetpath=$(ls -d1 /usr/include/*/CL | head -n 1)
+targetpath=""
+
+if [ -d /usr/include/*/CL ]; then
+    targetpath=$(ls -d1 /usr/include/*/CL | head -n 1)
+elif [ -d /usr/include/CL ]; then
+    targetpath="/usr/include/CL"
+fi
+
 linkpath="$LOCAL_INCLUDE_DIR/CL"
 
 if [[ ! -e $linkpath && -e $targetpath ]]; then

@@ -21,6 +21,12 @@ Install the OpenCL drivers and opencl support for your hardware. For Nvidia:
 sudo apt-get install nvidia-352 nvidia-352-dev nvidia-opencl-icd-352 nvidia-libopencl1-352 nvidia-prime nvidia-modprobe
 ```
 
+If you have both Qt 4 and 5 installed, select Qt 5 before compilation:
+
+```
+export QT_SELECT=qt5
+```
+
 Compile the binary:
 
 ```

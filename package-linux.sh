@@ -90,7 +90,8 @@ fi
 
 # tar 1.28 required for --exclude-vcs-ignores
 
-# FIXME: somehow it didn't ignore the 'Bin' folder.
+# NOTE: ./Data/flam3-palettes.xml has to be explicitly included. The *.xml rule
+# would exclude it, and tar doesn't handle "!" rules.
 
 tar --exclude='package-linux.sh' \
     --exclude='debian' \
@@ -98,7 +99,9 @@ tar --exclude='package-linux.sh' \
     --exclude-vcs \
     --exclude-vcs-ignores \
     --exclude-backups \
-    -czf "$PPA_DIR/$TAR_NAME" .
+    -czf "$PPA_DIR/$TAR_NAME" \
+    ./Data/flam3-palettes.xml \
+    .
 
 [ $? -ne 0 ] && echo "Tar command failed." && exit 2
 

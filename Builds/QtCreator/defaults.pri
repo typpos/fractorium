@@ -8,6 +8,7 @@ unix|macx {
   LIB_INSTALL_DIR = /usr/lib
   BIN_INSTALL_DIR = /usr/bin
   SHARE_INSTALL_DIR = /usr/share/fractorium
+  LAUNCHER_INSTALL_DIR = /usr/share/applications
 }
 
 # When loaded by QtCreator

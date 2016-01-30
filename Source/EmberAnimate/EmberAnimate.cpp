@@ -27,7 +27,8 @@ bool EmberAnimate(EmberOptions& opt)
 	//Regular variables.
 	Timing t;
 	bool unsorted = false;
-	uint channels, padding;
+	uint channels;
+	streamsize padding;
 	size_t i, firstUnsortedIndex = 0;
 	string inputPath = GetPath(opt.Input());
 	vector<Ember<T>> embers;
@@ -124,8 +125,12 @@ bool EmberAnimate(EmberOptions& opt)
 	if (!InitPaletteList<T>(opt.PalettePath()))
 		return false;
 
+	cout << "Parsing ember file " << opt.Input() << endl;
+
 	if (!ParseEmberFile(parser, opt.Input(), embers))
 		return false;
+
+	cout << "Finished parsing.\n";
 
 	if (embers.size() <= 1)
 	{
@@ -226,6 +231,15 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (opt.Supersample() > 0)
 			embers[i].m_Supersample = opt.Supersample();
+
+		if (opt.Quality() > 0)
+			embers[i].m_Quality = T(opt.Quality());
+
+		if (opt.DeMin() > -1)
+			embers[i].m_MinRadDE = T(opt.DeMin());
+
+		if (opt.DeMax() > -1)
+			embers[i].m_MaxRadDE = T(opt.DeMax());
 
 		if (opt.SubBatchSize() != DEFAULT_SBS)
 			embers[i].m_SubBatchSize = opt.SubBatchSize();

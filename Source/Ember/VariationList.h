@@ -6,6 +6,7 @@
 #include "Variations04.h"
 #include "Variations05.h"
 #include "Variations06.h"
+#include "Variations07.h"
 #include "VariationsDC.h"
 
 /// <summary>
@@ -343,6 +344,21 @@ public:
 		ADDPREPOSTREGVAR(Synth)
 		ADDPREPOSTREGVAR(Crackle)
 		m_Variations.push_back(new PostSmartcropVariation<T>());//Post only
+		ADDPREPOSTREGVAR(Xerf)
+		ADDPREPOSTREGVAR(Erf)
+		ADDPREPOSTREGVAR(W)
+		ADDPREPOSTREGVAR(X)
+		ADDPREPOSTREGVAR(Y)
+		ADDPREPOSTREGVAR(Z)
+		ADDPREPOSTREGVAR(Splits3D)
+		ADDPREPOSTREGVAR(Waves2B)
+		ADDPREPOSTREGVAR(JacCn)
+		ADDPREPOSTREGVAR(JacDn)
+		ADDPREPOSTREGVAR(JacSn)
+		ADDPREPOSTREGVAR(PressureWave)
+		ADDPREPOSTREGVAR(Gamma)
+		ADDPREPOSTREGVAR(PRose3D)
+		ADDPREPOSTREGVAR(LogDB)
 		//ADDPREPOSTREGVAR(LinearXZ)
 		//ADDPREPOSTREGVAR(LinearYZ)
 		//DC are special.

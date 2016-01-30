@@ -172,6 +172,15 @@ bool EmberRender(EmberOptions& opt)
 		if (opt.Supersample() > 0)
 			embers[i].m_Supersample = opt.Supersample();
 
+		if (opt.Quality() > 0)
+			embers[i].m_Quality = T(opt.Quality());
+
+		if (opt.DeMin() > -1)
+			embers[i].m_MinRadDE = T(opt.DeMin());
+
+		if (opt.DeMax() > -1)
+			embers[i].m_MaxRadDE = T(opt.DeMax());
+
 		if (opt.SubBatchSize() != DEFAULT_SBS)
 			embers[i].m_SubBatchSize = opt.SubBatchSize();
 

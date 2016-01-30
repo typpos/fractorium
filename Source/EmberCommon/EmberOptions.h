@@ -81,6 +81,9 @@ enum class eOptionIDs : et
 
 	OPT_SS,//Float value args.
 	OPT_QS,
+	OPT_QUALITY,
+	OPT_DE_MIN,
+	OPT_DE_MAX,
 	OPT_PIXEL_ASPECT,
 	OPT_STAGGER,
 	OPT_AVG_THRESH,
@@ -322,13 +325,13 @@ public:
 		INITBOOLOPTION(LockAccum,	   Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_LOCK_ACCUM,       _T("--lock_accum"),           false,                SO_NONE,    "\t--lock_accum             Lock threads when accumulating to the histogram using the CPU. This will drop performance to that of single threading [default: false].\n"));
 		INITBOOLOPTION(DumpKernel,	   Eob(eOptionUse::OPT_USE_RENDER,	eOptionIDs::OPT_DUMP_KERNEL,      _T("--dump_kernel"),          false,                SO_NONE,    "\t--dump_kernel            Print the iteration kernel string when using OpenCL (ignored for CPU) [default: false].\n"));
 		//Int.
-		INITINTOPTION(Symmetry,        Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SYMMETRY,         _T("--symmetry"),						  0, SO_REQ_SEP, "\t--symmetry=<val>         Set symmetry of result [default: 0].\n"));
-		INITINTOPTION(SheepGen,        Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SHEEP_GEN,        _T("--sheep_gen"),					 -1, SO_REQ_SEP, "\t--sheep_gen=<val>        Sheep generation of this flame [default: -1].\n"));
-		INITINTOPTION(SheepId,         Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SHEEP_ID,         _T("--sheep_id"),						 -1, SO_REQ_SEP, "\t--sheep_id=<val>         Sheep ID of this flame [default: -1].\n"));
+		INITINTOPTION(Symmetry,        Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SYMMETRY,         _T("--symmetry"),					0,			   SO_REQ_SEP,	  "\t--symmetry=<val>         Set symmetry of result [default: 0].\n"));
+		INITINTOPTION(SheepGen,        Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SHEEP_GEN,        _T("--sheep_gen"),	           -1,			   SO_REQ_SEP,	  "\t--sheep_gen=<val>        Sheep generation of this flame [default: -1].\n"));
+		INITINTOPTION(SheepId,         Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SHEEP_ID,         _T("--sheep_id"),				   -1,			   SO_REQ_SEP,	  "\t--sheep_id=<val>         Sheep ID of this flame [default: -1].\n"));
 #ifdef _WIN32
-		INITINTOPTION(Priority,		   Eoi(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PRIORITY,		  _T("--priority"), int(eThreadPriority::NORMAL), SO_REQ_SEP, "\t--priority=<val>         The priority of the CPU rendering threads from -2 - 2. This does not apply to OpenCL rendering.\n"));
+		INITINTOPTION(Priority,		   Eoi(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PRIORITY,		  _T("--priority"), int(eThreadPriority::NORMAL),  SO_REQ_SEP,	  "\t--priority=<val>         The priority of the CPU rendering threads from -2 - 2. This does not apply to OpenCL rendering.\n"));
 #else
-		INITINTOPTION(Priority,		   Eoi(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PRIORITY,		  _T("--priority"),	int(eThreadPriority::NORMAL), SO_REQ_SEP, "\t--priority=<val>         The priority of the CPU rendering threads, 1, 25, 50, 75, 99. This does not apply to OpenCL rendering.\n"));
+		INITINTOPTION(Priority,		   Eoi(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PRIORITY,		  _T("--priority"),	int(eThreadPriority::NORMAL),  SO_REQ_SEP,	  "\t--priority=<val>         The priority of the CPU rendering threads, 1, 25, 50, 75, 99. This does not apply to OpenCL rendering.\n"));
 #endif
 		//Uint.
 		INITUINTOPTION(Seed,           Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_SEED,             _T("--seed"),                 0,                    SO_REQ_SEP, "\t--seed=<val>             Integer seed to use for the random number generator [default: random].\n"));
@@ -355,6 +358,9 @@ public:
 		//Double.
 		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1,                    SO_REQ_SEP, "\t--ss=<val>               Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
 		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1,                    SO_REQ_SEP, "\t--qs=<val>               Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(Quality,	   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		  _T("--quality"),				0,					  SO_REQ_SEP, "\t--quality=<val>          Override the quality of the flame if not 0 [default: 0].\n"));
+		INITDOUBLEOPTION(DeMin,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,			  _T("--demin"),			   -1,					  SO_REQ_SEP, "\t--demin=<val>			  Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
+		INITDOUBLEOPTION(DeMax,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MAX,			  _T("--demax"),			   -1,					  SO_REQ_SEP, "\t--demax=<val>			  Override the maximum size of the density estimator filter radius if not -1 [default: -1].\n"));
 		INITDOUBLEOPTION(AspectRatio,  Eod(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PIXEL_ASPECT,     _T("--pixel_aspect"),         1,                    SO_REQ_SEP, "\t--pixel_aspect=<val>     Aspect ratio of pixels (width over height), eg. 0.90909 for NTSC [default: 1.0].\n"));
 		INITDOUBLEOPTION(Stagger,      Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STAGGER,          _T("--stagger"),              0,                    SO_REQ_SEP, "\t--stagger=<val>          Affects simultaneity of xform interpolation during flame interpolation.\n"
 										   "\t                         Represents how 'separate' the xforms are interpolated. Set to 1 for each\n"
@@ -374,7 +380,7 @@ public:
 		INITSTRINGOPTION(Out,          Eos(eOptionUse::OPT_USE_RENDER,	eOptionIDs::OPT_OUT,              _T("--out"),                  "",                   SO_REQ_SEP, "\t--out=<val>              Name of a single output file. Not recommended when rendering more than one image.\n"));
 		INITSTRINGOPTION(Prefix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PREFIX,           _T("--prefix"),               "",                   SO_REQ_SEP, "\t--prefix=<val>           Prefix to prepend to all output files.\n"));
 		INITSTRINGOPTION(Suffix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUFFIX,           _T("--suffix"),               "",                   SO_REQ_SEP, "\t--suffix=<val>           Suffix to append to all output files.\n"));
-		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP, "\t--format=<val>           Format of the output file. Valid values are: bmp, jpg, png, ppm [default: jpg].\n"));
+		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP, "\t--format=<val>           Format of the output file. Valid values are: bmp, jpg, png, ppm [default: png].\n"));
 		INITSTRINGOPTION(PalettePath,  Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_FILE,     _T("--flam3_palettes"),       "flam3-palettes.xml", SO_REQ_SEP, "\t--flam3_palettes=<val>   Path and name of the palette file [default: flam3-palettes.xml].\n"));
 		//INITSTRINGOPTION(PaletteImage, Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_IMAGE,    _T("--image"),                "",                   SO_REQ_SEP, "\t--image=<val>            Replace palette with png, jpg, or ppm image.\n"));
 		INITSTRINGOPTION(Id,           Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_ID,               _T("--id"),                   "",                   SO_REQ_SEP, "\t--id=<val>               ID to use in <edit> tags / image comments.\n"));
@@ -483,6 +489,9 @@ public:
 					PARSEUINTOPTION(eOptionIDs::OPT_MAX_XFORMS, MaxXforms);
 					PARSEDOUBLEOPTION(eOptionIDs::OPT_SS, SizeScale);//Float args.
 					PARSEDOUBLEOPTION(eOptionIDs::OPT_QS, QualityScale);
+					PARSEDOUBLEOPTION(eOptionIDs::OPT_QUALITY, Quality);
+					PARSEDOUBLEOPTION(eOptionIDs::OPT_DE_MIN, DeMin);
+					PARSEDOUBLEOPTION(eOptionIDs::OPT_DE_MAX, DeMax);
 					PARSEDOUBLEOPTION(eOptionIDs::OPT_PIXEL_ASPECT, AspectRatio);
 					PARSEDOUBLEOPTION(eOptionIDs::OPT_STAGGER, Stagger);
 					PARSEDOUBLEOPTION(eOptionIDs::OPT_AVG_THRESH, AvgThresh);
@@ -743,6 +752,9 @@ public:
 
 	Eod SizeScale;//Value double.
 	Eod QualityScale;
+	Eod Quality;
+	Eod DeMin;
+	Eod DeMax;
 	Eod AspectRatio;
 	Eod Stagger;
 	Eod AvgThresh;

@@ -537,6 +537,7 @@ QTableWidget#ColorTableHeader QHeaderView::section::horizontal,
 QTableWidget#GeometryTableHeader QHeaderView::section::horizontal,
 QTableWidget#FilterTableHeader QHeaderView::section::horizontal,
 QTableWidget#IterationTableHeader QHeaderView::section::horizontal,
+QTableWidget#AnimationTableHeader QHeaderView::section::horizontal,
 QTreeWidget#LibraryTree QHeaderView::section::horizontal
 {
 	border-right: none;
@@ -546,6 +547,7 @@ QTableWidget#ColorTable,
 QTableWidget#GeometryTable,
 QTableWidget#FilterTable,
 QTableWidget#IterationTable,
+QTableWidget#AnimationTable,
 QTableWidget#XformWeightNameTable
 {
 	border-left: 1px solid gray;
@@ -617,4 +619,3 @@ QTableView#FinalRenderParamsTable QPushButton
 	margin-bottom: 2px;
 	padding: 0px;
 }
-   

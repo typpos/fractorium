@@ -34,6 +34,14 @@ void SetDefaultTestValues(Ember<T>& ember)
 	ember.m_CurveDE = T(0.6);
 }
 
+template <typename T>
+void FormatName(Ember<T>& result, ostringstream& os, streamsize padding)
+{
+	os << std::setw(padding) << result.m_Time;
+	result.m_Name = os.str();
+	os.str("");
+}
+
 /// <summary>
 /// The core of the EmberGenome.exe program.
 /// Template argument expected to be float or double.
@@ -381,6 +389,9 @@ bool EmberGenome(EmberOptions& opt)
 
 		spread = 1 / T(opt.Frames());
 		frameCount = 0;
+		os.str("");
+		os << setfill('0');
+		auto padding = streamsize(std::log10(((opt.Frames() * opt.Loops()) + opt.Frames()) * embers.size())) + 1;
 
 		for (i = 0; i < embers.size(); i++)
 		{
@@ -390,6 +401,7 @@ bool EmberGenome(EmberOptions& opt)
 				{
 					blend = T(frame) / T(opt.Frames());
 					tools.Spin(embers[i], pTemplate, result, frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
+					FormatName(result, os, padding);
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 				}
 
@@ -399,6 +411,7 @@ bool EmberGenome(EmberOptions& opt)
 				frame = size_t(std::round(opt.Frames() * opt.Loops()));
 				blend = T(frame) / T(opt.Frames());
 				tools.Spin(embers[i], pTemplate, result, frameCount, blend);//Do not increment frameCount here.
+				FormatName(result, os, padding);
 			}
 
 			if (i < embers.size() - 1)
@@ -412,6 +425,7 @@ bool EmberGenome(EmberOptions& opt)
 					blend = frame / T(opt.Frames());
 					result.Clear();
 					tools.SpinInter(&embers[i], pTemplate, result, frameCount++, seqFlag, blend);
+					FormatName(result, os, padding);
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 				}
 			}
@@ -419,6 +433,7 @@ bool EmberGenome(EmberOptions& opt)
 
 		result = embers.back();
 		tools.Spin(embers.back(), pTemplate, result, frameCount, 0);
+		FormatName(result, os, padding);
 		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 
 		if (opt.Enclosed())

@@ -133,7 +133,7 @@ public:
 
 		helper.Out.x = m_Weight * (x + (m * 2 + 1) * m_Sc);
 		helper.Out.y = m_Weight * (y + (n * 2 + 1) * m_Sc);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -195,7 +195,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (x + (m * 2 + 1) * " << sc << ");\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y + (n * 2 + 1) * " << sc << ");\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -292,7 +292,7 @@ public:
 
 		helper.Out.x = m_Weight * (x + (m * 2 + 1) * m_Sc);
 		helper.Out.y = m_Weight * (y + (n * 2 + 1) * m_Sc);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -327,7 +327,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (x + (m * 2 + 1) * " << sc << ");\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y + (n * 2 + 1) * " << sc << ");\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -418,7 +418,7 @@ public:
 
 		helper.Out.x = m_Weight * ux;
 		helper.Out.y = m_Weight * uy;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -456,7 +456,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * ux;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * uy;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1086,7 +1086,7 @@ public:
 		T sucv = su * cv;
 		T x = std::pow(std::abs(cucv), m_XPow) + (cucv * m_XPow) + (T(0.25) * atOmegaX);//Must fabs first argument to pow, because negative values will return NaN.
 		T y = std::pow(std::abs(sucv), m_YPow) + (sucv * m_YPow) + (T(0.25) * atOmegaY);//Original did not do this and would frequently return bad values.
-		T z = std::pow(std::abs(sv), m_ZPow) + sv   * m_ZPow;
+		T z = std::pow(std::abs(sv), m_ZPow) + sv * m_ZPow;
 		helper.Out.x = m_Weight * x;
 		helper.Out.y = m_Weight * y;
 		helper.Out.z = m_Weight * z;
@@ -1356,7 +1356,7 @@ public:
 			helper.Out.y = m_Weight * helper.In.y;
 		}
 
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1417,7 +1417,7 @@ public:
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1498,7 +1498,7 @@ public:
 			helper.Out.y  = m_Weight * helper.In.y;
 		}
 
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1529,7 +1529,7 @@ public:
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1655,7 +1655,7 @@ public:
 		helper.Out.y = helper.In.y * r * m_Y;
 		helper.Out.x += (1 - (m_Twist * SQR(helper.In.x)) + helper.In.y) * m_Weight;//The += is intentional.
 		helper.Out.y += m_Tilt * helper.In.x * m_Weight;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1676,7 +1676,7 @@ public:
 		   << "\t\tvOut.y = vIn.y * r * " << y << ";\n"
 		   << "\t\tvOut.x += (1 - (" << twist << " * SQR(vIn.x)) + vIn.y) * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\tvOut.y += " << tilt << " * vIn.x * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1702,8 +1702,8 @@ private:
 /// <summary>
 /// waves2_3D.
 /// Original used a precalc for the input points, but it doesn't
-/// work with Ember's design, so it gets calculated on every iter
-/// which is slightly slower.
+/// work with Ember's design (and is also likely wrong), so it gets calculated on every iter
+/// which is slightly slower, but more correct.
 /// </summary>
 template <typename T>
 class EMBER_API Waves23DVariation : public ParametricVariation<T>
@@ -2130,8 +2130,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T b = m_Weight / (helper.m_PrecalcSumSquares * T(0.25) + 1);
-		T roundX = Rint(helper.In.x);
-		T roundY = Rint(helper.In.y);
+		T roundX = std::rint(helper.In.x);
+		T roundY = std::rint(helper.In.y);
 		T offsetX = helper.In.x - roundX;
 		T offsetY = helper.In.y - roundY;
 		helper.Out.x = helper.In.x * b;
@@ -2174,7 +2174,7 @@ public:
 
 		helper.Out.x += helper.In.x * m_Px;
 		helper.Out.y += helper.In.y * m_Py;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -2234,7 +2234,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x += vIn.x * " << px << ";\n"
 		   << "\t\tvOut.y += vIn.y * " << py << ";\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2278,7 +2278,7 @@ public:
 
 		helper.Out.x = m_Weight * r * std::cos(a);
 		helper.Out.y = m_Weight * r * std::sin(a);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -2294,7 +2294,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * r * cos(a);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * r * sin(a);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2941,7 +2941,7 @@ public:
 		InverseTrilinear(alpha, beta, x, y, rand);
 		helper.Out.x = m_Weight * x;
 		helper.Out.y = m_Weight * y;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -3062,7 +3062,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * y;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}

@@ -14,11 +14,12 @@ void Fractorium::InitToolbarUI()
 	spGroup->addAction(ui.ActionSP);
 	spGroup->addAction(ui.ActionDP);
 	SyncOptionsToToolbar();
-	connect(ui.ActionCpu,	SIGNAL(triggered(bool)), this, SLOT(OnActionCpu(bool)),	  Qt::QueuedConnection);
-	connect(ui.ActionCL,	SIGNAL(triggered(bool)), this, SLOT(OnActionCL(bool)),	  Qt::QueuedConnection);
-	connect(ui.ActionSP,	SIGNAL(triggered(bool)), this, SLOT(OnActionSP(bool)),	  Qt::QueuedConnection);
-	connect(ui.ActionDP,	SIGNAL(triggered(bool)), this, SLOT(OnActionDP(bool)),	  Qt::QueuedConnection);
-	connect(ui.ActionStyle, SIGNAL(triggered(bool)), this, SLOT(OnActionStyle(bool)), Qt::QueuedConnection);
+	connect(ui.ActionCpu,	            SIGNAL(triggered(bool)), this, SLOT(OnActionCpu(bool)),	              Qt::QueuedConnection);
+	connect(ui.ActionCL,	            SIGNAL(triggered(bool)), this, SLOT(OnActionCL(bool)),	              Qt::QueuedConnection);
+	connect(ui.ActionSP,	            SIGNAL(triggered(bool)), this, SLOT(OnActionSP(bool)),	              Qt::QueuedConnection);
+	connect(ui.ActionDP,	            SIGNAL(triggered(bool)), this, SLOT(OnActionDP(bool)),	              Qt::QueuedConnection);
+	connect(ui.ActionStyle,             SIGNAL(triggered(bool)), this, SLOT(OnActionStyle(bool)),             Qt::QueuedConnection);
+	connect(ui.ActionStartStopRenderer, SIGNAL(triggered(bool)), this, SLOT(OnActionStartStopRenderer(bool)), Qt::QueuedConnection);
 }
 
 /// <summary>
@@ -80,6 +81,28 @@ void Fractorium::OnActionDP(bool checked)
 void Fractorium::OnActionStyle(bool checked)
 {
 	m_QssDialog->show();
+}
+
+/// <summary>
+/// Called when the start/stop renderer button is clicked.
+/// </summary>
+/// <param name="checked">Check state, stop renderer if true, else start.</param>
+void Fractorium::OnActionStartStopRenderer(bool checked)
+{
+	EnableRenderControls(!checked);
+
+	if (checked)
+	{
+		m_Controller->StopRenderTimer(true);
+		ui.ActionStartStopRenderer->setToolTip("Start Renderer");
+		ui.ActionStartStopRenderer->setIcon(QIcon(":/Fractorium/Icons/control.png"));
+	}
+	else
+	{
+		m_Controller->StartRenderTimer();
+		ui.ActionStartStopRenderer->setToolTip("Stop Renderer");
+		ui.ActionStartStopRenderer->setIcon(QIcon(":/Fractorium/Icons/control-stop-square.png"));
+	}
 }
 
 /// <summary>

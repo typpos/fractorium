@@ -140,7 +140,7 @@ public:
 		T h = -m_H + (1 - x0_xor_y0) * m_H;
 		helper.Out.x = m_Weight * (m_Xform->m_Affine.A() * x + m_Xform->m_Affine.B() * y + m_Xform->m_Affine.E());
 		helper.Out.y = m_Weight * (m_Xform->m_Affine.C() * x + m_Xform->m_Affine.D() * y + m_Xform->m_Affine.F());
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 		outPoint.m_ColorX = fmod(std::abs(outPoint.m_ColorX * T(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * T(0.5)), T(1.0));
 	}
 
@@ -162,7 +162,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (xform->m_A * x + xform->m_B * y + xform->m_E);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_C * x + xform->m_D * y + xform->m_F);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t\toutPoint->m_ColorX = fmod(fabs(outPoint->m_ColorX * (real_t)(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * (real_t)(0.5)), (real_t)(1.0));\n"
 		   << "\t}\n";
 		return ss.str();
@@ -588,7 +588,7 @@ public:
 			}
 		}
 
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 		outPoint.m_ColorX = fmod(c, T(1.0));
 	}
 
@@ -668,7 +668,7 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t\toutPoint->m_ColorX = fmod(c, (real_t)(1.0));\n"
 		   << "\t}\n";
 		return ss.str();
@@ -1242,7 +1242,7 @@ public:
 		// Add blur effect to transform
 		helper.Out.x = m_Weight * vx;
 		helper.Out.y = m_Weight * vy;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 		col = m_Centre + m_Range * p;
 		outPoint.m_ColorX = col - Floor<T>(col);
 	}
@@ -1393,7 +1393,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vx; \n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vy; \n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t\tcol = " << centre << " + " << range << " * p; \n"
 		   << "\t\toutPoint->m_ColorX = col - floor(col); \n"
 		   << "\t}\n";

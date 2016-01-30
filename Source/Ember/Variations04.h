@@ -33,7 +33,7 @@ public:
 		nu = nu + mu * m_Out + m_In / mu;
 		helper.Out.x = m_Weight * std::cosh(mu) * std::cos(nu);
 		helper.Out.y = m_Weight * std::sinh(mu) * std::sin(nu);
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -62,7 +62,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosh(mu) * cos(nu);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -204,7 +204,7 @@ public:
 			}
 		}
 
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -321,7 +321,7 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -420,7 +420,7 @@ public:
 			helper.Out.y = (m_Weight * (8 * s - p));
 		}
 
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -484,7 +484,7 @@ public:
 		   << "\t\t	vOut.y = -(xform->m_VariationWeights[" << varIndex << "] * (8 * s - p));\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -533,7 +533,7 @@ public:
 
 		helper.Out.x = m_Weight * r * helper.m_PrecalcCosa;
 		helper.Out.y = m_Weight * r * helper.m_PrecalcSina;
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -554,7 +554,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * r * precalcCosa;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * r * precalcSina;\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -594,7 +594,7 @@ public:
 		T d = Zeps(helper.m_PrecalcSumSquares);
 		helper.Out.x = (m_Weight / d) * (tanh(d) * (2 * helper.In.x));
 		helper.Out.y = (m_Weight / d) * (cos(d)  * (2 * helper.In.y));
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -606,7 +606,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = (xform->m_VariationWeights[" << varIndex << "] / d) * (tanh(d) * ((real_t)(2.0) * vIn.x));\n"
 		   << "\t\tvOut.y = (xform->m_VariationWeights[" << varIndex << "] / d) * (cos(d)  * ((real_t)(2.0) * vIn.y));\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -633,7 +633,7 @@ public:
 		T d = Zeps(helper.m_PrecalcSumSquares);
 		helper.Out.x = (m_Weight / 2) * (tanh(d) * (2 * helper.In.x));
 		helper.Out.y = (m_Weight / 2) * (cos(d)  * (2 * helper.In.y));
-		helper.Out.z = m_Weight * helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -645,7 +645,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = (xform->m_VariationWeights[" << varIndex << "] / (real_t)(2.0)) * (tanh(d) * ((real_t)(2.0) * vIn.x));\n"
 		   << "\t\tvOut.y = (xform->m_VariationWeights[" << varIndex << "] / (real_t)(2.0)) * (cos(d)  * ((real_t)(2.0) * vIn.y));\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1134,7 +1134,7 @@ public:
 		r *= m_S2;
 		helper.Out.x = m_Weight * (helper.In.x + (rand.Frand01<T>() - T(0.5)) * r);
 		helper.Out.y = m_Weight * (helper.In.y + (rand.Frand01<T>() - T(0.5)) * r);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1158,7 +1158,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x + (MwcNext01(mwc) - (real_t)(0.5)) * r);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (vIn.y + (MwcNext01(mwc) - (real_t)(0.5)) * r);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1209,7 +1209,10 @@ public:
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn * m_A);
 		helper.Out.x = r * std::cos(a) + m_B;
 		helper.Out.y = r * std::sin(a) + m_B;
-		helper.Out.z = m_Weight * helper.In.z;//Original did not multiply by weight. Do it here to be consistent with others.
+		helper.Out.z = helper.In.z;
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			outPoint.m_Z = 0;
 	}
 
 	virtual string OpenCLString() const override
@@ -1232,8 +1235,13 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(a) + " << b << ";\n"
 		   << "\t\tvOut.y = r * sin(a) + " << b << ";\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
-		   << "\t}\n";
+		   << "\t\tvOut.z = vIn.z;\n";
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			ss << "\t\toutPoint->m_Z = 0;\n";
+
+		ss
+				<< "\t}\n";
 		return ss.str();
 	}
 
@@ -1292,7 +1300,7 @@ public:
 		T v = (sqX + sqY) * m_W;//Do not use precalcSumSquares here because its components are needed below.
 		helper.Out.x = m_Weight * std::sin(helper.In.x) * (sqX + m_W - v);
 		helper.Out.y = m_Weight * std::sin(helper.In.y) * (sqY + m_W - v);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1309,7 +1317,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * sin(vIn.x) * (sqX + " << w << " - v);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(vIn.y) * (sqY + " << w << " - v);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1378,7 +1386,7 @@ public:
 
 		helper.Out.x = m_Weight * (m_K * (helper.In.x - x0) + x0);
 		helper.Out.y = m_Weight * (m_K * (helper.In.y - y0) + y0);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1429,7 +1437,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (" << m_k << " * (vIn.x - x0) + x0);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (" << m_k << " * (vIn.y - y0) + y0);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1527,7 +1535,7 @@ public:
 
 		helper.Out.x = m_CosR * a + m_SinR * r;
 		helper.Out.y = -m_SinR * a + m_CosR * r;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1571,7 +1579,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = " << cosr << " * a + " << sinr << " * r;\n"
 		   << "\t\tvOut.y = -" << sinr << " * a + " << cosr << " * r;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2240,7 +2248,7 @@ public:
 			helper.Out.y = m_Weight * helper.In.y;
 		}
 
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -2307,7 +2315,7 @@ public:
 		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2963,7 +2971,7 @@ public:
 
 		helper.Out.x = m_Weight * (fp1x + fp2x);
 		helper.Out.y = m_Weight * (fp1y + fp2y);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -3030,7 +3038,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (fp1x + fp2x);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (fp1y + fp2y);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -3852,7 +3860,7 @@ public:
 	{
 		helper.Out.x = m_Weight / Zeps(helper.m_PrecalcSqrtSumSquares);
 		helper.Out.y = helper.m_PrecalcAtanyx;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -3862,7 +3870,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSqrtSumSquares);\n"
 		   << "\t\tvOut.y = precalcAtanyx;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -3896,7 +3904,7 @@ public:
 					   (m_Q04 * xy + m_Q05 * helper.In.y + m_Q06 * sqy);
 		helper.Out.y = (m_Q07 + m_Q08 * helper.In.x + m_Q09 * sqx) +
 					   (m_Q10 * xy + m_Weight * m_Q11 * helper.In.y + m_Q12 * sqy);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -3926,7 +3934,7 @@ public:
 		   << "\t\t			(" << q04 << " * xy + " << q05 << " * vIn.y + " << q06 << " * sqy);\n"
 		   << "\t\tvOut.y = (" << q07 << " + " << q08 << " * vIn.x + " << q09 << " * sqx) + \n"
 		   << "\t\t			(" << q10 << " * xy + xform->m_VariationWeights[" << varIndex << "] * " << q11 << " * vIn.y + " << q12 << " * sqy);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -4002,7 +4010,7 @@ public:
 
 		helper.Out.x = xx * m_Weight;
 		helper.Out.y = yy * m_Weight;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -4035,7 +4043,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xx * xform->m_VariationWeights[" << varIndex << "];\n"
 		   << "\t\tvOut.y = yy * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -4192,7 +4200,7 @@ public:
 			helper.Out.y += m_Size * (y + Floor<T>(helper.In.y));
 		}
 
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -4329,7 +4337,7 @@ public:
 		   << "\t\t	vOut.y += " << size << " * (y + floor(vIn.y));\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -4732,7 +4740,7 @@ public:
 			}
 		}
 
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -4789,7 +4797,7 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -4844,7 +4852,7 @@ public:
 		T mod2 = std::exp(lnmod * m_ReInv - arg * m_Im100);
 		helper.Out.x = m_Weight * mod2 * std::cos(temp);
 		helper.Out.y = m_Weight * mod2 * std::sin(temp);
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -4866,7 +4874,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * mod2 * cos(temp);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * mod2 * sin(temp);\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -5036,7 +5044,7 @@ public:
 		a = helper.In.y / Zeps(ymax);
 		b = SafeSqrt(1 - SQR(a));
 		helper.Out.y = m_Vy * atan2(a, b) * r;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -5068,7 +5076,7 @@ public:
 		   << "\t\tb = SafeSqrt(1 - SQR(a));\n"
 		   << "\n"
 		   << "\t\tvOut.y = " << vy << " * atan2(a, b) * r;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}

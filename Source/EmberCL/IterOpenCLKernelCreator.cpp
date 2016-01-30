@@ -122,8 +122,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 					if (Variation<T>* var = xform->GetVariation(varIndex))
 					{
 						xformFuncs << "\n\t//" << var->Name() << ".\n";
-						xformFuncs << var->PrecalcOpenCLString();
 						xformFuncs << xform->ReadOpenCLString(eVariationType::VARTYPE_PRE) << "\n";
+						xformFuncs << var->PrePostPrecalcOpenCLString();
 						xformFuncs << var->OpenCLString() << "\n";
 						xformFuncs << xform->WriteOpenCLString(eVariationType::VARTYPE_PRE, var->AssignType()) << "\n";
 					}
@@ -188,8 +188,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 				if (Variation<T>* var = xform->GetVariation(varIndex))
 				{
 					xformFuncs << "\n\t//" << var->Name() << ".\n";
-					xformFuncs << var->PrecalcOpenCLString();
 					xformFuncs << xform->ReadOpenCLString(eVariationType::VARTYPE_POST) << "\n";
+					xformFuncs << var->PrePostPrecalcOpenCLString();
 					xformFuncs << var->OpenCLString() << "\n";
 					xformFuncs << xform->WriteOpenCLString(eVariationType::VARTYPE_POST, var->AssignType()) << (varIndex == varCount - 1 ? "\n" : "\n\n");
 				}

@@ -1794,7 +1794,7 @@ private:
 		for (size_t k = 0; k < size; k++)
 			t += coefs[k] * embers[k].*m;
 
-		this->*m = size_t(Rint(t));
+		this->*m = size_t(std::rint(t));
 	}
 
 	/// <summary>

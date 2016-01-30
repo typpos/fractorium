@@ -23,6 +23,7 @@ template<> CriticalSection QTIsaac<ISAAC_SIZE, ISAAC_INT>::m_CS = CriticalSectio
 #include "Variations04.h"
 #include "Variations05.h"
 #include "Variations06.h"
+#include "Variations07.h"
 #include "VariationsDC.h"
 #include "VariationList.h"
 #include "Affine2D.h"
@@ -379,6 +380,21 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(BubbleT3D, T) \
 	EXPORTPREPOSTREGVAR(Synth, T) \
 	EXPORTPREPOSTREGVAR(Crackle, T) \
+	EXPORTPREPOSTREGVAR(Erf, T) \
+	EXPORTPREPOSTREGVAR(Xerf, T) \
+	EXPORTPREPOSTREGVAR(W, T) \
+	EXPORTPREPOSTREGVAR(X, T) \
+	EXPORTPREPOSTREGVAR(Y, T) \
+	EXPORTPREPOSTREGVAR(Z, T) \
+	EXPORTPREPOSTREGVAR(Splits3D, T) \
+	EXPORTPREPOSTREGVAR(Waves2B, T) \
+	EXPORTPREPOSTREGVAR(JacCn, T) \
+	EXPORTPREPOSTREGVAR(JacDn, T) \
+	EXPORTPREPOSTREGVAR(JacSn, T) \
+	EXPORTPREPOSTREGVAR(PressureWave, T) \
+	EXPORTPREPOSTREGVAR(Gamma, T) \
+	EXPORTPREPOSTREGVAR(PRose3D, T) \
+	EXPORTPREPOSTREGVAR(LogDB, T) \
 	template EMBER_API class PostSmartcropVariation<T>; /*Only implemented as post.*/ \
 	EXPORTPREPOSTREGVAR(DCBubble, T) \
 	EXPORTPREPOSTREGVAR(DCCarpet, T) \

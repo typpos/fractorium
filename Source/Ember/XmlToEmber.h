@@ -268,6 +268,7 @@ public:
 			badParams.push_back("post_scrop_cropmode");
 			badParams.push_back("post_scrop_static");
 			m_BadVariationNames.push_back(make_pair(make_pair(string("post_scrop"), string("post_smartcrop")), badParams));
+			//Note that splits3D can't be done here because it's param names are also used by splits.
 			badParams.clear();
 			m_BadVariationNames.push_back(make_pair(make_pair(string("pre_blur"),    string("pre_gaussian_blur")), badParams));//No other special params for these.
 			m_BadVariationNames.push_back(make_pair(make_pair(string("pre_spin_z"),  string("pre_rotate_z")),      badParams));

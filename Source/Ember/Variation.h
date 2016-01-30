@@ -136,6 +136,7 @@ enum class eVariationId : et
 	VAR_ENNEPERS	   ,
 	VAR_EPISPIRAL	   ,
 	VAR_EPUSH		   ,
+	VAR_ERF			   ,
 	VAR_EROTATE		   ,
 	VAR_ESCALE		   ,
 	VAR_ESCHER		   ,
@@ -166,6 +167,7 @@ enum class eVariationId : et
 	VAR_FOCI3D		   ,
 	VAR_FOURTH         ,
 	VAR_FUNNEL		   ,
+	VAR_GAMMA		   ,
 	VAR_GAUSSIAN_BLUR  ,
 	VAR_GDOFFS         ,
 	VAR_GLYNNIA		   ,
@@ -193,6 +195,9 @@ enum class eVariationId : et
 	VAR_HYPERTILE3D2   ,
 	VAR_IDISC		   ,
 	VAR_INTERFERENCE2  ,
+	VAR_JAC_CN		   ,
+	VAR_JAC_DN		   ,
+	VAR_JAC_SN		   ,
 	VAR_JULIA		   ,
 	VAR_JULIA3D		   ,
 	VAR_JULIA3DQ	   ,
@@ -216,6 +221,7 @@ enum class eVariationId : et
 	VAR_LINEAR3D	   ,
 	VAR_LISSAJOUS	   ,
 	VAR_LOG			   ,
+	VAR_LOG_DB		   ,
 	VAR_LOQ			   ,
 	VAR_LOONIE		   ,
 	VAR_LOONIE2		   ,
@@ -260,6 +266,8 @@ enum class eVariationId : et
 	VAR_POPCORN23D	   ,
 	VAR_POW_BLOCK	   ,
 	VAR_POWER		   ,
+	VAR_PRESSURE_WAVE  ,
+	VAR_PROSE3D		   ,
 	VAR_PSPHERE		   ,
 	VAR_Q_ODE          ,
 	VAR_RADIAL_BLUR	   ,
@@ -308,6 +316,7 @@ enum class eVariationId : et
 	VAR_SPLIT		   ,
 	VAR_SPLIT_BRDR     ,
 	VAR_SPLITS		   ,
+	VAR_SPLITS3D	   ,
 	VAR_SQUARE		   ,
 	VAR_SQUARE3D	   ,
 	VAR_SQUARIZE	   ,
@@ -336,18 +345,24 @@ enum class eVariationId : et
 	VAR_TWO_FACE	   ,
 	VAR_UNPOLAR		   ,
 	VAR_VORON          ,
+	VAR_W			   ,
 	VAR_WAFFLE         ,
 	VAR_WAVES		   ,
 	VAR_WAVES2		   ,
 	VAR_WAVES23D	   ,
+	VAR_WAVES2B		   ,
 	VAR_WAVESN		   ,
 	VAR_WDISC		   ,
 	VAR_WEDGE		   ,
 	VAR_WEDGE_JULIA	   ,
 	VAR_WEDGE_SPH	   ,
 	VAR_WHORL		   ,
+	VAR_X			   ,
+	VAR_XERF		   ,
 	VAR_XHEART		   ,
 	VAR_XTRB		   ,
+	VAR_Y			   ,
+	VAR_Z			   ,
 	VAR_ZBLUR		   ,
 	VAR_ZCONE		   ,
 	VAR_ZSCALE		   ,
@@ -445,6 +460,7 @@ enum class eVariationId : et
 	VAR_PRE_ENNEPERS,
 	VAR_PRE_EPISPIRAL,
 	VAR_PRE_EPUSH,
+	VAR_PRE_ERF,
 	VAR_PRE_EROTATE,
 	VAR_PRE_ESCALE,
 	VAR_PRE_ESCHER,
@@ -475,6 +491,7 @@ enum class eVariationId : et
 	VAR_PRE_FOCI3D,
 	VAR_PRE_FOURTH,
 	VAR_PRE_FUNNEL,
+	VAR_PRE_GAMMA,
 	VAR_PRE_GAUSSIAN_BLUR,
 	VAR_PRE_GDOFFS,
 	VAR_PRE_GLYNNIA,
@@ -502,6 +519,9 @@ enum class eVariationId : et
 	VAR_PRE_HYPERTILE3D2,
 	VAR_PRE_IDISC,
 	VAR_PRE_INTERFERENCE2,
+	VAR_PRE_JAC_CN,
+	VAR_PRE_JAC_DN,
+	VAR_PRE_JAC_SN,
 	VAR_PRE_JULIA,
 	VAR_PRE_JULIA3D,
 	VAR_PRE_JULIA3DQ,
@@ -525,6 +545,7 @@ enum class eVariationId : et
 	VAR_PRE_LINEAR3D,
 	VAR_PRE_LISSAJOUS,
 	VAR_PRE_LOG,
+	VAR_PRE_LOG_DB,
 	VAR_PRE_LOQ,
 	VAR_PRE_LOONIE,
 	VAR_PRE_LOONIE2,
@@ -569,6 +590,8 @@ enum class eVariationId : et
 	VAR_PRE_POPCORN23D,
 	VAR_PRE_POW_BLOCK,
 	VAR_PRE_POWER,
+	VAR_PRE_PRESSURE_WAVE,
+	VAR_PRE_PROSE3D,
 	VAR_PRE_PSPHERE,
 	VAR_PRE_Q_ODE,
 	VAR_PRE_RADIAL_BLUR,
@@ -617,6 +640,7 @@ enum class eVariationId : et
 	VAR_PRE_SPLIT,
 	VAR_PRE_SPLIT_BRDR,
 	VAR_PRE_SPLITS,
+	VAR_PRE_SPLITS3D,
 	VAR_PRE_SQUARE,
 	VAR_PRE_SQUARE3D,
 	VAR_PRE_SQUARIZE,
@@ -645,18 +669,24 @@ enum class eVariationId : et
 	VAR_PRE_TWO_FACE,
 	VAR_PRE_UNPOLAR,
 	VAR_PRE_VORON,
+	VAR_PRE_W,
 	VAR_PRE_WAFFLE,
 	VAR_PRE_WAVES,
 	VAR_PRE_WAVES2,
 	VAR_PRE_WAVES23D,
+	VAR_PRE_WAVES2B,
 	VAR_PRE_WAVESN,
 	VAR_PRE_WDISC,
 	VAR_PRE_WEDGE,
 	VAR_PRE_WEDGE_JULIA,
 	VAR_PRE_WEDGE_SPH,
 	VAR_PRE_WHORL,
+	VAR_PRE_X,
+	VAR_PRE_XERF,
 	VAR_PRE_XHEART,
 	VAR_PRE_XTRB,
+	VAR_PRE_Y,
+	VAR_PRE_Z,
 	VAR_PRE_ZBLUR,
 	VAR_PRE_ZCONE,
 	VAR_PRE_ZSCALE,
@@ -754,6 +784,7 @@ enum class eVariationId : et
 	VAR_POST_ENNEPERS,
 	VAR_POST_EPISPIRAL,
 	VAR_POST_EPUSH,
+	VAR_POST_ERF,
 	VAR_POST_EROTATE,
 	VAR_POST_ESCALE,
 	VAR_POST_ESCHER,
@@ -784,6 +815,7 @@ enum class eVariationId : et
 	VAR_POST_FOCI3D,
 	VAR_POST_FOURTH,
 	VAR_POST_FUNNEL,
+	VAR_POST_GAMMA,
 	VAR_POST_GAUSSIAN_BLUR,
 	VAR_POST_GDOFFS,
 	VAR_POST_GLYNNIA,
@@ -811,6 +843,9 @@ enum class eVariationId : et
 	VAR_POST_HYPERTILE3D2,
 	VAR_POST_IDISC,
 	VAR_POST_INTERFERENCE2,
+	VAR_POST_JAC_CN,
+	VAR_POST_JAC_DN,
+	VAR_POST_JAC_SN,
 	VAR_POST_JULIA,
 	VAR_POST_JULIA3D,
 	VAR_POST_JULIA3DQ,
@@ -834,6 +869,7 @@ enum class eVariationId : et
 	VAR_POST_LINEAR3D,
 	VAR_POST_LISSAJOUS,
 	VAR_POST_LOG,
+	VAR_POST_LOG_DB,
 	VAR_POST_LOQ,
 	VAR_POST_LOONIE,
 	VAR_POST_LOONIE2,
@@ -878,6 +914,8 @@ enum class eVariationId : et
 	VAR_POST_POPCORN23D,
 	VAR_POST_POW_BLOCK,
 	VAR_POST_POWER,
+	VAR_POST_PRESSURE_WAVE,
+	VAR_POST_PROSE3D,
 	VAR_POST_PSPHERE,
 	VAR_POST_Q_ODE,
 	VAR_POST_RADIAL_BLUR,
@@ -926,6 +964,7 @@ enum class eVariationId : et
 	VAR_POST_SPLIT,
 	VAR_POST_SPLIT_BRDR,
 	VAR_POST_SPLITS,
+	VAR_POST_SPLITS3D,
 	VAR_POST_SQUARE,
 	VAR_POST_SQUARE3D,
 	VAR_POST_SQUARIZE,
@@ -954,18 +993,24 @@ enum class eVariationId : et
 	VAR_POST_TWO_FACE,
 	VAR_POST_UNPOLAR,
 	VAR_POST_VORON,
+	VAR_POST_W,
 	VAR_POST_WAFFLE,
 	VAR_POST_WAVES,
 	VAR_POST_WAVES2,
 	VAR_POST_WAVES23D,
+	VAR_POST_WAVES2B,
 	VAR_POST_WAVESN,
 	VAR_POST_WDISC,
 	VAR_POST_WEDGE,
 	VAR_POST_WEDGE_JULIA,
 	VAR_POST_WEDGE_SPH,
 	VAR_POST_WHORL,
+	VAR_POST_X,
+	VAR_POST_XERF,
 	VAR_POST_XHEART,
 	VAR_POST_XTRB,
+	VAR_POST_Y,
+	VAR_POST_Z,
 	VAR_POST_ZBLUR,
 	VAR_POST_ZCONE,
 	VAR_POST_ZSCALE,
@@ -1077,7 +1122,7 @@ public:
 			m_NeedPrecalcSqrtSumSquares = true;
 		}
 
-		m_AssignType = eVariationAssignType::ASSIGNTYPE_SET;
+		m_PrePostAssignType = eVariationAssignType::ASSIGNTYPE_SET;
 		SetType();
 	}
 
@@ -1131,7 +1176,7 @@ public:
 	{
 		m_Name = variation.Name();
 		m_VarType = variation.VarType();
-		m_AssignType = variation.AssignType();
+		m_PrePostAssignType = variation.AssignType();
 		m_VariationId = variation.VariationId();
 		m_Weight = T(variation.m_Weight);
 		m_Xform = typeid(T) == typeid(U) ? const_cast<Xform<T>*>(reinterpret_cast<const Xform<T>*>(variation.ParentXform())) : nullptr;
@@ -1147,115 +1192,60 @@ public:
 	/// Per-variation precalc used for pre and post variations.
 	/// </summary>
 	/// <param name="iteratorHelper">The helper to read values from in the case of pre, and store precalc values to in both cases.</param>
-	/// <param name="point">The point to read values from in the case of post, ignored for pre.</param>
-	void PrecalcHelper(IteratorHelper<T>& iteratorHelper, Point<T>* point)
+	void PrePostPrecalcHelper(IteratorHelper<T>& iteratorHelper)
 	{
-		if (m_VarType == eVariationType::VARTYPE_PRE)
+		if (m_NeedPrecalcSumSquares)
 		{
-			if (m_NeedPrecalcSumSquares)
+			iteratorHelper.m_PrecalcSumSquares = SQR(iteratorHelper.In.x) + SQR(iteratorHelper.In.y);
+
+			if (m_NeedPrecalcSqrtSumSquares)
 			{
-				iteratorHelper.m_PrecalcSumSquares = SQR(iteratorHelper.m_TransX) + SQR(iteratorHelper.m_TransY);
+				iteratorHelper.m_PrecalcSqrtSumSquares = std::sqrt(iteratorHelper.m_PrecalcSumSquares);
 
-				if (m_NeedPrecalcSqrtSumSquares)
+				if (m_NeedPrecalcAngles)
 				{
-					iteratorHelper.m_PrecalcSqrtSumSquares = std::sqrt(iteratorHelper.m_PrecalcSumSquares);
-
-					if (m_NeedPrecalcAngles)
-					{
-						iteratorHelper.m_PrecalcSina = iteratorHelper.m_TransX / iteratorHelper.m_PrecalcSqrtSumSquares;
-						iteratorHelper.m_PrecalcCosa = iteratorHelper.m_TransY / iteratorHelper.m_PrecalcSqrtSumSquares;
-					}
+					iteratorHelper.m_PrecalcSina = iteratorHelper.In.x / iteratorHelper.m_PrecalcSqrtSumSquares;
+					iteratorHelper.m_PrecalcCosa = iteratorHelper.In.y / iteratorHelper.m_PrecalcSqrtSumSquares;
 				}
 			}
-
-			if (m_NeedPrecalcAtanXY)
-				iteratorHelper.m_PrecalcAtanxy = atan2(iteratorHelper.m_TransX, iteratorHelper.m_TransY);
-
-			if (m_NeedPrecalcAtanYX)
-				iteratorHelper.m_PrecalcAtanyx = atan2(iteratorHelper.m_TransY, iteratorHelper.m_TransX);
 		}
-		else if (m_VarType == eVariationType::VARTYPE_POST)
-		{
-			if (m_NeedPrecalcSumSquares)
-			{
-				iteratorHelper.m_PrecalcSumSquares = SQR(point->m_X) + SQR(point->m_Y);
 
-				if (m_NeedPrecalcSqrtSumSquares)
-				{
-					iteratorHelper.m_PrecalcSqrtSumSquares = std::sqrt(iteratorHelper.m_PrecalcSumSquares);
+		if (m_NeedPrecalcAtanXY)
+			iteratorHelper.m_PrecalcAtanxy = atan2(iteratorHelper.In.x, iteratorHelper.In.y);
 
-					if (m_NeedPrecalcAngles)
-					{
-						iteratorHelper.m_PrecalcSina = point->m_X / iteratorHelper.m_PrecalcSqrtSumSquares;
-						iteratorHelper.m_PrecalcCosa = point->m_Y / iteratorHelper.m_PrecalcSqrtSumSquares;
-					}
-				}
-			}
-
-			if (m_NeedPrecalcAtanXY)
-				iteratorHelper.m_PrecalcAtanxy = atan2(point->m_X, point->m_Y);
-
-			if (m_NeedPrecalcAtanYX)
-				iteratorHelper.m_PrecalcAtanyx = atan2(point->m_Y, point->m_X);
-		}
+		if (m_NeedPrecalcAtanYX)
+			iteratorHelper.m_PrecalcAtanyx = atan2(iteratorHelper.In.y, iteratorHelper.In.x);
 	}
 
 	/// <summary>
 	/// Per-variation precalc OpenCL string used for pre and post variations.
 	/// </summary>
 	/// <returns>The per-variation OpenCL precalc string</returns>
-	string PrecalcOpenCLString() const
+	string PrePostPrecalcOpenCLString() const
 	{
 		ostringstream ss;
 
-		if (m_VarType == eVariationType::VARTYPE_PRE)
+		if (m_NeedPrecalcSumSquares)
 		{
-			if (m_NeedPrecalcSumSquares)
+			ss << "\tprecalcSumSquares = SQR(vIn.x) + SQR(vIn.y);\n";
+
+			if (m_NeedPrecalcSqrtSumSquares)
 			{
-				ss << "\tprecalcSumSquares = SQR(transX) + SQR(transY);\n";
+				ss << "\tprecalcSqrtSumSquares = sqrt(precalcSumSquares);\n";
 
-				if (m_NeedPrecalcSqrtSumSquares)
+				if (m_NeedPrecalcAngles)
 				{
-					ss << "\tprecalcSqrtSumSquares = sqrt(precalcSumSquares);\n";
-
-					if (m_NeedPrecalcAngles)
-					{
-						ss << "\tprecalcSina = transX / precalcSqrtSumSquares;\n";
-						ss << "\tprecalcCosa = transY / precalcSqrtSumSquares;\n";
-					}
+					ss << "\tprecalcSina = vIn.x / precalcSqrtSumSquares;\n";
+					ss << "\tprecalcCosa = vIn.y / precalcSqrtSumSquares;\n";
 				}
 			}
-
-			if (m_NeedPrecalcAtanXY)
-				ss << "\tprecalcAtanxy = atan2(transX, transY);\n";
-
-			if (m_NeedPrecalcAtanYX)
-				ss << "\tprecalcAtanyx = atan2(transY, transX);\n";
 		}
-		else if (m_VarType == eVariationType::VARTYPE_POST)
-		{
-			if (m_NeedPrecalcSumSquares)
-			{
-				ss << "\tprecalcSumSquares = SQR(outPoint->m_X) + SQR(outPoint->m_Y);\n";
 
-				if (m_NeedPrecalcSqrtSumSquares)
-				{
-					ss << "\tprecalcSqrtSumSquares = sqrt(precalcSumSquares);\n";
+		if (m_NeedPrecalcAtanXY)
+			ss << "\tprecalcAtanxy = atan2(vIn.x, vIn.y);\n";
 
-					if (m_NeedPrecalcAngles)
-					{
-						ss << "\tprecalcSina = outPoint->m_X / precalcSqrtSumSquares;\n";
-						ss << "\tprecalcCosa = outPoint->m_Y / precalcSqrtSumSquares;\n";
-					}
-				}
-			}
-
-			if (m_NeedPrecalcAtanXY)
-				ss << "\tprecalcAtanxy = atan2(outPoint->m_X, outPoint->m_Y);\n";
-
-			if (m_NeedPrecalcAtanYX)
-				ss << "\tprecalcAtanyx = atan2(outPoint->m_Y, outPoint->m_X);\n";
-		}
+		if (m_NeedPrecalcAtanYX)
+			ss << "\tprecalcAtanyx = atan2(vIn.y, vIn.x);\n";
 
 		if (NeedAnyPrecalc())
 			ss << "\n";
@@ -1393,6 +1383,10 @@ public:
 			return "";
 	}
 
+	/// <summary>
+	/// Returns the base name of the variation without the "pre_" or "post_" prefix.
+	/// </summary>
+	/// <returns>The base name of the variation</returns>
 	string BaseName() const
 	{
 		string prefix = Prefix();
@@ -1415,7 +1409,7 @@ public:
 	eVariationId VariationId() const { return m_VariationId; }
 	string Name() const { return m_Name; }
 	eVariationType VarType() const { return m_VarType; }
-	eVariationAssignType AssignType() const { return m_AssignType; }
+	eVariationAssignType AssignType() const { return m_PrePostAssignType; }
 	const Xform<T>* ParentXform() const { return m_Xform; }
 	void ParentXform(Xform<T>* xform) { m_Xform = xform; }
 	intmax_t IndexInXform() const { return m_Xform ? m_Xform->GetVariationIndex(const_cast<Variation<T>*>(this)) : -1; }
@@ -1424,6 +1418,10 @@ public:
 	T m_Weight;//The weight of the variation.
 
 protected:
+	/// <summary>
+	/// Sets the type of the variation depending on whether the name starts with "pre_",
+	/// "post_" or neither.
+	/// </summary>
 	void SetType()
 	{
 		if (m_Name.find("pre_") == 0)
@@ -1434,11 +1432,30 @@ protected:
 			m_VarType = eVariationType::VARTYPE_REG;
 	}
 
+	/// <summary>
+	/// Return the default Z coordinate assignment value depending on the type of variation and its assign type.
+	/// </summary>
+	/// <param name="helper">The helper used to retrieve the input Z coordinate.</param>
+	/// <returns>The appropriate Z value.</returns>
+	T DefaultZ(const IteratorHelper<T>& helper) const
+	{
+		return m_VarType == eVariationType::VARTYPE_REG ? 0 : (m_PrePostAssignType == eVariationAssignType::ASSIGNTYPE_SET ? helper.In.z : 0);
+	}
+
+	/// <summary>
+	/// OpenCL equivalent of DefaultZ().
+	/// </summary>
+	/// <returns>The OpenCL string needed to make the proper Z coordinate assignment</returns>
+	string DefaultZCl() const
+	{
+		return m_VarType == eVariationType::VARTYPE_REG ? "0;\n" : (m_PrePostAssignType == eVariationAssignType::ASSIGNTYPE_SET ? "vIn.z;\n" : "0;\n");
+	}
+
 	Xform<T>* m_Xform;//The parent Xform that this variation is a child of.
 	eVariationId m_VariationId;//The unique ID of this variation.
 	string m_Name;//The unique name of this variation.
 	eVariationType m_VarType;//The type of variation: regular, pre or post.
-	eVariationAssignType m_AssignType;//Whether to assign the results for pre/post, or sum them.
+	eVariationAssignType m_PrePostAssignType;//Whether to assign the results for pre/post, or sum them.
 
 private:
 	bool m_NeedPrecalcSumSquares;//Whether this variation uses the precalc sum squares value in its calculations.
@@ -1750,13 +1767,15 @@ private:
 	using Variation<T>::m_VariationId; \
 	using Variation<T>::m_Name; \
 	using Variation<T>::m_VarType; \
-	using Variation<T>::m_AssignType; \
+	using Variation<T>::m_PrePostAssignType; \
 	using Variation<T>::SetType; \
 	using Variation<T>::IndexInXform; \
 	using Variation<T>::XformIndexInEmber; \
 	using Variation<T>::Prefix; \
 	using Variation<T>::Precalc; \
-	using Variation<T>::StateOpenCLString;
+	using Variation<T>::StateOpenCLString; \
+	using Variation<T>::DefaultZ; \
+	using Variation<T>::DefaultZCl;
 
 /// <summary>
 /// Parametric variations use parameters in addition to weight.
@@ -2147,7 +2166,7 @@ protected:
 		{ \
 			m_VariationId = eVariationId::VAR_PRE_##enumName; \
 			m_Name = "pre_"#stringName; \
-			m_AssignType = assignType; \
+			m_PrePostAssignType = assignType; \
 			SetType(); \
 		} \
 		\
@@ -2163,7 +2182,7 @@ protected:
 		{ \
 			m_VariationId = eVariationId::VAR_POST_##enumName; \
 			m_Name = "post_"#stringName; \
-			m_AssignType = assignType; \
+			m_PrePostAssignType = assignType; \
 			SetType(); \
 		} \
 		\
@@ -2268,7 +2287,7 @@ protected:
 		{ \
 			m_VariationId = eVariationId::VAR_PRE_##enumName; \
 			m_Name = "pre_"#stringName; \
-			m_AssignType = assignType; \
+			m_PrePostAssignType = assignType; \
 			SetType(); \
 			Init(); \
 		} \
@@ -2287,7 +2306,7 @@ protected:
 		{ \
 			m_VariationId = eVariationId::VAR_POST_##enumName; \
 			m_Name = "post_"#stringName; \
-			m_AssignType = assignType; \
+			m_PrePostAssignType = assignType; \
 			SetType(); \
 			Init(); \
 		} \

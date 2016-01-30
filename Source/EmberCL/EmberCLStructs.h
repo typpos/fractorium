@@ -73,7 +73,6 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define COLORMAP_LENGTH_MINUS_1 255u\n"
 	   "#define DE_THRESH 100u\n"
 	   "#define BadVal(x) (((x) != (x)) || ((x) > 1e10) || ((x) < -1e10))\n"
-	   "#define Rint(A) floor((A) + (((A) < 0) ? -0.5 : 0.5))\n"
 	   "#define SQR(x) ((x) * (x))\n"
 	   "#define CUBE(x) ((x) * (x) * (x))\n"
 	   "#define M_2PI (M_PI * 2)\n"

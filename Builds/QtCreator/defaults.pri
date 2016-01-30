@@ -14,16 +14,21 @@ unix|macx {
 #This cannot be this...
 #EMBER_ROOT = $$(PWD)/../../..
 #It must be this...
-EMBER_ROOT = ./../../../
+win32:{
+EMBER_ROOT = ./../../
+}
+unix|macx{
+EMBER_ROOT = ./../../..
+}
 # When compiling from project root
 autobuild {
-  EMBER_ROOT = $$(PWD)/../..
+#  EMBER_ROOT = $$(PWD)/../..
 }
 
 win32:{
-  EMBER_ROOT = $$(PWD)../../..
-  EXTERNAL_DIR = $$(PWD)../../../../External
-  EXTERNAL_LIB = $$(PWD)../../../External/libs
+  #EMBER_ROOT = $$(PWD)../../..
+  EXTERNAL_DIR = $$(EMBER_ROOT)/../
+  EXTERNAL_LIB = $$(EMBER_ROOT)/../
 # EXTERNAL_DIR which contains Third Party Codes is in the parent folder of "fractorium"
 # EXTERNAL_LIB is in EXTERNAL_DIR actually, but it is strange that EXTERNAL_DIR must go
 # one more step upper than EXTERNAL_LIB to get it work
@@ -32,8 +37,8 @@ win32:{
   SHARE_INSTALL_DIR = $$(PWD)../../../Install/share/fractorium
 # INSTALL_DIRs Don't work?
   message(EMBER_ROOT: $$absolute_path($$EMBER_ROOT))
-  message(EXTERNAL: $$absolute_path($$EXTERNAL_DIR))
-  message(EXTERNAL_LIB:$$absolute_path($$EXTERNAL_LIB) )
+  message(EXTERNAL_DIR: $$absolute_path($$EXTERNAL_DIR))
+  message(EXTERNAL_LIB: $$absolute_path($$EXTERNAL_LIB) )
 }
 
 message(EMBER_ROOT: $$EMBER_ROOT)

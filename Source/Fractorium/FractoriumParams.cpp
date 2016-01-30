@@ -20,8 +20,9 @@ void Fractorium::InitParamsUI()
 	SetFixedTableHeader(ui.GeometryTableHeader->horizontalHeader());
 	SetFixedTableHeader(ui.FilterTableHeader->horizontalHeader());
 	SetFixedTableHeader(ui.IterationTableHeader->horizontalHeader());
+	SetFixedTableHeader(ui.AnimationTableHeader->horizontalHeader());
 	//Color.
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.05,  100,    1,  SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	   true,  4.0,  4.0,  4.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.05, 1000,    1,  SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	   true,  4.0,  4.0,  4.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1, 9999,  0.5,  SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0,  4.0,  4.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,   10, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)),  true,  0.1,  0.1,  0.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,   30, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0,  1.0,  0.0);
@@ -65,9 +66,6 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight, 0.1, 10, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 1.0);
 	comboVals = SpatialFilterCreator<float>::FilterTypes();
 	SetupCombo(table, this, row, 1, m_SpatialFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnSpatialFilterTypeComboCurrentIndexChanged(const QString&)));
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1);
-	comboVals = TemporalFilterCreator<float>::FilterTypes();
-	SetupCombo(table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMinRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMinRadiusWidthChanged(double)), true,   0,   0,   0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMaxRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMaxRadiusWidthChanged(double)), true, 0.0, 9.0,   0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DECurveSpin,			  spinHeight, 0.15,  5, 0.1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterCurveWidthChanged(double)),     true, 0.4, 0.4, 0.4);
@@ -78,15 +76,21 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<SpinBox, int>(			table, this, row, 1, m_FuseSpin,			spinHeight, 1,      1000,   5, SIGNAL(valueChanged(int)),	 SLOT(OnFuseChanged(int)),			  true,	   15,	  15, 15);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_QualitySpin,			spinHeight, 1,      dmax,  50, SIGNAL(valueChanged(double)), SLOT(OnQualityChanged(double)),	  true,    10,	  10, 10);
 	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_SupersampleSpin,		spinHeight, 1,         4,   1, SIGNAL(valueChanged(int)),	 SLOT(OnSupersampleChanged(int)),	  true,     1,	   1,  1);
-	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_TemporalSamplesSpin, spinHeight, 1,      5000,   1, SIGNAL(valueChanged(int)),	 SLOT(OnTemporalSamplesChanged(int)), true,  1000);
-	comboVals.clear();
-	comboVals.push_back("Step");
-	comboVals.push_back("Linear");
-	SetupCombo(table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
+	//Animation.
+	row = 0;
+	table = ui.AnimationTable;
 	comboVals.clear();
 	comboVals.push_back("Linear");
 	comboVals.push_back("Smooth");
 	SetupCombo(table, this, row, 1, m_InterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnInterpTypeComboCurrentIndexChanged(int)));
+	comboVals.clear();
+	comboVals.push_back("Step");
+	comboVals.push_back("Linear");
+	SetupCombo(                         table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
+	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_TemporalSamplesSpin, spinHeight, 1, 5000, 1, SIGNAL(valueChanged(int)), SLOT(OnTemporalSamplesChanged(int)), true, 1000);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1);
+	comboVals = TemporalFilterCreator<float>::FilterTypes();
+	SetupCombo(                         table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
 }
 
 /// <summary>

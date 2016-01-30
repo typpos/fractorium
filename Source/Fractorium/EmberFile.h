@@ -150,7 +150,9 @@ public:
 		{
 			endSection = str.section('_', -1);
 			num = endSection.toULongLong(&ok);
-			ret.chop(str.size() - lastUnderscore);
+
+			if (ok)
+				ret.chop(str.size() - lastUnderscore);
 		}
 
 		ret += "_" + QString::number(num + 1);
@@ -180,7 +182,7 @@ public:
 			newPath = path + base + "." + extension;
 		}
 		while (QFile::exists(newPath));
-		
+
 		return newPath;
 	}
 

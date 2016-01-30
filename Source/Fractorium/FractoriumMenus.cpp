@@ -823,6 +823,8 @@ void Fractorium::OnFinalRenderClose(int result)
 {
 	m_RenderStatusLabel->setText("Renderer starting...");
 	StartRenderTimer();//Re-create the renderer and start rendering again.
+	ui.ActionStartStopRenderer->setChecked(false);//Re-enable any controls that might have been disabled.
+	OnActionStartStopRenderer(false);
 }
 
 /// <summary>

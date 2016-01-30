@@ -64,7 +64,6 @@ namespace EmberNs
 #define CX(c) (reinterpret_cast<char*>(c))
 #define CCX(c) (reinterpret_cast<const char*>(c))
 #define BadVal(x) (((x) != (x)) || ((x) > 1e10) || ((x) < -1e10))
-#define Rint(A) floor((A) + (((A) < 0) ? T(-0.5) : T(0.5)))
 #define Vlen(x) (sizeof(x) / sizeof(*x))
 #define SQR(x) ((x) * (x))
 #define CUBE(x) ((x) * (x) * (x))

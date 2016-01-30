@@ -122,6 +122,9 @@
     <ClInclude Include="..\..\..\Source\Ember\VarFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Ember\Variations07.h">
+      <Filter>Header Files\Variations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Ember\DllMain.cpp">

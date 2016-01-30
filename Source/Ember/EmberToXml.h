@@ -270,9 +270,9 @@ public:
 				for (j = 0; j < 8; j++)
 				{
 					size_t idx = 8 * i + j;
-					os << hex << setw(2) << setfill('0') << int(Rint(ember.m_Palette[idx][0] * 255));
-					os << hex << setw(2) << setfill('0') << int(Rint(ember.m_Palette[idx][1] * 255));
-					os << hex << setw(2) << setfill('0') << int(Rint(ember.m_Palette[idx][2] * 255));
+					os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][0] * 255));
+					os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][1] * 255));
+					os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][2] * 255));
 				}
 
 				os << endl;
@@ -294,14 +294,14 @@ public:
 				if (IsClose(a, 255.0))
 				{
 					if (intPalette)
-						os << "<color index=\"" << i << "\" rgb=\"" << int(Rint(r)) << " " << int(Rint(g)) << " " << int(Rint(b)) << "\"/>";
+						os << "<color index=\"" << i << "\" rgb=\"" << int(std::rint(r)) << " " << int(std::rint(g)) << " " << int(std::rint(b)) << "\"/>";
 					else
 						os << "<color index=\"" << i << "\" rgb=\"" << std::fixed << std::setprecision(2) << r << " " << g << " " << b << "\"/>";
 				}
 				else
 				{
 					if (intPalette)
-						os << "   <color index=\"" << i << "\" rgba=\"" << int(Rint(r)) << " " << int(Rint(g)) << " " << int(Rint(b)) << " " << int(Rint(a)) << "\"/>";
+						os << "   <color index=\"" << i << "\" rgba=\"" << int(std::rint(r)) << " " << int(std::rint(g)) << " " << int(std::rint(b)) << " " << int(std::rint(a)) << "\"/>";
 					else
 						os << "   <color index=\"" << i << "\" rgba=\"" << std::fixed << std::setprecision(2) << r << " " << g << " " << b << " " << a << "\"/>";
 				}

@@ -149,6 +149,7 @@ public slots:
 	void OnActionSP(bool checked);
 	void OnActionDP(bool checked);
 	void OnActionStyle(bool checked);
+	void OnActionStartStopRenderer(bool checked);
 
 	//Library.
 	void OnEmberTreeItemChanged(QTreeWidgetItem* item, int col);
@@ -369,6 +370,7 @@ private:
 	void ShutdownAndRecreateFromOptions();
 	bool CreateRendererFromOptions();
 	bool CreateControllerFromOptions();
+	void EnableRenderControls(bool enable);
 
 	//Dialogs.
 	QStringList SetupOpenXmlDialog();

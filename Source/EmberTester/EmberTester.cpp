@@ -567,7 +567,7 @@ bool TestVarEqual(const Variation<sT>* var1, const Variation<dT>* var2)
 			{
 				if (!IsClose<sT>(params1[i].ParamVal(), (sT)params2[i].ParamVal(), sT(1e-4)))
 				{
-					cout << "Param " << params1[i].Name() << " Val were not equal: " << params1[i].ParamVal() << " != " << params2[i].ParamVal() << endl;
+					cout << "Param " << params1[i].Name() << " Vals were not equal: " << params1[i].ParamVal() << " != " << params2[i].ParamVal() << endl;
 					success = false;
 				}
 			}

@@ -659,6 +659,22 @@ double SafeTan<double>(double x)
 }
 
 /// <summary>
+/// If r < EPS, return 1 / r.
+/// Else, return q / r.
+/// </summary>
+/// <param name="q">The numerator</param>
+/// <param name="r">The denominator</param>
+/// <returns>The quotient</returns>
+template <typename T>
+static inline T SafeDivInv(T q, T r)
+{
+	if (r < EPS)
+		return 1 / r;
+
+	return q / r;
+}
+
+/// <summary>
 /// Return the cube of the passed in value.
 /// This is useful when the value is a result of a computation
 /// rather than a fixed number. Otherwise, use the CUBE macro.

@@ -607,6 +607,20 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 }
 
 /// <summary>
+/// Enable or disable the controls related to changing the renderer.
+/// Used when pausing and restarting the renderer.
+/// </summary>
+/// <param name="enable">True to enable, else false.</param>
+void Fractorium::EnableRenderControls(bool enable)
+{
+	ui.ActionCpu->setEnabled(enable);
+	ui.ActionCL->setEnabled(enable);
+	ui.ActionSP->setEnabled(enable);
+	ui.ActionDP->setEnabled(enable);
+	ui.ActionOptions->setEnabled(enable);
+}
+
+/// <summary>
 /// Wrapper to stop the timer, shutdown the controller and recreate, then restart the controller and renderer from the options.
 /// </summary>
 void Fractorium::ShutdownAndRecreateFromOptions()

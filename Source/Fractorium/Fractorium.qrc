@@ -46,5 +46,7 @@
         <file>Icons/table_gear.png</file>
         <file>Icons/checkbox_checked.png</file>
         <file>Icons/checkbox_unchecked.png</file>
+        <file>Icons/control.png</file>
+        <file>Icons/control-stop-square.png</file>
     </qresource>
 </RCC>

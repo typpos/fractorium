@@ -46,7 +46,12 @@ public:
 
 		//Infinite number of small cells? No effect . . .
 		if (s == 0)
+		{
+			helper.Out.x = 0;
+			helper.Out.y = 0;
+			helper.Out.z = DefaultZ(helper);
 			return;
+		}
 
 		//Get co-ordinates, and convert to hex co-ordinates.
 		u.x = helper.In.x;
@@ -96,7 +101,7 @@ public:
 		DYo = u.y - P[0].y;
 		//Apply "interesting bit" to cell's DXo and DYo co-ordinates.
 		//trgL is the defined value of l, independent of any rotation.
-		trgL = std::pow(Zeps(L1), m_Power) * m_Scale;//Original added 1e-100, use Zeps to be more precise.
+		trgL = std::pow(std::abs(L1), m_Power) * m_Scale;//Original added 1e-100, use Zeps to be more precise.
 		//Rotate.
 		v.x = DXo * m_RotCos + DYo * m_RotSin;
 		v.y = -DXo * m_RotSin + DYo * m_RotCos;
@@ -110,7 +115,7 @@ public:
 		//L is maximum of L1 or L2 . . .
 		//When L = 0.8 or higher . . . match trgL/L2 exactly.
 		//When L = T(0.5) or less . . . match trgL/L1 exactly.
-		L = (L1 > L2) ? L1 : L2;
+		L = std::max(L1, L2);
 
 		if (L < T(0.5))
 		{
@@ -130,7 +135,7 @@ public:
 		//Finally add values in.
 		helper.Out.x = m_Weight * v.x;
 		helper.Out.y = m_Weight * v.y;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -155,7 +160,12 @@ public:
 		   << "\t\ts = " << cellsize << ";\n"
 		   << "\n"
 		   << "\t\tif (s == 0)\n"
-		   << "\t\t	return;\n"
+		   << "\t\t{\n"
+		   << "\t\t   vOut.x = 0;\n"
+		   << "\t\t   vOut.y = 0;\n"
+		   << "\t\t   vOut.z = " << DefaultZCl()
+		   << "\t\t   return;\n"
+		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tU.x = vIn.x;\n"
 		   << "\t\tU.y = vIn.y;\n"
@@ -201,7 +211,7 @@ public:
 		   << "\t\tDXo = U.x - P[0].x;\n"
 		   << "\t\tDYo = U.y - P[0].y;\n"
 		   << "\n"
-		   << "\t\ttrgL = pow(Zeps(L1), " << power << ") * " << scale << ";\n"
+		   << "\t\ttrgL = pow(fabs(L1), " << power << ") * " << scale << ";\n"
 		   << "\n"
 		   << "\t\tVx = DXo * " << rotcos << " + DYo * " << rotsin << ";\n"
 		   << "\t\tVy = -DXo * " << rotsin << " + DYo * " << rotcos << ";\n"
@@ -209,8 +219,7 @@ public:
 		   << "\t\tU.x = Vx + P[0].x;\n"
 		   << "\t\tU.y = Vy + P[0].y;\n"
 		   << "\t\tL2 = Voronoi(&P[0], 7, 0, &U);\n"
-		   << "\n"
-		   << "\t\tL = (L1 > L2) ? L1 : L2;\n"
+		   << "\t\tL = max(L1, L2);\n"
 		   << "\n"
 		   << "\t\tif (L < 0.5)\n"
 		   << "\t\t{\n"
@@ -232,7 +241,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * Vx;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * Vy;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -366,7 +375,7 @@ public:
 		params.Y = m_Sina * xTmp + m_Cosa * yTmp;
 		helper.Out.x = m_AdjustedWeight * params.X;
 		helper.Out.y = m_AdjustedWeight * params.Y;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -441,7 +450,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = " << adjustedWeight << " * params.X;\n"
 		   << "\t\tvOut.y = " << adjustedWeight << " * params.Y;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1544,7 +1553,7 @@ public:
 
 		helper.Out.x = xTmp;
 		helper.Out.y = yTmp;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1646,7 +1655,7 @@ public:
 				<< "\n"
 				<< "\t\tvOut.x = xTmp;\n"
 				<< "\t\tvOut.y = yTmp;\n"
-				<< "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+				<< "\t\tvOut.z = " << DefaultZCl()
 				<< "\t}\n";
 		return ss.str();
 	}
@@ -2737,7 +2746,7 @@ public:
 				break;
 		}
 
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -3092,7 +3101,7 @@ public:
 		   << "\t\t	break;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -3749,7 +3758,7 @@ public:
 		dO += p[4];
 		helper.Out.x = m_Weight * dO.x;
 		helper.Out.y = m_Weight * dO.y;
-		helper.Out.z = (m_VarType == eVariationType::VARTYPE_REG) ? 0 : helper.In.z;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
@@ -3847,7 +3856,7 @@ public:
 		   << "\t\tdO += p[4];\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * dO.x;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * dO.y;\n"
-		   << "\t\tvOut.z = " << ((m_VarType == eVariationType::VARTYPE_REG) ? "0" : "vIn.z") << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -3920,7 +3929,7 @@ class EMBER_API PostSmartcropVariation : public ParametricVariation<T>
 public:
 	PostSmartcropVariation(T weight = 1.0) : ParametricVariation<T>("post_smartcrop", eVariationId::VAR_POST_SMARTCROP, weight)
 	{
-		m_AssignType = eVariationAssignType::ASSIGNTYPE_SET;
+		m_PrePostAssignType = eVariationAssignType::ASSIGNTYPE_SET;
 		m_VarType = eVariationType::VARTYPE_POST;//Very special usage, post only.
 		Init();
 	}
@@ -4417,6 +4426,984 @@ private:
 	T m_C;
 };
 
+/// <summary>
+/// erf.
+/// </summary>
+template <typename T>
+class EMBER_API ErfVariation : public Variation<T>
+{
+public:
+	ErfVariation(T weight = 1.0) : Variation<T>("erf", eVariationId::VAR_ERF, weight) { }
+
+	VARCOPY(ErfVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.x = m_Weight * std::erf(helper.In.x);
+		helper.Out.y = m_Weight * std::erf(helper.In.y);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * erf(vIn.x);\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * erf(vIn.y);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
+/// <summary>
+/// xerf.
+/// </summary>
+template <typename T>
+class EMBER_API XerfVariation : public Variation<T>
+{
+public:
+	XerfVariation(T weight = 1.0) : Variation<T>("xerf", eVariationId::VAR_XERF, weight, true) { }
+
+	VARCOPY(XerfVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T r2 = Sqr(std::sqrt(helper.m_PrecalcSumSquares + SQR(helper.In.z)));
+		helper.Out.x = m_Weight * (std::abs(helper.In.x) >= 2 ? helper.In.x / r2 : std::erf(helper.In.x));
+		helper.Out.y = m_Weight * (std::abs(helper.In.y) >= 2 ? helper.In.y / r2 : std::erf(helper.In.y));
+		helper.Out.z = m_Weight * (std::abs(helper.In.z) >= 2 ? helper.In.z / r2 : std::erf(helper.In.z));
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\t\treal_t r2 = Sqr(sqrt(precalcSumSquares + SQR(vIn.z)));\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (fabs(vIn.x) >= 2 ? vIn.x / r2 : erf(vIn.x));\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (fabs(vIn.y) >= 2 ? vIn.y / r2 : erf(vIn.y));\n"
+		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (fabs(vIn.z) >= 2 ? vIn.z / r2 : erf(vIn.z));\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sqr" };
+	}
+};
+
+template <typename T>
+class EMBER_API WVariation : public ParametricVariation<T>
+{
+public:
+	WVariation(T weight = 1.0) : ParametricVariation<T>("w", eVariationId::VAR_W, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(WVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = helper.m_PrecalcAtanyx;
+		T r = helper.m_PrecalcSqrtSumSquares;
+		T a2 = a + m_Angle;
+
+		if (a2 < -T(M_PI))
+			a2 += M_2PI;
+
+		if (a2 > T(M_PI))
+			a2 -= M_2PI;
+
+		T s, c;
+		T total = 0;
+		T total2 = 0;
+		T temp1, temp2, temp3, temp4;
+
+		if (m_Hypergon != 0)
+		{
+			temp1 = fmod(std::abs(a), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
+			temp2 = Sqr(std::tan(temp1)) + 1;
+
+			if (temp2 >= Sqr(m_HypergonD))
+			{
+				total += m_Hypergon;
+			}
+			else
+			{
+				temp3 = m_HypergonD;
+				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+			}
+		}
+
+		if (m_Star != 0)
+		{
+			temp1 = std::tan(std::abs(fmod(std::abs(a), M_2PI / m_StarN) - T(M_PI) / m_StarN));
+			total += m_Star * std::sqrt(Sqr(m_TanStarSlope) * (1 + Sqr(temp1)) / Sqr(temp1 + m_TanStarSlope));
+		}
+
+		if (m_Lituus != 0)
+		{
+			total += m_Lituus * std::pow(std::abs(a / T(M_PI) + 1), m_InvLituusA);
+		}
+
+		if (m_Super != 0)
+		{
+			temp4 = a * m_SuperM4th;
+			sincos(temp4, &s, &c);
+			total += m_Super * std::pow(std::pow(std::abs(c), m_SuperN2) + std::pow(std::abs(s), m_SuperN3), m_OneOverSuperN1);
+		}
+
+		if (r <= total)
+		{
+			if (m_Hypergon != 0.0)
+			{
+				temp1 = fmod(std::abs(a2), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
+				temp2 = Sqr(std::tan(temp1)) + 1;
+
+				if (temp2 >= Sqr(m_HypergonD))
+				{
+					total2 += m_Hypergon;
+				}
+				else
+				{
+					temp3 = m_HypergonD;
+					total2 += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+				}
+			}
+
+			if (m_Star != 0)
+			{
+				temp1 = std::tan(std::abs(fmod(std::abs(a2), M_2PI / m_StarN) - T(M_PI) / m_StarN));
+				total2 += m_Star * std::sqrt(Sqr(m_TanStarSlope) * (1 + Sqr(temp1)) / Sqr(temp1 + m_TanStarSlope));
+			}
+
+			if (m_Lituus != 0)
+			{
+				total2 += m_Lituus * std::pow(std::abs(a2 / T(M_PI) + 1), m_InvLituusA);
+			}
+
+			if (m_Super != 0)
+			{
+				temp4 = a2 * m_SuperM4th;
+				sincos(temp4, &s, &c);
+				total2 += m_Super * std::pow(std::pow(std::abs(c), m_SuperN2) + std::pow(std::abs(s), m_SuperN3), m_OneOverSuperN1);
+			}
+
+			r = m_Weight * total2 * r / total;
+			sincos(a2, &s, &c);
+			helper.Out.x = r * c;
+			helper.Out.y = r * s;
+		}
+		else
+		{
+			helper.Out.x = m_Weight * helper.In.x;
+			helper.Out.y = m_Weight * helper.In.y;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string angle          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t r = precalcSqrtSumSquares;\n"
+		   << "\t\treal_t a2 = a + " << angle << ";\n"
+		   << "\n"
+		   << "\t\tif (a2 < -M_PI)\n"
+		   << "\t\t	a2 += M_2PI;\n"
+		   << "\n"
+		   << "\t\tif (a2 > M_PI)\n"
+		   << "\t\t	a2 -= M_2PI;\n"
+		   << "\n"
+		   << "\t\treal_t s, c;\n"
+		   << "\t\treal_t total = 0;\n"
+		   << "\t\treal_t total2 = 0;\n"
+		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\n"
+		   << "\t\tif (" << hypergon << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\n"
+		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		total += " << hypergon << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp3 = " << hypergonD << ";\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << star << "!= 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << lituus << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	total += " << lituus << " * pow(fabs(a / M_PI + 1), " << invLituusA << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << super << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp4 = a * " << superM4th << ";\n"
+		   << "\t\t	s = sincos(temp4, &c);\n"
+		   << "\t\t	total += " << super << " * pow(pow(fabs(c), " << superN2 << ") + pow(fabs(s), " << superN3 << "), " << oneOverSuperN1 << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (r <= total)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (" << hypergon << " != 0.0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp1 = fmod(fabs(a2), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t		temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\n"
+		   << "\t\t		if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t		{\n"
+		   << "\t\t			total2 += " << hypergon << ";\n"
+		   << "\t\t		}\n"
+		   << "\t\t		else\n"
+		   << "\t\t		{\n"
+		   << "\t\t			temp3 = " << hypergonD << ";\n"
+		   << "\t\t			total2 += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t		}\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	if (" << star << " != 0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp1 = tan(fabs(fmod(fabs(a2), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t		total2 += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	if (" << lituus << " != 0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		total2 += " << lituus << " * pow(fabs(a2 / M_PI + 1), " << invLituusA << ");\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	if (" << super << " != 0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp4 = a2 * " << superM4th << ";\n"
+		   << "\t\t		s = sincos(temp4, &c);\n"
+		   << "\t\t		total2 += " << super << " * pow(pow(fabs(c), " << superN2 << ") + pow(fabs(s), " << superN3 << "), " << oneOverSuperN1 << ");\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	r = xform->m_VariationWeights[" << varIndex << "] * total2 * r / total;\n"
+		   << "\t\t	s = sincos(a2, &c);\n"
+		   << "\t\t	vOut.x = r * c;\n"
+		   << "\t\t	vOut.y = r * s;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
+		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sqr" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_HypergonD = std::sqrt(1 + SQR(m_HypergonR));
+		m_InvLituusA = -m_LituusA;
+
+		if (IsClose(m_StarSlope, T(M_PI_2)))
+			m_TanStarSlope = std::tan(m_StarSlope - T(0.05));//Original did not do this, but it makes no sense to take tan(pi/2) because it's undefined.
+		else
+			m_TanStarSlope = std::tan(m_StarSlope);
+
+		m_SuperM4th = m_SuperM / 4;
+		m_OneOverSuperN1 = -1 / Zeps<T>(m_SuperN1);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Angle,     prefix + "w_angle", 0, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_Hypergon,  prefix + "w_hypergon"));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonN, prefix + "w_hypergon_n", 4, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonR, prefix + "w_hypergon_r", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Star,      prefix + "w_star"));
+		m_Params.push_back(ParamWithName<T>(&m_StarN,     prefix + "w_star_n", 5, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_StarSlope, prefix + "w_star_slope", 2, eParamType::REAL, EPS, T(M_PI_2)));
+		m_Params.push_back(ParamWithName<T>(&m_Lituus,    prefix + "w_lituus"));
+		m_Params.push_back(ParamWithName<T>(&m_LituusA,   prefix + "w_lituus_a", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Super,     prefix + "w_super"));
+		m_Params.push_back(ParamWithName<T>(&m_SuperM,    prefix + "w_super_m", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN1,   prefix + "w_super_n1", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN2,   prefix + "w_super_n2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN3,   prefix + "w_super_n3", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA,     prefix + "w_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope,   prefix + "w_tan_star_slope"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD,      prefix + "w_hypergon_d"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th,      prefix + "w_super_m_4th"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverSuperN1, prefix + "w_one_over_super_n1"));
+	}
+
+private:
+	T m_Angle;
+	T m_Hypergon;
+	T m_HypergonN;
+	T m_HypergonR;
+	T m_Star;
+	T m_StarN;
+	T m_StarSlope;
+	T m_Lituus;
+	T m_LituusA;
+	T m_Super;
+	T m_SuperM;
+	T m_SuperN1;
+	T m_SuperN2;
+	T m_SuperN3;
+	T m_InvLituusA;//Precalc
+	T m_TanStarSlope;
+	T m_HypergonD;
+	T m_SuperM4th;
+	T m_OneOverSuperN1;
+};
+
+template <typename T>
+class EMBER_API XVariation : public ParametricVariation<T>
+{
+public:
+	XVariation(T weight = 1.0) : ParametricVariation<T>("x", eVariationId::VAR_X, weight, true, false, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(XVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = helper.m_PrecalcAtanyx;
+		T a90 = atan2(helper.In.x, -helper.In.y);
+		T r;
+		T s, c;
+		T total = 0;
+		T temp1, temp2, temp3, temp4;
+
+		if (m_Hypergon != 0)
+		{
+			temp1 = fmod(std::abs(a), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
+			temp2 = Sqr(std::tan(temp1)) + 1;
+
+			if (temp2 >= Sqr(m_HypergonD))
+			{
+				total += m_Hypergon;
+			}
+			else
+			{
+				temp3 = m_HypergonD;
+				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+			}
+		}
+
+		if (m_Star != 0)
+		{
+			temp1 = std::tan(std::abs(fmod(std::abs(a), M_2PI / m_StarN) - T(M_PI) / m_StarN));
+			total += m_Star * std::sqrt(Sqr(m_TanStarSlope) * (1 + Sqr(temp1)) / Sqr(temp1 + m_TanStarSlope));
+		}
+
+		if (m_Lituus != 0)
+		{
+			total += m_Lituus * std::pow(std::fabs(a / T(M_PI) + 1), m_InvLituusA);
+		}
+
+		if (m_Super != 0)
+		{
+			temp4 = a * m_SuperM4th;
+			sincos(temp4, &s, &c);
+			total += m_Super * std::pow(std::pow(std::abs(c), m_SuperN2) + std::pow(std::abs(s), m_SuperN3), m_OneOverSuperN1);
+		}
+
+		r = m_Weight * std::sqrt(helper.m_PrecalcSumSquares + Sqr(total));
+		sincos(a, &s, &c);
+		helper.Out.x = r * c;
+		helper.Out.y = r * s;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t a90 = atan2(vIn.x, -vIn.y);\n"
+		   << "\t\treal_t r;\n"
+		   << "\t\treal_t s, c;\n"
+		   << "\t\treal_t total = 0;\n"
+		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\n"
+		   << "\t\tif (" << hypergon << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\n"
+		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		total += " << hypergon << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp3 = " << hypergonD << ";\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << star << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << lituus << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	total += " << lituus << " * pow(fabs(a / M_PI + 1), " << invLituusA << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << super << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp4 = a * " << superM4th << ";\n"
+		   << "\t\t	s = sincos(temp4, &c);\n"
+		   << "\t\t	total += " << super << " * pow(pow(fabs(c), " << superN2 << ") + pow(fabs(s), " << superN3 << "), " << oneOverSuperN1 << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tr = xform->m_VariationWeights[" << varIndex << "] * sqrt(precalcSumSquares + Sqr(total));\n"
+		   << "\t\ts = sincos(a, &c);\n"
+		   << "\t\tvOut.x = r * c;\n"
+		   << "\t\tvOut.y = r * s;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sqr" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_HypergonD = std::sqrt(1 + SQR(m_HypergonR));
+		m_InvLituusA = -m_LituusA;
+
+		if (IsClose(m_StarSlope, T(M_PI_2)))
+			m_TanStarSlope = std::tan(m_StarSlope - T(0.05));//Original did not do this, but it makes no sense to take tan(pi/2) because it's undefined.
+		else
+			m_TanStarSlope = std::tan(m_StarSlope);
+
+		m_SuperM4th = m_SuperM / 4;
+		m_OneOverSuperN1 = -1 / Zeps<T>(m_SuperN1);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Hypergon,             prefix + "x_hypergon"));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonN,            prefix + "x_hypergon_n", 4, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonR,            prefix + "x_hypergon_r", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Star,                 prefix + "x_star"));
+		m_Params.push_back(ParamWithName<T>(&m_StarN,                prefix + "x_star_n", 5, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_StarSlope,            prefix + "x_star_slope", 2, eParamType::REAL, EPS, T(M_PI_2)));
+		m_Params.push_back(ParamWithName<T>(&m_Lituus,               prefix + "x_lituus"));
+		m_Params.push_back(ParamWithName<T>(&m_LituusA,              prefix + "x_lituus_a", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Super,                prefix + "x_super"));
+		m_Params.push_back(ParamWithName<T>(&m_SuperM,               prefix + "x_super_m", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN1,              prefix + "x_super_n1", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN2,              prefix + "x_super_n2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN3,              prefix + "x_super_n3", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA,     prefix + "x_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope,   prefix + "x_tan_star_slope"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD,      prefix + "x_hypergon_d"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th,      prefix + "x_super_m_4th"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverSuperN1, prefix + "x_one_over_super_n1"));
+	}
+
+private:
+	T m_Hypergon;
+	T m_HypergonN;
+	T m_HypergonR;
+	T m_Star;
+	T m_StarN;
+	T m_StarSlope;
+	T m_Lituus;
+	T m_LituusA;
+	T m_Super;
+	T m_SuperM;
+	T m_SuperN1;
+	T m_SuperN2;
+	T m_SuperN3;
+	T m_InvLituusA;//Precalc
+	T m_TanStarSlope;
+	T m_HypergonD;
+	T m_SuperM4th;
+	T m_OneOverSuperN1;
+};
+
+template <typename T>
+class EMBER_API YVariation : public ParametricVariation<T>
+{
+public:
+	YVariation(T weight = 1.0) : ParametricVariation<T>("y", eVariationId::VAR_Y, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(YVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = helper.m_PrecalcAtanyx;
+		T a90 = atan2(helper.In.x, -helper.In.y);
+		T r;
+		T s, c;
+		T total = 0;
+		T temp1, temp2, temp3, temp4;
+
+		if (m_Hypergon != 0)
+		{
+			temp1 = fmod(std::abs(a), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
+			temp2 = Sqr(std::tan(temp1)) + 1;
+
+			if (temp2 >= Sqr(m_HypergonD))
+			{
+				total += m_Hypergon;
+			}
+			else
+			{
+				temp3 = m_HypergonD;
+				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+			}
+		}
+
+		if (m_Star != 0)
+		{
+			temp1 = std::tan(std::abs(fmod(std::abs(a), M_2PI / m_StarN) - T(M_PI) / m_StarN));
+			total += m_Star * std::sqrt(Sqr(m_TanStarSlope) * (1 + Sqr(temp1)) / Sqr(temp1 + m_TanStarSlope));
+		}
+
+		if (m_Lituus != 0)
+		{
+			total += m_Lituus * std::pow(std::abs(a / T(M_PI) + 1), m_InvLituusA);
+		}
+
+		if (m_Super != 0)
+		{
+			temp4 = a * m_SuperM4th;
+			sincos(temp4, &s, &c);
+			total += m_Super * std::pow(std::pow(std::abs(c), m_SuperN2) + std::pow(std::abs(s), m_SuperN3), m_OneOverSuperN1);
+		}
+
+		r = m_Weight * Sqr(total) / helper.m_PrecalcSqrtSumSquares;
+		sincos(a, &s, &c);
+		helper.Out.x = r * c;
+		helper.Out.y = r * s;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t a90 = atan2(vIn.x, -vIn.y);\n"
+		   << "\t\treal_t r;\n"
+		   << "\t\treal_t s, c;\n"
+		   << "\t\treal_t total = 0;\n"
+		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\n"
+		   << "\t\tif (" << hypergon << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\n"
+		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		total += " << hypergon << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp3 = " << hypergonD << ";\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << star << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << lituus << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	total += " << lituus << " * pow(fabs(a / M_PI + 1), " << invLituusA << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << super << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp4 = a * " << superM4th << ";\n"
+		   << "\t\t	s = sincos(temp4, &c);\n"
+		   << "\t\t	total += " << super << " * pow(pow(fabs(c), " << superN2 << ") + pow(fabs(s), " << superN3 << "), " << oneOverSuperN1 << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tr = xform->m_VariationWeights[" << varIndex << "] * Sqr(total) / precalcSqrtSumSquares;\n"
+		   << "\t\ts = sincos(a, &c);\n"
+		   << "\t\tvOut.x = r * c;\n"
+		   << "\t\tvOut.y = r * s;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sqr" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_HypergonD = std::sqrt(1 + SQR(m_HypergonR));
+		m_InvLituusA = -m_LituusA;
+
+		if (IsClose(m_StarSlope, T(M_PI_2)))
+			m_TanStarSlope = std::tan(m_StarSlope - T(0.05));//Original did not do this, but it makes no sense to take tan(pi/2) because it's undefined.
+		else
+			m_TanStarSlope = std::tan(m_StarSlope);
+
+		m_SuperM4th = m_SuperM / 4;
+		m_OneOverSuperN1 = -1 / Zeps<T>(m_SuperN1);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Hypergon,             prefix + "y_hypergon"));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonN,            prefix + "y_hypergon_n", 4, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonR,            prefix + "y_hypergon_r", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Star,                 prefix + "y_star"));
+		m_Params.push_back(ParamWithName<T>(&m_StarN,                prefix + "y_star_n", 5, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_StarSlope,            prefix + "y_star_slope", 2, eParamType::REAL, EPS, T(M_PI_2)));
+		m_Params.push_back(ParamWithName<T>(&m_Lituus,               prefix + "y_lituus"));
+		m_Params.push_back(ParamWithName<T>(&m_LituusA,              prefix + "y_lituus_a", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Super,                prefix + "y_super"));
+		m_Params.push_back(ParamWithName<T>(&m_SuperM,               prefix + "y_super_m", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN1,              prefix + "y_super_n1", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN2,              prefix + "y_super_n2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN3,              prefix + "y_super_n3", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA,     prefix + "y_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope,   prefix + "y_tan_star_slope"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD,      prefix + "y_hypergon_d"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th,      prefix + "y_super_m_4th"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverSuperN1, prefix + "y_one_over_super_n1"));
+	}
+
+private:
+	T m_Hypergon;
+	T m_HypergonN;
+	T m_HypergonR;
+	T m_Star;
+	T m_StarN;
+	T m_StarSlope;
+	T m_Lituus;
+	T m_LituusA;
+	T m_Super;
+	T m_SuperM;
+	T m_SuperN1;
+	T m_SuperN2;
+	T m_SuperN3;
+	T m_InvLituusA;//Precalc
+	T m_TanStarSlope;
+	T m_HypergonD;
+	T m_SuperM4th;
+	T m_OneOverSuperN1;
+};
+
+template <typename T>
+class EMBER_API ZVariation : public ParametricVariation<T>
+{
+public:
+	ZVariation(T weight = 1.0) : ParametricVariation<T>("z", eVariationId::VAR_Z, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ZVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = helper.m_PrecalcAtanyx;
+		T a90 = atan2(helper.In.x, -helper.In.y);
+		T r;
+		T s, c;
+		T total = 0;
+		T temp1, temp2, temp3, temp4;
+
+		if (m_Hypergon != 0)
+		{
+			temp1 = fmod(std::abs(a), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
+			temp2 = Sqr(std::tan(temp1)) + 1;
+
+			if (temp2 >= Sqr(m_HypergonD))
+			{
+				total += m_Hypergon;
+			}
+			else
+			{
+				temp3 = m_HypergonD;
+				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+			}
+		}
+
+		if (m_Star != 0)
+		{
+			temp1 = std::tan(std::abs(fmod(std::abs(a), M_2PI / m_StarN) - T(M_PI) / m_StarN));
+			total += m_Star * std::sqrt(Sqr(m_TanStarSlope) * (1 + Sqr(temp1)) / Sqr(temp1 + m_TanStarSlope));
+		}
+
+		if (m_Lituus != 0)
+		{
+			total += m_Lituus * std::pow(std::abs(a / T(M_PI) + 1), m_InvLituusA);
+		}
+
+		if (m_Super != 0)
+		{
+			temp4 = a * m_SuperM4th;
+			sincos(temp4, &s, &c);
+			total += m_Super * std::pow(std::pow(std::abs(c), m_SuperN2) + std::pow(std::abs(s), m_SuperN3), m_OneOverSuperN1);
+		}
+
+		r = m_Weight * (helper.m_PrecalcSqrtSumSquares + total);
+		sincos(a, &s, &c);
+		helper.Out.x = r * c;
+		helper.Out.y = r * s;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t a90 = atan2(vIn.x, -vIn.y);\n"
+		   << "\t\treal_t r;\n"
+		   << "\t\treal_t s, c;\n"
+		   << "\t\treal_t total = 0;\n"
+		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\n"
+		   << "\t\tif (" << hypergon << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\n"
+		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		total += " << hypergon << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		temp3 = " << hypergonD << ";\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << star << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << lituus << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	total += " << lituus << " * pow(fabs(a / M_PI + 1), " << invLituusA << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tif (" << super << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	temp4 = a * " << superM4th << ";\n"
+		   << "\t\t	s = sincos(temp4, &c);\n"
+		   << "\t\t	total += " << super << " * pow(pow(fabs(c), " << superN2 << ") + pow(fabs(s), " << superN3 << "), " << oneOverSuperN1 << ");\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tr = xform->m_VariationWeights[" << varIndex << "] * (precalcSqrtSumSquares + total);\n"
+		   << "\t\ts = sincos(a, &c);\n"
+		   << "\t\tvOut.x = r * c;\n"
+		   << "\t\tvOut.y = r * s;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sqr" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_HypergonD = std::sqrt(1 + SQR(m_HypergonR));
+		m_InvLituusA = -m_LituusA;
+
+		if (IsClose(m_StarSlope, T(M_PI_2)))
+			m_TanStarSlope = std::tan(m_StarSlope - T(0.05));//Original did not do this, but it makes no sense to take tan(pi/2) because it's undefined.
+		else
+			m_TanStarSlope = std::tan(m_StarSlope);
+
+		m_SuperM4th = m_SuperM / 4;
+		m_OneOverSuperN1 = -1 / Zeps<T>(m_SuperN1);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Hypergon,             prefix + "z_hypergon"));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonN,            prefix + "z_hypergon_n", 4, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_HypergonR,            prefix + "z_hypergon_r", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Star,                 prefix + "z_star"));
+		m_Params.push_back(ParamWithName<T>(&m_StarN,                prefix + "z_star_n", 5, eParamType::INTEGER, 3));
+		m_Params.push_back(ParamWithName<T>(&m_StarSlope,            prefix + "z_star_slope", 2, eParamType::REAL, EPS, T(M_PI_2)));
+		m_Params.push_back(ParamWithName<T>(&m_Lituus,               prefix + "z_lituus"));
+		m_Params.push_back(ParamWithName<T>(&m_LituusA,              prefix + "z_lituus_a", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Super,                prefix + "z_super"));
+		m_Params.push_back(ParamWithName<T>(&m_SuperM,               prefix + "z_super_m", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN1,              prefix + "z_super_n1", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN2,              prefix + "z_super_n2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SuperN3,              prefix + "z_super_n3", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA,     prefix + "z_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope,   prefix + "z_tan_star_slope"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD,      prefix + "z_hypergon_d"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th,      prefix + "z_super_m_4th"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverSuperN1, prefix + "z_one_over_super_n1"));
+	}
+
+private:
+	T m_Hypergon;
+	T m_HypergonN;
+	T m_HypergonR;
+	T m_Star;
+	T m_StarN;
+	T m_StarSlope;
+	T m_Lituus;
+	T m_LituusA;
+	T m_Super;
+	T m_SuperM;
+	T m_SuperN1;
+	T m_SuperN2;
+	T m_SuperN3;
+	T m_InvLituusA;//Precalc
+	T m_TanStarSlope;
+	T m_HypergonD;
+	T m_SuperM4th;
+	T m_OneOverSuperN1;
+};
+
 MAKEPREPOSTPARVAR(Hexes, hexes, HEXES)
 MAKEPREPOSTPARVAR(Nblur, nBlur, NBLUR)
 MAKEPREPOSTPARVAR(Octapol, octapol, OCTAPOL)
@@ -4424,4 +5411,10 @@ MAKEPREPOSTPARVAR(Crob, crob, CROB)
 MAKEPREPOSTPARVAR(BubbleT3D, bubbleT3D, BUBBLET3D)
 MAKEPREPOSTPARVAR(Synth, synth, SYNTH)
 MAKEPREPOSTPARVAR(Crackle, crackle, CRACKLE)
+MAKEPREPOSTVAR(Erf, erf, ERF)
+MAKEPREPOSTVAR(Xerf, xerf, XERF)
+MAKEPREPOSTPARVAR(W, w, W)
+MAKEPREPOSTPARVAR(X, x, X)
+MAKEPREPOSTPARVAR(Y, y, Y)
+MAKEPREPOSTPARVAR(Z, z, Z)
 }

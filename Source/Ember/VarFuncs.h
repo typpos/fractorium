@@ -255,7 +255,7 @@ public:
 		if (pmq.x == 0 && pmq.y == 0)
 			return 1;
 
-		return 2 * ((u.x - q.x) * pmq.x + (u.y - q.y) * pmq.y) / (SQR(pmq.x) + SQR(pmq.y));
+		return 2 * ((u.x - q.x) * pmq.x + (u.y - q.y) * pmq.y) / Zeps(SQR(pmq.x) + SQR(pmq.y));
 	}
 
 	/// <summary>
@@ -277,6 +277,99 @@ public:
 		}
 
 		return ratiomax;
+	}
+
+	/// <summary>
+	/// Used in the jac_* variations.
+	/// </summary>
+	static void JacobiElliptic(T uu, T emmc, T& sn, T& cn, T& dn)
+	{
+		//Code is taken from IROIRO++ library,
+		//released under CC share-alike license.
+		//Less accurate for faster rendering (still very precise).
+		T const CA = T(0.0003);//The accuracy is the square of CA.
+		T a, b, c, d, em[13], en[13];
+		int bo;
+		int l;
+		int ii;
+		int i;
+		T emc = emmc;
+		T u = uu;
+
+		if (emc != 0)
+		{
+			bo = 0;
+
+			if (emc < 0)
+				bo = 1;
+
+			if (bo != 0)
+			{
+				d = 1 - emc;
+				emc = -emc / d;
+				d = std::sqrt(d);
+				u = d * u;
+			}
+
+			a = 1;
+			dn = 1;
+
+			for (i = 0; i < 8; i++)
+			{
+				l = i;
+				em[i] = a;
+				emc = std::sqrt(emc);
+				en[i] = emc;
+				c = T(0.5) * (a + emc);
+
+				if (std::abs(a - emc) <= CA * a)
+					break;
+
+				emc = a * emc;
+				a = c;
+			}
+
+			u = c * u;
+			sincos(u, &sn, &cn);
+
+			if (sn != 0)
+			{
+				a = cn / sn;
+				c = a * c;
+
+				for (ii = l; ii >= 0; --ii)
+				{
+					b = em[ii];
+					a = c * a;
+					c = dn * c;
+					dn = (en[ii] + a) / (b + a);
+					a = c / b;
+				}
+
+				a = 1 / std::sqrt(c * c + 1);
+
+				if (sn < 0)
+					sn = -a;
+				else
+					sn = a;
+
+				cn = c * sn;
+			}
+
+			if (bo != 0)
+			{
+				a = dn;
+				dn = cn;
+				cn = a;
+				sn = sn / d;
+			}
+		}
+		else
+		{
+			cn = 1 / std::cosh(u);
+			dn = cn;
+			sn = std::tanh(u);
+		}
 	}
 
 	SINGLETON_DERIVED_IMPL(VarFuncs<T>);

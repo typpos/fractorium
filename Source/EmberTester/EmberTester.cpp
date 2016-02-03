@@ -1880,7 +1880,6 @@ void DistribTester()
 	size_t distribCount = 1;
 	size_t xformCount = 3;
 	vector<byte> m_XformDistributions;
-	//const Xform<T>* xforms = 3;
 	size_t j = 0;
 	vector<T> weights { T(0.333333), T(1.0), T(0.25) };
 	double tempDensity = 0, currentDensityLimit = 0, densityPerElement;

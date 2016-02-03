@@ -10,38 +10,30 @@
 void Fractorium::InitPaletteUI()
 {
 	int spinHeight = 20, row = 0;
-	QTableWidget* paletteTable = ui.PaletteListTable;
-	QTableWidget* palettePreviewTable = ui.PalettePreviewTable;
-
+	auto paletteTable = ui.PaletteListTable;
+	auto palettePreviewTable = ui.PalettePreviewTable;
 	connect(ui.PaletteFilenameCombo, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
-
 	connect(paletteTable, SIGNAL(cellClicked(int, int)),	   this, SLOT(OnPaletteCellClicked(int, int)),		 Qt::QueuedConnection);
 	connect(paletteTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnPaletteCellDoubleClicked(int, int)), Qt::QueuedConnection);
-	
-	//Palette adjustment table.	
-	QTableWidget* table = ui.PaletteAdjustTable;
+	//Palette adjustment table.
+	auto table = ui.PaletteAdjustTable;
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//Split width over all columns evenly.
-
 	SetupSpinner<SpinBox, int>(table, this, row, 1, m_PaletteHueSpin,		 spinHeight, -180, 180, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	SetupSpinner<SpinBox, int>(table, this, row, 1, m_PaletteSaturationSpin, spinHeight, -100, 100, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	SetupSpinner<SpinBox, int>(table, this, row, 1, m_PaletteBrightnessSpin, spinHeight, -255, 255, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	row = 0;
-
 	SetupSpinner<SpinBox, int>(table, this, row, 3, m_PaletteContrastSpin,  spinHeight, -100, 100, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	SetupSpinner<SpinBox, int>(table, this, row, 3, m_PaletteBlurSpin,	    spinHeight,	   0, 127, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	SetupSpinner<SpinBox, int>(table, this, row, 3, m_PaletteFrequencySpin, spinHeight,	   1,  10, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 1, 1, 1);
-
 	connect(ui.PaletteRandomSelect, SIGNAL(clicked(bool)), this, SLOT(OnPaletteRandomSelectButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.PaletteRandomAdjust, SIGNAL(clicked(bool)), this, SLOT(OnPaletteRandomAdjustButtonClicked(bool)), Qt::QueuedConnection);
-
 	//Preview table.
 	palettePreviewTable->setRowCount(1);
 	palettePreviewTable->setColumnWidth(1, 260);//256 plus small margin on each side.
-	QTableWidgetItem* previewNameCol = new QTableWidgetItem("");
+	auto previewNameCol = new QTableWidgetItem("");
 	palettePreviewTable->setItem(0, 0, previewNameCol);
-	QTableWidgetItem* previewPaletteItem = new QTableWidgetItem();
+	auto previewPaletteItem = new QTableWidgetItem();
 	palettePreviewTable->setItem(0, 1, previewPaletteItem);
-
 	connect(ui.PaletteFilterLineEdit,	 SIGNAL(textChanged(const QString&)), this, SLOT(OnPaletteFilterLineEditTextChanged(const QString&)));
 	connect(ui.PaletteFilterClearButton, SIGNAL(clicked(bool)),				  this, SLOT(OnPaletteFilterClearButtonClicked(bool)));
 	paletteTable->setColumnWidth(1, 260);//256 plus small margin on each side.
@@ -60,7 +52,6 @@ template <typename T>
 int FractoriumEmberController<T>::InitPaletteList(const string& s)
 {
 	QDirIterator it(s.c_str(), QStringList() << "*.xml", QDir::Files, QDirIterator::FollowSymlinks);
-
 	m_PaletteList.Clear();
 	m_Fractorium->ui.PaletteFilenameCombo->clear();
 	m_Fractorium->ui.PaletteFilenameCombo->setProperty("path", QString::fromStdString(s));
@@ -69,7 +60,7 @@ int FractoriumEmberController<T>::InitPaletteList(const string& s)
 	{
 		auto path = it.next().toStdString();
 		auto qfilename = it.fileName();
-	
+
 		if (m_PaletteList.Add(path))
 			m_Fractorium->ui.PaletteFilenameCombo->addItem(qfilename);
 	}
@@ -89,9 +80,8 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 {
 	if (!s.empty())//This occasionally seems to get called with an empty string for reasons unknown.
 	{
-		QTableWidget* paletteTable = m_Fractorium->ui.PaletteListTable;
-		QTableWidget* palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
-
+		auto paletteTable = m_Fractorium->ui.PaletteListTable;
+		auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
 		m_CurrentPaletteFilePath = m_Fractorium->ui.PaletteFilenameCombo->property("path").toString().toStdString() + "/" + s;
 
 		if (size_t paletteSize = m_PaletteList.Size(m_CurrentPaletteFilePath))
@@ -99,14 +89,11 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 			paletteTable->clear();
 			paletteTable->blockSignals(true);
 			paletteTable->setRowCount(paletteSize);
-
 			//Headers get removed when clearing, so must re-create here.
-			QTableWidgetItem* nameHeader = new QTableWidgetItem("Name");
-			QTableWidgetItem* paletteHeader = new QTableWidgetItem("Palette");
-
+			auto nameHeader = new QTableWidgetItem("Name");
+			auto paletteHeader = new QTableWidgetItem("Palette");
 			nameHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 			paletteHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-
 			paletteTable->setHorizontalHeaderItem(0, nameHeader);
 			paletteTable->setHorizontalHeaderItem(1, paletteHeader);
 
@@ -117,13 +104,10 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 				{
 					auto v = p->MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);
 					auto nameCol = new QTableWidgetItem(p->m_Name.c_str());
-
 					nameCol->setToolTip(p->m_Name.c_str());
 					paletteTable->setItem(i, 0, nameCol);
-
 					QImage image(v.data(), p->Size(), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
 					auto paletteItem = new PaletteTableWidgetItem<T>(p);
-
 					paletteItem->setData(Qt::DecorationRole, QPixmap::fromImage(image));
 					paletteTable->setItem(i, 1, paletteItem);
 				}
@@ -135,7 +119,6 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 		else
 		{
 			vector<string> errors = m_PaletteList.ErrorReport();
-
 			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 			m_Fractorium->ShowCritical("Palette Read Error", "Could not load palette file, all images will be black. See info tab for details.");
 		}
@@ -163,7 +146,6 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 	double brightness = double(m_Fractorium->m_PaletteBrightnessSpin->value() / 255.0);
 	double contrast = double(m_Fractorium->m_PaletteContrastSpin->value() > 0 ? (m_Fractorium->m_PaletteContrastSpin->value() * 2) : m_Fractorium->m_PaletteContrastSpin->value()) / 100.0;
 	double hue = double(m_Fractorium->m_PaletteHueSpin->value()) / 360.0;
-	
 	//Use the temp palette as the base and apply the adjustments gotten from the GUI and save the result in the ember palette.
 	m_TempPalette.MakeAdjustedPalette(m_Ember.m_Palette, 0, hue, sat, brightness, contrast, blur, freq);
 }
@@ -177,23 +159,21 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 template <typename T>
 void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<T>& palette)
 {
-	Xform<T>* xform = CurrentXform();
-	QTableWidget* palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
-	QTableWidgetItem* previewPaletteItem = palettePreviewTable->item(0, 1);
-	QString paletteName = QString::fromStdString(m_Ember.m_Palette.m_Name);
+	auto xform = CurrentXform();
+	auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
+	auto previewPaletteItem = palettePreviewTable->item(0, 1);
+	auto paletteName = QString::fromStdString(m_Ember.m_Palette.m_Name);
 
 	if (previewPaletteItem)//This can be null if the palette file was moved or corrupted.
 	{
 		//Use the adjusted palette to fill the preview palette control so the user can see the effects of applying the adjustements.
 		vector<byte> v = palette.MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);//Make the palette repeat for PALETTE_CELL_HEIGHT rows.
-
 		m_FinalPaletteImage = QImage(palette.Size(), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);//Create a QImage out of it.
 		memcpy(m_FinalPaletteImage.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
-		QPixmap pixmap = QPixmap::fromImage(m_FinalPaletteImage);//Create a QPixmap out of the QImage.
+		auto pixmap = QPixmap::fromImage(m_FinalPaletteImage);//Create a QPixmap out of the QImage.
 		previewPaletteItem->setData(Qt::DecorationRole, pixmap.scaled(QSize(pixmap.width(), palettePreviewTable->rowHeight(0) + 2), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));//Set the pixmap on the palette tab.
 		m_Fractorium->SetPaletteTableItem(&pixmap, m_Fractorium->ui.XformPaletteRefTable, m_Fractorium->m_PaletteRefItem, 0, 0);//Set the palette ref table on the xforms | color tab.
-
-		QTableWidgetItem* previewNameItem = palettePreviewTable->item(0, 0);
+		auto previewNameItem = palettePreviewTable->item(0, 0);
 		previewNameItem->setText(paletteName);//Finally, set the name of the palette to be both the text and the tooltip.
 		previewNameItem->setToolTip(paletteName);
 	}
@@ -308,7 +288,6 @@ void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 void Fractorium::OnPaletteRandomAdjustButtonClicked(bool checked)
 {
 	QTIsaac<ISAAC_SIZE, ISAAC_INT>* gRand = QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand.get();
-
 	m_PaletteHueSpin->setValue(-180 + gRand->Rand(361));
 	m_PaletteSaturationSpin->setValue(-50 + gRand->Rand(101));//Full range of these leads to bad palettes, so clamp range.
 	m_PaletteBrightnessSpin->setValue(-50 + gRand->Rand(101));
@@ -338,7 +317,6 @@ void Fractorium::OnPaletteRandomAdjustButtonClicked(bool checked)
 void Fractorium::OnPaletteFilterLineEditTextChanged(const QString& text)
 {
 	auto table = ui.PaletteListTable;
-
 	table->setUpdatesEnabled(false);
 
 	for (int i = 0; i < table->rowCount(); i++)
@@ -407,5 +385,5 @@ void Fractorium::SetPaletteFileComboIndex(const string& filename)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-	template class FractoriumEmberController<double>;
+template class FractoriumEmberController<double>;
 #endif

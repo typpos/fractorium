@@ -54,7 +54,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 
 	for (i = 0; i < totalXformCount; i++)
 	{
-		Xform<T>* xform = ember.GetTotalXform(i);
+		auto xform = ember.GetTotalXform(i);
 		bool needPrecalcSumSquares = false;
 		bool needPrecalcSqrtSumSquares = false;
 		bool needPrecalcAngles = false;
@@ -831,9 +831,9 @@ bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const E
 
 	for (i = 0; i < xformCount; i++)
 	{
-		Xform<T>* xform1 = ember1.GetTotalXform(i);
-		Xform<T>* xform2 = ember2.GetTotalXform(i);
-		size_t varCount = xform1->TotalVariationCount();
+		auto xform1 = ember1.GetTotalXform(i);
+		auto xform2 = ember2.GetTotalXform(i);
+		auto varCount = xform1->TotalVariationCount();
 
 		if (xform1->HasPost() != xform2->HasPost())
 			return true;

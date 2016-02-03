@@ -15,6 +15,7 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_Shared = true;
 	m_FailedRenders = 0;
 	m_UndoIndex = 0;
+	m_LockedScale = 1;
 	m_RenderType = eRendererType::CPU_RENDERER;
 	m_OutputTexID = 0;
 	m_SubBatchCount = 1;//Will be ovewritten by the options on first render.
@@ -224,6 +225,7 @@ void FractoriumEmberController<T>::Update(std::function<void (void)> func, bool 
 /// <summary>
 /// Wrapper to call a function on the specified xforms, then optionally add the requested action to the rendering queue.
 /// If no xforms are selected via the checkboxes, and the update type is UPDATE_SELECTED, then the function will be called only on the currently selected xform.
+/// If the update type is UPDATE_CURRENT_AND_SELECTED, and the current is not among those selected, then the function will be called on the currently selected xform as well.
 /// </summary>
 /// <param name="func">The function to call</param>
 /// <param name="updateType">Whether to apply this update operation on the current, all or selected xforms. Default: eXformUpdate::UPDATE_CURRENT.</param>
@@ -240,8 +242,37 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 	{
 		case eXformUpdate::UPDATE_CURRENT:
 		{
-			if (Xform<T>* xform = CurrentXform())
+			if (auto xform = CurrentXform())
 				func(xform);
+		}
+		break;
+
+		case eXformUpdate::UPDATE_CURRENT_AND_SELECTED:
+		{
+			bool currentDone = false;
+			auto current = CurrentXform();
+
+			while (auto xform = m_Ember.GetTotalXform(i))
+			{
+				if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
+				{
+					if (auto* w = qobject_cast<QCheckBox*>(child->widget()))
+					{
+						if (w->isChecked())
+						{
+							func(xform);
+
+							if (xform == current)
+								currentDone = true;
+						}
+					}
+				}
+
+				i++;
+			}
+
+			if (!currentDone)//Current was not among those selected, so apply to it.
+				func(current);
 		}
 		break;
 
@@ -250,9 +281,9 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 		{
 			bool anyUpdated = false;
 
-			while (Xform<T>* xform = (doFinal ? m_Ember.GetTotalXform(i) : m_Ember.GetXform(i)))
+			while (auto xform = (doFinal ? m_Ember.GetTotalXform(i) : m_Ember.GetXform(i)))
 			{
-				if (QLayoutItem* child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
+				if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
 				{
 					if (auto* w = qobject_cast<QCheckBox*>(child->widget()))
 					{
@@ -269,14 +300,14 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 			if (!anyUpdated)//None were selected, so just apply to the current.
 				if (doFinal || !isCurrentFinal)//If do final, call func regardless. If not, only call if current is not final.
-					if (Xform<T>* xform = CurrentXform())
+					if (auto xform = CurrentXform())
 						func(xform);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_ALL:
 		{
-			while (Xform<T>* xform = m_Ember.GetTotalXform(i++))
+			while (auto xform = m_Ember.GetTotalXform(i++))
 				func(xform);
 		}
 		break;
@@ -284,7 +315,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 		case eXformUpdate::UPDATE_ALL_EXCEPT_FINAL:
 		default:
 		{
-			while (Xform<T>* xform = m_Ember.GetXform(i++))
+			while (auto xform = m_Ember.GetXform(i++))
 				func(xform);
 		}
 		break;
@@ -325,6 +356,7 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	string filename = "last.flame";
 	writer.Save(filename.c_str(), m_Ember, 0, true, false, true);
 	m_GLController->ResetMouseState();
+	m_Fractorium->ui.LockAffineCheckBox->setChecked(false);
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 	FillParamTablesAndPalette();
 	FillSummary();

@@ -56,7 +56,7 @@ void FractoriumEmberController<T>::FillXaos()
 template <typename T>
 QString FractoriumEmberController<T>::MakeXaosNameString(uint i)
 {
-	Xform<T>* xform = m_Ember.GetXform(i);
+	auto xform = m_Ember.GetXform(i);
 	QString name;
 	//if (xform)
 	//{

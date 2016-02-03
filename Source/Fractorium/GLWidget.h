@@ -24,7 +24,7 @@ static const float GridStep = 1.0f / 8.0f;
 /// The current xform is set by either clicking on it, or by changing the index of the xforms combo box on the main window.
 /// A problem here is that all drawing is done using the legacy OpenGL fixed function pipeline which is deprecated
 /// and even completely disabled on Mac OS. This will need to be replaced with shader programs for every draw operation.
-/// Since this window has to know about various states of the renderer and the main window, it retains pointers to 
+/// Since this window has to know about various states of the renderer and the main window, it retains pointers to
 /// the main window and several of its members.
 /// This class uses a controller-based design similar to the main window.
 /// </summary>
@@ -36,12 +36,12 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_2_0//QOpenGLFu
 	friend FractoriumEmberController<float>;
 	friend GLEmberControllerBase;
 	friend GLEmberController<float>;
-	
+
 #ifdef DO_DOUBLE
 	friend GLEmberController<double>;
 	friend FractoriumEmberController<double>;
 #endif
-	
+
 public:
 	GLWidget(QWidget* p = nullptr);
 	~GLWidget();
@@ -63,13 +63,13 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
 	virtual void wheelEvent(QWheelEvent* e) override;
 	//virtual void resizeEvent(QResizeEvent* e) override;
-	
+
 private:
 	void SetDimensions(int w, int h);
 	bool Allocate(bool force = false);
 	bool Deallocate();
 	void SetViewport();
-	void DrawGrid();
+	void DrawGrid(double scale);
 	void DrawUnitSquare();
 	void DrawAffineHelper(int index, bool selected, bool pre, bool final, bool background);
 	GLEmberControllerBase* GLController();

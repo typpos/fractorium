@@ -8,8 +8,8 @@ void Fractorium::InitXformsAffineUI()
 {
 	int row = 0, affinePrec = 6, spinHeight = 20;
 	double affineStep = 0.01, affineMin = std::numeric_limits<double>::lowest(), affineMax = std::numeric_limits<double>::max();
-	QTableWidget* table = ui.PreAffineTable;
-
+	auto table = ui.PreAffineTable;
+	connect(ui.LockAffineCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnLockAffineScaleCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	table->verticalHeader()->setVisible(true);//The designer continually clobbers these values, so must manually set them here.
 	table->horizontalHeader()->setVisible(true);
 	table->verticalHeader()->setSectionsClickable(true);
@@ -18,7 +18,6 @@ void Fractorium::InitXformsAffineUI()
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	connect(table->verticalHeader(),   SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnPreAffineRowDoubleClicked(int)), Qt::QueuedConnection);
 	connect(table->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnPreAffineColDoubleClicked(int)), Qt::QueuedConnection);
-
 	//Pre affine spinners.
 	SetupAffineSpinner(table, this, 0, 0, m_PreX1Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnX1Changed(double)));
 	SetupAffineSpinner(table, this, 0, 1, m_PreX2Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnX2Changed(double)));
@@ -26,7 +25,6 @@ void Fractorium::InitXformsAffineUI()
 	SetupAffineSpinner(table, this, 1, 1, m_PreY2Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnY2Changed(double)));
 	SetupAffineSpinner(table, this, 2, 0, m_PreO1Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnO1Changed(double)));
 	SetupAffineSpinner(table, this, 2, 1, m_PreO2Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnO2Changed(double)));
-
 	table = ui.PostAffineTable;
 	table->verticalHeader()->setVisible(true);//The designer continually clobbers these values, so must manually set them here.
 	table->horizontalHeader()->setVisible(true);
@@ -34,10 +32,8 @@ void Fractorium::InitXformsAffineUI()
 	table->horizontalHeader()->setSectionsClickable(true);
 	table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
 	connect(table->verticalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnPostAffineRowDoubleClicked(int)), Qt::QueuedConnection);
 	connect(table->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnPostAffineColDoubleClicked(int)), Qt::QueuedConnection);
-
 	//Post affine spinners.
 	SetupAffineSpinner(table, this, 0, 0, m_PostX1Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnX1Changed(double)));
 	SetupAffineSpinner(table, this, 0, 1, m_PostX2Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnX2Changed(double)));
@@ -45,73 +41,60 @@ void Fractorium::InitXformsAffineUI()
 	SetupAffineSpinner(table, this, 1, 1, m_PostY2Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnY2Changed(double)));
 	SetupAffineSpinner(table, this, 2, 0, m_PostO1Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnO1Changed(double)));
 	SetupAffineSpinner(table, this, 2, 1, m_PostO2Spin, spinHeight, affineMin, affineMax, affineStep, affinePrec, SIGNAL(valueChanged(double)), SLOT(OnO2Changed(double)));
-
-	QDoubleValidator* preRotateVal = new QDoubleValidator(ui.PreRotateCombo); preRotateVal->setLocale(QLocale::system());
-	QDoubleValidator* preMoveVal   = new QDoubleValidator(ui.PreMoveCombo);   preMoveVal->setLocale(QLocale::system());
-	QDoubleValidator* preScaleVal  = new QDoubleValidator(ui.PreScaleCombo);  preScaleVal->setLocale(QLocale::system());
-
-	QDoubleValidator* postRotateVal = new QDoubleValidator(ui.PostRotateCombo); postRotateVal->setLocale(QLocale::system());
-	QDoubleValidator* postMoveVal   = new QDoubleValidator(ui.PostMoveCombo);   postMoveVal->setLocale(QLocale::system());
-	QDoubleValidator* postScaleVal  = new QDoubleValidator(ui.PostScaleCombo);  postScaleVal->setLocale(QLocale::system());
-
+	auto preRotateVal  = new QDoubleValidator(ui.PreRotateCombo); preRotateVal->setLocale(QLocale::system());
+	auto preMoveVal    = new QDoubleValidator(ui.PreMoveCombo);   preMoveVal->setLocale(QLocale::system());
+	auto preScaleVal   = new QDoubleValidator(ui.PreScaleCombo);  preScaleVal->setLocale(QLocale::system());
+	auto postRotateVal = new QDoubleValidator(ui.PostRotateCombo); postRotateVal->setLocale(QLocale::system());
+	auto postMoveVal   = new QDoubleValidator(ui.PostMoveCombo);   postMoveVal->setLocale(QLocale::system());
+	auto postScaleVal  = new QDoubleValidator(ui.PostScaleCombo);  postScaleVal->setLocale(QLocale::system());
 	ui.PreRotateCombo->setValidator(preRotateVal);
 	ui.PreMoveCombo->setValidator(preMoveVal);
 	ui.PreScaleCombo->setValidator(preScaleVal);
-
 	ui.PostRotateCombo->setValidator(postRotateVal);
 	ui.PostMoveCombo->setValidator(postMoveVal);
 	ui.PostScaleCombo->setValidator(postScaleVal);
-
 	QStringList moveList;
-
 	moveList.append(ToString(0.5));
 	moveList.append(ToString(0.25));
 	moveList.append(ToString(0.1));
 	moveList.append(ToString(0.05));
 	moveList.append(ToString(0.025));
 	moveList.append(ToString(0.01));
-
 	ui.PreMoveCombo->addItems(moveList);
 	ui.PostMoveCombo->addItems(moveList);
-
-	connect(ui.PreFlipHorizontalButton,    SIGNAL(clicked(bool)), this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PreFlipVerticalButton,      SIGNAL(clicked(bool)), this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PreRotate90CButton,         SIGNAL(clicked(bool)), this, SLOT(OnRotate90CButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreRotate90CcButton,        SIGNAL(clicked(bool)), this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreRotateCButton,           SIGNAL(clicked(bool)), this, SLOT(OnRotateCButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PreRotateCcButton,          SIGNAL(clicked(bool)), this, SLOT(OnRotateCcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreMoveUpButton,            SIGNAL(clicked(bool)), this, SLOT(OnMoveUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PreMoveDownButton,          SIGNAL(clicked(bool)), this, SLOT(OnMoveDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreMoveLeftButton,          SIGNAL(clicked(bool)), this, SLOT(OnMoveLeftButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreMoveRightButton,         SIGNAL(clicked(bool)), this, SLOT(OnMoveRightButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreScaleDownButton,         SIGNAL(clicked(bool)), this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreScaleUpButton,           SIGNAL(clicked(bool)), this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PreResetButton,             SIGNAL(clicked(bool)), this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
-
-	connect(ui.PostFlipHorizontalButton,   SIGNAL(clicked(bool)), this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PostFlipVerticalButton,     SIGNAL(clicked(bool)), this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PostRotate90CcButton,       SIGNAL(clicked(bool)), this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostRotateCcButton,         SIGNAL(clicked(bool)), this, SLOT(OnRotateCcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostRotateCButton,          SIGNAL(clicked(bool)), this, SLOT(OnRotateCButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PostRotate90CButton,        SIGNAL(clicked(bool)), this, SLOT(OnRotate90CButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostMoveUpButton,           SIGNAL(clicked(bool)), this, SLOT(OnMoveUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PostMoveDownButton,         SIGNAL(clicked(bool)), this, SLOT(OnMoveDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostMoveLeftButton,         SIGNAL(clicked(bool)), this, SLOT(OnMoveLeftButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostMoveRightButton,        SIGNAL(clicked(bool)), this, SLOT(OnMoveRightButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostScaleDownButton,        SIGNAL(clicked(bool)), this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostScaleUpButton,          SIGNAL(clicked(bool)), this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PostResetButton,            SIGNAL(clicked(bool)), this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
-
-	connect(ui.PreAffineGroupBox,		   SIGNAL(toggled(bool)), this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostAffineGroupBox,		   SIGNAL(toggled(bool)), this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
-	
-	connect(ui.ShowPreAffineAllRadio,      SIGNAL(toggled(bool)), this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPreAffineCurrentRadio,  SIGNAL(toggled(bool)), this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineAllRadio,     SIGNAL(toggled(bool)), this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineCurrentRadio, SIGNAL(toggled(bool)), this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-
-	connect(ui.PolarAffineCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)), Qt::QueuedConnection);
-
+	connect(ui.PreFlipHorizontalButton,    SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
+	connect(ui.PreFlipVerticalButton,      SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
+	connect(ui.PreRotate90CButton,         SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreRotate90CcButton,        SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreRotateCButton,           SIGNAL(clicked(bool)),     this, SLOT(OnRotateCButtonClicked(bool)),					  Qt::QueuedConnection);
+	connect(ui.PreRotateCcButton,          SIGNAL(clicked(bool)),     this, SLOT(OnRotateCcButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreMoveUpButton,            SIGNAL(clicked(bool)),     this, SLOT(OnMoveUpButtonClicked(bool)),					  Qt::QueuedConnection);
+	connect(ui.PreMoveDownButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveDownButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreMoveLeftButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveLeftButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreMoveRightButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveRightButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreScaleDownButton,         SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreScaleUpButton,           SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
+	connect(ui.PreResetButton,             SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostFlipHorizontalButton,   SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
+	connect(ui.PostFlipVerticalButton,     SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
+	connect(ui.PostRotate90CcButton,       SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostRotateCcButton,         SIGNAL(clicked(bool)),     this, SLOT(OnRotateCcButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostRotateCButton,          SIGNAL(clicked(bool)),     this, SLOT(OnRotateCButtonClicked(bool)),					  Qt::QueuedConnection);
+	connect(ui.PostRotate90CButton,        SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostMoveUpButton,           SIGNAL(clicked(bool)),     this, SLOT(OnMoveUpButtonClicked(bool)),					  Qt::QueuedConnection);
+	connect(ui.PostMoveDownButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveDownButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostMoveLeftButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveLeftButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostMoveRightButton,        SIGNAL(clicked(bool)),     this, SLOT(OnMoveRightButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostScaleDownButton,        SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostScaleUpButton,          SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
+	connect(ui.PostResetButton,            SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreAffineGroupBox,		   SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostAffineGroupBox,		   SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
+	connect(ui.ShowPreAffineAllRadio,      SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPreAffineCurrentRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPostAffineAllRadio,     SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPostAffineCurrentRadio, SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.PolarAffineCheckBox,        SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)),		  Qt::QueuedConnection);
 #ifndef WIN32
 	//For some reason linux makes these 24x24, even though the designer explicitly says 16x16.
 	//Also, in order to get 4 pixels of spacing between elements in the grid layout, 0 must be specified.
@@ -130,7 +113,6 @@ void Fractorium::InitXformsAffineUI()
 	ui.PreResetButton->setIconSize(QSize(16, 16));
 	ui.PreAffineGridLayout->setHorizontalSpacing(0);
 	ui.PreAffineGridLayout->setVerticalSpacing(0);
-	
 	ui.PostFlipHorizontalButton->setIconSize(QSize(16, 16));
 	ui.PostFlipVerticalButton->setIconSize(QSize(16, 16));
 	ui.PostRotate90CButton->setIconSize(QSize(16, 16));
@@ -146,13 +128,11 @@ void Fractorium::InitXformsAffineUI()
 	ui.PostResetButton->setIconSize(QSize(16, 16));
 	ui.PostAffineGridLayout->setHorizontalSpacing(0);
 	ui.PostAffineGridLayout->setVerticalSpacing(0);
-	
 	//Further, the size of the dock widget won't be properly adjusted until the xforms tab is shown.
 	//So show it here and it will be switched back in Fractorium's constructor.
 	//ui.ParamsTabWidget->setCurrentIndex(2);
 	//ui.DockWidget->update();
 #endif
-	
 	//Placing pointers to the spin boxes in arrays makes them easier to access in various places.
 	m_PreSpins[0] = m_PreX1Spin;//A
 	m_PreSpins[1] = m_PreY1Spin;//B
@@ -160,18 +140,56 @@ void Fractorium::InitXformsAffineUI()
 	m_PreSpins[3] = m_PreX2Spin;//D
 	m_PreSpins[4] = m_PreY2Spin;//E
 	m_PreSpins[5] = m_PreO2Spin;//F
-
 	m_PostSpins[0] = m_PostX1Spin;
 	m_PostSpins[1] = m_PostY1Spin;
 	m_PostSpins[2] = m_PostO1Spin;
 	m_PostSpins[3] = m_PostX2Spin;
 	m_PostSpins[4] = m_PostY2Spin;
 	m_PostSpins[5] = m_PostO2Spin;
-
 	ui.PreAffineGroupBox->setChecked(false);//Flip both once to force enabling/disabling the disabling of the group boxes and the corner buttons.
 	ui.PreAffineGroupBox->setChecked(true);//Pre affine enabled.
 	ui.PostAffineGroupBox->setChecked(true);
 	ui.PostAffineGroupBox->setChecked(false);//Post affine disabled.
+}
+
+/// <summary>
+/// Toggle whether to lock the visual scale of the affine spinners.
+/// Called when the user checks LockAffineCheckBox.
+/// </summary>
+/// <param name="state">True if checked, else false.</param>
+template <typename T>
+void FractoriumEmberController<T>::LockAffineScaleCheckBoxStateChanged(int state)
+{
+	m_LockedScale = m_Ember.m_PixelsPerUnit;
+	m_Fractorium->ui.GLDisplay->update();
+}
+
+void Fractorium::OnLockAffineScaleCheckBoxStateChanged(int state) { m_Controller->LockAffineScaleCheckBoxStateChanged(state); }
+
+/// <summary>
+/// Return the value needed to multiply the current scale by to get back to the locked scale.
+/// </summary>
+/// <returns>The scale value</returns>
+template <typename T>
+T FractoriumEmberController<T>::AffineScaleCurrentToLocked()
+{
+	if (m_Fractorium->ui.LockAffineCheckBox->isChecked())
+		return LockedScale() / m_Ember.m_PixelsPerUnit;
+	else
+		return 1;
+}
+
+/// <summary>
+/// Return the value needed to multiply the locked scale by to get to the current scale.
+/// </summary>
+/// <returns>The scale value</returns>
+template <typename T>
+T FractoriumEmberController<T>::AffineScaleLockedToCurrent()
+{
+	if (m_Fractorium->ui.LockAffineCheckBox->isChecked())
+		return m_Ember.m_PixelsPerUnit / LockedScale();
+	else
+		return 1;
 }
 
 /// <summary>
@@ -226,7 +244,7 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
 		DoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
 
 		if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
@@ -238,11 +256,13 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 					affine->A(cos(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
 					affine->D(sin(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
 					break;
+
 				case 1:
 				case 4:
 					affine->B(cos(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
 					affine->E(sin(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
 					break;
+
 				case 2:
 				case 5:
 				default:
@@ -258,18 +278,23 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 				case 0:
 					affine->A(d);
 					break;
+
 				case 1:
 					affine->B(d);
 					break;
+
 				case 2:
 					affine->C(d);
 					break;
+
 				case 3:
 					affine->D(d);
 					break;
+
 				case 4:
 					affine->E(d);
 					break;
+
 				case 5:
 					affine->F(d);
 					break;
@@ -301,7 +326,7 @@ void FractoriumEmberController<T>::FlipXforms(bool horizontal, bool vertical, bo
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
 
 		if (horizontal)
 		{
@@ -320,9 +345,7 @@ void FractoriumEmberController<T>::FlipXforms(bool horizontal, bool vertical, bo
 			if (!m_Fractorium->LocalPivot())
 				affine->F(-affine->F());
 		}
-
 	}, eXformUpdate::UPDATE_SELECTED);
-	
 	FillAffineWithXform(CurrentXform(), pre);
 }
 
@@ -340,11 +363,9 @@ void FractoriumEmberController<T>::RotateXformsByAngle(double angle, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
-
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
 		affine->Rotate(angle);
 	}, eXformUpdate::UPDATE_SELECTED);
-
 	FillAffineWithXform(CurrentXform(), pre);
 }
 
@@ -367,7 +388,7 @@ void Fractorium::OnRotateCButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreRotateCButton;
-	QComboBox* combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
+	auto combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
 	double d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
@@ -384,7 +405,7 @@ void Fractorium::OnRotateCcButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreRotateCcButton;
-	QComboBox* combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
+	auto combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
 	double d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
@@ -403,12 +424,10 @@ void FractoriumEmberController<T>::MoveXforms(double x, double y, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
-		
+		auto* affine = pre ? &xform->m_Affine : &xform->m_Post;
 		affine->C(affine->C() + x);
 		affine->F(affine->F() + y);
 	}, eXformUpdate::UPDATE_SELECTED);
-
 	FillAffineWithXform(CurrentXform(), pre);
 }
 
@@ -422,9 +441,9 @@ void Fractorium::OnMoveUpButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreMoveUpButton;
-	QComboBox* combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
 	double d = ToDouble(combo->currentText(), &ok);
-	
+
 	if (ok)
 		m_Controller->MoveXforms(0, d, pre);
 }
@@ -439,9 +458,9 @@ void Fractorium::OnMoveDownButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreMoveDownButton;
-	QComboBox* combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
 	double d = ToDouble(combo->currentText(), &ok);
-	
+
 	if (ok)
 		m_Controller->MoveXforms(0, -d, pre);
 }
@@ -456,9 +475,9 @@ void Fractorium::OnMoveLeftButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreMoveLeftButton;
-	QComboBox* combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
 	double d = ToDouble(combo->currentText(), &ok);
-	
+
 	if (ok)
 		m_Controller->MoveXforms(-d, 0, pre);
 }
@@ -473,9 +492,9 @@ void Fractorium::OnMoveRightButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreMoveRightButton;
-	QComboBox* combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
 	double d = ToDouble(combo->currentText(), &ok);
-	
+
 	if (ok)
 		m_Controller->MoveXforms(d, 0, pre);
 }
@@ -491,14 +510,12 @@ void FractoriumEmberController<T>::ScaleXforms(double scale, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
-		
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
 		affine->A(affine->A() * scale);
 		affine->B(affine->B() * scale);
 		affine->D(affine->D() * scale);
 		affine->E(affine->E() * scale);
 	}, eXformUpdate::UPDATE_SELECTED);
-
 	FillAffineWithXform(CurrentXform(), pre);
 }
 
@@ -512,9 +529,9 @@ void Fractorium::OnScaleDownButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreScaleDownButton;
-	QComboBox* combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
+	auto combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
 	double d = ToDouble(combo->currentText(), &ok);
-	
+
 	if (ok)
 		m_Controller->ScaleXforms(1.0 / (d / 100.0), pre);
 }
@@ -529,9 +546,9 @@ void Fractorium::OnScaleUpButtonClicked(bool checked)
 {
 	bool ok;
 	bool pre = sender() == ui.PreScaleUpButton;
-	QComboBox* combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
+	auto combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
 	double d = ToDouble(combo->currentText(), &ok);
-	
+
 	if (ok)
 		m_Controller->ScaleXforms(d / 100.0, pre);
 }
@@ -546,11 +563,9 @@ void FractoriumEmberController<T>::ResetXformsAffine(bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		Affine2D<T>* affine = pre ? &xform->m_Affine : &xform->m_Post;
-
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
 		affine->MakeID();
 	}, eXformUpdate::UPDATE_SELECTED);
-
 	FillAffineWithXform(CurrentXform(), pre);
 }
 
@@ -699,5 +714,5 @@ bool Fractorium::LocalPivot()  { return ui.LocalPivotRadio->isChecked();        
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-	template class FractoriumEmberController<double>;
+template class FractoriumEmberController<double>;
 #endif

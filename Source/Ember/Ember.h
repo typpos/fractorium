@@ -314,8 +314,6 @@ public:
 	/// <returns>True if success, else false.</returns>
 	bool DeleteXform(size_t i)
 	{
-		Xform<T>* xform;
-
 		if (i < XformCount())
 		{
 			m_Xforms.erase(m_Xforms.begin() + i);
@@ -323,7 +321,7 @@ public:
 			//Now shuffle xaos values from i on back by 1 for every xform.
 			for (size_t x1 = 0; x1 < XformCount(); x1++)
 			{
-				if ((xform = GetXform(x1)))
+				if (auto xform = GetXform(x1))
 				{
 					for (size_t x2 = i + 1; x2 <= XformCount(); x2++)//Iterate from the position after the deletion index up to the old count.
 						xform->SetXaos(x2 - 1, xform->Xaos(x2));
@@ -463,7 +461,7 @@ public:
 	{
 		for (size_t i = 0; i < TotalXformCount(); i++)
 		{
-			Xform<T>* xform = GetTotalXform(i);
+			auto xform = GetTotalXform(i);
 			xform->CacheColorVals();
 			xform->SetPrecalcFlags();
 		}
@@ -824,7 +822,7 @@ public:
 		//This includes all xforms plus final.
 		for (size_t i = 0; i < totalXformCount; i++)
 		{
-			Xform<T>* thisXform = GetTotalXform(i);
+			auto thisXform = GetTotalXform(i);
 
 			if (size == 2 && stagger > 0 && thisXform != &m_FinalXform)
 			{
@@ -845,7 +843,7 @@ public:
 
 				for (size_t k = 0; k < size; k++)//For each ember in the list.
 				{
-					Xform<T>* tempXform = embers[k].GetTotalXform(i);//Xform in this position in this ember, including final.
+					auto tempXform = embers[k].GetTotalXform(i);//Xform in this position in this ember, including final.
 
 					if (tempXform)
 					{
@@ -904,7 +902,7 @@ public:
 				{
 					if (i < embers[k].TotalXformCount())//Xform in this position in this ember.
 					{
-						Xform<T>* tempXform = embers[k].GetTotalXform(i);
+						auto tempXform = embers[k].GetTotalXform(i);
 						allID &= tempXform->m_Post.IsID();
 					}
 				}
@@ -931,7 +929,7 @@ public:
 
 				for (size_t k = 0; k < size; k++)
 				{
-					Xform<T>* tempXform = embers[k].GetTotalXform(i);//Xform in this position in this ember.
+					auto tempXform = embers[k].GetTotalXform(i);//Xform in this position in this ember.
 
 					if (tempXform)
 					{
@@ -971,7 +969,7 @@ public:
 				//Now fill them with interpolated values.
 				for (size_t j = 0; j < size; j++)//For each ember in the list.
 				{
-					Xform<T>* tempXform = embers[j].GetXform(i);
+					auto tempXform = embers[j].GetXform(i);
 
 					for (size_t k = 0; k < XformCount(); k++)//For each xaos entry in this xform's xaos array, sum it with the same entry in all of the embers multiplied by the coef for that ember.
 					{

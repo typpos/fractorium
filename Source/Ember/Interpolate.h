@@ -41,7 +41,6 @@ public:
 		bool aligned = true;
 		bool currentFinal, final = sourceEmbers[0].UseFinalXform();
 		size_t i, xf, currentCount, maxCount = sourceEmbers[0].XformCount();
-		Xform<T>* destXform;
 		Xform<T>* destOtherXform;
 
 		//Determine the max number of xforms present in sourceEmbers.
@@ -84,7 +83,7 @@ public:
 
 			for (xf = 0; xf < maxCount; xf++)//This will include both normal xforms and the final.
 			{
-				destXform = destEmbers[i].GetTotalXform(xf, final);
+				auto destXform = destEmbers[i].GetTotalXform(xf, final);
 
 				//Ensure every parametric variation contained in every xform at either position i - 1 or i + 1 is also contained in the dest xform.
 				if (i > 0)
@@ -607,7 +606,7 @@ public:
 				//Keep translation linear.
 				zlm[0] = zlm[1] = 0;
 
-				if (Xform<T>* xform = embers[k].GetTotalXform(xfi))
+				if (auto xform = embers[k].GetTotalXform(xfi))
 				{
 					for (col = 0; col < 2; col++)
 					{
@@ -650,7 +649,7 @@ public:
 			{
 				for (k = 1; k < size; k++)
 				{
-					if (Xform<T>* xform = embers[k].GetTotalXform(xfi))
+					if (auto xform = embers[k].GetTotalXform(xfi))
 					{
 						//Adjust angles differently if an asymmetric case.
 						if (xform->m_Wind[col] > 0 && cflag == 0)

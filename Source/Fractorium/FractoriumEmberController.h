@@ -16,7 +16,7 @@ enum class eEditUndoState : et { REGULAR_EDIT, UNDO_REDO, EDIT_UNDO };
 /// <summary>
 /// An enum representing which xforms an update should be applied to.
 /// </summary>
-enum class eXformUpdate : et { UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
+enum class eXformUpdate : et { UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_CURRENT_AND_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
 
 /// <summary>
 /// FractoriumEmberController and Fractorium need each other, but each can't include the other.
@@ -161,6 +161,7 @@ public:
 	virtual void XformWeightChanged(double d) { }
 	virtual void EqualizeWeights() { }
 	virtual void XformNameChanged(int row, int col) { }
+	virtual void XformAnimateChanged(int state) { }
 	virtual void FillXforms(int index = 0) { }
 
 	//Xforms Affine.
@@ -171,6 +172,8 @@ public:
 	virtual void ScaleXforms(double scale, bool pre) { }
 	virtual void ResetXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
+	double LockedScale() { return m_LockedScale; }
+	virtual void LockAffineScaleCheckBoxStateChanged(int state) { }
 
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender) { }
@@ -241,6 +244,7 @@ protected:
 	uint m_SubBatchCount;
 	uint m_FailedRenders;
 	uint m_UndoIndex;
+	double m_LockedScale;
 	eRendererType m_RenderType;
 	eEditUndoState m_EditState;
 	GLuint m_OutputTexID;
@@ -397,9 +401,11 @@ public:
 	virtual void XformWeightChanged(double d) override;
 	virtual void EqualizeWeights() override;
 	virtual void XformNameChanged(int row, int col) override;
+	virtual void XformAnimateChanged(int state) override;
 	virtual void FillXforms(int index = 0) override;
 	void FillWithXform(Xform<T>* xform);
 	Xform<T>* CurrentXform();
+	void UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER);
 
 	//Xforms Affine.
 	virtual void AffineSetHelper(double d, int index, bool pre) override;
@@ -409,7 +415,10 @@ public:
 	virtual void ScaleXforms(double scale, bool pre) override;
 	virtual void ResetXformsAffine(bool pre) override;
 	virtual void FillBothAffines() override;
+	virtual void LockAffineScaleCheckBoxStateChanged(int state) override;
 	void FillAffineWithXform(Xform<T>* xform, bool pre);
+	T AffineScaleCurrentToLocked();
+	T AffineScaleLockedToCurrent();
 
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender) override;
@@ -473,7 +482,6 @@ private:
 	QString MakeXformCaption(size_t i);
 	bool XformCheckboxAt(int i, std::function<void(QCheckBox*)> func);
 	bool XformCheckboxAt(Xform<T>* xform, std::function<void(QCheckBox*)> func);
-	void UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER);
 
 	//Palette.
 	void UpdateAdjustedPaletteGUI(Palette<T>& palette);

@@ -118,7 +118,7 @@ public:
 		//First clear out any xforms that are not the final, and have a density of less than 0.001.
 		for (i = 0; i < ember.XformCount(); i++)
 		{
-			Xform<T>* xform = ember.GetXform(i);
+			auto xform = ember.GetXform(i);
 
 			if (xform->m_Weight < T(0.001))
 			{
@@ -131,7 +131,7 @@ public:
 		//Now consider all xforms, including final.
 		for (i = 0; i < ember.TotalXformCount(); i++)
 		{
-			Xform<T>* xform = ember.GetTotalXform(i);
+			auto xform = ember.GetTotalXform(i);
 
 			do
 			{
@@ -223,8 +223,8 @@ public:
 
 				for (size_t i = 0; i < ember.TotalXformCount(); i++)
 				{
-					Xform<T>* xform1 = ember.GetTotalXform(i);
-					Xform<T>* xform2 = mutation.GetTotalXform(i);
+					auto xform1 = ember.GetTotalXform(i);
+					auto xform2 = mutation.GetTotalXform(i);
 
 					if (xform1 && xform2)
 					{
@@ -254,8 +254,8 @@ public:
 			Random(mutation, useVars, sym, 2, maxVars);
 			//Which xform to mutate?
 			modXform = m_Rand.Rand() % ember.TotalXformCount();
-			Xform<T>* xform1 = ember.GetTotalXform(modXform);
-			Xform<T>* xform2 = mutation.GetTotalXform(0);
+			auto xform1 = ember.GetTotalXform(modXform);
+			auto xform2 = mutation.GetTotalXform(0);
 			os << "mutate xform " << modXform << " coefs";
 
 			//If less than 3 xforms, then change only the translation part.
@@ -285,7 +285,7 @@ public:
 			for (size_t i = 0; i < ember.TotalXformCount(); i++)
 			{
 				bool copy = (i > 0) && same;
-				Xform<T>* xform = ember.GetTotalXform(i);
+				auto xform = ember.GetTotalXform(i);
 
 				if (copy)//Copy the post from the first xform to the rest of them.
 				{
@@ -400,8 +400,8 @@ public:
 			//Change all the coefs by a fraction of the random.
 			for (size_t x = 0; x < ember.TotalXformCount(); x++)
 			{
-				Xform<T>* xform1 = ember.GetTotalXform(x);
-				Xform<T>* xform2 = mutation.GetTotalXform(x);
+				auto xform1 = ember.GetTotalXform(x);
+				auto xform2 = mutation.GetTotalXform(x);
 
 				for (glm::length_t i = 0; i < 2; i++)
 					for (glm::length_t j = 0; j < 3; j++)
@@ -498,7 +498,7 @@ public:
 						{
 							if (i < ember1.XformCount() && ember1.GetXform(i)->m_Weight > 0)
 							{
-								Xform<T>* xform = emberOut.GetXform(i);
+								auto xform = emberOut.GetXform(i);
 								*xform = *ember1.GetXform(i);
 								os << " 1";
 								got1 = 1;
@@ -513,7 +513,7 @@ public:
 						{
 							if (i < ember0.XformCount() && ember0.GetXform(i)->m_Weight > 0)
 							{
-								Xform<T>* xform = emberOut.GetXform(i);
+								auto xform = emberOut.GetXform(i);
 								*xform = *ember0.GetXform(i);
 								os << " 0";
 								got0 = 1;
@@ -654,7 +654,7 @@ public:
 		//Loop over xforms.
 		for (i = 0; i < ember.TotalXformCount(); i++)
 		{
-			Xform<T>* xform = ember.GetTotalXform(i);
+			auto xform = ember.GetTotalXform(i);
 			xform->m_Weight = T(1) / ember.TotalXformCount();
 			xform->m_ColorX = m_Rand.Frand01<T>();//Original pingponged between 0 and 1, which gives bad coloring. Ember does random instead.
 			xform->m_ColorY = m_Rand.Frand01<T>();//Will need to update this if 2D coordinates are ever supported.
@@ -699,7 +699,7 @@ public:
 					if (samed && i > 0)
 					{
 						//Copy the same variations from the previous xform.
-						Xform<T>* prevXform = ember.GetXform(i - 1);
+						auto prevXform = ember.GetXform(i - 1);
 
 						for (j = 0; j < prevXform->TotalVariationCount(); j++)
 							if (xform->TotalVariationCount() < maxVars)
@@ -893,10 +893,6 @@ public:
 	/// <param name="changePalette">Change palette if true, else don't</param>
 	void ChangeColors(Ember<T>& ember, bool changePalette)
 	{
-		size_t i;
-		Xform<T>* xform0;
-		Xform<T>* xform1;
-
 		if (changePalette)
 		{
 			if (m_PaletteList.Size())
@@ -910,14 +906,14 @@ public:
 			}
 		}
 
-		for (i = 0; i < ember.TotalXformCount(); i++)
+		for (size_t i = 0; i < ember.TotalXformCount(); i++)
 		{
 			ember.GetTotalXform(i)->m_ColorX = m_Rand.Frand01<T>();
 			ember.GetTotalXform(i)->m_ColorY = m_Rand.Frand01<T>();
 		}
 
-		xform0 = RandomXform(ember, -1);
-		xform1 = RandomXform(ember, ember.GetXformIndex(xform0));
+		auto xform0 = RandomXform(ember, -1);
+		auto xform1 = RandomXform(ember, ember.GetXformIndex(xform0));
 
 		if (xform0 && (m_Rand.Rand() & 1))
 		{
@@ -949,7 +945,7 @@ public:
 
 			if (i != excluded)
 			{
-				Xform<T>* xform = ember.GetTotalXform(i);
+				auto xform = ember.GetTotalXform(i);
 
 				if (xform->m_Weight > 0)
 					return xform;
@@ -975,8 +971,8 @@ public:
 		//the result xforms before rotate is called.
 		for (size_t i = 0; i < ember.TotalXformCount(); i++)
 		{
-			Xform<T>* xform1 = ember.GetTotalXform(i);
-			Xform<T>* xform2 = rotated.GetTotalXform(i);
+			auto xform1 = ember.GetTotalXform(i);
+			auto xform2 = rotated.GetTotalXform(i);
 
 			if (!xform1->m_Motion.empty())
 				xform2->ApplyMotion(*xform1, blend);
@@ -1009,7 +1005,7 @@ public:
 
 			for (i = 0; i < embers[si].TotalXformCount(); i++)
 			{
-				Xform<T>* xform = embers[si].GetTotalXform(i);
+				auto xform = embers[si].GetTotalXform(i);
 
 				if (!xform->m_Motion.empty())
 					xform->ApplyMotion(*(prealign[si].GetTotalXform(i)), blend);//Apply motion parameters to result.xform[i] using blend parameter.

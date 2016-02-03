@@ -64,17 +64,19 @@ public:
 		D(T(affine.D()));
 		E(T(affine.E()));
 		F(T(affine.F()));
-
 		return *this;
 	}
 
 	bool operator == (const Affine2D<T>& affine);
 	v2T operator * (const v2T& v);
+	Affine2D<T> operator * (const T& t);
 
 	void MakeID();
 	bool IsID() const;
 	bool IsZero() const;
 	bool IsEmpty() const;
+	void Scale(T amount);
+	Affine2D<T> ScaleCopy(T amount);
 	void Rotate(T angle);
 	void Translate(const v2T& v);
 	void RotateScaleXTo(const v2T& v);

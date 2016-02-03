@@ -247,7 +247,7 @@ void FractoriumEmberController<T>::ApplyXmlSavingTemplate(Ember<T>& ember)
 /// <returns>True if the current ember contains a final xform, else false.</returns>
 bool Fractorium::HaveFinal()
 {
-	QComboBox* combo = ui.CurrentXformCombo;
+	auto combo = ui.CurrentXformCombo;
 	return (combo->count() > 0 && combo->itemText(combo->count() - 1) == "Final");
 }
 
@@ -389,7 +389,9 @@ void Fractorium::dragEnterEvent(QDragEnterEvent* e)
 {
 	if (e->mimeData()->hasUrls())
 	{
-		foreach (QUrl url, e->mimeData()->urls())
+		auto urls = e->mimeData()->urls();
+
+		for (auto& url : urls)
 		{
 			QString localFile = url.toLocalFile();
 			QFileInfo fileInfo(localFile);
@@ -426,7 +428,9 @@ void Fractorium::dropEvent(QDropEvent* e)
 
 	if (e->mimeData()->hasUrls())
 	{
-		foreach (QUrl url, e->mimeData()->urls())
+		auto urls = e->mimeData()->urls();
+
+		for (auto& url : urls)
 		{
 			QString localFile = url.toLocalFile();
 			QFileInfo fileInfo(localFile);

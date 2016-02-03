@@ -167,12 +167,12 @@ void FractoriumEmberController<T>::BackgroundChanged(const QColor& color)
 	Update([&]
 	{
 		int itemRow = 5;
-		QTableWidget* colorTable = m_Fractorium->ui.ColorTable;
+		auto colorTable = m_Fractorium->ui.ColorTable;
 		colorTable->item(itemRow, 1)->setBackgroundColor(color);
 
-		QString r = ToString(color.red());
-		QString g = ToString(color.green());
-		QString b = ToString(color.blue());
+		auto r = ToString(color.red());
+		auto g = ToString(color.green());
+		auto b = ToString(color.blue());
 
 		colorTable->item(itemRow, 1)->setTextColor(VisibleColor(color));
 		colorTable->item(itemRow, 1)->setText("rgb(" + r + ", " + g + ", " + b + ")");

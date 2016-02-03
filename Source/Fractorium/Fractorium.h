@@ -203,8 +203,10 @@ public slots:
 	void OnXformWeightChanged(double d);
 	void OnEqualWeightButtonClicked(bool checked);
 	void OnXformNameChanged(int row, int col);
+	void OnXformAnimateCheckBoxStateChanged(int state);
 
 	//Xforms Affine.
+	void OnLockAffineScaleCheckBoxStateChanged(int state);
 	void OnPreAffineRowDoubleClicked(int logicalIndex);
 	void OnPreAffineColDoubleClicked(int logicalIndex);
 	void OnPostAffineRowDoubleClicked(int logicalIndex);

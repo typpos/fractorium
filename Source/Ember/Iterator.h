@@ -98,7 +98,7 @@ public:
 	{
 		size_t i;
 		size_t distribCount = ember.XaosPresent() ? ember.XformCount() + 1 : 1;
-		const Xform<T>* xforms = ember.Xforms();
+		auto xforms = ember.Xforms();
 
 		if (m_XformDistributions.size() < CHOOSE_XFORM_GRAIN * distribCount)
 			m_XformDistributions.resize(CHOOSE_XFORM_GRAIN * distribCount);
@@ -306,7 +306,7 @@ public:
 	{
 		size_t i, badVals = 0;
 		Point<T> tempPoint, p1;
-		Xform<T>* xforms = ember.NonConstXforms();
+		auto xforms = ember.NonConstXforms();
 
 		if (ember.ProjBits())
 		{
@@ -473,7 +473,7 @@ public:
 		size_t lastXformUsed = 0;
 		size_t badVals = 0;
 		Point<T> tempPoint, p1;
-		Xform<T>* xforms = ember.NonConstXforms();
+		auto xforms = ember.NonConstXforms();
 
 		if (ember.ProjBits())
 		{

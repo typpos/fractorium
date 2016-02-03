@@ -56,7 +56,7 @@ void FractoriumVariationsDialog::ForEachSelectedCell(std::function<void(QTableWi
 	QList<QTableWidgetItem*> selectedItems = table->selectedItems();
 	table->model()->blockSignals(true);
 
-	foreach (QTableWidgetItem* item, selectedItems)
+	for (auto item : selectedItems)
 		if (item)
 			func(item);
 

@@ -142,6 +142,7 @@ private:
 	m4T m_Projection;
 
 	Affine2D<T> m_DragSrcTransform;
+	vector<Affine2D<T>> m_DragSrcTransforms;
 
 	Xform<T>* m_HoverXform;
 	Xform<T>* m_SelectedXform;

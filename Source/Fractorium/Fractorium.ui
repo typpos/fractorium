@@ -2350,7 +2350,7 @@
      <property name="minimumSize">
       <size>
        <width>291</width>
-       <height>613</height>
+       <height>632</height>
       </size>
      </property>
      <property name="features">
@@ -2756,7 +2756,7 @@
          </item>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QTabWidget" name="XformsTabWidget">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
@@ -2780,7 +2780,7 @@
           <enum>QTabWidget::Triangular</enum>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="XformColorTab">
           <property name="sizePolicy">
@@ -3445,6 +3445,13 @@
             <number>5</number>
            </property>
            <item>
+            <widget class="QCheckBox" name="LockAffineCheckBox">
+             <property name="text">
+              <string>Lock Affine Scale</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QScrollArea" name="AffineTabScrollArea">
              <property name="autoFillBackground">
               <bool>false</bool>
@@ -3464,7 +3471,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>263</width>
-                <height>743</height>
+                <height>700</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5479,7 +5486,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>259</width>
-                   <height>673</height>
+                   <height>652</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -5527,6 +5534,16 @@
            </item>
           </layout>
          </widget>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="AnimateXformCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate this xform when creating a sequence for animation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Animate</string>
+         </property>
         </widget>
        </item>
       </layout>

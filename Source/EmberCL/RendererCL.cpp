@@ -1750,7 +1750,7 @@ void RendererCL<T, bucketT>::ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, 
 
 	for (size_t i = 0; i < ember.TotalXformCount() && i < xformsCL.size(); i++)
 	{
-		Xform<T>* xform = ember.GetTotalXform(i);
+		auto xform = ember.GetTotalXform(i);
 		xformsCL[i].m_A = xform->m_Affine.A();
 		xformsCL[i].m_B = xform->m_Affine.B();
 		xformsCL[i].m_C = xform->m_Affine.C();

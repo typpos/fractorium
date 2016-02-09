@@ -39,7 +39,7 @@ public:
 		if (stage == 0 || stage == 1)
 		{
 			if (m_LastStage != stage)
-				cout << endl;
+				cout << "\n";
 
 			cout << "\r" << string(m_S.length() * 2, ' ');//Clear what was previously here, * 2 just to be safe because the end parts of previous strings might be longer.
 			m_SS.str("");//Begin new output.
@@ -88,13 +88,13 @@ static bool ParseEmberFile(XmlToEmber<T>& parser, const string& filename, vector
 {
 	if (!parser.Parse(filename.c_str(), embers, useDefaults))
 	{
-		cout << "Error parsing flame file " << filename << ", returning without executing." << endl;
+		cout << "Error parsing flame file " << filename << ", returning without executing.\n";
 		return false;
 	}
 
 	if (embers.empty())
 	{
-		cout << "Error: No data present in file " << filename << ". Aborting." << endl;
+		cout << "Error: No data present in file " << filename << ". Aborting.\n";
 		return false;
 	}
 
@@ -114,11 +114,11 @@ static bool InitPaletteList(const string& filename)
 	PaletteList<T> paletteList;//Even though this is local, the members are static so they will remain.
 	static vector<string> paths =
 	{
-		"./"
+		"./",
 #ifndef WIN32
-		"~/.fractorium"
-		"~/.config/fractorium"
-		"/usr/share/fractorium"
+		"~/.fractorium",
+		"~/.config/fractorium",
+		"/usr/share/fractorium",
 		"/usr/local/share/fractorium"
 #endif
 	};
@@ -130,8 +130,8 @@ static bool InitPaletteList(const string& filename)
 
 	if (!added || !paletteList.Size())
 	{
-		cout << "Error parsing palette file " << filename << ". Reason: " << endl;
-		cout << paletteList.ErrorReportString() << endl << "Returning without executing." << endl;
+		cout << "Error parsing palette file " << filename << ". Reason: \n";
+		cout << paletteList.ErrorReportString() << "\nReturning without executing.\n";
 		return false;
 	}
 
@@ -526,4 +526,4 @@ static size_t VerifyStrips(size_t height, size_t strips,
 /// <summary>
 /// Simple macro to print a string if the --verbose options has been specified.
 /// </summary>
-#define VerbosePrint(s) if (opt.Verbose()) cout << s << endl
+#define VerbosePrint(s) if (opt.Verbose()) cout << s << "\n"

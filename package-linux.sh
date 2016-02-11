@@ -46,6 +46,9 @@ if [ ! -d '.git' -o ! -f 'main.pro' ]; then
     exit 2
 fi
 
+# Make sure create-symlinks.sh will be executable.
+chmod +x ./Builds/create-symlinks.sh
+
 # Set defaults.
 OPT_BUILD_BINARY=0
 OPT_BUILD_SOURCE=1

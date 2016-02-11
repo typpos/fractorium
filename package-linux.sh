@@ -72,7 +72,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-tarversion=$(tar --version | head -1 | sed -e 's/tar (GNU tar) \+\([0-9\.]\+\)$/\1/; s/[^0-9]//g; s/^\(.{3}\).*$/\1/;')
+tarversion=$(tar --version | head -1 | sed -e 's/tar (GNU tar) \+\([0-9\.]\+\)$/\1/; s/[^0-9]//g; s/\(.\{3\}\).*/\1/;')
 
 if [[ "$tarversion" -lt "128" ]]; then
     echo "Tar >= 1.28 is required. Download the .deb from https://launchpad.net/ubuntu/+source/tar/ and install manually."

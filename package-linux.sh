@@ -46,6 +46,9 @@ if [ ! -d '.git' -o ! -f 'main.pro' ]; then
     exit 2
 fi
 
+# Make sure create-symlinks.sh will be executable.
+chmod +x ./Builds/create-symlinks.sh
+
 # Set defaults.
 OPT_BUILD_BINARY=0
 OPT_BUILD_SOURCE=1
@@ -72,7 +75,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-tarversion=$(tar --version | head -1 | sed -e 's/tar (GNU tar) \+\([0-9\.]\+\)$/\1/; s/[^0-9]//g; s/^\(.{3}\).*$/\1/;')
+tarversion=$(tar --version | head -1 | sed -e 's/tar (GNU tar) \+\([0-9\.]\+\)$/\1/; s/[^0-9]//g; s/\(.\{3\}\).*/\1/;')
 
 if [[ "$tarversion" -lt "128" ]]; then
     echo "Tar >= 1.28 is required. Download the .deb from https://launchpad.net/ubuntu/+source/tar/ and install manually."

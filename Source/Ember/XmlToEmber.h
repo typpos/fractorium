@@ -35,10 +35,10 @@ public:
 		m_OriginalLocale = setlocale(category, nullptr);//Query.
 
 		if (m_OriginalLocale.empty())
-			cout << "Couldn't get original locale." << endl;
+			cout << "Couldn't get original locale.\n";
 
 		if (setlocale(category, loc) == nullptr)//Set.
-			cout << "Couldn't set new locale " << category << ", " << loc << "." << endl;
+			cout << "Couldn't set new locale " << category << ", " << loc << ".\n";
 	}
 
 	/// <summary>
@@ -48,7 +48,7 @@ public:
 	{
 		if (!m_OriginalLocale.empty())
 			if (setlocale(m_Category, m_OriginalLocale.c_str()) == nullptr)//Restore.
-				cout << "Couldn't restore original locale " << m_Category << ", " << m_OriginalLocale << "." << endl;
+				cout << "Couldn't restore original locale " << m_Category << ", " << m_OriginalLocale << ".\n";
 	}
 
 private:
@@ -327,13 +327,13 @@ public:
 		{
 			if (embers[0].m_Interp == eInterp::EMBER_INTERP_SMOOTH)
 			{
-				cout << "Warning: smooth interpolation cannot be used for first segment.\n         switching to linear.\n" << endl;
+				cout << "Warning: smooth interpolation cannot be used for first segment.\n         switching to linear.\n";
 				embers[0].m_Interp = eInterp::EMBER_INTERP_LINEAR;
 			}
 
 			if (emberSize >= 2 && embers[emberSize - 2].m_Interp == eInterp::EMBER_INTERP_SMOOTH)
 			{
-				cout << "Warning: smooth interpolation cannot be used for last segment.\n         switching to linear.\n" << endl;
+				cout << "Warning: smooth interpolation cannot be used for last segment.\n         switching to linear.\n";
 				embers[emberSize - 2].m_Interp = eInterp::EMBER_INTERP_LINEAR;
 			}
 		}
@@ -526,7 +526,7 @@ private:
 		char* attStr;
 		const char* loc = __FUNCTION__;
 		int soloXform = -1;
-		size_t i, count, index = 0;
+		size_t i, count = 0, index = 0;
 		double vals[16];
 		xmlAttrPtr att, curAtt;
 		xmlNodePtr editNode, childNode, motionNode;

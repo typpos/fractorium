@@ -565,7 +565,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 template <typename T>
 void FractoriumEmberController<T>::ParamsToEmber(Ember<T>& ember)
 {
-	QColor color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
+	auto color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
 	ember.m_Brightness = m_Fractorium->m_BrightnessSpin->value();//Color.
 	ember.m_Gamma = m_Fractorium->m_GammaSpin->value();
 	ember.m_GammaThresh = m_Fractorium->m_GammaThresholdSpin->value();

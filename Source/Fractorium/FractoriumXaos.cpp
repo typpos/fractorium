@@ -49,35 +49,6 @@ void FractoriumEmberController<T>::FillXaos()
 }
 
 /// <summary>
-/// Create and return a xaos name string.
-/// </summary>
-/// <param name="i">The index of the xform whose xaos will be used</param>
-/// <returns>The xaos name string</returns>
-template <typename T>
-QString FractoriumEmberController<T>::MakeXaosNameString(uint i)
-{
-	auto xform = m_Ember.GetXform(i);
-	QString name;
-	//if (xform)
-	//{
-	//	int indexPlus1 = m_Ember.GetXformIndex(xform) + 1;//GUI is 1 indexed to avoid confusing the user.
-	//	int curr = m_Fractorium->ui.CurrentXformCombo->currentIndex() + 1;
-	//
-	//	if (indexPlus1 != -1)
-	//	{
-	//		if (m_Fractorium->ui.XaosToRadio->isChecked())
-	//			name = QString("From ") + ToString(curr) + QString(" To ") + ToString(indexPlus1);
-	//		else
-	//			name = QString("From ") + ToString(indexPlus1) + QString(" To ") + ToString(curr);
-	//
-	//		//if (xform->m_Name != "")
-	//		//	name = name + " (" + QString::fromStdString(xform->m_Name) + ")";
-	//	}
-	//}
-	return name;
-}
-
-/// <summary>
 /// Set the xaos value.
 /// Called when any xaos spinner is changed.
 /// It actually gets called multiple times as the user clicks around the
@@ -93,13 +64,13 @@ void FractoriumEmberController<T>::XaosChanged(int x, int y, double val)
 	auto newVal = TruncPrecision(val, XAOS_PREC);//Sometimes 0 comes in as a very small number, so round.
 
 	if (auto xform = m_Ember.GetXform(x))
-		if (!IsClose<T>(newVal, xform->Xaos(y), 1e-7))
+		if (!IsClose<T>(newVal, xform->Xaos(y), T(1e-7)))
 			Update([&] { xform->SetXaos(y, newVal); });
 }
 
 void Fractorium::OnXaosChanged(double d)
 {
-	if (auto* senderSpinBox = qobject_cast<DoubleSpinBox*>(this->sender()))
+	if (auto senderSpinBox = qobject_cast<DoubleSpinBox*>(this->sender()))
 	{
 		auto p = senderSpinBox->property("tableindex").toPoint();
 		m_Controller->XaosChanged(p.x(), p.y(), d);

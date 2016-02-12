@@ -32,8 +32,8 @@
 /// </summary>
 
 #ifndef __ISAAC64
-   typedef uint ISAAC_INT;
-   const ISAAC_INT GOLDEN_RATIO = ISAAC_INT(0x9e3779b9);
+	typedef uint ISAAC_INT;
+	const ISAAC_INT GOLDEN_RATIO = ISAAC_INT(0x9e3779b9);
 #else
 	typedef size_t ISAAC_INT;
 	const ISAAC_INT GOLDEN_RATIO = ISAAC_INT(0x9e3779b97f4a7c13);
@@ -63,9 +63,9 @@ public:
 	/// Global ISAAC RNG to be used from anywhere. This is not thread safe, so take caution to only
 	/// use it when no other threads are.
 	/// </summary>
-	static unique_ptr<QTIsaac<ALPHA, ISAAC_INT> > GlobalRand;
+	static unique_ptr<QTIsaac<ALPHA, ISAAC_INT>> GlobalRand;
 
-	static CriticalSection m_CS;
+	static std::recursive_mutex s_CS;
 
 	/// <summary>
 	/// The structure which holds all of the random information.
@@ -124,9 +124,8 @@ public:
 	/// <returns>The next random integer in the range of 0-255</returns>
 	static inline T LockedRandByte()
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		T t = GlobalRand->RandByte();
-		m_CS.Leave();
 		return t;
 	}
 
@@ -137,9 +136,9 @@ public:
 	inline T Rand()
 	{
 #ifdef ISAAC_FLAM3_DEBUG
-		return (!m_Rc.randcnt-- ? (Isaac(&m_Rc), m_Rc.randcnt=N-1, m_Rc.randrsl[m_Rc.randcnt]) : m_Rc.randrsl[m_Rc.randcnt]);
+		return (!m_Rc.randcnt-- ? (Isaac(&m_Rc), m_Rc.randcnt = N - 1, m_Rc.randrsl[m_Rc.randcnt]) : m_Rc.randrsl[m_Rc.randcnt]);
 #else
-		return (m_Rc.randcnt++ == N ? (Isaac(&m_Rc), m_Rc.randcnt=0, m_Rc.randrsl[m_Rc.randcnt]) : m_Rc.randrsl[m_Rc.randcnt]);
+		return (m_Rc.randcnt++ == N ? (Isaac(&m_Rc), m_Rc.randcnt = 0, m_Rc.randrsl[m_Rc.randcnt]) : m_Rc.randrsl[m_Rc.randcnt]);
 #endif
 	}
 
@@ -149,9 +148,8 @@ public:
 	/// <returns>The next random integer</returns>
 	static inline T LockedRand()
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		T t = GlobalRand->Rand();
-		m_CS.Leave();
 		return t;
 	}
 
@@ -172,9 +170,8 @@ public:
 	/// <returns>A value between 0 and the value passed in minus 1</returns>
 	static inline T LockedRand(T upper)
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		T t = GlobalRand->Rand(upper);
-		m_CS.Leave();
 		return t;
 	}
 
@@ -201,9 +198,8 @@ public:
 	template<typename floatType>
 	static inline floatType LockedFrand(floatType fMin, floatType fMax)
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		floatType t = GlobalRand->template Frand<floatType>(fMin, fMax);
-		m_CS.Leave();
 		return t;
 	}
 
@@ -229,9 +225,8 @@ public:
 	template<typename floatType>
 	static inline floatType LockedFrand01()
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		floatType t = GlobalRand->template Frand01<floatType>();
-		m_CS.Leave();
 		return t;
 	}
 
@@ -257,9 +252,8 @@ public:
 	template<typename floatType>
 	static inline floatType LockedFrand11()
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		floatType t = GlobalRand->template Frand11<floatType>();
-		m_CS.Leave();
 		return t;
 	}
 
@@ -280,9 +274,8 @@ public:
 	template<typename floatType>
 	static inline floatType LockedGoldenBit()
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		floatType t = GlobalRand->template GoldenBit<floatType>();
-		m_CS.Leave();
 		return t;
 	}
 
@@ -301,9 +294,8 @@ public:
 	/// <returns>A random 0 or 1</returns>
 	static inline uint LockedRandBit()
 	{
-		m_CS.Enter();
+		rlg l(s_CS);
 		uint t = GlobalRand->RandBit();
-		m_CS.Leave();
 		return t;
 	}
 
@@ -329,7 +321,6 @@ public:
 		T a, b, c, d, e, f, g, h;
 		T* m = ctx->randmem;
 		T* r = ctx->randrsl;
-
 		a = b = c = d = e = f = g = h = GOLDEN_RATIO;
 
 		if (!useSeed)
@@ -352,9 +343,7 @@ public:
 			{
 				a += r[i    ]; b += r[i + 1]; c += r[i + 2]; d += r[i + 3];
 				e += r[i + 4]; f += r[i + 5]; g += r[i + 6]; h += r[i + 7];
-
 				Shuffle(a, b, c, d, e, f, g, h);
-
 				m[i    ] = a; m[i + 1] = b; m[i + 2] = c; m[i + 3] = d;
 				m[i + 4] = e; m[i + 5] = f; m[i + 6] = g; m[i + 7] = h;
 			}
@@ -364,9 +353,7 @@ public:
 			{
 				a += m[i    ]; b += m[i + 1]; c += m[i + 2]; d += m[i + 3];
 				e += m[i + 4]; f += m[i + 5]; g += m[i + 6]; h += m[i + 7];
-
 				Shuffle(a, b, c, d, e, f, g, h);
-
 				m[i    ] = a; m[i + 1] = b; m[i + 2] = c; m[i + 3] = d;
 				m[i + 4] = e; m[i + 5] = f; m[i + 6] = g; m[i + 7] = h;
 			}
@@ -375,7 +362,6 @@ public:
 		{
 			//Fill in mm[] with messy stuff.
 			Shuffle(a, b, c, d, e, f, g, h);
-
 			m[i    ] = a; m[i + 1] = b; m[i + 2] = c; m[i + 3] = d;
 			m[i + 4] = e; m[i + 5] = f; m[i + 6] = g; m[i + 7] = h;
 		}
@@ -406,6 +392,7 @@ public:
 		}
 
 #ifndef ISAAC_FLAM3_DEBUG
+
 		if (a == 0 && b == 0 && c == 0)
 		{
 			m_Rc.randa = static_cast<T>(NowMs());
@@ -430,48 +417,45 @@ protected:
 	/// <param name="ctx">The context to populate.</param>
 	void Isaac(randctx* ctx)
 	{
-		T x,y;
-
+		T x, y;
 		T* mm = ctx->randmem;
 		T* r  = ctx->randrsl;
-
 		T a = (ctx->randa);
 		T b = (ctx->randb + (++ctx->randc));
-
 		T* m    = mm;
 		T* m2   = (m + (N / 2));
 		T* mend = m2;
 
-		for(; m < mend; )
+		for (; m < mend; )
 		{
-		#ifndef __ISAAC64
+#ifndef __ISAAC64
 			RngStep((a << 13), a, b, mm, m, m2, r, x, y);
 			RngStep((a >> 6) , a, b, mm, m, m2, r, x, y);
 			RngStep((a << 2) , a, b, mm, m, m2, r, x, y);
 			RngStep((a >> 16), a, b, mm, m, m2, r, x, y);
-		#else   // __ISAAC64
+#else   // __ISAAC64
 			RngStep(~(a ^ (a << 21)), a, b, mm, m, m2, r, x, y);
 			RngStep(  a ^ (a >> 5)  , a, b, mm, m, m2, r, x, y);
 			RngStep(  a ^ (a << 12) , a, b, mm, m, m2, r, x, y);
 			RngStep(  a ^ (a >> 33) , a, b, mm, m, m2, r, x, y);
-		#endif  // __ISAAC64
+#endif  // __ISAAC64
 		}
 
 		m2 = mm;
 
-		for(; m2<mend;)
+		for (; m2 < mend;)
 		{
-		#ifndef __ISAAC64
+#ifndef __ISAAC64
 			RngStep((a << 13), a, b, mm, m, m2, r, x, y);
 			RngStep((a >> 6) , a, b, mm, m, m2, r, x, y);
 			RngStep((a << 2) , a, b, mm, m, m2, r, x, y);
 			RngStep((a >> 16), a, b, mm, m, m2, r, x, y);
-		#else   // __ISAAC64
+#else   // __ISAAC64
 			RngStep(~(a ^ (a << 21)), a, b, mm, m, m2, r, x, y);
 			RngStep(  a ^ (a >> 5)  , a, b, mm, m, m2, r, x, y);
 			RngStep(  a ^ (a << 12) , a, b, mm, m, m2, r, x, y);
 			RngStep(  a ^ (a >> 33) , a, b, mm, m, m2, r, x, y);
-		#endif  // __ISAAC64
+#endif  // __ISAAC64
 		}
 
 		ctx->randb = b;

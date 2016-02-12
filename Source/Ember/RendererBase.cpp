@@ -263,12 +263,12 @@ size_t RendererBase::MemoryAvailable()
 	}
 	else
 	{
-		cout << "Warning: unable to determine physical memory." << endl;
+		cout << "Warning: unable to determine physical memory.\n";
 		memAvailable = 4e9;
 	}
 
 #else
-	cout << "Warning: unable to determine physical memory." << endl;
+	cout << "Warning: unable to determine physical memory.\n";
 	memAvailable = 4e9;
 #endif
 	return memAvailable;
@@ -610,14 +610,14 @@ void RendererBase::Reset()
 	m_ProcessAction = eProcessAction::FULL_RENDER;
 }
 
-void RendererBase::EnterRender() { m_RenderingCs.Enter(); }
-void RendererBase::LeaveRender() { m_RenderingCs.Leave(); }
+void RendererBase::EnterRender() { m_RenderingCs.lock(); }
+void RendererBase::LeaveRender() { m_RenderingCs.unlock(); }
 
-void RendererBase::EnterFinalAccum() { m_FinalAccumCs.Enter(); m_InFinalAccum = true; }
-void RendererBase::LeaveFinalAccum() { m_FinalAccumCs.Leave(); m_InFinalAccum = false; }
+void RendererBase::EnterFinalAccum() { m_FinalAccumCs.lock(); m_InFinalAccum = true; }
+void RendererBase::LeaveFinalAccum() { m_FinalAccumCs.unlock(); m_InFinalAccum = false; }
 
-void RendererBase::EnterResize() { m_ResizeCs.Enter(); }
-void RendererBase::LeaveResize() { m_ResizeCs.Leave(); }
+void RendererBase::EnterResize() { m_ResizeCs.lock(); }
+void RendererBase::LeaveResize() { m_ResizeCs.unlock(); }
 
 void RendererBase::Abort()   { m_Abort = true; }
 bool RendererBase::Aborted() { return m_Abort; }

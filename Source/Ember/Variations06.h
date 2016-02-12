@@ -1495,7 +1495,7 @@ public:
 	/// <param name="rand">The rand.</param>
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T gradTmp, secTmp, xTmp, yTmp;
+		T gradTmp, secTmp, xTmp = 0, yTmp = 0;
 
 		if ((helper.In.x < m_LeftBorder) || (helper.In.x > m_RightBorder) || (helper.In.y < m_TopBorder) || (helper.In.y > m_BottomBorder))
 		{
@@ -1591,7 +1591,7 @@ public:
 		string leftBorder =	   "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rightBorder =   "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t gradTmp, secTmp, xTmp, yTmp;\n"
+		   << "\t\treal_t gradTmp, secTmp, xTmp = 0, yTmp = 0;\n"
 		   << "\n"
 		   << "\t\tif ((vIn.x < " << leftBorder << ") || (vIn.x > " << rightBorder << ") || (vIn.y < " << topBorder << ") || (vIn.y > " << bottomBorder << "))\n"
 		   << "\t\t{\n"
@@ -3626,8 +3626,6 @@ private:
 			case LERP_BEZIER:
 				return BezierQuadMap(x, m);
 		}
-
-		return x * m;
 	}
 
 	inline void SynthSinCos(SynthStruct& synth, T theta, T& s, T& c, int sineType)

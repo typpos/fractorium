@@ -228,7 +228,7 @@ protected:
 	vector<size_t> m_BadVals;
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> m_Rand;
 	auto_ptr<tbb::task_group> m_TaskGroup;
-	CriticalSection m_RenderingCs, m_AccumCs, m_FinalAccumCs, m_ResizeCs;
+	std::recursive_mutex m_RenderingCs, m_AccumCs, m_FinalAccumCs, m_ResizeCs;
 	Timing m_RenderTimer, m_IterTimer, m_ProgressTimer;
 };
 }

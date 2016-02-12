@@ -116,18 +116,18 @@ public:
 			}
 			else
 			{
-				cout << "Error: Writing flame " << filename << " failed." << endl;
+				cout << "Error: Writing flame " << filename << " failed.\n";
 				b = false;
 			}
 		}
 		catch (const std::exception& e)
 		{
-			cout << "Error: Writing flame " << filename << " failed: " << e.what() << endl;
+			cout << "Error: Writing flame " << filename << " failed: " << e.what() << "\n";
 			b = false;
 		}
 		catch (...)
 		{
-			cout << "Error: Writing flame " << filename << " failed." << endl;
+			cout << "Error: Writing flame " << filename << " failed.\n";
 			b = false;
 		}
 
@@ -275,7 +275,7 @@ public:
 					os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][2] * 255));
 				}
 
-				os << endl;
+				os << "\n";
 			}
 
 			os << "   </palette>\n";
@@ -472,7 +472,7 @@ public:
 			}
 			else
 			{
-				cout << "Failed to parse comment into Xml." << endl;
+				cout << "Failed to parse comment into Xml.\n";
 			}
 		}
 

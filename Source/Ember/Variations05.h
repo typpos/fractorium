@@ -3466,7 +3466,7 @@ public:
 		int loc;
 		T tempx, tempy;
 		T lrmaj = m_Weight;//Sets hexagon length radius - major plane.
-		T boost;//Boost is the separation distance between the two planes.
+		T boost = 1;//Boost is the separation distance between the two planes.
 		T sumX, sumY;
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
@@ -3561,7 +3561,7 @@ public:
 		   << "\t\tint loc;\n"
 		   << "\t\treal_t tempx, tempy;\n"
 		   << "\t\treal_t lrmaj = xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\treal_t boost;\n"
+		   << "\t\treal_t boost = 1;\n"
 		   << "\t\treal_t sumX, sumY;\n\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)

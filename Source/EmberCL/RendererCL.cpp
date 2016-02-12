@@ -895,25 +895,23 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 	if (b)
 	{
 		m_IterKernel = m_IterOpenCLKernelCreator.CreateIterKernelString(m_Ember, m_Params.first, m_GlobalShared.first, m_LockAccum, doAccum);
-		//cout << "Building: " << endl << iterProgram << endl;
+		//cout << "Building: " << "\n" << iterProgram << "\n";
 		vector<std::thread> threads;
 		std::function<void(RendererClDevice*)> func = [&](RendererClDevice * dev)
 		{
 			if (!dev->m_Wrapper.AddProgram(m_IterOpenCLKernelCreator.IterEntryPoint(), m_IterKernel, m_IterOpenCLKernelCreator.IterEntryPoint(), m_DoublePrecision))
 			{
-				m_ResizeCs.Enter();//Just use the resize CS for lack of a better one.
+				rlg l(m_ResizeCs);//Just use the resize CS for lack of a better one.
 				b = false;
 				AddToReport(string(loc) + "()\n" + dev->m_Wrapper.DeviceName() + ":\nBuilding the following program failed: \n" + m_IterKernel + "\n");
-				m_ResizeCs.Leave();
 			}
 			else if (!m_GlobalShared.second.empty())
 			{
 				if (!dev->m_Wrapper.AddAndWriteBuffer(m_GlobalSharedBufferName, m_GlobalShared.second.data(), m_GlobalShared.second.size() * sizeof(m_GlobalShared.second[0])))
 				{
-					m_ResizeCs.Enter();//Just use the resize CS for lack of a better one.
+					rlg l(m_ResizeCs);//Just use the resize CS for lack of a better one.
 					b = false;
 					AddToReport(string(loc) + "()\n" + dev->m_Wrapper.DeviceName() + ":\nAdding global shared buffer failed.\n");
-					m_ResizeCs.Leave();
 				}
 			}
 		};
@@ -934,7 +932,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 		if (b)
 		{
 			//t.Toc(__FUNCTION__ " program build");
-			//cout << string(loc) << "():\nBuilding the following program succeeded: \n" << iterProgram << endl;
+			//cout << string(loc) << "():\nBuilding the following program succeeded: \n" << iterProgram << "\n";
 			m_LastBuiltEmber = m_Ember;
 		}
 	}
@@ -988,7 +986,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	{
 		bool b = true;
 		auto& wrapper = m_Devices[dev]->m_Wrapper;
-		intmax_t itersRemaining;
+		intmax_t itersRemaining = 0;
 
 		while (atomLaunchesRan.fetch_add(1), (b && (atomLaunchesRan.load() <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && !m_Abort))
 		{
@@ -1002,7 +1000,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			//The number of iters per thread must be adjusted if they've requested less iters than is normally ran in a grid (256 * 256 * 64 * 2 = 32,768).
 			uint iterCountPerKernel = std::min<uint>(uint(adjustedIterCountPerKernel), uint(ceil(double(itersRemaining) / IterGridKernelCount())));
 			size_t iterCountThisLaunch = iterCountPerKernel * IterGridKernelWidth() * IterGridKernelHeight();
-			//cout << "itersRemaining " << itersRemaining << ", iterCountPerKernel " << iterCountPerKernel << ", iterCountThisLaunch " << iterCountThisLaunch << endl;
+			//cout << "itersRemaining " << itersRemaining << ", iterCountPerKernel " << iterCountPerKernel << ", iterCountThisLaunch " << iterCountThisLaunch << "\n";
 
 			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, iterCountPerKernel)))        { AddToReport(loc); }//Number of iters for each thread to run.
 

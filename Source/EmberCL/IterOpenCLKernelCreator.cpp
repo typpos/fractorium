@@ -575,7 +575,7 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 
 	for (auto& funcName : funcNames)
 		if (auto text = m_FunctionMapper.GetGlobalFunc(funcName))
-			os << *text << endl;
+			os << *text << "\n";
 
 	return os.str();
 }
@@ -643,7 +643,7 @@ void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<
 						if (!parVar->Params()[k].IsState())
 						{
 							if (doString)
-								os << "#define " << ToUpper(parVar->Params()[k].Name()) << "_" << i << " " << size << endl;//Uniquely identify this param in this variation in this xform.
+								os << "#define " << ToUpper(parVar->Params()[k].Name()) << "_" << i << " " << size << "\n";//Uniquely identify this param in this variation in this xform.
 
 							auto elements = parVar->Params()[k].Size() / sizeof(T);
 
@@ -710,7 +710,7 @@ void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, p
 							if (auto dataInfo = varFuncs->GetSharedData(s))///Will contain a name, pointer to data, and size of the data in units of sizeof(T).
 							{
 								if (doString)
-									os << "#define " << ToUpper(name) << " " << offset << endl;
+									os << "#define " << ToUpper(name) << " " << offset << "\n";
 
 								if (doVals)
 									params.second.insert(params.second.end(), dataInfo->first, dataInfo->first + dataInfo->second);

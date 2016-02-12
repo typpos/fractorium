@@ -115,22 +115,22 @@ public:
 	{
 		size_t i;
 		stringstream ss;
-		ss  << "Temporal Filter:" << endl
-			<< "	       Size: " << Size() << endl
-			<< "           Type: " << TemporalFilterCreator<T>::ToString(m_FilterType) << endl
-			<< "       Sum Filt: " << SumFilt() << endl;
-		ss << "Deltas: " << endl;
+		ss  << "Temporal Filter:\n"
+			<< "\n	       Size: " << Size()
+			<< "\n           Type: " << TemporalFilterCreator<T>::ToString(m_FilterType)
+			<< "\n       Sum Filt: " << SumFilt();
+		ss << "\nDeltas: \n";
 
 		for (i = 0; i < m_Deltas.size(); i++)
 		{
-			ss << "Deltas[" << i << "]: " << m_Deltas[i] << endl;
+			ss << "Deltas[" << i << "]: " << m_Deltas[i] << "\n";
 		}
 
-		ss << "Filter: " << endl;
+		ss << "Filter: \n";
 
 		for (i = 0; i < m_Filter.size(); i++)
 		{
-			ss << "Filter[" << i << "]: " << m_Filter[i] << endl;
+			ss << "Filter[" << i << "]: " << m_Filter[i] << "\n";
 		}
 
 		return ss.str();

@@ -208,14 +208,23 @@ void Affine2D<T>::Scale(T amount)
 /// </summary>
 /// <param name="angle">The angle to rotate by</param>
 template <typename T>
-void Affine2D<T>::Rotate(T angle)
+void Affine2D<T>::Rotate(T rad)
 {
 	m4T origMat4 = ToMat4ColMajor(true);//Must center and use column major for glm to work.
-	m4T newMat4 = glm::rotate(origMat4, angle * DEG_2_RAD_T, v3T(0, 0, 1));//Assuming only rotating around z.
+	m4T newMat4 = glm::rotate(origMat4, rad, v3T(0, 0, 1));//Assuming only rotating around z.
 	A(newMat4[0][0]);//Use direct assignments instead of constructor to skip assigning C and F.
 	B(newMat4[0][1]);
 	D(newMat4[1][0]);
 	E(newMat4[1][1]);
+}
+
+template <typename T>
+void Affine2D<T>::RotateTrans(T rad)
+{
+	m4T origMat4 = TransToMat4ColMajor();//Only put translation in this matrix.
+	m4T newMat4 = glm::rotate(origMat4, rad, v3T(0, 0, 1));//Assuming only rotating around z.
+	C(newMat4[0][3]);//Use direct assignments instead of constructor to skip assigning A, B, D, E.
+	F(newMat4[1][3]);
 }
 
 /// <summary>
@@ -341,6 +350,16 @@ typename m4T Affine2D<T>::ToMat4RowMajor(bool center) const
 	return mat;
 }
 
+template <typename T>
+typename m4T Affine2D<T>::TransToMat4ColMajor() const
+{
+	m4T mat(1, 0, 0, C(), //Col0...
+			0, 1, 0, F(), //1
+			0, 0, 1, 0, //2
+			0, 0, 0, 1);//3
+	return mat;
+}
+
 /// <summary>
 /// Accessors.
 /// </summary>
@@ -365,6 +384,19 @@ template <typename T> typename v2T Affine2D<T>::O() const { return v2T(C(), F())
 template <typename T> void Affine2D<T>::X(const v2T& x) { A(x.x); D(x.y); }//X Axis.
 template <typename T> void Affine2D<T>::Y(const v2T& y) { B(y.x); E(y.y); }//Y Axis.
 template <typename T> void Affine2D<T>::O(const v2T& t) { C(t.x); F(t.y); }//Translation.
+
+template <typename T>
+string Affine2D<T>::ToString() const
+{
+	ostringstream ss;
+	ss << "A: " <<  A() << " "
+	   << "B: " << B() << " "
+	   << "C: " << C()
+	   << "\nD: " << D() << " "
+	   << "E: " << E() << " "
+	   << "F: " << F();
+	return ss.str();
+}
 
 /// <summary>
 /// Rotate and scale this affine transform and return as a copy. Orginal is unchanged.

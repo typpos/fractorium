@@ -7,7 +7,7 @@
 /// <returns>True if running, else false.</returns>
 bool FractoriumEmberControllerBase::RenderTimerRunning()
 {
-	return m_RenderTimer && m_RenderTimer->isActive();
+	return m_RenderTimer->isActive();
 }
 
 /// <summary>
@@ -16,12 +16,9 @@ bool FractoriumEmberControllerBase::RenderTimerRunning()
 /// </summary>
 void FractoriumEmberControllerBase::StartRenderTimer()
 {
-	if (m_RenderTimer)
-	{
-		UpdateRender();
-		m_RenderTimer->start();
-		m_RenderElapsedTimer.Tic();
-	}
+	UpdateRender();
+	m_RenderTimer->start();
+	m_RenderElapsedTimer.Tic();
 }
 
 /// <summary>
@@ -33,12 +30,8 @@ void FractoriumEmberControllerBase::StartRenderTimer()
 void FractoriumEmberControllerBase::DelayedStartRenderTimer()
 {
 	DeleteRenderer();
-
-	if (m_RenderRestartTimer)
-	{
-		m_RenderRestartTimer->setSingleShot(true);
-		m_RenderRestartTimer->start(300);//Will stop the timer if it's already running, and start again.
-	}
+	m_RenderRestartTimer->setSingleShot(true);
+	m_RenderRestartTimer->start(300);//Will stop the timer if it's already running, and start again.
 }
 
 /// <summary>
@@ -48,8 +41,7 @@ void FractoriumEmberControllerBase::DelayedStartRenderTimer()
 /// <param name="wait">True to block, else false.</param>
 void FractoriumEmberControllerBase::StopRenderTimer(bool wait)
 {
-	if (m_RenderTimer)
-		m_RenderTimer->stop();
+	m_RenderTimer->stop();
 
 	if (m_Renderer.get())
 		m_Renderer->Abort();
@@ -130,12 +122,11 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 	if (filename != "")
 	{
 		bool b = false;
-		uint i, j;
 		byte* data = nullptr;
 		vector<byte> vecRgb;
 		QFileInfo fileInfo(filename);
 		QString suffix = fileInfo.suffix();
-		FractoriumSettings* settings = m_Fractorium->m_Settings;
+		auto settings = m_Fractorium->m_Settings;
 
 		//Ensure dimensions are valid.
 		if (pixels.size() < (width * height * channels * bpc))
@@ -183,13 +174,11 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 /// <param name="action">The action for the renderer to take</param>
 void FractoriumEmberControllerBase::AddProcessAction(eProcessAction action)
 {
-	m_Cs.Enter();
+	rlg l(m_Cs);
 	m_ProcessActions.push_back(action);
 
 	if (m_Renderer.get())
 		m_Renderer->Abort();
-
-	m_Cs.Leave();
 }
 
 /// <summary>
@@ -200,7 +189,7 @@ void FractoriumEmberControllerBase::AddProcessAction(eProcessAction action)
 /// <returns>The most significant processing action desired</returns>
 eProcessAction FractoriumEmberControllerBase::CondenseAndClearProcessActions()
 {
-	m_Cs.Enter();
+	rlg l(m_Cs);
 	auto action = eProcessAction::NOTHING;
 
 	for (auto a : m_ProcessActions)
@@ -208,7 +197,6 @@ eProcessAction FractoriumEmberControllerBase::CondenseAndClearProcessActions()
 			action = a;
 
 	m_ProcessActions.clear();
-	m_Cs.Leave();
 	return action;
 }
 
@@ -266,7 +254,7 @@ template <typename T>
 bool FractoriumEmberController<T>::SyncSizes()
 {
 	bool changed = false;
-	GLWidget* gl = m_Fractorium->ui.GLDisplay;
+	auto gl = m_Fractorium->ui.GLDisplay;
 	RendererCL<T, float>* rendererCL = nullptr;
 
 	if (!m_GLController->SizesMatch())
@@ -296,7 +284,7 @@ bool FractoriumEmberController<T>::Render()
 {
 	m_Rendering = true;
 	bool success = true;
-	GLWidget* gl = m_Fractorium->ui.GLDisplay;
+	auto gl = m_Fractorium->ui.GLDisplay;
 	RendererCL<T, float>* rendererCL = nullptr;
 	eProcessAction qualityAction, action;
 	//Quality is the only parameter we update inside the timer.
@@ -403,10 +391,10 @@ bool FractoriumEmberController<T>::Render()
 			//Rendering has finished, update final stats.
 			if (ProcessState() == eProcessState::ACCUM_DONE)
 			{
-				EmberStats stats = m_Renderer->Stats();
-				QString iters = ToString<qulonglong>(stats.m_Iters);
-				QString scaledQuality = ToString(uint(m_Renderer->ScaledQuality()));
-				string renderTime = m_RenderElapsedTimer.Format(m_RenderElapsedTimer.Toc());
+				auto stats = m_Renderer->Stats();
+				auto iters = ToString<qulonglong>(stats.m_Iters);
+				auto scaledQuality = ToString(uint(m_Renderer->ScaledQuality()));
+				auto renderTime = m_RenderElapsedTimer.Format(m_RenderElapsedTimer.Toc());
 				m_Fractorium->m_ProgressBar->setValue(100);
 
 				//Only certain stats can be reported with OpenCL.
@@ -417,8 +405,8 @@ bool FractoriumEmberController<T>::Render()
 				else
 				{
 					double percent = double(stats.m_Badvals) / double(stats.m_Iters);
-					QString badVals = ToString<qulonglong>(stats.m_Badvals);
-					QString badPercent = QLocale::system().toString(percent * 100, 'f', 2);
+					auto badVals = ToString<qulonglong>(stats.m_Badvals);
+					auto badPercent = QLocale::system().toString(percent * 100, 'f', 2);
 					m_Fractorium->m_RenderStatusLabel->setText("Iters: " + iters + ". Scaled quality: " + scaledQuality + ". Bad values: " + badVals + " (" + badPercent + "%). Total time: " + QString::fromStdString(renderTime) + ".");
 				}
 
@@ -428,13 +416,18 @@ bool FractoriumEmberController<T>::Render()
 				}
 				else if (m_EditState == eEditUndoState::REGULAR_EDIT)//Regular edit, just add to the end of the undo list.
 				{
-					m_UndoList.push_back(m_Ember);
-					m_UndoIndex = m_UndoList.size() - 1;
-					m_Fractorium->ui.ActionUndo->setEnabled(m_UndoList.size() > 1);
-					m_Fractorium->ui.ActionRedo->setEnabled(false);
+					auto btn = QApplication::mouseButtons();
 
-					if (m_UndoList.size() >= UNDO_SIZE)
-						m_UndoList.pop_front();
+					if (!btn.testFlag(Qt::LeftButton) && !btn.testFlag(Qt::RightButton) && !btn.testFlag(Qt::MiddleButton))
+					{
+						m_UndoList.push_back(m_Ember);
+						m_UndoIndex = m_UndoList.size() - 1;
+						m_Fractorium->ui.ActionUndo->setEnabled(m_UndoList.size() > 1);
+						m_Fractorium->ui.ActionRedo->setEnabled(false);
+
+						if (m_UndoList.size() >= UNDO_SIZE)
+							m_UndoList.pop_front();
+					}
 				}
 				else if (!m_LastEditWasUndoRedo && m_UndoIndex < m_UndoList.size() - 1)//They were anywhere but the end of the undo list, then did a manual edit, so clear the undo list.
 				{
@@ -459,9 +452,6 @@ bool FractoriumEmberController<T>::Render()
 				if (m_FinalImage.size() == m_Renderer->FinalBufferSize())//Make absolutely sure the correct amount of data is passed.
 					gl->update();
 
-				//gl->repaint();
-				//m_Fractorium->update();
-				//m_Fractorium->ui.GLParentScrollArea->update();
 				//Uncomment for debugging kernel build and execution errors.
 				//m_Fractorium->ui.InfoRenderingTextEdit->setText(QString::fromStdString(m_Fractorium->m_Wrapper.DumpInfo()));
 				//if (rendererCL)
@@ -474,7 +464,7 @@ bool FractoriumEmberController<T>::Render()
 		}
 		else//Something went very wrong, show error report.
 		{
-			vector<string> errors = m_Renderer->ErrorReport();
+			auto errors = m_Renderer->ErrorReport();
 			success = false;
 			m_FailedRenders++;
 			m_Fractorium->m_RenderStatusLabel->setText("Rendering failed, see info tab. Try changing parameters.");
@@ -503,7 +493,6 @@ bool FractoriumEmberController<T>::Render()
 	if (ProcessState() == eProcessState::ACCUM_DONE)
 		QThread::msleep(1);
 
-	//QApplication::processEvents();
 	m_Rendering = false;
 	return success;
 }
@@ -520,8 +509,8 @@ template <typename T>
 bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared)
 {
 	bool ok = true;
-	FractoriumSettings* s = m_Fractorium->m_Settings;
-	GLWidget* gl = m_Fractorium->ui.GLDisplay;
+	auto s = m_Fractorium->m_Settings;
+	auto gl = m_Fractorium->ui.GLDisplay;
 
 	if (!m_Renderer.get() || (m_Renderer->RendererType() != renderType) || !Equal(m_Devices, devices))
 	{
@@ -691,6 +680,7 @@ bool Fractorium::CreateControllerFromOptions()
 		//First check if a controller has already been created, and if so, save its embers and gracefully shut it down.
 		if (m_Controller.get())
 		{
+			m_Controller->StopPreviewRender();//Must stop any previews first, else changing controllers will crash the program.
 			m_Controller->CopyTempPalette(tempPalette);//Convert float to double or save double verbatim;
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
 			//m_Controller->CopyEmber(ed);

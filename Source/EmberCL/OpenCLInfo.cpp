@@ -264,35 +264,35 @@ string OpenCLInfo::DumpInfo() const
 
 	for (size_t platform = 0; platform < m_Platforms.size(); platform++)
 	{
-		os << "Platform " << platform << ": " << PlatformName(platform) << endl;
+		os << "Platform " << platform << ": " << PlatformName(platform) << "\n";
 
 		for (size_t device = 0; device < m_Devices[platform].size(); device++)
 		{
-			os << "Device " << device << ": " << DeviceName(platform, device) << endl;
-			os << "CL_DEVICE_OPENCL_C_VERSION: " << GetInfo<string>(platform, device, CL_DEVICE_OPENCL_C_VERSION) << endl;
-			os << "CL_DEVICE_LOCAL_MEM_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_LOCAL_MEM_SIZE) << endl;
-			os << "CL_DEVICE_LOCAL_MEM_TYPE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_LOCAL_MEM_TYPE) << endl;
-			os << "CL_DEVICE_MAX_COMPUTE_UNITS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_COMPUTE_UNITS) << endl;
-			os << "CL_DEVICE_MAX_READ_IMAGE_ARGS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_READ_IMAGE_ARGS) << endl;
-			os << "CL_DEVICE_MAX_WRITE_IMAGE_ARGS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_WRITE_IMAGE_ARGS) << endl;
-			os << "CL_DEVICE_MAX_MEM_ALLOC_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_MAX_MEM_ALLOC_SIZE) << endl;
-			os << "CL_DEVICE_ADDRESS_BITS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_ADDRESS_BITS) << endl;
-			os << "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) << endl;
-			os << "CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE) << endl;
-			os << "CL_DEVICE_GLOBAL_MEM_CACHE_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE) << endl;
-			os << "CL_DEVICE_GLOBAL_MEM_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_GLOBAL_MEM_SIZE) << endl;
-			os << "CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE) << endl;
-			os << "CL_DEVICE_MAX_CONSTANT_ARGS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_CONSTANT_ARGS) << endl;
-			os << "CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) << endl;
-			os << "CL_DEVICE_MAX_WORK_GROUP_SIZE: " << GetInfo<size_t>(platform, device, CL_DEVICE_MAX_WORK_GROUP_SIZE) << endl;
+			os << "Device " << device << ": " << DeviceName(platform, device);
+			os << "\nCL_DEVICE_OPENCL_C_VERSION: " << GetInfo<string>(platform, device, CL_DEVICE_OPENCL_C_VERSION);
+			os << "\nCL_DEVICE_LOCAL_MEM_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_LOCAL_MEM_SIZE);
+			os << "\nCL_DEVICE_LOCAL_MEM_TYPE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_LOCAL_MEM_TYPE);
+			os << "\nCL_DEVICE_MAX_COMPUTE_UNITS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_COMPUTE_UNITS);
+			os << "\nCL_DEVICE_MAX_READ_IMAGE_ARGS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_READ_IMAGE_ARGS);
+			os << "\nCL_DEVICE_MAX_WRITE_IMAGE_ARGS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_WRITE_IMAGE_ARGS);
+			os << "\nCL_DEVICE_MAX_MEM_ALLOC_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+			os << "\nCL_DEVICE_ADDRESS_BITS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_ADDRESS_BITS);
+			os << "\nCL_DEVICE_GLOBAL_MEM_CACHE_TYPE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_GLOBAL_MEM_CACHE_TYPE);
+			os << "\nCL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE);
+			os << "\nCL_DEVICE_GLOBAL_MEM_CACHE_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_GLOBAL_MEM_CACHE_SIZE);
+			os << "\nCL_DEVICE_GLOBAL_MEM_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_GLOBAL_MEM_SIZE);
+			os << "\nCL_DEVICE_MAX_CONSTANT_BUFFER_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE);
+			os << "\nCL_DEVICE_MAX_CONSTANT_ARGS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_CONSTANT_ARGS);
+			os << "\nCL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS);
+			os << "\nCL_DEVICE_MAX_WORK_GROUP_SIZE: " << GetInfo<size_t>(platform, device, CL_DEVICE_MAX_WORK_GROUP_SIZE);
 			sizes = GetInfo<vector<size_t>>(platform, device, CL_DEVICE_MAX_WORK_ITEM_SIZES);
-			os << "CL_DEVICE_MAX_WORK_ITEM_SIZES: " << sizes[0] << ", " << sizes[1] << ", " << sizes[2] << endl << endl;
+			os << "\nCL_DEVICE_MAX_WORK_ITEM_SIZES: " << sizes[0] << ", " << sizes[1] << ", " << sizes[2] << "\n" << "\n";
 
 			if (device != m_Devices[platform].size() - 1 && platform != m_Platforms.size() - 1)
-				os << endl;
+				os << "\n";
 		}
 
-		os << endl;
+		os << "\n";
 	}
 
 	return os.str();
@@ -309,7 +309,7 @@ bool OpenCLInfo::CheckCL(cl_int err, const char* name)
 	if (err != CL_SUCCESS)
 	{
 		ostringstream ss;
-		ss << "ERROR: " << ErrorToStringCL(err) << " in " << name << "." << endl;
+		ss << "ERROR: " << ErrorToStringCL(err) << " in " << name << ".\n";
 		AddToReport(ss.str());
 	}
 

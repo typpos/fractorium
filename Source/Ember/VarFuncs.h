@@ -288,7 +288,7 @@ public:
 		//released under CC share-alike license.
 		//Less accurate for faster rendering (still very precise).
 		T const CA = T(0.0003);//The accuracy is the square of CA.
-		T a, b, c, d, em[13], en[13];
+		T a, b, c, d = 1, em[13], en[13];
 		int bo;
 		int l;
 		int ii;

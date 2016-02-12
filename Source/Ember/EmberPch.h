@@ -46,6 +46,7 @@
 #include <map>
 #include <math.h>
 #include <memory>
+#include <mutex>
 #include <numeric>
 #include <ostream>
 #include <sstream>

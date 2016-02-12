@@ -16,6 +16,6 @@ public:
 	static const string* GetGlobalFunc(const string& func);
 
 private:
-	static std::unordered_map<string, string> m_GlobalMap;
+	static std::unordered_map<string, string> s_GlobalMap;
 };
 }

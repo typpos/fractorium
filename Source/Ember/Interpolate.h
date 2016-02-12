@@ -639,7 +639,7 @@ public:
 				}
 				else
 				{
-					cout << loc << ": xform " << xfi << " is missing when it was expected, something is severely wrong." << endl;
+					cout << loc << ": xform " << xfi << " is missing when it was expected, something is severely wrong.\n";
 				}
 			}
 
@@ -684,7 +684,7 @@ public:
 					}
 					else
 					{
-						cout << loc << ": xform " << xfi << " is missing when it was expected, something is severely wrong." << endl;
+						cout << loc << ": xform " << xfi << " is missing when it was expected, something is severely wrong.\n";
 					}
 				}
 			}

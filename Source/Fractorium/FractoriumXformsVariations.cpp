@@ -171,11 +171,11 @@ void FractoriumEmberController<T>::SetupVariationTree()
 template <typename T>
 void FractoriumEmberController<T>::ClearVariationsTree()
 {
-	QTreeWidget* tree = m_Fractorium->ui.VariationsTree;
+	auto tree = m_Fractorium->ui.VariationsTree;
 
 	for (int i = 0; i < tree->topLevelItemCount(); i++)
 	{
-		QTreeWidgetItem* item = tree->topLevelItem(i);
+		auto item = tree->topLevelItem(i);
 		auto* spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(tree->itemWidget(item, 1));
 		spinBox->SetValueStealth(0);
 
@@ -189,7 +189,7 @@ void FractoriumEmberController<T>::ClearVariationsTree()
 
 /// <summary>
 /// Copy the value of a variation or param spinner to its corresponding value
-/// in the currently selected xform.
+/// in the selected xforms.
 /// Called when any spinner in the variations tree is changed.
 /// Resets the rendering process.
 /// </summary>
@@ -197,79 +197,82 @@ void FractoriumEmberController<T>::ClearVariationsTree()
 template <typename T>
 void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would be awesome to make this work for all.//TODO
 {
+	bool update = false;
 	auto objSender = m_Fractorium->sender();
 	auto tree = m_Fractorium->ui.VariationsTree;
 	auto sender = dynamic_cast<VariationTreeDoubleSpinBox*>(objSender);
 	auto xform = m_Ember.GetTotalXform(m_Fractorium->ui.CurrentXformCombo->currentIndex());//Will retrieve normal xform or final if needed.
 
-	if (sender && xform)
+	if (sender)
 	{
-		auto var = m_VariationList.GetVariation(sender->GetVariationId());//The variation attached to the sender, for reference only.
-		auto parVar = dynamic_cast<const ParametricVariation<T>*>(var);//The parametric cast of that variation.
-		auto xformVar = xform->GetVariationById(var->VariationId());//The corresponding variation in the currently selected xform.
-		auto widgetItem = sender->WidgetItem();
-		bool isParam = parVar && sender->IsParam();
-
-		if (isParam)
+		UpdateXform([&](Xform<T>* xform)
 		{
-			//Do not take action if the xform doesn't contain the variation which this param is part of.
-			if (ParametricVariation<T>* xformParVar = dynamic_cast<ParametricVariation<T>*>(xformVar))//The parametric cast of the xform's variation.
-			{
-				if (xformParVar->SetParamVal(sender->ParamName().c_str(), d))
-				{
-					UpdateRender();
-				}
-			}
-		}
-		else
-		{
-			//If they spun down to zero, and it wasn't a parameter item,
-			//and the current xform contained the variation, then remove the variation.
-			if (IsNearZero(d))
-			{
-				if (xformVar)
-					xform->DeleteVariationById(var->VariationId());
+			auto var = m_VariationList.GetVariation(sender->GetVariationId());//The variation attached to the sender, for reference only.
+			auto parVar = dynamic_cast<const ParametricVariation<T>*>(var);//The parametric cast of that variation.
+			auto xformVar = xform->GetVariationById(var->VariationId());//The corresponding variation in the currently selected xform.
+			auto widgetItem = sender->WidgetItem();
+			bool isParam = parVar && sender->IsParam();
 
-				widgetItem->setBackgroundColor(0, QColor(255, 255, 255));//Ensure background is always white if weight goes to zero.
+			if (isParam)
+			{
+				//Do not take action if the xform doesn't contain the variation which this param is part of.
+				if (ParametricVariation<T>* xformParVar = dynamic_cast<ParametricVariation<T>*>(xformVar))//The parametric cast of the xform's variation.
+					if (xformParVar->SetParamVal(sender->ParamName().c_str(), d))
+						update = true;
 			}
 			else
 			{
-				if (xformVar)//The xform already contained this variation, which means they just went from a non-zero weight to another non-zero weight (the simple case).
+				//If they spun down to zero, and it wasn't a parameter item,
+				//and the current xform contained the variation, then remove the variation.
+				if (IsNearZero(d))
 				{
-					xformVar->m_Weight = d;
+					if (xformVar)
+						xform->DeleteVariationById(var->VariationId());
+
+					widgetItem->setBackgroundColor(0, QColor(255, 255, 255));//Ensure background is always white if weight goes to zero.
 				}
 				else
 				{
-					//If the item wasn't a param and the xform did not contain this variation,
-					//it means they went from zero to a non-zero weight, so add a new copy of this xform.
-					auto newVar = var->Copy();//Create a new one with default values.
-					newVar->m_Weight = d;
-					xform->AddVariation(newVar);
-					widgetItem->setBackgroundColor(0, QColor(200, 200, 200));//Set background to gray when a variation has non-zero weight in this xform.
-
-					//If they've added a new parametric variation, then grab the values currently in the spinners
-					//for the child parameters and assign them to the newly added variation.
-					if (parVar)
+					if (xformVar)//The xform already contained this variation, which means they just went from a non-zero weight to another non-zero weight (the simple case).
 					{
-						auto newParVar = dynamic_cast<ParametricVariation<T>*>(newVar);
+						xformVar->m_Weight = d;
+					}
+					else
+					{
+						//If the item wasn't a param and the xform did not contain this variation,
+						//it means they went from zero to a non-zero weight, so add a new copy of this xform.
+						auto newVar = var->Copy();//Create a new one with default values.
+						newVar->m_Weight = d;
+						xform->AddVariation(newVar);
+						widgetItem->setBackgroundColor(0, QColor(200, 200, 200));//Set background to gray when a variation has non-zero weight in this xform.
 
-						for (int i = 0; i < widgetItem->childCount(); i++)//Iterate through all of the children, which will be the params.
+						//If they've added a new parametric variation, then grab the values currently in the spinners
+						//for the child parameters and assign them to the newly added variation.
+						if (parVar)
 						{
-							auto childItem = widgetItem->child(i);//Get the child.
-							auto itemWidget = tree->itemWidget(childItem, 1);//Get the widget for the child.
+							auto newParVar = dynamic_cast<ParametricVariation<T>*>(newVar);
 
-							if (auto spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget))//Cast the widget to the VariationTreeDoubleSpinBox type.
+							for (int i = 0; i < widgetItem->childCount(); i++)//Iterate through all of the children, which will be the params.
 							{
-								string s = childItem->text(0).toStdString();//Use the name of the child, and the value of the spinner widget to assign the param.
-								newParVar->SetParamVal(s.c_str(), spinBox->value());
+								auto childItem = widgetItem->child(i);//Get the child.
+								auto itemWidget = tree->itemWidget(childItem, 1);//Get the widget for the child.
+
+								if (auto spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget))//Cast the widget to the VariationTreeDoubleSpinBox type.
+								{
+									string s = childItem->text(0).toStdString();//Use the name of the child, and the value of the spinner widget to assign the param.
+									newParVar->SetParamVal(s.c_str(), spinBox->value());
+								}
 							}
 						}
 					}
 				}
-			}
 
+				update = true;
+			}
+		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
+
+		if (update)
 			UpdateRender();
-		}
 	}
 }
 

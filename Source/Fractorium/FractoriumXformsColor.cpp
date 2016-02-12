@@ -47,7 +47,15 @@ void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateR
 	scroll->blockSignals(true);
 	scroll->setValue(scrollVal);
 	scroll->blockSignals(false);
-	SetCurrentXformColorIndex(d, updateRender);
+	m_Fractorium->ui.XformColorIndexTable->item(0, 0)->setBackgroundColor(ColorIndexToQColor(d));//Grab the current color from the index and assign it to the first cell of the first table.
+
+	if (updateRender)//False when just updating GUI, true when in response to a GUI change so update values and reset renderer.
+	{
+		UpdateXform([&](Xform<T>* xform)
+		{
+			xform->m_ColorX = Clamp<T>(d, 0, 1);
+		}, eXformUpdate::UPDATE_SELECTED, updateRender);
+	}
 }
 
 void Fractorium::OnXformColorIndexChanged(double d) { OnXformColorIndexChanged(d, true); }
@@ -135,7 +143,7 @@ void Fractorium::OnSoloXformCheckBoxStateChanged(int state)
 /// <param name="newSize">Ignored</param>
 void Fractorium::OnXformRefPaletteResized(int logicalIndex, int oldSize, int newSize)
 {
-	QPixmap pixmap = QPixmap::fromImage(m_Controller->FinalPaletteImage());
+	QPixmap pixmap(QPixmap::fromImage(m_Controller->FinalPaletteImage()));
 	SetPaletteTableItem(&pixmap, ui.XformPaletteRefTable, m_PaletteRefItem, 0, 0);
 }
 
@@ -202,22 +210,6 @@ QColor FractoriumEmberController<T>::ColorIndexToQColor(double d)
 	entry.b *= 255;
 	QRgb rgb = uint(entry.r) << 16 | uint(entry.g) << 8 | uint(entry.b);
 	return QColor::fromRgb(rgb);
-}
-
-/// <summary>
-/// Set the selected xforms color index to the passed in value.
-/// Set the color cell in the palette ref table.
-/// </summary>
-/// <param name="d">The index value to set, 0-1.</param>
-template <typename T>
-void FractoriumEmberController<T>::SetCurrentXformColorIndex(double d, bool updateRender)
-{
-	UpdateXform([&] (Xform<T>* xform)
-	{
-		xform->m_ColorX = Clamp<T>(d, 0, 1);
-		//Grab the current color from the index and assign it to the first cell of the first table.
-		m_Fractorium->ui.XformColorIndexTable->item(0, 0)->setBackgroundColor(ColorIndexToQColor(xform->m_ColorX)/*QColor::fromRgb(rgb)*/);
-	}, eXformUpdate::UPDATE_SELECTED, updateRender);
 }
 
 /// <summary>

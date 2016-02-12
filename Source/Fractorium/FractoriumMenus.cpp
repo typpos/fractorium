@@ -139,7 +139,7 @@ void Fractorium::OnActionNewRandomFlameInCurrentFile(bool checked) { m_Controlle
 template <typename T>
 void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 {
-	Ember<T> ember = m_Ember;
+	auto ember = m_Ember;
 	StopPreviewRender();
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
 	ember.m_Index = m_EmberFile.Size();
@@ -199,7 +199,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 			}
 			else
 			{
-				vector<string> errors = parser.ErrorReport();
+				auto errors = parser.ErrorReport();
 				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 				m_Fractorium->ShowCritical("Open Failed", "Could not open file, see info tab for details.");
 			}
@@ -246,7 +246,7 @@ template <typename T>
 void FractoriumEmberController<T>::SaveCurrentAsXml()
 {
 	QString filename;
-	FractoriumSettings* s = m_Fractorium->m_Settings;
+	auto s = m_Fractorium->m_Settings;
 
 	if (s->SaveAutoUnique() && m_LastSaveCurrent != "")
 	{
@@ -266,10 +266,10 @@ void FractoriumEmberController<T>::SaveCurrentAsXml()
 
 	if (filename != "")
 	{
-		Ember<T> ember = m_Ember;
+		auto ember = m_Ember;
 		EmberToXml<T> writer;
 		QFileInfo fileInfo(filename);
-		xmlDocPtr tempEdit = ember.m_Edits;
+		auto tempEdit = ember.m_Edits;
 		SaveCurrentToOpenedFile();//Save the current ember back to the opened file before writing to disk.
 		ApplyXmlSavingTemplate(ember);
 		ember.m_Edits = writer.CreateNewEditdoc(&ember, nullptr, "edit", s->Nick().toStdString(), s->Url().toStdString(), s->Id().toStdString(), "", 0, 0);
@@ -300,7 +300,7 @@ template <typename T>
 void FractoriumEmberController<T>::SaveEntireFileAsXml()
 {
 	QString filename;
-	FractoriumSettings* s = m_Fractorium->m_Settings;
+	auto s = m_Fractorium->m_Settings;
 
 	if (s->SaveAutoUnique() && m_LastSaveAll != "")
 		filename = EmberFile<T>::UniqueFilename(m_LastSaveAll);
@@ -340,12 +340,12 @@ void Fractorium::OnActionSaveEntireFileAsXml(bool checked) { m_Controller->SaveE
 /// <param name="checked">Ignored</param>
 void Fractorium::OnActionSaveCurrentScreen(bool checked)
 {
-	QString filename = SetupSaveImageDialog(m_Controller->Name());
+	auto filename = SetupSaveImageDialog(m_Controller->Name());
 	auto renderer = m_Controller->Renderer();
 	auto& pixels = *m_Controller->FinalImage();
-	RendererCLBase* rendererCL = dynamic_cast<RendererCLBase*>(m_Controller->Renderer());
+	auto rendererCL = dynamic_cast<RendererCLBase*>(m_Controller->Renderer());
 	auto stats = m_Controller->Stats();
-	EmberImageComments comments = renderer->ImageComments(stats, 0, false, true);
+	auto comments = renderer->ImageComments(stats, 0, false, true);
 
 	if (rendererCL && renderer->PrepFinalAccumVector(pixels))
 	{
@@ -460,9 +460,9 @@ void Fractorium::OnActionRedo(bool checked) { m_Controller->Redo(); }
 template <typename T>
 void FractoriumEmberController<T>::CopyXml()
 {
-	Ember<T> ember = m_Ember;
+	auto ember = m_Ember;
 	EmberToXml<T> emberToXml;
-	FractoriumSettings* settings = m_Fractorium->m_Settings;
+	auto settings = m_Fractorium->m_Settings;
 	ember.m_Quality         = settings->XmlQuality();
 	ember.m_Supersample     = settings->XmlSupersample();
 	ember.m_TemporalSamples = settings->XmlTemporalSamples();
@@ -480,7 +480,7 @@ void FractoriumEmberController<T>::CopyAllXml()
 {
 	ostringstream os;
 	EmberToXml<T> emberToXml;
-	FractoriumSettings* settings = m_Fractorium->m_Settings;
+	auto settings = m_Fractorium->m_Settings;
 	os << "<flames>\n";
 
 	for (auto& e : m_EmberFile.m_Embers)
@@ -510,8 +510,8 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 	string s, errors;
 	XmlToEmber<T> parser;
 	vector<Ember<T>> embers;
-	QTextCodec* codec = QTextCodec::codecForName("UTF-8");
-	QByteArray b = codec->fromUnicode(QApplication::clipboard()->text());
+	auto codec = QTextCodec::codecForName("UTF-8");
+	auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
 
 	for (i = 0; i < b.size(); i++)
@@ -563,9 +563,9 @@ void FractoriumEmberController<T>::PasteXmlOver()
 	uint i;
 	string s, errors;
 	XmlToEmber<T> parser;
-	Ember<T> backupEmber = m_EmberFile.m_Embers[0];
-	QTextCodec* codec = QTextCodec::codecForName("UTF-8");
-	QByteArray b = codec->fromUnicode(QApplication::clipboard()->text());
+	auto backupEmber = m_EmberFile.m_Embers[0];
+	auto codec = QTextCodec::codecForName("UTF-8");
+	auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
 
 	for (i = 0; i < b.size(); i++)
@@ -810,6 +810,7 @@ void Fractorium::OnActionFinalRender(bool checked)
 {
 	//First completely stop what the current rendering process is doing.
 	m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
+	m_Controller->StopPreviewRender();
 	OnActionSaveCurrentToOpenedFile(true);//Save whatever was edited back to the current open file.
 	m_RenderStatusLabel->setText("Renderer stopped.");
 	m_FinalRenderDialog->show();

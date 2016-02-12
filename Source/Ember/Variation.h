@@ -2023,9 +2023,9 @@ public:
 	virtual string ToString() const override
 	{
 		ostringstream ss;
-		ss << Variation<T>::ToString() << endl;
+		ss << Variation<T>::ToString() << "\n";
 
-		for (auto& param : m_Params) ss << param.ToString() << endl;
+		for (auto& param : m_Params) ss << param.ToString() << "\n";
 
 		return ss.str();
 	}

@@ -15,11 +15,11 @@ bool EmberAnimate(EmberOptions& opt)
 	std::cout.imbue(std::locale(""));
 
 	if (opt.DumpArgs())
-		cout << opt.GetValues(eOptionUse::OPT_USE_ANIMATE) << endl;
+		cout << opt.GetValues(eOptionUse::OPT_USE_ANIMATE) << "\n";
 
 	if (opt.OpenCLInfo())
 	{
-		cout << "\nOpenCL Info: " << endl;
+		cout << "\nOpenCL Info: \n";
 		cout << info->DumpInfo();
 		return true;
 	}
@@ -41,7 +41,7 @@ bool EmberAnimate(EmberOptions& opt)
 	unique_ptr<RenderProgress<T>> progress;
 	vector<unique_ptr<Renderer<T, float>>> renderers;
 	vector<string> errorReport;
-	CriticalSection verboseCs;
+	std::recursive_mutex verboseCs;
 
 	if (opt.EmberCL())
 	{
@@ -53,7 +53,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (!renderers.size() || renderers.size() != devices.size())
 		{
-			cout << "Only created " << renderers.size() << " renderers out of " << devices.size() << " requested, exiting." << endl;
+			cout << "Only created " << renderers.size() << " renderers out of " << devices.size() << " requested, exiting.\n";
 			return false;
 		}
 
@@ -63,19 +63,19 @@ bool EmberAnimate(EmberOptions& opt)
 			renderers[0]->Callback(progress.get());
 		}
 
-		cout << "Using OpenCL to render." << endl;
+		cout << "Using OpenCL to render.\n";
 
 		if (opt.Verbose())
 		{
 			for (auto& device : devices)
 			{
-				cout << "Platform: " << info->PlatformName(device.first) << endl;
-				cout << "Device: " << info->DeviceName(device.first, device.second) << endl;
+				cout << "Platform: " << info->PlatformName(device.first) << "\n";
+				cout << "Device: " << info->DeviceName(device.first, device.second) << "\n";
 			}
 		}
 
 		if (opt.ThreadCount() > 1)
-			cout << "Cannot specify threads with OpenCL, using 1 thread." << endl;
+			cout << "Cannot specify threads with OpenCL, using 1 thread.\n";
 
 		opt.ThreadCount(1);
 
@@ -84,7 +84,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (opt.BitsPerChannel() != 8)
 		{
-			cout << "Bits per channel cannot be anything other than 8 with OpenCL, setting to 8." << endl;
+			cout << "Bits per channel cannot be anything other than 8 with OpenCL, setting to 8.\n";
 			opt.BitsPerChannel(8);
 		}
 	}
@@ -98,7 +98,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (!tempRenderer.get())
 		{
-			cout << "Renderer creation failed, exiting." << endl;
+			cout << "Renderer creation failed, exiting.\n";
 			return false;
 		}
 
@@ -110,12 +110,12 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (opt.ThreadCount() == 0)
 		{
-			cout << "Using " << Timing::ProcessorCount() << " automatically detected threads." << endl;
+			cout << "Using " << Timing::ProcessorCount() << " automatically detected threads.\n";
 			opt.ThreadCount(Timing::ProcessorCount());
 		}
 		else
 		{
-			cout << "Using " << opt.ThreadCount() << " manually specified threads." << endl;
+			cout << "Using " << opt.ThreadCount() << " manually specified threads.\n";
 		}
 
 		tempRenderer->ThreadCount(opt.ThreadCount(), opt.IsaacSeed() != "" ? opt.IsaacSeed().c_str() : nullptr);
@@ -125,7 +125,7 @@ bool EmberAnimate(EmberOptions& opt)
 	if (!InitPaletteList<T>(opt.PalettePath()))
 		return false;
 
-	cout << "Parsing ember file " << opt.Input() << endl;
+	cout << "Parsing ember file " << opt.Input() << "\n";
 
 	if (!ParseEmberFile(parser, opt.Input(), embers))
 		return false;
@@ -134,7 +134,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 	if (embers.size() <= 1)
 	{
-		cout << "Read " << embers.size() << " embers from file. At least 2 required to animate, exiting." << endl;
+		cout << "Read " << embers.size() << " embers from file. At least 2 required to animate, exiting.\n";
 		return false;
 	}
 
@@ -143,37 +143,37 @@ bool EmberAnimate(EmberOptions& opt)
 			opt.Format() != "ppm" &&
 			opt.Format() != "bmp")
 	{
-		cout << "Format must be jpg, png, ppm, or bmp not " << opt.Format() << ". Setting to jpg." << endl;
+		cout << "Format must be jpg, png, ppm, or bmp not " << opt.Format() << ". Setting to jpg.\n";
 	}
 
 	channels = opt.Format() == "png" ? 4 : 3;
 
 	if (opt.BitsPerChannel() == 16 && opt.Format() != "png")
 	{
-		cout << "Support for 16 bits per channel images is only present for the png format. Setting to 8." << endl;
+		cout << "Support for 16 bits per channel images is only present for the png format. Setting to 8.\n";
 		opt.BitsPerChannel(8);
 	}
 	else if (opt.BitsPerChannel() != 8 && opt.BitsPerChannel() != 16)
 	{
-		cout << "Unexpected bits per channel specified " << opt.BitsPerChannel() << ". Setting to 8." << endl;
+		cout << "Unexpected bits per channel specified " << opt.BitsPerChannel() << ". Setting to 8.\n";
 		opt.BitsPerChannel(8);
 	}
 
 	if (opt.InsertPalette() && opt.BitsPerChannel() != 8)
 	{
-		cout << "Inserting palette only supported with 8 bits per channel, insertion will not take place." << endl;
+		cout << "Inserting palette only supported with 8 bits per channel, insertion will not take place.\n";
 		opt.InsertPalette(false);
 	}
 
 	if (opt.AspectRatio() < 0)
 	{
-		cout << "Invalid pixel aspect ratio " << opt.AspectRatio() << endl << ". Must be positive, setting to 1." << endl;
+		cout << "Invalid pixel aspect ratio " << opt.AspectRatio() << "\n. Must be positive, setting to 1.\n";
 		opt.AspectRatio(1);
 	}
 
 	if (opt.Dtime() < 1)
 	{
-		cout << "Warning: dtime must be positive, not " << opt.Dtime() << ". Setting to 1." << endl;
+		cout << "Warning: dtime must be positive, not " << opt.Dtime() << ". Setting to 1.\n";
 		opt.Dtime(1);
 	}
 
@@ -181,13 +181,13 @@ bool EmberAnimate(EmberOptions& opt)
 	{
 		if (opt.Time())
 		{
-			cout << "Cannot specify both time and frame." << endl;
+			cout << "Cannot specify both time and frame.\n";
 			return false;
 		}
 
 		if (opt.FirstFrame() || opt.LastFrame())
 		{
-			cout << "Cannot specify both frame and begin or end." << endl;
+			cout << "Cannot specify both frame and begin or end.\n";
 			return false;
 		}
 
@@ -199,7 +199,7 @@ bool EmberAnimate(EmberOptions& opt)
 	{
 		if (opt.FirstFrame() || opt.LastFrame())
 		{
-			cout << "Cannot specify both time and begin or end." << endl;
+			cout << "Cannot specify both time and begin or end.\n";
 			return false;
 		}
 
@@ -225,7 +225,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (i > 0 && embers[i].m_Time == embers[i - 1].m_Time)
 		{
-			cout << "Image " << i << " time of " << embers[i].m_Time << " equaled previous image time of " << embers[i - 1].m_Time << ". Adjusting up by 1." << endl;
+			cout << "Image " << i << " time of " << embers[i].m_Time << " equaled previous image time of " << embers[i - 1].m_Time << ". Adjusting up by 1.\n";
 			embers[i].m_Time++;
 		}
 
@@ -255,14 +255,14 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (imageMem > maxMem)//Ensure the max amount of memory for a process isn't exceeded.
 		{
-			cout << "Image " << i << " size > " << maxMem << ". Setting to 1920 x 1080." << endl;
+			cout << "Image " << i << " size > " << maxMem << ". Setting to 1920 x 1080.\n";
 			embers[i].m_FinalRasW = 1920;
 			embers[i].m_FinalRasH = 1080;
 		}
 
 		if (embers[i].m_FinalRasW == 0 || embers[i].m_FinalRasH == 0)
 		{
-			cout << "Warning: Output image " << i << " has dimension 0: " << embers[i].m_FinalRasW  << ", " << embers[i].m_FinalRasH << ". Setting to 1920 x 1080." << endl;
+			cout << "Warning: Output image " << i << " has dimension 0: " << embers[i].m_FinalRasW  << ", " << embers[i].m_FinalRasH << ". Setting to 1920 x 1080.\n";
 			embers[i].m_FinalRasW = 1920;
 			embers[i].m_FinalRasH = 1080;
 		}
@@ -271,7 +271,7 @@ bool EmberAnimate(EmberOptions& opt)
 				(embers[i].m_FinalRasH != embers[0].m_FinalRasH))
 		{
 			cout << "Warning: flame " << i << " at time " << embers[i].m_Time << " size mismatch. (" << embers[i].m_FinalRasW << ", " << embers[i].m_FinalRasH <<
-				 ") should be (" << embers[0].m_FinalRasW << ", " << embers[0].m_FinalRasH << "). Setting to " << embers[0].m_FinalRasW << ", " << embers[0].m_FinalRasH << "." << endl;
+				 ") should be (" << embers[0].m_FinalRasW << ", " << embers[0].m_FinalRasH << "). Setting to " << embers[0].m_FinalRasW << ", " << embers[0].m_FinalRasH << ".\n";
 			embers[i].m_FinalRasW = embers[0].m_FinalRasW;
 			embers[i].m_FinalRasH = embers[0].m_FinalRasH;
 		}
@@ -279,7 +279,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 	if (unsorted)
 	{
-		cout << "Embers were unsorted by time. First out of order index was " << firstUnsortedIndex << ". Sorting." << endl;
+		cout << "Embers were unsorted by time. First out of order index was " << firstUnsortedIndex << ". Sorting.\n";
 		std::sort(embers.begin(), embers.end(), &CompareEmbers<T>);
 	}
 
@@ -295,7 +295,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 	if (!opt.Out().empty())
 	{
-		cout << "Single output file " << opt.Out() << " specified for multiple images. They would be all overwritten and only the last image will remain, exiting." << endl;
+		cout << "Single output file " << opt.Out() << " specified for multiple images. They would be all overwritten and only the last image will remain, exiting.\n";
 		return false;
 	}
 
@@ -339,7 +339,7 @@ bool EmberAnimate(EmberOptions& opt)
 			writeSuccess = WriteBmp(filename.c_str(), finalImagep, w, h);
 
 		if (!writeSuccess)
-			cout << "Error writing " << filename << endl;
+			cout << "Error writing " << filename << "\n";
 	};
 	atomfTime.store(opt.FirstFrame());
 	std::function<void(size_t)> iterFunc = [&](size_t index)
@@ -361,16 +361,15 @@ bool EmberAnimate(EmberOptions& opt)
 
 			if (opt.Verbose() && ((opt.LastFrame() - opt.FirstFrame()) / opt.Dtime() >= 1))
 			{
-				verboseCs.Enter();
-				cout << "Time = " << ftime << " / " << opt.LastFrame() << " / " << opt.Dtime() << endl;
-				verboseCs.Leave();
+				rlg l(verboseCs);
+				cout << "Time = " << ftime << " / " << opt.LastFrame() << " / " << opt.Dtime() << "\n";
 			}
 
 			renderer->Reset();
 
 			if ((renderer->Run(finalImages[finalImageIndex], localTime) != eRenderStatus::RENDER_OK) || renderer->Aborted() || finalImages[finalImageIndex].empty())
 			{
-				cout << "Error: image rendering failed, skipping to next image." << endl;
+				cout << "Error: image rendering failed, skipping to next image.\n";
 				renderer->DumpErrorReport();//Something went wrong, print errors.
 				atomfTime.store(opt.LastFrame() + 1);//Abort all threads if any of them encounter an error.
 				break;
@@ -386,9 +385,8 @@ bool EmberAnimate(EmberOptions& opt)
 
 				if (opt.Verbose())
 				{
-					verboseCs.Enter();
-					cout << "Writing " << flameName << endl;
-					verboseCs.Leave();
+					rlg l(verboseCs);
+					cout << "Writing " << flameName << "\n";
 				}
 
 				Interpolater<T>::Interpolate(embers, localTime, 0, centerEmber);//Get center flame.
@@ -404,16 +402,15 @@ bool EmberAnimate(EmberOptions& opt)
 
 			if (opt.Verbose())
 			{
-				verboseCs.Enter();
-				cout << "\nIters ran/requested: " + os.str() << endl;
+				rlg l(verboseCs);
+				cout << "\nIters ran/requested: " + os.str() << "\n";
 
-				if (!opt.EmberCL()) cout << "Bad values: " << stats.m_Badvals << endl;
+				if (!opt.EmberCL()) cout << "Bad values: " << stats.m_Badvals << "\n";
 
-				cout << "Render time: " << t.Format(stats.m_RenderMs) << endl;
-				cout << "Pure iter time: " << t.Format(stats.m_IterMs) << endl;
-				cout << "Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << endl;
-				cout << "Writing " << filename << endl << endl;
-				verboseCs.Leave();
+				cout << "Render time: " << t.Format(stats.m_RenderMs) << "\n";
+				cout << "Pure iter time: " << t.Format(stats.m_IterMs) << "\n";
+				cout << "Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << "\n";
+				cout << "Writing " << filename << "\n\n";
 			}
 
 			//Run image writing in a thread. Although doing it this way duplicates the final output memory, it saves a lot of time
@@ -487,7 +484,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			else if (opt.Bits() == 32)
 			{
-				cout << "Bits 32/int histogram no longer supported. Using bits == 33 (float)." << endl;
+				cout << "Bits 32/int histogram no longer supported. Using bits == 33 (float).\n";
 				b = EmberAnimate<float>(opt);
 			}
 	}

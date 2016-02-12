@@ -5,7 +5,7 @@
 namespace EmberNs
 {
 template<> unique_ptr<QTIsaac<ISAAC_SIZE, ISAAC_INT>> QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand = unique_ptr<QTIsaac<ISAAC_SIZE, ISAAC_INT>>(new QTIsaac<ISAAC_SIZE, ISAAC_INT>());
-template<> CriticalSection QTIsaac<ISAAC_SIZE, ISAAC_INT>::m_CS = CriticalSection();
+template<> std::recursive_mutex QTIsaac<ISAAC_SIZE, ISAAC_INT>::s_CS = std::recursive_mutex();
 }
 
 #include "Curves.h"
@@ -56,7 +56,7 @@ uint Timing::m_ProcessorCount;
 
 #define EXPORT_SINGLE_TYPE_EMBER(T) \
 	template<> const char* PaletteList<T>::m_DefaultFilename = "flam3-palettes.xml"; \
-	template<> map<string, vector<Palette<T>>> PaletteList<T>::m_Palettes = map<string, vector<Palette<T>>>(); \
+	template<> map<string, vector<Palette<T>>> PaletteList<T>::s_Palettes = map<string, vector<Palette<T>>>(); \
 	template<> bool XmlToEmber<T>::m_Init = false; \
 	template<> vector<string> XmlToEmber<T>::m_FlattenNames = vector<string>(); \
 	template<> unordered_map<string, string> XmlToEmber<T>::m_BadParamNames = unordered_map<string, string>(); \

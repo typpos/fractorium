@@ -57,12 +57,12 @@ typedef void (*KernelFuncPointer) (size_t gridWidth, size_t gridHeight, size_t b
 
 static void OpenCLSim(size_t gridWidth, size_t gridHeight, size_t blockWidth, size_t blockHeight, KernelFuncPointer func)
 {
-	cout << "OpenCLSim(): " << endl;
-	cout << "	Params: " << endl;
-	cout << "		gridW: " << gridWidth << endl;
-	cout << "		gridH: " << gridHeight << endl;
-	cout << "		blockW: " << blockWidth << endl;
-	cout << "		blockH: " << blockHeight << endl;
+	cout << "OpenCLSim(): ";
+	cout << "\n	Params: ";
+	cout << "\n		gridW: " << gridWidth;
+	cout << "\n		gridH: " << gridHeight;
+	cout << "\n		blockW: " << blockWidth;
+	cout << "\n		blockH: " << blockHeight;
 
 	for (size_t i = 0; i < gridHeight; i += blockHeight)
 	{

@@ -109,6 +109,20 @@ T GLEmberController<T>::CalcRotation()
 /// <param name="vec">The world cartesian coordinate to be snapped</param>
 /// <returns>The snapped world cartesian coordinate</returns>
 template <typename T>
+typename v2T GLEmberController<T>::SnapToGrid(v2T& vec)
+{
+	v2T ret;
+	ret.x = glm::round(vec.x / GridStep) * GridStep;
+	ret.y = glm::round(vec.y / GridStep) * GridStep;
+	return ret;
+}
+
+/// <summary>
+/// Snap the passed in world cartesian coordinate to the grid for rotation, scale or translation.
+/// </summary>
+/// <param name="vec">The world cartesian coordinate to be snapped</param>
+/// <returns>The snapped world cartesian coordinate</returns>
+template <typename T>
 typename v3T GLEmberController<T>::SnapToGrid(v3T& vec)
 {
 	v3T ret;
@@ -135,8 +149,8 @@ typename v3T GLEmberController<T>::SnapToNormalizedAngle(v3T& vec, uint division
 	for (uint i = 0; i < divisions; i++)
 	{
 		theta = 2.0 * M_PI * T(i) / T(divisions);
-		c.x = cos(theta);
-		c.y = sin(theta);
+		c.x = std::cos(theta);
+		c.y = std::sin(theta);
 		rsq = glm::distance(vec, c);
 
 		if (rsq < bestRsq)
@@ -220,7 +234,7 @@ void GLEmberController<double>::MultMatrix(tmat4x4<double, glm::defaultp>& mat)
 template <typename T>
 void GLEmberController<T>::QueryMatrices(bool print)
 {
-	RendererBase* renderer = m_FractoriumEmberController->Renderer();
+	auto renderer = m_FractoriumEmberController->Renderer();
 
 	if (renderer)
 	{
@@ -242,13 +256,13 @@ void GLEmberController<T>::QueryMatrices(bool print)
 		if (print)
 		{
 			for (size_t i = 0; i < 4; i++)
-				qDebug() << "Viewport[" << i << "] = " << m_Viewport[i] << endl;
+				qDebug() << "Viewport[" << i << "] = " << m_Viewport[i] << "\n";
 
 			for (size_t i = 0; i < 16; i++)
-				qDebug() << "Modelview[" << i << "] = " << glm::value_ptr(m_Modelview)[i] << endl;
+				qDebug() << "Modelview[" << i << "] = " << glm::value_ptr(m_Modelview)[i] << "\n";
 
 			for (size_t i = 0; i < 16; i++)
-				qDebug() << "Projection[" << i << "] = " << glm::value_ptr(m_Projection)[i] << endl;
+				qDebug() << "Projection[" << i << "] = " << glm::value_ptr(m_Projection)[i] << "\n";
 		}
 	}
 }

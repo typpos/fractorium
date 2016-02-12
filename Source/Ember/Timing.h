@@ -52,7 +52,7 @@ public:
 
 		if (str)
 		{
-			cout << string(str) << (fullString ? "" : " processing time: ") << Format(ms) << endl;
+			cout << string(str) << (fullString ? "" : " processing time: ") << Format(ms) << "\n";
 		}
 
 		return ms;
@@ -77,7 +77,6 @@ public:
 	double ElapsedTime() const
 	{
 		duration<double> elapsed = duration_cast<milliseconds, Clock::rep, Clock::period>(m_EndTime - m_BeginTime);
-
 		return elapsed.count() * 1000.0;
 	}
 
@@ -92,7 +91,6 @@ public:
 	string Format(double ms) const
 	{
 		stringstream ss;
-
 		double x = ms / 1000;
 		double secs = fmod(x, 60);
 		x /= 60;
@@ -145,79 +143,5 @@ private:
 	time_point<Clock> m_EndTime;//The end of the timing, set with Toc().
 	static bool m_TimingInit;//Whether the performance info has bee queried.
 	static uint m_ProcessorCount;//The number of cores on the system, set in Init().
-};
-
-/// <summary>
-/// Cross platform critical section class which can be used for thread locking.
-/// </summary>
-class EMBER_API CriticalSection
-{
-public:
-
-#ifdef _WIN32
-	/// <summary>
-	/// Constructor which initialized the underlying CRITICAL_SECTION object.
-	/// </summary>
-	CriticalSection() { InitializeCriticalSection(&m_CriticalSection); }
-
-	/// <summary>
-	/// Constructor which initialized the underlying CRITICAL_SECTION object
-	/// with the specified spin count value.
-	/// </summary>
-	/// <param name="spinCount">The spin count.</param>
-	CriticalSection(DWORD spinCount) { InitializeCriticalSectionAndSpinCount(&m_CriticalSection, spinCount); }
-
-	/// <summary>
-	/// Deletes the underlying CRITICAL_SECTION object.
-	/// </summary>
-	~CriticalSection() { DeleteCriticalSection(&m_CriticalSection); }
-
-	/// <summary>
-	/// Lock the critical section.
-	/// </summary>
-	void Enter() { EnterCriticalSection(&m_CriticalSection); }
-
-	/// <summary>
-	/// Unlock the critical section.
-	/// </summary>
-	void Leave() { LeaveCriticalSection(&m_CriticalSection); }
-
-private:
-	CRITICAL_SECTION m_CriticalSection;//The Windows specific critical section object.
-
-#else
-
-	/// <summary>
-	/// Constructor which initialized the underlying pthread_mutex_t object.
-	/// </summary>
-	CriticalSection()
-	{
-		pthread_mutexattr_t attr;
-		
-		pthread_mutexattr_init(&attr);
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
-		pthread_mutex_init(&m_CriticalSection, &attr);
-		pthread_mutexattr_destroy(&attr);
-	}
-
-	/// <summary>
-	/// Deletes the underlying pthread_mutex_t object.
-	/// </summary>
-	~CriticalSection() { pthread_mutex_destroy(&m_CriticalSection); }
-
-	/// <summary>
-	/// Lock the critical section.
-	/// </summary>
-	void Enter() { pthread_mutex_lock(&m_CriticalSection); }
-
-	/// <summary>
-	/// Unlock the critical section.
-	/// </summary>
-	void Leave() { pthread_mutex_unlock(&m_CriticalSection); }
-
-private:
-	pthread_mutex_t m_CriticalSection;//The *nix/pthread specific critical section object.
-
-#endif
 };
 }

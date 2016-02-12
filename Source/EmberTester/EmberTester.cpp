@@ -1962,6 +1962,28 @@ void DistribTester()
 	}
 }
 
+template <typename T>
+void TestAffine()
+{
+	v2T x(1, 0), y(0, 1), t(1, 0);
+	Affine2D<T> af(x, y, t);
+	auto af2 = af;
+	cout << af.ToString() << "\n\n";
+	af.RotateTrans(90);
+	cout << af.ToString() << "\n\n";
+	af2.RotateTrans(-90);
+	cout << af2.ToString() << "\n\n";
+}
+
+template <typename T>
+void TestRotate()
+{
+	T angle = 45;
+	v3T x(1, 0, 0), y(0, 1, 0), xy(1, 1, 0);
+	auto xtrans = glm::translate(m4T(1), xy);
+	auto xrot = glm::rotate(xtrans, angle * DEG_2_RAD_T, v3T(0, 0, 1));
+}
+
 #define DO_NVIDIA 1
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -1971,7 +1993,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	Timing t(4);
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(1, 2, 3);
 	mt19937 meow(1729);
-	/*  MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
+	/*  TestAffine<float>();
+	    TestAffine<double>();*/
+	/*  TestRotate<float>();
+	    TestRotate<double>();
+	    return 1;
+	    MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
 	    return 0;
 
 
@@ -2175,28 +2202,28 @@ int _tmain(int argc, _TCHAR* argv[])
 #endif
 	}
 
-#ifdef DO_DOUBLE
-
-	//t.Tic();
-	//TestCpuGpuResults<double>();
-	//t.Toc("TestCpuGpuResults<double>()");
-	if (b)
-	{
-		t.Tic();
-		TestAllVarsCLBuild<double>(0, 0, true);
-		t.Toc("TestAllVarsCLBuild<double>()");
-
-		if (b)
-		{
-#ifdef DO_NVIDIA
-			t.Tic();
-			TestAllVarsCLBuild<double>(1, 0, true);
-			t.Toc("TestAllVarsCLBuild<double>()");
-#endif
-		}
-	}
-
-#endif
+//#ifdef DO_DOUBLE
+//
+//	//t.Tic();
+//	//TestCpuGpuResults<double>();
+//	//t.Toc("TestCpuGpuResults<double>()");
+//	if (b)
+//	{
+//		t.Tic();
+//		TestAllVarsCLBuild<double>(0, 0, true);
+//		t.Toc("TestAllVarsCLBuild<double>()");
+//
+//		if (b)
+//		{
+//#ifdef DO_NVIDIA
+//			t.Tic();
+//			TestAllVarsCLBuild<double>(1, 0, true);
+//			t.Toc("TestAllVarsCLBuild<double>()");
+//#endif
+//		}
+//	}
+//
+//#endif
 #endif
 	//PrintAllVars();
 	//_CrtDumpMemoryLeaks();

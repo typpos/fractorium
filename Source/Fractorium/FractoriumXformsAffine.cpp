@@ -364,7 +364,7 @@ void FractoriumEmberController<T>::RotateXformsByAngle(double angle, bool pre)
 	UpdateXform([&] (Xform<T>* xform)
 	{
 		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-		affine->Rotate(angle);
+		affine->Rotate(angle * DEG_2_RAD_T);
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
 }
@@ -595,7 +595,7 @@ template <typename T>
 void FractoriumEmberController<T>::FillAffineWithXform(Xform<T>* xform, bool pre)
 {
 	DoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
-	const Affine2D<T>& affine = pre ? xform->m_Affine : xform->m_Post;
+	auto& affine = pre ? xform->m_Affine : xform->m_Post;
 
 	if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
 	{

@@ -99,7 +99,6 @@ public:
 		m_PadCarLlY = T(carToRas.PadCarLlY());
 		m_PadCarUrX = T(carToRas.PadCarUrX());
 		m_PadCarUrY = T(carToRas.PadCarUrY());
-
 		return *this;
 	}
 
@@ -117,29 +116,22 @@ public:
 	{
 		m_RasWidth = rasW;
 		m_RasHeight = rasH;
-
 		m_CarLlX = carLlX;
 		m_CarLlY = carLlY;
 		m_CarUrX = carUrX;
 		m_CarUrY = carUrY;
-
 		T carW = m_CarUrX - m_CarLlX;//Right minus left.
 		T carH = m_CarUrY - m_CarLlY;//Top minus bottom.
 		T invSizeW = T(1.0) / carW;
 		T invSizeH = T(1.0) / carH;
-
 		m_PixPerImageUnitW = static_cast<T>(rasW) * invSizeW;
 		m_RasLlX = m_PixPerImageUnitW * carLlX;
-
 		m_PixPerImageUnitH = static_cast<T>(rasH) * invSizeH;
 		m_RasLlY = m_PixPerImageUnitH * carLlY;
-
 		m_OneRow = abs(m_CarUrY - m_CarLlY) / m_RasHeight;
 		m_OneCol = abs(m_CarUrX - m_CarLlX) / m_RasWidth;
-
 		m_PadCarLlX = m_CarLlX + m_OneCol;
 		m_PadCarUrX = m_CarUrX - m_OneCol;
-
 		m_PadCarLlY = m_CarLlY + m_OneRow;
 		m_PadCarUrY = m_CarUrY - m_OneRow;
 	}
@@ -209,9 +201,8 @@ public:
 		//if (point.m_Y > m_CarLlY && point.m_Y <= m_PadCarLlY && //Mapped to top row...
 		//	point.m_X > m_CarLlX && point.m_X <= m_PadCarLlX)//...first col.
 		//{
-		//	cout << "First pixel hit." << endl;
+		//	cout << "First pixel hit.\n";
 		//}
-
 		return point.m_X >= m_CarLlX &&
 			   point.m_X < m_CarUrX &&
 			   point.m_Y < m_CarUrY &&

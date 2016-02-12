@@ -9,8 +9,6 @@
 
 namespace EmberCLns
 {
-#define IMAGEGL2D cl::ImageGL
-
 /// <summary>
 /// Class to contain all of the things needed to store an OpenCL program.
 /// The name of it, the source, the compiled program object and the kernel.
@@ -75,13 +73,13 @@ public:
 	{
 	}
 
-	NamedImage2DGL(const IMAGEGL2D& image, const string& name)
+	NamedImage2DGL(const cl::ImageGL& image, const string& name)
 	{
 		m_Image = image;
 		m_Name = name;
 	}
 
-	IMAGEGL2D m_Image;
+	cl::ImageGL m_Image;
 	string m_Name;
 };
 
@@ -129,11 +127,11 @@ public:
 	bool CompareImageParams(cl::Image& image, cl_mem_flags flags, const cl::ImageFormat& format, ::size_t width, ::size_t height, ::size_t row_pitch);
 	void ClearImages(bool shared);
 	bool CreateImage2D(cl::Image2D& image2D, cl_mem_flags flags, cl::ImageFormat format, ::size_t width, ::size_t height, ::size_t row_pitch = 0, void* data = NULL);
-	bool CreateImage2DGL(IMAGEGL2D& image2DGL, cl_mem_flags flags, GLenum target, GLint miplevel, GLuint texobj);
+	bool CreateImage2DGL(cl::ImageGL& image2DGL, cl_mem_flags flags, GLenum target, GLint miplevel, GLuint texobj);
 	bool EnqueueAcquireGLObjects(const string& name);
-	bool EnqueueAcquireGLObjects(IMAGEGL2D& image);
+	bool EnqueueAcquireGLObjects(cl::ImageGL& image);
 	bool EnqueueReleaseGLObjects(const string& name);
-	bool EnqueueReleaseGLObjects(IMAGEGL2D& image);
+	bool EnqueueReleaseGLObjects(cl::ImageGL& image);
 	bool EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = NULL);
 	bool EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = NULL);
 	bool CreateSampler(cl::Sampler& sampler, cl_bool normalizedCoords, cl_addressing_mode addressingMode, cl_filter_mode filterMode);

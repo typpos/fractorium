@@ -109,9 +109,9 @@ public:
 
 	T CalcScale();
 	T CalcRotation();
-	Affine2D<T> CalcDragXAxis();
-	Affine2D<T> CalcDragYAxis();
-	Affine2D<T> CalcDragTranslation();
+	void CalcDragXAxis();
+	void CalcDragYAxis();
+	void CalcDragTranslation();
 
 	void SetEmber(Ember<T>* ember);
 	void SetSelectedXform(Xform<T>* xform);
@@ -120,6 +120,7 @@ public:
 	bool CheckXformHover(Xform<T>* xform, v3T& glCoords, T& bestDist, bool pre, bool post);
 
 private:
+	v2T SnapToGrid(v2T& vec);
 	v3T SnapToGrid(v3T& vec);
 	v3T SnapToNormalizedAngle(v3T& vec, uint divisions);
 	v3T WindowToWorld(v3T& v, bool flip);

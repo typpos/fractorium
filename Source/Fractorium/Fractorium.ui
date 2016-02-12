@@ -2780,7 +2780,7 @@
           <enum>QTabWidget::Triangular</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="XformColorTab">
           <property name="sizePolicy">
@@ -3470,8 +3470,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>263</width>
-                <height>700</height>
+                <width>118</width>
+                <height>618</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5485,8 +5485,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>259</width>
-                   <height>652</height>
+                   <width>133</width>
+                   <height>52</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -6768,6 +6768,9 @@
    <property name="toolTip">
     <string>Clear any existing flames and create a new file with 10 random flames in it</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="ActionOpen">
    <property name="icon">
@@ -6776,6 +6779,9 @@
    </property>
    <property name="text">
     <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="ActionExit">
@@ -6798,6 +6804,9 @@
    <property name="toolTip">
     <string>&lt;html&gt;&lt;body&gt;&lt;p&gt;Save the currently displayed flame back to the opened file in memory.&lt;/p&gt;&lt;p&gt;This overwrites the original flame but does not store the file back to disk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
   </action>
   <action name="ActionSaveCurrentAsXml">
    <property name="icon">
@@ -6809,6 +6818,9 @@
    </property>
    <property name="toolTip">
     <string>Save the current flame as an xml file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="ActionAbout">
@@ -6861,6 +6873,9 @@
    <property name="toolTip">
     <string>Add a new random flame to the end of the current file</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="ActionSaveEntireFileAsXml">
    <property name="icon">
@@ -6875,6 +6890,9 @@
    </property>
    <property name="toolTip">
     <string>Save all flames as a single xml file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="ActionAddReflectiveSymmetry">
@@ -6920,6 +6938,9 @@
    <property name="toolTip">
     <string>Add a new empty flame to the end of the current file</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="ActionCopyFlameInCurrentFile">
    <property name="icon">
@@ -6927,7 +6948,7 @@
      <normaloff>:/Fractorium/Icons/layers.png</normaloff>:/Fractorium/Icons/layers.png</iconset>
    </property>
    <property name="text">
-    <string>Co&amp;py Flame</string>
+    <string>Add Co&amp;py of Flame</string>
    </property>
    <property name="toolTip">
     <string>Add a copy of the current flame to the end of the current file</string>
@@ -7069,11 +7090,6 @@
     <string>Remove the flatten variation from each xform</string>
    </property>
   </action>
-  <action name="ActionFlip">
-   <property name="text">
-    <string>Fl&amp;ip</string>
-   </property>
-  </action>
   <action name="ActionCopySelectedXforms">
    <property name="text">
     <string>Copy Selected &amp;Xforms</string>
@@ -7082,7 +7098,7 @@
     <string>Copy selected xforms to the clipboard</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+D</string>
+    <string>Ctrl+C, X</string>
    </property>
   </action>
   <action name="ActionPasteSelectedXforms">
@@ -7093,7 +7109,7 @@
     <string>Paste copied xforms into the current flame</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string>Ctrl+V, X</string>
    </property>
   </action>
   <action name="ActionResetWorkspace">
@@ -7192,7 +7208,7 @@
     <string>Stop Renderer</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

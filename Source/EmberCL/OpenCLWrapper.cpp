@@ -332,7 +332,7 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 			if (shared)
 			{
 				//::wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
-				IMAGEGL2D imageGL(m_Context, flags, GL_TEXTURE_2D, 0, texName, &err);
+				cl::ImageGL imageGL(m_Context, flags, GL_TEXTURE_2D, 0, texName, &err);
 				NamedImage2DGL namedImageGL(imageGL, name);
 
 				if (m_Info->CheckCL(err, "cl::ImageGL()"))
@@ -360,11 +360,11 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 		{
 			if (shared)
 			{
-				IMAGEGL2D imageGL = m_GLImages[imageIndex].m_Image;
+				cl::ImageGL imageGL = m_GLImages[imageIndex].m_Image;
 
 				if (!CompareImageParams(imageGL, flags, format, width, height, row_pitch))
 				{
-					NamedImage2DGL namedImageGL(IMAGEGL2D(m_Context, flags, GL_TEXTURE_2D, 0, texName, &err), name);//Sizes are different, so create new.
+					NamedImage2DGL namedImageGL(cl::ImageGL(m_Context, flags, GL_TEXTURE_2D, 0, texName, &err), name);//Sizes are different, so create new.
 
 					if (m_Info->CheckCL(err, "cl::ImageGL()"))
 					{
@@ -430,7 +430,7 @@ bool OpenCLWrapper::WriteImage2D(size_t index, bool shared, ::size_t width, ::si
 
 		if (shared && index < m_GLImages.size())
 		{
-			IMAGEGL2D imageGL = m_GLImages[index].m_Image;
+			cl::ImageGL imageGL = m_GLImages[index].m_Image;
 
 			if (EnqueueAcquireGLObjects(imageGL))
 			{
@@ -502,7 +502,7 @@ bool OpenCLWrapper::ReadImage(size_t imageIndex, ::size_t width, ::size_t height
 
 		if (shared && imageIndex < m_GLImages.size())
 		{
-			IMAGEGL2D imageGL = m_GLImages[imageIndex].m_Image;
+			cl::ImageGL imageGL = m_GLImages[imageIndex].m_Image;
 
 			if (EnqueueAcquireGLObjects(imageGL))
 			{
@@ -573,7 +573,7 @@ size_t OpenCLWrapper::GetImageSize(size_t imageIndex, bool shared)
 		{
 			vector<cl::Memory> images;
 			images.push_back(m_GLImages[imageIndex].m_Image);
-			IMAGEGL2D image = m_GLImages[imageIndex].m_Image;
+			cl::ImageGL image = m_GLImages[imageIndex].m_Image;
 
 			if (EnqueueAcquireGLObjects(&images))
 				size = image.getImageInfo<CL_IMAGE_WIDTH>(nullptr) * image.getImageInfo<CL_IMAGE_HEIGHT>(nullptr) * image.getImageInfo<CL_IMAGE_ELEMENT_SIZE>(nullptr);//Should pitch be checked here?
@@ -662,17 +662,17 @@ bool OpenCLWrapper::CreateImage2D(cl::Image2D& image2D, cl_mem_flags flags, cl::
 /// <param name="miplevel">The mip map level</param>
 /// <param name="texobj">The texture ID of the shared OpenGL texture</param>
 /// <returns>True if success, else false.</returns>
-bool OpenCLWrapper::CreateImage2DGL(IMAGEGL2D& image2DGL, cl_mem_flags flags, GLenum target, GLint miplevel, GLuint texobj)
+bool OpenCLWrapper::CreateImage2DGL(cl::ImageGL& image2DGL, cl_mem_flags flags, GLenum target, GLint miplevel, GLuint texobj)
 {
 	if (m_Init)
 	{
 		cl_int err;
-		image2DGL = IMAGEGL2D(m_Context,
-							  flags,
-							  target,
-							  miplevel,
-							  texobj,
-							  &err);
+		image2DGL = cl::ImageGL(m_Context,
+								flags,
+								target,
+								miplevel,
+								texobj,
+								&err);
 		return m_Info->CheckCL(err, "cl::ImageGL()");
 	}
 
@@ -699,7 +699,7 @@ bool OpenCLWrapper::EnqueueAcquireGLObjects(const string& name)
 /// </summary>
 /// <param name="image">The image to acquire</param>
 /// <returns>True if success, else false.</returns>
-bool OpenCLWrapper::EnqueueAcquireGLObjects(IMAGEGL2D& image)
+bool OpenCLWrapper::EnqueueAcquireGLObjects(cl::ImageGL& image)
 {
 	if (m_Init && m_Shared)
 	{
@@ -733,7 +733,7 @@ bool OpenCLWrapper::EnqueueReleaseGLObjects(const string& name)
 /// </summary>
 /// <param name="image">The image to release</param>
 /// <returns>True if success, else false.</returns>
-bool OpenCLWrapper::EnqueueReleaseGLObjects(IMAGEGL2D& image)
+bool OpenCLWrapper::EnqueueReleaseGLObjects(cl::ImageGL& image)
 {
 	if (m_Init && m_Shared)
 	{

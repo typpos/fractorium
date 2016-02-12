@@ -139,7 +139,7 @@ void Renderer<T, bucketT>::ComputeCamera()
 	T carUrX = m_UpperRightX + t0;
 	T carUrY = m_UpperRightY + t1 + shift;
 	m_RotMat.MakeID();
-	m_RotMat.Rotate(-Rotate());
+	m_RotMat.Rotate(-Rotate() * DEG_2_RAD_T);
 	m_CarToRas.Init(carLlX, carLlY, carUrX, carUrY, m_SuperRasW, m_SuperRasH, PixelAspectRatio());
 }
 
@@ -215,8 +215,6 @@ bool Renderer<T, bucketT>::CreateDEFilter(bool& newAlloc)
 			if (!m_DensityFilter.get()) { return false; }//Did object creation succeed?
 
 			if (!m_DensityFilter->Create()) { return false; }//Object creation succeeded, did filter creation succeed?
-
-			//cout << m_DensityFilter->ToString() << endl;
 		}
 		else if (!m_DensityFilter->Valid()) { return false; } //Previously created, are values ok?
 	}
@@ -1299,7 +1297,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 				//iterationTime += t.Toc();
 
 				if (m_LockAccum)
-					m_AccumCs.Enter();
+					m_AccumCs.lock();
 
 				//t.Tic();
 				//Map temp buffer samples into the histogram using the palette for color.
@@ -1307,7 +1305,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 
 				//accumulationTime += t.Toc();
 				if (m_LockAccum)
-					m_AccumCs.Leave();
+					m_AccumCs.unlock();
 
 				if (m_Callback && threadIndex == 0)
 				{

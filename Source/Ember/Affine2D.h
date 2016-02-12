@@ -77,7 +77,8 @@ public:
 	bool IsEmpty() const;
 	void Scale(T amount);
 	Affine2D<T> ScaleCopy(T amount);
-	void Rotate(T angle);
+	void Rotate(T rad);
+	void RotateTrans(T rad);
 	void Translate(const v2T& v);
 	void RotateScaleXTo(const v2T& v);
 	void RotateScaleYTo(const v2T& v);
@@ -88,6 +89,7 @@ public:
 	m2T ToMat2RowMajor() const;
 	m4T ToMat4ColMajor(bool center = false) const;
 	m4T ToMat4RowMajor(bool center = false) const;
+	m4T TransToMat4ColMajor() const;
 
 	//Note that returning a copy is actually faster than a const ref&.
 	T A() const;
@@ -111,6 +113,8 @@ public:
 	void X(const v2T& x);
 	void Y(const v2T& y);
 	void O(const v2T& t);
+
+	string ToString() const;
 
 	static Affine2D CalcRotateScale(const v2T& from, const v2T& to);
 	static void CalcRSAC(const v2T& from, const v2T& to, T& a, T& c);

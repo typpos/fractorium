@@ -53,25 +53,21 @@ private:
 	bool operator < (const QTreeWidgetItem& other) const
 	{
 		int column = treeWidget()->sortColumn();
-		eVariationId index1, index2;
-		double weight1 = 0, weight2 = 0;
-		VariationTreeWidgetItem* varItemWidget;
-		VariationTreeDoubleSpinBox* spinBox1, *spinBox2;
 		auto itemWidget1 = treeWidget()->itemWidget(const_cast<VariationTreeWidgetItem*>(this), 1);//Get the widget for the second column.
 
-		if ((spinBox1 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget1)))//Cast the widget to the VariationTreeDoubleSpinBox type.
+		if (auto spinBox1 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget1))//Cast the widget to the VariationTreeDoubleSpinBox type.
 		{
 			auto itemWidget2 = treeWidget()->itemWidget(const_cast<QTreeWidgetItem*>(&other), 1);//Get the widget for the second column of the widget item passed in.
 
-			if ((spinBox2 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget2)))//Cast the widget to the VariationTreeDoubleSpinBox type.
+			if (auto spinBox2 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget2))//Cast the widget to the VariationTreeDoubleSpinBox type.
 			{
 				if (spinBox1->IsParam() || spinBox2->IsParam())//Do not sort params, their order will always remain the same.
 					return false;
 
-				weight1 = spinBox1->value();
-				weight2 = spinBox2->value();
-				index1 = spinBox1->GetVariationId();
-				index2 = spinBox2->GetVariationId();
+				auto weight1 = spinBox1->value();
+				auto weight2 = spinBox2->value();
+				auto index1 = spinBox1->GetVariationId();
+				auto index2 = spinBox2->GetVariationId();
 
 				if (column == 0)//First column clicked, sort by variation index.
 				{

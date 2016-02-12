@@ -139,7 +139,7 @@ void Fractorium::OnPaletteFilenameComboChanged(const QString& text)
 template <typename T>
 void FractoriumEmberController<T>::ApplyPaletteToEmber()
 {
-	int i, rot = 0;
+	int rot = 0;
 	uint blur = m_Fractorium->m_PaletteBlurSpin->value();
 	uint freq = m_Fractorium->m_PaletteFrequencySpin->value();
 	double sat = double(m_Fractorium->m_PaletteSaturationSpin->value() / 100.0);
@@ -170,7 +170,7 @@ void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<T>& palette)
 		vector<byte> v = palette.MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);//Make the palette repeat for PALETTE_CELL_HEIGHT rows.
 		m_FinalPaletteImage = QImage(palette.Size(), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);//Create a QImage out of it.
 		memcpy(m_FinalPaletteImage.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
-		auto pixmap = QPixmap::fromImage(m_FinalPaletteImage);//Create a QPixmap out of the QImage.
+		QPixmap pixmap(QPixmap::fromImage(m_FinalPaletteImage));//Create a QPixmap out of the QImage.
 		previewPaletteItem->setData(Qt::DecorationRole, pixmap.scaled(QSize(pixmap.width(), palettePreviewTable->rowHeight(0) + 2), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));//Set the pixmap on the palette tab.
 		m_Fractorium->SetPaletteTableItem(&pixmap, m_Fractorium->ui.XformPaletteRefTable, m_Fractorium->m_PaletteRefItem, 0, 0);//Set the palette ref table on the xforms | color tab.
 		auto previewNameItem = palettePreviewTable->item(0, 0);
@@ -287,7 +287,7 @@ void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 /// </summary>
 void Fractorium::OnPaletteRandomAdjustButtonClicked(bool checked)
 {
-	QTIsaac<ISAAC_SIZE, ISAAC_INT>* gRand = QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand.get();
+	auto gRand = QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand.get();
 	m_PaletteHueSpin->setValue(-180 + gRand->Rand(361));
 	m_PaletteSaturationSpin->setValue(-50 + gRand->Rand(101));//Full range of these leads to bad palettes, so clamp range.
 	m_PaletteBrightnessSpin->setValue(-50 + gRand->Rand(101));

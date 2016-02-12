@@ -804,7 +804,7 @@ public:
 
 		if (best < 0)
 		{
-			cout << "Error in TryColors(), skipping ImproveColors()" << endl;
+			cout << "Error in TryColors(), skipping ImproveColors()\n";
 			return;
 		}
 
@@ -815,7 +815,7 @@ public:
 
 			if (b < 0)
 			{
-				cout << "Error in TryColors, aborting tries." << endl;
+				cout << "Error in TryColors, aborting tries.\n";
 				break;
 			}
 
@@ -861,7 +861,7 @@ public:
 
 		if (m_Renderer->Run(m_FinalImage) != eRenderStatus::RENDER_OK)
 		{
-			cout << "Error rendering test image for TryColors().  Aborting." << endl;
+			cout << "Error rendering test image for TryColors().  Aborting.\n";
 			return -1;
 		}
 
@@ -902,7 +902,7 @@ public:
 			else
 			{
 				ember.m_Palette.Clear(false);
-				cout << "Error retrieving random palette, setting to all white" << endl;
+				cout << "Error retrieving random palette, setting to all white.\n";
 			}
 		}
 

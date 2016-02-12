@@ -32,7 +32,7 @@ void Fractorium::InitInfoUI()
 /// <param name="newSize">Ignored</param>
 void Fractorium::OnSummaryTableHeaderResized(int logicalIndex, int oldSize, int newSize)
 {
-	QPixmap pixmap = QPixmap::fromImage(m_Controller->FinalPaletteImage());//Create a QPixmap out of the QImage, will be empty on startup.
+	QPixmap pixmap(QPixmap::fromImage(m_Controller->FinalPaletteImage()));//Create a QPixmap out of the QImage, will be empty on startup.
 	SetPaletteTableItem(&pixmap, ui.SummaryTable, m_InfoPaletteItem, 1, 0);
 }
 
@@ -57,7 +57,7 @@ void Fractorium::OnSummaryTreeHeaderSectionClicked(int logicalIndex)
 /// values from the ember.
 /// It's also meant to be used in a fire-and-forget way. Once the tree is filled
 /// individual nodes are never referenced again.
-/// The entire tree is cleared and refilled for every field change.
+/// The entire tree is cleared and refilled whenever a render is completed.
 /// This would seem inefficient, but it appears to update with no flicker.
 /// If this ever presents a problem in the future, revisit with a more
 /// intelligent design.
@@ -74,17 +74,6 @@ void FractoriumEmberController<T>::FillSummary()
 	QColor color;
 	auto table = m_Fractorium->ui.SummaryTable;
 	auto tree = m_Fractorium->ui.SummaryTree;
-	QVariantList states;
-	QTreeWidgetItemIterator it(tree);
-
-	while (*it)
-	{
-		if (!(*it)->parent())//Top level only.
-			states += (*it)->isExpanded();
-
-		++it;
-	}
-
 	tree->blockSignals(true);
 	tree->clear();
 	m_Fractorium->m_InfoNameItem->setText(m_Ember.m_Name.c_str());
@@ -92,7 +81,7 @@ void FractoriumEmberController<T>::FillSummary()
 	m_Fractorium->m_InfoXaosItem->setText(m_Ember.XaosPresent() ? "Yes" : "No");
 	m_Fractorium->m_InfoXformCountItem->setText(QString::number(m_Ember.XformCount()));
 	m_Fractorium->m_InfoFinalXformItem->setText(m_Ember.UseFinalXform() ? "Yes" : "No");
-	QPixmap pixmap = QPixmap::fromImage(m_FinalPaletteImage);//Create a QPixmap out of the QImage.
+	QPixmap pixmap(QPixmap::fromImage(m_FinalPaletteImage));//Create a QPixmap out of the QImage.
 	QSize size(table->columnWidth(0), table->rowHeight(1) + 1);
 	m_Fractorium->m_InfoPaletteItem->setData(Qt::DecorationRole, pixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
@@ -178,26 +167,7 @@ void FractoriumEmberController<T>::FillSummary()
 		auto item2 = new QTreeWidgetItem(tree);//Empty item in between xforms.
 	}
 
-	QTreeWidgetItemIterator it2(tree);
-
-	if (!states.isEmpty())
-	{
-		while (*it2)
-		{
-			if (!(*it2)->parent())//Top level only.
-			{
-				if (!states.isEmpty())
-					(*it2)->setExpanded(states.takeFirst().toBool());
-				else
-					(*it2)->setExpanded(true);//Expand any remainder when going from lesser to greater number of xforms.
-			}
-
-			++it2;
-		}
-	}
-	else
-		tree->expandAll();
-
+	tree->expandAll();
 	tree->blockSignals(false);
 }
 

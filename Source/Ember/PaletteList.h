@@ -38,7 +38,7 @@ public:
 	bool Add(const string& filename, bool force = false)
 	{
 		bool added = true;
-		auto palettes = m_Palettes.insert(make_pair(filename, vector<Palette<T>>()));
+		auto palettes = s_Palettes.insert(make_pair(filename, vector<Palette<T>>()));
 
 		if (force || palettes.second)
 		{
@@ -53,7 +53,6 @@ public:
 				{
 					auto rootNode = xmlDocGetRootElement(doc);
 					auto pfilename = shared_ptr<string>(new string(filename));
-
 					palettes.first->second.clear();
 					palettes.first->second.reserve(buf.size() / 2048);//Roughly what it takes per palette.
 					ParsePalettes(rootNode, pfilename, palettes.first->second);
@@ -62,14 +61,14 @@ public:
 				else
 				{
 					added = false;
-					m_Palettes.erase(filename);
+					s_Palettes.erase(filename);
 					AddToReport(string(loc) + " : Couldn't load xml doc");
 				}
 			}
 			else
 			{
 				added = false;
-				m_Palettes.erase(filename);
+				s_Palettes.erase(filename);
 				AddToReport(string(loc) + " : Couldn't read palette file " + filename);
 			}
 		}
@@ -82,11 +81,11 @@ public:
 	/// </summary>
 	Palette<T>* GetRandomPalette()
 	{
-		auto p = m_Palettes.begin();
+		auto p = s_Palettes.begin();
 		size_t i = 0, paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand->Rand() % Size();
-		
+
 		//Move p forward i elements.
-		while (i < paletteFileIndex && p != m_Palettes.end())
+		while (i < paletteFileIndex && p != s_Palettes.end())
 		{
 			++i;
 			++p;
@@ -111,7 +110,7 @@ public:
 	/// <returns>A pointer to the requested palette if the index was in range, else nullptr.</returns>
 	Palette<T>* GetPalette(const string& filename, size_t i)
 	{
-		auto& palettes = m_Palettes[filename];
+		auto& palettes = s_Palettes[filename];
 
 		if (!palettes.empty() && i < palettes.size())
 			return &palettes[i];
@@ -127,7 +126,7 @@ public:
 	/// <returns>A pointer to the palette if found, else nullptr</returns>
 	Palette<T>* GetPaletteByName(const string& filename, const string& name)
 	{
-		for (auto& palettes : m_Palettes)
+		for (auto& palettes : s_Palettes)
 			if (palettes.first == filename)
 				for (auto& palette : palettes.second)
 					if (palette.m_Name == name)
@@ -163,7 +162,7 @@ public:
 	/// </summary>
 	void Clear()
 	{
-		m_Palettes.clear();
+		s_Palettes.clear();
 	}
 
 	/// <summary>
@@ -171,7 +170,7 @@ public:
 	/// This will be the number of files read.
 	/// </summary>
 	/// <returns>The size of the palettes map</returns>
-	size_t Size() { return m_Palettes.size(); }
+	size_t Size() { return s_Palettes.size(); }
 
 	/// <summary>
 	/// Get the size of specified palette vector in the palettes map.
@@ -181,9 +180,9 @@ public:
 	size_t Size(size_t index)
 	{
 		size_t i = 0;
-		auto p = m_Palettes.begin();
+		auto p = s_Palettes.begin();
 
-		while (i < index && p != m_Palettes.end())
+		while (i < index && p != s_Palettes.end())
 		{
 			++i;
 			++p;
@@ -199,7 +198,7 @@ public:
 	/// <returns>The size of the palette vector at the specified index in the palettes map</returns>
 	size_t Size(const string& s)
 	{
-		return m_Palettes[s].size();
+		return s_Palettes[s].size();
 	}
 
 	/// <summary>
@@ -210,9 +209,9 @@ public:
 	const string& Name(size_t index)
 	{
 		size_t i = 0;
-		auto p = m_Palettes.begin();
+		auto p = s_Palettes.begin();
 
-		while (i < index && p != m_Palettes.end())
+		while (i < index && p != s_Palettes.end())
 		{
 			++i;
 			++p;
@@ -257,7 +256,7 @@ private:
 
 						do
 						{
-							int ret = sscanf_s(static_cast<char*>(&(val[colorIndex])),"00%2x%2x%2x", &r, &g, &b);
+							int ret = sscanf_s(static_cast<char*>(&(val[colorIndex])), "00%2x%2x%2x", &r, &g, &b);
 
 							if (ret != 3)
 							{
@@ -274,9 +273,9 @@ private:
 							palette[colorCount].r = T(r) / T(255);//Store as normalized colors in the range of 0-1.
 							palette[colorCount].g = T(g) / T(255);
 							palette[colorCount].b = T(b) / T(255);
-
 							colorCount++;
-						} while (colorCount < COLORMAP_LENGTH);
+						}
+						while (colorCount < COLORMAP_LENGTH);
 					}
 					else if (!Compare(attr->name, "number"))
 					{
@@ -306,6 +305,6 @@ private:
 		}
 	}
 
-	static map<string, vector<Palette<T>>> m_Palettes;//The map of filenames to vectors that store the palettes.
+	static map<string, vector<Palette<T>>> s_Palettes;//The map of filenames to vectors that store the palettes.
 };
 }

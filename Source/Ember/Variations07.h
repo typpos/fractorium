@@ -573,7 +573,7 @@ public:
 	{
 		int posNeg = 1;
 		T th = 0;
-		T sth, cth, pang, wig, wag, wag2, wag3, wag12, waggle;
+		T sth, cth, pang, wig, wag, wag2, wag3, wag12 = 0, waggle = 0;
 		T rad = helper.m_PrecalcSqrtSumSquares;
 		T curve1 = rad / m_L;
 		T curve2 = Sqr(curve1);

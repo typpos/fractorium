@@ -88,15 +88,13 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * t * cos(theta);\n"
 		   << "\t\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * t * sin(theta);\n"
-		   << "\t\t\tvOut.z = 0;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t\tvOut.x = 0;\n"
 		   << "\t\t\tvOut.y = 0;\n"
-		   << "\t\t\tvOut.z = 0;\n"
 		   << "\t\t}\n"
-		   << "\t\tvOut.Z = " << DefaultZCl()
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2726,8 +2724,8 @@ public:
 
 	virtual void Precalc() override
 	{
-		T pa = 2 * T(M_PI) / m_P;
-		T qa = 2 * T(M_PI) / m_Q;
+		T pa = 2 * T(M_PI) / Zeps(m_P);
+		T qa = 2 * T(M_PI) / Zeps(m_Q);
 		T r = (1 - std::cos(pa)) / (std::cos(pa) + std::cos(qa)) + 1;
 		T a = m_N * pa;
 
@@ -2822,15 +2820,15 @@ public:
 
 	virtual void Precalc() override
 	{
-		T r2 = 1 - (std::cos(2 * T(M_PI) / m_P) - 1) /
-			   (std::cos(2 * T(M_PI) / m_P) + std::cos(2 * T(M_PI) / m_Q));
+		T r2 = 1 - (std::cos(2 * T(M_PI) / Zeps(m_P)) - 1) /
+			   (std::cos(2 * T(M_PI) / Zeps(m_P)) + std::cos(2 * T(M_PI) / Zeps(m_Q)));
 
 		if (r2 > 0)
 			m_R = 1 / std::sqrt(r2);
 		else
 			m_R = 1;
 
-		m_Pa = 2 * T(M_PI) / m_P;
+		m_Pa = 2 * T(M_PI) / Zeps(m_P);
 	}
 
 protected:
@@ -2841,7 +2839,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile1_p", 3, eParamType::INTEGER, 3, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile1_q", 7, eParamType::INTEGER, 3, T(0x7fffffff)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa, prefix + "hypertile1_pa"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_R, prefix  + "hypertile1_r"));
+		m_Params.push_back(ParamWithName<T>(true, &m_R,  prefix + "hypertile1_r"));
 	}
 
 private:
@@ -2913,15 +2911,15 @@ public:
 
 	virtual void Precalc() override
 	{
-		T r2 = 1 - (std::cos(2 * T(M_PI) / m_P) - 1) /
-			   (std::cos(2 * T(M_PI) / m_P) + std::cos(2 * T(M_PI) / m_Q));
+		T r2 = 1 - (std::cos(2 * T(M_PI) / Zeps(m_P)) - 1) /
+			   (std::cos(2 * T(M_PI) / Zeps(m_P)) + std::cos(2 * T(M_PI) / Zeps(m_Q)));
 
 		if (r2 > 0)
 			m_R = 1 / std::sqrt(r2);
 		else
 			m_R = 1;
 
-		m_Pa = 2 * T(M_PI) / m_P;
+		m_Pa = 2 * T(M_PI) / Zeps(m_P);
 	}
 
 protected:
@@ -3001,13 +2999,13 @@ public:
 
 	virtual void Precalc() override
 	{
-		T pa = 2 * T(M_PI) / m_P;
-		T qa = 2 * T(M_PI) / m_Q;
-		T r = -(std::cos(pa) - 1) / (std::cos(pa) + std::cos(qa));
+		T pa = 2 * T(M_PI) / Zeps(m_P);
+		T qa = 2 * T(M_PI) / Zeps(m_Q);
+		T r = -(std::cos(pa) - 1) / Zeps(std::cos(pa) + std::cos(qa));
 		T na = m_N * pa;
 
 		if (r > 0)
-			r = 1 / std::sqrt(1 + r);
+			r = 1 / Zeps(std::sqrt(1 + r));
 		else
 			r = 1;
 
@@ -3119,12 +3117,12 @@ public:
 
 	virtual void Precalc() override
 	{
-		T pa = M_2PI / m_P;
-		T qa = M_2PI / m_Q;
-		T r = -(std::cos(pa) - 1) / (std::cos(pa) + std::cos(qa));
+		T pa = M_2PI / Zeps(m_P);
+		T qa = M_2PI / Zeps(m_Q);
+		T r = -(std::cos(pa) - 1) / Zeps(std::cos(pa) + std::cos(qa));
 
 		if (r > 0)
-			r = 1 / std::sqrt(1 + r);
+			r = 1 / Zeps(std::sqrt(1 + r));
 		else
 			r = 1;
 
@@ -3219,12 +3217,12 @@ public:
 
 	virtual void Precalc() override
 	{
-		T pa = M_2PI / m_P;
-		T qa = M_2PI / m_Q;
-		T r = -(std::cos(pa) - 1) / (std::cos(pa) + std::cos(qa));
+		T pa = M_2PI / Zeps(m_P);
+		T qa = M_2PI / Zeps(m_Q);
+		T r = -(std::cos(pa) - 1) / Zeps(std::cos(pa) + std::cos(qa));
 
 		if (r > 0)
-			r = 1 / std::sqrt(1 + r);
+			r = 1 / Zeps(std::sqrt(1 + r));
 		else
 			r = 1;
 

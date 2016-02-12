@@ -194,7 +194,6 @@ public:
 
 	//Xaos.
 	virtual void FillXaos() { }
-	virtual QString MakeXaosNameString(uint i) { return ""; }
 	virtual void XaosChanged(int x, int y, double val) { }
 	virtual void ClearXaos() { }
 	virtual void RandomXaos() { }
@@ -254,7 +253,7 @@ protected:
 	QString m_LastSaveAll;
 	QString m_LastSaveCurrent;
 	string m_CurrentPaletteFilePath;
-	CriticalSection m_Cs;
+	std::recursive_mutex m_Cs;
 	std::thread m_WriteThread;
 	vector<byte> m_FinalImage;
 	vector<byte> m_PreviewFinalImage;
@@ -263,8 +262,8 @@ protected:
 	unique_ptr<EmberNs::RendererBase> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	Fractorium* m_Fractorium;
-	QTimer* m_RenderTimer;
-	QTimer* m_RenderRestartTimer;
+	std::unique_ptr<QTimer> m_RenderTimer;
+	std::unique_ptr<QTimer> m_RenderRestartTimer;
 	shared_ptr<OpenCLInfo> m_Info;
 };
 
@@ -439,7 +438,6 @@ public:
 
 	//Xforms Xaos.
 	virtual void FillXaos() override;
-	virtual QString MakeXaosNameString(uint i) override;
 	virtual void XaosChanged(int x, int y, double val) override;
 	virtual void ClearXaos() override;
 	virtual void RandomXaos() override;
@@ -475,7 +473,6 @@ private:
 	bool IsFinal(Xform<T>* xform);
 
 	//Xforms Color.
-	void SetCurrentXformColorIndex(double d, bool updateRender);
 	void FillCurvesControl();
 
 	//Xforms Selection.

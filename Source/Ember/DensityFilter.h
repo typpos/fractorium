@@ -115,10 +115,8 @@ public:
 		T finalMinRad = m_MinRad * m_Supersample + 1;//Should scale the filter width by the oversample.
 		T finalMaxRad = m_MaxRad * m_Supersample + 1;//The '+1' comes from the assumed distance to the first pixel.
 		GaussianFilter<T> gaussianFilter(m_MaxRad, m_Supersample);
-
 		m_KernelSize = 0;
 		m_MaxFilterIndex = 0;
-
 		//Calculate how many filter kernels are needed based on the decay function
 		//
 		//    num filters = (de_max_width / de_min_width)^(1 / estimator_curve)
@@ -146,7 +144,6 @@ public:
 		rowSize = static_cast<int>(2 * ceil(finalMaxRad) - 1);
 		m_FilterWidth = (rowSize - 1) / 2;
 		m_KernelSize = (m_FilterWidth + 1) * (2 + m_FilterWidth) / 2;
-
 		m_Coefs.resize(maxIndex * m_KernelSize);
 		m_Widths.resize(maxIndex);
 
@@ -261,7 +258,6 @@ public:
 	{
 		T finalMaxRad = m_MaxRad * m_Supersample + 1;
 		T finalMinRad = m_MinRad * m_Supersample + 1;
-
 		return std::pow(finalMaxRad / finalMinRad, T(1.0) / m_Curve) <= 1e7;
 	}
 
@@ -273,30 +269,28 @@ public:
 	{
 		size_t i, j, coefIndex = 0, w = m_FilterWidth + 1;
 		stringstream ss;
-
 		ss
-			<< "Density Filter:" << endl
-			<< "	     Min radius: " << MinRad() << endl
-			<< "	     Max radius: " << MaxRad() << endl
-			<< "		      Curve: " << Curve() << endl
-			<< "        Kernel size: " << KernelSize() << endl
-			<< "   Max filter index: " << MaxFilterIndex() << endl
-			<< "Max Filtered counts: " << MaxFilteredCounts() << endl
-			<< "       Filter width: " << FilterWidth() << endl;
-
-		ss << "Coefficients: " << endl;
+				<< "Density Filter:"
+				<< "\n	     Min radius: " << MinRad()
+				<< "\n	     Max radius: " << MaxRad()
+				<< "\n		      Curve: " << Curve()
+				<< "\n        Kernel size: " << KernelSize()
+				<< "\n   Max filter index: " << MaxFilterIndex()
+				<< "\nMax Filtered counts: " << MaxFilteredCounts()
+				<< "\n       Filter width: " << FilterWidth();
+		ss << "\nCoefficients: \n";
 
 		for (i = 0; i < m_Widths.size(); i++)
 		{
 			for (coefIndex = 0; coefIndex < m_KernelSize; coefIndex++)
-				ss << "Kernel[" << i << "].Coefs[" << coefIndex << "]: " << m_Coefs[(i * m_KernelSize) + coefIndex] << endl;
+				ss << "Kernel[" << i << "].Coefs[" << coefIndex << "]: " << m_Coefs[(i * m_KernelSize) + coefIndex] << "\n";
 		}
 
-		ss << endl << "Widths: " << endl;
+		ss << "\nWidths: \n";
 
 		for (i = 0; i < m_Widths.size(); i++)
 		{
-			ss << "Widths[" << i << "]: " << m_Widths[i] << endl;
+			ss << "Widths[" << i << "]: " << m_Widths[i] << "\n";
 		}
 
 		for (i = 0; i < w; i++)
@@ -306,7 +300,7 @@ public:
 				cout << std::setw(2) << std::setfill('0') << m_CoefIndices[i * w + j] << "\t";
 			}
 
-			cout << endl;
+			cout << "\n";
 		}
 
 		return ss.str();

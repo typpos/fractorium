@@ -20,15 +20,13 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_OutputTexID = 0;
 	m_SubBatchCount = 1;//Will be ovewritten by the options on first render.
 	m_Fractorium = fractorium;
-	m_RenderTimer = nullptr;
-	m_RenderRestartTimer = nullptr;
 	m_Info = OpenCLInfo::Instance();
 	m_Rand = QTIsaac<ISAAC_SIZE, ISAAC_INT>(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));//Ensure a different rand seed on each instance.
-	m_RenderTimer = new QTimer(m_Fractorium);
+	m_RenderTimer = std::unique_ptr<QTimer>(new QTimer(m_Fractorium));
 	m_RenderTimer->setInterval(0);
-	m_Fractorium->connect(m_RenderTimer, SIGNAL(timeout()), SLOT(IdleTimer()));
-	m_RenderRestartTimer = new QTimer(m_Fractorium);
-	m_Fractorium->connect(m_RenderRestartTimer, SIGNAL(timeout()), SLOT(StartRenderTimer()));
+	m_Fractorium->connect(m_RenderTimer.get(), SIGNAL(timeout()), SLOT(IdleTimer()));
+	m_RenderRestartTimer = std::unique_ptr<QTimer>(new QTimer(m_Fractorium));
+	m_Fractorium->connect(m_RenderRestartTimer.get(), SIGNAL(timeout()), SLOT(StartRenderTimer()));
 }
 
 /// <summary>
@@ -38,20 +36,8 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 FractoriumEmberControllerBase::~FractoriumEmberControllerBase()
 {
 	StopRenderTimer(true);
-
-	if (m_RenderTimer)
-	{
-		m_RenderTimer->stop();
-		delete m_RenderTimer;
-		m_RenderTimer = nullptr;
-	}
-
-	if (m_RenderRestartTimer)
-	{
-		m_RenderRestartTimer->stop();
-		delete m_RenderRestartTimer;
-		m_RenderRestartTimer = nullptr;
-	}
+	m_RenderTimer->stop();
+	m_RenderRestartTimer->stop();
 }
 
 /// <summary>
@@ -64,25 +50,34 @@ template <typename T>
 FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 	: FractoriumEmberControllerBase(fractorium)
 {
+	bool b = false;
 	m_PreviewRun = false;
 	m_PreviewRunning = false;
-	m_SheepTools = unique_ptr<SheepTools<T, float>>(new SheepTools<T, float>(
-					   QString(QApplication::applicationDirPath() + "flam3-palettes.xml").toLocal8Bit().data(),
-					   new EmberNs::Renderer<T, float>()));
 	m_GLController = unique_ptr<GLEmberController<T>>(new GLEmberController<T>(fractorium, fractorium->ui.GLDisplay, this));
 	m_PreviewRenderer = unique_ptr<EmberNs::Renderer<T, float>>(new EmberNs::Renderer<T, float>());
-
 	//Initial combo change event to fill the palette table will be called automatically later.
-
 	//Look hard for a palette.
-	if (!(InitPaletteList(QDir::currentPath().toLocal8Bit().data()) ||
-			InitPaletteList(QDir::homePath().toLocal8Bit().data()) ||
-			InitPaletteList(QCoreApplication::applicationDirPath().toLocal8Bit().data()) ||
-			InitPaletteList(QString("/usr/local/share/fractorium").toLocal8Bit().data()) ||
-			InitPaletteList(QString("/usr/share/fractorium").toLocal8Bit().data())) )
+	static vector<string> paths =
 	{
-		throw "No palettes found, exiting.";
+		QDir::currentPath().toLocal8Bit().data(),
+		QDir::homePath().toLocal8Bit().data(),
+		QCoreApplication::applicationDirPath().toLocal8Bit().data(),
+		QString("/usr/local/share/fractorium").toLocal8Bit().data(),
+		QString("/usr/share/fractorium").toLocal8Bit().data()
+	};
+
+	for (auto& path : paths)
+	{
+		if (b = InitPaletteList(path))
+		{
+			m_SheepTools = unique_ptr<SheepTools<T, float>>(new SheepTools<T, float>(
+							   m_PaletteList.Name(0), new EmberNs::Renderer<T, float>()));
+			break;
+		}
 	}
+
+	if (!b)
+		throw "No palettes found, exiting.";
 
 	BackgroundChanged(QColor(0, 0, 0));//Default to black.
 	ClearUndo();
@@ -101,9 +96,9 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 		m_PreviewRun = true;
 		m_PreviewRunning = true;
 		m_PreviewRenderer->ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Leave one processor free so the GUI can breathe.
-		QTreeWidget* tree = m_Fractorium->ui.LibraryTree;
+		auto tree = m_Fractorium->ui.LibraryTree;
 
-		if (QTreeWidgetItem* top = tree->topLevelItem(0))
+		if (auto top = tree->topLevelItem(0))
 		{
 			for (size_t i = start; m_PreviewRun && i < end && i < m_EmberFile.Size(); i++)
 			{
@@ -117,7 +112,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 
 				if (m_PreviewRenderer->Run(m_PreviewFinalImage) == eRenderStatus::RENDER_OK)
 				{
-					if (EmberTreeWidgetItem<T>* treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
+					if (auto treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
 					{
 						//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
 						//This ensures the events are processed in order as each preview is updated, and that control does not return here
@@ -193,11 +188,11 @@ void FractoriumEmberController<T>::SetEmber(size_t index)
 {
 	if (index < m_EmberFile.Size())
 	{
-		if (QTreeWidgetItem* top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
+		if (auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
 		{
 			for (uint i = 0; i < top->childCount(); i++)
 			{
-				if (EmberTreeWidgetItem<T>* emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
+				if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
 					emberItem->setSelected(i == index);
 			}
 		}

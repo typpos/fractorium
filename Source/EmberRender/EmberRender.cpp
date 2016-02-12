@@ -17,11 +17,11 @@ bool EmberRender(EmberOptions& opt)
 	std::cout.imbue(std::locale(""));
 
 	if (opt.DumpArgs())
-		cout << opt.GetValues(eOptionUse::OPT_USE_RENDER) << endl;
+		cout << opt.GetValues(eOptionUse::OPT_USE_RENDER) << "\n";
 
 	if (opt.OpenCLInfo())
 	{
-		cout << "\nOpenCL Info: " << endl;
+		cout << "\nOpenCL Info: \n";
 		cout << info->DumpInfo();
 		return true;
 	}
@@ -55,7 +55,7 @@ bool EmberRender(EmberOptions& opt)
 
 	if (!renderer.get())
 	{
-		cout << "Renderer creation failed, exiting." << endl;
+		cout << "Renderer creation failed, exiting.\n" ;
 		return false;
 	}
 
@@ -72,38 +72,38 @@ bool EmberRender(EmberOptions& opt)
 	{
 		if (opt.ThreadCount() == 0)
 		{
-			cout << "Using " << Timing::ProcessorCount() << " automatically detected threads." << endl;
+			cout << "Using " << Timing::ProcessorCount() << " automatically detected threads.\n";
 			opt.ThreadCount(Timing::ProcessorCount());
 		}
 		else
 		{
-			cout << "Using " << opt.ThreadCount() << " manually specified threads." << endl;
+			cout << "Using " << opt.ThreadCount() << " manually specified threads.\n";
 		}
 
 		renderer->ThreadCount(opt.ThreadCount(), opt.IsaacSeed() != "" ? opt.IsaacSeed().c_str() : nullptr);
 	}
 	else
 	{
-		cout << "Using OpenCL to render." << endl;
+		cout << "Using OpenCL to render.\n";
 
 		if (opt.Verbose())
 		{
 			for (auto& device : devices)
 			{
-				cout << "Platform: " << info->PlatformName(device.first) << endl;
-				cout << "Device: " << info->DeviceName(device.first, device.second) << endl;
+				cout << "Platform: " << info->PlatformName(device.first) << "\n";
+				cout << "Device: " << info->DeviceName(device.first, device.second) << "\n";
 			}
 		}
 
 		if (opt.ThreadCount() > 1)
-			cout << "Cannot specify threads with OpenCL, using 1 thread." << endl;
+			cout << "Cannot specify threads with OpenCL, using 1 thread.\n";
 
 		opt.ThreadCount(1);
 		renderer->ThreadCount(opt.ThreadCount(), opt.IsaacSeed() != "" ? opt.IsaacSeed().c_str() : nullptr);
 
 		if (opt.BitsPerChannel() != 8)
 		{
-			cout << "Bits per channel cannot be anything other than 8 with OpenCL, setting to 8." << endl;
+			cout << "Bits per channel cannot be anything other than 8 with OpenCL, setting to 8.\n";
 			opt.BitsPerChannel(8);
 		}
 	}
@@ -113,37 +113,37 @@ bool EmberRender(EmberOptions& opt)
 			opt.Format() != "ppm" &&
 			opt.Format() != "bmp")
 	{
-		cout << "Format must be jpg, png, ppm, or bmp not " << opt.Format() << ". Setting to jpg." << endl;
+		cout << "Format must be jpg, png, ppm, or bmp not " << opt.Format() << ". Setting to jpg.\n";
 	}
 
 	channels = opt.Format() == "png" ? 4 : 3;
 
 	if (opt.BitsPerChannel() == 16 && opt.Format() != "png")
 	{
-		cout << "Support for 16 bits per channel images is only present for the png format. Setting to 8." << endl;
+		cout << "Support for 16 bits per channel images is only present for the png format. Setting to 8.\n";
 		opt.BitsPerChannel(8);
 	}
 	else if (opt.BitsPerChannel() != 8 && opt.BitsPerChannel() != 16)
 	{
-		cout << "Unexpected bits per channel specified " << opt.BitsPerChannel() << ". Setting to 8." << endl;
+		cout << "Unexpected bits per channel specified " << opt.BitsPerChannel() << ". Setting to 8.\n";
 		opt.BitsPerChannel(8);
 	}
 
 	if (opt.InsertPalette() && opt.BitsPerChannel() != 8)
 	{
-		cout << "Inserting palette only supported with 8 bits per channel, insertion will not take place." << endl;
+		cout << "Inserting palette only supported with 8 bits per channel, insertion will not take place.\n";
 		opt.InsertPalette(false);
 	}
 
 	if (opt.AspectRatio() < 0)
 	{
-		cout << "Invalid pixel aspect ratio " << opt.AspectRatio() << endl << ". Must be positive, setting to 1." << endl;
+		cout << "Invalid pixel aspect ratio " << opt.AspectRatio() << "\n. Must be positive, setting to 1.\n";
 		opt.AspectRatio(1);
 	}
 
 	if (!opt.Out().empty() && (embers.size() > 1))
 	{
-		cout << "Single output file " << opt.Out() << " specified for multiple images. Changing to use prefix of badname-changethis instead. Always specify prefixes when reading a file with multiple embers." << endl;
+		cout << "Single output file " << opt.Out() << " specified for multiple images. Changing to use prefix of badname-changethis instead. Always specify prefixes when reading a file with multiple embers.\n";
 		opt.Out("");
 		opt.Prefix("badname-changethis");
 	}
@@ -165,9 +165,9 @@ bool EmberRender(EmberOptions& opt)
 	for (i = 0; i < embers.size(); i++)
 	{
 		if (opt.Verbose() && embers.size() > 1)
-			cout << "\nFlame = " << i + 1 << "/" << embers.size() << endl;
+			cout << "\nFlame = " << i + 1 << "/" << embers.size() << "\n";
 		else if (embers.size() > 1)
-			VerbosePrint(endl);
+			VerbosePrint("\n");
 
 		if (opt.Supersample() > 0)
 			embers[i].m_Supersample = opt.Supersample();
@@ -192,7 +192,7 @@ bool EmberRender(EmberOptions& opt)
 
 		if (embers[i].m_FinalRasW == 0 || embers[i].m_FinalRasH == 0)
 		{
-			cout << "Output image " << i << " has dimension 0: " << embers[i].m_FinalRasW  << ", " << embers[i].m_FinalRasH << ". Setting to 1920 x 1080." << endl;
+			cout << "Output image " << i << " has dimension 0: " << embers[i].m_FinalRasW  << ", " << embers[i].m_FinalRasH << ". Setting to 1920 x 1080.\n";
 			embers[i].m_FinalRasW = 1920;
 			embers[i].m_FinalRasH = 1080;
 		}
@@ -204,7 +204,7 @@ bool EmberRender(EmberOptions& opt)
 
 		if (imageMem > maxMem)//Ensure the max amount of memory for a process is not exceeded.
 		{
-			cout << "Image " << i << " size > " << maxMem << ". Setting to 1920 x 1080." << endl;
+			cout << "Image " << i << " size > " << maxMem << ". Setting to 1920 x 1080.\n";
 			embers[i].m_FinalRasW = 1920;
 			embers[i].m_FinalRasH = 1080;
 		}
@@ -227,9 +227,9 @@ bool EmberRender(EmberOptions& opt)
 		}
 
 		strips = VerifyStrips(embers[i].m_FinalRasH, strips,
-		[&](const string & s) { cout << s << endl; }, //Greater than height.
-		[&](const string & s) { cout << s << endl; }, //Mod height != 0.
-		[&](const string & s) { cout << s << endl; }); //Final strips value to be set.
+		[&](const string & s) { cout << s << "\n"; }, //Greater than height.
+		[&](const string & s) { cout << s << "\n"; }, //Mod height != 0.
+		[&](const string & s) { cout << s << "\n"; }); //Final strips value to be set.
 		//For testing incremental renderer.
 		//int sb = 1;
 		//bool resume = false, success = false;
@@ -244,7 +244,7 @@ bool EmberRender(EmberOptions& opt)
 						[&](size_t strip)//Pre strip.
 		{
 			if (opt.Verbose() && (strips > 1) && strip > 0)
-				cout << endl;
+				cout << "\n";
 
 			if (strips > 1)
 				VerbosePrint("Strip = " << (strip + 1) << "/" << strips);
@@ -256,7 +256,7 @@ bool EmberRender(EmberOptions& opt)
 		},
 		[&](size_t strip)//Error.
 		{
-			cout << "Error: image rendering failed, skipping to next image." << endl;
+			cout << "Error: image rendering failed, skipping to next image.\n";
 			renderer->DumpErrorReport();//Something went wrong, print errors.
 		},
 		//Final strip.
@@ -291,7 +291,7 @@ bool EmberRender(EmberOptions& opt)
 
 			VerbosePrint("Render time: " + t.Format(stats.m_RenderMs));
 			VerbosePrint("Pure iter time: " + t.Format(stats.m_IterMs));
-			VerbosePrint("Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << endl);
+			VerbosePrint("Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << "\n");
 			VerbosePrint("Writing " + filename);
 
 			if ((opt.Format() == "jpg" || opt.Format() == "bmp") && renderer->NumChannels() == 4)
@@ -310,7 +310,7 @@ bool EmberRender(EmberOptions& opt)
 				writeSuccess = WriteBmp(filename.c_str(), finalImagep, finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
 
 			if (!writeSuccess)
-				cout << "Error writing " << filename << endl;
+				cout << "Error writing " << filename << "\n";
 		});
 
 		if (opt.EmberCL() && opt.DumpKernel())
@@ -322,7 +322,7 @@ bool EmberRender(EmberOptions& opt)
 					 "Density filter kernel:\n" <<
 					 rendererCL->DEKernel() << "\n\n" <<
 					 "Final accumulation kernel:\n" <<
-					 rendererCL->FinalAccumKernel() << endl;
+					 rendererCL->FinalAccumKernel() << "\n";
 			}
 		}
 
@@ -368,7 +368,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			else if (opt.Bits() == 32)
 			{
-				cout << "Bits 32/int histogram no longer supported. Using bits == 33 (float)." << endl;
+				cout << "Bits 32/int histogram no longer supported. Using bits == 33 (float).\n";
 				b = EmberRender<float>(opt);
 			}
 	}

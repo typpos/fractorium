@@ -15,7 +15,6 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 {
 	ui.setupUi(this);
 	int row = 0, spinHeight = 20;
-	uint i;
 	double dmax = numeric_limits<double>::max();
 	QTableWidget* table = ui.FinalRenderParamsTable;
 	QTableWidgetItem* item = nullptr;

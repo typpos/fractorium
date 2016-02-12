@@ -1034,7 +1034,7 @@ public:
 			if (m_Xforms[i].Empty() && m_AffineInterp != eAffineInterp::AFFINE_INTERP_LOG)
 				continue;
 
-			m_Xforms[i].m_Affine.Rotate(angle);
+			m_Xforms[i].m_Affine.Rotate(angle * DEG_2_RAD_T);
 			//Don't rotate post.
 		}
 	}

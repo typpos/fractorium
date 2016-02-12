@@ -55,11 +55,11 @@ bool EmberGenome(EmberOptions& opt)
 	std::cout.imbue(std::locale(""));
 
 	if (opt.DumpArgs())
-		cerr << opt.GetValues(eOptionUse::OPT_USE_GENOME) << endl;
+		cerr << opt.GetValues(eOptionUse::OPT_USE_GENOME) << "\n";
 
 	if (opt.OpenCLInfo())
 	{
-		cerr << "\nOpenCL Info: " << endl;
+		cerr << "\nOpenCL Info: \n";
 		cerr << info->DumpInfo();
 		return true;
 	}
@@ -98,7 +98,7 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (!renderer.get())
 	{
-		cerr << "Renderer creation failed, exiting." << endl;
+		cerr << "Renderer creation failed, exiting.\n";
 		return false;
 	}
 
@@ -112,14 +112,14 @@ bool EmberGenome(EmberOptions& opt)
 	}
 	else
 	{
-		cerr << "Using OpenCL to render." << endl;
+		cerr << "Using OpenCL to render.\n";
 
 		if (opt.Verbose())
 		{
 			for (auto& device : devices)
 			{
-				cerr << "Platform: " << info->PlatformName(device.first) << endl;
-				cerr << "Device: " << info->DeviceName(device.first, device.second) << endl;
+				cerr << "Platform: " << info->PlatformName(device.first) << "\n";
+				cerr << "Device: " << info->DeviceName(device.first, device.second) << "\n";
 			}
 		}
 	}
@@ -139,7 +139,7 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (opt.UseVars() != "" && opt.DontUseVars() != "")
 	{
-		cerr << "use_vars and dont_use_vars cannot both be specified. Returning without executing." << endl;
+		cerr << "use_vars and dont_use_vars cannot both be specified. Returning without executing.\n";
 		return false;
 	}
 
@@ -231,19 +231,19 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (count > 1)
 	{
-		cerr << "Can only specify one of mutate, clone, cross, rotate, strip, or inter. Returning without executing." << endl;
+		cerr << "Can only specify one of mutate, clone, cross, rotate, strip, or inter. Returning without executing.\n";
 		return false;
 	}
 
 	if (doCross0 != doCross1)//Must both be either true or false.
 	{
-		cerr << "Must specify both crossover arguments. Returning without executing." << endl;
+		cerr << "Must specify both crossover arguments. Returning without executing.\n";
 		return false;
 	}
 
 	if (opt.Method() != "" && (!doCross0 && !doMutate))
 	{
-		cerr << "Cannot specify method unless doing crossover or mutate. Returning without executing." << endl;
+		cerr << "Cannot specify method unless doing crossover or mutate. Returning without executing.\n";
 		return false;
 	}
 
@@ -253,7 +253,7 @@ bool EmberGenome(EmberOptions& opt)
 			return false;
 
 		if (templateEmbers.size() > 1)
-			cerr << "More than one control point in template, ignoring all but first." << endl;
+			cerr << "More than one control point in template, ignoring all but first.\n";
 
 		pTemplate = &templateEmbers[0];
 	}
@@ -297,7 +297,7 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (opt.CloneAll() != "")
 	{
-		cout << "<clone_all version=\"Ember-" << EmberVersion() << "\">" << endl;
+		cout << "<clone_all version=\"Ember-" << EmberVersion() << "\">\n";
 
 		for (i = 0; i < embers.size(); i++)
 		{
@@ -308,7 +308,7 @@ bool EmberGenome(EmberOptions& opt)
 			cout << emberToXml.ToString(embers[i], opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 		}
 
-		cout << "</clone_all>" << endl;
+		cout << "</clone_all>\n";
 		return true;
 	}
 
@@ -318,7 +318,7 @@ bool EmberGenome(EmberOptions& opt)
 		{
 			if (i > 0 && embers[i].m_Time <= embers[i - 1].m_Time)
 			{
-				cerr << "Error: control points must be sorted by time, but " << embers[i].m_Time << " <= " << embers[i - 1].m_Time << ", index " << i << "." << endl;
+				cerr << "Error: control points must be sorted by time, but " << embers[i].m_Time << " <= " << embers[i - 1].m_Time << ", index " << i << ".\n";
 				return false;
 			}
 
@@ -331,7 +331,7 @@ bool EmberGenome(EmberOptions& opt)
 		if (lastFrame < firstFrame)
 			lastFrame = firstFrame;
 
-		cout << "<animate version=\"EMBER-" << EmberVersion() << "\">" << endl;
+		cout << "<animate version=\"EMBER-" << EmberVersion() << "\">\n";
 
 		for (ftime = firstFrame; ftime <= lastFrame; ftime++)
 		{
@@ -370,7 +370,7 @@ bool EmberGenome(EmberOptions& opt)
 			cout << emberToXml.ToString(interpolated, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 		}
 
-		cout << "</animate>" << endl;
+		cout << "</animate>\n";
 		return true;
 	}
 
@@ -380,12 +380,12 @@ bool EmberGenome(EmberOptions& opt)
 
 		if (opt.Frames() == 0)
 		{
-			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << "." << endl;
+			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
 			return false;
 		}
 
 		if (opt.Enclosed())
-			cout << "<sequence version=\"EMBER-" << EmberVersion() << "\">" << endl;
+			cout << "<sequence version=\"EMBER-" << EmberVersion() << "\">\n";
 
 		spread = 1 / T(opt.Frames());
 		frameCount = 0;
@@ -437,7 +437,7 @@ bool EmberGenome(EmberOptions& opt)
 		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
 
 		if (opt.Enclosed())
-			cout << "</sequence>" << endl;
+			cout << "</sequence>\n";
 
 		return true;
 	}
@@ -448,7 +448,7 @@ bool EmberGenome(EmberOptions& opt)
 
 		if (opt.Frames() == 0)
 		{
-			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << "." << endl;
+			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
 			return false;
 		}
 
@@ -456,13 +456,13 @@ bool EmberGenome(EmberOptions& opt)
 		spread = 1 / T(opt.Frames());
 
 		if (opt.Enclosed())
-			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">" << endl;
+			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";
 
 		if (doRotate)
 		{
 			if (embers.size() != 1)
 			{
-				cerr << "rotation requires one control point, not " << embers.size() << "." << endl;
+				cerr << "rotation requires one control point, not " << embers.size() << ".\n";
 				return false;
 			}
 
@@ -477,7 +477,7 @@ bool EmberGenome(EmberOptions& opt)
 		{
 			if (embers.size() != 2)
 			{
-				cerr << "interpolation requires two control points, not " << embers.size() << "." << endl;
+				cerr << "interpolation requires two control points, not " << embers.size() << ".\n";
 				return false;
 			}
 
@@ -490,7 +490,7 @@ bool EmberGenome(EmberOptions& opt)
 		}
 
 		if (opt.Enclosed())
-			cout << "</pick>" << endl;
+			cout << "</pick>\n";
 
 		return true;
 	}
@@ -498,7 +498,7 @@ bool EmberGenome(EmberOptions& opt)
 	if (doStrip)
 	{
 		if (opt.Enclosed())
-			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">" << endl;
+			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";
 
 		for (i = 0; i < embers.size(); i++)
 		{
@@ -520,7 +520,7 @@ bool EmberGenome(EmberOptions& opt)
 		}
 
 		if (opt.Enclosed())
-			cout << "</pick>" << endl;
+			cout << "</pick>\n";
 
 		return true;
 	}
@@ -534,12 +534,12 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (opt.Repeat() == 0)
 	{
-		cerr << "Repeat must be positive, not " << opt.Repeat() << endl;
+		cerr << "Repeat must be positive, not " << opt.Repeat() << "\n";
 		return false;
 	}
 
 	if (opt.Enclosed())
-		cout << "<pick version=\"EMBER-" << EmberVersion() << "\">" << endl;
+		cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";
 
 	for (rep = 0; rep < opt.Repeat(); rep++)
 	{
@@ -596,7 +596,7 @@ bool EmberGenome(EmberOptions& opt)
 						mutMeth = eMutateMode::MUTATE_ALL_COEFS;
 					else
 					{
-						cerr << "method " << opt.Method() << " not defined for mutate. Defaulting to random." << endl;
+						cerr << "method " << opt.Method() << " not defined for mutate. Defaulting to random.\n";
 						mutMeth = eMutateMode::MUTATE_NOT_SPECIFIED;
 					}
 
@@ -632,7 +632,7 @@ bool EmberGenome(EmberOptions& opt)
 						crossMeth = eCrossMode::CROSS_ALTERNATE;
 					else
 					{
-						cerr << "method '" << opt.Method() << "' not defined for cross. Defaulting to random." << endl;
+						cerr << "method '" << opt.Method() << "' not defined for cross. Defaulting to random.\n";
 						crossMeth = eCrossMode::CROSS_NOT_SPECIFIED;
 					}
 
@@ -699,7 +699,7 @@ bool EmberGenome(EmberOptions& opt)
 				if (!didColor && rand.RandBit())
 				{
 					if (opt.Debug())
-						cerr << "improving colors..." << endl;
+						cerr << "improving colors...\n";
 
 					tools.ImproveColors(orig, 100, false, 10);
 					os << " improved colors";
@@ -712,7 +712,7 @@ bool EmberGenome(EmberOptions& opt)
 
 				if (renderer->Run(finalImage) != eRenderStatus::RENDER_OK)
 				{
-					cerr << "Error: test image rendering failed, aborting." << endl;
+					cerr << "Error: test image rendering failed, aborting.\n";
 					return false;
 				}
 
@@ -733,7 +733,7 @@ bool EmberGenome(EmberOptions& opt)
 				fractionWhite = totw / T(n);
 
 				if (opt.Debug())
-					cerr << "avgPix = " << avgPix << " fractionBlack = " << fractionBlack << " fractionWhite = " << fractionWhite << " n = " << n << endl;
+					cerr << "avgPix = " << avgPix << " fractionBlack = " << fractionBlack << " fractionWhite = " << fractionWhite << " n = " << n << "\n";
 
 				orig.Clear();
 				count++;
@@ -744,7 +744,7 @@ bool EmberGenome(EmberOptions& opt)
 					count < opt.Tries());
 
 			if (count == opt.Tries())
-				cerr << "Warning: reached maximum attempts, giving up." << endl;
+				cerr << "Warning: reached maximum attempts, giving up.\n";
 		}
 
 		if (pTemplate)
@@ -806,7 +806,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			else if (opt.Bits() == 32)
 			{
-				cerr << "Bits 32/int histogram no longer supported. Using bits == 33 (float)." << endl;
+				cerr << "Bits 32/int histogram no longer supported. Using bits == 33 (float).\n";
 				b = EmberGenome<float>(opt);
 			}
 	}

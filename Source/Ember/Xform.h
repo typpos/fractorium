@@ -1113,7 +1113,7 @@ public:
 		   << "C: " << m_Affine.C() << " "
 		   << "D: " << m_Affine.D() << " "
 		   << "E: " << m_Affine.E() << " "
-		   << "F: " << m_Affine.F() << " " << endl;
+		   << "F: " << m_Affine.F() << " \n";
 
 		if (m_HasPost)
 		{
@@ -1122,27 +1122,27 @@ public:
 			   << "Post C: " << m_Post.C() << " "
 			   << "Post D: " << m_Post.D() << " "
 			   << "Post E: " << m_Post.E() << " "
-			   << "Post F: " << m_Post.F() << " " << endl;
+			   << "Post F: " << m_Post.F() << " \n";
 		}
 
-		ss << "Weight: " << m_Weight << endl;
-		ss << "ColorX: " << m_ColorX << endl;
-		ss << "ColorY: " << m_ColorY << endl;
-		ss << "Direct Color: " << m_DirectColor << endl;
-		ss << "Color Speed: " << m_ColorSpeed << endl;
-		ss << "Animate: " << m_Animate << endl;
-		ss << "Opacity: " << m_Opacity << endl;
-		ss << "Viz Adjusted: " << m_VizAdjusted << endl;
-		ss << "Wind: " << m_Wind[0] << ", " << m_Wind[1] << endl;
-		ss << "Motion Frequency: " << m_MotionFreq << endl;
-		ss << "Motion Func: " << m_MotionFunc << endl;
-		ss << "Motion Offset: " << m_MotionOffset << endl;
+		ss << "Weight: " << m_Weight;
+		ss << "\nColorX: " << m_ColorX;
+		ss << "\nColorY: " << m_ColorY;
+		ss << "\nDirect Color: " << m_DirectColor;
+		ss << "\nColor Speed: " << m_ColorSpeed;
+		ss << "\nAnimate: " << m_Animate;
+		ss << "\nOpacity: " << m_Opacity;
+		ss << "\nViz Adjusted: " << m_VizAdjusted;
+		ss << "\nWind: " << m_Wind[0] << ", " << m_Wind[1];
+		ss << "\nMotion Frequency: " << m_MotionFreq;
+		ss << "\nMotion Func: " << m_MotionFunc;
+		ss << "\nMotion Offset: " << m_MotionOffset;
 		const_cast<Xform<T>*>(this)->AllVarsFunc([&] (vector<Variation<T>*>& variations, bool & keepGoing)
 		{
 			for (auto var : variations)
-				ss << var->ToString() << endl;
+				ss << var->ToString() << "\n";
 
-			ss << endl;
+			ss << "\n";
 		});
 
 		if (XaosPresent())
@@ -1150,7 +1150,7 @@ public:
 			for (auto xaos : m_Xaos)
 				ss << xaos << " ";
 
-			ss << endl;
+			ss << "\n";
 		}
 
 		return ss.str();

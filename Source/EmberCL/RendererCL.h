@@ -222,7 +222,7 @@ private:
 	cl::ImageFormat m_PaletteFormat;
 	cl::ImageFormat m_FinalFormat;
 	cl::Image2D m_Palette;
-	IMAGEGL2D m_AccumImage;
+	cl::ImageGL m_AccumImage;
 	GLuint m_OutputTexID;
 	EmberCL<T> m_EmberCL;
 	vector<XformCL<T>> m_XformsCL;

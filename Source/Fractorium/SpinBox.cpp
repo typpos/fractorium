@@ -1,7 +1,7 @@
 #include "FractoriumPch.h"
 #include "SpinBox.h"
 
-QTimer SpinBox::m_Timer;
+QTimer SpinBox::s_Timer;
 
 /// <summary>
 /// Constructor that passes parent to the base and sets up height and step.
@@ -118,17 +118,16 @@ void SpinBox::OnTimeout()
 		//qDebug() << "Shift pressed";
 		scale = 0.001;
 	}
-	/*else if (ctrl)
-	{
-	qDebug() << "Control pressed";
-	scale = 0.01;
-	}*/
+	/*  else if (ctrl)
+	    {
+	    qDebug() << "Control pressed";
+	    scale = 0.01;
+	    }*/
 	else
 		scale = 0.01;
 
 	val = d + (distance * amount * scale);
 	setValue(int(val));
-
 	//qDebug() << "Timer on, orig val: " << d << ", new val: " << val << ", distance " << distance;
 }
 
@@ -143,9 +142,9 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 	QMouseEvent* me = dynamic_cast<QMouseEvent*>(e);
 
 	if (isEnabled() &&
-		me &&
-		me->type() == QMouseEvent::MouseButtonPress &&
-		me->button() == Qt::RightButton)
+			me &&
+			me->type() == QMouseEvent::MouseButtonPress &&
+			me->button() == Qt::RightButton)
 	{
 		m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		StartTimer();
@@ -172,18 +171,18 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 		//	}
 	}
 	else if (isEnabled() &&
-		me &&
-		me->type() == QMouseEvent::MouseButtonRelease &&
-		me->button() == Qt::RightButton)
+			 me &&
+			 me->type() == QMouseEvent::MouseButtonRelease &&
+			 me->button() == Qt::RightButton)
 	{
 		StopTimer();
 		m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		//qDebug() << "Right mouse up";
 	}
 	else if (isEnabled() &&
-		me &&
-		me->type() == QMouseEvent::MouseMove &&
-		QGuiApplication::mouseButtons() & Qt::RightButton)
+			 me &&
+			 me->type() == QMouseEvent::MouseMove &&
+			 QGuiApplication::mouseButtons() & Qt::RightButton)
 	{
 		m_MouseMovePoint = me->pos();
 		qDebug() << "Mouse move while right down. Pt = " << me->pos() << ", global: " << mapToGlobal(me->pos());
@@ -236,8 +235,8 @@ void SpinBox::focusInEvent(QFocusEvent* e)
 /// <param name="e">The event</param>
 void SpinBox::focusOutEvent(QFocusEvent* e)
 {
-	 //lineEdit()->deselect();//Clear selection when leaving.
-	 //lineEdit()->setReadOnly(true);//Clever hack to clear the cursor when leaving.
+	//lineEdit()->deselect();//Clear selection when leaving.
+	//lineEdit()->setReadOnly(true);//Clever hack to clear the cursor when leaving.
 	StopTimer();
 	QSpinBox::focusOutEvent(e);
 }
@@ -273,9 +272,9 @@ void SpinBox::leaveEvent(QEvent* e)
 /// </summary>
 void SpinBox::StartTimer()
 {
-	m_Timer.stop();
-	connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
-	m_Timer.start(300);
+	s_Timer.stop();
+	connect(&s_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+	s_Timer.start(300);
 }
 
 /// <summary>
@@ -283,6 +282,6 @@ void SpinBox::StartTimer()
 /// </summary>
 void SpinBox::StopTimer()
 {
-	m_Timer.stop();
-	disconnect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+	s_Timer.stop();
+	disconnect(&s_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
 }

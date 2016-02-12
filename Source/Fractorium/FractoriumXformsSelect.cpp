@@ -9,7 +9,6 @@ void Fractorium::InitXformsSelectUI()
 	m_XformsSelectionLayout = (QFormLayout*)ui.XformsSelectGroupBoxScrollAreaWidget->layout();
 	connect(ui.XformsSelectAllButton,  SIGNAL(clicked(bool)), this, SLOT(OnXformsSelectAllButtonClicked(bool)),  Qt::QueuedConnection);
 	connect(ui.XformsSelectNoneButton, SIGNAL(clicked(bool)), this, SLOT(OnXformsSelectNoneButtonClicked(bool)), Qt::QueuedConnection);
-
 	ClearXformsSelections();
 }
 
@@ -17,13 +16,13 @@ void Fractorium::InitXformsSelectUI()
 /// Check all of the xform selection checkboxes.
 /// </summary>
 /// <param name="checked">Ignored</param>
-void Fractorium::OnXformsSelectAllButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox* w) { w->setChecked(true); }); }
+void Fractorium::OnXformsSelectAllButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w) { w->setChecked(true); }); }
 
 /// <summary>
 /// Uncheck all of the xform selection checkboxes.
 /// </summary>
 /// <param name="checked">Ignored</param>
-void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox* w) { w->setChecked(false); }); }
+void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w) { w->setChecked(false); }); }
 
 /// <summary>
 /// Clear all of the dynamically created xform checkboxes.
@@ -31,7 +30,6 @@ void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformChe
 void Fractorium::ClearXformsSelections()
 {
 	QLayoutItem* child = nullptr;
-
 	m_XformSelections.clear();
 	m_XformsSelectionLayout->blockSignals(true);
 
@@ -95,9 +93,9 @@ void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*)> func)
 template <typename T>
 bool FractoriumEmberController<T>::XformCheckboxAt(int i, std::function<void(QCheckBox*)> func)
 {
-	if (QLayoutItem* child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
+	if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
 	{
-		if (auto* w = qobject_cast<QCheckBox*>(child->widget()))
+		if (auto w = qobject_cast<QCheckBox*>(child->widget()))
 		{
 			func(w);
 			return true;

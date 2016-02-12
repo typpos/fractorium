@@ -51,7 +51,7 @@ private:
 	double m_SmallStep;
 	QPoint m_MouseDownPoint;
 	QPoint m_MouseMovePoint;
-	static QTimer m_Timer;
+	static QTimer s_Timer;
 };
 
 /// <summary>

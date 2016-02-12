@@ -159,18 +159,18 @@ public:
 		size_t i;
 		stringstream ss;
 		ss
-				<< "Spatial Filter:" << endl
-				<< "	       Support: " << m_Support << endl
-				<< "     Filter radius: " << m_FilterRadius << endl
-				<< "	   Supersample: " << m_Supersample << endl
-				<< "Pixel aspect ratio: " << m_PixelAspectRatio << endl
-				<< "Final filter width: " << m_FinalFilterWidth << endl
-				<< "Filter buffer size: " << m_Filter.size() << endl;
-		ss << "Filter: " << endl;
+				<< "Spatial Filter:"
+				<< "\n	       Support: " << m_Support
+				<< "\n     Filter radius: " << m_FilterRadius
+				<< "\n	   Supersample: " << m_Supersample
+				<< "\nPixel aspect ratio: " << m_PixelAspectRatio
+				<< "\nFinal filter width: " << m_FinalFilterWidth
+				<< "\nFilter buffer size: " << m_Filter.size();
+		ss << "\nFilter: \n";
 
 		for (i = 0; i < m_Filter.size(); i++)
 		{
-			ss << "Filter[" << i << "]: " << m_Filter[i] << endl;
+			ss << "Filter[" << i << "]: " << m_Filter[i] << "\n";
 		}
 
 		return ss.str();

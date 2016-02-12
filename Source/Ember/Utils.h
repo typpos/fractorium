@@ -169,7 +169,7 @@ public:
 	{
 		stringstream ss;
 
-		for (auto& s : errorReport) ss << s << endl;
+		for (auto& s : errorReport) ss << s << "\n";
 
 		return ss.str();
 	}
@@ -288,12 +288,12 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 	}
 	catch (const std::exception& e)
 	{
-		cout << "Error: Reading file " << filename << " failed: " << e.what() << endl;
+		cout << "Error: Reading file " << filename << " failed: " << e.what() << "\n";
 		b = false;
 	}
 	catch (...)
 	{
-		cout << "Error: Reading file " << filename << " failed." << endl;
+		cout << "Error: Reading file " << filename << " failed.\n";
 		b = false;
 	}
 

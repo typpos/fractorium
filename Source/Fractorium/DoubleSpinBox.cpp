@@ -1,7 +1,7 @@
 #include "FractoriumPch.h"
 #include "DoubleSpinBox.h"
 
-QTimer DoubleSpinBox::m_Timer;
+QTimer DoubleSpinBox::s_Timer;
 
 /// <summary>
 /// Constructor that passes parent to the base and sets up height and step.
@@ -144,17 +144,16 @@ void DoubleSpinBox::OnTimeout()
 		//qDebug() << "Shift pressed";
 		scale = 0.0001;
 	}
-	/*else if (ctrl)
-	{
+	/*  else if (ctrl)
+	    {
 		qDebug() << "Control pressed";
 		scale = 0.01;
-	}*/
+	    }*/
 	else
 		scale = 0.001;
 
 	val = d + (distance * amount * scale);
 	setValue(val);
-
 	//qDebug() << "Timer on, orig val: " << d << ", new val: " << val << ", distance " << distance;
 }
 
@@ -169,47 +168,47 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 	QMouseEvent* me = dynamic_cast<QMouseEvent*>(e);
 
 	if (isEnabled() &&
-		me &&
-		me->type() == QMouseEvent::MouseButtonPress &&
-		me->button() == Qt::RightButton)
+			me &&
+			me->type() == QMouseEvent::MouseButtonPress &&
+			me->button() == Qt::RightButton)
 	{
 		m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		StartTimer();
 		//qDebug() << "Right mouse down";
-	//	QPoint pt;
-	//
-	//	if (QMouseEvent* me = (QMouseEvent*)e)
-	//		pt = me->localPos().toPoint();
-	//
-	//	int pos = lineEdit()->cursorPositionAt(pt);
-	//
-	//	if (lineEdit()->selectedText() != "")
-	//	{
-	//		lineEdit()->deselect();
-	//		lineEdit()->setCursorPosition(pos);
-	//		return true;
-	//	}
-	//	else if (m_Select)
-	//	{
-	//		lineEdit()->setCursorPosition(pos);
-	//		selectAll();
-	//		m_Select = false;
-	//		return true;
-	//	}
+		//	QPoint pt;
+		//
+		//	if (QMouseEvent* me = (QMouseEvent*)e)
+		//		pt = me->localPos().toPoint();
+		//
+		//	int pos = lineEdit()->cursorPositionAt(pt);
+		//
+		//	if (lineEdit()->selectedText() != "")
+		//	{
+		//		lineEdit()->deselect();
+		//		lineEdit()->setCursorPosition(pos);
+		//		return true;
+		//	}
+		//	else if (m_Select)
+		//	{
+		//		lineEdit()->setCursorPosition(pos);
+		//		selectAll();
+		//		m_Select = false;
+		//		return true;
+		//	}
 	}
 	else if (isEnabled() &&
-		me &&
-		me->type() == QMouseEvent::MouseButtonRelease &&
-		me->button() == Qt::RightButton)
+			 me &&
+			 me->type() == QMouseEvent::MouseButtonRelease &&
+			 me->button() == Qt::RightButton)
 	{
 		StopTimer();
 		m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		//qDebug() << "Right mouse up";
 	}
 	else if (isEnabled() &&
-		me &&
-		me->type() == QMouseEvent::MouseMove &&
-		QGuiApplication::mouseButtons() & Qt::RightButton)
+			 me &&
+			 me->type() == QMouseEvent::MouseMove &&
+			 QGuiApplication::mouseButtons() & Qt::RightButton)
 	{
 		m_MouseMovePoint = me->pos();
 		qDebug() << "Mouse move while right down. Pt = " << me->pos() << ", global: " << mapToGlobal(me->pos());
@@ -262,8 +261,8 @@ void DoubleSpinBox::focusInEvent(QFocusEvent* e)
 /// <param name="e">The event</param>
 void DoubleSpinBox::focusOutEvent(QFocusEvent* e)
 {
-	 //lineEdit()->deselect();//Clear selection when leaving.
-	 //lineEdit()->setReadOnly(true);//Clever hack to clear the cursor when leaving.
+	//lineEdit()->deselect();//Clear selection when leaving.
+	//lineEdit()->setReadOnly(true);//Clever hack to clear the cursor when leaving.
 	StopTimer();
 	QDoubleSpinBox::focusOutEvent(e);
 }
@@ -299,9 +298,9 @@ void DoubleSpinBox::leaveEvent(QEvent* e)
 /// </summary>
 void DoubleSpinBox::StartTimer()
 {
-	m_Timer.stop();
-	connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
-	m_Timer.start(300);
+	s_Timer.stop();
+	connect(&s_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+	s_Timer.start(300);
 }
 
 /// <summary>
@@ -309,6 +308,6 @@ void DoubleSpinBox::StartTimer()
 /// </summary>
 void DoubleSpinBox::StopTimer()
 {
-	m_Timer.stop();
-	disconnect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
+	s_Timer.stop();
+	disconnect(&s_Timer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
 }

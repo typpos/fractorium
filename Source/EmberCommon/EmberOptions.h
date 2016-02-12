@@ -439,7 +439,7 @@ public:
 
 					case eOptionIDs::OPT_VERSION:
 					{
-						cout << EmberVersion() << endl;
+						cout << EmberVersion() << "\n";
 						return true;
 					}
 
@@ -540,8 +540,8 @@ public:
 			}
 			else
 			{
-				cout << "Invalid argument: " << args.OptionText() << endl;
-				cout << "\tReason: " << GetLastErrorText(errorCode) << endl;
+				cout << "Invalid argument: " << args.OptionText() << "\n";
+				cout << "\tReason: " << GetLastErrorText(errorCode) << "\n";
 			}
 		}
 
@@ -608,15 +608,15 @@ public:
 	{
 		ostringstream os;
 
-		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << endl;
+		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << endl;
+		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << endl;
+		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << endl;
+		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << endl;
+		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
 
 		return os.str();
 	}
@@ -631,15 +631,15 @@ public:
 		ostringstream os;
 		os << std::boolalpha;
 
-		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << endl;
+		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << endl;
+		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << endl;
+		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << endl;
+		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << endl;
+		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
 		return os.str();
 	}
@@ -650,25 +650,25 @@ public:
 	/// <param name="optUsage">The specified program usage</param>
 	void ShowUsage(eOptionUse optUsage)
 	{
-		cout << DescriptionString << " version " << EmberVersion() << endl << endl;
+		cout << DescriptionString << " version " << EmberVersion() << "\n\n";
 
 		if (optUsage == eOptionUse::OPT_USE_RENDER)
 		{
 			cout << "Usage:\n"
-				 "\tEmberRender.exe --in=test.flam3 [--out=outfile --format=png --verbose --progress --opencl]\n" << endl;
+				 "\tEmberRender.exe --in=test.flam3 [--out=outfile --format=png --verbose --progress --opencl]\n\n";
 		}
 		else if (optUsage == eOptionUse::OPT_USE_ANIMATE)
 		{
 			cout << "Usage:\n"
-				 "\tEmberAnimate.exe --in=sequence.flam3 [--format=png --verbose --progress --opencl]\n" << endl;
+				 "\tEmberAnimate.exe --in=sequence.flam3 [--format=png --verbose --progress --opencl]\n\n";
 		}
 		else if (optUsage == eOptionUse::OPT_USE_GENOME)
 		{
 			cout << "Usage:\n"
-				 "\tEmberGenome.exe --sequence=test.flam3 > sequenceout.flam3\n" << endl;
+				 "\tEmberGenome.exe --sequence=test.flam3 > sequenceout.flam3\n\n";
 		}
 
-		cout << GetUsage(optUsage) << endl;
+		cout << GetUsage(optUsage) << "\n";
 	}
 
 	/// <summary>

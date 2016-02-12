@@ -74,6 +74,7 @@ namespace EmberNs
 #define EMPTYFIELD -9999
 typedef std::chrono::high_resolution_clock Clock;
 typedef uint et;
+typedef std::lock_guard <std::recursive_mutex> rlg;
 
 /// <summary>
 /// Thin wrapper around getting the current time in milliseconds.

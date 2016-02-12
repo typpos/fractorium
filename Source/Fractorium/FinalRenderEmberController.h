@@ -82,11 +82,11 @@ protected:
 	QFuture<void> m_FinalPreviewResult;
 	std::function<void (void)> m_FinalRenderFunc;
 	std::function<void (void)> m_FinalPreviewRenderFunc;
-	
+
 	FractoriumSettings* m_Settings;
 	FractoriumFinalRenderDialog* m_FinalRenderDialog;
 	FinalRenderGuiState m_GuiState;
-	CriticalSection m_PreviewCs, m_ProgressCs;
+	std::recursive_mutex m_PreviewCs, m_ProgressCs;
 	Timing m_RenderTimer;
 	Timing m_TotalTimer;
 };

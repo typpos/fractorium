@@ -1971,7 +1971,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		int sl = int(rand.Frand01<T>() * m_Slices + T(0.5));
-		T a = m_Rotation + M_2PI * (sl + rand.Frand01<T>() * m_Thickness) / m_Slices;
+		T a = m_Rotation + m_Pi2Slices * (sl + m_Thickness * rand.Frand01<T>());
 		T r = m_Weight * rand.Frand01<T>();
 		helper.Out.x = r * std::cos(a);
 		helper.Out.y = r * std::sin(a);
@@ -1987,9 +1987,10 @@ public:
 		string slices =    "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotation =  "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pi2Slices = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint sl = (int)(MwcNext01(mwc) * " << slices << " + (real_t)(0.5));\n"
-		   << "\t\treal_t a = " << rotation << " + M_2PI * (sl + MwcNext01(mwc) * " << thickness << ") / " << slices << ";\n"
+		   << "\t\treal_t a = " << rotation << " + " << pi2Slices << " * (sl + " << thickness << " * MwcNext01(mwc));\n"
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * MwcNext01(mwc);\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(a);\n"
@@ -1997,6 +1998,11 @@ public:
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Pi2Slices = M_2PI / m_Slices;
 	}
 
 	virtual void Random(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
@@ -2014,12 +2020,14 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Slices,    prefix + "pie_slices", 6, eParamType::INTEGER_NONZERO, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Rotation,  prefix + "pie_rotation", T(0.5), eParamType::REAL_CYCLIC, 0, M_2PI));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "pie_thickness", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Pi2Slices, prefix + "pie_pi2_slices"));
 	}
 
 private:
 	T m_Slices;
 	T m_Rotation;
 	T m_Thickness;
+	T m_Pi2Slices;//Precalc
 };
 
 /// <summary>

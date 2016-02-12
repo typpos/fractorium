@@ -110,7 +110,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 	m_FinalPreviewRenderer->NumChannels(4);
 	m_FinalPreviewRenderFunc = [&]()
 	{
-		m_PreviewCs.Enter();//Thread prep.
+		rlg l(m_PreviewCs);//Thread prep.
 		m_PreviewRun = true;
 		m_FinalPreviewRenderer->Abort();
 		T scalePercentage;
@@ -144,11 +144,10 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		{
 			QImage image(finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, QImage::Format_RGBA8888);//The label wants RGBA.
 			memcpy(image.scanLine(0), m_PreviewFinalImage.data(), finalEmber.m_FinalRasW * finalEmber.m_FinalRasH * 4);//Memcpy the data in.
-			QPixmap pixmap = QPixmap::fromImage(image);
+			QPixmap pixmap(QPixmap::fromImage(image));
 			QMetaObject::invokeMethod(widget, "setPixmap", Qt::QueuedConnection, Q_ARG(QPixmap, pixmap));
 		});
 		m_PreviewRun = false;
-		m_PreviewCs.Leave();
 	};
 	//The main rendering function which will be called in a Qt thread.
 	//A backup Xml is made before the rendering process starts just in case it crashes before finishing.
@@ -837,7 +836,7 @@ void FinalRenderEmberController<T>::HandleFinishedProgress()
 template<typename T>
 void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberStats& stats, Timing& renderTimer)
 {
-	m_ProgressCs.Enter();
+	rlg l(m_ProgressCs);
 	string renderTimeString = renderTimer.Format(renderTimer.Toc()), totalTimeString;
 	QString status, filename = ComposePath(QString::fromStdString(ember.m_Name));
 	QString itersString = ToString<qulonglong>(stats.m_Iters);
@@ -885,7 +884,6 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 	}
 
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderTextOutput, "update", Qt::QueuedConnection);
-	m_ProgressCs.Leave();
 }
 
 /// <summary>

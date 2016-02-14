@@ -995,7 +995,7 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 	bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
 	bool preAll = pre && m_Fractorium->DrawAllPre();
 	bool postAll = post && m_Fractorium->DrawAllPost();
-	uint bestIndex = -1;
+	int bestIndex = -1;
 	T bestDist = 10;
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	m_HoverType = eHoverType::HoverNone;
@@ -1012,12 +1012,12 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 		if (CheckXformHover(m_SelectedXform, glCoords, bestDist, checkSelPre, checkSelPost))
 		{
 			m_HoverXform = m_SelectedXform;
-			bestIndex = ember->GetTotalXformIndex(m_SelectedXform);
+			bestIndex = int(ember->GetTotalXformIndex(m_SelectedXform));
 		}
 	}
 
 	//Check all xforms.
-	for (size_t i = 0; i < ember->TotalXformCount(); i++)
+	for (int i = 0; i < int(ember->TotalXformCount()); i++)
 	{
 		auto xform = ember->GetTotalXform(i);
 
@@ -1186,7 +1186,8 @@ void GLEmberController<T>::CalcDragXAxis()
 
 	if (GetShift())
 	{
-		v3T snapped = GetControl() ? SnapToNormalizedAngle(m_MouseWorldPos + m_DragHandleOffset, 24) : m_MouseWorldPos + m_DragHandleOffset;
+		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
+		v3T snapped = GetControl() ? SnapToNormalizedAngle(posOffset, 24u) : posOffset;
 		auto startDiff = (v2T(m_MouseDownWorldPos) * scale) - m_DragSrcTransform.O();
 		auto endDiff = (v2T(snapped) * scale) - m_DragSrcTransform.O();
 		T startAngle = std::atan2(startDiff.y, startDiff.x);
@@ -1222,11 +1223,12 @@ void GLEmberController<T>::CalcDragXAxis()
 	else
 	{
 		v3T diff;
+		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
 
 		if (GetControl())
-			diff = SnapToGrid(m_MouseWorldPos + m_DragHandleOffset) - m_MouseDownWorldPos;
+			diff = SnapToGrid(posOffset) - m_MouseDownWorldPos;
 		else
-			diff = (m_MouseWorldPos + m_DragHandleOffset) - m_MouseDownWorldPos;
+			diff = posOffset - m_MouseDownWorldPos;
 
 		auto origXPlusOff = v3T(m_DragSrcTransform.X(), 0) + (diff * scale);
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
@@ -1274,7 +1276,8 @@ void GLEmberController<T>::CalcDragYAxis()
 
 	if (GetShift())
 	{
-		v3T snapped = GetControl() ? SnapToNormalizedAngle(m_MouseWorldPos + m_DragHandleOffset, 24) : m_MouseWorldPos + m_DragHandleOffset;
+		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
+		v3T snapped = GetControl() ? SnapToNormalizedAngle(posOffset, 24u) : posOffset;
 		auto startDiff = (v2T(m_MouseDownWorldPos) * scale) - m_DragSrcTransform.O();
 		auto endDiff = (v2T(snapped) * scale) - m_DragSrcTransform.O();
 		T startAngle = std::atan2(startDiff.y, startDiff.x);
@@ -1310,11 +1313,12 @@ void GLEmberController<T>::CalcDragYAxis()
 	else
 	{
 		v3T diff;
+		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
 
 		if (GetControl())
-			diff = SnapToGrid(m_MouseWorldPos + m_DragHandleOffset) - m_MouseDownWorldPos;
+			diff = SnapToGrid(posOffset) - m_MouseDownWorldPos;
 		else
-			diff = (m_MouseWorldPos + m_DragHandleOffset) - m_MouseDownWorldPos;
+			diff = posOffset - m_MouseDownWorldPos;
 
 		auto origXPlusOff = v3T(m_DragSrcTransform.Y(), 0) + (diff * scale);
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)

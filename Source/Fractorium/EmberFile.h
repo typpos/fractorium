@@ -192,9 +192,9 @@ public:
 	/// </summary>
 	/// <param name="i">The index in the file of the ember</param>
 	/// <returns>The default ember name</returns>
-	static QString DefaultEmberName(uint i)
+	static QString DefaultEmberName(T i)
 	{
-		return DefaultFilename() + "_" + ToString(i);
+		return DefaultFilename() + "_" + ToString<T>(i);
 	}
 
 	QString m_Filename;

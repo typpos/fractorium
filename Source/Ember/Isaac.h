@@ -41,7 +41,6 @@
 
 namespace EmberNs
 {
-
 union UintBytes
 {
 	unsigned char Bytes[4];
@@ -58,14 +57,6 @@ public:
 	enum { N = (1 << ALPHA) };
 	UintBytes m_Cache;
 	size_t m_LastIndex;
-
-	/// <summary>
-	/// Global ISAAC RNG to be used from anywhere. This is not thread safe, so take caution to only
-	/// use it when no other threads are.
-	/// </summary>
-	static unique_ptr<QTIsaac<ALPHA, ISAAC_INT>> GlobalRand;
-
-	static std::recursive_mutex s_CS;
 
 	/// <summary>
 	/// The structure which holds all of the random information.
@@ -124,7 +115,7 @@ public:
 	/// <returns>The next random integer in the range of 0-255</returns>
 	static inline T LockedRandByte()
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		T t = GlobalRand->RandByte();
 		return t;
 	}
@@ -148,7 +139,7 @@ public:
 	/// <returns>The next random integer</returns>
 	static inline T LockedRand()
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		T t = GlobalRand->Rand();
 		return t;
 	}
@@ -170,7 +161,7 @@ public:
 	/// <returns>A value between 0 and the value passed in minus 1</returns>
 	static inline T LockedRand(T upper)
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		T t = GlobalRand->Rand(upper);
 		return t;
 	}
@@ -198,7 +189,7 @@ public:
 	template<typename floatType>
 	static inline floatType LockedFrand(floatType fMin, floatType fMax)
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		floatType t = GlobalRand->template Frand<floatType>(fMin, fMax);
 		return t;
 	}
@@ -225,7 +216,7 @@ public:
 	template<typename floatType>
 	static inline floatType LockedFrand01()
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		floatType t = GlobalRand->template Frand01<floatType>();
 		return t;
 	}
@@ -252,7 +243,7 @@ public:
 	template<typename floatType>
 	static inline floatType LockedFrand11()
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		floatType t = GlobalRand->template Frand11<floatType>();
 		return t;
 	}
@@ -274,7 +265,7 @@ public:
 	template<typename floatType>
 	static inline floatType LockedGoldenBit()
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		floatType t = GlobalRand->template GoldenBit<floatType>();
 		return t;
 	}
@@ -294,7 +285,7 @@ public:
 	/// <returns>A random 0 or 1</returns>
 	static inline uint LockedRandBit()
 	{
-		rlg l(s_CS);
+		rlg l(*s_CS.get());
 		uint t = GlobalRand->RandBit();
 		return t;
 	}
@@ -516,5 +507,12 @@ protected:
 
 private:
 	randctx m_Rc;//The random context which holds all of the seed and state information as well as the random number values.
+
+	/// <summary>
+	/// Global ISAAC RNG to be used from anywhere. This is not thread safe, so take caution to only
+	/// use it when no other threads are.
+	/// </summary>
+	static unique_ptr<QTIsaac<ALPHA, ISAAC_INT>> GlobalRand;
+	static unique_ptr<recursive_mutex> s_CS;
 };
 }

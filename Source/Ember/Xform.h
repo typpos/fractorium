@@ -159,9 +159,9 @@ public:
 		m_HasPreOrRegularVars = xform.PreVariationCount() > 0 || xform.VariationCount() > 0;
 		m_Wind[0] = T(xform.m_Wind[0]);
 		m_Wind[1] = T(xform.m_Wind[1]);
-		m_MotionFreq = xform.m_MotionFreq;
+		m_MotionFreq = T(xform.m_MotionFreq);
 		m_MotionFunc = xform.m_MotionFunc;
-		m_MotionOffset = xform.m_MotionOffset;
+		m_MotionOffset = T(xform.m_MotionOffset);
 		ClearAndDeleteVariations();
 
 		//Must manually add them via the AddVariation() function so that

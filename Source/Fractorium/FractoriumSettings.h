@@ -77,16 +77,16 @@ public:
 
 	bool EarlyClip();
 	void EarlyClip(bool b);
-	
+
 	bool YAxisUp();
 	void YAxisUp(bool b);
 
 	bool Transparency();
 	void Transparency(bool b);
-	
+
 	bool OpenCL();
 	void OpenCL(bool b);
-		
+
 	bool Double();
 	void Double(bool b);
 
@@ -113,13 +113,13 @@ public:
 
 	uint OpenCLSubBatch();
 	void OpenCLSubBatch(uint i);
-	
+
 	uint RandomCount();
 	void RandomCount(uint i);
 
 	bool FinalEarlyClip();
 	void FinalEarlyClip(bool b);
-	
+
 	bool FinalYAxisUp();
 	void FinalYAxisUp(bool b);
 
@@ -131,7 +131,7 @@ public:
 
 	bool FinalDouble();
 	void FinalDouble(bool b);
-	
+
 	bool FinalSaveXml();
 	void FinalSaveXml(bool b);
 
@@ -143,10 +143,10 @@ public:
 
 	bool FinalKeepAspect();
 	void FinalKeepAspect(bool b);
-	
+
 	uint FinalScale();
 	void FinalScale(uint i);
-	
+
 	QString FinalExt();
 	void FinalExt(const QString& s);
 
@@ -168,8 +168,8 @@ public:
 	uint FinalSupersample();
 	void FinalSupersample(uint i);
 
-	uint FinalStrips();
-	void FinalStrips(uint i);
+	size_t FinalStrips();
+	void FinalStrips(size_t i);
 
 	uint XmlTemporalSamples();
 	void XmlTemporalSamples(uint i);

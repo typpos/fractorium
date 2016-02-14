@@ -867,18 +867,14 @@ static inline bool IsClose(T val1, T val2, T tolerance = 1e-6)
 template <typename T>
 static inline T NormalizeDeg180(T angle)
 {
-	angle = fmod(angle, 360);
+	auto a = fmod(angle, T(360));
 
-	if (angle > 180)
-	{
-		angle -= 360;
-	}
-	else if (angle < -180)
-	{
-		angle += 360;
-	}
+	if (a > 180)
+		a -= 360;
+	else if (a < -180)
+		a += 360;
 
-	return angle;
+	return a;
 }
 
 /// <summary>

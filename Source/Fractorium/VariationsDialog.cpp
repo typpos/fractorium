@@ -127,10 +127,10 @@ void FractoriumVariationsDialog::OnSelectNoneButtonClicked(bool checked)
 void FractoriumVariationsDialog::Populate()
 {
 	auto table = ui.VariationsTable;
-	auto size = std::max<size_t>(std::max<size_t>(m_VariationList.RegSize(), m_VariationList.PreSize()), m_VariationList.PostSize());
+	int size = int(std::max<size_t>(std::max<size_t>(m_VariationList.RegSize(), m_VariationList.PreSize()), m_VariationList.PostSize()));
 	table->setRowCount(size);
 
-	for (size_t i = 0; i < size; i++)
+	for (auto i = 0; i < size; i++)
 	{
 		if (auto pre = m_VariationList.GetVariation(i, eVariationType::VARTYPE_PRE))
 		{

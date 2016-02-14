@@ -211,7 +211,7 @@ static vector<pair<size_t, size_t>> Devices(const QList<QVariant>& selectedDevic
 	auto& devices = OpenCLInfo::Instance()->DeviceIndices();
 	vec.reserve(selectedDevices.size());
 
-	for (size_t i = 0; i < selectedDevices.size(); i++)
+	for (int i = 0; i < selectedDevices.size(); i++)
 	{
 		auto index = selectedDevices[i].toUInt();
 
@@ -235,9 +235,9 @@ static void SetupDeviceTable(QTableWidget* table, const QList<QVariant>& setting
 	bool primary = false;
 	auto& deviceNames = OpenCLInfo::Instance()->AllDeviceNames();
 	table->clearContents();
-	table->setRowCount(deviceNames.size());
+	table->setRowCount(int(deviceNames.size()));
 
-	for (size_t i = 0; i < deviceNames.size(); i++)
+	for (int i = 0; i < deviceNames.size(); i++)
 	{
 		auto checkItem = new QTableWidgetItem();
 		auto radio = new QRadioButton();

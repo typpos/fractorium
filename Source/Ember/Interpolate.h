@@ -828,11 +828,11 @@ public:
 		//The first line below makes the first xform interpolate first.
 		//The second line makes the last xform interpolate first.
 		T st = stagScaled * (numXforms - 1 - thisXform) / (numXforms - 1);
-		T et = st + (1 - stagScaled);
+		T ett = st + (1 - stagScaled);
 
 		if (t <= st)
 			return 0;
-		else if (t >= et)
+		else if (t >= ett)
 			return 1;
 		else
 			return Smoother((t - st) / (1 - stagScaled));
@@ -893,9 +893,9 @@ public:
 	}
 
 	/*
-	    //Will need to alter this to handle 2D palettes.
-	    static bool InterpMissingColors(vector<glm::detail::tvec4<T>>& palette)
-	    {
+		//Will need to alter this to handle 2D palettes.
+		static bool InterpMissingColors(vector<glm::detail::tvec4<T>>& palette)
+		{
 		//Check for a non-full palette.
 		int minIndex, maxIndex;
 		int colorli, colorri;
@@ -988,7 +988,7 @@ public:
 		}
 
 		return true;
-	    }
+		}
 	*/
 
 	/// <summary>

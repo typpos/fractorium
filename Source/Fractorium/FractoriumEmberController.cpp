@@ -100,7 +100,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 
 		if (auto top = tree->topLevelItem(0))
 		{
-			for (size_t i = start; m_PreviewRun && i < end && i < m_EmberFile.Size(); i++)
+			for (auto i = start; m_PreviewRun && i < end && i < m_EmberFile.Size(); i++)
 			{
 				Ember<T> ember = m_EmberFile.m_Embers[i];
 				ember.SyncSize();
@@ -112,7 +112,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 
 				if (m_PreviewRenderer->Run(m_PreviewFinalImage) == eRenderStatus::RENDER_OK)
 				{
-					if (auto treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
+					if (auto treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(int(i))))
 					{
 						//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
 						//This ensures the events are processed in order as each preview is updated, and that control does not return here
@@ -173,8 +173,8 @@ template <typename T> Ember<T>* FractoriumEmberController<T>::CurrentEmber() { r
 template <typename T>
 void FractoriumEmberController<T>::ConstrainDimensions(Ember<T>& ember)
 {
-	ember.m_FinalRasW = std::min<int>(m_Fractorium->ui.GLDisplay->MaxTexSize(), ember.m_FinalRasW);
-	ember.m_FinalRasH = std::min<int>(m_Fractorium->ui.GLDisplay->MaxTexSize(), ember.m_FinalRasH);
+	ember.m_FinalRasW = std::min<int>(m_Fractorium->ui.GLDisplay->MaxTexSize(), int(ember.m_FinalRasW));
+	ember.m_FinalRasH = std::min<int>(m_Fractorium->ui.GLDisplay->MaxTexSize(), int(ember.m_FinalRasH));
 }
 
 /// <summary>
@@ -190,7 +190,7 @@ void FractoriumEmberController<T>::SetEmber(size_t index)
 	{
 		if (auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
 		{
-			for (uint i = 0; i < top->childCount(); i++)
+			for (int i = 0; i < top->childCount(); i++)
 			{
 				if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
 					emberItem->setSelected(i == index);
@@ -229,7 +229,7 @@ void FractoriumEmberController<T>::Update(std::function<void (void)> func, bool 
 template <typename T>
 void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType, bool updateRender, eProcessAction action)
 {
-	size_t i = 0;
+	int i = 0;
 	bool isCurrentFinal = m_Ember.IsFinalXform(CurrentXform());
 	bool doFinal = updateType != eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL && updateType != eXformUpdate::UPDATE_ALL_EXCEPT_FINAL;
 

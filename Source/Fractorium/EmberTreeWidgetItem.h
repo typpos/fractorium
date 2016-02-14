@@ -19,7 +19,7 @@ public:
 	/// This is meant to be a root level item.
 	/// </summary>
 	/// <param name="p">The parent widget of this item</param>
-	explicit EmberTreeWidgetItemBase(QTreeWidget* p = 0)
+	explicit EmberTreeWidgetItemBase(QTreeWidget* p)
 		: QTreeWidgetItem(p)
 	{
 	}
@@ -29,11 +29,11 @@ public:
 	/// This is meant to be the child of a root level item.
 	/// </summary>
 	/// <param name="p">The parent widget of this item</param>
-	explicit EmberTreeWidgetItemBase(QTreeWidgetItem* p = 0)
+	explicit EmberTreeWidgetItemBase(QTreeWidgetItem* p)
 		: QTreeWidgetItem(p)
 	{
 	}
-	
+
 	/// <summary>
 	/// Set the preview image for the tree widget item.
 	/// </summary>
@@ -43,7 +43,6 @@ public:
 	void SetImage(vector<byte>& v, uint width, uint height)
 	{
 		int size = 64;
-
 		m_Image = QImage(width, height, QImage::Format_RGBA8888);
 		memcpy(m_Image.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
 		m_Pixmap = QPixmap::fromImage(m_Image).scaled(QSize(size, size), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);//Create a QPixmap out of the QImage, scaled to size.

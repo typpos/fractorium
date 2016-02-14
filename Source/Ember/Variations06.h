@@ -3985,7 +3985,7 @@ public:
 				else
 				{
 					T x, s, c;
-					x = ((int)(rand.Frand01<T>() * 2)) ? m_WorkPower + (rand.Frand01<T>() * m_Scatter + m_Offset + edge) * T(M_PI) : -(rand.Frand01<T>() * m_Scatter + m_Offset + edge) * T(M_PI);
+					x = int(rand.Frand01<T>() * 2) ? m_WorkPower + (rand.Frand01<T>() * m_Scatter + m_Offset + edge) * T(M_PI) : -(rand.Frand01<T>() * m_Scatter + m_Offset + edge) * T(M_PI);
 					sincos(x, &s, &c);
 
 					if (m_Static > 1 || m_Static == -1)
@@ -4519,7 +4519,7 @@ public:
 		T s, c;
 		T total = 0;
 		T total2 = 0;
-		T temp1, temp2, temp3, temp4;
+		T temp1, temp2, temp4;
 
 		if (m_Hypergon != 0)
 		{
@@ -4532,7 +4532,6 @@ public:
 			}
 			else
 			{
-				temp3 = m_HypergonD;
 				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
 			}
 		}
@@ -4568,7 +4567,6 @@ public:
 				}
 				else
 				{
-					temp3 = m_HypergonD;
 					total2 += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
 				}
 			}
@@ -4644,7 +4642,7 @@ public:
 		   << "\t\treal_t s, c;\n"
 		   << "\t\treal_t total = 0;\n"
 		   << "\t\treal_t total2 = 0;\n"
-		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\t\treal_t temp1, temp2, temp4;\n"
 		   << "\n"
 		   << "\t\tif (" << hypergon << " != 0)\n"
 		   << "\t\t{\n"
@@ -4657,7 +4655,6 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		temp3 = " << hypergonD << ";\n"
 		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -4693,7 +4690,6 @@ public:
 		   << "\t\t		}\n"
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
-		   << "\t\t			temp3 = " << hypergonD << ";\n"
 		   << "\t\t			total2 += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
@@ -4813,11 +4809,10 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T a = helper.m_PrecalcAtanyx;
-		T a90 = atan2(helper.In.x, -helper.In.y);
 		T r;
 		T s, c;
 		T total = 0;
-		T temp1, temp2, temp3, temp4;
+		T temp1, temp2, temp4;
 
 		if (m_Hypergon != 0)
 		{
@@ -4830,7 +4825,6 @@ public:
 			}
 			else
 			{
-				temp3 = m_HypergonD;
 				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
 			}
 		}
@@ -4886,11 +4880,10 @@ public:
 		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
-		   << "\t\treal_t a90 = atan2(vIn.x, -vIn.y);\n"
 		   << "\t\treal_t r;\n"
 		   << "\t\treal_t s, c;\n"
 		   << "\t\treal_t total = 0;\n"
-		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\t\treal_t temp1, temp2, temp4;\n"
 		   << "\n"
 		   << "\t\tif (" << hypergon << " != 0)\n"
 		   << "\t\t{\n"
@@ -4903,7 +4896,6 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		temp3 = " << hypergonD << ";\n"
 		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -5014,11 +5006,10 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T a = helper.m_PrecalcAtanyx;
-		T a90 = atan2(helper.In.x, -helper.In.y);
 		T r;
 		T s, c;
 		T total = 0;
-		T temp1, temp2, temp3, temp4;
+		T temp1, temp2, temp4;
 
 		if (m_Hypergon != 0)
 		{
@@ -5031,7 +5022,6 @@ public:
 			}
 			else
 			{
-				temp3 = m_HypergonD;
 				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
 			}
 		}
@@ -5087,11 +5077,10 @@ public:
 		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
-		   << "\t\treal_t a90 = atan2(vIn.x, -vIn.y);\n"
 		   << "\t\treal_t r;\n"
 		   << "\t\treal_t s, c;\n"
 		   << "\t\treal_t total = 0;\n"
-		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\t\treal_t temp1, temp2, temp4;\n"
 		   << "\n"
 		   << "\t\tif (" << hypergon << " != 0)\n"
 		   << "\t\t{\n"
@@ -5104,7 +5093,6 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		temp3 = " << hypergonD << ";\n"
 		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -5215,11 +5203,10 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T a = helper.m_PrecalcAtanyx;
-		T a90 = atan2(helper.In.x, -helper.In.y);
 		T r;
 		T s, c;
 		T total = 0;
-		T temp1, temp2, temp3, temp4;
+		T temp1, temp2, temp4;
 
 		if (m_Hypergon != 0)
 		{
@@ -5232,7 +5219,6 @@ public:
 			}
 			else
 			{
-				temp3 = m_HypergonD;
 				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
 			}
 		}
@@ -5292,7 +5278,7 @@ public:
 		   << "\t\treal_t r;\n"
 		   << "\t\treal_t s, c;\n"
 		   << "\t\treal_t total = 0;\n"
-		   << "\t\treal_t temp1, temp2, temp3, temp4;\n"
+		   << "\t\treal_t temp1, temp2, temp4;\n"
 		   << "\n"
 		   << "\t\tif (" << hypergon << " != 0)\n"
 		   << "\t\t{\n"
@@ -5305,7 +5291,6 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		temp3 = " << hypergonD << ";\n"
 		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"

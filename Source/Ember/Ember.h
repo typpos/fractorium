@@ -101,7 +101,7 @@ public:
 		m_FinalRasH			  = ember.m_FinalRasH;
 		m_OrigFinalRasW		  = ember.m_OrigFinalRasW;
 		m_OrigFinalRasH		  = ember.m_OrigFinalRasH;
-		m_OrigPixPerUnit	  = ember.m_OrigPixPerUnit;
+		m_OrigPixPerUnit	  = T(ember.m_OrigPixPerUnit);
 		m_SubBatchSize		  = ember.m_SubBatchSize;
 		m_FuseCount			  = ember.m_FuseCount;
 		m_Supersample		  = ember.m_Supersample;

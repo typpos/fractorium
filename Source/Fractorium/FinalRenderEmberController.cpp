@@ -142,7 +142,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		[&](size_t strip) { },//Error.
 		[&](Ember<T>& finalEmber)//Final strip.
 		{
-			QImage image(finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, QImage::Format_RGBA8888);//The label wants RGBA.
+			QImage image(int(finalEmber.m_FinalRasW), int(finalEmber.m_FinalRasH), QImage::Format_RGBA8888);//The label wants RGBA.
 			memcpy(image.scanLine(0), m_PreviewFinalImage.data(), finalEmber.m_FinalRasW * finalEmber.m_FinalRasH * 4);//Memcpy the data in.
 			QPixmap pixmap(QPixmap::fromImage(image));
 			QMetaObject::invokeMethod(widget, "setPixmap", Qt::QueuedConnection, Q_ARG(QPixmap, pixmap));

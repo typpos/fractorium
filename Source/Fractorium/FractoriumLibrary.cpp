@@ -18,7 +18,7 @@ void Fractorium::InitLibraryUI()
 /// <returns>A pair containing the index of the item clicked and a pointer to the item</param>
 pair<size_t, QTreeWidgetItem*> Fractorium::GetCurrentEmberIndex()
 {
-	size_t index = 0;
+	int index = 0;
 	QTreeWidgetItem* item = nullptr;
 	auto tree = ui.LibraryTree;
 
@@ -141,7 +141,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 				emberItem->setSelected(true);
 
 	QCoreApplication::flush();
-	RenderPreviews(0, m_EmberFile.Size());
+	RenderPreviews(0, uint(m_EmberFile.Size()));
 	tree->expandAll();
 }
 
@@ -180,7 +180,7 @@ void FractoriumEmberController<T>::UpdateLibraryTree()
 		//the pointers contained in the EmberTreeWidgetItems. So reassign all pointers here.
 		SyncPointers();
 		tree->blockSignals(false);
-		RenderPreviews(childCount, m_EmberFile.Size());
+		RenderPreviews(childCount, uint(m_EmberFile.Size()));
 	}
 }
 
@@ -334,7 +334,7 @@ void FractoriumEmberController<T>::RenderPreviews(uint start, uint end)
 		}
 
 		tree->blockSignals(false);
-		m_PreviewResult = QtConcurrent::run(m_PreviewRenderFunc, 0, m_EmberFile.Size());
+		m_PreviewResult = QtConcurrent::run(m_PreviewRenderFunc, 0, uint(m_EmberFile.Size()));
 	}
 	else
 		m_PreviewResult = QtConcurrent::run(m_PreviewRenderFunc, start, end);

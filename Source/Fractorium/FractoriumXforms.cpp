@@ -101,7 +101,7 @@ void FractoriumEmberController<T>::AddXform()
 		newXform.m_Weight = 0.25;
 		newXform.m_ColorX = m_Rand.Frand01<T>();
 		m_Ember.AddXform(newXform);
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		int index = int(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);
 	});
 }
@@ -148,7 +148,7 @@ void FractoriumEmberController<T>::AddLinkedXform()
 
 		xform->SetXaos(count - 1, 1);//Set the xaos value for the previous xform pointing to the new one to one.
 		xform->m_Opacity = 0;//Clear the opacity of the previous xform.
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		int index = int(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);
 		FillXaos();
 	}, eXformUpdate::UPDATE_CURRENT);
@@ -178,7 +178,7 @@ void FractoriumEmberController<T>::DuplicateXform()
 		for (auto& it : vec)
 			m_Ember.AddXform(it);
 
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		int index = int(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);//Handles xaos.
 	});
 }
@@ -257,7 +257,7 @@ void FractoriumEmberController<T>::DeleteXforms()
 
 	if (offset)
 	{
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final. Note final is requeried one last time.
+		int index = int(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final. Note final is requeried one last time.
 		FillXforms(index);
 		UpdateRender();
 	}
@@ -284,7 +284,7 @@ void FractoriumEmberController<T>::AddFinalXform()
 			auto combo = m_Fractorium->ui.CurrentXformCombo;
 			final.AddVariation(new LinearVariation<T>());//Just a placeholder so other parts of the code don't see it as being empty.
 			m_Ember.SetFinalXform(final);
-			int index = m_Ember.TotalXformCount() - 1;//Set index to the last item.
+			int index = int(m_Ember.TotalXformCount() - 1);//Set index to the last item.
 			FillXforms(index);
 		});
 	}

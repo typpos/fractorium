@@ -5,7 +5,8 @@
 namespace EmberNs
 {
 template<> unique_ptr<QTIsaac<ISAAC_SIZE, ISAAC_INT>> QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand = unique_ptr<QTIsaac<ISAAC_SIZE, ISAAC_INT>>(new QTIsaac<ISAAC_SIZE, ISAAC_INT>());
-template<> std::recursive_mutex QTIsaac<ISAAC_SIZE, ISAAC_INT>::s_CS;
+template<> unique_ptr<recursive_mutex> QTIsaac<ISAAC_SIZE, ISAAC_INT>::s_CS = unique_ptr<recursive_mutex>(new recursive_mutex());
+template EMBER_API class QTIsaac<ISAAC_SIZE, ISAAC_INT>;
 }
 
 #include "Curves.h"

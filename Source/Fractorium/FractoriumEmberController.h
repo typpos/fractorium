@@ -199,7 +199,7 @@ public:
 	virtual void RandomXaos() { }
 
 	//Palette.
-	virtual int  InitPaletteList(const string& s) { return 0; }
+	virtual size_t InitPaletteList(const string& s) { return 0; }
 	virtual bool FillPaletteTable(const string& s) { return false; }
 	virtual void ApplyPaletteToEmber() { }
 	virtual void PaletteAdjust() { }
@@ -240,9 +240,9 @@ protected:
 	bool m_Shared;
 	bool m_LastEditWasUndoRedo;
 	vector<pair<size_t, size_t>> m_Devices;
-	uint m_SubBatchCount;
+	size_t m_SubBatchCount;
 	uint m_FailedRenders;
-	uint m_UndoIndex;
+	size_t m_UndoIndex;
 	double m_LockedScale;
 	eRendererType m_RenderType;
 	eEditUndoState m_EditState;
@@ -443,7 +443,7 @@ public:
 	virtual void RandomXaos() override;
 
 	//Palette.
-	virtual int  InitPaletteList(const string& s) override;
+	virtual size_t InitPaletteList(const string& s) override;
 	virtual bool FillPaletteTable(const string& s) override;
 	virtual void ApplyPaletteToEmber() override;
 	virtual void PaletteAdjust() override;

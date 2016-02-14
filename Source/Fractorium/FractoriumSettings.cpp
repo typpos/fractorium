@@ -180,8 +180,8 @@ void FractoriumSettings::FinalTemporalSamples(uint i)				  { setValue(FINALTEMPO
 uint FractoriumSettings::FinalSupersample()							  { return value(FINALSUPERSAMPLE).toUInt();     }
 void FractoriumSettings::FinalSupersample(uint i)					  { setValue(FINALSUPERSAMPLE, i);               }
 
-uint FractoriumSettings::FinalStrips()								  { return value(FINALSTRIPS).toUInt();			 }
-void FractoriumSettings::FinalStrips(uint i)						  { setValue(FINALSTRIPS, i);					 }
+size_t FractoriumSettings::FinalStrips()							  { return value(FINALSTRIPS).toULongLong();	 }
+void FractoriumSettings::FinalStrips(size_t i)						  { setValue(FINALSTRIPS, uint(i));				 }
 
 /// <summary>
 /// Xml file saving settings.

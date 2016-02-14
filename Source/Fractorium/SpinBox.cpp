@@ -43,6 +43,8 @@ void SpinBox::SetValueStealth(int d)
 	blockSignals(false);
 }
 
+void SpinBox::SetValueStealth(size_t d) { SetValueStealth(int(d)); }
+
 /// <summary>
 /// Set whether to respond to double click events.
 /// </summary>

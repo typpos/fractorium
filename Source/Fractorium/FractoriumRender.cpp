@@ -260,7 +260,7 @@ bool FractoriumEmberController<T>::SyncSizes()
 	if (!m_GLController->SizesMatch())
 	{
 		m_GLController->ClearWindow();
-		gl->SetDimensions(m_Ember.m_FinalRasW, m_Ember.m_FinalRasH);
+		gl->SetDimensions(int(m_Ember.m_FinalRasW), int(m_Ember.m_FinalRasH));
 		gl->Allocate();
 		gl->SetViewport();
 
@@ -660,12 +660,12 @@ bool Fractorium::CreateControllerFromOptions()
 
 	if (!m_Controller.get() || (m_Controller->SizeOfT() != elementSize))
 	{
-		double hue = m_PaletteHueSpin->value();
-		double sat = m_PaletteSaturationSpin->value();
-		double bright = m_PaletteBrightnessSpin->value();
-		double con = m_PaletteContrastSpin->value();
-		double blur = m_PaletteBlurSpin->value();
-		double freq = m_PaletteFrequencySpin->value();
+		auto hue = m_PaletteHueSpin->value();
+		auto sat = m_PaletteSaturationSpin->value();
+		auto bright = m_PaletteBrightnessSpin->value();
+		auto con = m_PaletteContrastSpin->value();
+		auto blur = m_PaletteBlurSpin->value();
+		auto freq = m_PaletteFrequencySpin->value();
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efd;

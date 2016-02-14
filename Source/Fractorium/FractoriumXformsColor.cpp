@@ -204,7 +204,7 @@ void Fractorium::OnCurvesBlueRadioButtonToggled(bool checked)  { if (checked) ui
 template <typename T>
 QColor FractoriumEmberController<T>::ColorIndexToQColor(double d)
 {
-	v4T entry = m_Ember.m_Palette[Clamp<int>(d * COLORMAP_LENGTH_MINUS_1, 0, m_Ember.m_Palette.Size())];
+	v4T entry = m_Ember.m_Palette[Clamp<size_t>(d * COLORMAP_LENGTH_MINUS_1, 0, m_Ember.m_Palette.Size())];
 	entry.r *= 255;
 	entry.g *= 255;
 	entry.b *= 255;
@@ -220,9 +220,9 @@ void FractoriumEmberController<T>::FillCurvesControl()
 {
 	m_Fractorium->ui.CurvesView->blockSignals(true);
 
-	for (size_t i = 0; i < 4; i++)
+	for (auto i = 0; i < 4; i++)
 	{
-		for (size_t j = 1; j < 3; j++)//Only do middle points.
+		for (auto j = 1; j < 3; j++)//Only do middle points.
 		{
 			QPointF point(m_Ember.m_Curves.m_Points[i][j].x, m_Ember.m_Curves.m_Points[i][j].y);
 			m_Fractorium->ui.CurvesView->Set(i, j, point);

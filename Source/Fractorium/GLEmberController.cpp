@@ -255,13 +255,13 @@ void GLEmberController<T>::QueryMatrices(bool print)
 
 		if (print)
 		{
-			for (size_t i = 0; i < 4; i++)
+			for (glm::length_t i = 0; i < 4; i++)
 				qDebug() << "Viewport[" << i << "] = " << m_Viewport[i] << "\n";
 
-			for (size_t i = 0; i < 16; i++)
+			for (glm::length_t i = 0; i < 16; i++)
 				qDebug() << "Modelview[" << i << "] = " << glm::value_ptr(m_Modelview)[i] << "\n";
 
-			for (size_t i = 0; i < 16; i++)
+			for (glm::length_t i = 0; i < 16; i++)
 				qDebug() << "Projection[" << i << "] = " << glm::value_ptr(m_Projection)[i] << "\n";
 		}
 	}

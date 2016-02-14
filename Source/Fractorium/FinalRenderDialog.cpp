@@ -116,7 +116,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 	m_QualitySpin->setValue(m_Settings->FinalQuality());
 	m_TemporalSamplesSpin->setValue(m_Settings->FinalTemporalSamples());
 	m_SupersampleSpin->setValue(m_Settings->FinalSupersample());
-	m_StripsSpin->setValue(m_Settings->FinalStrips());
+	m_StripsSpin->setValue(int(m_Settings->FinalStrips()));
 	Scale(eScaleType(m_Settings->FinalScale()));
 
 	if (m_Settings->FinalExt() == "jpg")
@@ -622,7 +622,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 {
 	if (CreateControllerFromGUI(true))
 	{
-		int index = m_Fractorium->m_Controller->Index() + 1;
+		int index = int(m_Fractorium->m_Controller->Index()) + 1;
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efi;
@@ -644,7 +644,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 		});//Copy the whole file, will take about 0.2ms per ember in the file.
 #endif
 		m_Controller->SetEmberFile(efi);//Copy the temp file into the final render controller.
-		ui.FinalRenderCurrentSpin->setMaximum(efi.Size());
+		ui.FinalRenderCurrentSpin->setMaximum(int(efi.Size()));
 		ui.FinalRenderCurrentSpin->blockSignals(true);
 		ui.FinalRenderCurrentSpin->setValue(index);//Set the currently selected ember to the one that was being edited.
 		ui.FinalRenderCurrentSpin->blockSignals(false);

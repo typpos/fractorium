@@ -79,194 +79,211 @@ public:
 
 		if (!m_Init)
 		{
-			m_BadParamNames.reserve(100);
-			m_BadParamNames["swtin_distort"] =   "stwin_distort";//stwin.
-			m_BadParamNames["pow_numerator"] =   "pow_block_numerator";//pow_block.
-			m_BadParamNames["pow_denominator"] = "pow_block_denominator";
-			m_BadParamNames["pow_root"] =        "pow_block_root";
-			m_BadParamNames["pow_correctn"] =    "pow_block_correctn";
-			m_BadParamNames["pow_correctd"] =    "pow_block_correctd";
-			m_BadParamNames["pow_power"] =       "pow_block_power";
-			m_BadParamNames["lt"] = "linearT_powX";//linearT.
-			m_BadParamNames["lt"] = "linearT_powY";
-			m_BadParamNames["re_a"] = "Mobius_Re_A";//Mobius.
-			m_BadParamNames["im_a"] = "Mobius_Im_A";
-			m_BadParamNames["re_b"] = "Mobius_Re_B";
-			m_BadParamNames["im_b"] = "Mobius_Im_B";
-			m_BadParamNames["re_c"] = "Mobius_Re_C";
-			m_BadParamNames["im_c"] = "Mobius_Im_C";
-			m_BadParamNames["re_d"] = "Mobius_Re_D";
-			m_BadParamNames["im_d"] = "Mobius_Im_D";
-			m_BadParamNames["rx_sin"] = "rotate_x_sin";//rotate_x.
-			m_BadParamNames["rx_cos"] = "rotate_x_cos";
-			m_BadParamNames["ry_sin"] = "rotate_y_sin";//rotate_y.
-			m_BadParamNames["ry_cos"] = "rotate_y_cos";
-			m_BadParamNames["intrfr2_a1"] = "interference2_a1";//interference2.
-			m_BadParamNames["intrfr2_b1"] = "interference2_b1";
-			m_BadParamNames["intrfr2_c1"] = "interference2_c1";
-			m_BadParamNames["intrfr2_p1"] = "interference2_p1";
-			m_BadParamNames["intrfr2_t1"] = "interference2_t1";
-			m_BadParamNames["intrfr2_a2"] = "interference2_a2";
-			m_BadParamNames["intrfr2_b2"] = "interference2_b2";
-			m_BadParamNames["intrfr2_c2"] = "interference2_c2";
-			m_BadParamNames["intrfr2_p2"] = "interference2_p2";
-			m_BadParamNames["intrfr2_t2"] = "interference2_t2";
-			m_BadParamNames["octa_x"] = "octagon_x";//octagon.
-			m_BadParamNames["octa_y"] = "octagon_y";
-			m_BadParamNames["octa_z"] = "octagon_z";
-			m_BadParamNames["bubble_x"] = "bubble2_x";//bubble2.
-			m_BadParamNames["bubble_y"] = "bubble2_y";
-			m_BadParamNames["bubble_z"] = "bubble2_z";
-			m_BadParamNames["cubic3d_xpand"] = "cubicLattice_3D_xpand";//cubicLattice_3D.
-			m_BadParamNames["cubic3d_style"] = "cubicLattice_3D_style";
-			m_BadParamNames["splitb_x"] =  "SplitBrdr_x";//SplitBrdr.
-			m_BadParamNames["splitb_y"] =  "SplitBrdr_y";
-			m_BadParamNames["splitb_px"] = "SplitBrdr_px";
-			m_BadParamNames["splitb_py"] = "SplitBrdr_py";
-			m_BadParamNames["dc_cyl_offset"] = "dc_cylinder_offset";//dc_cylinder.
-			m_BadParamNames["dc_cyl_angle"] =  "dc_cylinder_angle";
-			m_BadParamNames["dc_cyl_scale"] =  "dc_cylinder_scale";
-			m_BadParamNames["cyl_x"] =         "dc_cylinder_x";
-			m_BadParamNames["cyl_y"] =         "dc_cylinder_y";
-			m_BadParamNames["cyl_blur"] =      "dc_cylinder_blur";
-			m_BadParamNames["mobius_radius"] =   "mobius_strip_radius";//mobius_strip.
-			m_BadParamNames["mobius_width"] =    "mobius_strip_width";
-			m_BadParamNames["mobius_rect_x"] =   "mobius_strip_rect_x";
-			m_BadParamNames["mobius_rect_y"] =   "mobius_strip_rect_y";
-			m_BadParamNames["mobius_rotate_x"] = "mobius_strip_rotate_x";
-			m_BadParamNames["mobius_rotate_y"] = "mobius_strip_rotate_y";
-			m_BadParamNames["bwraps2_cellsize"] =    "bwraps_cellsize";//bwraps2.
-			m_BadParamNames["bwraps2_space"] =       "bwraps_space";
-			m_BadParamNames["bwraps2_gain"] =        "bwraps_gain";
-			m_BadParamNames["bwraps2_inner_twist"] = "bwraps_inner_twist";
-			m_BadParamNames["bwraps2_outer_twist"] = "bwraps_outer_twist";
-			m_BadParamNames["bwraps7_cellsize"] =    "bwraps_cellsize";//bwraps7.
-			m_BadParamNames["bwraps7_space"] =       "bwraps_space";
-			m_BadParamNames["bwraps7_gain"] =        "bwraps_gain";
-			m_BadParamNames["bwraps7_inner_twist"] = "bwraps_inner_twist";
-			m_BadParamNames["bwraps7_outer_twist"] = "bwraps_outer_twist";
-			m_BadParamNames["pre_bwraps2_cellsize"] =    "pre_bwraps_cellsize";
-			m_BadParamNames["pre_bwraps2_space"] =       "pre_bwraps_space";
-			m_BadParamNames["pre_bwraps2_gain"] =        "pre_bwraps_gain";
-			m_BadParamNames["pre_bwraps2_inner_twist"] = "pre_bwraps_inner_twist";
-			m_BadParamNames["pre_bwraps2_outer_twist"] = "pre_bwraps_outer_twist";
-			m_BadParamNames["post_bwraps2_cellsize"] =    "post_bwraps_cellsize";
-			m_BadParamNames["post_bwraps2_space"] =       "post_bwraps_space";
-			m_BadParamNames["post_bwraps2_gain"] =        "post_bwraps_gain";
-			m_BadParamNames["post_bwraps2_inner_twist"] = "post_bwraps_inner_twist";
-			m_BadParamNames["post_bwraps2_outer_twist"] = "post_bwraps_outer_twist";
-			m_BadParamNames["hexa3d_majp"] =  "hexaplay3D_majp";
-			m_BadParamNames["hexa3d_scale"] = "hexaplay3D_scale";
-			m_BadParamNames["hexa3d_zlift"] = "hexaplay3D_zlift";
-			m_BadParamNames["nb_numedges"] =		"nBlur_numEdges";
-			m_BadParamNames["nb_numstripes"] =		"nBlur_numStripes";
-			m_BadParamNames["nb_ratiostripes"] =	"nBlur_ratioStripes";
-			m_BadParamNames["nb_ratiohole"] =		"nBlur_ratioHole";
-			m_BadParamNames["nb_circumcircle"] =	"nBlur_circumCircle";
-			m_BadParamNames["nb_adjusttolinear"] = "nBlur_adjustToLinear";
-			m_BadParamNames["nb_equalblur"] =		"nBlur_equalBlur";
-			m_BadParamNames["nb_exactcalc"] =		"nBlur_exactCalc";
-			m_BadParamNames["nb_highlightedges"] = "nBlur_highlightEdges";
-			m_BadParamNames["octapol_r"] = "octapol_radius";
-			m_BadParamNames["number_of_stripes"] = "bubbleT3D_number_of_stripes";
-			m_BadParamNames["ratio_of_stripes"]  = "bubbleT3D_ratio_of_stripes";
-			m_BadParamNames["angle_of_hole"]	 = "bubbleT3D_angle_of_hole";
-			m_BadParamNames["exponentZ"]		 = "bubbleT3D_exponentZ";
-			m_BadParamNames["_symmetryZ"]		 = "bubbleT3D_symmetryZ";
-			m_BadParamNames["_modusBlur"]		 = "bubbleT3D_modusBlur";
-			m_BadParamNames["post_scrop_power"]      = "post_smartcrop_power";
-			m_BadParamNames["post_scrop_radius"]     = "post_smartcrop_radius";
-			m_BadParamNames["post_scrop_roundstr"]   = "post_smartcrop_roundstr";
-			m_BadParamNames["post_scrop_roundwidth"] = "post_smartcrop_roundwidth";
-			m_BadParamNames["post_scrop_distortion"] = "post_smartcrop_distortion";
-			m_BadParamNames["post_scrop_edge"]       = "post_smartcrop_edge";
-			m_BadParamNames["post_scrop_scatter"]    = "post_smartcrop_scatter";
-			m_BadParamNames["post_scrop_offset"]     = "post_smartcrop_offset";
-			m_BadParamNames["post_scrop_rotation"]   = "post_smartcrop_rotation";
-			m_BadParamNames["post_scrop_cropmode"]   = "post_smartcrop_cropmode";
-			m_BadParamNames["post_scrop_static"]     = "post_smartcrop_static";
-			m_FlattenNames.reserve(24);
-			m_FlattenNames.push_back("pre_crop");
-			m_FlattenNames.push_back("pre_falloff2");
-			m_FlattenNames.push_back("pre_rotate_x");
-			m_FlattenNames.push_back("pre_rotate_y");
-			m_FlattenNames.push_back("pre_ztranslate");
-			m_FlattenNames.push_back("blur3D");
-			m_FlattenNames.push_back("bubble");
-			m_FlattenNames.push_back("bwraps");
-			m_FlattenNames.push_back("bwraps2");
-			m_FlattenNames.push_back("crop");
-			m_FlattenNames.push_back("cylinder");
-			m_FlattenNames.push_back("falloff2");
-			m_FlattenNames.push_back("hemisphere");
-			m_FlattenNames.push_back("julia3D");
-			m_FlattenNames.push_back("julia3Dz");
-			m_FlattenNames.push_back("linear3D");
-			m_FlattenNames.push_back("zblur");
-			m_FlattenNames.push_back("zcone");
-			m_FlattenNames.push_back("ztranslate");
-			m_FlattenNames.push_back("post_crop");
-			m_FlattenNames.push_back("post_falloff2");
-			m_FlattenNames.push_back("post_rotate_x");
-			m_FlattenNames.push_back("post_rotate_y");
-			m_FlattenNames.push_back("curl3D_cz");
+			m_BadParamNames = unordered_map<string, string>
+			{
+				{ "swtin_distort"           , "stwin_distort"               },//stwin.
+				{ "pow_numerator"           , "pow_block_numerator"         },//pow_block.
+				{ "pow_denominator"         , "pow_block_denominator"       },
+				{ "pow_root"                , "pow_block_root"              },
+				{ "pow_correctn"            , "pow_block_correctn"          },
+				{ "pow_correctd"            , "pow_block_correctd"          },
+				{ "pow_power"               , "pow_block_power"             },
+				{ "lt"                      , "linearT_powX"                },//linearT.
+				{ "lt"                      , "linearT_powY"                },
+				{ "re_a"                    , "Mobius_Re_A"                 },//Mobius.
+				{ "im_a"                    , "Mobius_Im_A"                 },
+				{ "re_b"                    , "Mobius_Re_B"                 },
+				{ "im_b"                    , "Mobius_Im_B"                 },
+				{ "re_c"                    , "Mobius_Re_C"                 },
+				{ "im_c"                    , "Mobius_Im_C"                 },
+				{ "re_d"                    , "Mobius_Re_D"                 },
+				{ "im_d"                    , "Mobius_Im_D"                 },
+				{ "rx_sin"                  , "rotate_x_sin"                },//rotate_x.
+				{ "rx_cos"                  , "rotate_x_cos"                },
+				{ "ry_sin"                  , "rotate_y_sin"                },//rotate_y.
+				{ "ry_cos"                  , "rotate_y_cos"                },
+				{ "intrfr2_a1"              , "interference2_a1"            },//interference2.
+				{ "intrfr2_b1"              , "interference2_b1"            },
+				{ "intrfr2_c1"              , "interference2_c1"            },
+				{ "intrfr2_p1"              , "interference2_p1"            },
+				{ "intrfr2_t1"              , "interference2_t1"            },
+				{ "intrfr2_a2"              , "interference2_a2"            },
+				{ "intrfr2_b2"              , "interference2_b2"            },
+				{ "intrfr2_c2"              , "interference2_c2"            },
+				{ "intrfr2_p2"              , "interference2_p2"            },
+				{ "intrfr2_t2"              , "interference2_t2"            },
+				{ "octa_x"                  , "octagon_x"                   },//octagon.
+				{ "octa_y"                  , "octagon_y"                   },
+				{ "octa_z"                  , "octagon_z"                   },
+				{ "bubble_x"                , "bubble2_x"                   },//bubble2.
+				{ "bubble_y"                , "bubble2_y"                   },
+				{ "bubble_z"                , "bubble2_z"                   },
+				{ "cubic3d_xpand"           , "cubicLattice_3D_xpand"       },//cubicLattice_3D.
+				{ "cubic3d_style"           , "cubicLattice_3D_style"       },
+				{ "splitb_x"                , "SplitBrdr_x"                 },//SplitBrdr.
+				{ "splitb_y"                , "SplitBrdr_y"                 },
+				{ "splitb_px"               , "SplitBrdr_px"                },
+				{ "splitb_py"               , "SplitBrdr_py"                },
+				{ "dc_cyl_offset"           , "dc_cylinder_offset"          },//dc_cylinder.
+				{ "dc_cyl_angle"            , "dc_cylinder_angle"           },
+				{ "dc_cyl_scale"            , "dc_cylinder_scale"           },
+				{ "cyl_x"                   , "dc_cylinder_x"               },
+				{ "cyl_y"                   , "dc_cylinder_y"               },
+				{ "cyl_blur"                , "dc_cylinder_blur"            },
+				{ "mobius_radius"           , "mobius_strip_radius"         },//mobius_strip.
+				{ "mobius_width"            , "mobius_strip_width"          },
+				{ "mobius_rect_x"           , "mobius_strip_rect_x"         },
+				{ "mobius_rect_y"           , "mobius_strip_rect_y"         },
+				{ "mobius_rotate_x"         , "mobius_strip_rotate_x"       },
+				{ "mobius_rotate_y"         , "mobius_strip_rotate_y"       },
+				{ "bwraps2_cellsize"        , "bwraps_cellsize"             },//bwraps2.
+				{ "bwraps2_space"           , "bwraps_space"                },
+				{ "bwraps2_gain"            , "bwraps_gain"                 },
+				{ "bwraps2_inner_twist"     , "bwraps_inner_twist"          },
+				{ "bwraps2_outer_twist"     , "bwraps_outer_twist"          },
+				{ "bwraps7_cellsize"        , "bwraps_cellsize"             },//bwraps7.
+				{ "bwraps7_space"           , "bwraps_space"                },
+				{ "bwraps7_gain"            , "bwraps_gain"                 },
+				{ "bwraps7_inner_twist"     , "bwraps_inner_twist"          },
+				{ "bwraps7_outer_twist"     , "bwraps_outer_twist"          },
+				{ "pre_bwraps2_cellsize"    , "pre_bwraps_cellsize"         },//bwraps2.
+				{ "pre_bwraps2_space"       , "pre_bwraps_space"            },
+				{ "pre_bwraps2_gain"        , "pre_bwraps_gain"             },
+				{ "pre_bwraps2_inner_twist" , "pre_bwraps_inner_twist"      },
+				{ "pre_bwraps2_outer_twist" , "pre_bwraps_outer_twist"      },
+				{ "post_bwraps2_cellsize"   , "post_bwraps_cellsize"        },
+				{ "post_bwraps2_space"      , "post_bwraps_space"           },
+				{ "post_bwraps2_gain"       , "post_bwraps_gain"            },
+				{ "post_bwraps2_inner_twist", "post_bwraps_inner_twist"     },
+				{ "post_bwraps2_outer_twist", "post_bwraps_outer_twist"     },
+				{ "hexa3d_majp"             , "hexaplay3D_majp"             },//hexaplay3D.
+				{ "hexa3d_scale"            , "hexaplay3D_scale"            },
+				{ "hexa3d_zlift"            , "hexaplay3D_zlift"            },
+				{ "nb_numedges"             , "nBlur_numEdges"              },//nBlur.
+				{ "nb_numstripes"           , "nBlur_numStripes"            },
+				{ "nb_ratiostripes"         , "nBlur_ratioStripes"          },
+				{ "nb_ratiohole"            , "nBlur_ratioHole"             },
+				{ "nb_circumcircle"         , "nBlur_circumCircle"          },
+				{ "nb_adjusttolinear"       , "nBlur_adjustToLinear"        },
+				{ "nb_equalblur"            , "nBlur_equalBlur"             },
+				{ "nb_exactcalc"            , "nBlur_exactCalc"             },
+				{ "nb_highlightedges"       , "nBlur_highlightEdges"        },
+				{ "octapol_r"               , "octapol_radius"              },//octapol.
+				{ "number_of_stripes"       , "bubbleT3D_number_of_stripes" },//bubbleT3D.
+				{ "ratio_of_stripes"        , "bubbleT3D_ratio_of_stripes"  },
+				{ "angle_of_hole"           , "bubbleT3D_angle_of_hole"     },
+				{ "exponentZ"               , "bubbleT3D_exponentZ"         },
+				{ "_symmetryZ"              , "bubbleT3D_symmetryZ"         },
+				{ "_modusBlur"              , "bubbleT3D_modusBlur"         },
+				{ "post_scrop_power"        , "post_smartcrop_power"        },//post_smartcrop.
+				{ "post_scrop_radius"       , "post_smartcrop_radius"       },
+				{ "post_scrop_roundstr"     , "post_smartcrop_roundstr"     },
+				{ "post_scrop_roundwidth"   , "post_smartcrop_roundwidth"   },
+				{ "post_scrop_distortion"   , "post_smartcrop_distortion"   },
+				{ "post_scrop_edge"         , "post_smartcrop_edge"         },
+				{ "post_scrop_scatter"      , "post_smartcrop_scatter"      },
+				{ "post_scrop_offset"       , "post_smartcrop_offset"       },
+				{ "post_scrop_rotation"     , "post_smartcrop_rotation"     },
+				{ "post_scrop_cropmode"     , "post_smartcrop_cropmode"     },
+				{ "post_scrop_static"       , "post_smartcrop_static"       }
+			};
+			m_FlattenNames =
+			{
+				"pre_crop",
+				"pre_falloff2",
+				"pre_rotate_x",
+				"pre_rotate_y",
+				"pre_ztranslate",
+				"blur3D",
+				"bubble",
+				"bwraps",
+				"bwraps2",
+				"crop",
+				"cylinder",
+				"falloff2",
+				"hemisphere",
+				"julia3D",
+				"julia3Dz",
+				"linear3D",
+				"zblur",
+				"zcone",
+				"ztranslate",
+				"post_crop",
+				"post_falloff2",
+				"post_rotate_x",
+				"post_rotate_y",
+				"curl3D_cz",
+			};
 			//This is a vector of the param names as they are in the legacy, badly named flam3/Apophysis code.
-			vector<string> badParams;
-			badParams.reserve(11);
-			badParams.push_back("bwraps7_cellsize");
-			badParams.push_back("bwraps7_space");
-			badParams.push_back("bwraps7_gain");
-			badParams.push_back("bwraps7_inner_twist");
-			badParams.push_back("bwraps7_outer_twist");
+			vector<string> badParams =
+			{
+				"bwraps7_cellsize",
+				"bwraps7_space",
+				"bwraps7_gain",
+				"bwraps7_inner_twist",
+				"bwraps7_outer_twist"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("bwraps7"), string("bwraps")), badParams));//bwraps7 is the same as bwraps.
-			badParams.clear();
-			badParams.push_back("bwraps2_cellsize");
-			badParams.push_back("bwraps2_space");
-			badParams.push_back("bwraps2_gain");
-			badParams.push_back("bwraps2_inner_twist");
-			badParams.push_back("bwraps2_outer_twist");
+			badParams =
+			{
+				"bwraps2_cellsize",
+				"bwraps2_space",
+				"bwraps2_gain",
+				"bwraps2_inner_twist",
+				"bwraps2_outer_twist"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("bwraps2"), string("bwraps")), badParams));//bwraps2 is the same as bwraps.
-			badParams.clear();
-			badParams.push_back("pre_bwraps2_cellsize");
-			badParams.push_back("pre_bwraps2_space");
-			badParams.push_back("pre_bwraps2_gain");
-			badParams.push_back("pre_bwraps2_inner_twist");
-			badParams.push_back("pre_bwraps2_outer_twist");
+			badParams =
+			{
+				"pre_bwraps2_cellsize",
+				"pre_bwraps2_space",
+				"pre_bwraps2_gain",
+				"pre_bwraps2_inner_twist",
+				"pre_bwraps2_outer_twist"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("pre_bwraps2"), string("pre_bwraps")), badParams));
-			badParams.clear();
-			badParams.push_back("post_bwraps2_cellsize");
-			badParams.push_back("post_bwraps2_space");
-			badParams.push_back("post_bwraps2_gain");
-			badParams.push_back("post_bwraps2_inner_twist");
-			badParams.push_back("post_bwraps2_outer_twist");
+			badParams =
+			{
+				"post_bwraps2_cellsize",
+				"post_bwraps2_space",
+				"post_bwraps2_gain",
+				"post_bwraps2_inner_twist",
+				"post_bwraps2_outer_twist"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("post_bwraps2"), string("post_bwraps")), badParams));
-			badParams.clear();
-			badParams.push_back("mobius_radius");
-			badParams.push_back("mobius_width");
-			badParams.push_back("mobius_rect_x");
-			badParams.push_back("mobius_rect_y");
-			badParams.push_back("mobius_rotate_x");
-			badParams.push_back("mobius_rotate_y");
+			badParams =
+			{
+				"mobius_radius",
+				"mobius_width",
+				"mobius_rect_x",
+				"mobius_rect_y",
+				"mobius_rotate_x",
+				"mobius_rotate_y"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("mobius"),	string("mobius_strip")), badParams));//mobius_strip clashes with Mobius.
-			badParams.clear();
-			badParams.push_back("post_dcztransl_x0");
-			badParams.push_back("post_dcztransl_x1");
-			badParams.push_back("post_dcztransl_factor");
-			badParams.push_back("post_dcztransl_overwrite");
-			badParams.push_back("post_dcztransl_clamp");
+			badParams =
+			{
+				"post_dcztransl_x0",
+				"post_dcztransl_x1",
+				"post_dcztransl_factor",
+				"post_dcztransl_overwrite",
+				"post_dcztransl_clamp"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("post_dcztransl"), string("post_dc_ztransl")), badParams));
-			badParams.clear();
-			badParams.push_back("post_scrop_power");
-			badParams.push_back("post_scrop_radius");
-			badParams.push_back("post_scrop_roundstr");
-			badParams.push_back("post_scrop_roundwidth");
-			badParams.push_back("post_scrop_distortion");
-			badParams.push_back("post_scrop_edge");
-			badParams.push_back("post_scrop_scatter");
-			badParams.push_back("post_scrop_offset");
-			badParams.push_back("post_scrop_rotation");
-			badParams.push_back("post_scrop_cropmode");
-			badParams.push_back("post_scrop_static");
+			badParams =
+			{
+				"post_scrop_power",
+				"post_scrop_radius",
+				"post_scrop_roundstr",
+				"post_scrop_roundwidth",
+				"post_scrop_distortion",
+				"post_scrop_edge",
+				"post_scrop_scatter",
+				"post_scrop_offset",
+				"post_scrop_rotation",
+				"post_scrop_cropmode",
+				"post_scrop_static"
+			};
 			m_BadVariationNames.push_back(make_pair(make_pair(string("post_scrop"), string("post_smartcrop")), badParams));
 			//Note that splits3D can't be done here because it's param names are also used by splits.
 			badParams.clear();
@@ -277,14 +294,14 @@ public:
 		}
 	}
 
-	/// <summary>
-	/// Parse the specified buffer and place the results in the vector of embers passed in.
-	/// </summary>
-	/// <param name="buf">The buffer to parse</param>
-	/// <param name="filename">Full path and filename, optionally empty</param>
-	/// <param name="embers">The newly constructed embers based on what was parsed</param>
-	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
-	/// <returns>True if there were no errors, else false.</returns>
+/// <summary>
+/// Parse the specified buffer and place the results in the vector of embers passed in.
+/// </summary>
+/// <param name="buf">The buffer to parse</param>
+/// <param name="filename">Full path and filename, optionally empty</param>
+/// <param name="embers">The newly constructed embers based on what was parsed</param>
+/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
+/// <returns>True if there were no errors, else false.</returns>
 	bool Parse(byte* buf, const char* filename, vector<Ember<T>>& embers, bool useDefaults = true)
 	{
 		char* bn;
@@ -360,14 +377,14 @@ public:
 		return true;
 	}
 
-	/// <summary>
-	/// Parse the specified file and place the results in the vector of embers passed in.
-	/// This will strip out ampersands because the Xml parser can't handle them.
-	/// </summary>
-	/// <param name="filename">Full path and filename</param>
-	/// <param name="embers">The newly constructed embers based on what was parsed</param>
-	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
-	/// <returns>True if there were no errors, else false.</returns>
+/// <summary>
+/// Parse the specified file and place the results in the vector of embers passed in.
+/// This will strip out ampersands because the Xml parser can't handle them.
+/// </summary>
+/// <param name="filename">Full path and filename</param>
+/// <param name="embers">The newly constructed embers based on what was parsed</param>
+/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
+/// <returns>True if there were no errors, else false.</returns>
 	bool Parse(const char* filename, vector<Ember<T>>& embers, bool useDefaults = true)
 	{
 		const char* loc = __FUNCTION__;
@@ -389,13 +406,13 @@ public:
 			return false;
 	}
 
-	/// <summary>
-	/// Thin wrapper around converting the string to a numeric value and return a bool indicating success.
-	/// See error report for errors.
-	/// </summary>
-	/// <param name="str">The string to convert</param>
-	/// <param name="val">The converted value</param>
-	/// <returns>True if success, else false.</returns>
+/// <summary>
+/// Thin wrapper around converting the string to a numeric value and return a bool indicating success.
+/// See error report for errors.
+/// </summary>
+/// <param name="str">The string to convert</param>
+/// <param name="val">The converted value</param>
+/// <returns>True if success, else false.</returns>
 	template <typename valT>
 	bool Aton(const char* str, valT& val)
 	{
@@ -414,13 +431,13 @@ public:
 	}
 
 
-	/// <summary>
-	/// Convert an integer to a string.
-	/// Just a wrapper around _itoa_s() which wraps the result in a std::string.
-	/// </summary>
-	/// <param name="i">The integer to convert</param>
-	/// <param name="radix">The radix of the integer. Default: 10.</param>
-	/// <returns>The converted string</returns>
+/// <summary>
+/// Convert an integer to a string.
+/// Just a wrapper around _itoa_s() which wraps the result in a std::string.
+/// </summary>
+/// <param name="i">The integer to convert</param>
+/// <param name="radix">The radix of the integer. Default: 10.</param>
+/// <returns>The converted string</returns>
 	static string Itos(int i, int radix = 10)
 	{
 		char ch[16];
@@ -432,13 +449,13 @@ public:
 		return string(ch);
 	}
 
-	/// <summary>
-	/// Convert an unsigned 64-bit integer to a string.
-	/// Just a wrapper around _ui64toa_s() which wraps the result in a std::string.
-	/// </summary>
-	/// <param name="i">The unsigned 64-bit integer to convert</param>
-	/// <param name="radix">The radix of the integer. Default: 10.</param>
-	/// <returns>The converted string</returns>
+/// <summary>
+/// Convert an unsigned 64-bit integer to a string.
+/// Just a wrapper around _ui64toa_s() which wraps the result in a std::string.
+/// </summary>
+/// <param name="i">The unsigned 64-bit integer to convert</param>
+/// <param name="radix">The radix of the integer. Default: 10.</param>
+/// <returns>The converted string</returns>
 	static string Itos64(size_t i, int radix = 10)
 	{
 		char ch[64];
@@ -453,13 +470,13 @@ public:
 	static vector<string> m_FlattenNames;
 
 private:
-	/// <summary>
-	/// Scan the file for ember nodes, and parse them out into the vector of embers.
-	/// </summary>
-	/// <param name="curNode">The current node to parse</param>
-	/// <param name="parentFile">The full path and filename</param>
-	/// <param name="embers">The newly constructed embers based on what was parsed</param>
-	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present.</param>
+/// <summary>
+/// Scan the file for ember nodes, and parse them out into the vector of embers.
+/// </summary>
+/// <param name="curNode">The current node to parse</param>
+/// <param name="parentFile">The full path and filename</param>
+/// <param name="embers">The newly constructed embers based on what was parsed</param>
+/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present.</param>
 	void ScanForEmberNodes(xmlNode* curNode, char* parentFile, vector<Ember<T>>& embers, bool useDefaults)
 	{
 		bool parseEmberSuccess;
@@ -512,12 +529,12 @@ private:
 		}
 	}
 
-	/// <summary>
-	/// Parse an ember element.
-	/// </summary>
-	/// <param name="emberNode">The current node to parse</param>
-	/// <param name="currentEmber">The newly constructed ember based on what was parsed</param>
-	/// <returns>True if there were no errors, else false.</returns>
+/// <summary>
+/// Parse an ember element.
+/// </summary>
+/// <param name="emberNode">The current node to parse</param>
+/// <param name="currentEmber">The newly constructed ember based on what was parsed</param>
+/// <returns>True if there were no errors, else false.</returns>
 	bool ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber)
 	{
 		bool ret = true;
@@ -1074,14 +1091,14 @@ private:
 		return ErrorReport().empty();
 	}
 
-	/// <summary>
-	/// Parse a floating point value from an xml attribute and add the value to a EmberMotion object
-	/// </summary>
-	/// <param name="att">The current attribute</param>
-	/// <param name="attStr">The attribute value to parse</param>
-	/// <param name="param">The flame motion parameter type</param>
-	/// <param name="motion">The flame motion element to add the parameter to</param>
-	/// <returns>True if there were no errors, else false.</returns>
+/// <summary>
+/// Parse a floating point value from an xml attribute and add the value to a EmberMotion object
+/// </summary>
+/// <param name="att">The current attribute</param>
+/// <param name="attStr">The attribute value to parse</param>
+/// <param name="param">The flame motion parameter type</param>
+/// <param name="motion">The flame motion element to add the parameter to</param>
+/// <returns>True if there were no errors, else false.</returns>
 	bool AttToEmberMotionFloat(xmlAttrPtr att, const char* attStr, eEmberMotionParam param, EmberMotion<T>& motion)
 	{
 		const char* loc = __FUNCTION__;
@@ -1101,13 +1118,13 @@ private:
 		return r;
 	}
 
-	/// <summary>
-	/// Parse an xform element.
-	/// </summary>
-	/// <param name="childNode">The current node to parse</param>
-	/// <param name="xform">The newly constructed xform based on what was parsed</param>
-	/// <param name="motion">True if this xform is a motion within a parent xform, else false</param>
-	/// <returns>True if there were no errors, else false.</returns>
+/// <summary>
+/// Parse an xform element.
+/// </summary>
+/// <param name="childNode">The current node to parse</param>
+/// <param name="xform">The newly constructed xform based on what was parsed</param>
+/// <param name="motion">True if this xform is a motion within a parent xform, else false</param>
+/// <returns>True if there were no errors, else false.</returns>
 	bool ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion, bool fromEmber)
 	{
 		bool success = true;
@@ -1350,13 +1367,13 @@ private:
 		return true;
 	}
 
-	/// <summary>
-	/// Some Apophysis plugins use an inconsistent naming scheme for the parametric variation variables.
-	/// This function identifies and converts them to Ember's consistent naming convention.
-	/// </summary>
-	/// <param name="names">The map of corrected names to search</param>
-	/// <param name="name">The current Xml node to check</param>
-	/// <returns>The corrected name if one was found, else the passed in name.</returns>
+/// <summary>
+/// Some Apophysis plugins use an inconsistent naming scheme for the parametric variation variables.
+/// This function identifies and converts them to Ember's consistent naming convention.
+/// </summary>
+/// <param name="names">The map of corrected names to search</param>
+/// <param name="name">The current Xml node to check</param>
+/// <returns>The corrected name if one was found, else the passed in name.</returns>
 	static string GetCorrectedParamName(const unordered_map<string, string>& names, const char* name)
 	{
 		const auto& newName = names.find(ToLower(name));
@@ -1367,15 +1384,15 @@ private:
 			return name;
 	}
 
-	/// <summary>
-	/// Some Apophysis plugins use an inconsistent naming scheme for variation names.
-	/// This function identifies and converts them to Ember's consistent naming convention.
-	/// It uses some additional intelligence to ensure the variation is the expected one,
-	/// by examining the rest of the xform for the existence of parameter names.
-	/// </summary>
-	/// <param name="vec">The vector of corrected names to search</param>
-	/// <param name="att">The current Xml node to check</param>
-	/// <returns>The corrected name if one was found, else the passed in name.</returns>
+/// <summary>
+/// Some Apophysis plugins use an inconsistent naming scheme for variation names.
+/// This function identifies and converts them to Ember's consistent naming convention.
+/// It uses some additional intelligence to ensure the variation is the expected one,
+/// by examining the rest of the xform for the existence of parameter names.
+/// </summary>
+/// <param name="vec">The vector of corrected names to search</param>
+/// <param name="att">The current Xml node to check</param>
+/// <returns>The corrected name if one was found, else the passed in name.</returns>
 	static string GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, xmlAttrPtr att)
 	{
 		for (auto& v : vec)
@@ -1400,12 +1417,12 @@ private:
 		return string(CCX(att->name));
 	}
 
-	/// <summary>
-	/// Determine if an Xml node contains a given tag.
-	/// </summary>
-	/// <param name="att">The Xml node to search</param>
-	/// <param name="name">The node name to search for</param>
-	/// <returns>True if name was found, else false.</returns>
+/// <summary>
+/// Determine if an Xml node contains a given tag.
+/// </summary>
+/// <param name="att">The Xml node to search</param>
+/// <param name="name">The node name to search for</param>
+/// <returns>True if name was found, else false.</returns>
 	static bool XmlContainsTag(xmlAttrPtr att, const char* name)
 	{
 		xmlAttrPtr temp = att;
@@ -1420,15 +1437,15 @@ private:
 		return false;
 	}
 
-	/// <summary>
-	/// Parse hexadecimal colors.
-	/// This can read RGB and RGBA, however only RGB will be stored.
-	/// </summary>
-	/// <param name="colstr">The string of hex colors to parse</param>
-	/// <param name="ember">The ember whose palette will be assigned the colors</param>
-	/// <param name="numColors">The number of colors present</param>
-	/// <param name="chan">The number of channels in each color</param>
-	/// <returns>True if there were no errors, else false.</returns>
+/// <summary>
+/// Parse hexadecimal colors.
+/// This can read RGB and RGBA, however only RGB will be stored.
+/// </summary>
+/// <param name="colstr">The string of hex colors to parse</param>
+/// <param name="ember">The ember whose palette will be assigned the colors</param>
+/// <param name="numColors">The number of colors present</param>
+/// <param name="chan">The number of channels in each color</param>
+/// <returns>True if there were no errors, else false.</returns>
 	bool ParseHexColors(char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan)
 	{
 		size_t colorIndex = 0;
@@ -1491,15 +1508,15 @@ private:
 		return ok;
 	}
 
-	/// <summary>
-	/// Wrapper to parse a numeric Xml string value and convert it.
-	/// </summary>
-	/// <param name="name">The xml tag to parse</param>
-	/// <param name="attStr">The name of the Xml attribute</param>
-	/// <param name="str">The name of the Xml tag</param>
-	/// <param name="val">The parsed value</param>
-	/// <param name="b">Bitwise ANDed with true if name matched str and the conversion succeeded, else false. Used for keeping a running value between successive calls.</param>
-	/// <returns>True if the tag was matched and the conversion succeeded, else false</returns>
+/// <summary>
+/// Wrapper to parse a numeric Xml string value and convert it.
+/// </summary>
+/// <param name="name">The xml tag to parse</param>
+/// <param name="attStr">The name of the Xml attribute</param>
+/// <param name="str">The name of the Xml tag</param>
+/// <param name="val">The parsed value</param>
+/// <param name="b">Bitwise ANDed with true if name matched str and the conversion succeeded, else false. Used for keeping a running value between successive calls.</param>
+/// <returns>True if the tag was matched and the conversion succeeded, else false</returns>
 	template <typename valT>
 	bool ParseAndAssign(const xmlChar* name, const char* attStr, const char* str, valT& val, bool& b)
 	{

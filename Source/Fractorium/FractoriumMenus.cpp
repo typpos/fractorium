@@ -60,7 +60,7 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 
 	for (size_t i = 0; i < count; i++)
 	{
-		m_SheepTools->Random(ember, m_FilteredVariations, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand->Frand<T>(-2, 2)), 0, MAX_CL_VARS);
+		m_SheepTools->Random(ember, m_FilteredVariations, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
 		ParamsToEmber(ember);
 		ember.m_Index = i;
 		ember.m_Name = m_EmberFile.m_Filename.toStdString() + "_" + ToString(i + 1ULL).toStdString();
@@ -119,7 +119,7 @@ void FractoriumEmberController<T>::NewRandomFlameInCurrentFile()
 {
 	Ember<T> ember;
 	StopPreviewRender();
-	m_SheepTools->Random(ember, m_FilteredVariations, static_cast<int>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand->Frand<T>(-2, 2)), 0, MAX_CL_VARS);
+	m_SheepTools->Random(ember, m_FilteredVariations, static_cast<int>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
 	ParamsToEmber(ember);
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
 	ember.m_Index = m_EmberFile.Size();
@@ -172,7 +172,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 		EmberFile<T> emberFile;
 		XmlToEmber<T> parser;
 		vector<Ember<T>> embers;
-		uint previousSize = append ? m_EmberFile.Size() : 0;
+		uint previousSize = append ? uint(m_EmberFile.Size()) : 0u;
 		StopPreviewRender();
 		emberFile.m_Filename = filenames[0];
 
@@ -366,7 +366,7 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::SaveCurrentToOpenedFile()
 {
-	size_t i;
+	uint i;
 	bool fileFound = false;
 
 	for (i = 0; i < m_EmberFile.Size(); i++)
@@ -415,7 +415,7 @@ void FractoriumEmberController<T>::Undo()
 	{
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
 		m_LastEditWasUndoRedo = true;
-		m_UndoIndex = std::max(0u, m_UndoIndex - 1u);
+		m_UndoIndex = std::max<size_t>(0u, m_UndoIndex - 1u);
 		SetEmber(m_UndoList[m_UndoIndex], true);
 		m_EditState = eEditUndoState::UNDO_REDO;
 
@@ -439,7 +439,7 @@ void FractoriumEmberController<T>::Redo()
 	{
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
 		m_LastEditWasUndoRedo = true;
-		m_UndoIndex = std::min<uint>(m_UndoIndex + 1, m_UndoList.size() - 1);
+		m_UndoIndex = std::min<size_t>(m_UndoIndex + 1, m_UndoList.size() - 1);
 		SetEmber(m_UndoList[m_UndoIndex], true);
 		m_EditState = eEditUndoState::UNDO_REDO;
 
@@ -506,7 +506,7 @@ void Fractorium::OnActionCopyAllXml(bool checked) { m_Controller->CopyAllXml(); 
 template <typename T>
 void FractoriumEmberController<T>::PasteXmlAppend()
 {
-	uint i, previousSize = m_EmberFile.Size();
+	size_t previousSize = m_EmberFile.Size();
 	string s, errors;
 	XmlToEmber<T> parser;
 	vector<Ember<T>> embers;
@@ -514,7 +514,7 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 	auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
 
-	for (i = 0; i < b.size(); i++)
+	for (auto i = 0; i < b.size(); i++)
 	{
 		if (uint(b[i]) < 128u)
 			s.push_back(b[i]);
@@ -532,7 +532,7 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 
 	if (!embers.empty())
 	{
-		for (i = 0; i < embers.size(); i++)
+		for (auto i = 0; i < embers.size(); i++)
 		{
 			embers[i].m_Index = m_EmberFile.Size();
 			ConstrainDimensions(embers[i]);//Do not exceed the max texture size.
@@ -560,7 +560,6 @@ void Fractorium::OnActionPasteXmlAppend(bool checked) { m_Controller->PasteXmlAp
 template <typename T>
 void FractoriumEmberController<T>::PasteXmlOver()
 {
-	uint i;
 	string s, errors;
 	XmlToEmber<T> parser;
 	auto backupEmber = m_EmberFile.m_Embers[0];
@@ -568,7 +567,7 @@ void FractoriumEmberController<T>::PasteXmlOver()
 	auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
 
-	for (i = 0; i < b.size(); i++)
+	for (auto i = 0; i < b.size(); i++)
 	{
 		if (uint(b[i]) < 128u)
 			s.push_back(b[i]);
@@ -587,7 +586,7 @@ void FractoriumEmberController<T>::PasteXmlOver()
 
 	if (m_EmberFile.Size())
 	{
-		for (i = 0; i < m_EmberFile.Size(); i++)
+		for (auto i = 0; i < m_EmberFile.Size(); i++)
 		{
 			m_EmberFile.m_Embers[i].m_Index = i;
 			ConstrainDimensions(m_EmberFile.m_Embers[i]);//Do not exceed the max texture size.
@@ -698,8 +697,8 @@ void FractoriumEmberController<T>::AddReflectiveSymmetry()
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-1, m_Rand);
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
-		FillXforms(index);
+		auto index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		FillXforms(int(index));
 	});
 }
 
@@ -716,8 +715,8 @@ void FractoriumEmberController<T>::AddRotationalSymmetry()
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(2, m_Rand);
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
-		FillXforms(index);
+		auto index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		FillXforms(int(index));
 	});
 }
 
@@ -734,8 +733,8 @@ void FractoriumEmberController<T>::AddBothSymmetry()
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-2, m_Rand);
-		int index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
-		FillXforms(index);
+		auto index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		FillXforms(int(index));
 	});
 }
 

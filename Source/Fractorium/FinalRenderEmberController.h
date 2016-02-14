@@ -43,7 +43,7 @@ struct FinalRenderGuiState
 	double m_Quality;
 	uint m_TemporalSamples;
 	uint m_Supersample;
-	uint m_Strips;
+	size_t m_Strips;
 };
 
 /// <summary>

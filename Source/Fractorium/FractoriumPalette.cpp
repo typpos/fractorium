@@ -49,7 +49,7 @@ void Fractorium::InitPaletteUI()
 /// <param name="s">The full path to the palette files folder</param>
 /// <returns>The number of palettes successfully added</returns>
 template <typename T>
-int FractoriumEmberController<T>::InitPaletteList(const string& s)
+size_t FractoriumEmberController<T>::InitPaletteList(const string& s)
 {
 	QDirIterator it(s.c_str(), QStringList() << "*.xml", QDir::Files, QDirIterator::FollowSymlinks);
 	m_PaletteList.Clear();
@@ -84,7 +84,7 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 		auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
 		m_CurrentPaletteFilePath = m_Fractorium->ui.PaletteFilenameCombo->property("path").toString().toStdString() + "/" + s;
 
-		if (size_t paletteSize = m_PaletteList.Size(m_CurrentPaletteFilePath))
+		if (int paletteSize = int(m_PaletteList.Size(m_CurrentPaletteFilePath)))
 		{
 			paletteTable->clear();
 			paletteTable->blockSignals(true);
@@ -98,7 +98,7 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 			paletteTable->setHorizontalHeaderItem(1, paletteHeader);
 
 			//Palette list table.
-			for (size_t i = 0; i < paletteSize; i++)
+			for (auto i = 0; i < paletteSize; i++)
 			{
 				if (auto p = m_PaletteList.GetPalette(m_CurrentPaletteFilePath, i))
 				{
@@ -106,7 +106,7 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 					auto nameCol = new QTableWidgetItem(p->m_Name.c_str());
 					nameCol->setToolTip(p->m_Name.c_str());
 					paletteTable->setItem(i, 0, nameCol);
-					QImage image(v.data(), p->Size(), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
+					QImage image(v.data(), int(p->Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
 					auto paletteItem = new PaletteTableWidgetItem<T>(p);
 					paletteItem->setData(Qt::DecorationRole, QPixmap::fromImage(image));
 					paletteTable->setItem(i, 1, paletteItem);
@@ -168,7 +168,7 @@ void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<T>& palette)
 	{
 		//Use the adjusted palette to fill the preview palette control so the user can see the effects of applying the adjustements.
 		vector<byte> v = palette.MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);//Make the palette repeat for PALETTE_CELL_HEIGHT rows.
-		m_FinalPaletteImage = QImage(palette.Size(), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);//Create a QImage out of it.
+		m_FinalPaletteImage = QImage(int(palette.Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);//Create a QImage out of it.
 		memcpy(m_FinalPaletteImage.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
 		QPixmap pixmap(QPixmap::fromImage(m_FinalPaletteImage));//Create a QPixmap out of the QImage.
 		previewPaletteItem->setData(Qt::DecorationRole, pixmap.scaled(QSize(pixmap.width(), palettePreviewTable->rowHeight(0) + 2), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));//Set the pixmap on the palette tab.
@@ -235,7 +235,7 @@ void Fractorium::OnPaletteCellClicked(int row, int col)
 {
 	if (auto item = dynamic_cast<PaletteTableWidgetItemBase*>(ui.PaletteListTable->item(row, 1)))
 	{
-		auto index = item->Index();
+		auto index = int(item->Index());
 
 		if (m_PreviousPaletteRow != index)
 		{
@@ -272,7 +272,7 @@ void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 	uint i = 0;
 	int rowCount = ui.PaletteListTable->rowCount() - 1;
 
-	while ((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand->Rand(rowCount)) == uint(m_PreviousPaletteRow));
+	while ((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow));
 
 	if (checked)
 		OnPaletteCellDoubleClicked(i, 1);//Will clear the adjustments.
@@ -287,22 +287,21 @@ void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 /// </summary>
 void Fractorium::OnPaletteRandomAdjustButtonClicked(bool checked)
 {
-	auto gRand = QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand.get();
-	m_PaletteHueSpin->setValue(-180 + gRand->Rand(361));
-	m_PaletteSaturationSpin->setValue(-50 + gRand->Rand(101));//Full range of these leads to bad palettes, so clamp range.
-	m_PaletteBrightnessSpin->setValue(-50 + gRand->Rand(101));
-	m_PaletteContrastSpin->setValue(-50 + gRand->Rand(101));
+	m_PaletteHueSpin->setValue(-180 + QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(361));
+	m_PaletteSaturationSpin->setValue(-50 + QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(101));//Full range of these leads to bad palettes, so clamp range.
+	m_PaletteBrightnessSpin->setValue(-50 + QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(101));
+	m_PaletteContrastSpin->setValue(-50 + QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(101));
 
 	//Doing frequency and blur together gives bad palettes that are just a solid color.
-	if (gRand->RandBit())
+	if (QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit())
 	{
-		m_PaletteBlurSpin->setValue(gRand->Rand(21));
+		m_PaletteBlurSpin->setValue(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(21));
 		m_PaletteFrequencySpin->setValue(1);
 	}
 	else
 	{
 		m_PaletteBlurSpin->setValue(0);
-		m_PaletteFrequencySpin->setValue(1 + gRand->Rand(10));
+		m_PaletteFrequencySpin->setValue(1 + QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(10));
 	}
 
 	OnPaletteAdjust(0);

@@ -19,6 +19,7 @@ public:
 	explicit SpinBox(QWidget* p = 0, int height = 16, int step = 1);
 	virtual ~SpinBox() { }
 	void SetValueStealth(int d);
+	void SetValueStealth(size_t d);
 	void DoubleClick(bool b);
 	void DoubleClickZero(int val);
 	void DoubleClickNonZero(int val);

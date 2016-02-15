@@ -541,6 +541,11 @@ public:
 	size_t PostSize() const { return m_PostVariations.size(); }
 	size_t ParametricSize() const { return m_ParametricVariations.size(); }
 
+	const vector<Variation<T>*>& AllVars() const { return m_Variations; }
+	const vector<Variation<T>*>& RegVars() const { return m_RegVariations; }
+	const vector<Variation<T>*>& PreVars() const { return m_PreVariations; }
+	const vector<Variation<T>*>& PostVars() const { return m_PostVariations; }
+
 private:
 	/// <summary>
 	/// Make a dyncamically allocated copy of a variation and assign it a specified weight.

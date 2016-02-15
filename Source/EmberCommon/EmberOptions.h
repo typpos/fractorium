@@ -35,6 +35,10 @@ enum class eOptionIDs : et
 	OPT_DUMP_ARGS,
 	OPT_PROGRESS,
 	OPT_DUMP_OPENCL_INFO,
+	OPT_ALL_VARS,
+	OPT_REG_VARS,
+	OPT_PRE_VARS,
+	OPT_POST_VARS,
 
 	//Boolean args.
 	OPT_OPENCL,
@@ -306,6 +310,10 @@ public:
 		INITBOOLOPTION(DumpArgs,       Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_ARGS,        _T("--dumpargs"),             false,                SO_NONE,    "\t--dumpargs               Print all arguments entered from either the command line or environment variables.\n"));
 		INITBOOLOPTION(DoProgress,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PROGRESS,         _T("--progress"),             false,                SO_NONE,    "\t--progress               Display progress. This will slow down processing by about 10%%.\n"));
 		INITBOOLOPTION(OpenCLInfo,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_OPENCL_INFO, _T("--openclinfo"),           false,                SO_NONE,    "\t--openclinfo             Display platforms and devices for OpenCL.\n"));
+		INITBOOLOPTION(AllVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_ALL_VARS,		  _T("--allvars"),				false,				  SO_NONE,	  "\t--allvars				  Display the names of all supported variations.\n"));
+		INITBOOLOPTION(RegVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_REG_VARS,		  _T("--regvars"),				false,				  SO_NONE,	  "\t--regvars				  Display the names of all supported regular variations.\n"));
+		INITBOOLOPTION(PreVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_PRE_VARS,		  _T("--prevars"),				false,				  SO_NONE,	  "\t--prevars				  Display the names of all supported pre variations.\n"));
+		INITBOOLOPTION(PostVars,	   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_POST_VARS,		  _T("--postvars"),				false,				  SO_NONE,	  "\t--postvars               Display the names of all supported post variations.\n"));
 		//Execution bools.
 		INITBOOLOPTION(EmberCL,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_OPENCL,           _T("--opencl"),               false,                SO_NONE,    "\t--opencl                 Use OpenCL renderer (EmberCL) for rendering [default: false].\n"));
 		INITBOOLOPTION(EarlyClip,      Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_EARLYCLIP,        _T("--earlyclip"),            false,                SO_NONE,    "\t--earlyclip              Perform clipping of RGB values before spatial filtering for better antialiasing and resizing [default: false].\n"));
@@ -448,6 +456,10 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_DUMP_ARGS, DumpArgs);
 					PARSEBOOLOPTION(eOptionIDs::OPT_PROGRESS, DoProgress);
 					PARSEBOOLOPTION(eOptionIDs::OPT_DUMP_OPENCL_INFO, OpenCLInfo);
+					PARSEBOOLOPTION(eOptionIDs::OPT_ALL_VARS, AllVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_REG_VARS, RegVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_PRE_VARS, PreVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_POST_VARS, PostVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_OPENCL, EmberCL);
 					PARSEBOOLOPTION(eOptionIDs::OPT_EARLYCLIP, EarlyClip);
 					PARSEBOOLOPTION(eOptionIDs::OPT_POS_Y_UP, YAxisUp);
@@ -708,6 +720,10 @@ public:
 	Eob DumpArgs;
 	Eob DoProgress;
 	Eob OpenCLInfo;
+	Eob AllVars;
+	Eob RegVars;
+	Eob PreVars;
+	Eob PostVars;
 
 	Eob EmberCL;//Value bool.
 	Eob EarlyClip;

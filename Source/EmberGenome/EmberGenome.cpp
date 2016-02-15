@@ -64,6 +64,39 @@ bool EmberGenome(EmberOptions& opt)
 		return true;
 	}
 
+	if (opt.AllVars() || opt.RegVars() || opt.PreVars() || opt.PostVars())
+	{
+		VariationList<T> vl;
+
+		if (opt.AllVars())
+		{
+			auto& vars = vl.AllVars();
+
+			for (auto& v : vars)
+				cout << v->Name() << "\n";
+
+			return true;
+		}
+		else
+		{
+			vector<Variation<T>*> vars;
+
+			if (opt.RegVars())
+				vars.insert(vars.end(), vl.RegVars().begin(), vl.RegVars().end());
+
+			if (opt.PreVars())
+				vars.insert(vars.end(), vl.PreVars().begin(), vl.PreVars().end());
+
+			if (opt.PostVars())
+				vars.insert(vars.end(), vl.PostVars().begin(), vl.PostVars().end());
+
+			for (auto& v : vars)
+				cout << v->Name() << "\n";
+		}
+
+		return true;
+	}
+
 	//Regular variables.
 	Timing t;
 	bool exactTimeMatch, randomMode, didColor, seqFlag;

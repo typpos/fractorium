@@ -82,7 +82,9 @@ template <typename T, typename bucketT>
 void Renderer<T, bucketT>::ComputeBounds()
 {
 	size_t maxDEFilterWidth = 0;
-	m_GutterWidth = ClampGte((m_SpatialFilter->FinalFilterWidth() - Supersample()) / 2, size_t(0));
+	//Use type T to account for negative numbers which will occur with a larger supersample and smaller filter width.
+	//The final value will be of type size_t.
+	m_GutterWidth = size_t(ClampGte<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0));
 
 	//Check the size of the density estimation filter.
 	//If the radius of the density estimation filter is greater than the

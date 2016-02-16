@@ -185,11 +185,11 @@ void Fractorium::UpdateHistogramBounds()
 {
 	if (RendererBase* r = m_Controller->Renderer())
 	{
-		sprintf_s(m_ULString, 32, "UL: %3.3f, %3.3f",   r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
-		sprintf_s(m_URString, 32, "UR: %3.3f, %3.3f",  -r->LowerLeftX(), r->UpperRightY());
-		sprintf_s(m_LRString, 32, "LR: %3.3f, %3.3f",  -r->LowerLeftX(), r->LowerLeftY());
-		sprintf_s(m_LLString, 32, "LL: %3.3f, %3.3f",   r->LowerLeftX(), r->LowerLeftY());
-		sprintf_s(m_WHString, 32, "W x H: %4lu x %4lu", r->SuperRasW(),  r->SuperRasH());
+		sprintf_s(m_ULString, sizeof(m_ULString), "UL: %3.3f, %3.3f", r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
+		sprintf_s(m_URString, sizeof(m_URString), "UR: %3.3f, %3.3f", -r->LowerLeftX(), r->UpperRightY());
+		sprintf_s(m_LRString, sizeof(m_LRString), "LR: %3.3f, %3.3f", -r->LowerLeftX(), r->LowerLeftY());
+		sprintf_s(m_LLString, sizeof(m_LLString), "LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
+		sprintf_s(m_WHString, sizeof(m_WHString), "W x H: %4lu x %4lu", r->SuperRasW(), r->SuperRasH());
 		ui.InfoBoundsLabelUL->setText(QString(m_ULString));
 		ui.InfoBoundsLabelUR->setText(QString(m_URString));
 		ui.InfoBoundsLabelLR->setText(QString(m_LRString));
@@ -200,7 +200,7 @@ void Fractorium::UpdateHistogramBounds()
 		if (r->GetDensityFilter())
 		{
 			uint deWidth = (r->GetDensityFilter()->FilterWidth() * 2) + 1;
-			sprintf_s(m_DEString, 16, "%d x %d", deWidth, deWidth);
+			sprintf_s(m_DEString, sizeof(m_DEString), "%d x %d", deWidth, deWidth);
 			ui.InfoBoundsTable->item(1, 1)->setText(QString(m_DEString));
 		}
 		else

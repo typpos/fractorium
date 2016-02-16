@@ -488,12 +488,12 @@ private:
 	QLabel* m_RenderStatusLabel;
 	QLabel* m_CoordinateStatusLabel;
 	FractoriumSettings* m_Settings;
-	char m_ULString[32];
-	char m_URString[32];
-	char m_LRString[32];
-	char m_LLString[32];
+	char m_ULString[64];
+	char m_URString[64];
+	char m_LRString[64];
+	char m_LLString[64];
 	char m_WHString[64];
-	char m_DEString[16];
+	char m_DEString[64];
 	char m_CoordinateString[128];
 	QColor m_XformComboColors[XFORM_COLOR_COUNT], m_FinalXformComboColor;
 	QIcon m_XformComboIcons[XFORM_COLOR_COUNT], m_FinalXformComboIcon;

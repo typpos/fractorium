@@ -213,7 +213,7 @@ Fractorium::~Fractorium()
 void Fractorium::SetCoordinateStatus(int rasX, int rasY, float worldX, float worldY)
 {
 	//Use sprintf rather than allocating and concatenating 6 QStrings for efficiency since this is called on every mouse move.
-	sprintf_s(m_CoordinateString, 128, "Window: %4d, %4d World: %2.2f, %2.2f", rasX, rasY, worldX, worldY);
+	sprintf_s(m_CoordinateString, sizeof(m_CoordinateString), "Window: %4d, %4d World: %2.2f, %2.2f", rasX, rasY, worldX, worldY);
 	m_CoordinateStatusLabel->setText(QString(m_CoordinateString));
 }
 

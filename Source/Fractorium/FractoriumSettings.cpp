@@ -17,6 +17,8 @@ FractoriumSettings::FractoriumSettings(QObject* p)
 /// </summary>
 void FractoriumSettings::EnsureDefaults()
 {
+	auto info = OpenCLInfo::Instance();
+
 	if (FinalQuality() == 0)
 		FinalQuality(1000);
 
@@ -37,6 +39,9 @@ void FractoriumSettings::EnsureDefaults()
 
 	if (XmlSupersample() == 0)
 		XmlSupersample(2);
+
+	if (Devices().empty() && !info->Devices().empty())
+		Devices(QList<QVariant> { 0 });
 
 	if (ThreadCount() == 0 || ThreadCount() > Timing::ProcessorCount())
 		ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Default to one less to keep the UI responsive for first time users.

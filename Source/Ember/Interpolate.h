@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ember.h"
+#include "VariationList.h"
 
 /// <summary>
 /// Interpolater class.
@@ -12,6 +13,7 @@ namespace EmberNs
 /// g++ needs a forward declaration here.
 /// </summary>
 template <typename T> class Ember;
+template <typename T> class VariationList;
 
 /// <summary>
 /// Contains many static functions for handling interpolation and other miscellaneous operations on
@@ -42,6 +44,7 @@ public:
 		bool currentFinal, final = sourceEmbers[0].UseFinalXform();
 		size_t i, xf, currentCount, maxCount = sourceEmbers[0].XformCount();
 		Xform<T>* destOtherXform;
+		VariationList<T>& variationList(VariationList<T>::Instance());
 
 		//Determine the max number of xforms present in sourceEmbers.
 		//Also check if final xforms are used in any of them.
@@ -135,7 +138,7 @@ public:
 									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_SPH) ||
 									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_JULIA))
 							{
-								destXform->AddVariation(new LinearVariation<T>(-1));
+								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_LINEAR, -1));
 								//Set the coefs appropriately.
 								destXform->m_Affine.A(-1);
 								destXform->m_Affine.D(0);
@@ -164,58 +167,71 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_RECTANGLES))
 							{
-								RectanglesVariation<T>* var = new RectanglesVariation<T>();
-								var->SetParamVal("rectangles_x", 0);
-								var->SetParamVal("rectangles_y", 0);
-								destXform->AddVariation(var);
+								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_RECTANGLES))
+								{
+									var->SetParamVal("rectangles_x", 0);
+									var->SetParamVal("rectangles_y", 0);
+									destXform->AddVariation(var);
+								}
+
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS2))
 							{
-								Rings2Variation<T>* var = new Rings2Variation<T>();
-								var->SetParamVal("rings2_val", 0);
-								destXform->AddVariation(var);
+								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_RINGS2))
+								{
+									var->SetParamVal("rings2_val", 0);
+									destXform->AddVariation(var);
+								}
+
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN2))
 							{
-								Fan2Variation<T>* var = new Fan2Variation<T>();
-								destXform->AddVariation(var);
+								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_FAN2));
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_BLOB))
 							{
-								BlobVariation<T>* var = new BlobVariation<T>();
-								var->SetParamVal("blob_low", 1);
-								destXform->AddVariation(var);
+								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_BLOB))
+								{
+									var->SetParamVal("blob_low", 1);
+									destXform->AddVariation(var);
+								}
+
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_PERSPECTIVE))
 							{
-								PerspectiveVariation<T>* var = new PerspectiveVariation<T>();
-								destXform->AddVariation(var);
+								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_PERSPECTIVE));
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_CURL))
 							{
-								CurlVariation<T>* var = new CurlVariation<T>();
-								var->SetParamVal("curl_c1", 0);
-								destXform->AddVariation(var);
+								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_CURL))
+								{
+									var->SetParamVal("curl_c1", 0);
+									destXform->AddVariation(var);
+								}
+
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_SUPER_SHAPE))
 							{
-								SuperShapeVariation<T>* var = new SuperShapeVariation<T>();
-								var->SetParamVal("super_shape_n1", 2);
-								var->SetParamVal("super_shape_n2", 2);
-								var->SetParamVal("super_shape_n3", 2);
-								destXform->AddVariation(var);
+								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_SUPER_SHAPE))
+								{
+									var->SetParamVal("super_shape_n1", 2);
+									var->SetParamVal("super_shape_n2", 2);
+									var->SetParamVal("super_shape_n3", 2);
+									destXform->AddVariation(var);
+								}
+
 								found++;
 							}
 						}
@@ -238,13 +254,13 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN))
 							{
-								destXform->AddVariation(new FanVariation<T>());
+								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_FAN));
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS))
 							{
-								destXform->AddVariation(new RingsVariation<T>());
+								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_RINGS));
 								found++;
 							}
 						}
@@ -264,7 +280,7 @@ public:
 					//If there still are no matches, switch back to linear.
 					if (found == 0)
 					{
-						destXform->AddVariation(new LinearVariation<T>());
+						destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_LINEAR));
 					}
 					else if (found > 0)
 					{
@@ -891,105 +907,6 @@ public:
 				break;
 		}
 	}
-
-	/*
-		//Will need to alter this to handle 2D palettes.
-		static bool InterpMissingColors(vector<glm::detail::tvec4<T>>& palette)
-		{
-		//Check for a non-full palette.
-		int minIndex, maxIndex;
-		int colorli, colorri;
-		int wrapMin, wrapMax;
-		int intl, intr;
-		int str, enr;
-		int i, j, k;
-		double prcr;
-
-		if (palette.size() != 256)
-			return false;
-
-		for (i = 0; i < 256; i++)
-		{
-			if (palette[i].m_Index >= 0)
-			{
-				minIndex = i;
-				break;
-			}
-		}
-
-		if (i == 256)
-		{
-			//No colors. Set all indices properly.
-			for (i = 0; i < 256; i++)
-				palette[i].m_Index = (T)i;
-
-			return false;
-		}
-
-		wrapMin = minIndex + 256;
-
-		for (i = 255; i >= 0; i--)//Moving backwards, ouch!
-		{
-			if (palette[i].m_Index >= 0)
-			{
-				maxIndex = i;
-				break;
-			}
-		}
-
-		wrapMax = maxIndex - 256;
-
-		//Loop over the indices looking for negs,
-		i = 0;
-
-		while (i < 256)
-		{
-			if (palette[i].m_Index < 0)
-			{
-				//Start of a range of negs.
-				str = i;
-				intl = i - 1;
-				colorli = intl;
-
-				while (palette[i].m_Index < 0 && i < 256)
-				{
-					enr = i;
-					intr = i + 1;
-					colorri = intr;
-					i++;
-				}
-
-				if (intl == -1)
-				{
-					intl = wrapMax;
-					colorli = maxIndex;
-				}
-
-				if (intr == 256)
-				{
-					intr = wrapMin;
-					colorri = minIndex;
-				}
-
-				for (j = str; j <= enr; j++)
-				{
-					prcr = (j - intl) / T(intr - intl);
-
-					for (k = 0; k <= 3; k++)
-						palette[j].Channels[k] = T(palette[colorli].Channels[k] * (1 - prcr) + palette[colorri].Channels[k] * prcr);
-
-					palette[j].m_Index = T(j);
-				}
-
-				i = colorri + 1;
-			}
-			else
-				i++;
-		}
-
-		return true;
-		}
-	*/
 
 	/// <summary>
 	/// Compare xforms for sorting based first on color speed and second on determinants if

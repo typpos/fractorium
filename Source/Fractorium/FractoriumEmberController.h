@@ -499,7 +499,7 @@ private:
 	Xform<T> m_CopiedFinalXform;
 	Palette<T> m_TempPalette;
 	PaletteList<T> m_PaletteList;
-	VariationList<T> m_VariationList;
+	VariationList<T>& m_VariationList;
 	unique_ptr<SheepTools<T, float>> m_SheepTools;
 	unique_ptr<GLEmberController<T>> m_GLController;
 	unique_ptr<EmberNs::Renderer<T, float>> m_PreviewRenderer;

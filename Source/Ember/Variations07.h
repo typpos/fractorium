@@ -8,7 +8,7 @@ namespace EmberNs
 /// splits3D.
 /// </summary>
 template <typename T>
-class EMBER_API Splits3DVariation : public ParametricVariation<T>
+class Splits3DVariation : public ParametricVariation<T>
 {
 public:
 	Splits3DVariation(T weight = 1.0) : ParametricVariation<T>("splits3D", eVariationId::VAR_SPLITS3D, weight)
@@ -93,7 +93,7 @@ private:
 /// when running on the GPU. The results might look different.
 /// </summary>
 template <typename T>
-class EMBER_API Waves2BVariation : public ParametricVariation<T>
+class Waves2BVariation : public ParametricVariation<T>
 {
 public:
 	Waves2BVariation(T weight = 1.0) : ParametricVariation<T>("waves2b", eVariationId::VAR_WAVES2B, weight)
@@ -249,7 +249,7 @@ private:
 /// jac_cn.
 /// </summary>
 template <typename T>
-class EMBER_API JacCnVariation : public ParametricVariation<T>
+class JacCnVariation : public ParametricVariation<T>
 {
 public:
 	JacCnVariation(T weight = 1.0) : ParametricVariation<T>("jac_cn", eVariationId::VAR_JAC_CN, weight)
@@ -322,7 +322,7 @@ private:
 /// jac_dn.
 /// </summary>
 template <typename T>
-class EMBER_API JacDnVariation : public ParametricVariation<T>
+class JacDnVariation : public ParametricVariation<T>
 {
 public:
 	JacDnVariation(T weight = 1.0) : ParametricVariation<T>("jac_dn", eVariationId::VAR_JAC_DN, weight)
@@ -395,7 +395,7 @@ private:
 /// jac_sn.
 /// </summary>
 template <typename T>
-class EMBER_API JacSnVariation : public ParametricVariation<T>
+class JacSnVariation : public ParametricVariation<T>
 {
 public:
 	JacSnVariation(T weight = 1.0) : ParametricVariation<T>("jac_sn", eVariationId::VAR_JAC_SN, weight)
@@ -468,7 +468,7 @@ private:
 /// pressure_wave.
 /// </summary>
 template <typename T>
-class EMBER_API PressureWaveVariation : public ParametricVariation<T>
+class PressureWaveVariation : public ParametricVariation<T>
 {
 public:
 	PressureWaveVariation(T weight = 1.0) : ParametricVariation<T>("pressure_wave", eVariationId::VAR_PRESSURE_WAVE, weight)
@@ -524,7 +524,7 @@ private:
 /// gamma.
 /// </summary>
 template <typename T>
-class EMBER_API GammaVariation : public Variation<T>
+class GammaVariation : public Variation<T>
 {
 public:
 	GammaVariation(T weight = 1.0) : Variation<T>("gamma", eVariationId::VAR_GAMMA, weight, true, true, false, false, true)
@@ -559,7 +559,7 @@ public:
 /// prose3D.
 /// </summary>
 template <typename T>
-class EMBER_API PRose3DVariation : public ParametricVariation<T>
+class PRose3DVariation : public ParametricVariation<T>
 {
 public:
 	PRose3DVariation(T weight = 1.0) : ParametricVariation<T>("pRose3D", eVariationId::VAR_PROSE3D, weight, true, true, false, false, true)
@@ -863,7 +863,7 @@ private:
 /// http://jwildfire.org/forum/viewtopic.php?f=23&t=1450&p=2692#p2692
 /// </summary>
 template <typename T>
-class EMBER_API LogDBVariation : public ParametricVariation<T>
+class LogDBVariation : public ParametricVariation<T>
 {
 public:
 	LogDBVariation(T weight = 1.0) : ParametricVariation<T>("log_db", eVariationId::VAR_LOG_DB, weight, true, false, false, false, true)

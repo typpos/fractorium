@@ -10,8 +10,8 @@
 namespace EmberNs
 {
 /// <summary>
-/// Xform and Variation need each other, but each can't include the other.
-/// So Xform includes this file, and Ember is declared as a forward declaration here.
+/// Xform and Ember need each other, but each can't include the other.
+/// So Ember includes this file, and Ember is declared as a forward declaration here.
 /// </summary>
 template <typename T> class Ember;
 
@@ -879,6 +879,7 @@ public:
 	bool Flatten(vector<string>& names)
 	{
 		bool shouldFlatten = true;
+		VariationList<T>& vl(VariationList<T>::Instance());
 
 		if (GetVariationById(eVariationId::VAR_FLATTEN) == nullptr)
 		{
@@ -914,7 +915,7 @@ public:
 
 			if (shouldFlatten)//Flatten was not present and neither was any variation name or parameter in the list.
 			{
-				Variation<T>* var = new FlattenVariation<T>();
+				auto var = vl.GetVariationCopy(eVariationId::VAR_FLATTEN);
 
 				if (AddVariation(var))
 				{

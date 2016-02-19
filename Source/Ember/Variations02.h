@@ -8,7 +8,7 @@ namespace EmberNs
 /// Hemisphere.
 /// </summary>
 template <typename T>
-class EMBER_API HemisphereVariation : public Variation<T>
+class HemisphereVariation : public Variation<T>
 {
 public:
 	HemisphereVariation(T weight = 1.0) : Variation<T>("hemisphere", eVariationId::VAR_HEMISPHERE, weight, true) { }
@@ -42,7 +42,7 @@ public:
 /// Epispiral.
 /// </summary>
 template <typename T>
-class EMBER_API EpispiralVariation : public ParametricVariation<T>
+class EpispiralVariation : public ParametricVariation<T>
 {
 public:
 	EpispiralVariation(T weight = 1.0) : ParametricVariation<T>("epispiral", eVariationId::VAR_EPISPIRAL, weight, false, false, false, false, true)
@@ -120,7 +120,7 @@ private:
 /// Note, this is the same as bwraps2.
 /// </summary>
 template <typename T>
-class EMBER_API BwrapsVariation : public ParametricVariation<T>
+class BwrapsVariation : public ParametricVariation<T>
 {
 public:
 	BwrapsVariation(T weight = 1.0) : ParametricVariation<T>("bwraps", eVariationId::VAR_BWRAPS, weight)
@@ -279,7 +279,7 @@ private:
 /// BlurCircle.
 /// </summary>
 template <typename T>
-class EMBER_API BlurCircleVariation : public Variation<T>
+class BlurCircleVariation : public Variation<T>
 {
 public:
 	BlurCircleVariation(T weight = 1.0) : Variation<T>("blur_circle", eVariationId::VAR_BLUR_CIRCLE, weight) { }
@@ -383,7 +383,7 @@ public:
 /// BlurZoom.
 /// </summary>
 template <typename T>
-class EMBER_API BlurZoomVariation : public ParametricVariation<T>
+class BlurZoomVariation : public ParametricVariation<T>
 {
 public:
 	BlurZoomVariation(T weight = 1.0) : ParametricVariation<T>("blur_zoom", eVariationId::VAR_BLUR_ZOOM, weight)
@@ -440,7 +440,7 @@ private:
 /// BlurPixelize.
 /// </summary>
 template <typename T>
-class EMBER_API BlurPixelizeVariation : public ParametricVariation<T>
+class BlurPixelizeVariation : public ParametricVariation<T>
 {
 public:
 	BlurPixelizeVariation(T weight = 1.0) : ParametricVariation<T>("blur_pixelize", eVariationId::VAR_BLUR_PIXELIZE, weight)
@@ -508,7 +508,7 @@ private:
 /// Crop.
 /// </summary>
 template <typename T>
-class EMBER_API CropVariation : public ParametricVariation<T>
+class CropVariation : public ParametricVariation<T>
 {
 public:
 	CropVariation(T weight = 1.0) : ParametricVariation<T>("crop", eVariationId::VAR_CROP, weight)
@@ -659,7 +659,7 @@ private:
 /// BCircle.
 /// </summary>
 template <typename T>
-class EMBER_API BCircleVariation : public ParametricVariation<T>
+class BCircleVariation : public ParametricVariation<T>
 {
 public:
 	BCircleVariation(T weight = 1.0) : ParametricVariation<T>("bcircle", eVariationId::VAR_BCIRCLE, weight)
@@ -765,7 +765,7 @@ private:
 /// BlurLinear.
 /// </summary>
 template <typename T>
-class EMBER_API BlurLinearVariation : public ParametricVariation<T>
+class BlurLinearVariation : public ParametricVariation<T>
 {
 public:
 	BlurLinearVariation(T weight = 1.0) : ParametricVariation<T>("blur_linear", eVariationId::VAR_BLUR_LINEAR, weight)
@@ -830,7 +830,7 @@ private:
 /// BlurSquare.
 /// </summary>
 template <typename T>
-class EMBER_API BlurSquareVariation : public ParametricVariation<T>
+class BlurSquareVariation : public ParametricVariation<T>
 {
 public:
 	BlurSquareVariation(T weight = 1.0) : ParametricVariation<T>("blur_square", eVariationId::VAR_BLUR_SQUARE, weight)
@@ -884,7 +884,7 @@ private:
 /// This uses in/out in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API FlattenVariation : public Variation<T>
+class FlattenVariation : public Variation<T>
 {
 public:
 	FlattenVariation(T weight = 1.0) : Variation<T>("flatten", eVariationId::VAR_FLATTEN, weight) { }
@@ -937,7 +937,7 @@ public:
 /// This uses in/out in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API ZblurVariation : public Variation<T>
+class ZblurVariation : public Variation<T>
 {
 public:
 	ZblurVariation(T weight = 1.0) : Variation<T>("zblur", eVariationId::VAR_ZBLUR, weight) { }
@@ -967,7 +967,7 @@ public:
 /// This uses in/out in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API ZScaleVariation : public Variation<T>
+class ZScaleVariation : public Variation<T>
 {
 public:
 	ZScaleVariation(T weight = 1.0) : Variation<T>("zscale", eVariationId::VAR_ZSCALE, weight) { }
@@ -997,7 +997,7 @@ public:
 /// This uses in/out in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API ZTranslateVariation : public Variation<T>
+class ZTranslateVariation : public Variation<T>
 {
 public:
 	ZTranslateVariation(T weight = 1.0) : Variation<T>("ztranslate", eVariationId::VAR_ZTRANSLATE, weight) { }
@@ -1027,7 +1027,7 @@ public:
 /// This uses in/out in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API ZConeVariation : public Variation<T>
+class ZConeVariation : public Variation<T>
 {
 public:
 	ZConeVariation(T weight = 1.0) : Variation<T>("zcone", eVariationId::VAR_ZCONE, weight, true, true) { }
@@ -1075,7 +1075,7 @@ public:
 /// Blur3D.
 /// </summary>
 template <typename T>
-class EMBER_API Blur3DVariation : public Variation<T>
+class Blur3DVariation : public Variation<T>
 {
 public:
 	Blur3DVariation(T weight = 1.0) : Variation<T>("blur3D", eVariationId::VAR_BLUR3D, weight) { }
@@ -1121,7 +1121,7 @@ public:
 /// Spherical3D.
 /// </summary>
 template <typename T>
-class EMBER_API Spherical3DVariation : public Variation<T>
+class Spherical3DVariation : public Variation<T>
 {
 public:
 	Spherical3DVariation(T weight = 1.0) : Variation<T>("Spherical3D", eVariationId::VAR_SPHERICAL3D, weight, true) { }
@@ -1160,7 +1160,7 @@ public:
 /// Curl3D.
 /// </summary>
 template <typename T>
-class EMBER_API Curl3DVariation : public ParametricVariation<T>
+class Curl3DVariation : public ParametricVariation<T>
 {
 public:
 	Curl3DVariation(T weight = 1.0) : ParametricVariation<T>("curl3D", eVariationId::VAR_CURL3D, weight, true)
@@ -1244,7 +1244,7 @@ private:
 /// Disc3D.
 /// </summary>
 template <typename T>
-class EMBER_API Disc3DVariation : public ParametricVariation<T>
+class Disc3DVariation : public ParametricVariation<T>
 {
 public:
 	Disc3DVariation(T weight = 1.0) : ParametricVariation<T>("disc3d", eVariationId::VAR_DISC3D, weight, true, true, false, true, false)
@@ -1308,7 +1308,7 @@ private:
 /// Boarders2.
 /// </summary>
 template <typename T>
-class EMBER_API Boarders2Variation : public ParametricVariation<T>
+class Boarders2Variation : public ParametricVariation<T>
 {
 public:
 	Boarders2Variation(T weight = 1.0) : ParametricVariation<T>("boarders2", eVariationId::VAR_BOARDERS2, weight)
@@ -1457,7 +1457,7 @@ private:
 /// Cardioid.
 /// </summary>
 template <typename T>
-class EMBER_API CardioidVariation : public ParametricVariation<T>
+class CardioidVariation : public ParametricVariation<T>
 {
 public:
 	CardioidVariation(T weight = 1.0) : ParametricVariation<T>("cardioid", eVariationId::VAR_CARDIOID, weight, true, true, true, false, true)
@@ -1508,7 +1508,7 @@ private:
 /// Checks.
 /// </summary>
 template <typename T>
-class EMBER_API ChecksVariation : public ParametricVariation<T>
+class ChecksVariation : public ParametricVariation<T>
 {
 public:
 	ChecksVariation(T weight = 1.0) : ParametricVariation<T>("checks", eVariationId::VAR_CHECKS, weight)
@@ -1627,7 +1627,7 @@ private:
 /// Circlize.
 /// </summary>
 template <typename T>
-class EMBER_API CirclizeVariation : public ParametricVariation<T>
+class CirclizeVariation : public ParametricVariation<T>
 {
 public:
 	CirclizeVariation(T weight = 1.0) : ParametricVariation<T>("circlize", eVariationId::VAR_CIRCLIZE, weight)
@@ -1737,7 +1737,7 @@ private:
 /// Circlize2.
 /// </summary>
 template <typename T>
-class EMBER_API Circlize2Variation : public ParametricVariation<T>
+class Circlize2Variation : public ParametricVariation<T>
 {
 public:
 	Circlize2Variation(T weight = 1.0) : ParametricVariation<T>("circlize2", eVariationId::VAR_CIRCLIZE2, weight)
@@ -1838,7 +1838,7 @@ private:
 /// CosWrap.
 /// </summary>
 template <typename T>
-class EMBER_API CosWrapVariation : public ParametricVariation<T>
+class CosWrapVariation : public ParametricVariation<T>
 {
 public:
 	CosWrapVariation(T weight = 1.0) : ParametricVariation<T>("coswrap", eVariationId::VAR_COS_WRAP, weight)
@@ -1947,7 +1947,7 @@ private:
 /// that precalc variable omitted.
 /// </summary>
 template <typename T>
-class EMBER_API DeltaAVariation : public Variation<T>
+class DeltaAVariation : public Variation<T>
 {
 public:
 	DeltaAVariation(T weight = 1.0) : Variation<T>("deltaa", eVariationId::VAR_DELTA_A, weight) { }
@@ -1987,7 +1987,7 @@ public:
 /// Expo.
 /// </summary>
 template <typename T>
-class EMBER_API ExpoVariation : public ParametricVariation<T>
+class ExpoVariation : public ParametricVariation<T>
 {
 public:
 	ExpoVariation(T weight = 1.0) : ParametricVariation<T>("expo", eVariationId::VAR_EXPO, weight)
@@ -2059,7 +2059,7 @@ private:
 /// Extrude.
 /// </summary>
 template <typename T>
-class EMBER_API ExtrudeVariation : public ParametricVariation<T>
+class ExtrudeVariation : public ParametricVariation<T>
 {
 public:
 	ExtrudeVariation(T weight = 1.0) : ParametricVariation<T>("extrude", eVariationId::VAR_EXTRUDE, weight)
@@ -2143,7 +2143,7 @@ private:
 /// fdisc.
 /// </summary>
 template <typename T>
-class EMBER_API FDiscVariation : public Variation<T>
+class FDiscVariation : public Variation<T>
 {
 public:
 	FDiscVariation(T weight = 1.0) : Variation<T>("fdisc", eVariationId::VAR_FDISC, weight, true, true, false, false, true) { }
@@ -2183,7 +2183,7 @@ public:
 /// Fibonacci.
 /// </summary>
 template <typename T>
-class EMBER_API FibonacciVariation : public ParametricVariation<T>
+class FibonacciVariation : public ParametricVariation<T>
 {
 public:
 	FibonacciVariation(T weight = 1.0) : ParametricVariation<T>("fibonacci", eVariationId::VAR_FIBONACCI, weight)
@@ -2256,7 +2256,7 @@ private:
 /// Fibonacci2.
 /// </summary>
 template <typename T>
-class EMBER_API Fibonacci2Variation : public ParametricVariation<T>
+class Fibonacci2Variation : public ParametricVariation<T>
 {
 public:
 	Fibonacci2Variation(T weight = 1.0) : ParametricVariation<T>("fibonacci2", eVariationId::VAR_FIBONACCI2, weight)
@@ -2335,7 +2335,7 @@ private:
 /// Glynnia.
 /// </summary>
 template <typename T>
-class EMBER_API GlynniaVariation : public ParametricVariation<T>
+class GlynniaVariation : public ParametricVariation<T>
 {
 public:
 	GlynniaVariation(T weight = 1.0) : ParametricVariation<T>("glynnia", eVariationId::VAR_GLYNNIA, weight, true, true)
@@ -2454,7 +2454,7 @@ private:
 /// GridOut.
 /// </summary>
 template <typename T>
-class EMBER_API GridOutVariation : public Variation<T>
+class GridOutVariation : public Variation<T>
 {
 public:
 	GridOutVariation(T weight = 1.0) : Variation<T>("gridout", eVariationId::VAR_GRIDOUT, weight) { }
@@ -2610,7 +2610,7 @@ public:
 /// Hole.
 /// </summary>
 template <typename T>
-class EMBER_API HoleVariation : public ParametricVariation<T>
+class HoleVariation : public ParametricVariation<T>
 {
 public:
 	HoleVariation(T weight = 1.0) : ParametricVariation<T>("hole", eVariationId::VAR_HOLE, weight, true, true, true, false, true)
@@ -2675,7 +2675,7 @@ private:
 /// Hypertile.
 /// </summary>
 template <typename T>
-class EMBER_API HypertileVariation : public ParametricVariation<T>
+class HypertileVariation : public ParametricVariation<T>
 {
 public:
 	HypertileVariation(T weight = 1.0) : ParametricVariation<T>("hypertile", eVariationId::VAR_HYPERTILE, weight)
@@ -2762,7 +2762,7 @@ private:
 /// Hypertile1.
 /// </summary>
 template <typename T>
-class EMBER_API Hypertile1Variation : public ParametricVariation<T>
+class Hypertile1Variation : public ParametricVariation<T>
 {
 public:
 	Hypertile1Variation(T weight = 1.0) : ParametricVariation<T>("hypertile1", eVariationId::VAR_HYPERTILE1, weight)
@@ -2853,7 +2853,7 @@ private:
 /// Hypertile2.
 /// </summary>
 template <typename T>
-class EMBER_API Hypertile2Variation : public ParametricVariation<T>
+class Hypertile2Variation : public ParametricVariation<T>
 {
 public:
 	Hypertile2Variation(T weight = 1.0) : ParametricVariation<T>("hypertile2", eVariationId::VAR_HYPERTILE2, weight)
@@ -2944,7 +2944,7 @@ private:
 /// Hypertile3D.
 /// </summary>
 template <typename T>
-class EMBER_API Hypertile3DVariation : public ParametricVariation<T>
+class Hypertile3DVariation : public ParametricVariation<T>
 {
 public:
 	Hypertile3DVariation(T weight = 1.0) : ParametricVariation<T>("hypertile3D", eVariationId::VAR_HYPERTILE3D, weight, true)
@@ -3059,7 +3059,7 @@ private:
 /// Hypertile3D1.
 /// </summary>
 template <typename T>
-class EMBER_API Hypertile3D1Variation : public ParametricVariation<T>
+class Hypertile3D1Variation : public ParametricVariation<T>
 {
 public:
 	Hypertile3D1Variation(T weight = 1.0) : ParametricVariation<T>("hypertile3D1", eVariationId::VAR_HYPERTILE3D1, weight, true)
@@ -3158,7 +3158,7 @@ private:
 /// Hypertile3D2.
 /// </summary>
 template <typename T>
-class EMBER_API Hypertile3D2Variation : public ParametricVariation<T>
+class Hypertile3D2Variation : public ParametricVariation<T>
 {
 public:
 	Hypertile3D2Variation(T weight = 1.0) : ParametricVariation<T>("hypertile3D2", eVariationId::VAR_HYPERTILE3D2, weight, true)
@@ -3267,7 +3267,7 @@ private:
 /// IDisc.
 /// </summary>
 template <typename T>
-class EMBER_API IDiscVariation : public ParametricVariation<T>
+class IDiscVariation : public ParametricVariation<T>
 {
 public:
 	IDiscVariation(T weight = 1.0) : ParametricVariation<T>("idisc", eVariationId::VAR_IDISC, weight, true, true, false, false, true)
@@ -3329,7 +3329,7 @@ private:
 /// Julian2.
 /// </summary>
 template <typename T>
-class EMBER_API Julian2Variation : public ParametricVariation<T>
+class Julian2Variation : public ParametricVariation<T>
 {
 public:
 	Julian2Variation(T weight = 1.0) : ParametricVariation<T>("julian2", eVariationId::VAR_JULIAN2, weight)
@@ -3426,7 +3426,7 @@ private:
 /// JuliaQ.
 /// </summary>
 template <typename T>
-class EMBER_API JuliaQVariation : public ParametricVariation<T>
+class JuliaQVariation : public ParametricVariation<T>
 {
 public:
 	JuliaQVariation(T weight = 1.0) : ParametricVariation<T>("juliaq", eVariationId::VAR_JULIAQ, weight, true, false, false, false, true)
@@ -3502,7 +3502,7 @@ private:
 /// Murl.
 /// </summary>
 template <typename T>
-class EMBER_API MurlVariation : public ParametricVariation<T>
+class MurlVariation : public ParametricVariation<T>
 {
 public:
 	MurlVariation(T weight = 1.0) : ParametricVariation<T>("murl", eVariationId::VAR_MURL, weight, true, false, false, false, true)
@@ -3588,7 +3588,7 @@ private:
 /// Murl2.
 /// </summary>
 template <typename T>
-class EMBER_API Murl2Variation : public ParametricVariation<T>
+class Murl2Variation : public ParametricVariation<T>
 {
 public:
 	Murl2Variation(T weight = 1.0) : ParametricVariation<T>("murl2", eVariationId::VAR_MURL2, weight, true, false, false, false, true)
@@ -3692,7 +3692,7 @@ private:
 /// NPolar.
 /// </summary>
 template <typename T>
-class EMBER_API NPolarVariation : public ParametricVariation<T>
+class NPolarVariation : public ParametricVariation<T>
 {
 public:
 	NPolarVariation(T weight = 1.0) : ParametricVariation<T>("npolar", eVariationId::VAR_NPOLAR, weight, true, false, false, true, false)
@@ -3788,7 +3788,7 @@ private:
 /// Ortho.
 /// </summary>
 template <typename T>
-class EMBER_API OrthoVariation : public ParametricVariation<T>
+class OrthoVariation : public ParametricVariation<T>
 {
 public:
 	OrthoVariation(T weight = 1.0) : ParametricVariation<T>("ortho", eVariationId::VAR_ORTHO, weight, true, false, false, false, true)
@@ -3990,7 +3990,7 @@ private:
 /// Poincare.
 /// </summary>
 template <typename T>
-class EMBER_API PoincareVariation : public ParametricVariation<T>
+class PoincareVariation : public ParametricVariation<T>
 {
 public:
 	PoincareVariation(T weight = 1.0) : ParametricVariation<T>("poincare", eVariationId::VAR_POINCARE, weight)
@@ -4080,7 +4080,7 @@ private:
 /// Poincare3D.
 /// </summary>
 template <typename T>
-class EMBER_API Poincare3DVariation : public ParametricVariation<T>
+class Poincare3DVariation : public ParametricVariation<T>
 {
 public:
 	Poincare3DVariation(T weight = 1.0) : ParametricVariation<T>("poincare3D", eVariationId::VAR_POINCARE3D, weight, true)
@@ -4196,7 +4196,7 @@ private:
 /// Polynomial.
 /// </summary>
 template <typename T>
-class EMBER_API PolynomialVariation : public ParametricVariation<T>
+class PolynomialVariation : public ParametricVariation<T>
 {
 public:
 	PolynomialVariation(T weight = 1.0) : ParametricVariation<T>("polynomial", eVariationId::VAR_POLYNOMIAL, weight)
@@ -4270,7 +4270,7 @@ private:
 /// PSphere.
 /// </summary>
 template <typename T>
-class EMBER_API PSphereVariation : public ParametricVariation<T>
+class PSphereVariation : public ParametricVariation<T>
 {
 public:
 	PSphereVariation(T weight = 1.0) : ParametricVariation<T>("psphere", eVariationId::VAR_PSPHERE, weight)
@@ -4339,7 +4339,7 @@ private:
 /// Rational3.
 /// </summary>
 template <typename T>
-class EMBER_API Rational3Variation : public ParametricVariation<T>
+class Rational3Variation : public ParametricVariation<T>
 {
 public:
 	Rational3Variation(T weight = 1.0) : ParametricVariation<T>("rational3", eVariationId::VAR_RATIONAL3, weight)
@@ -4430,7 +4430,7 @@ private:
 /// Ripple.
 /// </summary>
 template <typename T>
-class EMBER_API RippleVariation : public ParametricVariation<T>
+class RippleVariation : public ParametricVariation<T>
 {
 public:
 	RippleVariation(T weight = 1.0) : ParametricVariation<T>("ripple", eVariationId::VAR_RIPPLE, weight)
@@ -4577,7 +4577,7 @@ private:
 /// Sigmoid.
 /// </summary>
 template <typename T>
-class EMBER_API SigmoidVariation : public ParametricVariation<T>
+class SigmoidVariation : public ParametricVariation<T>
 {
 public:
 	SigmoidVariation(T weight = 1.0) : ParametricVariation<T>("sigmoid", eVariationId::VAR_SIGMOID, weight)
@@ -4692,7 +4692,7 @@ private:
 /// SinusGrid.
 /// </summary>
 template <typename T>
-class EMBER_API SinusGridVariation : public ParametricVariation<T>
+class SinusGridVariation : public ParametricVariation<T>
 {
 public:
 	SinusGridVariation(T weight = 1.0) : ParametricVariation<T>("sinusgrid", eVariationId::VAR_SINUS_GRID, weight)
@@ -4788,7 +4788,7 @@ private:
 /// Stwin.
 /// </summary>
 template <typename T>
-class EMBER_API StwinVariation : public ParametricVariation<T>
+class StwinVariation : public ParametricVariation<T>
 {
 public:
 	StwinVariation(T weight = 1.0) : ParametricVariation<T>("stwin", eVariationId::VAR_STWIN, weight)
@@ -4866,7 +4866,7 @@ private:
 /// TwoFace.
 /// </summary>
 template <typename T>
-class EMBER_API TwoFaceVariation : public Variation<T>
+class TwoFaceVariation : public Variation<T>
 {
 public:
 	TwoFaceVariation(T weight = 1.0) : Variation<T>("twoface", eVariationId::VAR_TWO_FACE, weight, true) { }
@@ -4907,7 +4907,7 @@ public:
 /// Unpolar.
 /// </summary>
 template <typename T>
-class EMBER_API UnpolarVariation : public ParametricVariation<T>
+class UnpolarVariation : public ParametricVariation<T>
 {
 public:
 	UnpolarVariation(T weight = 1.0) : ParametricVariation<T>("unpolar", eVariationId::VAR_UNPOLAR, weight)
@@ -4967,7 +4967,7 @@ private:
 /// WavesN.
 /// </summary>
 template <typename T>
-class EMBER_API WavesNVariation : public ParametricVariation<T>
+class WavesNVariation : public ParametricVariation<T>
 {
 public:
 	WavesNVariation(T weight = 1.0) : ParametricVariation<T>("wavesn", eVariationId::VAR_WAVESN, weight, true, false, false, false, true)
@@ -5069,7 +5069,7 @@ private:
 /// XHeart.
 /// </summary>
 template <typename T>
-class EMBER_API XHeartVariation : public ParametricVariation<T>
+class XHeartVariation : public ParametricVariation<T>
 {
 public:
 	XHeartVariation(T weight = 1.0) : ParametricVariation<T>("xheart", eVariationId::VAR_XHEART, weight, true)
@@ -5174,7 +5174,7 @@ private:
 /// Barycentroid.
 /// </summary>
 template <typename T>
-class EMBER_API BarycentroidVariation : public ParametricVariation<T>
+class BarycentroidVariation : public ParametricVariation<T>
 {
 public:
 	BarycentroidVariation(T weight = 1.0) : ParametricVariation<T>("barycentroid", eVariationId::VAR_BARYCENTROID, weight)
@@ -5262,7 +5262,7 @@ private:
 /// BiSplit.
 /// </summary>
 template <typename T>
-class EMBER_API BiSplitVariation : public ParametricVariation<T>
+class BiSplitVariation : public ParametricVariation<T>
 {
 public:
 	BiSplitVariation(T weight = 1.0) : ParametricVariation<T>("bisplit", eVariationId::VAR_BISPLIT, weight)
@@ -5315,7 +5315,7 @@ private:
 /// Crescents.
 /// </summary>
 template <typename T>
-class EMBER_API CrescentsVariation : public Variation<T>
+class CrescentsVariation : public Variation<T>
 {
 public:
 	CrescentsVariation(T weight = 1.0) : Variation<T>("crescents", eVariationId::VAR_CRESCENTS, weight) { }
@@ -5360,7 +5360,7 @@ public:
 /// Mask.
 /// </summary>
 template <typename T>
-class EMBER_API MaskVariation : public Variation<T>
+class MaskVariation : public Variation<T>
 {
 public:
 	MaskVariation(T weight = 1.0) : Variation<T>("mask", eVariationId::VAR_MASK, weight, true) { }
@@ -5407,7 +5407,7 @@ public:
 /// Cpow2.
 /// </summary>
 template <typename T>
-class EMBER_API Cpow2Variation : public ParametricVariation<T>
+class Cpow2Variation : public ParametricVariation<T>
 {
 public:
 	Cpow2Variation(T weight = 1.0) : ParametricVariation<T>("cpow2", eVariationId::VAR_CPOW2, weight, true, false, false, false, true)

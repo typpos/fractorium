@@ -282,7 +282,7 @@ void FractoriumEmberController<T>::AddFinalXform()
 		{
 			Xform<T> final;
 			auto combo = m_Fractorium->ui.CurrentXformCombo;
-			final.AddVariation(new LinearVariation<T>());//Just a placeholder so other parts of the code don't see it as being empty.
+			final.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));//Just a placeholder so other parts of the code don't see it as being empty.
 			m_Ember.SetFinalXform(final);
 			int index = int(m_Ember.TotalXformCount() - 1);//Set index to the last item.
 			FillXforms(index);

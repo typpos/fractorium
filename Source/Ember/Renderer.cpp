@@ -107,7 +107,6 @@ void Renderer<T, bucketT>::ComputeBounds()
 
 /// <summary>
 /// Compute the scale based on the zoom, then the quality based on the computed scale.
-/// This sets up the bounds of the cartesian plane that the raster bounds correspond to.
 /// This must be called before ComputeCamera() which will use scale.
 /// </summary>
 template <typename T, typename bucketT>

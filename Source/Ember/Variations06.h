@@ -8,7 +8,7 @@ namespace EmberNs
 /// hexes.
 /// </summary>
 template <typename T>
-class EMBER_API HexesVariation : public ParametricVariation<T>
+class HexesVariation : public ParametricVariation<T>
 {
 public:
 	HexesVariation(T weight = 1.0) : ParametricVariation<T>("hexes", eVariationId::VAR_HEXES, weight)
@@ -300,7 +300,7 @@ private:
 /// nBlur.
 /// </summary>
 template <typename T>
-class EMBER_API NblurVariation : public ParametricVariation<T>
+class NblurVariation : public ParametricVariation<T>
 {
 	struct RandXyParams
 	{
@@ -1138,7 +1138,7 @@ private:
 /// octapol.
 /// </summary>
 template <typename T>
-class EMBER_API OctapolVariation : public ParametricVariation<T>
+class OctapolVariation : public ParametricVariation<T>
 {
 public:
 	OctapolVariation(T weight = 1.0) : ParametricVariation<T>("octapol", eVariationId::VAR_OCTAPOL, weight)
@@ -1477,7 +1477,7 @@ private:
 /// This uses the input point in an extremely rare way since it changes it.
 /// </summary>
 template <typename T>
-class EMBER_API CrobVariation : public ParametricVariation<T>
+class CrobVariation : public ParametricVariation<T>
 {
 public:
 	CrobVariation(T weight = 1.0) : ParametricVariation<T>("crob", eVariationId::VAR_CROB, weight)
@@ -1810,7 +1810,7 @@ private:
 /// bubbleT3D.
 /// </summary>
 template <typename T>
-class EMBER_API BubbleT3DVariation : public ParametricVariation<T>
+class BubbleT3DVariation : public ParametricVariation<T>
 {
 public:
 	BubbleT3DVariation(T weight = 1.0) : ParametricVariation<T>("bubbleT3D", eVariationId::VAR_BUBBLET3D, weight, true)
@@ -2361,7 +2361,7 @@ private:
 /// synth.
 /// </summary>
 template <typename T>
-class EMBER_API SynthVariation : public ParametricVariation<T>
+class SynthVariation : public ParametricVariation<T>
 {
 public:
 	SynthVariation(T weight = 1.0) : ParametricVariation<T>("synth", eVariationId::VAR_SYNTH, weight, true, true, false, true)
@@ -3694,7 +3694,7 @@ private:
 /// crackle.
 /// </summary>
 template <typename T>
-class EMBER_API CrackleVariation : public ParametricVariation<T>
+class CrackleVariation : public ParametricVariation<T>
 {
 public:
 	CrackleVariation(T weight = 1.0) : ParametricVariation<T>("crackle", eVariationId::VAR_CRACKLE, weight)
@@ -3922,7 +3922,7 @@ private:
 /// This variation is special in that it only exists as a post_.
 /// </summary>
 template <typename T>
-class EMBER_API PostSmartcropVariation : public ParametricVariation<T>
+class PostSmartcropVariation : public ParametricVariation<T>
 {
 public:
 	PostSmartcropVariation(T weight = 1.0) : ParametricVariation<T>("post_smartcrop", eVariationId::VAR_POST_SMARTCROP, weight)
@@ -4428,7 +4428,7 @@ private:
 /// erf.
 /// </summary>
 template <typename T>
-class EMBER_API ErfVariation : public Variation<T>
+class ErfVariation : public Variation<T>
 {
 public:
 	ErfVariation(T weight = 1.0) : Variation<T>("erf", eVariationId::VAR_ERF, weight) { }
@@ -4459,7 +4459,7 @@ public:
 /// xerf.
 /// </summary>
 template <typename T>
-class EMBER_API XerfVariation : public Variation<T>
+class XerfVariation : public Variation<T>
 {
 public:
 	XerfVariation(T weight = 1.0) : Variation<T>("xerf", eVariationId::VAR_XERF, weight, true) { }
@@ -4494,7 +4494,7 @@ public:
 };
 
 template <typename T>
-class EMBER_API WVariation : public ParametricVariation<T>
+class WVariation : public ParametricVariation<T>
 {
 public:
 	WVariation(T weight = 1.0) : ParametricVariation<T>("w", eVariationId::VAR_W, weight, true, true, false, false, true)
@@ -4796,7 +4796,7 @@ private:
 };
 
 template <typename T>
-class EMBER_API XVariation : public ParametricVariation<T>
+class XVariation : public ParametricVariation<T>
 {
 public:
 	XVariation(T weight = 1.0) : ParametricVariation<T>("x", eVariationId::VAR_X, weight, true, false, false, false, true)
@@ -4993,7 +4993,7 @@ private:
 };
 
 template <typename T>
-class EMBER_API YVariation : public ParametricVariation<T>
+class YVariation : public ParametricVariation<T>
 {
 public:
 	YVariation(T weight = 1.0) : ParametricVariation<T>("y", eVariationId::VAR_Y, weight, true, true, false, false, true)
@@ -5190,7 +5190,7 @@ private:
 };
 
 template <typename T>
-class EMBER_API ZVariation : public ParametricVariation<T>
+class ZVariation : public ParametricVariation<T>
 {
 public:
 	ZVariation(T weight = 1.0) : ParametricVariation<T>("z", eVariationId::VAR_Z, weight, true, true, false, false, true)

@@ -62,6 +62,7 @@ public:
 	/// <param name="palettePath">The full path and filename of the palette file</param>
 	/// <param name="renderer">A pre-constructed renderer to use. The caller should not delete this.</param>
 	SheepTools(const string& palettePath, Renderer<T, bucketT>* renderer)
+		: m_VariationList(VariationList<T>::Instance())
 	{
 		Timing t;
 		m_Smooth = true;
@@ -87,9 +88,9 @@ public:
 		Xform<T> xform1(T(0.25), T(1),    T(0.5), T(1), T(0.5), T(0), T(0), T(0.5), T(0.5),  T(0.25));
 		Xform<T> xform2(T(0.25), T(0.66), T(0.5), T(1), T(0.5), T(0), T(0), T(0.5), T(-0.5), T(0.25));
 		Xform<T> xform3(T(0.25), T(0.33), T(0.5), T(1), T(0.5), T(0), T(0), T(0.5), T(0.0),  T(-0.5));
-		xform1.AddVariation(new LinearVariation<T>());
-		xform2.AddVariation(new LinearVariation<T>());
-		xform3.AddVariation(new LinearVariation<T>());
+		xform1.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
+		xform2.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
+		xform3.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
 		ember.AddXform(xform1);
 		ember.AddXform(xform2);
 		ember.AddXform(xform3);
@@ -1349,6 +1350,6 @@ private:
 	unique_ptr<Renderer<T, bucketT>> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	PaletteList<T> m_PaletteList;
-	VariationList<T> m_VariationList;
+	VariationList<T>& m_VariationList;
 };
 }

@@ -9,7 +9,7 @@ namespace EmberNs
 /// This accesses the summed output point in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API DCBubbleVariation : public ParametricVariation<T>
+class DCBubbleVariation : public ParametricVariation<T>
 {
 public:
 	DCBubbleVariation(T weight = 1.0) : ParametricVariation<T>("dc_bubble", eVariationId::VAR_DC_BUBBLE, weight, true)
@@ -120,7 +120,7 @@ private:
 /// DC Carpet.
 /// </summary>
 template <typename T>
-class EMBER_API DCCarpetVariation : public ParametricVariation<T>
+class DCCarpetVariation : public ParametricVariation<T>
 {
 public:
 	DCCarpetVariation(T weight = 1.0) : ParametricVariation<T>("dc_carpet", eVariationId::VAR_DC_CARPET, weight)
@@ -191,7 +191,7 @@ private:
 /// DC Cube.
 /// </summary>
 template <typename T>
-class EMBER_API DCCubeVariation : public ParametricVariation<T>
+class DCCubeVariation : public ParametricVariation<T>
 {
 public:
 	DCCubeVariation(T weight = 1.0) : ParametricVariation<T>("dc_cube", eVariationId::VAR_DC_CUBE, weight)
@@ -381,7 +381,7 @@ private:
 /// This accesses the summed output point in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API DCCylinderVariation : public ParametricVariation<T>
+class DCCylinderVariation : public ParametricVariation<T>
 {
 public:
 	DCCylinderVariation(T weight = 1.0) : ParametricVariation<T>("dc_cylinder", eVariationId::VAR_DC_CYLINDER, weight)
@@ -508,7 +508,7 @@ private:
 /// DC GridOut.
 /// </summary>
 template <typename T>
-class EMBER_API DCGridOutVariation : public Variation<T>
+class DCGridOutVariation : public Variation<T>
 {
 public:
 	DCGridOutVariation(T weight = 1.0) : Variation<T>("dc_gridout", eVariationId::VAR_DC_GRIDOUT, weight) { }
@@ -685,7 +685,7 @@ public:
 /// This accesses the summed output point in a rare and different way.
 /// </summary>
 template <typename T>
-class EMBER_API DCLinearVariation : public ParametricVariation<T>
+class DCLinearVariation : public ParametricVariation<T>
 {
 public:
 	DCLinearVariation(T weight = 1.0) : ParametricVariation<T>("dc_linear", eVariationId::VAR_DC_LINEAR, weight)
@@ -795,7 +795,7 @@ private:
 /// DC Triangle.
 /// </summary>
 template <typename T>
-class EMBER_API DCTriangleVariation : public ParametricVariation<T>
+class DCTriangleVariation : public ParametricVariation<T>
 {
 public:
 	DCTriangleVariation(T weight = 1.0) : ParametricVariation<T>("dc_triangle", eVariationId::VAR_DC_TRIANGLE, weight)
@@ -1004,7 +1004,7 @@ private:
 /// These will follow the same naming convention as all other variations.
 /// </summary>
 template <typename T>
-class EMBER_API DCZTranslVariation : public ParametricVariation<T>
+class DCZTranslVariation : public ParametricVariation<T>
 {
 public:
 	DCZTranslVariation(T weight = 1.0) : ParametricVariation<T>("dc_ztransl", eVariationId::VAR_DC_ZTRANSL, weight)
@@ -1109,7 +1109,7 @@ private:
 /// dc_perlin.
 /// </summary>
 template <typename T>
-class EMBER_API DCPerlinVariation : public ParametricVariation <T>
+class DCPerlinVariation : public ParametricVariation <T>
 {
 public:
 	DCPerlinVariation(T weight = 1.0) : ParametricVariation<T>("dc_perlin", eVariationId::VAR_DC_PERLIN, weight)

@@ -320,6 +320,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Ember\Renderer.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\RendererBase.cpp" />
+    <ClCompile Include="..\..\..\Source\Ember\VariationList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\libxml2\win32\VC10\libxml2.vcxproj">

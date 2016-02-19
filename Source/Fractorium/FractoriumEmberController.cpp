@@ -48,7 +48,8 @@ FractoriumEmberControllerBase::~FractoriumEmberControllerBase()
 /// <param name="fractorium">Pointer to the main window.</param>
 template <typename T>
 FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
-	: FractoriumEmberControllerBase(fractorium)
+	: FractoriumEmberControllerBase(fractorium),
+	  m_VariationList(VariationList<T>::Instance())
 {
 	bool b = false;
 	m_PreviewRun = false;

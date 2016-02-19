@@ -10,7 +10,8 @@
 /// <param name="f">The window flags. Default: 0.</param>
 FractoriumVariationsDialog::FractoriumVariationsDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f)
 	: QDialog(p, f),
-	  m_Settings(settings)
+	  m_Settings(settings),
+	  m_VariationList(VariationList<float>::Instance())
 {
 	ui.setupUi(this);
 	auto table = ui.VariationsTable;

@@ -89,7 +89,7 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 {
 	uint index = 0;
 	ostringstream ss;
-	VariationList<T> varList;
+	VariationList<T>& varList(VariationList<T>::Instance());
 	PaletteList<T> paletteList;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	paletteList.Add("flam3-palettes.xml");
@@ -337,7 +337,7 @@ template <typename T>
 static vector<Variation<T>*> FindVarsWith(vector<string>& stringVec, bool findAll = true)
 {
 	int index = 0;
-	VariationList<T> vl;
+	VariationList<T>& vl(VariationList<T>::Instance());
 	vector<Variation<T>*> vec;
 
 	while (index < vl.RegSize())
@@ -360,9 +360,9 @@ static vector<Variation<T>*> FindVarsWith(vector<string>& stringVec, bool findAl
 
 bool TestVarCounts()
 {
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 #ifdef DO_DOUBLE
-	VariationList<double> vld;
+	VariationList<double>& vld(VariationList<double>::Instance());
 	bool success((vlf.Size() == vld.Size()) && (vlf.Size() == size_t(eVariationId::LAST_VAR)));
 #else
 	bool success = true;
@@ -392,7 +392,7 @@ template <typename T>
 bool TestVarUnique()
 {
 	bool success = true;
-	VariationList<T> vl;
+	VariationList<T>& vl(VariationList<T>::Instance());
 	vector<eVariationId> ids;
 	vector<string> names;
 	ids.reserve(vl.Size());
@@ -580,7 +580,7 @@ bool TestVarEqual(const Variation<sT>* var1, const Variation<dT>* var2)
 bool TestVarPrePostNames()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 
 	for (size_t i = 0; i < vlf.Size(); i++)
 	{
@@ -646,7 +646,7 @@ template <typename sT, typename dT>
 bool TestVarCopy()
 {
 	bool success = true;
-	VariationList<sT> vlf;
+	VariationList<sT>& vlf(VariationList<sT>::Instance());
 
 	for (size_t i = 0; i < vlf.Size(); i++)
 	{
@@ -676,7 +676,7 @@ bool TestVarCopy()
 bool TestParVars()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 
 	for (size_t i = 0; i < vlf.ParametricSize(); i++)
 	{
@@ -730,7 +730,7 @@ bool TestParVars()
 bool TestVarRegPrePost()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 
 	for (size_t i = 0; i < vlf.RegSize(); i++)
 	{
@@ -782,7 +782,7 @@ bool TestVarRegPrePost()
 bool TestVarPrecalcUsedCL()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 
 	for (size_t i = 0; i < vlf.Size(); i++)
 	{
@@ -951,7 +951,7 @@ bool TestVarPrecalcUsedCL()
 bool TestVarAssignTypes()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 	vector<string> vset, vsum;
 	vset.push_back("vIn.x");
 	vset.push_back("vIn.y");
@@ -1009,7 +1009,7 @@ bool TestVarAssignTypes()
 bool TestVarAssignVals()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 	vector<string> xout, yout, zout;
 	xout.push_back("vOut.x =");
 	xout.push_back("vOut.x +=");
@@ -1056,7 +1056,7 @@ bool TestVarAssignVals()
 bool TestZepsFloor()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 	vector<string> zeps;
 	zeps.push_back("Zeps(floor");
 
@@ -1077,7 +1077,7 @@ bool TestZepsFloor()
 bool TestConstants()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 	vector<string> stringVec;
 	stringVec.push_back("2 * M_PI");
 	stringVec.push_back("2*M_PI");
@@ -1101,7 +1101,7 @@ bool TestConstants()
 bool TestGlobalFuncs()
 {
 	bool success = true;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 	vector<string> funcs;
 	FunctionMapper mapper;
 
@@ -1130,7 +1130,7 @@ bool TestGlobalFuncs()
 void PrintAllVars()
 {
 	uint i = 0;
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 
 	while (auto var = vlf.GetVariation(i++))
 		cout << var->Name() << endl;
@@ -1139,7 +1139,7 @@ void PrintAllVars()
 void TestXformsInOutPoints()
 {
 	uint index = 0;
-	VariationList<float> varList;
+	VariationList<float>& varList(VariationList<float>::Instance());
 	PaletteList<float> paletteList;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	paletteList.Add("flam3-palettes.xml");
@@ -2111,12 +2111,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	TestCasting();
 	t.Toc("TestCasting()");
 	t.Tic();
-	VariationList<float> vlf;
+	VariationList<float>& vlf(VariationList<float>::Instance());
 	t.Toc("Creating VariationList<float>");
 	cout << "There are " << vlf.Size() << " variations present." << endl;
 #ifdef DO_DOUBLE
 	t.Tic();
-	VariationList<double> vld;
+	VariationList<double>& vld(VariationList<double>::Instance());
 	t.Toc("Creating VariationList<double>");
 #endif
 	t.Tic();

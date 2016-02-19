@@ -51,9 +51,9 @@ bool Timing::m_TimingInit = false;
 uint Timing::m_ProcessorCount;
 
 #define EXPORTPREPOSTREGVAR(varName, T) \
-	template EMBER_API class varName##Variation<T>; \
-	template EMBER_API class Pre##varName##Variation<T>; \
-	template EMBER_API class Post##varName##Variation<T>;
+	template class varName##Variation<T>; \
+	template class Pre##varName##Variation<T>; \
+	template class Post##varName##Variation<T>;
 
 #define EXPORT_SINGLE_TYPE_EMBER(T) \
 	template<> const char* PaletteList<T>::m_DefaultFilename = "flam3-palettes.xml"; \

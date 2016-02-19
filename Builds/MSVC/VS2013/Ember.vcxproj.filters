@@ -145,6 +145,9 @@
     <ClCompile Include="..\..\..\Source\Ember\RendererBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Ember\VariationList.cpp">
+      <Filter>Header Files\Variations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Ember.rc" />

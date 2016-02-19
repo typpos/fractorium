@@ -23,7 +23,8 @@ SOURCES += \
     $$PRJ_DIR/Ember.cpp \
     $$PRJ_DIR/EmberPch.cpp \
     $$PRJ_DIR/RendererBase.cpp \
-    $$PRJ_DIR/Renderer.cpp
+	$$PRJ_DIR/Renderer.cpp \
+	$$PRJ_DIR/VariationList.cpp
 
 include(deployment.pri)
 qtcAddDeployment()

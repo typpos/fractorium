@@ -13,6 +13,8 @@
 
 namespace EmberNs
 {
+template <typename T> class Interpolater;
+
 /// <summary>
 /// Bit position specifying the presence of each type of 3D parameter.
 /// One, none, some or all of these can be present.
@@ -42,6 +44,7 @@ public:
 	/// Default constructor which calls Init() to set default values.
 	/// </summary>
 	Ember()
+		: m_VariationList(VariationList<T>::Instance())
 	{
 		Init();
 	}
@@ -51,7 +54,8 @@ public:
 	/// </summary>
 	/// <param name="ember">The Ember object to copy</param>
 	Ember(const Ember<T>& ember)
-		: m_Edits(nullptr)
+		: m_VariationList(VariationList<T>::Instance()),
+		  m_Edits(nullptr)
 	{
 		Ember<T>::operator=<T>(ember);
 	}
@@ -62,7 +66,8 @@ public:
 	/// <param name="ember">The Ember object to copy</param>
 	template <typename U>
 	Ember(const Ember<U>& ember)
-		: m_Edits(nullptr)
+		: m_VariationList(VariationList<T>::Instance()),
+		  m_Edits(nullptr)
 	{
 		Ember<T>::operator=<U>(ember);
 	}
@@ -299,7 +304,7 @@ public:
 				ember.m_FinalXform.m_ColorSpeed = 0;
 				ember.m_FinalXform.m_Motion.clear();
 				ember.m_FinalXform.ClearAndDeleteVariations();
-				ember.m_FinalXform.AddVariation(new LinearVariation<T>(0));//Do this so it doesn't appear empty.
+				ember.m_FinalXform.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR, 0));//Do this so it doesn't appear empty.
 			}
 		}
 
@@ -1096,7 +1101,7 @@ public:
 			m_Xforms[i].m_Affine.D(0);
 			m_Xforms[i].m_Affine.E(1);
 			m_Xforms[i].m_Affine.F(0);
-			m_Xforms[i].AddVariation(new LinearVariation<T>());
+			m_Xforms[i].AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
 			result++;
 			sym = -sym;
 		}
@@ -1118,7 +1123,7 @@ public:
 			m_Xforms[i].m_Affine.E(m_Xforms[i].m_Affine.A());
 			m_Xforms[i].m_Affine.C(0);
 			m_Xforms[i].m_Affine.F(0);
-			m_Xforms[i].AddVariation(new LinearVariation<T>());
+			m_Xforms[i].AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
 			result++;
 		}
 
@@ -1746,6 +1751,9 @@ private:
 	//Discussed in section 3.2 of the paper, page 6.
 	//Xml field: "finalxform".
 	Xform<T> m_FinalXform;
+
+	//Single global reference to create variations with.
+	VariationList<T>& m_VariationList;
 
 	/// <summary>
 	/// Interpolation function that takes the address of a member variable of type T as a template parameter.

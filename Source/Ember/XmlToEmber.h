@@ -74,6 +74,7 @@ public:
 	/// Constructor that initializes the random context.
 	/// </summary>
 	XmlToEmber()
+		: m_VariationList(VariationList<T>::Instance())
 	{
 		Timing t;
 
@@ -1535,7 +1536,7 @@ private:
 	static bool m_Init;
 	static unordered_map<string, string> m_BadParamNames;
 	static vector<pair<pair<string, string>, vector<string>>> m_BadVariationNames;
-	VariationList<T> m_VariationList;//The variation list used to make copies of variations to populate the embers with.
+	VariationList<T>& m_VariationList;//The variation list used to make copies of variations to populate the embers with.
 	PaletteList<T> m_PaletteList;
 };
 }

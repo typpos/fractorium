@@ -64,13 +64,13 @@ bool EmberGenome(EmberOptions& opt)
 		return true;
 	}
 
+	VariationList<T>& varList(VariationList<T>::Instance());
+
 	if (opt.AllVars() || opt.RegVars() || opt.PreVars() || opt.PostVars())
 	{
-		VariationList<T> vl;
-
 		if (opt.AllVars())
 		{
-			auto& vars = vl.AllVars();
+			auto& vars = varList.AllVars();
 
 			for (auto& v : vars)
 				cout << v->Name() << "\n";
@@ -82,13 +82,13 @@ bool EmberGenome(EmberOptions& opt)
 			vector<Variation<T>*> vars;
 
 			if (opt.RegVars())
-				vars.insert(vars.end(), vl.RegVars().begin(), vl.RegVars().end());
+				vars.insert(vars.end(), varList.RegVars().begin(), varList.RegVars().end());
 
 			if (opt.PreVars())
-				vars.insert(vars.end(), vl.PreVars().begin(), vl.PreVars().end());
+				vars.insert(vars.end(), varList.PreVars().begin(), varList.PreVars().end());
 
 			if (opt.PostVars())
-				vars.insert(vars.end(), vl.PostVars().begin(), vl.PostVars().end());
+				vars.insert(vars.end(), varList.PostVars().begin(), varList.PostVars().end());
 
 			for (auto& v : vars)
 				cout << v->Name() << "\n";
@@ -116,7 +116,6 @@ bool EmberGenome(EmberOptions& opt)
 	Ember<T>* aselp0, *aselp1, *pTemplate = nullptr;
 	XmlToEmber<T> parser;
 	EmberToXml<T> emberToXml;
-	VariationList<T> varList;
 	EmberReport emberReport, emberReport2;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
 	unique_ptr<RenderProgress<T>> progress(new RenderProgress<T>());

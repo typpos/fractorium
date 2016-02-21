@@ -176,7 +176,7 @@ void FractoriumEmberController<T>::ClearVariationsTree()
 	for (int i = 0; i < tree->topLevelItemCount(); i++)
 	{
 		auto item = tree->topLevelItem(i);
-		auto* spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(tree->itemWidget(item, 1));
+		auto spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(tree->itemWidget(item, 1));
 		spinBox->SetValueStealth(0);
 
 		for (int j = 0; j < item->childCount(); j++)//Iterate through all of the children, which will be the params.

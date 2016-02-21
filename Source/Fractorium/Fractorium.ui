@@ -3470,8 +3470,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>118</width>
-                <height>618</height>
+                <width>263</width>
+                <height>700</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5485,8 +5485,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>133</width>
-                   <height>52</height>
+                   <width>259</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -7098,7 +7098,7 @@
     <string>Copy selected xforms to the clipboard</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C, X</string>
+    <string>Ctrl+X, Ctrl+C</string>
    </property>
   </action>
   <action name="ActionPasteSelectedXforms">
@@ -7109,7 +7109,7 @@
     <string>Paste copied xforms into the current flame</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+V, X</string>
+    <string>Ctrl+X, Ctrl+V</string>
    </property>
   </action>
   <action name="ActionResetWorkspace">

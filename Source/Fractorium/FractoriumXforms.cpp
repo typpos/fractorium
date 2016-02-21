@@ -143,7 +143,7 @@ void FractoriumEmberController<T>::AddLinkedXform()
 
 		//Set the xaos for all xforms pointing to the new one to zero.
 		for (i = 0; i < count; i++)
-			if (auto* xf = m_Ember.GetXform(i))
+			if (auto xf = m_Ember.GetXform(i))
 				xf->SetXaos(count - 1, 0);
 
 		xform->SetXaos(count - 1, 1);//Set the xaos value for the previous xform pointing to the new one to one.

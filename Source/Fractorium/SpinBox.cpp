@@ -112,25 +112,18 @@ void SpinBox::OnTimeout()
 	double scale, val;
 	int d = value();
 	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-	//bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 	double amount = (m_SmallStep + m_Step) * 0.5;
 
 	if (shift)
-	{
-		//qDebug() << "Shift pressed";
 		scale = 0.001;
-	}
-	/*  else if (ctrl)
-	    {
-	    qDebug() << "Control pressed";
-	    scale = 0.01;
-	    }*/
+	else if (ctrl)
+		scale = 0.01;
 	else
 		scale = 0.01;
 
 	val = d + (distance * amount * scale);
 	setValue(int(val));
-	//qDebug() << "Timer on, orig val: " << d << ", new val: " << val << ", distance " << distance;
 }
 
 /// <summary>
@@ -150,27 +143,6 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 	{
 		m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		StartTimer();
-		//qDebug() << "Right mouse down";
-		//	QPoint pt;
-		//
-		//	if (QMouseEvent* me = (QMouseEvent*)e)
-		//		pt = me->localPos().toPoint();
-		//
-		//	int pos = lineEdit()->cursorPositionAt(pt);
-		//
-		//	if (lineEdit()->selectedText() != "")
-		//	{
-		//		lineEdit()->deselect();
-		//		lineEdit()->setCursorPosition(pos);
-		//		return true;
-		//	}
-		//	else if (m_Select)
-		//	{
-		//		lineEdit()->setCursorPosition(pos);
-		//		selectAll();
-		//		m_Select = false;
-		//		return true;
-		//	}
 	}
 	else if (isEnabled() &&
 			 me &&
@@ -179,7 +151,6 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 	{
 		StopTimer();
 		m_MouseDownPoint = m_MouseMovePoint = me->pos();
-		//qDebug() << "Right mouse up";
 	}
 	else if (isEnabled() &&
 			 me &&
@@ -187,7 +158,6 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 			 QGuiApplication::mouseButtons() & Qt::RightButton)
 	{
 		m_MouseMovePoint = me->pos();
-		qDebug() << "Mouse move while right down. Pt = " << me->pos() << ", global: " << mapToGlobal(me->pos());
 	}
 	else if (m_DoubleClick && e->type() == QMouseEvent::MouseButtonDblClick && isEnabled())
 	{
@@ -223,7 +193,6 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 /// <param name="e">The event</param>
 void SpinBox::focusInEvent(QFocusEvent* e)
 {
-	//lineEdit()->setReadOnly(false);
 	StopTimer();
 	QSpinBox::focusInEvent(e);
 }
@@ -237,8 +206,6 @@ void SpinBox::focusInEvent(QFocusEvent* e)
 /// <param name="e">The event</param>
 void SpinBox::focusOutEvent(QFocusEvent* e)
 {
-	//lineEdit()->deselect();//Clear selection when leaving.
-	//lineEdit()->setReadOnly(true);//Clever hack to clear the cursor when leaving.
 	StopTimer();
 	QSpinBox::focusOutEvent(e);
 }
@@ -250,8 +217,6 @@ void SpinBox::focusOutEvent(QFocusEvent* e)
 /// <param name="e">The event</param>
 void SpinBox::enterEvent(QEvent* e)
 {
-	//m_Select = true;
-	//setFocus();
 	StopTimer();
 	QSpinBox::enterEvent(e);
 }
@@ -263,8 +228,6 @@ void SpinBox::enterEvent(QEvent* e)
 /// <param name="e">The event</param>
 void SpinBox::leaveEvent(QEvent* e)
 {
-	//m_Select = false;
-	//clearFocus();
 	StopTimer();
 	QSpinBox::leaveEvent(e);
 }

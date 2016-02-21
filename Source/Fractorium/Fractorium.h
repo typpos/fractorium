@@ -262,6 +262,7 @@ public slots:
 	//Xforms Selection.
 	void OnXformsSelectAllButtonClicked(bool checked);
 	void OnXformsSelectNoneButtonClicked(bool checked);
+	bool IsXformSelected(size_t i);
 
 	//Xaos.
 	void OnXaosChanged(double d);

@@ -424,7 +424,7 @@ void FractoriumEmberController<T>::MoveXforms(double x, double y, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto* affine = pre ? &xform->m_Affine : &xform->m_Post;
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
 		affine->C(affine->C() + x);
 		affine->F(affine->F() + y);
 	}, eXformUpdate::UPDATE_SELECTED);

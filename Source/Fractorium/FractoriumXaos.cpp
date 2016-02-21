@@ -146,7 +146,7 @@ void FractoriumEmberController<T>::RandomXaos()
 	{
 		for (size_t i = 0; i < m_Ember.XformCount(); i++)
 		{
-			if (auto* xform = m_Ember.GetXform(i))
+			if (auto xform = m_Ember.GetXform(i))
 			{
 				for (size_t j = 0; j < m_Ember.XformCount(); j++)
 				{

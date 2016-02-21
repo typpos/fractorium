@@ -307,7 +307,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			for (size_t i = 0; i < ember->TotalXformCount(); i++)
 			{
 				auto xform = ember->GetTotalXform(i);
-				bool selected = dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform);
+				bool selected = m_Fractorium->IsXformSelected(i) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
 				DrawAffine(xform, true, selected);
 			}
 		}
@@ -321,7 +321,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			for (size_t i = 0; i < ember->TotalXformCount(); i++)
 			{
 				auto xform = ember->GetTotalXform(i);
-				bool selected = dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform);
+				bool selected = m_Fractorium->IsXformSelected(i) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
 				DrawAffine(xform, false, selected);
 			}
 		}

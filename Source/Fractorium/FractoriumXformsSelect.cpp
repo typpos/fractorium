@@ -25,6 +25,19 @@ void Fractorium::OnXformsSelectAllButtonClicked(bool checked) { ForEachXformChec
 void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w) { w->setChecked(false); }); }
 
 /// <summary>
+/// Return whether the checkbox at the specified index is checked.
+/// </summary>
+/// <param name="checked">True if checked, else false.</param>
+bool Fractorium::IsXformSelected(size_t i)
+{
+	if (auto child = m_XformsSelectionLayout->itemAt(int(i)))
+		if (auto w = qobject_cast<QCheckBox*>(child->widget()))
+			return w->isChecked();
+
+	return false;
+}
+
+/// <summary>
 /// Clear all of the dynamically created xform checkboxes.
 /// </summary>
 void Fractorium::ClearXformsSelections()
@@ -35,7 +48,7 @@ void Fractorium::ClearXformsSelections()
 
 	while (m_XformsSelectionLayout->count() && (child = m_XformsSelectionLayout->takeAt(0)))
 	{
-		auto* w = child->widget();
+		auto w = child->widget();
 		delete child;
 		delete w;
 	}
@@ -75,10 +88,8 @@ void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*)> func)
 
 	while (QLayoutItem* child = m_XformsSelectionLayout->itemAt(i))
 	{
-		if (auto* w = qobject_cast<QCheckBox*>(child->widget()))
-		{
+		if (auto w = qobject_cast<QCheckBox*>(child->widget()))
 			func(i, w);
-		}
 
 		i++;
 	}

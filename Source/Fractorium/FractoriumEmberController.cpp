@@ -252,7 +252,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 			{
 				if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
 				{
-					if (auto* w = qobject_cast<QCheckBox*>(child->widget()))
+					if (auto w = qobject_cast<QCheckBox*>(child->widget()))
 					{
 						if (w->isChecked())
 						{
@@ -281,7 +281,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 			{
 				if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
 				{
-					if (auto* w = qobject_cast<QCheckBox*>(child->widget()))
+					if (auto w = qobject_cast<QCheckBox*>(child->widget()))
 					{
 						if (w->isChecked())
 						{

@@ -1,3 +1,70 @@
+0.9.9.4 02/21/2016
+--User changes
+	-Allow for stopping the renderer in the main window. This makes is more efficient when entering many parameters, such as when following a tutorial.
+	-Add support for new variations: erf, gamma, jac_cn, jac_dn, jac_sn, logDB, pressure_wave, pRose3D, splits3D, w, waves2b, x, xerf, y, z.
+	-Inform user of the start and stop of file parsing in EmberAnimate because the files could potentially be very large.
+	-Move the follwing fields to a new table called Animation: Interpolation, Affine Interpolation, Temporal Samples, Temporal Filter Width, Temporal Filter Type.
+		--These currently have no effect on the interactive renderer and instead are used when running flames through EmberGenome to generate sequences, and then animating them in Fractorium or EmberAnimate.
+	-Add new parameter overrides for EmberRender and EmberAnimate which directly assign values to all flames being rendered, rather than scale:
+		  --quality
+		  --demin
+		  --demax
+	-Allow locking of the scale at which affine circles are displayed.
+	-Allow user to toggle whether xform will be animated when generating sequences. Also show the animate value when loading.
+	-Add variations changes to the list of functionality that can be applied to all xforms using the Select tab.
+	-Allow for graphical affine adjustments to apply to multiple selected xforms.
+	-Slight optimization of the pie variation.
+	-Undo state is only saved when the render completes and the mouse buttons are released. This helps avoid intermediate steps for quickly completing renders while dragging.
+	-Add some keyboard shortcuts for toolbar and menu items.
+	-Make info tab tree always expanded.
+	-Draw selection circles around all selected xforms plus the current one.
+	
+--Bug fixes
+	-Crash when supersample minus final spatial filter width was negative.
+	-Left pad instead of right pad names of sequence outputs from EmberGenome.
+	-Unique file naming was broken for files which already had an underscore in them.
+	-Properly report that png is the default format of EmberRender and EmberAnimate output instead of erroneously claiming it was jpg.
+	-Make command line programs search these folders in this order for the palette file:
+		./
+		~/.fractorium
+		~/.config/fractorium
+		/usr/share/fractorium
+		/usr/local/share/fractorium
+	-Fix possible bad values in hexes.
+	-Better assignment of Z variables.
+	-Fix boarders due to use of poorly implemented rint() function from flam3. Use std::rint() now.
+	-wedge_sph was completely wrong due to having accidentally swapped the mapping of two parameters.
+	-Make juliascope juliascope_power parameter be of type REAL_NONZERO since it's used as a denominator.
+	-Make Z assignment compatible with the originals in:
+		--arch, bcircle, bCollide, bent, bent2, bisplit, blob, blur_linear, blur_square, bMod, boarders, boarders2, bSwirl, bTransform, butterfly, cardioid, cell, circleblur, circlize, circlize2, circus, collideoscope, cos, cosine, cosh, coth, cpow, cpow2, crescents, cropn, csc, csch, curl, curve, dc_gridout, deltaa, diamond, disc2, eclipse, eCollide, edisc, eJulia, elliptic, eMod, eMotion, ennepers, epispiral, ePush, eRotate, eScale, eSwirl, ex, exp, expo, exponential, fan, fdisc, fibonacci, fibonacci2, fisheye, flipcircle, flipy, flower, flux, funnel, glynnia, GlynnSim1, GlynnSim2, GlynnSim3, gridout, handkerchief, heart, hole, idisc, julia, julian2, juliaNab, kaleidoscope, lazyTravis, Lissajous, mask, MobiusN, mobius_strip, modulus, murl, murl2, npolar, ortho, oscilloscope, parabola, perspective, petal, phoenix_julia, pie (was also inconsistent between cpu and gpu), poincare, popcorn, popcorn2, power, pow_block, rational3, rays, rblur, rings, rippled, roundspher, sec, secant2, sigmoid, sin, sineblur, sinh, sinusgrid, sphericaln, spiralwing, spirograph, split, squarize, squirrel, squish, sschecks, starblur, stripes, stwin, super_shape, tan, tancos, tangent, tanh, TwinTrian, twoface, unpolar, waves, wavesn, wedge_julia, whorl, xheart, zblur, zscale.
+	-Make precalcs for all hypertile variations safer by using Zeps() for denominators.
+	-Changing the current xform with more than one selected would set all xform's color index value that of the current one.
+	-Use hard found palette path information for randoms as well.
+	-OpenCL build and assignment errors for Z value in epispiral variation.
+	-Unitialized local variables in hexaplay3D, crob, pRose3D.
+	-Devices settings was empty on first run, so switching to OpenCL had no effect until the user manually selected a device in the options dialog. Fix by defaulting to device 0 if present.
+	-Add control key as a modifier to increase the amount a spinbox is changed when using right mouse drag to edit. Previously only observed shift key to decrease the value.
+	-Change the copy/paste selected xforms shortcuts to be Ctrl+X+C and Ctrl+X+V.
+	
+--Code changes
+	-Generalize Variation::PrecalcHelper() and rename to PrePostPrecalcHelper().
+		--Do the same for the OpenCL version and rename it PrePostPrecalcOpenCLString().
+	-Rename Variation::m_AssignType to m_PrePostAssignType since it's only relevant to pre/post variations.
+	-More conversion to C++11 style code.
+	-Add another value to the eXformUpdate enum called UPDATE_CURRENT_AND_SELECTED.
+	-Remove some old #defines.
+	-Change static member variables from m_ to s_.
+	-Get rid of excessive endl and replace with "\n".
+	-Remove old IMAGEGL2D define from before Nvidia supported OpenCL 1.2.
+	-Remove old CriticalSection code and use std::recursive_mutex.
+	-Make Affine2D Rotate() and RotateTrans() take radians instead of angles.
+	-Split VariationList into .h/cpp files.
+		--Make VariationList.cpp the only place where the variations files are included from. This speeds up the build, but variations can no longer be directly instantiated.
+		--Variations are no longer exported.
+	-Add function Fractorium::IsXformSelected() to determine if an xform has been selected with the checkboxes.
+	-Cleanup warnings.
+	-General cleanup.
+ 
 0.9.9.3 01/17/2016
 --User changes
 	-Add new variations: crackle, dc_perlin and post_smartcrop.

@@ -27,6 +27,7 @@ void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformChe
 /// <summary>
 /// Return whether the checkbox at the specified index is checked.
 /// </summary>
+/// <param name="i">The index of the xform to check for selection</param>
 /// <param name="checked">True if checked, else false.</param>
 bool Fractorium::IsXformSelected(size_t i)
 {
@@ -61,7 +62,7 @@ void Fractorium::ClearXformsSelections()
 /// The caption will be the xform count + 1, optionally followed by the xform's name.
 /// For final xforms, the string "Final" will be used in place of the count.
 /// </summary>
-/// <param name="i">The index of xform to make a caption for</param>
+/// <param name="i">The index of the xform to make a caption for</param>
 /// <returns>The caption string</returns>
 template <typename T>
 QString FractoriumEmberController<T>::MakeXformCaption(size_t i)

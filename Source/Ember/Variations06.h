@@ -36,7 +36,7 @@ public:
 		static const T AYoXh = T(1.7320508075688772935 / 2.0);
 		static const T AYoYh = T(1.7320508075688772935 / 2.0);
 		static const v2T offset[4] { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } };
-		int i = 0;
+		int i, j;
 		T di, dj;
 		T XCh, YCh, XCo, YCo, DXo, DYo, L, L1, L2, R, s, trgL;
 		v2T u, v;
@@ -60,13 +60,12 @@ public:
 		YCh = T(Floor((AYhXo * u.x + AYhYo * u.y) / s));
 
 		// Get a set of 4 hex center points, based around the one above
-		for (di = XCh; di < XCh + T(1.1); di += 1)
+		for (i = 0, di = XCh; i < 2; di += 1, i++)//Note that in SP mode, these numbers won't advance if they are on the boundary of what can be represented with an DP number...
 		{
-			for (dj = YCh; dj < YCh + T(1.1); dj += 1)
+			for (j = 0, dj = YCh; j < 2; dj += 1, j++)//...which is why the check uses i and j.
 			{
-				P[i].x = (AXoXh * di + AXoYh * dj) * s;
-				P[i].y = (AYoXh * di + AYoYh * dj) * s;
-				i++;
+				P[(i * 2) + j].x = (AXoXh * di + AXoYh * dj) * s;
+				P[(i * 2) + j].y = (AYoXh * di + AYoYh * dj) * s;
 			}
 		}
 
@@ -151,7 +150,7 @@ public:
 		string rotsin	= "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotcos	= "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tint i = 0;\n"
+		   << "\t\tint i, j;\n"
 		   << "\t\treal_t di, dj;\n"
 		   << "\t\treal_t XCh, YCh, XCo, YCo, DXo, DYo, L, L1, L2, R, s, trgL, Vx, Vy;\n"
 		   << "\t\treal2 U;\n"
@@ -173,13 +172,12 @@ public:
 		   << "\t\tXCh = floor((AXhXo * U.x + AXhYo * U.y) / s);\n"
 		   << "\t\tYCh = floor((AYhXo * U.x + AYhYo * U.y) / s);\n"
 		   << "\n"
-		   << "\t\tfor (di = XCh; di < XCh + 1.1; di += 1)\n"
+		   << "\t\tfor (i = 0, di = XCh; i < 2; di += 1, i++)\n"
 		   << "\t\t{\n"
-		   << "\t\t	for (dj = YCh; dj < YCh + 1.1; dj += 1)\n"
+		   << "\t\t	for (j = 0, dj = YCh; j < 2; dj += 1, j++)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		P[i].x = (AXoXh * di + AXoYh * dj) * s;\n"
-		   << "\t\t		P[i].y = (AYoXh * di + AYoYh * dj) * s;\n"
-		   << "\t\t		i++;\n"
+		   << "\t\t		P[(i * 2) + j].x = (AXoXh * di + AXoYh * dj) * s;\n"
+		   << "\t\t		P[(i * 2) + j].y = (AYoXh * di + AYoYh * dj) * s;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"

@@ -2393,9 +2393,10 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_InvN = m_Dist / m_Power;
-		m_Inv2PiN = M_2PI / m_Power;
-		m_Cn = m_Dist / m_Power / 2;
+		auto zp = Zeps(m_Power);
+		m_InvN = m_Dist / zp;
+		m_Inv2PiN = M_2PI / zp;
+		m_Cn = m_Dist / zp / 2;
 	}
 
 protected:
@@ -2405,7 +2406,7 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Power,    prefix + "phoenix_julia_power", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Dist,     prefix + "phoenix_julia_dist", 1));
-		m_Params.push_back(ParamWithName<T>(&m_XDistort, prefix + "phoenix_julia_x_distort", T(-T(0.5))));//Original omitted phoenix_ prefix.
+		m_Params.push_back(ParamWithName<T>(&m_XDistort, prefix + "phoenix_julia_x_distort", T(-0.5)));//Original omitted phoenix_ prefix.
 		m_Params.push_back(ParamWithName<T>(&m_YDistort, prefix + "phoenix_julia_y_distort"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn,      prefix + "phoenix_julia_cn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_InvN,    prefix + "phoenix_julia_invn"));

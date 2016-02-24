@@ -12,22 +12,17 @@ FinalAccumOpenCLKernelCreator::FinalAccumOpenCLKernelCreator(bool doublePrecisio
 	m_DoublePrecision = doublePrecision;
 	m_GammaCorrectionWithAlphaCalcEntryPoint    = "GammaCorrectionWithAlphaCalcKernel";
 	m_GammaCorrectionWithoutAlphaCalcEntryPoint = "GammaCorrectionWithoutAlphaCalcKernel";
-
 	m_GammaCorrectionWithAlphaCalcKernel    = CreateGammaCorrectionKernelString(true);
 	m_GammaCorrectionWithoutAlphaCalcKernel = CreateGammaCorrectionKernelString(false);
-
 	m_FinalAccumEarlyClipEntryPoint                               = "FinalAccumEarlyClipKernel";
 	m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint    = "FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel";
 	m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel";
-
 	m_FinalAccumEarlyClipKernel                               = CreateFinalAccumKernelString(true, false, false);
 	m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel    = CreateFinalAccumKernelString(true, true,  true);
 	m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel = CreateFinalAccumKernelString(true, false, true);
-
 	m_FinalAccumLateClipEntryPoint                               = "FinalAccumLateClipKernel";
 	m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint    = "FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel";
 	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel";
-
 	m_FinalAccumLateClipKernel                               = CreateFinalAccumKernelString(false, false, false);
 	m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel    = CreateFinalAccumKernelString(false, true,  true);
 	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel = CreateFinalAccumKernelString(false, false, true);
@@ -183,15 +178,14 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 {
 	ostringstream os;
 	string channels = alphaAccum ? "4" : "3";
-
 	os <<
-		ConstantDefinesString(m_DoublePrecision) <<
-		UnionCLStructString <<
-		RgbToHsvFunctionString <<
-		HsvToRgbFunctionString <<
-		CalcAlphaFunctionString <<
-		CurveAdjustFunctionString <<
-		SpatialFilterCLStructString;
+	   ConstantDefinesString(m_DoublePrecision) <<
+	   UnionCLStructString <<
+	   RgbToHsvFunctionString <<
+	   HsvToRgbFunctionString <<
+	   CalcAlphaFunctionString <<
+	   CurveAdjustFunctionString <<
+	   SpatialFilterCLStructString;
 
 	if (earlyClip)
 	{
@@ -207,8 +201,8 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	else
 	{
 		os <<
-			CreateCalcNewRgbFunctionString(false) <<
-			CreateGammaCorrectionFunctionString(false, alphaCalc, alphaAccum, true);
+		   CreateCalcNewRgbFunctionString(false) <<
+		   CreateGammaCorrectionFunctionString(false, alphaCalc, alphaAccum, true);
 
 		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
 			os << "__kernel void " << m_FinalAccumLateClipEntryPoint << "(\n";
@@ -221,53 +215,53 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	}
 
 	os <<
-		"	const __global real4reals_bucket* accumulator,\n"
-		"	__write_only image2d_t pixels,\n"
-		"	__constant SpatialFilterCL* spatialFilter,\n"
-		"	__constant real_bucket_t* filterCoefs,\n"
-		"	__constant real4reals_bucket* csa,\n"
-		"	const uint doCurves,\n"
-		"	const real_bucket_t alphaBase,\n"
-		"	const real_bucket_t alphaScale\n"
-		"\t)\n"
-		"{\n"
-		"\n"
-		"	if ((GLOBAL_ID_Y >= spatialFilter->m_FinalRasH) || (GLOBAL_ID_X >= spatialFilter->m_FinalRasW))\n"
-		"		return;\n"
-		"\n"
-		"	uint accumX = spatialFilter->m_DensityFilterOffset + (GLOBAL_ID_X * spatialFilter->m_Supersample);\n"
-		"	uint accumY = spatialFilter->m_DensityFilterOffset + (GLOBAL_ID_Y * spatialFilter->m_Supersample);\n"
-		"	int2 finalCoord;\n"
-		"	finalCoord.x = GLOBAL_ID_X;\n"
-		"	finalCoord.y = (int)((spatialFilter->m_YAxisUp == 1) ? ((spatialFilter->m_FinalRasH - GLOBAL_ID_Y) - 1) : GLOBAL_ID_Y);\n"
-		"	float4floats finalColor;\n"
-		"	int ii, jj;\n"
-		"	uint filterKRowIndex;\n"
-		"	const __global real4reals_bucket* accumBucket;\n"
-		"	real4reals_bucket newBucket;\n"
-		"	newBucket.m_Real4 = 0;\n"
-		"\n"
-		"	for (jj = 0; jj < spatialFilter->m_FilterWidth; jj++)\n"
-		"	{\n"
-		"		filterKRowIndex = jj * spatialFilter->m_FilterWidth;\n"
-		"\n"
-		"		for (ii = 0; ii < spatialFilter->m_FilterWidth; ii++)\n"
-		"		{\n"
-		"			real_bucket_t k = filterCoefs[ii + filterKRowIndex];\n"
-		"\n"
-		"			accumBucket = accumulator + (accumX + ii) + ((accumY + jj) * spatialFilter->m_SuperRasW);\n"
-		"			newBucket.m_Real4 += (k * accumBucket->m_Real4);\n"
-		"		}\n"
-		"	}\n"
-		"\n";
+	   "	const __global real4reals_bucket* accumulator,\n"
+	   "	__write_only image2d_t pixels,\n"
+	   "	__constant SpatialFilterCL* spatialFilter,\n"
+	   "	__constant real_bucket_t* filterCoefs,\n"
+	   "	__constant real4reals_bucket* csa,\n"
+	   "	const uint doCurves,\n"
+	   "	const real_bucket_t alphaBase,\n"
+	   "	const real_bucket_t alphaScale\n"
+	   "\t)\n"
+	   "{\n"
+	   "\n"
+	   "	if ((GLOBAL_ID_Y >= spatialFilter->m_FinalRasH) || (GLOBAL_ID_X >= spatialFilter->m_FinalRasW))\n"
+	   "		return;\n"
+	   "\n"
+	   "	uint accumX = spatialFilter->m_DensityFilterOffset + (GLOBAL_ID_X * spatialFilter->m_Supersample);\n"
+	   "	uint accumY = spatialFilter->m_DensityFilterOffset + (GLOBAL_ID_Y * spatialFilter->m_Supersample);\n"
+	   "	int2 finalCoord;\n"
+	   "	finalCoord.x = GLOBAL_ID_X;\n"
+	   "	finalCoord.y = (int)((spatialFilter->m_YAxisUp == 1) ? ((spatialFilter->m_FinalRasH - GLOBAL_ID_Y) - 1) : GLOBAL_ID_Y);\n"
+	   "	float4floats finalColor;\n"
+	   "	int ii, jj;\n"
+	   "	uint filterKRowIndex;\n"
+	   "	const __global real4reals_bucket* accumBucket;\n"
+	   "	real4reals_bucket newBucket;\n"
+	   "	newBucket.m_Real4 = 0;\n"
+	   "\n"
+	   "	for (jj = 0; jj < spatialFilter->m_FilterWidth; jj++)\n"
+	   "	{\n"
+	   "		filterKRowIndex = jj * spatialFilter->m_FilterWidth;\n"
+	   "\n"
+	   "		for (ii = 0; ii < spatialFilter->m_FilterWidth; ii++)\n"
+	   "		{\n"
+	   "			real_bucket_t k = filterCoefs[ii + filterKRowIndex];\n"
+	   "\n"
+	   "			accumBucket = accumulator + (accumX + ii) + ((accumY + jj) * spatialFilter->m_SuperRasW);\n"
+	   "			newBucket.m_Real4 += (k * accumBucket->m_Real4);\n"
+	   "		}\n"
+	   "	}\n"
+	   "\n";
 
 	//Not supporting 2 bytes per channel on the GPU. If the user wants it, run on the CPU.
 	if (earlyClip)//If early clip, simply assign values directly to the temp float4 since they've been gamma corrected already, then write it straight to the output image below.
 	{
 		os <<
-		"	finalColor.m_Float4.x = (float)newBucket.m_Real4.x;\n"//CPU side clamps, skip here because write_imagef() does the clamping for us.
-		"	finalColor.m_Float4.y = (float)newBucket.m_Real4.y;\n"
-		"	finalColor.m_Float4.z = (float)newBucket.m_Real4.z;\n";
+		   "	finalColor.m_Float4.x = (float)newBucket.m_Real4.x;\n"//CPU side clamps, skip here because write_imagef() does the clamping for us.
+		   "	finalColor.m_Float4.y = (float)newBucket.m_Real4.y;\n"
+		   "	finalColor.m_Float4.z = (float)newBucket.m_Real4.z;\n";
 
 		if (alphaAccum)
 		{
@@ -283,37 +277,36 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 		if (m_DoublePrecision)
 		{
 			os <<
-		"	real4reals_bucket realFinal;\n"
-		"\n"
-		"	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, alphaBase, alphaScale, &(realFinal.m_Reals[0]));\n"
-		"	finalColor.m_Float4.x = (float)realFinal.m_Real4.x;\n"
-		"	finalColor.m_Float4.y = (float)realFinal.m_Real4.y;\n"
-		"	finalColor.m_Float4.z = (float)realFinal.m_Real4.z;\n"
-		"	finalColor.m_Float4.w = (float)realFinal.m_Real4.w;\n"
-		;
+			   "	real4reals_bucket realFinal;\n"
+			   "\n"
+			   "	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, alphaBase, alphaScale, &(realFinal.m_Reals[0]));\n"
+			   "	finalColor.m_Float4.x = (float)realFinal.m_Real4.x;\n"
+			   "	finalColor.m_Float4.y = (float)realFinal.m_Real4.y;\n"
+			   "	finalColor.m_Float4.z = (float)realFinal.m_Real4.z;\n"
+			   "	finalColor.m_Float4.w = (float)realFinal.m_Real4.w;\n"
+			   ;
 		}
 		else
 		{
 			os <<
-		"	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, alphaBase, alphaScale, &(finalColor.m_Floats[0]));\n";
+			   "	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, alphaBase, alphaScale, &(finalColor.m_Floats[0]));\n";
 		}
 	}
 
 	os <<
-		"\n"
-		"	if (doCurves)\n"
-		"	{\n"
-		"		CurveAdjust(csa, &(finalColor.m_Floats[0]), 1);\n"
-		"		CurveAdjust(csa, &(finalColor.m_Floats[1]), 2);\n"
-		"		CurveAdjust(csa, &(finalColor.m_Floats[2]), 3);\n"
-		"	}\n"
-		"\n"
-		"	finalColor.m_Float4 /= 255.0f;\n"
-		"	write_imagef(pixels, finalCoord, finalColor.m_Float4);\n"//Use write_imagef instead of write_imageui because only the former works when sharing with an OpenGL texture.
-		"	barrier(CLK_GLOBAL_MEM_FENCE);\n"//Required, or else page tearing will occur during interactive rendering.
-		"}\n"
-		;
-
+	   "\n"
+	   "	if (doCurves)\n"
+	   "	{\n"
+	   "		CurveAdjust(csa, &(finalColor.m_Floats[0]), 1);\n"
+	   "		CurveAdjust(csa, &(finalColor.m_Floats[1]), 2);\n"
+	   "		CurveAdjust(csa, &(finalColor.m_Floats[2]), 3);\n"
+	   "	}\n"
+	   "\n"
+	   "	finalColor.m_Float4 /= 255.0f;\n"
+	   "	write_imagef(pixels, finalCoord, finalColor.m_Float4);\n"//Use write_imagef instead of write_imageui because only the former works when sharing with an OpenGL texture.
+	   "	barrier(CLK_GLOBAL_MEM_FENCE);\n"//Required, or else page tearing will occur during interactive rendering.
+	   "}\n"
+	   ;
 	return os.str();
 }
 
@@ -332,54 +325,52 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool g
 	string dataType;
 	string unionMember;
 	dataType = "real_bucket_t";
-
 	//Use real_t for all cases, early clip and final accum.
 	os << "void GammaCorrectionFloats(" << (globalBucket ? "__global " : "") << "real4reals_bucket* bucket, __constant real_bucket_t* background, real_bucket_t g, real_bucket_t linRange, real_bucket_t vibrancy, real_bucket_t highlightPower, real_bucket_t alphaBase, real_bucket_t alphaScale, " << (finalOut ? "" : "__global") << " real_bucket_t* correctedChannels)\n";
-
 	os
-	<< "{\n"
-	<< "	real_bucket_t alpha, ls, tmp, a;\n"
-	<< "	real4reals_bucket newRgb;\n"
-	<< "\n"
-	<< "	if (bucket->m_Reals[3] <= 0)\n"
-	<< "	{\n"
-	<< "		alpha = 0;\n"
-	<< "		ls = 0;\n"
-	<< "	}\n"
-	<< "	else\n"
-	<< "	{\n"
-	<< "		tmp = bucket->m_Reals[3];\n"
-	<< "		alpha = CalcAlpha(tmp, g, linRange);\n"
-	<< "		ls = vibrancy * 256.0 * alpha / tmp;\n"
-	<< "		alpha = clamp(alpha, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
-	<< "	}\n"
-	<< "\n"
-	<< "	CalcNewRgb(bucket, ls, highlightPower, &newRgb);\n"
-	<< "\n"
-	<< "	for (uint rgbi = 0; rgbi < 3; rgbi++)\n"
-	<< "	{\n"
-	<< "		a = newRgb.m_Reals[rgbi] + ((1.0 - vibrancy) * 256.0 * pow(bucket->m_Reals[rgbi], g));\n"
-	<< "\n";
+			<< "{\n"
+			<< "	real_bucket_t alpha, ls, tmp, a;\n"
+			<< "	real4reals_bucket newRgb;\n"
+			<< "\n"
+			<< "	if (bucket->m_Reals[3] <= 0)\n"
+			<< "	{\n"
+			<< "		alpha = 0;\n"
+			<< "		ls = 0;\n"
+			<< "	}\n"
+			<< "	else\n"
+			<< "	{\n"
+			<< "		tmp = bucket->m_Reals[3];\n"
+			<< "		alpha = CalcAlpha(tmp, g, linRange);\n"
+			<< "		ls = vibrancy * 256.0 * alpha / tmp;\n"
+			<< "		alpha = clamp(alpha, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
+			<< "	}\n"
+			<< "\n"
+			<< "	CalcNewRgb(bucket, ls, highlightPower, &newRgb);\n"
+			<< "\n"
+			<< "	for (uint rgbi = 0; rgbi < 3; rgbi++)\n"
+			<< "	{\n"
+			<< "		a = newRgb.m_Reals[rgbi] + ((1.0 - vibrancy) * 256.0 * pow(fabs(bucket->m_Reals[rgbi]), g));\n"
+			<< "\n";
 
 	if (!alphaCalc)
 	{
 		os <<
-		"		a += ((1.0 - alpha) * background[rgbi]);\n";
+		   "		a += ((1.0 - alpha) * background[rgbi]);\n";
 	}
 	else
 	{
 		os
-	<< "		if (alpha > 0)\n"
-	<< "			a /= alpha;\n"
-	<< "		else\n"
-	<< "			a = 0;\n";
+				<< "		if (alpha > 0)\n"
+				<< "			a /= alpha;\n"
+				<< "		else\n"
+				<< "			a = 0;\n";
 	}
 
 	os <<
-	"\n"
-	"			correctedChannels[rgbi] = (" << dataType << ")clamp(a, (real_bucket_t)0.0, (real_bucket_t)255.0);\n"
-	"		}\n"
-	"\n";
+	   "\n"
+	   "			correctedChannels[rgbi] = (" << dataType << ")clamp(a, (real_bucket_t)0.0, (real_bucket_t)255.0);\n"
+	   "		}\n"
+	   "\n";
 
 	//The CPU code has 3 cases for assigning alpha:
 	//[3] = alpha.//Early clip.
@@ -393,13 +384,12 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool g
 	if (alphaAccum)
 	{
 		os
-	<< "	correctedChannels[3] = (" << dataType << ")(alphaBase + (alpha * alphaScale));\n";
+				<< "	correctedChannels[3] = (" << dataType << ")(alphaBase + (alpha * alphaScale));\n";
 	}
 
 	os <<
-	"}\n"
-	"\n";
-
+	   "}\n"
+	   "\n";
 	return os.str();
 }
 
@@ -411,63 +401,61 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool g
 string FinalAccumOpenCLKernelCreator::CreateCalcNewRgbFunctionString(bool globalBucket)
 {
 	ostringstream os;
-
 	os <<
-	"static void CalcNewRgb(" << (globalBucket ? "__global " : "") << "real4reals_bucket* oldRgb, real_bucket_t ls, real_bucket_t highPow, real4reals_bucket* newRgb)\n"
-	"{\n"
-	"	int rgbi;\n"
-	"	real_bucket_t newls, lsratio;\n"
-	"	real4reals_bucket newHsv;\n"
-	"	real_bucket_t maxa, maxc;\n"
-	"	real_bucket_t adjhlp;\n"
-	"\n"
-	"	if (ls == 0 || (oldRgb->m_Real4.x == 0 && oldRgb->m_Real4.y == 0 && oldRgb->m_Real4.z == 0))\n"//Can't do a vector compare to zero.
-	"	{\n"
-	"		newRgb->m_Real4 = 0;\n"
-	"		return;\n"
-	"	}\n"
-	"\n"
-	//Identify the most saturated channel.
-	"	maxc = max(max(oldRgb->m_Reals[0], oldRgb->m_Reals[1]), oldRgb->m_Reals[2]);\n"
-	"	maxa = ls * maxc;\n"
-	"\n"
-	//If a channel is saturated and highlight power is non-negative
-	//modify the color to prevent hue shift.
-	"	if (maxa > 255 && highPow >= 0)\n"
-	"	{\n"
-	"		newls = 255.0 / maxc;\n"
-	"		lsratio = pow(newls / ls, highPow);\n"
-	"\n"
-	//Calculate the max-value color (ranged 0 - 1).
-	"		for (rgbi = 0; rgbi < 3; rgbi++)\n"
-	"			newRgb->m_Reals[rgbi] = newls * oldRgb->m_Reals[rgbi] / 255.0;\n"
-	"\n"
-	//Reduce saturation by the lsratio.
-	"		RgbToHsv(&(newRgb->m_Real4), &(newHsv.m_Real4));\n"
-	"		newHsv.m_Real4.y *= lsratio;\n"
-	"		HsvToRgb(&(newHsv.m_Real4), &(newRgb->m_Real4));\n"
-	"\n"
-	"		for (rgbi = 0; rgbi < 3; rgbi++)\n"//Unrolling and vectorizing makes no difference.
-	"			newRgb->m_Reals[rgbi] *= 255.0;\n"
-	"	}\n"
-	"	else\n"
-	"	{\n"
-	"		newls = 255.0 / maxc;\n"
-	"		adjhlp = -highPow;\n"
-	"\n"
-	"		if (adjhlp > 1)\n"
-	"			adjhlp = 1;\n"
-	"\n"
-	"		if (maxa <= 255)\n"
-	"			adjhlp = 1;\n"
-	"\n"
-	//Calculate the max-value color (ranged 0 - 1) interpolated with the old behavior.
-	"		for (rgbi = 0; rgbi < 3; rgbi++)\n"//Unrolling, caching and vectorizing makes no difference.
-	"			newRgb->m_Reals[rgbi] = ((1.0 - adjhlp) * newls + adjhlp * ls) * oldRgb->m_Reals[rgbi];\n"
-	"	}\n"
-	"}\n"
-	"\n";
-
+	   "static void CalcNewRgb(" << (globalBucket ? "__global " : "") << "real4reals_bucket* oldRgb, real_bucket_t ls, real_bucket_t highPow, real4reals_bucket* newRgb)\n"
+	   "{\n"
+	   "	int rgbi;\n"
+	   "	real_bucket_t newls, lsratio;\n"
+	   "	real4reals_bucket newHsv;\n"
+	   "	real_bucket_t maxa, maxc;\n"
+	   "	real_bucket_t adjhlp;\n"
+	   "\n"
+	   "	if (ls == 0 || (oldRgb->m_Real4.x == 0 && oldRgb->m_Real4.y == 0 && oldRgb->m_Real4.z == 0))\n"//Can't do a vector compare to zero.
+	   "	{\n"
+	   "		newRgb->m_Real4 = 0;\n"
+	   "		return;\n"
+	   "	}\n"
+	   "\n"
+	   //Identify the most saturated channel.
+	   "	maxc = max(max(oldRgb->m_Reals[0], oldRgb->m_Reals[1]), oldRgb->m_Reals[2]);\n"
+	   "	maxa = ls * maxc;\n"
+	   "\n"
+	   //If a channel is saturated and highlight power is non-negative
+	   //modify the color to prevent hue shift.
+	   "	if (maxa > 255 && highPow >= 0)\n"
+	   "	{\n"
+	   "		newls = 255.0 / maxc;\n"
+	   "		lsratio = pow(newls / ls, highPow);\n"
+	   "\n"
+	   //Calculate the max-value color (ranged 0 - 1).
+	   "		for (rgbi = 0; rgbi < 3; rgbi++)\n"
+	   "			newRgb->m_Reals[rgbi] = newls * oldRgb->m_Reals[rgbi] / 255.0;\n"
+	   "\n"
+	   //Reduce saturation by the lsratio.
+	   "		RgbToHsv(&(newRgb->m_Real4), &(newHsv.m_Real4));\n"
+	   "		newHsv.m_Real4.y *= lsratio;\n"
+	   "		HsvToRgb(&(newHsv.m_Real4), &(newRgb->m_Real4));\n"
+	   "\n"
+	   "		for (rgbi = 0; rgbi < 3; rgbi++)\n"//Unrolling and vectorizing makes no difference.
+	   "			newRgb->m_Reals[rgbi] *= 255.0;\n"
+	   "	}\n"
+	   "	else\n"
+	   "	{\n"
+	   "		newls = 255.0 / maxc;\n"
+	   "		adjhlp = -highPow;\n"
+	   "\n"
+	   "		if (adjhlp > 1)\n"
+	   "			adjhlp = 1;\n"
+	   "\n"
+	   "		if (maxa <= 255)\n"
+	   "			adjhlp = 1;\n"
+	   "\n"
+	   //Calculate the max-value color (ranged 0 - 1) interpolated with the old behavior.
+	   "		for (rgbi = 0; rgbi < 3; rgbi++)\n"//Unrolling, caching and vectorizing makes no difference.
+	   "			newRgb->m_Reals[rgbi] = ((1.0 - adjhlp) * newls + adjhlp * ls) * oldRgb->m_Reals[rgbi];\n"
+	   "	}\n"
+	   "}\n"
+	   "\n";
 	return os.str();
 }
 
@@ -480,34 +468,31 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionKernelString(bool alp
 {
 	ostringstream os;
 	string dataType;
-
 	os <<
-		ConstantDefinesString(m_DoublePrecision) <<
-		UnionCLStructString <<
-		RgbToHsvFunctionString <<
-		HsvToRgbFunctionString <<
-		CalcAlphaFunctionString <<
-		CreateCalcNewRgbFunctionString(true) <<
-		SpatialFilterCLStructString <<
-		CreateGammaCorrectionFunctionString(true, alphaCalc, true, false);//Will only be used with float in this case, early clip. Will always alpha accum.
-
-		os << "__kernel void " << (alphaCalc ? m_GammaCorrectionWithAlphaCalcEntryPoint : m_GammaCorrectionWithoutAlphaCalcEntryPoint) << "(\n" <<
-			"	__global real4reals_bucket* accumulator,\n"
-			"	__constant SpatialFilterCL* spatialFilter\n"
-			")\n"
-			"{\n"
-			"	int testGutter = 0;\n"
-			"\n"
-			"	if (GLOBAL_ID_Y >= (spatialFilter->m_SuperRasH - testGutter) || GLOBAL_ID_X >= (spatialFilter->m_SuperRasW - testGutter))\n"
-			"		return;\n"
-			"\n"
-			"	uint superIndex = (GLOBAL_ID_Y * spatialFilter->m_SuperRasW) + GLOBAL_ID_X;\n"
-			"	__global real4reals_bucket* bucket = accumulator + superIndex;\n"
-			//Pass in an alphaBase and alphaScale of 0, 1 which means to just directly assign the computed alpha value.
-			"	GammaCorrectionFloats(bucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, 0.0, 1.0, &(bucket->m_Reals[0]));\n"
-			"}\n"
-		;
-
+	   ConstantDefinesString(m_DoublePrecision) <<
+	   UnionCLStructString <<
+	   RgbToHsvFunctionString <<
+	   HsvToRgbFunctionString <<
+	   CalcAlphaFunctionString <<
+	   CreateCalcNewRgbFunctionString(true) <<
+	   SpatialFilterCLStructString <<
+	   CreateGammaCorrectionFunctionString(true, alphaCalc, true, false);//Will only be used with float in this case, early clip. Will always alpha accum.
+	os << "__kernel void " << (alphaCalc ? m_GammaCorrectionWithAlphaCalcEntryPoint : m_GammaCorrectionWithoutAlphaCalcEntryPoint) << "(\n" <<
+	   "	__global real4reals_bucket* accumulator,\n"
+	   "	__constant SpatialFilterCL* spatialFilter\n"
+	   ")\n"
+	   "{\n"
+	   "	int testGutter = 0;\n"
+	   "\n"
+	   "	if (GLOBAL_ID_Y >= (spatialFilter->m_SuperRasH - testGutter) || GLOBAL_ID_X >= (spatialFilter->m_SuperRasW - testGutter))\n"
+	   "		return;\n"
+	   "\n"
+	   "	uint superIndex = (GLOBAL_ID_Y * spatialFilter->m_SuperRasW) + GLOBAL_ID_X;\n"
+	   "	__global real4reals_bucket* bucket = accumulator + superIndex;\n"
+	   //Pass in an alphaBase and alphaScale of 0, 1 which means to just directly assign the computed alpha value.
+	   "	GammaCorrectionFloats(bucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, 0.0, 1.0, &(bucket->m_Reals[0]));\n"
+	   "}\n"
+	   ;
 	return os.str();
 }
 }

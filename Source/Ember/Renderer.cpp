@@ -1629,7 +1629,7 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 
 	for (glm::length_t rgbi = 0; rgbi < 3; rgbi++)
 	{
-		a = newRgb[rgbi] + ((1 - vibrancy) * 255 * std::pow(bucket[rgbi], g));
+		a = newRgb[rgbi] + ((1 - vibrancy) * 255 * std::pow(std::abs(bucket[rgbi]), g));//Must use abs(), else it it could be a negative value and return NAN.
 
 		if (NumChannels() <= 3 || !Transparency())
 		{

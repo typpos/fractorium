@@ -172,8 +172,8 @@ public:
 	const cl::Context& Context() const;
 	size_t PlatformIndex() const;
 	size_t DeviceIndex() const;
-	const string& DeviceName() const;
 	size_t TotalDeviceIndex() const;
+	const string& DeviceName() const;
 	size_t LocalMemSize() const;
 	size_t GlobalMemSize() const;
 	size_t MaxAllocSize() const;

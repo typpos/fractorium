@@ -135,6 +135,9 @@ public:
 	const string& DEKernel() const;
 	const string& FinalAccumKernel() const;
 
+	//Access to underlying OpenCL structures. Use cautiously.
+	const vector<unique_ptr<RendererClDevice>>& Devices() const;
+
 	//Virtual functions overridden from RendererCLBase.
 	virtual bool ReadFinal(byte* pixels);
 	virtual bool ClearFinal();

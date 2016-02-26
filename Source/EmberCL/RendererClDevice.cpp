@@ -55,6 +55,4 @@ bool RendererClDevice::Ok() const { return m_Init; }
 bool RendererClDevice::Shared() const { return m_Shared; }
 bool RendererClDevice::Nvidia() const { return m_NVidia; }
 size_t RendererClDevice::WarpSize() const { return m_WarpSize; }
-size_t RendererClDevice::PlatformIndex() const { return m_PlatformIndex; }
-size_t RendererClDevice::DeviceIndex() const { return m_DeviceIndex; }
 }

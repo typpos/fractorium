@@ -395,6 +395,14 @@ template <typename T, typename bucketT>
 const string& RendererCL<T, bucketT>::FinalAccumKernel() const { return m_FinalAccumOpenCLKernelCreator.FinalAccumKernel(EarlyClip(), Renderer<T, bucketT>::NumChannels(), Transparency()); }
 
 /// <summary>
+/// Get the a const referece to the devices this renderer will use.
+/// Use this cautiously and do not use const_cast to manipulate the vector.
+/// </summary>
+/// <returns>A const reference to a vector of unique_ptr of devices</returns>
+template <typename T, typename bucketT>
+const vector<unique_ptr<RendererClDevice>>& RendererCL<T, bucketT>::Devices() const { return m_Devices; }
+
+/// <summary>
 /// Virtual functions overridden from RendererCLBase.
 /// </summary>
 

@@ -748,58 +748,19 @@ bool FractoriumFinalRenderDialog::CreateControllerFromGUI(bool createRenderer)
 /// assign the result to the table cell as text.
 /// Report errors if not enough memory is available for any of the selected devices.
 /// </summary>
-/// <returns>True devices and a controller is present, else false.</returns>
+/// <returns>True if devices and a controller is present, else false.</returns>
 bool FractoriumFinalRenderDialog::SetMemory()
 {
 	if (isVisible() && CreateControllerFromGUI(true))
 	{
-		bool error = false;
-		tuple<size_t, size_t, size_t> p = m_Controller->SyncAndComputeMemory();
 		QString s;
+		auto p = m_Controller->SyncAndComputeMemory();
 		ui.FinalRenderParamsTable->item(m_MemoryCellIndex, 1)->setText(ToString<qulonglong>(get<1>(p)));
 		ui.FinalRenderParamsTable->item(m_ItersCellIndex, 1)->setText(ToString<qulonglong>(get<2>(p)));
 
-		if (OpenCL() && !m_Wrappers.empty())
-		{
-			auto devices = Devices();
-
-			for (size_t i = 0; i < m_Wrappers.size(); i++)
-			{
-				if (devices.contains(int(i)))
-				{
-					size_t histSize = get<0>(p);
-					size_t totalSize = get<1>(p);
-					size_t maxAlloc = m_Wrappers[i].MaxAllocSize();
-					size_t totalAvail = m_Wrappers[i].GlobalMemSize();
-					QString temp;
-
-					if (histSize > maxAlloc)
-					{
-						temp = "Histogram/Accumulator memory size of " + ToString<qulonglong>(histSize) +
-							   " is greater than the max OpenCL allocation size of " + ToString<qulonglong>(maxAlloc);
-					}
-
-					if (totalSize > totalAvail)
-					{
-						temp += "\n\nTotal required memory size of " + ToString<qulonglong>(totalSize) +
-								" is greater than the max OpenCL available memory of " + ToString<qulonglong>(totalAvail);
-					}
-
-					if (!temp.isEmpty())
-					{
-						error = true;
-						s += QString::fromStdString(m_Wrappers[i].DeviceName()) + ":\n" + temp + "\n\n";
-					}
-				}
-			}
-
-			if (!s.isEmpty())
-				s += "Rendering will most likely fail.";
-
-			ui.FinalRenderTextOutput->setText(s);
-		}
-
-		if (!error)
+		if (OpenCL())
+			ui.FinalRenderTextOutput->setText(m_Controller->CheckMemory(p));
+		else
 			ui.FinalRenderTextOutput->clear();
 
 		return true;

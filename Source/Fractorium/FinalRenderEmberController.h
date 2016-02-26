@@ -13,7 +13,6 @@
 /// </summary>
 class Fractorium;
 class FractoriumFinalRenderDialog;
-//class FractoriumEmberControllerBase;
 
 /// <summary>
 /// Used to hold the options specified in the current state of the Gui for performing the final render.
@@ -68,6 +67,7 @@ public:
 	virtual double OriginalAspect() { return 1; }
 	virtual QString ComposePath(const QString& name) { return ""; }
 	virtual void CancelRender() { }
+	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) { return ""; }
 
 	bool CreateRendererFromGUI();
 	void Output(const QString& s);
@@ -126,6 +126,7 @@ public:
 	virtual QString Name() const override { return QString::fromStdString(m_Ember->m_Name); }
 	virtual QString ComposePath(const QString& name) override;
 	virtual void CancelRender() override;
+	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) override;
 
 	//Non Virtual functions.
 	EmberNs::Renderer<T, float>* FirstOrDefaultRenderer();

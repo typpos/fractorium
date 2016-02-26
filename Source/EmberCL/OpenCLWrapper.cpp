@@ -933,6 +933,7 @@ bool OpenCLWrapper::Shared() const { return m_Shared; }
 const cl::Context& OpenCLWrapper::Context() const { return m_Context; }
 size_t OpenCLWrapper::PlatformIndex() const { return m_PlatformIndex; }
 size_t OpenCLWrapper::DeviceIndex() const { return m_DeviceIndex; }
+size_t OpenCLWrapper::TotalDeviceIndex() const { return m_Info->TotalDeviceIndex(m_PlatformIndex, m_DeviceIndex); }
 const string& OpenCLWrapper::DeviceName() const { return m_Info->DeviceName(m_PlatformIndex, m_DeviceIndex); }
 size_t OpenCLWrapper::LocalMemSize() const { return m_LocalMemSize; }
 size_t OpenCLWrapper::GlobalMemSize() const { return m_GlobalMemSize; }

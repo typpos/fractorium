@@ -24,8 +24,6 @@ public:
 	bool Shared() const;
 	bool Nvidia() const;
 	size_t WarpSize() const;
-	size_t PlatformIndex() const;
-	size_t DeviceIndex() const;
 
 	size_t m_Calls;
 	OpenCLWrapper m_Wrapper;

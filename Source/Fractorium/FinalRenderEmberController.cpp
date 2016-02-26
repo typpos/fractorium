@@ -931,6 +931,85 @@ void FinalRenderEmberController<T>::SetProgressComplete(int val)
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderAccumProgress,		"setValue", Qt::QueuedConnection, Q_ARG(int, val));
 }
 
+/// <summary>
+/// Check if the amount of required memory is greater than that available on
+/// all required OpenCL devices. Also check if enough space is available for the max allocation.
+/// No check is done for CPU renders.
+/// Report errors if not enough memory is available for any of the selected devices.
+/// </summary>
+/// <returns>A string with an error report if required memory exceeds available memory on any device, else empty string.</returns>
+template <typename T>
+QString FinalRenderEmberController<T>::CheckMemory(const tuple<size_t, size_t, size_t>& p)
+{
+	bool error = false;
+	QString s;
+	size_t histSize = get<0>(p);
+	size_t totalSize = get<1>(p);
+	auto& selectedDevices = m_FinalRenderDialog->Devices();
+	static vector<RendererCL<T, float>*> clRenderers;
+	clRenderers.clear();
+
+	//Find all OpenCL renderers currently being used and place them in a vector of pointers.
+	if (m_FinalRenderDialog->DoSequence())
+	{
+		for (auto& r : m_Renderers)
+			if (auto clr = dynamic_cast<RendererCL<T, float>*>(r.get()))
+				clRenderers.push_back(clr);
+	}
+	else
+	{
+		if (auto clr = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get()))
+			clRenderers.push_back(clr);
+	}
+
+	//Iterate through each renderer and examine each device it's using.
+	for (auto r : clRenderers)
+	{
+		auto& devices = r->Devices();
+
+		for (auto& d : devices)
+		{
+			auto& wrapper = d->m_Wrapper;
+			auto index = wrapper.TotalDeviceIndex();
+
+			if (selectedDevices.contains(int(index)))
+			{
+				bool err = false;
+				QString temp;
+				size_t maxAlloc = wrapper.MaxAllocSize();
+				size_t totalAvail = wrapper.GlobalMemSize();
+
+				if (histSize > maxAlloc)
+				{
+					err = true;
+					temp = "Histogram/Accumulator memory size of " + ToString<qulonglong>(histSize) +
+						   " is greater than the max OpenCL allocation size of " + ToString<qulonglong>(maxAlloc);
+				}
+
+				if (totalSize > totalAvail)
+				{
+					if (err)
+						temp += "\n\n";
+
+					temp += "Total required memory size of " + ToString<qulonglong>(totalSize) +
+							" is greater than the max OpenCL available memory of " + ToString<qulonglong>(totalAvail);
+				}
+
+				if (!temp.isEmpty())
+				{
+					error = true;
+					s += QString::fromStdString(wrapper.DeviceName()) + ":\n" + temp + "\n\n";
+				}
+			}
+		}
+	}
+
+	if (!s.isEmpty())
+		s += "Rendering will most likely fail.";
+
+	return s;
+}
+
 template class FinalRenderEmberController<float>;
 
 #ifdef DO_DOUBLE

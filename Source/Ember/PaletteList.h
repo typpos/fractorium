@@ -57,6 +57,13 @@ public:
 					palettes.first->second.reserve(buf.size() / 2048);//Roughly what it takes per palette.
 					ParsePalettes(rootNode, pfilename, palettes.first->second);
 					xmlFreeDoc(doc);
+
+					if (palettes.first->second.empty())
+					{
+						added = false;//Reading failed, likely not a valid palette file.
+						s_Palettes.erase(filename);
+						AddToReport(string(loc) + " : Couldn't parse xml doc");
+					}
 				}
 				else
 				{

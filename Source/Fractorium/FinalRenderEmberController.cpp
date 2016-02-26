@@ -945,7 +945,7 @@ QString FinalRenderEmberController<T>::CheckMemory(const tuple<size_t, size_t, s
 	QString s;
 	size_t histSize = get<0>(p);
 	size_t totalSize = get<1>(p);
-	auto& selectedDevices = m_FinalRenderDialog->Devices();
+	auto selectedDevices = m_FinalRenderDialog->Devices();
 	static vector<RendererCL<T, float>*> clRenderers;
 	clRenderers.clear();
 

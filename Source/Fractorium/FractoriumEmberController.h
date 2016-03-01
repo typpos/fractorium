@@ -173,6 +173,7 @@ public:
 	virtual void ResetXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
 	double LockedScale() { return m_LockedScale; }
+	void LockedScale(double scale) { m_LockedScale = scale; }
 	virtual void LockAffineScaleCheckBoxStateChanged(int state) { }
 
 	//Xforms Color.

@@ -352,7 +352,6 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	string filename = "last.flame";
 	writer.Save(filename.c_str(), m_Ember, 0, true, false, true);
 	m_GLController->ResetMouseState();
-	m_Fractorium->ui.LockAffineCheckBox->setChecked(false);
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 	FillParamTablesAndPalette();
 	FillSummary();

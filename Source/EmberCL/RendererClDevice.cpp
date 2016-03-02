@@ -12,7 +12,7 @@ namespace EmberCLns
 /// <param name="device">The index device of the device to use</param>
 /// <param name="shared">True if shared with OpenGL, else false.</param>
 /// <returns>True if success, else false.</returns>
-RendererClDevice::RendererClDevice(bool doublePrec, size_t platform, size_t device, bool shared)
+RendererClDevice::RendererClDevice(size_t platform, size_t device, bool shared)
 {
 	m_Init = false;
 	m_Shared = shared;

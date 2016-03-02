@@ -119,7 +119,7 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 	{
 		try
 		{
-			unique_ptr<RendererClDevice> cld(new RendererClDevice(typeid(T) == typeid(double), devices[i].first, devices[i].second, i == 0 ? shared : false));
+			unique_ptr<RendererClDevice> cld(new RendererClDevice(devices[i].first, devices[i].second, i == 0 ? shared : false));
 
 			if ((b = cld->Init()))//Build a simple program to ensure OpenCL is working right.
 			{

@@ -1,4 +1,4 @@
-#ifdef WIN32
+#ifdef _WIN32
 	#pragma once
 #endif
 
@@ -8,8 +8,10 @@
 
 #define NOMINMAX
 #define _USE_MATH_DEFINES
+#define __TBB_NO_IMPLICIT_LINKAGE 1//Prevent tbb from automatically looking for tbb_debug.lib. We only care about the release tbb.lib/dll.
 
 #ifdef _WIN32
+	#pragma warning(disable : 4251; disable : 4661; disable : 4100)
 	#define basename(x) _strdup(x)
 	#define snprintf _snprintf
 	#define snprintf_s _snprintf_s

@@ -18,6 +18,9 @@
     <Filter Include="Header Files\Variations">
       <UniqueIdentifier>{1ae77918-b5ee-4186-9fec-802fed55144e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{782f9ed7-c2d4-4cad-9676-f707ccde10a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Ember\Timing.h">
@@ -125,6 +128,9 @@
     <ClInclude Include="..\..\..\Source\Ember\Variations07.h">
       <Filter>Header Files\Variations</Filter>
     </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Ember\DllMain.cpp">
@@ -150,6 +156,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Ember.rc" />
+    <ResourceCompile Include="Ember.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

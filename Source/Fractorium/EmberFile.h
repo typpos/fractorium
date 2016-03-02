@@ -106,8 +106,6 @@ public:
 	/// </summary>
 	void MakeNamesUnique()
 	{
-		int x = 0;
-
 		for (size_t i = 0; i < m_Embers.size(); i++)
 		{
 			for (size_t j = 0; j < m_Embers.size(); j++)
@@ -169,7 +167,6 @@ public:
 		if (!QFile::exists(filename))
 			return filename;
 
-		int counter = 2;
 		QString newPath;
 		QFileInfo original(filename);
 		QString path = original.absolutePath() + '/';

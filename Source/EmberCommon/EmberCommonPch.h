@@ -1,5 +1,5 @@
-#ifdef WIN32
-    #pragma once
+#ifdef _WIN32
+	#pragma once
 #endif
 
 /// <summary>
@@ -11,19 +11,20 @@
 #define _USE_MATH_DEFINES
 
 #ifdef _WIN32
-#include <SDKDDKVer.h>
-#include <windows.h>
-#include <winsock.h>//For htons().
-#include <BaseTsd.h>
-#include <crtdbg.h>
-#include <tchar.h>
-#define snprintf _snprintf
+	#pragma warning(disable : 4251; disable : 4661; disable : 4100)
+	#include <SDKDDKVer.h>
+	#include <windows.h>
+	#include <winsock.h>//For htons().
+	#include <BaseTsd.h>
+	#include <crtdbg.h>
+	#include <tchar.h>
+	#define snprintf _snprintf
 #else
-#include <arpa/inet.h>
-#define _TCHAR char
-#define _tmain main
-#define _T
-#define fprintf_s fprintf
+	#include <arpa/inet.h>
+	#define _TCHAR char
+	#define _tmain main
+	#define _T
+	#define fprintf_s fprintf
 #endif
 
 #include <iostream>

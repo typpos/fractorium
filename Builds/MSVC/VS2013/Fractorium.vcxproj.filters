@@ -48,11 +48,6 @@
     <Filter Include="Controllers">
       <UniqueIdentifier>{811962f9-51c1-48ba-a9da-f5ce981aea71}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Generated Files\ReleaseNvidia">
-      <UniqueIdentifier>{52886ad8-fa57-4c60-b799-7c648147b7f1}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
-    </Filter>
     <Filter Include="Dialogs\Qss">
       <UniqueIdentifier>{5ba9fccd-8922-4037-956f-d57177a43700}</UniqueIdentifier>
     </Filter>
@@ -133,116 +128,8 @@
     <ClCompile Include="..\..\..\Source\Fractorium\GLEmberController.cpp">
       <Filter>Controllers</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_TableWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_TableWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_TableWidget.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_StealthComboBox.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_StealthComboBox.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_StealthComboBox.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_SpinBox.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_SpinBox.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_SpinBox.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_OptionsDialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_OptionsDialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_OptionsDialog.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_GLWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_GLWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_GLWidget.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_FractoriumSettings.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_FractoriumSettings.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_FractoriumSettings.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_Fractorium.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_Fractorium.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_Fractorium.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_FinalRenderDialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_FinalRenderDialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_FinalRenderDialog.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_DoubleSpinBox.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_DoubleSpinBox.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_DoubleSpinBox.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_AboutDialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_AboutDialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_AboutDialog.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_TwoButtonComboWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_TwoButtonComboWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_TwoButtonComboWidget.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Fractorium\CurvesGraphicsView.cpp">
       <Filter>Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CurvesGraphicsView.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CurvesGraphicsView.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_CurvesGraphicsView.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Fractorium\FractoriumXaos.cpp">
       <Filter>MainWindows</Filter>
@@ -250,35 +137,8 @@
     <ClCompile Include="..\..\..\Source\Fractorium\FractoriumXformsSelect.cpp">
       <Filter>MainWindows</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_DoubleSpinBoxTableItemDelegate.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_DoubleSpinBoxTableItemDelegate.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_DoubleSpinBoxTableItemDelegate.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Source\Fractorium\VariationsDialog.cpp">
       <Filter>Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_VariationsDialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_VariationsDialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_VariationsDialog.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_QssDialog.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_QssDialog.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_QssDialog.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Fractorium\QssDialog.cpp">
       <Filter>Dialogs\Qss</Filter>
@@ -292,17 +152,98 @@
     <ClCompile Include="..\..\..\Source\Fractorium\QssTextEdit.cpp">
       <Filter>Dialogs\Qss</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\qcssscanner.cpp">
+      <Filter>Dialogs\Qss</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_VariationsDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_VariationsDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TwoButtonComboWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TwoButtonComboWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TableWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TableWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_StealthComboBox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_StealthComboBox.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SpinBox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SpinBox.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_QssTextEdit.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_QssTextEdit.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_QssTextEdit.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
+    <ClCompile Include="GeneratedFiles\Debug\moc_QssDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\Fractorium\qcssscanner.cpp">
-      <Filter>Dialogs\Qss</Filter>
+    <ClCompile Include="GeneratedFiles\Release\moc_QssDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_OptionsDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_OptionsDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_GLWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_GLWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_FractoriumSettings.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_FractoriumSettings.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_Fractorium.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_Fractorium.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_FinalRenderDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_FinalRenderDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DoubleSpinBoxTableItemDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DoubleSpinBoxTableItemDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DoubleSpinBox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DoubleSpinBox.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CurvesGraphicsView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CurvesGraphicsView.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_csshighlighter.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -310,8 +251,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_csshighlighter.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\ReleaseNvidia\moc_csshighlighter.cpp">
-      <Filter>Generated Files\ReleaseNvidia</Filter>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AboutDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AboutDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -451,11 +395,11 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\Source\Fractorium\Fractorium.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <None Include="..\..\..\Source\Fractorium\Icons\Fractorium.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Source\Fractorium\Icons\Fractorium.ico" />
+    <ResourceCompile Include="Fractorium.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

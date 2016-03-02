@@ -54,7 +54,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\Source\EmberGenome\EmberGenome.rc">
+    <ResourceCompile Include="EmberGenome.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

@@ -59,7 +59,6 @@ void GLWidget::InitGL()
 /// </summary>
 void GLWidget::DrawQuad()
 {
-	GLint texWidth = 0, texHeight = 0;
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -417,9 +416,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 {
 	v3T mouseFlipped(e->x() * m_GL->devicePixelRatio(), m_Viewport[3] - e->y() * m_GL->devicePixelRatio(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	auto ember = m_FractoriumEmberController->CurrentEmber();
-	auto xforms = ember->TotalXformCount();
 	auto renderer = m_FractoriumEmberController->Renderer();
-	size_t i = 0;
 
 	//Ensure everything has been initialized.
 	if (!renderer)

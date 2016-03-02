@@ -92,7 +92,7 @@ static inline size_t NowMs()
 //#define ISAAC_FLAM3_DEBUG 1//This is almost never needed, but is very useful when troubleshooting difficult bugs. Enable it to do a side by side comparison with flam3.
 
 //These two must always match.
-#ifdef WIN32
+#ifdef _WIN32
 	#define ALIGN __declspec(align(16))
 #else
 	#define ALIGN __attribute__ ((aligned (16)))

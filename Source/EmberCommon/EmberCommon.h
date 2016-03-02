@@ -115,7 +115,7 @@ static bool InitPaletteList(const string& filename)
 	static vector<string> paths =
 	{
 		"./",
-#ifndef WIN32
+#ifndef _WIN32
 		"~/.fractorium",
 		"~/.config/fractorium",
 		"/usr/share/fractorium",

@@ -22,7 +22,6 @@ static bool WritePpm(const char* filename, byte* image, size_t width, size_t hei
 	{
 		fprintf_s(file, "P6\n");
 		fprintf_s(file, "%lu %lu\n255\n", width, height);
-
 		b = (size == fwrite(image, 1, size, file));
 		fclose(file);
 	}
@@ -57,14 +56,12 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		char nickString[64], urlString[128], idString[128];
 		char bvString[64], niString[64], rtString[64];
 		char genomeString[65536], verString[64];
-
 		//Create the mandatory comment strings.
 		snprintf_s(genomeString, 65536, "flam3_genome: %s", comments.m_Genome.c_str());
 		snprintf_s(bvString, 64, "flam3_error_rate: %s", comments.m_Badvals.c_str());
 		snprintf_s(niString, 64, "flam3_samples: %s", comments.m_NumIters.c_str());
 		snprintf_s(rtString, 64, "flam3_time: %s", comments.m_Runtime.c_str());
 		snprintf_s(verString, 64, "flam3_version: %s", EmberVersion());
-
 		info.err = jpeg_std_error(&jerr);
 		jpeg_create_compress(&info);
 		jpeg_stdio_dest(&info, file);
@@ -73,15 +70,16 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		info.image_width = JDIMENSION(width);
 		info.image_height = JDIMENSION(height);
 		jpeg_set_defaults(&info);
-    #ifdef _WIN32
-        jpeg_set_quality(&info, quality, static_cast<boolean>(TRUE));
-        jpeg_start_compress(&info, static_cast<boolean>(TRUE));
-        //Win32:TRUE is defined in MSVC2013\Windows Kits\8.1\Include\shared\minwindef.h:"#define TRUE                1"
-        //cast from int to boolean in External/libjpeg/jmorecfg.h:"typedef enum  { FALSE = 0, TRUE =1  } boolean;"
-    #else
-        jpeg_set_quality(&info, quality, TRUE);
-        jpeg_start_compress(&info, TRUE);
-    #endif
+#ifdef _WIN32
+		jpeg_set_quality(&info, quality, static_cast<boolean>(TRUE));
+		jpeg_start_compress(&info, static_cast<boolean>(TRUE));
+		//Win32:TRUE is defined in MSVC2013\Windows Kits\8.1\Include\shared\minwindef.h:"#define TRUE                1"
+		//cast from int to boolean in External/libjpeg/jmorecfg.h:"typedef enum  { FALSE = 0, TRUE =1  } boolean;"
+#else
+		jpeg_set_quality(&info, quality, TRUE);
+		jpeg_start_compress(&info, TRUE);
+#endif
+
 		//Write comments to jpeg.
 		if (enableComments)
 		{
@@ -154,35 +152,27 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 		size_t i;
 		glm::uint16 testbe = 1;
 		vector<byte*> rows(height);
-
 		text[0].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[0].key = const_cast<png_charp>("flam3_version");
 		text[0].text = const_cast<png_charp>(EmberVersion());
-
 		text[1].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[1].key = const_cast<png_charp>("flam3_nickname");
 		text[1].text = const_cast<png_charp>(nick.c_str());
-
 		text[2].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[2].key = const_cast<png_charp>("flam3_url");
 		text[2].text = const_cast<png_charp>(url.c_str());
-
 		text[3].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[3].key = const_cast<png_charp>("flam3_id");
 		text[3].text = const_cast<png_charp>(id.c_str());
-
 		text[4].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[4].key = const_cast<png_charp>("flam3_error_rate");
 		text[4].text = const_cast<png_charp>(comments.m_Badvals.c_str());
-
 		text[5].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[5].key = const_cast<png_charp>("flam3_samples");
 		text[5].text = const_cast<png_charp>(comments.m_NumIters.c_str());
-
 		text[6].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[6].key = const_cast<png_charp>("flam3_time");
 		text[6].text = const_cast<png_charp>(comments.m_Runtime.c_str());
-
 		text[7].compression = PNG_TEXT_COMPRESSION_zTXt;
 		text[7].key = const_cast<png_charp>("flam3_genome");
 		text[7].text = const_cast<png_charp>(comments.m_Genome.c_str());
@@ -202,12 +192,11 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 		}
 
 		png_init_io(png_ptr, file);
-
 		png_set_IHDR(png_ptr, info_ptr, png_uint_32(width), png_uint_32(height), 8 * png_uint_32(bytesPerChannel),
-			PNG_COLOR_TYPE_RGBA,
-			PNG_INTERLACE_NONE,
-			PNG_COMPRESSION_TYPE_BASE,
-			PNG_FILTER_TYPE_BASE);
+					 PNG_COLOR_TYPE_RGBA,
+					 PNG_INTERLACE_NONE,
+					 PNG_COMPRESSION_TYPE_BASE,
+					 PNG_FILTER_TYPE_BASE);
 
 		if (enableComments == 1)
 			png_set_text(png_ptr, info_ptr, text, PNG_COMMENT_MAX);
@@ -245,18 +234,17 @@ static byte* ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, si
 
 	size_t padding = 0;
 	size_t scanlinebytes = width * 3;
+
 	while ((scanlinebytes + padding ) % 4 != 0)
 		padding++;
 
 	size_t psw = scanlinebytes + padding;
-
 	newSize = height * psw;
 	byte* newBuf = new byte[newSize];
 
 	if (newBuf)
 	{
 		memset (newBuf, 0, newSize);
-
 		size_t bufpos = 0;
 		size_t newpos = 0;
 
@@ -266,10 +254,9 @@ static byte* ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, si
 			{
 				bufpos = y * 3 * width + x;     // position in original buffer
 				newpos = (height - y - 1) * psw + x; // position in padded buffer
-				newBuf[newpos] = buffer[bufpos+2];       // swap r and b
+				newBuf[newpos] = buffer[bufpos + 2];     // swap r and b
 				newBuf[newpos + 1] = buffer[bufpos + 1]; // g stays
 				newBuf[newpos + 2] = buffer[bufpos];     // swap b and r
-
 				//No swap.
 				//newBuf[newpos] = buffer[bufpos];
 				//newBuf[newpos + 1] = buffer[bufpos + 1];
@@ -294,20 +281,18 @@ static byte* ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, si
 /// <returns>True if success, else false</returns>
 static bool SaveBmp(const char* filename, byte* image, size_t width, size_t height, size_t paddedSize)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	BITMAPFILEHEADER bmfh;
 	BITMAPINFOHEADER info;
 	DWORD bwritten;
 	HANDLE file;
 	memset (&bmfh, 0, sizeof (BITMAPFILEHEADER));
 	memset (&info, 0, sizeof (BITMAPINFOHEADER));
-
 	bmfh.bfType = 0x4d42;       // 0x4d42 = 'BM'
 	bmfh.bfReserved1 = 0;
 	bmfh.bfReserved2 = 0;
 	bmfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (DWORD)paddedSize;
 	bmfh.bfOffBits = 0x36;
-
 	info.biSize = sizeof(BITMAPINFOHEADER);
 	info.biWidth = (LONG)width;
 	info.biHeight = (LONG)height;

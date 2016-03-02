@@ -54,7 +54,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\Source\EmberRender\EmberRender.rc">
+    <ResourceCompile Include="EmberRender.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

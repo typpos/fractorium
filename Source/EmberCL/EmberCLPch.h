@@ -1,4 +1,4 @@
-#ifdef WIN32
+#ifdef _WIN32
 	#pragma once
 #endif
 
@@ -14,6 +14,7 @@
 #include "Renderer.h"
 
 #if defined(_WIN32)
+	#pragma warning(disable : 4251; disable : 4661; disable : 4100)
 	#include <windows.h>
 	#include <SDKDDKVer.h>
 	#include "GL/gl.h"

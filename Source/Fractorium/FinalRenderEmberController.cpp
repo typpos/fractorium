@@ -460,7 +460,6 @@ template <typename T>
 bool FinalRenderEmberController<T>::CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared)
 {
 	bool ok = true;
-	bool deviceDiff = false;
 	//uint channels = m_FinalRenderDialog->Ext().endsWith("png", Qt::CaseInsensitive) ? 4 : 3;
 	bool renderTypeMismatch = (m_Renderer.get() && (m_Renderer->RendererType() != renderType)) ||
 							  (!m_Renderers.empty() && (m_Renderers[0]->RendererType() != renderType));

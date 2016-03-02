@@ -6,7 +6,7 @@
 /// </summary>
 void Fractorium::InitXformsAffineUI()
 {
-	int row = 0, affinePrec = 6, spinHeight = 20;
+	int affinePrec = 6, spinHeight = 20;
 	double affineStep = 0.01, affineMin = std::numeric_limits<double>::lowest(), affineMax = std::numeric_limits<double>::max();
 	auto table = ui.PreAffineTable;
 	connect(ui.LockAffineCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnLockAffineScaleCheckBoxStateChanged(int)), Qt::QueuedConnection);
@@ -95,7 +95,7 @@ void Fractorium::InitXformsAffineUI()
 	connect(ui.ShowPostAffineAllRadio,     SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.ShowPostAffineCurrentRadio, SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.PolarAffineCheckBox,        SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)),		  Qt::QueuedConnection);
-#ifndef WIN32
+#ifndef _WIN32
 	//For some reason linux makes these 24x24, even though the designer explicitly says 16x16.
 	//Also, in order to get 4 pixels of spacing between elements in the grid layout, 0 must be specified.
 	ui.PreFlipHorizontalButton->setIconSize(QSize(16, 16));

@@ -446,9 +446,9 @@ const Variation<T>* VariationList<T>::GetVariation(size_t index, eVariationType 
 /// <param name="weight">The weight to assign the new copy. Default: 1</param>
 /// <returns>A pointer to the variation at the index if in range, else nullptr.</returns>
 template <typename T>
-Variation<T>* VariationList<T>::GetVariationCopy(size_t index, T weight = 1) const { return MakeCopyWithWeight(GetVariation(index), weight); }
+Variation<T>* VariationList<T>::GetVariationCopy(size_t index, T weight) const { return MakeCopyWithWeight(GetVariation(index), weight); }
 template <typename T>
-Variation<T>* VariationList<T>::GetVariationCopy(size_t index, eVariationType varType, T weight = 1) const { return MakeCopyWithWeight(GetVariation(index, varType), weight); }
+Variation<T>* VariationList<T>::GetVariationCopy(size_t index, eVariationType varType, T weight) const { return MakeCopyWithWeight(GetVariation(index, varType), weight); }
 
 /// <summary>
 /// Get a pointer to the variation with the specified ID.
@@ -473,7 +473,7 @@ const Variation<T>* VariationList<T>::GetVariation(eVariationId id) const
 /// <param name="weight">The weight to assign the new copy. Default: 1</param>
 /// <returns>A pointer to the variation with a matching ID, else nullptr.</returns>
 template <typename T>
-Variation<T>* VariationList<T>::GetVariationCopy(eVariationId id, T weight = 1) const { return MakeCopyWithWeight(GetVariation(id), weight); }
+Variation<T>* VariationList<T>::GetVariationCopy(eVariationId id, T weight) const { return MakeCopyWithWeight(GetVariation(id), weight); }
 
 /// <summary>
 /// Get a pointer to the variation with the specified name.
@@ -498,7 +498,7 @@ const Variation<T>* VariationList<T>::GetVariation(const string& name) const
 /// <param name="weight">The weight to assign the new copy. Default: 1</param>
 /// <returns>A pointer to the variation with a matching name, else nullptr.</returns>
 template <typename T>
-Variation<T>* VariationList<T>::GetVariationCopy(const string& name, T weight = 1) const { return MakeCopyWithWeight(GetVariation(name), weight); }
+Variation<T>* VariationList<T>::GetVariationCopy(const string& name, T weight) const { return MakeCopyWithWeight(GetVariation(name), weight); }
 
 /// <summary>
 /// Get a parametric variation at the specified index.

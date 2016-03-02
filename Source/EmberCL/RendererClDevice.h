@@ -18,7 +18,7 @@ namespace EmberCLns
 class EMBERCL_API RendererClDevice : public EmberReport
 {
 public:
-	RendererClDevice(bool doublePrec, size_t platform, size_t device, bool shared);
+	RendererClDevice(size_t platform, size_t device, bool shared);
 	bool Init();
 	bool Ok() const;
 	bool Shared() const;

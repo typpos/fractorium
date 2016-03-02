@@ -17,7 +17,6 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 	int row = 0, spinHeight = 20;
 	double dmax = numeric_limits<double>::max();
 	QTableWidget* table = ui.FinalRenderParamsTable;
-	QTableWidgetItem* item = nullptr;
 	m_Info = OpenCLInfo::Instance();
 	m_Fractorium = qobject_cast<Fractorium*>(p);
 	m_Settings = settings;
@@ -532,14 +531,12 @@ void FractoriumFinalRenderDialog::OnStripsChanged(int d)
 }
 
 /// <summary>
-/// If a single ember is being rendered, show the save file dialog.
-/// If a more than one is being rendered, show the save folder dialog.
+/// Show the save folder dialog.
 /// Called when the ... file button is clicked.
 /// </summary>
 /// <param name="checked">Ignored</param>
 void FractoriumFinalRenderDialog::OnFileButtonClicked(bool checked)
 {
-	bool doAll = ui.FinalRenderDoAllCheckBox->isChecked();
 	QString s = m_Fractorium->SetupSaveFolderDialog();
 
 	if (Exists(s))
@@ -684,7 +681,6 @@ void FractoriumFinalRenderDialog::reject()
 /// <returns>True if successful, else false.</returns>
 bool FractoriumFinalRenderDialog::CreateControllerFromGUI(bool createRenderer)
 {
-	bool ok = true;
 	int index = Current() - 1;
 #ifdef DO_DOUBLE
 	size_t elementSize = Double() ? sizeof(double) : sizeof(float);

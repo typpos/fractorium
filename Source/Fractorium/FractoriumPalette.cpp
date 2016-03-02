@@ -81,7 +81,6 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 	if (!s.empty())//This occasionally seems to get called with an empty string for reasons unknown.
 	{
 		auto paletteTable = m_Fractorium->ui.PaletteListTable;
-		auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
 		m_CurrentPaletteFilePath = m_Fractorium->ui.PaletteFilenameCombo->property("path").toString().toStdString() + "/" + s;
 
 		if (int paletteSize = int(m_PaletteList.Size(m_CurrentPaletteFilePath)))
@@ -139,7 +138,6 @@ void Fractorium::OnPaletteFilenameComboChanged(const QString& text)
 template <typename T>
 void FractoriumEmberController<T>::ApplyPaletteToEmber()
 {
-	int rot = 0;
 	uint blur = m_Fractorium->m_PaletteBlurSpin->value();
 	uint freq = m_Fractorium->m_PaletteFrequencySpin->value();
 	double sat = double(m_Fractorium->m_PaletteSaturationSpin->value() / 100.0);

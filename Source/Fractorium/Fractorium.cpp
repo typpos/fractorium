@@ -17,7 +17,7 @@
 Fractorium::Fractorium(QWidget* p)
 	: QMainWindow(p)
 {
-	int spinHeight = 20, iconSize_ = 9;
+	int iconSize_ = 9;
 	size_t i = 0;
 	string s;
 	Timing t;

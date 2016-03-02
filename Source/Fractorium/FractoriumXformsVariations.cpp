@@ -201,7 +201,6 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 	auto objSender = m_Fractorium->sender();
 	auto tree = m_Fractorium->ui.VariationsTree;
 	auto sender = dynamic_cast<VariationTreeDoubleSpinBox*>(objSender);
-	auto xform = m_Ember.GetTotalXform(m_Fractorium->ui.CurrentXformCombo->currentIndex());//Will retrieve normal xform or final if needed.
 
 	if (sender)
 	{

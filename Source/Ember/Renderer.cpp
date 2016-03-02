@@ -1260,7 +1260,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 	parallel_for(size_t(0), m_ThreadsToUse, [&] (size_t threadIndex)
 	{
 #endif
-#if defined(WIN32)
+#if defined(_WIN32)
 			SetThreadPriority(GetCurrentThread(), int(m_Priority));
 #elif defined(__APPLE__)
 			sched_param sp = {0};

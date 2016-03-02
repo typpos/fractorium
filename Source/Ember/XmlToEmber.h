@@ -442,7 +442,7 @@ public:
 	static string Itos(int i, int radix = 10)
 	{
 		char ch[16];
-#ifdef WIN32
+#ifdef _WIN32
 		_itoa_s(i, ch, 16, radix);
 #else
 		sprintf(ch, "%d", i);
@@ -460,7 +460,7 @@ public:
 	static string Itos64(size_t i, int radix = 10)
 	{
 		char ch[64];
-#ifdef WIN32
+#ifdef _WIN32
 		_ui64toa_s(i, ch, 64, radix);
 #else
 		sprintf(ch, "%lu", i);
@@ -1495,7 +1495,7 @@ private:
 		}
 		while (colorCount < numColors && colorCount < ember.m_Palette.m_Entries.size());
 
-#ifdef WIN32
+#ifdef _WIN32
 
 		if (sscanf_s(&(colstr[colorIndex]), "%1s", tmps, sizeof(tmps)) > 0) //Really need to migrate all of this parsing to C++.//TODO
 #else

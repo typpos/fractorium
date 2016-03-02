@@ -28,7 +28,7 @@ void Fractorium::InitXformsUI()
 	ui.XformWeightNameTable->setItem(0, 1, new QTableWidgetItem());
 	connect(ui.XformWeightNameTable, SIGNAL(cellChanged(int, int)), this, SLOT(OnXformNameChanged(int, int)), Qt::QueuedConnection);
 	ui.CurrentXformCombo->setProperty("soloxform", -1);
-#ifndef WIN32
+#ifndef _WIN32
 	//For some reason linux makes these 24x24, even though the designer explicitly says 16x16.
 	ui.AddXformButton->setIconSize(QSize(16, 16));
 	ui.DuplicateXformButton->setIconSize(QSize(16, 16));
@@ -173,8 +173,6 @@ void FractoriumEmberController<T>::DuplicateXform()
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
 	Update([&]()
 	{
-		auto combo = m_Fractorium->ui.CurrentXformCombo;
-
 		for (auto& it : vec)
 			m_Ember.AddXform(it);
 
@@ -213,7 +211,7 @@ void Fractorium::OnClearXformButtonClicked(bool checked) { m_Controller->ClearXf
 template <typename T>
 void FractoriumEmberController<T>::DeleteXforms()
 {
-	int i = 0, offset = 0, current = 0, checked = 0;
+	int offset = 0, current = 0, checked = 0;
 	bool haveFinal = false;
 	size_t count;
 	auto combo = m_Fractorium->ui.CurrentXformCombo;
@@ -281,7 +279,6 @@ void FractoriumEmberController<T>::AddFinalXform()
 		Update([&]()
 		{
 			Xform<T> final;
-			auto combo = m_Fractorium->ui.CurrentXformCombo;
 			final.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));//Just a placeholder so other parts of the code don't see it as being empty.
 			m_Ember.SetFinalXform(final);
 			int index = int(m_Ember.TotalXformCount() - 1);//Set index to the last item.

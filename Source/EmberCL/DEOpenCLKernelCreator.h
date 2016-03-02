@@ -41,7 +41,7 @@ public:
 
 	//Miscellaneous static functions.
 	static uint MaxDEFilterSize();
-	static double SolveMaxDERad(uint maxBoxSize, double desiredFilterSize, double ss);
+	static double SolveMaxDERad(double desiredFilterSize, double ss);
 	static uint SolveMaxBoxSize(uint localMem);
 
 private:

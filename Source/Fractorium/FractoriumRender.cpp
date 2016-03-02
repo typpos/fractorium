@@ -651,7 +651,6 @@ bool Fractorium::CreateRendererFromOptions()
 /// <returns>True if successful, else false.</returns>
 bool Fractorium::CreateControllerFromOptions()
 {
-	bool ok = true;
 	size_t elementSize =
 #ifdef DO_DOUBLE
 		m_Settings->Double() ? sizeof(double) :
@@ -666,6 +665,7 @@ bool Fractorium::CreateControllerFromOptions()
 		auto con = m_PaletteContrastSpin->value();
 		auto blur = m_PaletteBlurSpin->value();
 		auto freq = m_PaletteFrequencySpin->value();
+		double scale;
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efd;
@@ -680,6 +680,7 @@ bool Fractorium::CreateControllerFromOptions()
 		//First check if a controller has already been created, and if so, save its embers and gracefully shut it down.
 		if (m_Controller.get())
 		{
+			scale = m_Controller->LockedScale();
 			m_Controller->StopPreviewRender();//Must stop any previews first, else changing controllers will crash the program.
 			m_Controller->CopyTempPalette(tempPalette);//Convert float to double or save double verbatim;
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
@@ -709,6 +710,7 @@ bool Fractorium::CreateControllerFromOptions()
 			ed.m_Palette = tempPalette;//Restore base temp palette. Adjustments will be then be applied and stored back in in m_Ember.m_Palette below.
 			m_Controller->SetEmber(ed);//Convert float to double or set double verbatim. This will assign m_Ember.m_Palette (which was just tempPalette) to m_TempPalette.
 			m_Controller->SetEmberFile(efd);
+			m_Controller->LockedScale(scale);
 			//Setting these and updating the GUI overwrites the work of clearing them done in SetEmber() above.
 			//It's a corner case, but doesn't seem to matter.
 			m_PaletteHueSpin->SetValueStealth(hue);

@@ -140,9 +140,6 @@
       <Component Id="EmberCL.dll" Guid="21c0e372-c605-4e0d-9ba8-94e38949833b">
         <File Id="EmberCL.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\$(var.Configuration)\EmberCL.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
       </Component>
-      <Component Id="libpng16.dll" Guid="0a1605f8-e041-45a3-956b-10efdfa9da20">
-        <File Id="libpng16.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\libpng16.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
-      </Component>
       <Component Id="libxml2.dll" Guid="bb3aa687-7a3d-4d16-a27c-28529b472754">
         <File Id="libxml2.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\libxml2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
       </Component>

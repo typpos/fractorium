@@ -376,7 +376,7 @@ static QString BaseStyle()
 		   "This is needed to deal with the large tabs in the fusion theme which is the default on Linux, and optional on Windows.\n"
 		   "It's not needed for other themes."
 		   "You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/\n"
-#ifndef WIN32
+#ifndef _WIN32
 		   "QTabBar::tab { height: 3ex; }\n\n"
 #else
 		   "QTabBar::tab { height: 5ex; }\n\n"

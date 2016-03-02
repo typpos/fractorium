@@ -239,7 +239,7 @@ bool RendererBase::Ok() const
 size_t RendererBase::MemoryAvailable()
 {
 	size_t memAvailable = 0;
-#ifdef WIN32
+#ifdef _WIN32
 	MEMORYSTATUSEX stat;
 	stat.dwLength = sizeof(stat);
 	GlobalMemoryStatusEx(&stat);

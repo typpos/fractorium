@@ -54,8 +54,8 @@ public:
 	/// </summary>
 	/// <param name="ember">The Ember object to copy</param>
 	Ember(const Ember<T>& ember)
-		: m_VariationList(VariationList<T>::Instance()),
-		  m_Edits(nullptr)
+		: m_Edits(nullptr),
+		  m_VariationList(VariationList<T>::Instance())
 	{
 		Ember<T>::operator=<T>(ember);
 	}
@@ -66,8 +66,8 @@ public:
 	/// <param name="ember">The Ember object to copy</param>
 	template <typename U>
 	Ember(const Ember<U>& ember)
-		: m_VariationList(VariationList<T>::Instance()),
-		  m_Edits(nullptr)
+		: m_Edits(nullptr),
+		  m_VariationList(VariationList<T>::Instance())
 	{
 		Ember<T>::operator=<U>(ember);
 	}

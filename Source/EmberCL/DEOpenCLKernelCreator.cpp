@@ -147,11 +147,10 @@ uint DEOpenCLKernelCreator::MaxDEFilterSize() { return 9; }//The true max would 
 /// size of up to 9: (20 - 1) / 2 == (19 / 2) == 9 could be supported.
 /// This function is deprecated, the appropriate kernels take care of this problem now.
 /// </summary>
-/// <param name="maxBoxSize">Maximum size of the box.</param>
 /// <param name="desiredFilterSize">Size of the desired filter.</param>
 /// <param name="ss">The supersample being used</param>
 /// <returns>The maximum filter radius allowed</returns>
-double DEOpenCLKernelCreator::SolveMaxDERad(uint maxBoxSize, double desiredFilterSize, double ss)
+double DEOpenCLKernelCreator::SolveMaxDERad(double desiredFilterSize, double ss)
 {
 	uint finalFilterSize = uint((ceil(desiredFilterSize) * ss) + (ss - 1.0));
 

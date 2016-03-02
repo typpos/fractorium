@@ -1,14 +1,15 @@
-#ifndef FRACTORIUM_PCH
-#define FRACTORIUM_PCH
+#ifndef FRACTORIUM_PCH_H
+#define FRACTORIUM_PCH_H//GCC doesn't like #pragma once
 
-#define GL_GLEXT_PROTOTYPES 1
 #define XFORM_COLOR_COUNT 14
 
-#undef QT_OPENGL_ES_2//Make absolutely sure OpenGL ES is not used.
-#define QT_NO_OPENGL_ES_2
+#ifdef _WIN32
+	#pragma warning(disable : 4251; disable : 4661; disable : 4100)
+#endif
 
-#ifndef WIN32
-#include <QtWidgets>
+//Has to come first on non-Windows platforms due to some weird naming collisions on *nix.
+#ifndef _WIN32
+	#include <QtWidgets>
 #endif
 
 #include "Renderer.h"
@@ -21,8 +22,8 @@
 #include "JpegUtils.h"
 #include "EmberCommon.h"
 
-#ifdef WIN32
-#include <QtWidgets>
+#ifdef _WIN32
+	#include <QtWidgets>
 #endif
 
 #include <deque>
@@ -77,12 +78,11 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#ifndef WIN32
-    #undef Bool
+#ifndef _WIN32
+	#undef Bool
 #endif
 
 using namespace std;
 using namespace EmberNs;
 using namespace EmberCLns;
-
 #endif

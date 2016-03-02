@@ -480,7 +480,6 @@ void FractoriumEmberController<T>::CopyAllXml()
 {
 	ostringstream os;
 	EmberToXml<T> emberToXml;
-	auto settings = m_Fractorium->m_Settings;
 	os << "<flames>\n";
 
 	for (auto& e : m_EmberFile.m_Embers)
@@ -693,7 +692,6 @@ void Fractorium::OnActionResetWorkspace(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::AddReflectiveSymmetry()
 {
-	auto combo = m_Fractorium->ui.CurrentXformCombo;
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-1, m_Rand);
@@ -711,7 +709,6 @@ void Fractorium::OnActionAddReflectiveSymmetry(bool checked) { m_Controller->Add
 template <typename T>
 void FractoriumEmberController<T>::AddRotationalSymmetry()
 {
-	auto combo = m_Fractorium->ui.CurrentXformCombo;
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(2, m_Rand);
@@ -729,7 +726,6 @@ void Fractorium::OnActionAddRotationalSymmetry(bool checked) { m_Controller->Add
 template <typename T>
 void FractoriumEmberController<T>::AddBothSymmetry()
 {
-	auto combo = m_Fractorium->ui.CurrentXformCombo;
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-2, m_Rand);

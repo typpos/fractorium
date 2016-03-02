@@ -348,7 +348,7 @@ public:
 		//Add the edit attributes.
 		//Date.
 		myTime = time(nullptr);
-#ifdef WIN32
+#ifdef _WIN32
 		tm localt;
 		localtime_s(&localt, &myTime);
 		strftime(timeString, 128, "%a %b %d %H:%M:%S %z %Y", &localt);//XXX use standard time format including timezone.

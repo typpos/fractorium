@@ -25,7 +25,7 @@ a=$(echo -n "$changelogVersion" | sed 's/[a-z]//g')
 b=$(echo -n "$emberVersion" | sed 's/[a-z]//g')
 
 if [[ "$a" != "$b" ]]; then
-    echo "Error: Different version numbers were found. Please update the correct file,
+	echo "Error: Different version numbers were found. Please update the correct file,
 the version numbers should agree up to the digits in:
 
 $changelogVersion
@@ -33,7 +33,7 @@ $emberVersion
 
 ./debian/changelog            : $a
 ./Source/Ember/EmberDefines.h : $b"
-    exit 2
+	exit 2
 fi
 
 VERSION=$changelogVersion
@@ -42,8 +42,8 @@ PPA_DIR="$HOME/PPA/$PROJECT-$VERSION"
 TAR_NAME="$PROJECT-$VERSION.tar.gz"
 
 if [ ! -d '.git' -o ! -f 'main.pro' ]; then
-    echo "Run `basename $0` from the project root."
-    exit 2
+	echo "Run `basename $0` from the project root."
+	exit 2
 fi
 
 # Make sure create-symlinks.sh will be executable.
@@ -55,40 +55,40 @@ OPT_BUILD_SOURCE=1
 OPT_SIGNED=1
 
 while [ $# -gt 0 ]; do
-    case "$1" in
-        --binary-only)       OPT_BUILD_SOURCE=0
-                             OPT_BUILD_BINARY=1
-                             ;;
-        --source-only)       OPT_BUILD_SOURCE=1
-                             OPT_BUILD_BINARY=0
-                             ;;
-        --source-and-binary) OPT_BUILD_SOURCE=1
-                             OPT_BUILD_BINARY=1
-                             ;;
-        --signed)            OPT_SIGNED=1
-                             ;;
-        --unsigned)          OPT_SIGNED=0
-                             ;;
-        -h|--help) echo "$USAGE"
-                   exit 0;;
-    esac
-    shift
+	case "$1" in
+		--binary-only)       OPT_BUILD_SOURCE=0
+							 OPT_BUILD_BINARY=1
+							 ;;
+		--source-only)       OPT_BUILD_SOURCE=1
+							 OPT_BUILD_BINARY=0
+							 ;;
+		--source-and-binary) OPT_BUILD_SOURCE=1
+							 OPT_BUILD_BINARY=1
+							 ;;
+		--signed)            OPT_SIGNED=1
+							 ;;
+		--unsigned)          OPT_SIGNED=0
+							 ;;
+		-h|--help) echo "$USAGE"
+				   exit 0;;
+	esac
+	shift
 done
 
 tarversion=$(tar --version | head -1 | sed -e 's/tar (GNU tar) \+\([0-9\.]\+\)$/\1/; s/[^0-9]//g; s/\(.\{3\}\).*/\1/;')
 
 if [[ "$tarversion" -lt "128" ]]; then
-    echo "Tar >= 1.28 is required. Download the .deb from https://launchpad.net/ubuntu/+source/tar/ and install manually."
-    exit 2
+	echo "Tar >= 1.28 is required. Download the .deb from https://launchpad.net/ubuntu/+source/tar/ and install manually."
+	exit 2
 fi
 
 if [ ! -d "$PPA_DIR" ]; then
-    mkdir -p "$PPA_DIR"
+	mkdir -p "$PPA_DIR"
 else
-    echo -n "PPA work folder already exists: $PPA_DIR
+	echo -n "PPA work folder already exists: $PPA_DIR
 Move this folder aside or remove it.
 "
-    exit 2
+	exit 2
 fi
 
 # tar 1.28 required for --exclude-vcs-ignores
@@ -97,14 +97,15 @@ fi
 # would exclude it, and tar doesn't handle "!" rules.
 
 tar --exclude='package-linux.sh' \
-    --exclude='debian' \
-    --exclude='Bin' \
-    --exclude-vcs \
-    --exclude-vcs-ignores \
-    --exclude-backups \
-    -czf "$PPA_DIR/$TAR_NAME" \
-    ./Data/flam3-palettes.xml \
-    .
+	--exclude='debian' \
+	--exclude='Bin' \
+	--exclude-vcs \
+	--exclude-vcs-ignores \
+	--exclude-backups \
+	-czf "$PPA_DIR/$TAR_NAME" \
+	./Data/flam3-palettes.xml \
+	./Data/dark.qss \
+	.
 
 [ $? -ne 0 ] && echo "Tar command failed." && exit 2
 
@@ -117,8 +118,8 @@ rm "$PPA_DIR/fractorium/debian" -r
 cp -R "$PROJECT_ROOT/debian" "$PPA_DIR/fractorium"
 
 cd "$PPA_DIR/fractorium" &&\
-    bzr add . &&\
-    bzr commit -m "Debian package $VERSION"
+	bzr add . &&\
+	bzr commit -m "Debian package $VERSION"
 
 [ $? -ne 0 ] && echo "bzr command failed." && exit 2
 
@@ -128,11 +129,11 @@ cd "$PPA_DIR/fractorium" &&\
 # the servers.
 
 if [ $OPT_BUILD_SOURCE -eq 1 ]; then
-    if [ $OPT_SIGNED -eq 1 ]; then
-        bzr builddeb -- -S
-    else
-        bzr builddeb -- -S -us -uc
-    fi
+	if [ $OPT_SIGNED -eq 1 ]; then
+		bzr builddeb -- -S
+	else
+		bzr builddeb -- -S -us -uc
+	fi
 fi
 
 [ $? -ne 0 ] && echo "bzr builddeb for source package failed." && exit 2
@@ -140,11 +141,11 @@ fi
 # Build an binary package.
 
 if [ $OPT_BUILD_BINARY -eq 1 ]; then
-    if [ $OPT_SIGNED -eq 1 ]; then
-        bzr builddeb -- -b
-    else
-        bzr builddeb -- -b -us -uc
-    fi
+	if [ $OPT_SIGNED -eq 1 ]; then
+		bzr builddeb -- -b
+	else
+		bzr builddeb -- -b -us -uc
+	fi
 fi
 
 [ $? -ne 0 ] && echo "bzr builddeb for source package failed." && exit 2

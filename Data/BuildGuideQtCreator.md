@@ -69,16 +69,16 @@ Select *shadow build* in *Edit build configuration* for both *Debug* and *Releas
 
 Switch to *Release* configuration for all projects and build main.pro.
 
-The outputs will be placed in `fractorium\Bin\release` several minutes later if no error occurs.
+The outputs will be placed in `fractorium/Bin/release` several minutes later if no error occurs.
 
 ##Begin build with Visual Studio:
 Open the file Fractorium.sln under Builds/MSVC/2013
 
 Set the configuration to release, and build all.
 
-The outputs will be the same and will be placed in:
+The outputs will be the same as with Qt Creator and will be placed in:
 
-`Bin/x64/Release`
+`fractorium/Bin/x64/Release`
 
 Regardless of the IDE chosen, the output folder will have these contents:
 
@@ -95,7 +95,7 @@ emberrender.exe
 fractorium.exe
 ```
 
-To run it, just double click any of the .exe files.
+Double click fractorium.exe to run it, and use the command line to run the others.
 
 To run it on a machine which does not have Qt installed, put the .exe and .dll files above along with these files together in one folder
 

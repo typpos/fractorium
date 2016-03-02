@@ -69,6 +69,17 @@ Switch to `Release` configuration for all projects and build.
 
 The outputs will be placed in `fractorium\Bin\release` several minutes later if no error occurs.
 
+##Begin build with Visual Studio:
+Open the file Fractorium.sln under Builds/MSVC/2013
+
+Set the configuration to release, and build all.
+
+The outputs will be the same and will be placed in:
+
+`Bin/x64/Release
+
+Regardless of the IDE chosen, the output folder will have these contents:
+
 ```
 Ember.dll
 Ember.exp
@@ -81,18 +92,11 @@ embergenome.exe
 emberrender.exe
 fractorium.exe
 ```
-##Begin build with Visual Studio:
-Open the file Fractorium.sln under Builds/MSVC/2013
-
-Set the configuration to release, and build all.
-
-The outputs will be the same and will be placed in:
-
-`Bin/x64/Release
 
 To run it, just double click any of the .exe files.
 
 To run it on a machine which does not have Qt installed, put the .exe and .dll files above along with these files together in one folder
+
 ```
 Qt5.5.1\5.5\msvc2013_64\bin\Qt5Core.dll
 Qt5.5.1\5.5\msvc2013_64\bin\Qt5Gui.dll
@@ -140,5 +144,3 @@ or you can install *Visual C++ Redistributable Packages for Visual Studio 2013 (
 └─platforms
         qwindows.dll
 ```
-
-####Have Fun!

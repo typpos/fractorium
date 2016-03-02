@@ -31,9 +31,11 @@ Compile the binary:
 
 ```
 cd fractorium
-qmake
+qmake main.pro -r -spec linux-g++-64 CONFIG+=release
 make
 ```
+
+Or open main.pro in Qt Creator and build all.
 
 Run the binary from the release folder:
 

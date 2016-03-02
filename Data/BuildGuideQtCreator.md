@@ -23,7 +23,7 @@ There are six prerequisite dependencies. Two of them must be downloaded manually
 
 [libjpeg](http://www.ijg.org/)
 
-[tbb](https://www.threadingbuildingblocks.org/download)
+[tbb](https://www.threadingbuildingblocks.org/download) (get the open source download)
 
 Extract them into the folder you created such that they are arranged like so:
 
@@ -36,8 +36,9 @@ Extract them into the folder you created such that they are arranged like so:
 
 Go into the fractorium folder and run this script which will get the rest of the prerequisites from git and build them:
 
-`cd fractorium
-`makedeps.bat
+`cd fractorium`
+
+`makedeps.bat`
 
 This will download and build `glm libpng libxml zlib`. You will have a folder structure like this:
 
@@ -50,6 +51,7 @@ This will download and build `glm libpng libxml zlib`. You will have a folder st
 ├─libxml2
 ├─tbb
 └─fractorium
+    │
     ├─Deps
         │
         ├─libjpeg.lib
@@ -62,10 +64,10 @@ This will download and build `glm libpng libxml zlib`. You will have a folder st
 ```
 
 ##Begin build with Qt Creator:
-Open the Qt Project `fractorium/main.pro` using Qt Creator with config like *Desktop Qt 5.5.1 MSVC2013 OpenGL 64bit*  
-Select "shadow build" in "Edit build configuration" for both `Debug` and `Release`
+Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2013 64bit*  
+Select *shadow build* in *Edit build configuration* for both *Debug* and *Release*
 
-Switch to `Release` configuration for all projects and build.
+Switch to *Release* configuration for all projects and build main.pro.
 
 The outputs will be placed in `fractorium\Bin\release` several minutes later if no error occurs.
 
@@ -76,7 +78,7 @@ Set the configuration to release, and build all.
 
 The outputs will be the same and will be placed in:
 
-`Bin/x64/Release
+`Bin/x64/Release`
 
 Regardless of the IDE chosen, the output folder will have these contents:
 
@@ -118,7 +120,7 @@ MSVC2013\VC\redist\x64\Microsoft.VC120.CRT\vccorlib120.dll
 
 or you can install *Visual C++ Redistributable Packages for Visual Studio 2013 (64 bit)*
 
-####Final file structure
+##Final file structure for distribution
 
 ```
 [YOUR FOLDER]

@@ -54,7 +54,9 @@ win32 {
 #libjpeg and libpng aren't in separate folders, so nothing to add here for them.
 }
 
-#5) Add up all library paths.
+#5) Add up all library paths. Ember and EmberCL don't need libjpeb, libpng or zlib and
+# Ember doesn't need OpenCL. But just place them all here in the common file for ease of maintenance.
+# Unneeded libs will just be ignored.
 win32 {
 	LIBS = ""
 	LIBS += OpenGL32.lib
@@ -69,11 +71,11 @@ win32 {
 }
 
 !win32 {
-	LIBS += -L/usr/lib -ljpeg
-	LIBS += -L/usr/lib -lpng
-	LIBS += -L/usr/lib -ltbb
-	LIBS += -L/usr/lib -lpthread
-	LIBS += -L/usr/lib/x86_64-linux-gnu -lxml2
+	LIBS += -ljpeg
+	LIBS += -lpng
+	LIBS += -ltbb
+	LIBS += -lpthread
+	LIBS += -lxml2
 }
 
 macx {

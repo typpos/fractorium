@@ -295,14 +295,14 @@ public:
 		}
 	}
 
-/// <summary>
-/// Parse the specified buffer and place the results in the vector of embers passed in.
-/// </summary>
-/// <param name="buf">The buffer to parse</param>
-/// <param name="filename">Full path and filename, optionally empty</param>
-/// <param name="embers">The newly constructed embers based on what was parsed</param>
-/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
-/// <returns>True if there were no errors, else false.</returns>
+	/// <summary>
+	/// Parse the specified buffer and place the results in the vector of embers passed in.
+	/// </summary>
+	/// <param name="buf">The buffer to parse</param>
+	/// <param name="filename">Full path and filename, optionally empty</param>
+	/// <param name="embers">The newly constructed embers based on what was parsed</param>
+	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
+	/// <returns>True if there were no errors, else false.</returns>
 	bool Parse(byte* buf, const char* filename, vector<Ember<T>>& embers, bool useDefaults = true)
 	{
 		char* bn;
@@ -378,14 +378,14 @@ public:
 		return true;
 	}
 
-/// <summary>
-/// Parse the specified file and place the results in the vector of embers passed in.
-/// This will strip out ampersands because the Xml parser can't handle them.
-/// </summary>
-/// <param name="filename">Full path and filename</param>
-/// <param name="embers">The newly constructed embers based on what was parsed</param>
-/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
-/// <returns>True if there were no errors, else false.</returns>
+	/// <summary>
+	/// Parse the specified file and place the results in the vector of embers passed in.
+	/// This will strip out ampersands because the Xml parser can't handle them.
+	/// </summary>
+	/// <param name="filename">Full path and filename</param>
+	/// <param name="embers">The newly constructed embers based on what was parsed</param>
+	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
+	/// <returns>True if there were no errors, else false.</returns>
 	bool Parse(const char* filename, vector<Ember<T>>& embers, bool useDefaults = true)
 	{
 		const char* loc = __FUNCTION__;
@@ -407,13 +407,13 @@ public:
 			return false;
 	}
 
-/// <summary>
-/// Thin wrapper around converting the string to a numeric value and return a bool indicating success.
-/// See error report for errors.
-/// </summary>
-/// <param name="str">The string to convert</param>
-/// <param name="val">The converted value</param>
-/// <returns>True if success, else false.</returns>
+	/// <summary>
+	/// Thin wrapper around converting the string to a numeric value and return a bool indicating success.
+	/// See error report for errors.
+	/// </summary>
+	/// <param name="str">The string to convert</param>
+	/// <param name="val">The converted value</param>
+	/// <returns>True if success, else false.</returns>
 	template <typename valT>
 	bool Aton(const char* str, valT& val)
 	{
@@ -431,14 +431,13 @@ public:
 		return b;
 	}
 
-
-/// <summary>
-/// Convert an integer to a string.
-/// Just a wrapper around _itoa_s() which wraps the result in a std::string.
-/// </summary>
-/// <param name="i">The integer to convert</param>
-/// <param name="radix">The radix of the integer. Default: 10.</param>
-/// <returns>The converted string</returns>
+	/// <summary>
+	/// Convert an integer to a string.
+	/// Just a wrapper around _itoa_s() which wraps the result in a std::string.
+	/// </summary>
+	/// <param name="i">The integer to convert</param>
+	/// <param name="radix">The radix of the integer. Default: 10.</param>
+	/// <returns>The converted string</returns>
 	static string Itos(int i, int radix = 10)
 	{
 		char ch[16];
@@ -450,13 +449,13 @@ public:
 		return string(ch);
 	}
 
-/// <summary>
-/// Convert an unsigned 64-bit integer to a string.
-/// Just a wrapper around _ui64toa_s() which wraps the result in a std::string.
-/// </summary>
-/// <param name="i">The unsigned 64-bit integer to convert</param>
-/// <param name="radix">The radix of the integer. Default: 10.</param>
-/// <returns>The converted string</returns>
+	/// <summary>
+	/// Convert an unsigned 64-bit integer to a string.
+	/// Just a wrapper around _ui64toa_s() which wraps the result in a std::string.
+	/// </summary>
+	/// <param name="i">The unsigned 64-bit integer to convert</param>
+	/// <param name="radix">The radix of the integer. Default: 10.</param>
+	/// <returns>The converted string</returns>
 	static string Itos64(size_t i, int radix = 10)
 	{
 		char ch[64];
@@ -471,13 +470,13 @@ public:
 	static vector<string> m_FlattenNames;
 
 private:
-/// <summary>
-/// Scan the file for ember nodes, and parse them out into the vector of embers.
-/// </summary>
-/// <param name="curNode">The current node to parse</param>
-/// <param name="parentFile">The full path and filename</param>
-/// <param name="embers">The newly constructed embers based on what was parsed</param>
-/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present.</param>
+	/// <summary>
+	/// Scan the file for ember nodes, and parse them out into the vector of embers.
+	/// </summary>
+	/// <param name="curNode">The current node to parse</param>
+	/// <param name="parentFile">The full path and filename</param>
+	/// <param name="embers">The newly constructed embers based on what was parsed</param>
+	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present.</param>
 	void ScanForEmberNodes(xmlNode* curNode, char* parentFile, vector<Ember<T>>& embers, bool useDefaults)
 	{
 		bool parseEmberSuccess;
@@ -530,12 +529,12 @@ private:
 		}
 	}
 
-/// <summary>
-/// Parse an ember element.
-/// </summary>
-/// <param name="emberNode">The current node to parse</param>
-/// <param name="currentEmber">The newly constructed ember based on what was parsed</param>
-/// <returns>True if there were no errors, else false.</returns>
+	/// <summary>
+	/// Parse an ember element.
+	/// </summary>
+	/// <param name="emberNode">The current node to parse</param>
+	/// <param name="currentEmber">The newly constructed ember based on what was parsed</param>
+	/// <returns>True if there were no errors, else false.</returns>
 	bool ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber)
 	{
 		bool ret = true;
@@ -640,10 +639,9 @@ private:
 				if (sscanf_s(attStr, "%lu %lu", &currentEmber.m_FinalRasW, &currentEmber.m_FinalRasH) != 2)
 				{
 					AddToReport(string(loc) + " : Invalid size attribute " + string(attStr));
-					xmlFree(attStr);
-					//These return statements are bad. One because they are inconsistent with others that just assign defaults.
-					//Two, because assigning easily guessable defaults is easy and less drastic.
-					return false;
+					//Assign reasonable defaults.
+					currentEmber.m_FinalRasW = 1000;
+					currentEmber.m_FinalRasH = 1000;
 				}
 
 				currentEmber.m_OrigFinalRasW = currentEmber.m_FinalRasW;
@@ -654,8 +652,8 @@ private:
 				if (sscanf_s(attStr, "%lf %lf", &vals[0], &vals[1]) != 2)
 				{
 					AddToReport(string(loc) + " : Invalid center attribute " + string(attStr));
-					xmlFree(attStr);
-					return false;
+					vals[0] = 0;
+					vals[1] = 0;
 				}
 
 				currentEmber.m_CenterX = T(vals[0]);
@@ -686,8 +684,9 @@ private:
 				if (sscanf_s(attStr, "%lf %lf %lf", &vals[0], &vals[1], &vals[2]) != 3)
 				{
 					AddToReport(string(loc) + " : Invalid background attribute " + string(attStr));
-					xmlFree(attStr);
-					return false;
+					vals[0] = 0;
+					vals[1] = 0;
+					vals[2] = 0;
 				}
 
 				currentEmber.m_Background[0] = T(vals[0]);//[0..1]
@@ -1003,8 +1002,8 @@ private:
 							motion.m_MotionFunc = eMotion::MOTION_SAW;
 						else
 						{
-							AddToReport(string(loc) + " : invalid flame motion function " + func);
-							return false;
+							AddToReport(string(loc) + " : invalid flame motion function " + func + ", setting to sin");
+							motion.m_MotionFunc = eMotion::MOTION_SIN;
 						}
 					}
 					else if (!Compare(curAtt->name, "zoom"))
@@ -1038,8 +1037,7 @@ private:
 						if (sscanf_s(attStr, "%lf %lf %lf", &r, &g, &b) != 3)
 						{
 							AddToReport(string(loc) + " : Invalid flame motion background attribute " + string(attStr));
-							xmlFree(attStr);
-							return false;
+							r = g = b = 0;
 						}
 
 						if (r != 0)
@@ -1058,8 +1056,7 @@ private:
 						if (sscanf_s(attStr, "%lf %lf", &cx, &cy) != 2)
 						{
 							AddToReport(string(loc) + " : Invalid flame motion center attribute " + string(attStr));
-							xmlFree(attStr);
-							return false;
+							cx = cy = 0;
 						}
 
 						if (cx != 0)
@@ -1071,8 +1068,6 @@ private:
 					else
 					{
 						AddToReport(string(loc) + " : Unknown flame motion attribute " + string(CCX(curAtt->name)));
-						xmlFree(attStr);
-						return false;
 					}
 
 					xmlFree(attStr);
@@ -1089,17 +1084,17 @@ private:
 			if (soloXform >= 0 && i != soloXform)
 				currentEmber.GetXform(i)->m_Opacity = 0;//Will calc the cached adjusted viz value later.
 
-		return ErrorReport().empty();
+		return true;
 	}
 
-/// <summary>
-/// Parse a floating point value from an xml attribute and add the value to a EmberMotion object
-/// </summary>
-/// <param name="att">The current attribute</param>
-/// <param name="attStr">The attribute value to parse</param>
-/// <param name="param">The flame motion parameter type</param>
-/// <param name="motion">The flame motion element to add the parameter to</param>
-/// <returns>True if there were no errors, else false.</returns>
+	/// <summary>
+	/// Parse a floating point value from an xml attribute and add the value to a EmberMotion object
+	/// </summary>
+	/// <param name="att">The current attribute</param>
+	/// <param name="attStr">The attribute value to parse</param>
+	/// <param name="param">The flame motion parameter type</param>
+	/// <param name="motion">The flame motion element to add the parameter to</param>
+	/// <returns>True if there were no errors, else false.</returns>
 	bool AttToEmberMotionFloat(xmlAttrPtr att, const char* attStr, eEmberMotionParam param, EmberMotion<T>& motion)
 	{
 		const char* loc = __FUNCTION__;
@@ -1119,13 +1114,13 @@ private:
 		return r;
 	}
 
-/// <summary>
-/// Parse an xform element.
-/// </summary>
-/// <param name="childNode">The current node to parse</param>
-/// <param name="xform">The newly constructed xform based on what was parsed</param>
-/// <param name="motion">True if this xform is a motion within a parent xform, else false</param>
-/// <returns>True if there were no errors, else false.</returns>
+	/// <summary>
+	/// Parse an xform element.
+	/// </summary>
+	/// <param name="childNode">The current node to parse</param>
+	/// <param name="xform">The newly constructed xform based on what was parsed</param>
+	/// <param name="motion">True if this xform is a motion within a parent xform, else false</param>
+	/// <returns>True if there were no errors, else false.</returns>
 	bool ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion, bool fromEmber)
 	{
 		bool success = true;
@@ -1368,13 +1363,13 @@ private:
 		return true;
 	}
 
-/// <summary>
-/// Some Apophysis plugins use an inconsistent naming scheme for the parametric variation variables.
-/// This function identifies and converts them to Ember's consistent naming convention.
-/// </summary>
-/// <param name="names">The map of corrected names to search</param>
-/// <param name="name">The current Xml node to check</param>
-/// <returns>The corrected name if one was found, else the passed in name.</returns>
+	/// <summary>
+	/// Some Apophysis plugins use an inconsistent naming scheme for the parametric variation variables.
+	/// This function identifies and converts them to Ember's consistent naming convention.
+	/// </summary>
+	/// <param name="names">The map of corrected names to search</param>
+	/// <param name="name">The current Xml node to check</param>
+	/// <returns>The corrected name if one was found, else the passed in name.</returns>
 	static string GetCorrectedParamName(const unordered_map<string, string>& names, const char* name)
 	{
 		const auto& newName = names.find(ToLower(name));
@@ -1385,15 +1380,15 @@ private:
 			return name;
 	}
 
-/// <summary>
-/// Some Apophysis plugins use an inconsistent naming scheme for variation names.
-/// This function identifies and converts them to Ember's consistent naming convention.
-/// It uses some additional intelligence to ensure the variation is the expected one,
-/// by examining the rest of the xform for the existence of parameter names.
-/// </summary>
-/// <param name="vec">The vector of corrected names to search</param>
-/// <param name="att">The current Xml node to check</param>
-/// <returns>The corrected name if one was found, else the passed in name.</returns>
+	/// <summary>
+	/// Some Apophysis plugins use an inconsistent naming scheme for variation names.
+	/// This function identifies and converts them to Ember's consistent naming convention.
+	/// It uses some additional intelligence to ensure the variation is the expected one,
+	/// by examining the rest of the xform for the existence of parameter names.
+	/// </summary>
+	/// <param name="vec">The vector of corrected names to search</param>
+	/// <param name="att">The current Xml node to check</param>
+	/// <returns>The corrected name if one was found, else the passed in name.</returns>
 	static string GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, xmlAttrPtr att)
 	{
 		for (auto& v : vec)
@@ -1418,12 +1413,12 @@ private:
 		return string(CCX(att->name));
 	}
 
-/// <summary>
-/// Determine if an Xml node contains a given tag.
-/// </summary>
-/// <param name="att">The Xml node to search</param>
-/// <param name="name">The node name to search for</param>
-/// <returns>True if name was found, else false.</returns>
+	/// <summary>
+	/// Determine if an Xml node contains a given tag.
+	/// </summary>
+	/// <param name="att">The Xml node to search</param>
+	/// <param name="name">The node name to search for</param>
+	/// <returns>True if name was found, else false.</returns>
 	static bool XmlContainsTag(xmlAttrPtr att, const char* name)
 	{
 		xmlAttrPtr temp = att;
@@ -1438,15 +1433,15 @@ private:
 		return false;
 	}
 
-/// <summary>
-/// Parse hexadecimal colors.
-/// This can read RGB and RGBA, however only RGB will be stored.
-/// </summary>
-/// <param name="colstr">The string of hex colors to parse</param>
-/// <param name="ember">The ember whose palette will be assigned the colors</param>
-/// <param name="numColors">The number of colors present</param>
-/// <param name="chan">The number of channels in each color</param>
-/// <returns>True if there were no errors, else false.</returns>
+	/// <summary>
+	/// Parse hexadecimal colors.
+	/// This can read RGB and RGBA, however only RGB will be stored.
+	/// </summary>
+	/// <param name="colstr">The string of hex colors to parse</param>
+	/// <param name="ember">The ember whose palette will be assigned the colors</param>
+	/// <param name="numColors">The number of colors present</param>
+	/// <param name="chan">The number of channels in each color</param>
+	/// <returns>True if there were no errors, else false.</returns>
 	bool ParseHexColors(char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan)
 	{
 		size_t colorIndex = 0;
@@ -1509,15 +1504,15 @@ private:
 		return ok;
 	}
 
-/// <summary>
-/// Wrapper to parse a numeric Xml string value and convert it.
-/// </summary>
-/// <param name="name">The xml tag to parse</param>
-/// <param name="attStr">The name of the Xml attribute</param>
-/// <param name="str">The name of the Xml tag</param>
-/// <param name="val">The parsed value</param>
-/// <param name="b">Bitwise ANDed with true if name matched str and the conversion succeeded, else false. Used for keeping a running value between successive calls.</param>
-/// <returns>True if the tag was matched and the conversion succeeded, else false</returns>
+	/// <summary>
+	/// Wrapper to parse a numeric Xml string value and convert it.
+	/// </summary>
+	/// <param name="name">The xml tag to parse</param>
+	/// <param name="attStr">The name of the Xml attribute</param>
+	/// <param name="str">The name of the Xml tag</param>
+	/// <param name="val">The parsed value</param>
+	/// <param name="b">Bitwise ANDed with true if name matched str and the conversion succeeded, else false. Used for keeping a running value between successive calls.</param>
+	/// <returns>True if the tag was matched and the conversion succeeded, else false</returns>
 	template <typename valT>
 	bool ParseAndAssign(const xmlChar* name, const char* attStr, const char* str, valT& val, bool& b)
 	{

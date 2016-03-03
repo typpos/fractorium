@@ -172,6 +172,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 		EmberFile<T> emberFile;
 		XmlToEmber<T> parser;
 		vector<Ember<T>> embers;
+		vector<string> errors;
 		uint previousSize = append ? uint(m_EmberFile.Size()) : 0u;
 		StopPreviewRender();
 		emberFile.m_Filename = filenames[0];
@@ -196,13 +197,16 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 
 				m_LastSaveAll = "";
 				emberFile.m_Embers.insert(emberFile.m_Embers.end(), embers.begin(), embers.end());
+				errors = parser.ErrorReport();
 			}
 			else
 			{
-				auto errors = parser.ErrorReport();
-				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
+				errors = parser.ErrorReport();
 				m_Fractorium->ShowCritical("Open Failed", "Could not open file, see info tab for details.");
 			}
+
+			if (!errors.empty())
+				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 		}
 
 		if (append)

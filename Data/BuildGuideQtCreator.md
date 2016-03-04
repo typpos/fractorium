@@ -13,9 +13,9 @@ Install [Microsoft Visual Studio 2013 or later](https://www.visualstudio.com/en-
 
 Install Qt for Windows 64-bit (VS 2013) 5.5.x (http://www.qt.io/download/). 
 
-Add system environment variable named `QTPATH` and point it to the location of the Qt binaries folder. On a default install, this will be something like:
+Add system environment variable named `QTPATH` and point it to the location of the Qt folder. On a default install, this will be something like:
 
-`C:\Qt\Qt5.5.1\5.5\msvc2013_64\bin`
+`C:\Qt\Qt5.5.1\5.5\msvc2013_64`
 
 ###Wix
 To build the installer, you must have Wix installed. If you are unconcerned with it, you can skip this step and just dismiss the warning that shows when opening the solution later. It's recommended you ignore the installer since official builds are provided on this page.
@@ -96,7 +96,7 @@ Install the [Visual Studio Qt Addon](http://www.qt.io/download/).
 
 Run Visual Studio and verify there is a menu item named *Qt5*. Click on it and click *Qt Options*.
 
-Add a new Qt version to the list with the exact name of "Qt 5.5", and set its path to be one level higher than `$QTPATH`, which will be something like:
+Add a new Qt version to the list with the exact name of "Qt 5.5", and set its path to the same as `$QTPATH`, which will be something like:
 
 `C:\Qt\Qt5.5.1\5.5\msvc2013_64`
 

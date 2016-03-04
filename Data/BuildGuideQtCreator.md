@@ -130,19 +130,14 @@ emberrender.exe
 flam3-palettes.xml
 fractorium.exe
 libxml2.dll
+Qt5Core.dll
+Qt5Gui.dll
+Qt5Widgets.dll
 tbb.dll
+platforms\qwindows.dll
 ```
 
 Double click fractorium.exe to run it, and use the command line to run the others.
-
-To run it on a machine which does not have Qt installed, put the .exe and .dll files above along with these files together in one folder
-
-```
-Qt5.5.1\5.5\msvc2013_64\bin\Qt5Core.dll
-Qt5.5.1\5.5\msvc2013_64\bin\Qt5Gui.dll
-Qt5.5.1\5.5\msvc2013_64\bin\Qt5Widgets.dll
-Qt5.5.1\5.5\msvc2013_64\plugins\platforms\qwindows.dll  (put in folder "platforms")
-```
 
 To run on a computer without Visual Studio 2013, these files also need to be in the folder:
 
@@ -170,7 +165,6 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2013 (
 ├─  libxml2.dll
 ├─  Qt5Core.dll
 ├─  Qt5Gui.dll
-├─  Qt5OpenGL.dll
 ├─  Qt5Widgets.dll
 ├─  tbb.dll
 │

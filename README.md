@@ -44,9 +44,11 @@ TODO
 
 # Building from git
 
+All builds are 64-bit.
+
 ## Windows
 
-[Build Guide for Fractorium Using MSVC2013 and Qt Creator (64 bit)](Data/BuildGuideQtCreator.md)
+[Build Guide for for Visual Studio 2013 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 

@@ -20,9 +20,25 @@ PRJ_SRC_DIR = $$absolute_path($$EMBER_ROOT/../Source/Fractorium)
 
 #Qt will be installed on a system wide level on *nix. It should be the same for Windows, but copy it local just to be safe.
 win32 {
+CONFIG(release, debug|release) {
 	qtfiles.path = $$BIN_INSTALL_DIR
 	qtfiles.files = $$(QTDIR)\bin\Qt5Core.dll $$(QTDIR)\bin\Qt5Gui.dll $$(QTDIR)\bin\Qt5Widgets.dll
 	INSTALLS += qtfiles
+
+	qtplatforms.path = $$BIN_INSTALL_DIR\platforms
+	qtplatforms.files = $$(QTDIR)\plugins\platforms\qwindows.dll
+	INSTALLS += qtplatforms
+}
+
+CONFIG(debug, debug|release) {
+	qtfiles.path = $$BIN_INSTALL_DIR
+	qtfiles.files = $$(QTDIR)\bin\Qt5Cored.dll $$(QTDIR)\bin\Qt5Guid.dll $$(QTDIR)\bin\Qt5Widgetsd.dll
+	INSTALLS += qtfiles
+
+	qtplatforms.path = $$BIN_INSTALL_DIR\platforms
+	qtplatforms.files = $$(QTDIR)\plugins\platforms\qwindowsd.dll
+	INSTALLS += qtplatforms
+}
 }
 
 #For some reason, a Qt project needs to be told to look at itself.

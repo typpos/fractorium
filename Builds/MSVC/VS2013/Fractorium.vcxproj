@@ -78,6 +78,13 @@
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark.qss" "$(OutDir)"
+
+xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Cored.dll" "$(OutDir)"
+xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Guid.dll" "$(OutDir)"
+xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Widgetsd.dll" "$(OutDir)"
+
+xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)\platforms\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -112,7 +119,13 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
-</Command>
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark.qss" "$(OutDir)"
+
+xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Core.dll" "$(OutDir)"
+xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Gui.dll" "$(OutDir)"
+xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Widgets.dll" "$(OutDir)"
+
+xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindows.dll" "$(OutDir)\platforms\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

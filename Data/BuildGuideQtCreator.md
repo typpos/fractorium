@@ -110,11 +110,17 @@ Set the configuration to release, and build all.
 
 ###Outputs
 
-The outputs will be the same as with Qt Creator and will be placed in:
+The outputs will be the same whether Visual Studio or Qt Creator was used, however their locations will be different.
+
+Qt Creator will place its outputs in:
+
+`fractorium/Bin/Release`
+
+and Visual Studio will place its outputs in:
 
 `fractorium/Bin/x64/Release`
 
-Regardless of the IDE chosen, the output folder will have these contents:
+Regardless of the IDE chosen, the output folder will have the same contents:
 
 ```
 dark.qss

@@ -1,4 +1,4 @@
-#Build Guide for Fractorium Using MSVC2013 or Qt Creator (64 bit)
+#Build Guide For Visual Studio 2013 or Qt Creator
 ##Tools
 
 ###git

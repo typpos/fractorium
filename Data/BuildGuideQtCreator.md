@@ -18,11 +18,13 @@ Add system environment variable named `QTPATH` and point it to the location of t
 `C:\Qt\Qt5.5.1\5.5\msvc2013_64`
 
 ###Wix
+
 To build the installer, you must have Wix installed. If you are unconcerned with it, you can skip this step and just dismiss the warning that shows when opening the solution later. It's recommended you ignore the installer since official builds are provided on this page.
 
 ##Obtaining source
 
 ###This project
+
 Open up the Visual Studio x64 Native Tools Command Prompt.
 
 Create a new folder in your development area named fractorium:
@@ -34,6 +36,7 @@ Create a new folder in your development area named fractorium:
 `git clone https://github.com/mfeemster/fractorium.git`
 
 ###Prerequisites
+
 There are six prerequisite dependencies. Two of them must be downloaded manually:
 
 [libjpeg](http://www.ijg.org/)
@@ -80,15 +83,22 @@ This will download and build `glm libpng libxml zlib`. You will have a folder st
 
 ##Building with Qt Creator or Visual Studio
 
-###Begin build with Qt Creator:
-Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2013 64bit*  
-Select *shadow build* in *Edit build configuration* for both *Debug* and *Release*
+###Begin build with Qt Creator
 
-Switch to *Release* configuration for all projects and build main.pro.
+Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2013 64bit*.
+Select *Shadow build* in *Edit build configuration* for both *Debug* and *Release*.
+
+Switch to the *Release* configuration.
+
+Under *Build Steps*, add an additional argument of `install` to the `make` command to force all dependencies to be copied to the output folder. The final make command should look like:
+
+`jom.exe install in /path/to/your/build/build-main-Desktop_Qt_5_5_1_MSVC2013_64bit-Release`
+
+Ensure all projects are in the *Release* configuration and build main.pro.
 
 The outputs will be placed in `fractorium/Bin/release` several minutes later if no error occurs.
 
-###Begin build with Visual Studio:
+###Begin build with Visual Studio
 
 ####Visual Studio Qt Addon
 
@@ -120,7 +130,7 @@ and Visual Studio will place its outputs in:
 
 `fractorium/Bin/x64/Release`
 
-Regardless of the IDE chosen, the output folder will have the same contents:
+The output contents will be:
 
 ```
 dark.qss

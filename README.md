@@ -48,7 +48,7 @@ All builds are 64-bit.
 
 ## Windows
 
-[Build Guide for for Visual Studio 2013 or Qt Creator](Data/BuildGuideQtCreator.md)
+[Build Guide for Visual Studio 2013 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 

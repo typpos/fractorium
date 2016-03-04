@@ -94,7 +94,7 @@ The outputs will be placed in `fractorium/Bin/release` several minutes later if 
 
 Install the [Visual Studio Qt Addon](http://www.qt.io/download/).
 
-Run Visual Studio and verify there is a menu item named Qt5. Click on it and click Qt Options.
+Run Visual Studio and verify there is a menu item named *Qt5*. Click on it and click *Qt Options*.
 
 Add a new Qt version to the list with the exact name of "Qt 5.5", and set its path to be one level higher than `$QTPATH`, which will be something like:
 
@@ -102,7 +102,7 @@ Add a new Qt version to the list with the exact name of "Qt 5.5", and set its pa
 
 The name "Qt 5.5" must match exactly and this step must be completed before the Fractorium solution is opened. If not, the Qt add-in will completely ruin all solution and project files that use Qt.
 
-Set the default version to the newly created Qt version and click Ok.
+Set the default version to the newly created Qt version and click *Ok*.
 
 Open the file Fractorium.sln under Builds/MSVC/2013
 

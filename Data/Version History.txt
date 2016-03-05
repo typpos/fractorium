@@ -1,6 +1,38 @@
+0.9.9.5 03/04/2016
+--User changes
+	-None.
+	
+--Bug fixes
+	-Fix crash when using Lanczos2 filter with color curves due to negative numbers. Fix by passing abs() of first argument to pow() in Renderer::GammaCorrection().
+	-Fix crash in hexes with SP. Rounding error caused out of bounds index.
+	-Do not reset locked affine scale on new flame or undo.
+	-Gracefully recover from reading a bad palette file.
+	-Gracefully recover from reading flame file with unknown params.
+	-Available memory size checking in the final render dialog was accidentally removed during the multi-gpu work last year. Add it back in.
+
+--Code changes
+	-Migrate to Qt 5.5.1
+	-Remove dependency projects from the solution. Move to a project design where they are built once via command line and stored in a /Deps folder.
+		--Because of this, libpng is built as a static lib instead of a dll because that's what its command line makefile supports.
+	--Remove libpng16.dll from Wix installer.
+	-Remove all configs except for debug and release.
+	-Remove all platforms except for x64.
+	-Add #define __TBB_NO_IMPLICIT_LINKAGE 1 to prevent tbb from looking for tbb_debug.lib by default on debug builds.
+	-Put Ember.rc in a filter folder in the project.
+	-Place pragma warning disable statements in PCH files rather than in projects. This makes it easier when using Qt Creator.
+	-Move all resource files to the MSVC folder.
+	-Set all targets in QtCreator project to their lowercase names to be more *nix friendly. Set -l link statements to use these new lowercase names for ember and embercl.
+	-Rework Qt projects to favor shadow builds.
+	-Remove the symlinks.sh file and all references to it. It was never needed. Instead, just specify multiple include and link paths in the .pro files.
+	-Change WIN32 to _WIN32.
+	-Fix a few code warnings.
+	-Make usage of VarFuncs more consistent by moving some global functions there.
+	-Make CircleTrans1 a little safer by calling Zeps() on m_Sc during precalc.
+	-Major work on Qt Creator builds.
+
 0.9.9.4 02/21/2016
 --User changes
-	-Allow for stopping the renderer in the main window. This makes is more efficient when entering many parameters, such as when following a tutorial.
+	-Allow for stopping the renderer in the main window. This makes it more efficient when entering many parameters, such as when following a tutorial.
 	-Add support for new variations: erf, gamma, jac_cn, jac_dn, jac_sn, logDB, pressure_wave, pRose3D, splits3D, w, waves2b, x, xerf, y, z.
 	-Inform user of the start and stop of file parsing in EmberAnimate because the files could potentially be very large.
 	-Move the follwing fields to a new table called Animation: Interpolation, Affine Interpolation, Temporal Samples, Temporal Filter Width, Temporal Filter Type.

@@ -170,9 +170,6 @@
       <Component Id="Qt5Gui.dll" Guid="7f93dcc2-55db-4920-83d7-e06c23f7719a">
         <File Id="Qt5Gui.dll" Source="$(env.QTDIR)\bin\Qt5Gui.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
       </Component>
-      <Component Id="Qt5OpenGL.dll" Guid="dad0a1ca-366c-4df8-aaa1-ae0de31f157a">
-        <File Id="Qt5OpenGL.dll" Source="$(env.QTDIR)\bin\Qt5OpenGL.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
-      </Component>
       <Component Id="Qt5Widgets.dll" Guid="006bb2f1-7a38-426f-ba2c-5196d1d6c24d">
         <File Id="Qt5Widgets.dll" Source="$(env.QTDIR)\bin\Qt5Widgets.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
       </Component>

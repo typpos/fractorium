@@ -442,6 +442,38 @@ static inline T Clamp(T val, T min, T max)
 		return val;
 }
 
+template <>
+#ifdef _WIN32
+	static
+#endif
+float Clamp<float>(float val, float min, float max)
+{
+	if (val < min)
+		return min;
+	else if (val > max)
+		return max;
+	else if (!std::isfinite(val))
+		return min;
+	else
+		return val;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+double Clamp<double>(double val, double min, double max)
+{
+	if (val < min)
+		return min;
+	else if (val > max)
+		return max;
+	else if (!std::isfinite(val))
+		return min;
+	else
+		return val;
+}
+
 /// <summary>
 /// Clamp and return a value to be greater than or equal to a specified minimum and less than
 /// or equal to a specified maximum. If lesser, the value is fmod(val - min, max - min). If greater,
@@ -458,6 +490,8 @@ static inline T ClampMod(T val, T min, T max)
 		return min + fmod(val - min, max - min);
 	else if (val > max)
 		return max - fmod(max - val, max - min);
+	else if (!std::isfinite(val))
+		return min;
 	else
 		return val;
 }
@@ -477,6 +511,34 @@ static inline void ClampRef(T& val, T min, T max)
 		val = max;
 }
 
+template <>
+#ifdef _WIN32
+	static
+#endif
+void ClampRef<float>(float& val, float min, float max)
+{
+	if (val < min)
+		val = min;
+	else if (val > max)
+		val = max;
+	else if (!std::isfinite(val))
+		val = min;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+void ClampRef<double>(double& val, double min, double max)
+{
+	if (val < min)
+		val = min;
+	else if (val > max)
+		val = max;
+	else if (!std::isfinite(val))
+		val = min;
+}
+
 /// <summary>
 /// Similar to Clamp(), but clamps a reference value in place rather than returning.
 /// </summary>
@@ -486,6 +548,26 @@ template <typename T>
 static inline void ClampLteRef(T& val, T lte)
 {
 	if (val > lte)
+		val = lte;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+void ClampLteRef<float>(float& val, float lte)
+{
+	if (val > lte || !std::isfinite(val))
+		val = lte;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+void ClampLteRef<double>(double& val, double lte)
+{
+	if (val > lte || !std::isfinite(val))
 		val = lte;
 }
 
@@ -502,6 +584,30 @@ static inline T ClampGte(T val, T gte)
 	return (val < gte) ? gte : val;
 }
 
+template <>
+#ifdef _WIN32
+	static
+#endif
+float ClampGte<float>(float val, float gte)
+{
+	if (val < gte || !std::isfinite(val))
+		return gte;
+	else
+		return val;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+double ClampGte<double>(double val, double gte)
+{
+	if (val < gte || !std::isfinite(val))
+		return gte;
+	else
+		return val;
+}
+
 /// <summary>
 /// Similar to Clamp(), but clamps a reference value in place rather than returning.
 /// </summary>
@@ -511,6 +617,26 @@ template <typename T>
 static inline void ClampGteRef(T& val, T gte)
 {
 	if (val < gte)
+		val = gte;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+void ClampGteRef<float>(float& val, float gte)
+{
+	if (val < gte || !std::isfinite(val))
+		val = gte;
+}
+
+template <>
+#ifdef _WIN32
+	static
+#endif
+void ClampGteRef<double>(double& val, double gte)
+{
+	if (val < gte || !std::isfinite(val))
 		val = gte;
 }
 
@@ -547,28 +673,6 @@ static inline T Round(T r)
 }
 
 /// <summary>
-/// Special rounding for certain variations, gotten from Apophysis.
-/// </summary>
-/// <param name="x">The value to round</param>
-/// <returns>The rounded value</returns>
-static inline float LRint(float x)
-{
-	int temp = (x >= 0 ? static_cast<int>(x + 0.5f) : static_cast<int>(x - 0.5f));
-	return static_cast<float>(temp);
-}
-
-/// <summary>
-/// Special rounding for certain variations, gotten from Apophysis.
-/// </summary>
-/// <param name="x">The value to round</param>
-/// <returns>The rounded value</returns>
-static inline double LRint(double x)
-{
-	glm::int64_t temp = (x >= 0 ? static_cast<int64_t>(x + 0.5) : static_cast<int64_t>(x - 0.5));
-	return static_cast<double>(temp);
-}
-
-/// <summary>
 /// Never really understood what this did.
 /// </summary>
 /// <param name="r">The value to round</param>
@@ -585,30 +689,6 @@ static inline T Round6(T r)
 }
 
 /// <summary>
-/// Return -1 if the value is less than 0, 1 if it's greater and
-/// 0 if it's equal to 0.
-/// </summary>
-/// <param name="v">The value to inspect</param>
-/// <returns>-1, 0 or 1</returns>
-template <typename T>
-static inline T Sign(T v)
-{
-	return (v < 0) ? static_cast<T>(-1) : (v > 0) ? static_cast<T>(1) : static_cast<T>(0);
-}
-
-/// <summary>
-/// Return -1 if the value is less than 0, 1 if it's greater.
-/// This differs from Sign() in that it doesn't return 0.
-/// </summary>
-/// <param name="v">The value to inspect</param>
-/// <returns>-1 or 1</returns>
-template <typename T>
-static inline T SignNz(T v)
-{
-	return (v < 0) ? static_cast<T>(-1) : static_cast<T>(1);
-}
-
-/// <summary>
 /// Return the square of the passed in value.
 /// This is useful when the value is a result of a computation
 /// rather than a fixed number. Otherwise, use the SQR macro.
@@ -622,16 +702,16 @@ static inline T Sqr(T t)
 }
 
 /// <summary>
-/// Taking the square root of numbers close to zero is dangerous.  If x is negative
-/// due to floating point errors, it can return NaN results.
+/// Return the cube of the passed in value.
+/// This is useful when the value is a result of a computation
+/// rather than a fixed number. Otherwise, use the CUBE macro.
 /// </summary>
+/// <param name="v">The value to cube</param>
+/// <returns>The cubed value</returns>
 template <typename T>
-static inline T SafeSqrt(T x)
+static inline T Cube(T t)
 {
-	if (x <= 0)
-		return 0;
-
-	return std::sqrt(x);
+	return t * t * t;
 }
 
 template <typename T>
@@ -659,83 +739,6 @@ double SafeTan<double>(double x)
 }
 
 /// <summary>
-/// If r < EPS, return 1 / r.
-/// Else, return q / r.
-/// </summary>
-/// <param name="q">The numerator</param>
-/// <param name="r">The denominator</param>
-/// <returns>The quotient</returns>
-template <typename T>
-static inline T SafeDivInv(T q, T r)
-{
-	if (r < EPS)
-		return 1 / r;
-
-	return q / r;
-}
-
-/// <summary>
-/// Return the cube of the passed in value.
-/// This is useful when the value is a result of a computation
-/// rather than a fixed number. Otherwise, use the CUBE macro.
-/// </summary>
-/// <param name="v">The value to cube</param>
-/// <returns>The cubed value</returns>
-template <typename T>
-static inline T Cube(T t)
-{
-	return t * t * t;
-}
-
-/// <summary>
-/// Return the hypotenuse of the passed in values.
-/// </summary>
-/// <param name="x">The x distance</param>
-/// <param name="y">The y distance</param>
-/// <returns>The hypotenuse</returns>
-template <typename T>
-static inline T Hypot(T x, T y)
-{
-	return std::sqrt(SQR(x) + SQR(y));
-}
-
-/// <summary>
-/// Spread the values.
-/// </summary>
-/// <param name="x">The x distance</param>
-/// <param name="y">The y distance</param>
-/// <returns>The spread</returns>
-template <typename T>
-static inline T Spread(T x, T y)
-{
-	return Hypot<T>(x, y) * ((x) > 0 ? 1 : -1);
-}
-
-/// <summary>
-/// Unsure.
-/// </summary>
-/// <param name="x">The x distance</param>
-/// <param name="y">The y distance</param>
-/// <returns>The powq4</returns>
-template <typename T>
-static inline T Powq4(T x, T y)
-{
-	return std::pow(std::abs(x), y) * SignNz(x);
-}
-
-/// <summary>
-/// Unsure.
-/// </summary>
-/// <param name="x">The x distance</param>
-/// <param name="y">The y distance</param>
-/// <returns>The powq4c</returns>
-template <typename T>
-static inline T Powq4c(T x, T y)
-{
-	return y == 1 ? x : Powq4(x, y);
-}
-
-/// <summary>
 /// Return EPS if the passed in value was zero, else return the value.
 /// </summary>
 /// <param name="x">The value</param>
@@ -758,66 +761,6 @@ template <typename T>
 static inline T Lerp(T a, T b, T p)
 {
 	return a + (b - a) * p;
-}
-
-/// <summary>
-/// Thin wrapper around a call to modf that discards the integer portion
-/// and returns the signed fractional portion.
-/// </summary>
-/// <param name="v">The value to retrieve the signed fractional portion of.</param>
-/// <returns>The signed fractional portion of v.</returns>
-template <typename T>
-static inline T Fabsmod(T v)
-{
-	T dummy;
-	return modf(v, &dummy);
-}
-
-/// <summary>
-/// Unsure.
-/// </summary>
-/// <param name="p">Unsure.</param>
-/// <param name="amp">Unsure.</param>
-/// <param name="ph">Unsure.</param>
-/// <returns>Unsure.</returns>
-template <typename T>
-static inline T Fosc(T p, T amp, T ph)
-{
-	return T(0.5) - std::cos(p * amp + ph) * T(0.5);
-}
-
-/// <summary>
-/// Unsure.
-/// </summary>
-/// <param name="p">Unsure.</param>
-/// <param name="ph">Unsure.</param>
-/// <returns>Unsure.</returns>
-template <typename T>
-static inline T Foscn(T p, T ph)
-{
-	return T(0.5) - std::cos(p + ph) * T(0.5);
-}
-
-/// <summary>
-/// Log scale from Apophysis.
-/// </summary>
-/// <param name="x">The value to log scale</param>
-/// <returns>The log scaled value</returns>
-template <typename T>
-static inline T LogScale(T x)
-{
-	return x == 0 ? 0 : std::log((fabs(x) + 1) * T(M_E)) * SignNz(x) / T(M_E);
-}
-
-/// <summary>
-/// Log map from Apophysis.
-/// </summary>
-/// <param name="x">The value to log map</param>
-/// <returns>The log mapped value</returns>
-template <typename T>
-static inline T LogMap(T x)
-{
-	return x == 0 ? 0 : (T(M_E) + std::log(x * T(M_E))) * T(0.25) * SignNz(x);
 }
 
 /// <summary>
@@ -875,23 +818,6 @@ static inline T NormalizeDeg180(T angle)
 		a += 360;
 
 	return a;
-}
-
-/// <summary>
-/// Put an angular measurement in degrees into the range of 0 - 360.
-/// </summary>
-/// <param name="angle">The angle to normalize</param>
-/// <returns>The normalized angle in a range of 0 - 360</returns>
-template <typename T>
-static inline T NormalizeDeg360(T angle)
-{
-	if (angle > 360 || angle < -360)
-		angle = fmod(angle, 360);
-
-	if (angle < 0)
-		angle += 360;
-
-	return angle;
 }
 
 /// <summary>
@@ -979,7 +905,7 @@ static inline T Arg(char* name, T def)
 {
 	char* ch;
 	T returnVal;
-#ifdef WIN32
+#ifdef _WIN32
 	size_t len;
 	errno_t err = _dupenv_s(&ch, &len, name);
 #else
@@ -1001,7 +927,7 @@ static inline T Arg(char* name, T def)
 			returnVal = def;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	free(ch);
 #endif
 	return returnVal;
@@ -1036,7 +962,7 @@ string Arg<string>(char* name, string def)
 {
 	char* ch;
 	string returnVal;
-#ifdef WIN32
+#ifdef _WIN32
 	size_t len;
 	errno_t err = _dupenv_s(&ch, &len, name);
 #else
@@ -1052,7 +978,7 @@ string Arg<string>(char* name, string def)
 	else
 		returnVal = string(ch);
 
-#ifdef WIN32
+#ifdef _WIN32
 	free(ch);
 #endif
 	return returnVal;

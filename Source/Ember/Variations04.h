@@ -22,7 +22,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		ClampGteRef<T>(xmax, -1);
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
@@ -2519,7 +2519,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		const T zr = Hypot<T>(helper.In.z, helper.m_PrecalcSqrtSumSquares);
+		const T zr = VarFuncs<T>::Hypot(helper.In.z, helper.m_PrecalcSqrtSumSquares);
 		const T phi = std::acos(Clamp<T>(helper.In.z / zr, -1, 1));
 		const T ps = std::sin(phi);
 		const T pc = std::cos(phi);
@@ -2670,13 +2670,13 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		const T x = Powq4c(helper.In.x, m_Power);
-		const T y = Powq4c(helper.In.y, m_Power);
-		const T z = Powq4c(helper.In.z, m_Power);
+		const T x = VarFuncs<T>::Powq4c(helper.In.x, m_Power);
+		const T y = VarFuncs<T>::Powq4c(helper.In.y, m_Power);
+		const T z = VarFuncs<T>::Powq4c(helper.In.z, m_Power);
 		const T d = SQR(x) - SQR(y);
-		const T re = Spread(m_C1 * x + m_C2 * d, m_Sx) + 1;
-		const T im = Spread(m_C1 * y + m_C2x2 * x * y, m_Sy);
-		T c = Zeps(Powq4c(SQR(re) + SQR(im), m_PowerInv));
+		const T re = VarFuncs<T>::Spread(m_C1 * x + m_C2 * d, m_Sx) + 1;
+		const T im = VarFuncs<T>::Spread(m_C1 * y + m_C2x2 * x * y, m_Sy);
+		T c = Zeps(VarFuncs<T>::Powq4c(SQR(re) + SQR(im), m_PowerInv));
 		const T r = m_Weight / c;
 		helper.Out.x = (x * re + y * im) * r;
 		helper.Out.y = (y * re - x * im) * r;
@@ -3121,7 +3121,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T s = std::sin(helper.In.x);
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
@@ -3170,7 +3170,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T s = std::sin(absV);
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
@@ -3219,7 +3219,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(-helper.In.x);
 		T c = std::cos(-helper.In.x);
@@ -3270,7 +3270,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(absV);
 		T c = std::cos(absV);
@@ -3433,7 +3433,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T s = std::sin(helper.In.x);
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
@@ -3482,7 +3482,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T s = std::sin(absV);
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
@@ -3643,7 +3643,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(helper.In.x);
 		T c = std::cos(helper.In.x);
@@ -3694,7 +3694,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(absV);
 		T c = std::cos(absV);
@@ -3745,7 +3745,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T e = std::exp(helper.In.x);
 		T s = std::sin(absV);
 		T c = std::cos(absV);
@@ -3795,7 +3795,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T absV = Hypot<T>(helper.In.y, helper.In.z);
+		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
 		T c = m_Weight * std::atan2(absV, helper.In.x) / absV;
 		helper.Out.x = std::log(SQR(helper.In.x) + SQR(absV)) * m_Denom;
 		helper.Out.y = c * helper.In.y;
@@ -3991,7 +3991,7 @@ public:
 	{
 		T xx = (rand.Frand01<T>() - T(0.5)) * 2;
 		T yy = (rand.Frand01<T>() - T(0.5)) * 2;
-		T k = SignNz(yy);
+		T k = VarFuncs<T>::SignNz(yy);
 		T yymax = ((m_A * std::pow(std::abs(xx), m_P) + k * m_B * std::sqrt(std::abs(1 - SQR(xx)))) - m_A);
 		//The function must be in a range 0-1 to work properly.
 		yymax /= Zeps(std::abs(m_A) + std::abs(m_B));
@@ -5039,10 +5039,10 @@ public:
 		T xmax = T(0.5) * (std::sqrt(tmp + x2) + std::sqrt(tmp - x2));
 		T ymax = T(0.5) * (std::sqrt(tmp + y2) + std::sqrt(tmp - y2));
 		T a = helper.In.x / Zeps(xmax);
-		T b = SafeSqrt(1 - SQR(a));
+		T b = VarFuncs<T>::SafeSqrt(1 - SQR(a));
 		helper.Out.x = m_Vx * atan2(a, b) * r;
 		a = helper.In.y / Zeps(ymax);
-		b = SafeSqrt(1 - SQR(a));
+		b = VarFuncs<T>::SafeSqrt(1 - SQR(a));
 		helper.Out.y = m_Vy * atan2(a, b) * r;
 		helper.Out.z = DefaultZ(helper);
 	}

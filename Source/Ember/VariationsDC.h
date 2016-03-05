@@ -517,8 +517,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x = LRint(helper.In.x);
-		T y = LRint(helper.In.y);
+		T x = VarFuncs<T>::LRint(helper.In.x);
+		T y = VarFuncs<T>::LRint(helper.In.y);
 		T c = outPoint.m_ColorX;
 
 		if (y <= 0)

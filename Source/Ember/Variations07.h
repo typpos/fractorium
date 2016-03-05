@@ -108,14 +108,14 @@ public:
 		T CsX = 1;
 		T CsY = 1;
 		T jcbSn = 0, jcbCn, jcbDn;
-		CsX = SafeDivInv(m_Unity, (m_Unity + Sqr(helper.In.x)));
+		CsX = VarFuncs<T>::SafeDivInv(m_Unity, (m_Unity + Sqr(helper.In.x)));
 		CsX = CsX * m_Six + m_Scaleinfx;
-		CsY = SafeDivInv(m_Unity, (m_Unity + Sqr(helper.In.y)));
+		CsY = VarFuncs<T>::SafeDivInv(m_Unity, (m_Unity + Sqr(helper.In.y)));
 		CsY = CsY * m_Siy + m_Scaleinfy;
 
 		if (m_Pwx >= 0 && m_Pwx < 1e-4)
 		{
-			m_VarFuncs->JacobiElliptic(helper.In.y * m_Freqx, m_Jacok, jcbSn, jcbCn, jcbDn);
+			VarFuncs<T>::JacobiElliptic(helper.In.y * m_Freqx, m_Jacok, jcbSn, jcbCn, jcbDn);
 			helper.Out.x = m_Weight * (helper.In.x + CsX * jcbSn);
 		}
 		else if (m_Pwx < 0 && m_Pwx > -1e-4)
@@ -126,11 +126,11 @@ public:
 			helper.Out.x = m_Weight * (helper.In.x + CsX * T(j1(helper.In.y * m_Freqx)));//This is not implemented in OpenCL.
 #endif
 		else
-			helper.Out.x = m_Weight * (helper.In.x + CsX * std::sin(SignNz(helper.In.y) * std::pow(Zeps(std::abs(helper.In.y)), m_Pwx) * m_Freqx));
+			helper.Out.x = m_Weight * (helper.In.x + CsX * std::sin(VarFuncs<T>::SignNz(helper.In.y) * std::pow(Zeps(std::abs(helper.In.y)), m_Pwx) * m_Freqx));
 
 		if (m_Pwy >= 0 && m_Pwy < 1e-4)
 		{
-			m_VarFuncs->JacobiElliptic(helper.In.x * m_Freqy, m_Jacok, jcbSn, jcbCn, jcbDn);
+			VarFuncs<T>::JacobiElliptic(helper.In.x * m_Freqy, m_Jacok, jcbSn, jcbCn, jcbDn);
 			helper.Out.y = m_Weight * (helper.In.y + CsY * jcbSn);
 		}
 		else if (m_Pwy < 0 && m_Pwy > -1e-4)
@@ -141,7 +141,7 @@ public:
 			helper.Out.y = m_Weight * (helper.In.y + CsY * T(j1(helper.In.x * m_Freqy)));
 #endif
 		else
-			helper.Out.y = m_Weight * (helper.In.y + CsY * std::sin(SignNz(helper.In.x) * std::pow(Zeps(std::abs(helper.In.x)), m_Pwy) * m_Freqy));
+			helper.Out.y = m_Weight * (helper.In.y + CsY * std::sin(VarFuncs<T>::SignNz(helper.In.x) * std::pow(Zeps(std::abs(helper.In.x)), m_Pwy) * m_Freqy));
 
 		helper.Out.z = DefaultZ(helper);
 	}
@@ -213,7 +213,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Freqx,     prefix + "waves2b_freqx", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Freqy,     prefix + "waves2b_freqy", 2));
@@ -242,7 +241,6 @@ private:
 	T m_Jacok;
 	T m_Six;//Precalc.
 	T m_Siy;
-	shared_ptr<VarFuncs<T>> m_VarFuncs;
 };
 
 /// <summary>
@@ -264,8 +262,8 @@ public:
 		T snx, cnx, dnx;
 		T sny, cny, dny;
 		T numX, numY, denom;
-		m_VarFuncs->JacobiElliptic(helper.In.x, m_K, snx, cnx, dnx);
-		m_VarFuncs->JacobiElliptic(helper.In.y, 1 - m_K, sny, cny, dny);
+		VarFuncs<T>::JacobiElliptic(helper.In.x, m_K, snx, cnx, dnx);
+		VarFuncs<T>::JacobiElliptic(helper.In.y, 1 - m_K, sny, cny, dny);
 		numX = cnx * cny;
 		numY = -dnx * snx * dny * sny;
 		denom = SQR(snx) * SQR(sny) * m_K + SQR(cny);
@@ -308,14 +306,12 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_K, prefix + "jac_cn_k", T(0.5), eParamType::REAL, -1, 1));
 	}
 
 private:
 	T m_K;
-	shared_ptr<VarFuncs<T>> m_VarFuncs;
 };
 
 /// <summary>
@@ -337,8 +333,8 @@ public:
 		T snx, cnx, dnx;
 		T sny, cny, dny;
 		T numX, numY, denom;
-		m_VarFuncs->JacobiElliptic(helper.In.x, m_K, snx, cnx, dnx);
-		m_VarFuncs->JacobiElliptic(helper.In.y, 1 - m_K, sny, cny, dny);
+		VarFuncs<T>::JacobiElliptic(helper.In.x, m_K, snx, cnx, dnx);
+		VarFuncs<T>::JacobiElliptic(helper.In.y, 1 - m_K, sny, cny, dny);
 		numX = dnx * cny * dny;
 		numY = -cnx * snx * sny * m_K;
 		denom = SQR(snx) * SQR(sny) * m_K + SQR(cny);
@@ -381,14 +377,12 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_K, prefix + "jac_dn_k", T(0.5), eParamType::REAL, -1, 1));
 	}
 
 private:
 	T m_K;
-	shared_ptr<VarFuncs<T>> m_VarFuncs;
 };
 
 /// <summary>
@@ -410,8 +404,8 @@ public:
 		T snx, cnx, dnx;
 		T sny, cny, dny;
 		T numX, numY, denom;
-		m_VarFuncs->JacobiElliptic(helper.In.x, m_K, snx, cnx, dnx);
-		m_VarFuncs->JacobiElliptic(helper.In.y, 1 - m_K, sny, cny, dny);
+		VarFuncs<T>::JacobiElliptic(helper.In.x, m_K, snx, cnx, dnx);
+		VarFuncs<T>::JacobiElliptic(helper.In.y, 1 - m_K, sny, cny, dny);
 		numX = snx * dny;
 		numY = cnx * dnx * cny * sny;
 		denom = SQR(snx) * SQR(sny) * m_K + SQR(cny);
@@ -454,14 +448,12 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_K, prefix + "jac_sn_k", T(0.5), eParamType::REAL, -1, 1));
 	}
 
 private:
 	T m_K;
-	shared_ptr<VarFuncs<T>> m_VarFuncs;
 };
 
 /// <summary>

@@ -1523,7 +1523,7 @@ public:
 		T dx, dy;
 		T rnx = m_Rnd * rand.Frand01<T>();
 		T rny = m_Rnd * rand.Frand01<T>();
-		int isXY = int(LRint(helper.In.x * m_Cs) + LRint(helper.In.y * m_Cs));
+		int isXY = int(VarFuncs<T>::LRint(helper.In.x * m_Cs) + VarFuncs<T>::LRint(helper.In.y * m_Cs));
 
 		if (isXY & 1)
 		{
@@ -1852,12 +1852,12 @@ public:
 	{
 		T x = T(0.5) * helper.In.x + T(0.5);
 		T y = T(0.5) * helper.In.y + T(0.5);
-		T bx = Fabsmod<T>(m_Fr * x);
-		T by = Fabsmod<T>(m_Fr * y);
-		T oscnapx = Foscn<T>(m_AmountX, m_Px);
-		T oscnapy = Foscn<T>(m_AmountY, m_Py);
-		helper.Out.x = -1 + m_Vv2 * Lerp<T>(Lerp(x, Fosc(x, T(4), m_Px), oscnapx), Fosc(bx, T(4), m_Px), oscnapx);//Original did a direct assignment to outPoint, which is incompatible with Ember's design.
-		helper.Out.y = -1 + m_Vv2 * Lerp<T>(Lerp(y, Fosc(y, T(4), m_Py), oscnapy), Fosc(by, T(4), m_Py), oscnapy);
+		T bx = VarFuncs<T>::Fabsmod(m_Fr * x);
+		T by = VarFuncs<T>::Fabsmod(m_Fr * y);
+		T oscnapx = VarFuncs<T>::Foscn(m_AmountX, m_Px);
+		T oscnapy = VarFuncs<T>::Foscn(m_AmountY, m_Py);
+		helper.Out.x = -1 + m_Vv2 * Lerp<T>(Lerp<T>(x, VarFuncs<T>::Fosc(x, T(4), m_Px), oscnapx), VarFuncs<T>::Fosc(bx, T(4), m_Px), oscnapx);//Original did a direct assignment to outPoint, which is incompatible with Ember's design.
+		helper.Out.y = -1 + m_Vv2 * Lerp<T>(Lerp<T>(y, VarFuncs<T>::Fosc(y, T(4), m_Py), oscnapy), VarFuncs<T>::Fosc(by, T(4), m_Py), oscnapy);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -2463,8 +2463,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x = LRint(helper.In.x);
-		T y = LRint(helper.In.y);
+		T x = VarFuncs<T>::LRint(helper.In.x);
+		T y = VarFuncs<T>::LRint(helper.In.y);
 
 		if (y <= 0)
 		{
@@ -4210,8 +4210,8 @@ public:
 	{
 		T xp = std::pow(std::abs(m_Weight) * std::abs(helper.In.x), m_Powx);//Original did not fabs.
 		T yp = std::pow(std::abs(m_Weight) * std::abs(helper.In.y), m_Powy);
-		helper.Out.x = xp * Sign(helper.In.x) + m_Lcx * helper.In.x + m_Scx;
-		helper.Out.y = yp * Sign(helper.In.y) + m_Lcy * helper.In.y + m_Scy;
+		helper.Out.x = xp * VarFuncs<T>::Sign(helper.In.x) + m_Lcx * helper.In.x + m_Scx;
+		helper.Out.y = yp * VarFuncs<T>::Sign(helper.In.y) + m_Lcy * helper.In.y + m_Scy;
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -5199,8 +5199,8 @@ public:
 		T u = (dot11 * dot02 - dot01 * dot12) * invDenom;
 		T v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 		// now combine with input
-		T um = std::sqrt(SQR(u) + SQR(helper.In.x)) * Sign<T>(u);
-		T vm = std::sqrt(SQR(v) + SQR(helper.In.y)) * Sign<T>(v);
+		T um = std::sqrt(SQR(u) + SQR(helper.In.x)) * VarFuncs<T>::Sign(u);
+		T vm = std::sqrt(SQR(v) + SQR(helper.In.y)) * VarFuncs<T>::Sign(v);
 		helper.Out.x = m_Weight * um;
 		helper.Out.y = m_Weight * vm;
 		helper.Out.z = m_Weight * helper.In.z;

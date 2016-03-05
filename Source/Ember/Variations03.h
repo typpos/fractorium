@@ -1609,8 +1609,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		helper.Out.x = SignNz<T>(helper.In.x) * std::pow(std::abs(helper.In.x), m_PowX) * m_Weight;
-		helper.Out.y = SignNz<T>(helper.In.y) * std::pow(std::abs(helper.In.y), m_PowY) * m_Weight;
+		helper.Out.x = VarFuncs<T>::SignNz(helper.In.x) * std::pow(std::abs(helper.In.x), m_PowX) * m_Weight;
+		helper.Out.y = VarFuncs<T>::SignNz(helper.In.y) * std::pow(std::abs(helper.In.y), m_PowY) * m_Weight;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -2259,7 +2259,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T dx, dy, r = m_Weight / (helper.m_PrecalcSumSquares + EPS);
-		int isXY = int(LRint(helper.In.x * m_InvSize) + LRint(helper.In.y * m_InvSize));
+		int isXY = int(VarFuncs<T>::LRint(helper.In.x * m_InvSize) + VarFuncs<T>::LRint(helper.In.y * m_InvSize));
 
 		if (isXY & 1)
 		{
@@ -3761,7 +3761,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		int alt;
 
 		if (xmax < 1)
@@ -3911,7 +3911,7 @@ public:
 
 		T tmp = r2 + 1;
 		T tmp2 = 2 * x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		ClampGteRef<T>(xmax, 1);
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(x / xmax, -1, 1));//-Pi < nu < Pi.
@@ -4015,7 +4015,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		ClampGteRef<T>(xmax, 1);
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
@@ -4110,7 +4110,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		ClampGteRef<T>(xmax, 1);
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
@@ -4214,7 +4214,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		ClampGteRef<T>(xmax, 1);
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.
@@ -4303,7 +4303,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 
 		if (xmax < 1)
 			xmax = 1;
@@ -4383,7 +4383,7 @@ public:
 	{
 		T tmp = helper.m_PrecalcSumSquares + 1;
 		T tmp2 = 2 * helper.In.x;
-		T xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * T(0.5);
+		T xmax = (VarFuncs<T>::SafeSqrt(tmp + tmp2) + VarFuncs<T>::SafeSqrt(tmp - tmp2)) * T(0.5);
 		ClampGteRef<T>(xmax, 1);
 		T mu = std::acosh(xmax);
 		T nu = std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));//-Pi < nu < Pi.

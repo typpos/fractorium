@@ -17,6 +17,176 @@ class EMBER_API VarFuncs : public Singleton<VarFuncs<T>>
 {
 public:
 	/// <summary>
+	/// Return -1 if the value is less than 0, 1 if it's greater and
+	/// 0 if it's equal to 0.
+	/// </summary>
+	/// <param name="v">The value to inspect</param>
+	/// <returns>-1, 0 or 1</returns>
+	static inline T Sign(T v)
+	{
+		return (v < 0) ? static_cast<T>(-1) : (v > 0) ? static_cast<T>(1) : static_cast<T>(0);
+	}
+
+	/// <summary>
+	/// Return -1 if the value is less than 0, 1 if it's greater.
+	/// This differs from Sign() in that it doesn't return 0.
+	/// </summary>
+	/// <param name="v">The value to inspect</param>
+	/// <returns>-1 or 1</returns>
+	static inline T SignNz(T v)
+	{
+		return (v < 0) ? static_cast<T>(-1) : static_cast<T>(1);
+	}
+
+	/// <summary>
+	/// Thin wrapper around a call to modf that discards the integer portion
+	/// and returns the signed fractional portion.
+	/// </summary>
+	/// <param name="v">The value to retrieve the signed fractional portion of.</param>
+	/// <returns>The signed fractional portion of v.</returns>
+	static inline T Fabsmod(T v)
+	{
+		T dummy;
+		return modf(v, &dummy);
+	}
+
+	/// <summary>
+	/// Unsure.
+	/// </summary>
+	/// <param name="p">Unsure.</param>
+	/// <param name="amp">Unsure.</param>
+	/// <param name="ph">Unsure.</param>
+	/// <returns>Unsure.</returns>
+	static inline T Fosc(T p, T amp, T ph)
+	{
+		return T(0.5) - std::cos(p * amp + ph) * T(0.5);
+	}
+
+	/// <summary>
+	/// Unsure.
+	/// </summary>
+	/// <param name="p">Unsure.</param>
+	/// <param name="ph">Unsure.</param>
+	/// <returns>Unsure.</returns>
+	static inline T Foscn(T p, T ph)
+	{
+		return T(0.5) - std::cos(p + ph) * T(0.5);
+	}
+
+	/// <summary>
+	/// Log scale from Apophysis.
+	/// </summary>
+	/// <param name="x">The value to log scale</param>
+	/// <returns>The log scaled value</returns>
+	static inline T LogScale(T x)
+	{
+		return x == 0 ? 0 : std::log((fabs(x) + 1) * T(M_E)) * SignNz(x) / T(M_E);
+	}
+
+	/// <summary>
+	/// Log map from Apophysis.
+	/// </summary>
+	/// <param name="x">The value to log map</param>
+	/// <returns>The log mapped value</returns>
+	static inline T LogMap(T x)
+	{
+		return x == 0 ? 0 : (T(M_E) + std::log(x * T(M_E))) * T(0.25) * SignNz(x);
+	}
+
+	/// <summary>
+	/// Taking the square root of numbers close to zero is dangerous.  If x is negative
+	/// due to floating point errors, it can return NaN results.
+	/// </summary>
+	static inline T SafeSqrt(T x)
+	{
+		if (x <= 0)
+			return 0;
+
+		return std::sqrt(x);
+	}
+
+	/// <summary>
+	/// If r < EPS, return 1 / r.
+	/// Else, return q / r.
+	/// </summary>
+	/// <param name="q">The numerator</param>
+	/// <param name="r">The denominator</param>
+	/// <returns>The quotient</returns>
+	static inline T SafeDivInv(T q, T r)
+	{
+		if (r < EPS)
+			return 1 / r;
+
+		return q / r;
+	}
+
+	/// <summary>
+	/// Return the hypotenuse of the passed in values.
+	/// </summary>
+	/// <param name="x">The x distance</param>
+	/// <param name="y">The y distance</param>
+	/// <returns>The hypotenuse</returns>
+	static inline T Hypot(T x, T y)
+	{
+		return std::sqrt(SQR(x) + SQR(y));
+	}
+
+	/// <summary>
+	/// Spread the values.
+	/// </summary>
+	/// <param name="x">The x distance</param>
+	/// <param name="y">The y distance</param>
+	/// <returns>The spread</returns>
+	static inline T Spread(T x, T y)
+	{
+		return Hypot(x, y) * ((x) > 0 ? T(1) : T(-1));
+	}
+
+	/// <summary>
+	/// Unsure.
+	/// </summary>
+	/// <param name="x">The x distance</param>
+	/// <param name="y">The y distance</param>
+	/// <returns>The powq4</returns>
+	static inline T Powq4(T x, T y)
+	{
+		return std::pow(std::abs(x), y) * SignNz(x);
+	}
+
+	/// <summary>
+	/// Unsure.
+	/// </summary>
+	/// <param name="x">The x distance</param>
+	/// <param name="y">The y distance</param>
+	/// <returns>The powq4c</returns>
+	static inline T Powq4c(T x, T y)
+	{
+		return y == 1 ? x : Powq4(x, y);
+	}
+
+	/// <summary>
+	/// Special rounding for certain variations, gotten from Apophysis.
+	/// </summary>
+	/// <param name="x">The value to round</param>
+	/// <returns>The rounded value</returns>
+	static inline float LRint(float x)
+	{
+		int temp = (x >= 0 ? static_cast<int>(x + 0.5f) : static_cast<int>(x - 0.5f));
+		return static_cast<float>(temp);
+	}
+
+	/// <summary>
+	/// Special rounding for certain variations, gotten from Apophysis.
+	/// </summary>
+	/// <param name="x">The value to round</param>
+	/// <returns>The rounded value</returns>
+	static inline double LRint(double x)
+	{
+		glm::int64_t temp = (x >= 0 ? static_cast<int64_t>(x + 0.5) : static_cast<int64_t>(x - 0.5));
+		return static_cast<double>(temp);
+	}
+
+	/// <summary>
 	/// Retrieve information about a piece of shared data by looking
 	/// up its name.
 	/// </summary>

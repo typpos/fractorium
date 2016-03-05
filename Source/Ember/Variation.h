@@ -1688,7 +1688,7 @@ public:
 				T vd = std::max(std::min(val, m_Max), m_Min);
 
 				if (IsNearZero(vd))
-					*m_Param = EPS * SignNz(vd);
+					*m_Param = EPS * VarFuncs<T>::SignNz(vd);
 				else
 					*m_Param = vd;
 
@@ -1707,7 +1707,7 @@ public:
 				int vi = int(std::max(std::min<T>(T(Floor<T>(val + T(0.5))), m_Max), m_Min));
 
 				if (vi == 0)
-					vi = int(SignNz<T>(val));
+					vi = int(VarFuncs<T>::SignNz(val));
 
 				*m_Param = T(vi);
 				break;

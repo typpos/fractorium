@@ -95,7 +95,7 @@ public:
 		int n = int(Floor<T>(T(0.5) * helper.In.y / m_Sc));
 		T x = helper.In.x - (m * 2 + 1) * m_Sc;
 		T y = helper.In.y - (n * 2 + 1) * m_Sc;
-		T u = Zeps(Hypot(x, y));
+		T u = Zeps(VarFuncs<T>::Hypot(x, y));
 		T v = (T(0.3) + T(0.7) * DiscreteNoise2(m + 10, n + 3)) * m_Sc;
 		T z1 = DiscreteNoise2(int(m + m_Seed), n);
 
@@ -283,7 +283,7 @@ public:
 			n = Floor<T>(T(0.5) * y / m_Sc);
 			x -= (m * 2 + 1) * m_Sc;
 			y -= (n * 2 + 1) * m_Sc;
-			u = Hypot(x, y);
+			u = VarFuncs<T>::Hypot(x, y);
 
 			if (++iters > 10)
 				break;
@@ -404,7 +404,7 @@ public:
 		intmax_t n = Floor<T>(T(0.5) * uy / m_Sc);
 		x = ux - (m * 2 + 1) * m_Sc;
 		y = uy - (n * 2 + 1) * m_Sc;
-		u = Hypot(x, y);
+		u = VarFuncs<T>::Hypot(x, y);
 
 		if ((DiscreteNoise2(int(m + m_Seed), int(n)) > m_Dens) || (u > (T(0.3) + T(0.7) * DiscreteNoise2(int(m + 10), int(n + 3))) * m_Sc))
 		{
@@ -510,6 +510,11 @@ public:
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
 		return vector<string> { "Hypot" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_Sc = Zeps(m_Sc);
 	}
 
 protected:
@@ -2742,11 +2747,11 @@ public:
 			case 2://Log.
 			default:
 			{
-				const T coeff = m_RMax <= EPS ? dist : dist + m_Alpha * (LogMap(dist) - dist);
-				helper.Out.x = helper.In.x + LogMap(m_MulX) * LogScale(random.x) * coeff;
-				helper.Out.y = helper.In.y + LogMap(m_MulY) * LogScale(random.y) * coeff;
-				helper.Out.z = helper.In.z + LogMap(m_MulZ) * LogScale(random.z) * coeff;
-				outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + LogMap(m_MulC) * LogScale(random.w) * coeff, T(1)));
+				const T coeff = m_RMax <= EPS ? dist : dist + m_Alpha * (VarFuncs<T>::LogMap(dist) - dist);
+				helper.Out.x = helper.In.x + VarFuncs<T>::LogMap(m_MulX) * VarFuncs<T>::LogScale(random.x) * coeff;
+				helper.Out.y = helper.In.y + VarFuncs<T>::LogMap(m_MulY) * VarFuncs<T>::LogScale(random.y) * coeff;
+				helper.Out.z = helper.In.z + VarFuncs<T>::LogMap(m_MulZ) * VarFuncs<T>::LogScale(random.z) * coeff;
+				outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + VarFuncs<T>::LogMap(m_MulC) * VarFuncs<T>::LogScale(random.w) * coeff, T(1)));
 			}
 			break;
 		}

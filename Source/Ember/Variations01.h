@@ -3200,7 +3200,7 @@ public:
 	{
 		if (!_stricmp(name, "bipolar_shift"))
 		{
-			T temp = Fabsmod(T(0.5) * (val + 1));
+			T temp = VarFuncs<T>::Fabsmod(T(0.5) * (val + 1));
 			m_Shift = 2 * temp - 1;
 			Precalc();
 			return true;
@@ -3902,7 +3902,7 @@ public:
 	{
 		if (!_stricmp(name, "escher_beta"))
 		{
-			m_Beta = Fabsmod((val + T(M_PI)) / (2 * T(M_PI))) * 2 * T(M_PI) - T(M_PI);
+			m_Beta = VarFuncs<T>::Fabsmod((val + T(M_PI)) / (2 * T(M_PI))) * 2 * T(M_PI) - T(M_PI);
 			Precalc();
 			return true;
 		}
@@ -4056,7 +4056,7 @@ public:
 	{
 		if (!_stricmp(name, "lazysusan_spin"))
 		{
-			m_Spin = Fabsmod(val / T(M_2PI)) * T(M_2PI);
+			m_Spin = VarFuncs<T>::Fabsmod(val / T(M_2PI)) * T(M_2PI);
 			this->Precalc();
 			return true;
 		}

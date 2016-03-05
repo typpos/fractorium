@@ -1,4 +1,4 @@
-VERSION = 0.9.9.4
+VERSION = 0.9.9.5
 win32:CONFIG += skip_target_version_ext
 #message(PWD: $$absolute_path($$PWD))
 

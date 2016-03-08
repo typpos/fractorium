@@ -63,8 +63,10 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 		QDir::currentPath().toLocal8Bit().data(),
 		QDir::homePath().toLocal8Bit().data(),
 		QCoreApplication::applicationDirPath().toLocal8Bit().data(),
-		QString("/usr/local/share/fractorium").toLocal8Bit().data(),
-		QString("/usr/share/fractorium").toLocal8Bit().data()
+		QString("~/.fractorium").toLocal8Bit().data(),
+		QString("~/.config/fractorium").toLocal8Bit().data(),
+		QString("/usr/share/fractorium").toLocal8Bit().data(),
+		QString("/usr/local/share/fractorium").toLocal8Bit().data()
 	};
 
 	for (auto& path : paths)
@@ -349,7 +351,11 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	}
 
 	static EmberToXml<T> writer;//Save parameters of last full render just in case there is a crash.
+#ifdef _WIN32
 	string filename = "last.flame";
+#else
+	string filename = "~/.config/fractorium/last.flame";
+#endif
 	writer.Save(filename.c_str(), m_Ember, 0, true, false, true);
 	m_GLController->ResetMouseState();
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.

@@ -116,6 +116,7 @@ static bool InitPaletteList(const string& filename)
 	{
 		"./",
 #ifndef _WIN32
+		"~"
 		"~/.fractorium",
 		"~/.config/fractorium",
 		"/usr/share/fractorium",

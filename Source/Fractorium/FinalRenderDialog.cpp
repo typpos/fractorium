@@ -75,6 +75,25 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 
 	if (m_Info->Ok() && !m_Info->Devices().empty())
 	{
+		//This is an extra attempt to prevent crashes on unsupported hardware:
+		//Hardware which does not have an OpenCL 1.2 driver installed will hard crash the program upon initializing a renderer. There is no way around this.
+		//When the user selects the OpenCL settings in the main options dialog, they can select the desired hardware before an attempt is made to create the renderer.
+		//However, in the final render dialog, the renderer is created and its settings changed for every applicable UI change made by the user so that it can be
+		//applied to the preview thumbnail.
+		//When they click Use OpenCL, it will immediately try to create the renderer with whatever devices are present in the device table.
+		//Since the first entry is always selected by default, the renderer will be created using it.
+		//If that entry is a supported device, then all is fine.
+		//However, if it's not a supported device, it will immediately crash the program.
+		//In such a scenario, the user will never be able to use OpenCL for the final render, even though they were able to use it for the interactive render.
+		//This workaround is to detect if the user has successfully specified and used any device other than the default on the main window in the options dialog.
+		//If so, use that instead.
+		//Since this code only runs once upon startup, they must close the program and re-run it after properly configuring an OpenCL device on the main window.
+		//At that point, when they open the final render dialog, it will use the correct device.
+		if (m_Settings->FinalDevices().isEmpty() &&//Is it the first run?
+				!m_Settings->Devices().empty() &&//They've successfully used OpenCL in the main window?
+				!(m_Settings->Devices().size() == 1 && m_Settings->Devices()[0].toInt() == 0))//Extra check it wasn't just the default, in which case it'd offer no value here since the default here is also 0.
+			m_Settings->FinalDevices(m_Settings->Devices());//Assign what was used in the main window here.
+
 		SetupDeviceTable(table, m_Settings->FinalDevices());
 
 		for (int i = 0; i < table->rowCount(); i++)

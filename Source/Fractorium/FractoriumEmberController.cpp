@@ -63,7 +63,6 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 		QDir::currentPath().toLocal8Bit().data(),
 		QDir::homePath().toLocal8Bit().data(),
 		QCoreApplication::applicationDirPath().toLocal8Bit().data(),
-		QString("~/.Fractorium").toLocal8Bit().data(),
 		QString("~/.config/Fractorium").toLocal8Bit().data(),
 		QString("/usr/share/fractorium").toLocal8Bit().data(),
 		QString("/usr/local/share/fractorium").toLocal8Bit().data()
@@ -354,12 +353,12 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 #ifdef _WIN32
 	string filename = "last.flame";
 #else
-	QDir dir("~/.config/Fractorium");
+	QDir dir(QDir::homePath() + "/.config/Fractorium");
 
 	if (!dir.exists())
 		dir.mkpath(".");
 
-	string filename = "~/.config/Fractorium/last.flame";
+	string filename = QDir::homePath().toStdString() + "/.config/Fractorium/last.flame";
 #endif
 	writer.Save(filename.c_str(), m_Ember, 0, true, false, true);
 	m_GLController->ResetMouseState();

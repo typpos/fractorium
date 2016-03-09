@@ -7,7 +7,11 @@
 /// </summary>
 /// <param name="p">The parent widget</param>
 FractoriumSettings::FractoriumSettings(QObject* p)
+#ifdef _WIN32
 	: QSettings(QSettings::IniFormat, QSettings::UserScope, "Fractorium", "Fractorium", p)
+#else
+	: QSettings(QSettings::IniFormat, QSettings::UserScope, "fractorium", "fractorium", p)
+#endif
 {
 	EnsureDefaults();
 }

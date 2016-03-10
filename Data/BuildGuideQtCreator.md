@@ -134,13 +134,13 @@ The output contents will be:
 
 ```
 dark.qss
-Ember.dll
-Ember.exp
-Ember.lib
+ember.dll
+ember.exp
+ember.lib
 emberanimate.exe
-EmberCL.dll
-EmberCL.exp
-EmberCL.lib
+emberCL.dll
+emberCL.exp
+emberCL.lib
 embergenome.exe
 emberrender.exe
 flam3-palettes.xml
@@ -171,9 +171,9 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2013 (
 [YOUR FOLDER]
 │
 ├─  dark.qss
-├─  Ember.dll
+├─  ember.dll
 ├─  emberanimate.exe
-├─  EmberCL.dll
+├─  emberCL.dll
 ├─  embergenome.exe
 ├─  emberrender.exe
 ├─  flam3-palettes.xml

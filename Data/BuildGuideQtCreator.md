@@ -138,9 +138,9 @@ ember.dll
 ember.exp
 ember.lib
 emberanimate.exe
-emberCL.dll
-emberCL.exp
-emberCL.lib
+embercl.dll
+embercl.exp
+embercl.lib
 embergenome.exe
 emberrender.exe
 flam3-palettes.xml
@@ -173,7 +173,7 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2013 (
 ├─  dark.qss
 ├─  ember.dll
 ├─  emberanimate.exe
-├─  emberCL.dll
+├─  embercl.dll
 ├─  embergenome.exe
 ├─  emberrender.exe
 ├─  flam3-palettes.xml

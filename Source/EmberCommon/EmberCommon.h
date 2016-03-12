@@ -130,8 +130,8 @@ static bool InitPaletteList(const string& filename)
 
 	if (!added || !paletteList.Size())
 	{
-		cout << "Error parsing palette file " << filename << ". Reason: \n";
-		cout << paletteList.ErrorReportString() << "\nReturning without executing.\n";
+		cout << "Error parsing palette file " << filename << ". Reason: \n"
+			 << paletteList.ErrorReportString() << "\nReturning without executing.\n";
 		return false;
 	}
 

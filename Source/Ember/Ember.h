@@ -219,7 +219,7 @@ public:
 		m_HighlightPower = -1;
 		m_Time = 0;
 		m_Background.Reset();
-		m_Interp = eInterp::EMBER_INTERP_LINEAR;
+		m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 		m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
 		//DE filter.
 		m_MinRadDE = 0;
@@ -1367,7 +1367,7 @@ public:
 		m_Symmetry = 0;
 		m_Rotate = 0;
 		m_PixelsPerUnit = 50;
-		m_Interp = eInterp::EMBER_INTERP_LINEAR;
+		m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 		m_PaletteInterp = ePaletteInterp::INTERP_HSV;
 		m_Index = 0;
 		m_ParentFilename = "";

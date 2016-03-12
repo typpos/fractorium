@@ -83,10 +83,12 @@ void Fractorium::InitParamsUI()
 	comboVals.push_back("Linear");
 	comboVals.push_back("Smooth");
 	SetupCombo(table, this, row, 1, m_InterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnInterpTypeComboCurrentIndexChanged(int)));
+	m_InterpTypeCombo->SetCurrentIndexStealth(int(eInterp::EMBER_INTERP_SMOOTH));
 	comboVals.clear();
-	comboVals.push_back("Step");
 	comboVals.push_back("Linear");
+	comboVals.push_back("Log");
 	SetupCombo(                         table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
+	m_AffineInterpTypeCombo->SetCurrentIndexStealth(int(eAffineInterp::AFFINE_INTERP_LOG));
 	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_TemporalSamplesSpin, spinHeight, 1, 5000, 1, SIGNAL(valueChanged(int)), SLOT(OnTemporalSamplesChanged(int)), true, 1000);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1);
 	comboVals = TemporalFilterCreator<float>::FilterTypes();

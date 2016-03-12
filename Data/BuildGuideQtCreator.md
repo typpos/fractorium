@@ -86,13 +86,13 @@ This will download and build `glm libpng libxml zlib`. You will have a folder st
 ###Begin build with Qt Creator
 
 Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2013 64bit*.
-Select *Shadow build* in *Edit build configuration* for both *Debug* and *Release*.
+Make sure *Shadow build* in *Edit build configuration* for both *Debug* and *Release* is unchecked.
 
 Switch to the *Release* configuration.
 
 Under *Build Steps*, add an additional argument of `install` to the `make` command to force all dependencies to be copied to the output folder. The final make command should look like:
 
-`jom.exe install in /path/to/your/build/build-main-Desktop_Qt_5_5_1_MSVC2013_64bit-Release`
+`jom.exe install in /path/to/fractorium`
 
 Ensure all projects are in the *Release* configuration and build main.pro.
 
@@ -134,13 +134,13 @@ The output contents will be:
 
 ```
 dark.qss
-Ember.dll
-Ember.exp
-Ember.lib
+ember.dll
+ember.exp
+ember.lib
 emberanimate.exe
-EmberCL.dll
-EmberCL.exp
-EmberCL.lib
+embercl.dll
+embercl.exp
+embercl.lib
 embergenome.exe
 emberrender.exe
 flam3-palettes.xml
@@ -171,9 +171,9 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2013 (
 [YOUR FOLDER]
 │
 ├─  dark.qss
-├─  Ember.dll
+├─  ember.dll
 ├─  emberanimate.exe
-├─  EmberCL.dll
+├─  embercl.dll
 ├─  embergenome.exe
 ├─  emberrender.exe
 ├─  flam3-palettes.xml

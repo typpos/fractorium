@@ -178,7 +178,7 @@ private:
 	eRenderStatus RunDensityFilter();
 	eRenderStatus RunFinalAccum();
 	bool ClearBuffer(size_t device, const string& bufferName, uint width, uint height, uint elementSize);
-	bool RunDensityFilterPrivate(size_t kernelIndex, size_t gridW, size_t gridH, size_t blockW, size_t blockH, uint chunkSizeW, uint chunkSizeH, uint chunkW, uint chunkH);
+	bool RunDensityFilterPrivate(size_t kernelIndex, size_t gridW, size_t gridH, size_t blockW, size_t blockH, uint chunkSizeW, uint chunkSizeH, uint colChunkPass, uint rowChunkPass);
 	int MakeAndGetDensityFilterProgram(size_t ss, uint filterWidth);
 	int MakeAndGetFinalAccumProgram(double& alphaBase, double& alphaScale);
 	int MakeAndGetGammaCorrectionProgram();

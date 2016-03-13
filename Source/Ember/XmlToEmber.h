@@ -344,16 +344,10 @@ public:
 		if (emberSize > 0)
 		{
 			if (embers[0].m_Interp == eInterp::EMBER_INTERP_SMOOTH)
-			{
-				cout << "Warning: smooth interpolation cannot be used for first segment.\n         switching to linear.\n";
 				embers[0].m_Interp = eInterp::EMBER_INTERP_LINEAR;
-			}
 
 			if (emberSize >= 2 && embers[emberSize - 2].m_Interp == eInterp::EMBER_INTERP_SMOOTH)
-			{
-				cout << "Warning: smooth interpolation cannot be used for last segment.\n         switching to linear.\n";
 				embers[emberSize - 2].m_Interp = eInterp::EMBER_INTERP_LINEAR;
-			}
 		}
 
 		//Finally, ensure that consecutive 'rotate' parameters never exceed

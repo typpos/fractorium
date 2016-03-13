@@ -165,13 +165,14 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 
 		if (b)
 		{
-			//This is the maximum box dimension for density filtering which consists of (blockSize  * blockSize) + (2 * filterWidth).
-			//These blocks must be square, and ideally, 32x32.
-			//Sadly, at the moment, Fermi runs out of resources at that block size because the DE filter function is so complex.
+			//This is the maximum box dimension for density filtering which consists of (blockSize * blockSize) + (2 * filterWidth).
+			//These blocks should be square, and ideally, 32x32.
+			//Sadly, at the moment, the GPU runs out of resources at that block size because the DE filter function is so complex.
 			//The next best block size seems to be 24x24.
 			//AMD is further limited because of less local memory so these have to be 16 on AMD.
-			m_MaxDEBlockSizeW = m_Devices[0]->Nvidia() ? 24 : 16;//These *must* both be divisible by 8 or else pixels will go missing.
-			m_MaxDEBlockSizeH = m_Devices[0]->Nvidia() ? 24 : 16;
+			//Users have reported crashes on Nvidia cards even at size 24, so just to be safe, make them both 16 for all manufacturers.
+			m_MaxDEBlockSizeW = 16;
+			m_MaxDEBlockSizeH = 16;
 			FillSeeds();
 
 			for (size_t device = 0; device < m_Devices.size(); device++)
@@ -1191,22 +1192,18 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 
 	if (kernelIndex != -1)
 	{
-		uint leftBound  = m_DensityFilterCL.m_Supersample - 1;
-		uint rightBound = m_DensityFilterCL.m_SuperRasW - (m_DensityFilterCL.m_Supersample - 1);
-		uint topBound   = leftBound;
-		uint botBound   = m_DensityFilterCL.m_SuperRasH - (m_DensityFilterCL.m_Supersample - 1);
+		uint ssm1		  = m_DensityFilterCL.m_Supersample - 1;
+		uint leftBound    = ssm1;
+		uint rightBound   = m_DensityFilterCL.m_SuperRasW - ssm1;
+		uint topBound     = leftBound;
+		uint botBound     = m_DensityFilterCL.m_SuperRasH - ssm1;
 		size_t gridW      = rightBound - leftBound;
 		size_t gridH      = botBound - topBound;
-		size_t blockSizeW = m_MaxDEBlockSizeW;//These *must* both be divisible by 16 or else pixels will go missing.
+		size_t blockSizeW = m_MaxDEBlockSizeW;
 		size_t blockSizeH = m_MaxDEBlockSizeH;
-		auto& wrapper = m_Devices[0]->m_Wrapper;
-
-		//OpenCL runs out of resources when using double or a supersample of 2.
-		//Remedy this by reducing the height of the block by 2.
-		if (m_DoublePrecision || m_DensityFilterCL.m_Supersample > 1)
-			blockSizeH -= 2;
-
-		//Can't just blindly pass dimension in vals. Must adjust them first to evenly divide the block count
+		double fw2        = m_DensityFilterCL.m_FilterWidth * 2.0;
+		auto& wrapper     = m_Devices[0]->m_Wrapper;
+		//Can't just blindly pass dimension in vals. Must adjust them first to evenly divide the thread count
 		//into the total grid dimensions.
 		OpenCLWrapper::MakeEvenGridDims(blockSizeW, blockSizeH, gridW, gridH);
 		//t.Tic();
@@ -1215,11 +1212,11 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 		//The other is to proces the entire image in multiple passes, and each pass processes blocks of pixels
 		//that are far enough apart such that their filters do not overlap.
 		//Do the latter.
-		//Gap is in terms of blocks. How many blocks must separate two blocks running at the same time.
-		uint gapW = uint(ceil((m_DensityFilterCL.m_FilterWidth * 2.0) / double(blockSizeW)));
-		uint chunkSizeW = gapW + 1;
-		uint gapH = uint(ceil((m_DensityFilterCL.m_FilterWidth * 2.0) / double(blockSizeH)));
-		uint chunkSizeH = gapH + 1;
+		//Gap is in terms of blocks and specifies how many blocks must separate two blocks running at the same time.
+		uint gapW = uint(ceil(fw2 / blockSizeW));
+		uint chunkSizeW = gapW + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap to the right of it.
+		uint gapH = uint(ceil(fw2 / blockSizeH));
+		uint chunkSizeH = gapH + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap below it.
 		double totalChunks = chunkSizeW * chunkSizeH;
 
 		if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { AddToReport(loc); }
@@ -1257,22 +1254,22 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 		}
 
 #else
-		gridW /= chunkSizeW;
+		gridW /= chunkSizeW;//Grid must be scaled down by number of chunks.
 		gridH /= chunkSizeH;
 		OpenCLWrapper::MakeEvenGridDims(blockSizeW, blockSizeH, gridW, gridH);
 
-		for (uint rowChunk = 0; b && !m_Abort && rowChunk < chunkSizeH; rowChunk++)
+		for (uint rowChunkPass = 0; b && !m_Abort && rowChunkPass < chunkSizeH; rowChunkPass++)//Number of vertical passes.
 		{
-			for (uint colChunk = 0; b && !m_Abort && colChunk < chunkSizeW; colChunk++)
+			for (uint colChunkPass = 0; b && !m_Abort && colChunkPass < chunkSizeW; colChunkPass++)//Number of horizontal passes.
 			{
 				//t2.Tic();
-				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, chunkSizeW, chunkSizeH, colChunk, rowChunk))) { m_Abort = true; AddToReport(loc); }
+				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, chunkSizeW, chunkSizeH, colChunkPass, rowChunkPass))) { m_Abort = true; AddToReport(loc); }
 
 				//t2.Toc(loc);
 
 				if (b && m_Callback)
 				{
-					double percent = (double((rowChunk * chunkSizeW) + (colChunk + 1)) / totalChunks) * 100.0;
+					double percent = (double((rowChunkPass * chunkSizeW) + (colChunkPass + 1)) / totalChunks) * 100.0;
 					double etaMs = ((100.0 - percent) / percent) * t.Toc();
 
 					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 1, etaMs))
@@ -1456,11 +1453,11 @@ bool RendererCL<T, bucketT>::ClearBuffer(size_t device, const string& bufferName
 /// <param name="blockH">Block height</param>
 /// <param name="chunkSizeW">Chunk size width (gapW + 1)</param>
 /// <param name="chunkSizeH">Chunk size height (gapH + 1)</param>
-/// <param name="rowParity">Row parity</param>
-/// <param name="colParity">Column parity</param>
+/// <param name="colChunkPass">The current horizontal pass index</param>
+/// <param name="rowChunkPass">The current vertical pass index</param>
 /// <returns>True if success, else false.</returns>
 template <typename T, typename bucketT>
-bool RendererCL<T, bucketT>::RunDensityFilterPrivate(size_t kernelIndex, size_t gridW, size_t gridH, size_t blockW, size_t blockH, uint chunkSizeW, uint chunkSizeH, uint chunkW, uint chunkH)
+bool RendererCL<T, bucketT>::RunDensityFilterPrivate(size_t kernelIndex, size_t gridW, size_t gridH, size_t blockW, size_t blockH, uint chunkSizeW, uint chunkSizeH, uint colChunkPass, uint rowChunkPass)
 {
 	//Timing t(4);
 	bool b = true;
@@ -1487,9 +1484,9 @@ bool RendererCL<T, bucketT>::RunDensityFilterPrivate(size_t kernelIndex, size_t 
 
 		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkSizeH)))						 { AddToReport(loc); } argIndex++;//Chunk size height (gapH + 1).
 
-		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkW)))							 { AddToReport(loc); } argIndex++;//Column chunk.
+		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, colChunkPass)))					 { AddToReport(loc); } argIndex++;//Column chunk, horizontal pass.
 
-		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkH)))							 { AddToReport(loc); } argIndex++;//Row chunk.
+		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, rowChunkPass)))					 { AddToReport(loc); } argIndex++;//Row chunk, vertical pass.
 
 		//t.Toc(__FUNCTION__ " set args");
 

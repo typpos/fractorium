@@ -437,16 +437,12 @@ public:
 		{
 			if (i1 == 0)
 			{
-				//fprintf(stderr, "error: cannot use smooth interpolation on first segment.\n");
-				//fprintf(stderr, "reverting to linear interpolation.\n");
 				Align(&embers[i1], &localEmbers[0], 2);
 				smoothFlag = false;
 			}
 
 			if (i2 == size - 1)
 			{
-				//fprintf(stderr, "error: cannot use smooth interpolation on last segment.\n");
-				//fprintf(stderr, "reverting to linear interpolation.\n");
 				Align(&embers[i1], &localEmbers[0], 2);
 				smoothFlag = false;
 			}

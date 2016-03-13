@@ -940,12 +940,20 @@ size_t OpenCLWrapper::GlobalMemSize() const { return m_GlobalMemSize; }
 size_t OpenCLWrapper::MaxAllocSize() const { return m_MaxAllocSize; }
 
 /// <summary>
-/// Makes the even grid dims.
+/// Make even grid dimensions.
+/// The size of the blocks in terms of threads must divide evenly into the total number of threads in the grid.
+/// In the case of a remainder, expand the width and height of the grid to the next highest evenly divisible value.
+/// Ex:
+///		blockW = 5, blockH = 5
+///		gridW = 18, gridH = 27
+///
+/// To make these even:
+///		gridW = 20, gridH = 30
 /// </summary>
-/// <param name="blockW">The block w.</param>
-/// <param name="blockH">The block h.</param>
-/// <param name="gridW">The grid w.</param>
-/// <param name="gridH">The grid h.</param>
+/// <param name="blockW">The width of each block in terms of threads.</param>
+/// <param name="blockH">The height of each block in terms of threads.</param>
+/// <param name="gridW">The width of the entire grid in terms of threads.</param>
+/// <param name="gridH">The width of the entire grid in terms of threads.</param>
 void OpenCLWrapper::MakeEvenGridDims(size_t blockW, size_t blockH, size_t& gridW, size_t& gridH)
 {
 	if (gridW % blockW != 0)

@@ -1,4 +1,4 @@
-# Building Guide for Mac OS/X
+# Build Guide for Mac OS/X
 
 Install Xcode from the App Store. Install [homebrew](http://brew.sh/).
 

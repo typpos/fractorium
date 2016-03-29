@@ -1524,8 +1524,8 @@ public:
 	/// <summary>
 	/// Accessors.
 	/// </summary>
-	inline const Xform<T>* Xforms() const { return &m_Xforms[0]; }
-	inline Xform<T>* NonConstXforms() { return &m_Xforms[0]; }
+	inline const Xform<T>* Xforms() const { return m_Xforms.data(); }
+	inline Xform<T>* NonConstXforms() { return m_Xforms.data(); }
 	inline size_t XformCount() const { return m_Xforms.size(); }
 	inline const Xform<T>* FinalXform() const { return &m_FinalXform; }
 	inline Xform<T>* NonConstFinalXform() { return &m_FinalXform; }

@@ -101,7 +101,7 @@ void FractoriumEmberController<T>::FillSummary()
 			item1->setText(0, "Xform " +
 						   QString::number(x + 1) +
 						   " (" + QLocale::system().toString(xform->m_Weight, pc, p) + ") (" +
-						   QLocale::system().toString(double(m_NormalizedWeights[index]), pc, p) + ") " +
+						   QLocale::system().toString(double(m_NormalizedWeights[index]), pc, p) + ")" +
 						   linked);
 		}
 		else

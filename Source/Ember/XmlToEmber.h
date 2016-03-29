@@ -559,6 +559,7 @@ private:
 			else if (ParseAndAssign(curAtt->name, attStr, "scale",				   currentEmber.m_PixelsPerUnit,	   ret)) { currentEmber.m_OrigPixPerUnit = currentEmber.m_PixelsPerUnit; }
 			else if (ParseAndAssign(curAtt->name, attStr, "rotate",                currentEmber.m_Rotate,              ret)) { }
 			else if (ParseAndAssign(curAtt->name, attStr, "zoom",				   currentEmber.m_Zoom,				   ret)) { ClampGteRef<T>(currentEmber.m_Zoom, 0); }
+			else if (ParseAndAssign(curAtt->name, attStr, "cam_zoom",			   currentEmber.m_Zoom,				   ret)) { ClampGteRef<T>(currentEmber.m_Zoom, 0); }//JWildfire uses cam_zoom.
 			else if (ParseAndAssign(curAtt->name, attStr, "filter",                currentEmber.m_SpatialFilterRadius, ret)) { }
 			else if (ParseAndAssign(curAtt->name, attStr, "temporal_filter_width", currentEmber.m_TemporalFilterWidth, ret)) { }
 			else if (ParseAndAssign(curAtt->name, attStr, "temporal_filter_exp",   currentEmber.m_TemporalFilterExp,   ret)) { }
@@ -1253,9 +1254,15 @@ private:
 
 				if (auto var = m_VariationList.GetVariation(s))
 				{
-					auto varCopy = var->Copy();
-					Aton(attStr, varCopy->m_Weight);
-					xform.AddVariation(varCopy);
+					T weight = 0;
+					Aton(attStr, weight);
+
+					if (!IsNearZero(weight))//Having a variation with zero weight makes no sense, so guard against it.
+					{
+						auto varCopy = var->Copy();
+						varCopy->m_Weight = weight;
+						xform.AddVariation(varCopy);
+					}
 				}
 
 				//else

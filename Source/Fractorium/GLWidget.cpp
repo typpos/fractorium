@@ -43,7 +43,7 @@ void GLWidget::InitGL()
 		SetDimensions(w, h);
 		m_Fractorium->m_WidthSpin->setValue(w);
 		m_Fractorium->m_HeightSpin->setValue(h);
-		//Start with a flock of 10 random embers. Can't do this until now because the window wasn't maximized yet, so the sizes would have been off.
+		//Start with a flock of random embers. Can't do this until now because the window wasn't maximized yet, so the sizes would have been off.
 		m_Fractorium->OnActionNewFlock(false);
 		m_Fractorium->m_Controller->DelayedStartRenderTimer();
 		m_Init = true;

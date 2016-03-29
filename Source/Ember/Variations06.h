@@ -3938,14 +3938,13 @@ public:
 		T xi, yi, zi;
 		int iMode = int(m_Mode);
 
-		//Extremely strange usage, where a post variation wants the original affine transformed points.
 		if (m_Static > 1)
 		{
 			xi = helper.In.x;
 			yi = helper.In.y;
 			zi = helper.In.z;
 		}
-		else
+		else//Extremely strange usage, where a post variation wants the original affine transformed points.
 		{
 			xi = helper.m_TransX;
 			yi = helper.m_TransY;
@@ -4021,7 +4020,7 @@ public:
 				if (m_Roundstr != 0)
 				{
 					T wwidth = ((m_Roundwidth != 1) ? std::exp(std::log(xang * 2) * m_Roundwidth) : (xang * 2)) * m_RoundCoeff;
-					coeff = abs((1 - wwidth) * coeff + wwidth);
+					coeff = std::abs((1 - wwidth) * coeff + wwidth);
 				}
 
 				if (m_Distortion != 1)
@@ -4369,6 +4368,7 @@ public:
 
 		m_X = m_Y = m_Z = m_C = 0;
 	}
+
 protected:
 	void Init()
 	{

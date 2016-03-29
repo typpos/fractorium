@@ -68,7 +68,7 @@ public:
 	/// <summary>
 	/// Accessors.
 	/// </summary>
-	const byte* XformDistributions() const { return m_XformDistributions.empty() ? nullptr : &m_XformDistributions[0]; }
+	const byte* XformDistributions() const { return m_XformDistributions.empty() ? nullptr : m_XformDistributions.data(); }
 	size_t      XformDistributionsSize() const { return m_XformDistributions.size(); }
 
 	/// <summary>
@@ -308,9 +308,9 @@ public:
 		Point<T> tempPoint, p1;
 		auto xforms = ember.NonConstXforms();
 
-		if (ember.ProjBits())
+		if (ember.ProjBits())//No xaos, 3D.
 		{
-			if (ember.UseFinalXform())
+			if (ember.UseFinalXform())//No xaos, 3D, final.
 			{
 				p1 = samples[0];
 
@@ -332,7 +332,7 @@ public:
 					ember.Proj(samples[i], rand);
 				}
 			}
-			else
+			else//No xaos, 3D, no final.
 			{
 				p1 = samples[0];
 
@@ -355,9 +355,9 @@ public:
 				}
 			}
 		}
-		else
+		else//No xaos, no 3D.
 		{
-			if (ember.UseFinalXform())
+			if (ember.UseFinalXform())//No xaos, no 3D, final.
 			{
 				p1 = samples[0];
 
@@ -377,7 +377,7 @@ public:
 					DoFinalXform(ember, p1, samples + i, rand);
 				}
 			}
-			else
+			else//No xaos, no 3D, no final.
 			{
 				p1 = samples[0];
 
@@ -475,9 +475,9 @@ public:
 		Point<T> tempPoint, p1;
 		auto xforms = ember.NonConstXforms();
 
-		if (ember.ProjBits())
+		if (ember.ProjBits())//Xaos, 3D.
 		{
-			if (ember.UseFinalXform())
+			if (ember.UseFinalXform())//Xaos, 3D, final.
 			{
 				p1 = samples[0];
 
@@ -506,7 +506,7 @@ public:
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 			}
-			else
+			else//Xaos, 3D, no final.
 			{
 				p1 = samples[0];
 
@@ -536,9 +536,9 @@ public:
 				}
 			}
 		}
-		else
+		else//Xaos, no 3D.
 		{
-			if (ember.UseFinalXform())
+			if (ember.UseFinalXform())//Xaos, no 3D, final.
 			{
 				p1 = samples[0];
 
@@ -565,7 +565,7 @@ public:
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 			}
-			else
+			else//Xaos, no 3D, no final.
 			{
 				p1 = samples[0];
 

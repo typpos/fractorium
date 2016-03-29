@@ -2033,7 +2033,7 @@ public:
 	/// <summary>
 	/// Accessors.
 	/// </summary>
-	const ParamWithName<T>* Params() const { return &m_Params[0]; }
+	const ParamWithName<T>* Params() const { return m_Params.data(); }
 	size_t ParamCount() const { return m_Params.size(); }
 	const vector<ParamWithName<T>>& ParamsVec() const { return m_Params; }
 

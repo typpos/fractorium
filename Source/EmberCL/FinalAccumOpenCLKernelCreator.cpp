@@ -32,7 +32,7 @@ FinalAccumOpenCLKernelCreator::FinalAccumOpenCLKernelCreator(bool doublePrecisio
 /// Kernel source and entry point properties, getters only.
 /// </summary>
 
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithAlphaCalcKernel()        const { return m_GammaCorrectionWithAlphaCalcKernel;	    }
+const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithAlphaCalcKernel()        const { return m_GammaCorrectionWithAlphaCalcKernel;	     }
 const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithAlphaCalcEntryPoint()    const { return m_GammaCorrectionWithAlphaCalcEntryPoint;    }
 const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithoutAlphaCalcKernel()     const { return m_GammaCorrectionWithoutAlphaCalcKernel;     }
 const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithoutAlphaCalcEntryPoint() const { return m_GammaCorrectionWithoutAlphaCalcEntryPoint; }
@@ -231,6 +231,8 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	   "\n"
 	   "	uint accumX = spatialFilter->m_DensityFilterOffset + (GLOBAL_ID_X * spatialFilter->m_Supersample);\n"
 	   "	uint accumY = spatialFilter->m_DensityFilterOffset + (GLOBAL_ID_Y * spatialFilter->m_Supersample);\n"
+	   "    uint clampedFilterH = min((uint)spatialFilter->m_FilterWidth, spatialFilter->m_SuperRasH - accumY);"
+	   "    uint clampedFilterW = min((uint)spatialFilter->m_FilterWidth, spatialFilter->m_SuperRasW - accumX);"
 	   "	int2 finalCoord;\n"
 	   "	finalCoord.x = GLOBAL_ID_X;\n"
 	   "	finalCoord.y = (int)((spatialFilter->m_YAxisUp == 1) ? ((spatialFilter->m_FinalRasH - GLOBAL_ID_Y) - 1) : GLOBAL_ID_Y);\n"
@@ -241,15 +243,15 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	   "	real4reals_bucket newBucket;\n"
 	   "	newBucket.m_Real4 = 0;\n"
 	   "\n"
-	   "	for (jj = 0; jj < spatialFilter->m_FilterWidth; jj++)\n"
+	   "	for (jj = 0; jj < clampedFilterH; jj++)\n"
 	   "	{\n"
-	   "		filterKRowIndex = jj * spatialFilter->m_FilterWidth;\n"
+	   "		filterKRowIndex = jj * spatialFilter->m_FilterWidth;\n"//Use the full, non-clamped width to get the filter value.
 	   "\n"
-	   "		for (ii = 0; ii < spatialFilter->m_FilterWidth; ii++)\n"
+	   "		for (ii = 0; ii < clampedFilterW; ii++)\n"
 	   "		{\n"
-	   "			real_bucket_t k = filterCoefs[ii + filterKRowIndex];\n"
+	   "			real_bucket_t k = filterCoefs[filterKRowIndex + ii];\n"
 	   "\n"
-	   "			accumBucket = accumulator + (accumX + ii) + ((accumY + jj) * spatialFilter->m_SuperRasW);\n"
+	   "			accumBucket = accumulator + ((accumY + jj) * spatialFilter->m_SuperRasW) + (accumX + ii);\n"
 	   "			newBucket.m_Real4 += (k * accumBucket->m_Real4);\n"
 	   "		}\n"
 	   "	}\n"
@@ -268,12 +270,12 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 			if (alphaCalc)
 				os << "	finalColor.m_Float4.w = (float)newBucket.m_Real4.w * 255.0f;\n";
 			else
-				os << "	finalColor.m_Float4.w = 255;\n";
+				os << "	finalColor.m_Float4.w = 255.0f;\n";
 		}
 	}
 	else
 	{
-		//Late clip, so must gamma correct from the temp new bucket to temp float4.
+		//Late clip, so must gamma correct from the temp newBucket to temp finalColor float4.
 		if (m_DoublePrecision)
 		{
 			os <<

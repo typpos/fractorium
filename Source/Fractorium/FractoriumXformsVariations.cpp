@@ -97,7 +97,7 @@ void FractoriumEmberController<T>::FilteredVariations()
 /// Called upon initialization, or controller type change.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::SetupVariationTree()
+void FractoriumEmberController<T>::SetupVariationsTree()
 {
 	T fMin = TLOW;
 	T fMax = TMAX;

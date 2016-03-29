@@ -319,8 +319,8 @@ public:
 	virtual intmax_t FilterWidth() const override { return m_FilterWidth; }
 	inline size_t BufferSize() const { return m_Widths.size(); }
 	inline size_t CoefsSizeBytes() const { return BufferSize() * m_KernelSize * sizeof(T); }
-	inline size_t WidthsSizeBytes() const { return BufferSize() * sizeof(T); }
-	inline size_t CoefsIndicesSizeBytes() const { return (m_CoefIndices.size() * sizeof(m_CoefIndices[0])); }
+	inline size_t WidthsSizeBytes() const { return SizeOf(m_Widths); }
+	inline size_t CoefsIndicesSizeBytes() const { return SizeOf(m_CoefIndices); }
 	inline const T* Coefs() const { return m_Coefs.data(); }
 	inline const T* Widths() const { return m_Widths.data(); }
 	inline const uint* CoefIndices() const { return m_CoefIndices.data(); }

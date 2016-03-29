@@ -364,6 +364,7 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	m_GLController->ResetMouseState();
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 	FillParamTablesAndPalette();
+	FillCurvesControl();
 	FillSummary();
 
 	//If a resize happened, this won't do anything because the new size is not reflected in the scroll area yet.

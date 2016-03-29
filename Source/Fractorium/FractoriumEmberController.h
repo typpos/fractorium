@@ -186,7 +186,7 @@ public:
 
 	//Xforms Variations.
 	virtual void Filter(const QString& text) { }
-	virtual void SetupVariationTree() { }
+	virtual void SetupVariationsTree() { }
 	virtual void ClearVariationsTree() { }
 	virtual void VariationSpinBoxValueChanged(double d) { }
 	virtual void FilteredVariations() { }
@@ -431,7 +431,7 @@ public:
 
 	//Xforms Variations.
 	virtual void Filter(const QString& text) override;
-	virtual void SetupVariationTree() override;
+	virtual void SetupVariationsTree() override;
 	virtual void ClearVariationsTree() override;
 	virtual void VariationSpinBoxValueChanged(double d) override;
 	virtual void FilteredVariations() override;

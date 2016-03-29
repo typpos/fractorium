@@ -155,7 +155,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: show all xforms while dragging.&lt;/p&gt;&lt;p&gt;Unchecked: only show current xform while dragging.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Show All Xforms</string>
+          <string>Show All Xforms While Dragging</string>
          </property>
         </widget>
        </item>
@@ -421,7 +421,7 @@ in interactive mode for each mouse movement</string>
        <bool>true</bool>
       </property>
       <attribute name="title">
-       <string>Xml Saving</string>
+       <string>Xml Render Values</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
        <property name="leftMargin">
@@ -614,7 +614,7 @@ in interactive mode for each mouse movement</string>
        <bool>true</bool>
       </property>
       <attribute name="title">
-       <string>Identity</string>
+       <string>Xml Identity Values</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_3">
        <property name="leftMargin">

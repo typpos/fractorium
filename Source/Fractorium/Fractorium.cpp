@@ -105,7 +105,7 @@ Fractorium::Fractorium(QWidget* p)
 #endif
 		m_Controller = unique_ptr<FractoriumEmberControllerBase>(new FractoriumEmberController<float>(this));
 
-	m_Controller->SetupVariationTree();
+	m_Controller->SetupVariationsTree();
 	m_Controller->FilteredVariations();
 
 	if (m_Info->Ok() && m_Settings->OpenCL() && m_QualitySpin->value() < (30 * m_Settings->Devices().size()))
@@ -424,7 +424,7 @@ void Fractorium::dropEvent(QDropEvent* e)
 {
 	QStringList filenames;
 	Qt::KeyboardModifiers mod = e->keyboardModifiers();
-	bool append = mod.testFlag(Qt::ControlModifier) ? true : false;
+	bool append = mod.testFlag(Qt::ControlModifier) ? false : true;
 
 	if (e->mimeData()->hasUrls())
 	{

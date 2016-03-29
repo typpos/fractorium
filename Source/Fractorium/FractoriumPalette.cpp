@@ -39,6 +39,12 @@ void Fractorium::InitPaletteUI()
 	paletteTable->setColumnWidth(1, 260);//256 plus small margin on each side.
 	paletteTable->horizontalHeader()->setSectionsClickable(true);
 	connect(paletteTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnPaletteHeaderSectionClicked(int)), Qt::QueuedConnection);
+	connect(ui.ResetCurvesButton, SIGNAL(clicked(bool)), this, SLOT(OnResetCurvesButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.CurvesView, SIGNAL(PointChangedSignal(int, int, const QPointF&)), this, SLOT(OnCurvesPointChanged(int, int, const QPointF&)), Qt::QueuedConnection);
+	connect(ui.CurvesAllRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesAllRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.CurvesRedRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesRedRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.CurvesGreenRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesGreenRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.CurvesBlueRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesBlueRadioButtonToggled(bool)), Qt::QueuedConnection);
 }
 
 /// <summary>
@@ -377,6 +383,75 @@ void Fractorium::SetPaletteFileComboIndex(const string& filename)
 {
 	if (!filename.empty())
 		ui.PaletteFilenameCombo->setCurrentText(QFileInfo(QString::fromStdString(filename)).fileName());
+}
+
+/// <summary>
+/// Reset the color curve values in the current ember to their default state and also update the curves control.
+/// Called when ResetCurvesButton is clicked.
+/// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::ClearColorCurves()
+{
+	Update([&]
+	{
+		m_Ember.m_Curves.Init();
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+	FillCurvesControl();
+}
+
+void Fractorium::OnResetCurvesButtonClicked(bool checked) { m_Controller->ClearColorCurves(); }
+
+/// <summary>
+/// Set the coordinate of the curve point.
+/// Called when the position of any of the points in the curves editor is is changed.
+/// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
+/// </summary>
+/// <param name="curveIndex">The curve index, 0-1/</param>
+/// <param name="pointIndex">The point index within the selected curve, 1-2.</param>
+/// <param name="point">The new coordinate of the point in terms of the curves control rect.</param>
+template <typename T>
+void FractoriumEmberController<T>::ColorCurveChanged(int curveIndex, int pointIndex, const QPointF& point)
+{
+	Update([&]
+	{
+		m_Ember.m_Curves.m_Points[curveIndex][pointIndex].x = point.x();
+		m_Ember.m_Curves.m_Points[curveIndex][pointIndex].y = point.y();
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+}
+
+void Fractorium::OnCurvesPointChanged(int curveIndex, int pointIndex, const QPointF& point) { m_Controller->ColorCurveChanged(curveIndex, pointIndex, point); }
+
+/// <summary>
+/// Set the top most points in the curves control, which makes it easier to
+/// select a point by putting it on top of all the others.
+/// Called when the any of the curve color radio buttons are toggled.
+/// </summary>
+/// <param name="curveIndex">The curve index, 0-1/</param>
+void Fractorium::OnCurvesAllRadioButtonToggled(bool checked)   { if (checked) ui.CurvesView->SetTop(CurveIndex::ALL); }
+void Fractorium::OnCurvesRedRadioButtonToggled(bool checked)   { if (checked) ui.CurvesView->SetTop(CurveIndex::RED); }
+void Fractorium::OnCurvesGreenRadioButtonToggled(bool checked) { if (checked) ui.CurvesView->SetTop(CurveIndex::GREEN); }
+void Fractorium::OnCurvesBlueRadioButtonToggled(bool checked)  { if (checked) ui.CurvesView->SetTop(CurveIndex::BLUE); }
+
+/// <summary>
+/// Set the points in the curves control to the values of the curve points in the current ember.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::FillCurvesControl()
+{
+	m_Fractorium->ui.CurvesView->blockSignals(true);
+
+	for (auto i = 0; i < 4; i++)
+	{
+		for (auto j = 1; j < 3; j++)//Only do middle points.
+		{
+			QPointF point(m_Ember.m_Curves.m_Points[i][j].x, m_Ember.m_Curves.m_Points[i][j].y);
+			m_Fractorium->ui.CurvesView->Set(i, j, point);
+		}
+	}
+
+	m_Fractorium->ui.CurvesView->blockSignals(false);
+	m_Fractorium->ui.CurvesView->update();
 }
 
 template class FractoriumEmberController<float>;

@@ -144,8 +144,8 @@ public:
 	T FilterWidth() const { return m_FilterWidth; }
 	T FilterExp() const { return m_FilterExp; }
 	T SumFilt() const { return m_SumFilt; }
-	T* Deltas() { return &m_Deltas[0]; }
-	T* Filter() { return &m_Filter[0]; }
+	T* Deltas() { return m_Deltas.data(); }
+	T* Filter() { return m_Filter.data(); }
 	eTemporalFilterType FilterType() const { return m_FilterType; }
 
 protected:

@@ -59,7 +59,7 @@ static inline bool Contains(c& container, const T& val)
 /// <param name="vec">The vector to compute the size of</param>
 /// <returns>The size of one element times the length.</returns>
 template<typename T>
-static inline size_t SizeOf(vector<T>& vec)
+static inline size_t SizeOf(const vector<T>& vec)
 {
 	return sizeof(vec[0]) * vec.size();
 }

@@ -377,7 +377,7 @@ bool FractoriumEmberController<T>::Render()
 			//Change later if better values can be derived/observed.
 			if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 			{
-				if (m_SubBatchCount < (4 * m_Devices.size()))//More than 3 with OpenCL gives a sluggish UI.
+				if (m_SubBatchCount < (4 * m_Devices.size()))//More than 4 with OpenCL gives a sluggish UI.
 					m_SubBatchCount += m_Devices.size();
 			}
 			else

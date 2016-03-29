@@ -553,10 +553,15 @@ QTableWidget#XformWeightNameTable
 	border-left: 1px solid gray;
 }
 
-QTableWidget#SummaryTable,
-QTableWidget#PaletteListTable
+QTableWidget#SummaryTable
 {
 	border-left: 1px solid gray;
+}
+
+/*Normally doesn't matter, but when a palette file doesn't have enough palettes in it to fill the whole table, it looks funny without a border*/
+QTableWidget#PaletteListTable
+{
+	border: 1px solid gray;
 }
 
 QTableWidget#SummaryTable QHeaderView::section::vertical

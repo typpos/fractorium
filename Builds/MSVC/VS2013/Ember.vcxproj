@@ -64,8 +64,7 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <PrecompiledHeaderFile>EmberPch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <AdditionalOptions>/bigobj
- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <StringPooling>true</StringPooling>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -93,8 +92,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PrecompiledHeaderFile>EmberPch.h</PrecompiledHeaderFile>
       <StringPooling>true</StringPooling>
-      <AdditionalOptions>/bigobj
- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FloatingPointExceptions>false</FloatingPointExceptions>

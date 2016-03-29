@@ -47,7 +47,7 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterXSpin,     spinHeight, -dmax,    dmax,   0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterXChanged(double)),     true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterYSpin,     spinHeight, -dmax,    dmax,   0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterYChanged(double)),     true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ScaleSpin,       spinHeight,    10,    dmax,     20, SIGNAL(valueChanged(double)), SLOT(OnScaleChanged(double)),	      true, 240, 240, 240);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,     100,    0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	      true,	  0,   0,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,      25,    0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	      true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight,  -180,     180,     10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,      1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PerspectiveSpin, spinHeight,  -500,     500,   0.01, SIGNAL(valueChanged(double)), SLOT(OnPerspectiveChanged(double)), true,	  0,   1,	0);
@@ -63,7 +63,7 @@ void Fractorium::InitParamsUI()
 	//Filter.
 	row = 0;
 	table = ui.FilterTable;
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight, 0.1, 10, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 1.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight, 0.1, 2, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 1.0);
 	comboVals = SpatialFilterCreator<float>::FilterTypes();
 	SetupCombo(table, this, row, 1, m_SpatialFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnSpatialFilterTypeComboCurrentIndexChanged(const QString&)));
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMinRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMinRadiusWidthChanged(double)), true,   0,   0,   0);
@@ -116,7 +116,7 @@ void Fractorium::OnBrightnessChanged(double d) { m_Controller->BrightnessChanged
 /// else if early clip is true, filter and accum, else final accum only.
 /// </summary>
 /// <param name="d">The gamma value</param>
-template <typename T> void FractoriumEmberController<T>::GammaChanged(double d) { Update([&] { m_Ember.m_Gamma = d; }, true, m_Ember.m_TemporalSamples > 1 ? eProcessAction::FULL_RENDER : (m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY)); }
+template <typename T> void FractoriumEmberController<T>::GammaChanged(double d) { Update([&] { m_Ember.m_Gamma = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
 void Fractorium::OnGammaChanged(double d) { m_Controller->GammaChanged(d); }
 
 /// <summary>
@@ -125,7 +125,7 @@ void Fractorium::OnGammaChanged(double d) { m_Controller->GammaChanged(d); }
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The gamma threshold</param>
-template <typename T> void FractoriumEmberController<T>::GammaThresholdChanged(double d) { Update([&] { m_Ember.m_GammaThresh = d; }, true, m_Ember.m_TemporalSamples > 1 ? eProcessAction::FULL_RENDER : (m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY)); }
+template <typename T> void FractoriumEmberController<T>::GammaThresholdChanged(double d) { Update([&] { m_Ember.m_GammaThresh = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
 void Fractorium::OnGammaThresholdChanged(double d) { m_Controller->GammaThresholdChanged(d); }
 
 /// <summary>
@@ -134,7 +134,7 @@ void Fractorium::OnGammaThresholdChanged(double d) { m_Controller->GammaThreshol
 /// Resets the rendering process to the final accumulation stage if temporal samples is 1, else full reset.
 /// </summary>
 /// <param name="d">The vibrancy</param>
-template <typename T> void FractoriumEmberController<T>::VibrancyChanged(double d) { Update([&] { m_Ember.m_Vibrancy = d; }, true, m_Ember.m_TemporalSamples > 1 ? eProcessAction::FULL_RENDER : (m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY)); }
+template <typename T> void FractoriumEmberController<T>::VibrancyChanged(double d) { Update([&] { m_Ember.m_Vibrancy = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
 void Fractorium::OnVibrancyChanged(double d) { m_Controller->VibrancyChanged(d); }
 
 /// <summary>
@@ -143,7 +143,7 @@ void Fractorium::OnVibrancyChanged(double d) { m_Controller->VibrancyChanged(d);
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The highlight power</param>
-template <typename T> void FractoriumEmberController<T>::HighlightPowerChanged(double d) { Update([&] { m_Ember.m_HighlightPower = d; }, true, m_Ember.m_TemporalSamples > 1 ? eProcessAction::FULL_RENDER : (m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY)); }
+template <typename T> void FractoriumEmberController<T>::HighlightPowerChanged(double d) { Update([&] { m_Ember.m_HighlightPower = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
 void Fractorium::OnHighlightPowerChanged(double d) { m_Controller->HighlightPowerChanged(d); }
 
 /// <summary>
@@ -286,19 +286,33 @@ void Fractorium::OnDepthBlurChanged(double d) { m_Controller->DepthBlurChanged(d
 /// <summary>
 /// Set the spatial filter width.
 /// Called when the spatial filter width spinner is changed.
-/// Resets the rendering process.
+/// Resets the rendering process to density filtering if early clip is used, else to final accumulation.
 /// </summary>
 /// <param name="d">The spatial filter width</param>
-template <typename T> void FractoriumEmberController<T>::SpatialFilterWidthChanged(double d) { Update([&] { m_Ember.m_SpatialFilterRadius = d; }); }//Must fully reset because it's used to create bounds.
+template <typename T> void FractoriumEmberController<T>::SpatialFilterWidthChanged(double d)
+{
+	Update([&]
+	{
+		m_Ember.m_SpatialFilterRadius = d;
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+}
+
 void Fractorium::OnSpatialFilterWidthChanged(double d) { m_Controller->SpatialFilterWidthChanged(d); }
 
 /// <summary>
 /// Set the spatial filter type.
 /// Called when the spatial filter type combo box index is changed.
-/// Resets the rendering process.
+/// Resets the rendering process to density filtering if early clip is used, else to final accumulation.
 /// </summary>
 /// <param name="text">The spatial filter type</param>
-template <typename T> void FractoriumEmberController<T>::SpatialFilterTypeChanged(const QString& text) { Update([&] { m_Ember.m_SpatialFilterType = SpatialFilterCreator<T>::FromString(text.toStdString()); }); }//Must fully reset because it's used to create bounds.
+template <typename T> void FractoriumEmberController<T>::SpatialFilterTypeChanged(const QString& text)
+{
+	Update([&]
+	{
+		m_Ember.m_SpatialFilterType = SpatialFilterCreator<T>::FromString(text.toStdString());
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+}
+
 void Fractorium::OnSpatialFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->SpatialFilterTypeChanged(text); }
 
 /// <summary>
@@ -323,54 +337,61 @@ void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& tex
 
 /// <summary>
 /// Set the density estimation filter min radius value.
-/// Resets the rendering process.
+/// Resets the rendering process to density filtering.
 /// </summary>
 /// <param name="d">The min radius value</param>
 template <typename T>
 void FractoriumEmberController<T>::DEFilterMinRadiusWidthChanged(double d)
 {
+	if (m_Fractorium->m_DEFilterMinRadiusSpin->value() > m_Fractorium->m_DEFilterMaxRadiusSpin->value())
+	{
+		m_Fractorium->m_DEFilterMinRadiusSpin->SetValueStealth(m_Fractorium->m_DEFilterMaxRadiusSpin->value());
+		return;
+	}
+
 	Update([&]
 	{
-		if (m_Fractorium->m_DEFilterMinRadiusSpin->value() > m_Fractorium->m_DEFilterMaxRadiusSpin->value())
-		{
-			m_Fractorium->m_DEFilterMinRadiusSpin->setValue(m_Fractorium->m_DEFilterMaxRadiusSpin->value() - 1);
-			return;
-		}
-
 		m_Ember.m_MinRadDE = d;
-	});
+	}, true, eProcessAction::FILTER_AND_ACCUM);
 }
 
 void Fractorium::OnDEFilterMinRadiusWidthChanged(double d) { m_Controller->DEFilterMinRadiusWidthChanged(d); }
 
 /// <summary>
 /// Set the density estimation filter max radius value.
-/// Resets the rendering process.
+/// Resets the rendering process to density filtering.
 /// </summary>
 /// <param name="d">The max radius value</param>
 template <typename T>
 void FractoriumEmberController<T>::DEFilterMaxRadiusWidthChanged(double d)
 {
+	if (m_Fractorium->m_DEFilterMaxRadiusSpin->value() < m_Fractorium->m_DEFilterMinRadiusSpin->value())
+	{
+		m_Fractorium->m_DEFilterMaxRadiusSpin->SetValueStealth(m_Fractorium->m_DEFilterMinRadiusSpin->value());
+		return;
+	}
+
 	Update([&]
 	{
-		if (m_Fractorium->m_DEFilterMaxRadiusSpin->value() < m_Fractorium->m_DEFilterMinRadiusSpin->value())
-		{
-			m_Fractorium->m_DEFilterMaxRadiusSpin->setValue(m_Fractorium->m_DEFilterMinRadiusSpin->value() + 1);
-			return;
-		}
-
 		m_Ember.m_MaxRadDE = d;
-	});
+	}, true, eProcessAction::FILTER_AND_ACCUM);
 }
 
 void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d) { m_Controller->DEFilterMaxRadiusWidthChanged(d); }
 
 /// <summary>
 /// Set the density estimation filter curve value.
-/// Resets the rendering process.
+/// Resets the rendering process to density filtering.
 /// </summary>
 /// <param name="d">The curve value</param>
-template <typename T> void FractoriumEmberController<T>::DEFilterCurveWidthChanged(double d) { Update([&] { m_Ember.m_CurveDE = d; }); }
+template <typename T> void FractoriumEmberController<T>::DEFilterCurveWidthChanged(double d)
+{
+	Update([&]
+	{
+		m_Ember.m_CurveDE = d;
+	}, true, eProcessAction::FILTER_AND_ACCUM);
+}
+
 void Fractorium::OnDEFilterCurveWidthChanged(double d) { m_Controller->DEFilterCurveWidthChanged(d); }
 
 /// <summary>

@@ -1892,14 +1892,14 @@
       <rect>
        <x>770</x>
        <y>0</y>
-       <width>240</width>
+       <width>255</width>
        <height>881</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>240</width>
-       <height>498</height>
+       <width>255</width>
+       <height>617</height>
       </size>
      </property>
      <property name="features">
@@ -1925,7 +1925,7 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
-       <item row="3" column="0">
+       <item row="6" column="0">
         <widget class="TableWidget" name="PalettePreviewTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -2010,7 +2010,7 @@
          <column/>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="7" column="0">
         <layout class="QHBoxLayout" name="PaletteTabHLayout2" stretch="0,0">
          <property name="spacing">
           <number>5</number>
@@ -2058,7 +2058,7 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="0">
+       <item row="8" column="0">
         <widget class="QTableWidget" name="PaletteListTable">
          <property name="focusPolicy">
           <enum>Qt::StrongFocus</enum>
@@ -2119,7 +2119,7 @@
            <string>Name</string>
           </property>
           <property name="textAlignment">
-           <set>AlignLeft|AlignVCenter</set>
+           <set>AlignLeading|AlignVCenter</set>
           </property>
          </column>
          <column>
@@ -2127,7 +2127,7 @@
            <string>Palette</string>
           </property>
           <property name="textAlignment">
-           <set>AlignLeft|AlignVCenter</set>
+           <set>AlignLeading|AlignVCenter</set>
           </property>
          </column>
         </widget>
@@ -2334,6 +2334,137 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="9" column="0">
+        <widget class="QPushButton" name="ResetCurvesButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Reset Curves</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="CurvesGraphicsView" name="CurvesView">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>245</width>
+           <height>245</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>245</width>
+           <height>245</height>
+          </size>
+         </property>
+         <property name="mouseTracking">
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="backgroundBrush">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>219</red>
+            <green>219</green>
+            <blue>219</blue>
+           </color>
+          </brush>
+         </property>
+         <property name="sceneRect">
+          <rectf>
+           <x>0.000000000000000</x>
+           <y>0.000000000000000</y>
+           <width>245.000000000000000</width>
+           <height>245.000000000000000</height>
+          </rectf>
+         </property>
+         <property name="resizeAnchor">
+          <enum>QGraphicsView::NoAnchor</enum>
+         </property>
+         <property name="viewportUpdateMode">
+          <enum>QGraphicsView::FullViewportUpdate</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QGroupBox" name="CurvesGroupBox">
+         <property name="title">
+          <string>Curve</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <property name="leftMargin">
+           <number>6</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="CurvesAllRadio">
+            <property name="text">
+             <string>All</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="CurvesRedRadio">
+            <property name="text">
+             <string>Red</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="CurvesGreenRadio">
+            <property name="text">
+             <string>Green</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="CurvesBlueRadio">
+            <property name="text">
+             <string>Blue</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -2746,12 +2877,12 @@
          </column>
          <item row="0" column="0">
           <property name="textAlignment">
-           <set>AlignLeft|AlignVCenter</set>
+           <set>AlignLeading|AlignVCenter</set>
           </property>
          </item>
          <item row="0" column="1">
           <property name="textAlignment">
-           <set>AlignLeft|AlignVCenter</set>
+           <set>AlignLeading|AlignVCenter</set>
           </property>
          </item>
         </widget>
@@ -2934,7 +3065,7 @@
                <string/>
               </property>
               <property name="textAlignment">
-               <set>AlignLeft|AlignVCenter</set>
+               <set>AlignLeading|AlignVCenter</set>
               </property>
              </item>
             </widget>
@@ -3247,7 +3378,7 @@
                </font>
               </property>
               <property name="textAlignment">
-               <set>AlignLeft|AlignVCenter</set>
+               <set>AlignLeading|AlignVCenter</set>
               </property>
              </item>
              <item row="1" column="0">
@@ -3276,134 +3407,6 @@
             <widget class="QCheckBox" name="SoloXformCheckBox">
              <property name="text">
               <string>Solo</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0" colspan="2">
-            <widget class="CurvesGraphicsView" name="CurvesView">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>245</width>
-               <height>245</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>245</width>
-               <height>245</height>
-              </size>
-             </property>
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="autoFillBackground">
-              <bool>false</bool>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-             <property name="verticalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="backgroundBrush">
-              <brush brushstyle="SolidPattern">
-               <color alpha="255">
-                <red>219</red>
-                <green>219</green>
-                <blue>219</blue>
-               </color>
-              </brush>
-             </property>
-             <property name="sceneRect">
-              <rectf>
-               <x>0.000000000000000</x>
-               <y>0.000000000000000</y>
-               <width>245.000000000000000</width>
-               <height>245.000000000000000</height>
-              </rectf>
-             </property>
-             <property name="resizeAnchor">
-              <enum>QGraphicsView::NoAnchor</enum>
-             </property>
-             <property name="viewportUpdateMode">
-              <enum>QGraphicsView::FullViewportUpdate</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0" colspan="2">
-            <widget class="QGroupBox" name="CurvesGroupBox">
-             <property name="title">
-              <string>Curve</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <property name="leftMargin">
-               <number>6</number>
-              </property>
-              <property name="topMargin">
-               <number>2</number>
-              </property>
-              <property name="rightMargin">
-               <number>6</number>
-              </property>
-              <property name="bottomMargin">
-               <number>6</number>
-              </property>
-              <item>
-               <widget class="QRadioButton" name="CurvesAllRadio">
-                <property name="text">
-                 <string>All</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="CurvesRedRadio">
-                <property name="text">
-                 <string>Red</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="CurvesGreenRadio">
-                <property name="text">
-                 <string>Green</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="CurvesBlueRadio">
-                <property name="text">
-                 <string>Blue</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QPushButton" name="ResetCurvesButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Reset Curves</string>
              </property>
             </widget>
            </item>
@@ -5237,6 +5240,9 @@
              <property name="editTriggers">
               <set>QAbstractItemView::NoEditTriggers</set>
              </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::SingleSelection</enum>
              </property>
@@ -5247,7 +5253,7 @@
               <number>12</number>
              </property>
              <property name="uniformRowHeights">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="itemsExpandable">
               <bool>true</bool>
@@ -5552,7 +5558,7 @@
     <widget class="QDockWidget" name="InfoDockWidget">
      <property name="geometry">
       <rect>
-       <x>1010</x>
+       <x>1020</x>
        <y>0</y>
        <width>301</width>
        <height>881</height>
@@ -5662,7 +5668,7 @@
               <enum>QTabWidget::Triangular</enum>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="InfoSummaryTab">
               <property name="autoFillBackground">
@@ -5861,7 +5867,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="selectionMode">
-                  <enum>QAbstractItemView::NoSelection</enum>
+                  <enum>QAbstractItemView::SingleSelection</enum>
                  </property>
                  <property name="rootIsDecorated">
                   <bool>true</bool>
@@ -5869,11 +5875,14 @@
                  <property name="uniformRowHeights">
                   <bool>true</bool>
                  </property>
+                 <property name="headerHidden">
+                  <bool>false</bool>
+                 </property>
                  <property name="columnCount">
                   <number>2</number>
                  </property>
                  <attribute name="headerVisible">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </attribute>
                  <attribute name="headerCascadingSectionResizes">
                   <bool>false</bool>
@@ -6351,7 +6360,7 @@
                       </font>
                      </property>
                      <property name="textAlignment">
-                      <set>AlignLeft|AlignVCenter</set>
+                      <set>AlignLeading|AlignVCenter</set>
                      </property>
                     </item>
                    </widget>
@@ -6713,7 +6722,7 @@
   </widget>
   <widget class="QToolBar" name="ToolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Toolbar</string>
    </property>
    <property name="movable">
     <bool>true</bool>
@@ -7202,10 +7211,10 @@
      <normaloff>:/Fractorium/Icons/control-stop-square.png</normaloff>:/Fractorium/Icons/control-stop-square.png</iconset>
    </property>
    <property name="text">
-    <string>Stop Renderer</string>
+    <string>Stop renderer</string>
    </property>
    <property name="toolTip">
-    <string>Stop Renderer</string>
+    <string>Stop renderer</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>

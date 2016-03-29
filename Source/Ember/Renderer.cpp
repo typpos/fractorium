@@ -81,25 +81,31 @@ bool Renderer<T, bucketT>::AssignIterator()
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::ComputeBounds()
 {
-	size_t maxDEFilterWidth = 0;
+	//size_t maxDEFilterWidth = 0;
 	//Use type T to account for negative numbers which will occur with a larger supersample and smaller filter width.
 	//The final value will be of type size_t.
-	m_GutterWidth = size_t(ClampGte<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0));
-
-	//Check the size of the density estimation filter.
-	//If the radius of the density estimation filter is greater than the
-	//gutter width, have to pad with more.  Otherwise, use the same value.
-	for (auto& ember : m_Embers)
-		maxDEFilterWidth = std::max<size_t>(size_t(ceil(ember.m_MaxRadDE) * m_Ember.m_Supersample), maxDEFilterWidth);
-
-	//Need an extra ss = (int)floor(m_Supersample / 2.0) of pixels so that a local iteration count for DE can be determined.//SMOULDER
-	if (maxDEFilterWidth > 0)
-		maxDEFilterWidth += size_t(Floor<T>(m_Ember.m_Supersample / T(2)));
-
+	//m_GutterWidth = size_t(ClampGte<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0));
+	//
+	////Check the size of the density estimation filter.
+	////If the radius of the density estimation filter is greater than the
+	////gutter width, have to pad with more.  Otherwise, use the same value.
+	//for (auto& ember : m_Embers)
+	//	maxDEFilterWidth = std::max<size_t>(size_t(ceil(ember.m_MaxRadDE) * m_Ember.m_Supersample), maxDEFilterWidth);
+	//
+	////Need an extra ss = (int)floor(m_Supersample / 2.0) of pixels so that a local iteration count for DE can be determined.//SMOULDER
+	//if (maxDEFilterWidth > 0)
+	//	maxDEFilterWidth += size_t(Floor<T>(m_Ember.m_Supersample / T(2)));
 	//To have a fully present set of pixels for the spatial filter, must
 	//add the DE filter width to the spatial filter width.//SMOULDER
-	m_DensityFilterOffset = maxDEFilterWidth;
-	m_GutterWidth += m_DensityFilterOffset;
+	//m_DensityFilterOffset = maxDEFilterWidth;
+	//m_GutterWidth += m_DensityFilterOffset;
+	//
+	//Original did a lot of work to compute a gutter that changes size based on various parameters, which seems to be of no benefit.
+	//It also prevents the renderer from only performing filtering or final accum based on a filter parameter change, since that
+	//change may have changed the gutter.
+	//By using a fixed gutter, a filter change can be applied without fully restarting iteration.
+	//m_GutterWidth = 10;
+	m_GutterWidth = 10 * Supersample();//Should be enough to fully accommodate most spatial and density filter widths.
 	m_SuperRasW = (Supersample() * FinalRasW()) + (2 * m_GutterWidth);
 	m_SuperRasH = (Supersample() * FinalRasH()) + (2 * m_GutterWidth);
 	m_SuperSize = m_SuperRasW * m_SuperRasH;
@@ -401,10 +407,12 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	if (m_InsertPalette && BytesPerChannel() == 1)
 		m_TempEmber = m_Ember;
 
-	//Field would go here, however Ember omits it. Would need temps for width and height if ever implemented.
-	CreateSpatialFilter(newFilterAlloc);
-	CreateTemporalFilter(newFilterAlloc);
-	ComputeBounds();
+	if (!resume)//Only need to create this when starting a new render.
+	{
+		CreateSpatialFilter(newFilterAlloc);//Will be checked and recreated again if necessary right before final output.
+		CreateTemporalFilter(newFilterAlloc);//But create here just to ensure allocation succeeded.
+		ComputeBounds();
+	}
 
 	if (m_SpatialFilter.get() == nullptr || m_TemporalFilter.get() == nullptr)
 	{
@@ -423,7 +431,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	if (!resume)
 		ResetBuckets(true, false);//Only reset hist here and do accum when needed later on.
 
-	deTime = T(time) + m_TemporalFilter->Deltas()[0];
+	deTime = T(time) + *m_TemporalFilter->Deltas();
 
 	//Interpolate and get an ember for DE purposes.
 	//Additional interpolation will be done in the temporal samples loop.
@@ -436,7 +444,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	ClampGteRef<T>(m_Ember.m_MaxRadDE, 0);
 	ClampGteRef<T>(m_Ember.m_MaxRadDE, m_Ember.m_MinRadDE);
 
-	if (!CreateDEFilter(newFilterAlloc))
+	if (!CreateDEFilter(newFilterAlloc))//Will be checked and recreated again if necessary right before density filtering.
 	{
 		AddToReport("Density filter creation failed, aborting.\n");
 		success = eRenderStatus::RENDER_ERROR;
@@ -564,6 +572,11 @@ FilterAndAccum:
 
 		ResetBuckets(false, true);//Only the histogram was reset above, now reset the density filtering buffer.
 		//t.Tic();
+		//Make sure a density filter was created with the latest values.
+		ClampGteRef<T>(m_Ember.m_MinRadDE, 0);
+		ClampGteRef<T>(m_Ember.m_MaxRadDE, 0);
+		ClampGteRef<T>(m_Ember.m_MaxRadDE, m_Ember.m_MinRadDE);
+		CreateDEFilter(newFilterAlloc);
 
 		//Apply appropriate filter if iterating is complete.
 		if (filterAndAccumOnly || temporalSample >= TemporalSamples())
@@ -615,6 +628,7 @@ AccumOnly:
 
 		//Make sure a filter has been created.
 		CreateSpatialFilter(newFilterAlloc);
+		m_DensityFilterOffset = m_GutterWidth - size_t(Clamp<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0, T(m_GutterWidth)));
 		m_CurvesSet = m_Ember.m_Curves.CurvesSet();
 
 		//Color curves must be re-calculated as well.
@@ -868,7 +882,12 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 						bucketT logScale = (m_K1 * std::log(1 + m_HistBuckets[i].a * m_K2)) / m_HistBuckets[i].a;
 						//Original did a temporary assignment, then *= logScale, then passed the result to bump_no_overflow().
 						//Combine here into one operation for a slight speedup.
-						m_AccumulatorBuckets[i] = m_HistBuckets[i] * logScale;
+						//Vectorized version:
+						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[i]);//Vectorizer can't tell these point to different locations.
+						bucketT* __restrict acc = glm::value_ptr(m_AccumulatorBuckets[i]);
+
+						for (size_t v = 0; v < 4; v++)
+							acc[v] = hist[v] * logScale;
 					}
 				}
 			}
@@ -1073,6 +1092,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 
 	EnterFinalAccum();
 	//Timing t(4);
+	bool doAlpha = NumChannels() > 3;
 	size_t filterWidth = m_SpatialFilter->FinalFilterWidth();
 	bucketT g, linRange, vibrancy;
 	Color<bucketT> background;
@@ -1085,11 +1105,13 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 	{
 		parallel_for(size_t(0), m_SuperRasH, [&] (size_t j)
 		{
-			size_t rowStart = j * m_SuperRasW;//Pull out of inner loop for optimization.
+			auto rowStart = m_AccumulatorBuckets.data() + (j * m_SuperRasW);//Pull out of inner loop for optimization.
+			auto rowEnd = rowStart + m_SuperRasW;
 
-			for (size_t i = 0; i < m_SuperRasW && !m_Abort; i++)
+			while (rowStart < rowEnd && !m_Abort)//Use the pointer itself as the offset to save an extra addition per iter.
 			{
-				GammaCorrection(m_AccumulatorBuckets[i + rowStart], background, g, linRange, vibrancy, true, false, &(m_AccumulatorBuckets[i + rowStart][0]));//Write back in place.
+				GammaCorrection(*rowStart, background, g, linRange, vibrancy, true, false, glm::value_ptr(*rowStart));//Write back in place.
+				rowStart++;
 			}
 		});
 	}
@@ -1109,32 +1131,33 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 		Color<bucketT> newBucket;
 		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRowSize();//Pull out of inner loop for optimization.
 		size_t y = m_DensityFilterOffset + (j * Supersample());//Start at the beginning row of each super sample block.
-		glm::uint16* p16;
+		size_t clampedFilterH = std::min(filterWidth, m_SuperRasH - y);//Make sure the filter doesn't go past the bottom of the gutter.
 
 		for (size_t i = 0; i < FinalRasW(); i++, pixelsRowStart += PixelSize())
 		{
 			size_t ii, jj;
 			size_t x = m_DensityFilterOffset + (i * Supersample());//Start at the beginning column of each super sample block.
+			size_t clampedFilterW = std::min(filterWidth, m_SuperRasW - x);//Make sure the filter doesn't go past the right of the gutter.
 			newBucket.Clear();
 
 			//Original was iterating column-wise, which is slow.
 			//Here, iterate one row at a time, giving a 10% speed increase.
-			for (jj = 0; jj < filterWidth; jj++)
+			for (jj = 0; jj < clampedFilterH; jj++)
 			{
-				size_t filterKRowIndex = jj * filterWidth;
+				size_t filterKRowIndex = jj * filterWidth;//Use the full, non-clamped width to get the filter value.
 				size_t accumRowIndex = (y + jj) * m_SuperRasW;//Pull out of inner loop for optimization.
 
-				for (ii = 0; ii < filterWidth; ii++)
+				for (ii = 0; ii < clampedFilterW; ii++)
 				{
 					//Need to dereference the spatial filter pointer object to use the [] operator. Makes no speed difference.
-					bucketT k = ((*m_SpatialFilter)[ii + filterKRowIndex]);
-					newBucket += (m_AccumulatorBuckets[(x + ii) + accumRowIndex] * k);
+					bucketT k = ((*m_SpatialFilter)[filterKRowIndex + ii]);
+					newBucket += (m_AccumulatorBuckets[accumRowIndex + (x + ii)] * k);
 				}
 			}
 
 			if (BytesPerChannel() == 2)
 			{
-				p16 = reinterpret_cast<glm::uint16*>(pixels + pixelsRowStart);
+				auto p16 = reinterpret_cast<glm::uint16*>(pixels + pixelsRowStart);
 
 				if (EarlyClip())
 				{
@@ -1149,7 +1172,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 					p16[1] = glm::uint16(Clamp<bucketT>(newBucket.g, 0, 255) * bucketT(256));
 					p16[2] = glm::uint16(Clamp<bucketT>(newBucket.b, 0, 255) * bucketT(256));
 
-					if (NumChannels() > 3)
+					if (doAlpha)
 					{
 						if (Transparency())
 							p16[3] = byte(Clamp<bucketT>(newBucket.a, 0, 1) * bucketT(65535.0));
@@ -1159,7 +1182,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 				}
 				else
 				{
-					GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, NumChannels() > 3, true, p16);
+					GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, doAlpha, true, p16);
 				}
 			}
 			else
@@ -1177,7 +1200,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 					pixels[pixelsRowStart + 1] = byte(Clamp<bucketT>(newBucket.g, 0, 255));
 					pixels[pixelsRowStart + 2] = byte(Clamp<bucketT>(newBucket.b, 0, 255));
 
-					if (NumChannels() > 3)
+					if (doAlpha)
 					{
 						if (Transparency())
 							pixels[pixelsRowStart + 3] = byte(Clamp<bucketT>(newBucket.a, 0, 1) * bucketT(255.0));
@@ -1187,13 +1210,13 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 				}
 				else
 				{
-					GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, NumChannels() > 3, true, pixels + pixelsRowStart);
+					GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, doAlpha, true, pixels + pixelsRowStart);
 				}
 			}
 		}
 	});
 
-	//Insert the palette into the image for debugging purposes. Only works with 8bpc.
+	//Insert the palette into the image for debugging purposes. Only works with 8bpc and is not implemented on the GPU.
 	if (m_InsertPalette && BytesPerChannel() == 1)
 	{
 		size_t i, j, ph = 100;
@@ -1625,7 +1648,7 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 		ClampRef<bucketT>(alpha, 0, 1);
 	}
 
-	Palette<bucketT>::template CalcNewRgb<bucketT>(&bucket[0], ls, HighlightPower(), newRgb);
+	Palette<bucketT>::template CalcNewRgb<bucketT>(glm::value_ptr(bucket), ls, HighlightPower(), newRgb);
 
 	for (glm::length_t rgbi = 0; rgbi < 3; rgbi++)
 	{

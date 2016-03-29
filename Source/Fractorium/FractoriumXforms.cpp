@@ -338,6 +338,7 @@ void FractoriumEmberController<T>::XformNameChanged(int row, int col)
 		xform->m_Name = m_Fractorium->ui.XformWeightNameTable->item(row, col)->text().toStdString();
 		XformCheckboxAt(index, [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(index)); });
 	}, eXformUpdate::UPDATE_CURRENT, false);
+	FillSummary();//Manually update because this does not trigger a render, which is where this would normally be called.
 }
 
 void Fractorium::OnXformNameChanged(int row, int col) { m_Controller->XformNameChanged(row, col); }

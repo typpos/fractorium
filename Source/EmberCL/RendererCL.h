@@ -182,6 +182,7 @@ private:
 	int MakeAndGetDensityFilterProgram(size_t ss, uint filterWidth);
 	int MakeAndGetFinalAccumProgram(double& alphaBase, double& alphaScale);
 	int MakeAndGetGammaCorrectionProgram();
+	bool CreateHostBuffer();
 	bool SumDeviceHist();
 	void FillSeeds();
 
@@ -214,6 +215,7 @@ private:
 	string m_DEWidthsBufferName;
 	string m_DECoefIndicesBufferName;
 	string m_SpatialFilterCoefsBufferName;
+	string m_HostBufferName;
 	string m_HistBufferName;
 	string m_AccumBufferName;
 	string m_FinalImageName;

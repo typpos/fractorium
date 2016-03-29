@@ -106,6 +106,7 @@ public:
 
 	//Buffers.
 	bool AddBuffer(const string& name, size_t size, cl_mem_flags flags = CL_MEM_READ_WRITE);
+	bool AddHostBuffer(const string& name, size_t size, void* data);
 	bool AddAndWriteBuffer(const string& name, void* data, size_t size, cl_mem_flags flags = CL_MEM_READ_WRITE);
 	bool WriteBuffer(const string& name, void* data, size_t size);
 	bool WriteBuffer(size_t bufferIndex, void* data, size_t size);

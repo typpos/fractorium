@@ -56,6 +56,7 @@ void RendererCL<T, bucketT>::Init()
 	m_DECoefIndicesBufferName = "DECoefIndices";
 	m_SpatialFilterCoefsBufferName = "SpatialFilterCoefs";
 	m_CurvesCsaName = "CurvesCsa";
+	m_HostBufferName = "Host";
 	m_HistBufferName = "Hist";
 	m_AccumBufferName = "Accum";
 	m_FinalImageName = "Final";
@@ -256,7 +257,7 @@ bool RendererCL<T, bucketT>::ReadHist(size_t device)
 {
 	if (device < m_Devices.size())
 		if (Renderer<T, bucketT>::Alloc(true))//Allocate the histogram memory to read into, other buffers not needed.
-			return m_Devices[device]->m_Wrapper.ReadBuffer(m_HistBufferName, reinterpret_cast<void*>(HistBuckets()), SuperSize() * sizeof(v4bT));
+			return m_Devices[device]->m_Wrapper.ReadBuffer(m_HistBufferName, reinterpret_cast<void*>(HistBuckets()), SuperSize() * sizeof(v4bT));//HistBuckets should have been created as a ClBuffer with HOST_PTR if more than one device is used.
 
 	return false;
 }
@@ -668,8 +669,7 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 	EnterResize();
 	m_XformsCL.resize(m_Ember.TotalXformCount());
 	bool b = true;
-	size_t histLength = SuperSize() * sizeof(v4bT);
-	size_t accumLength = SuperSize() * sizeof(v4bT);
+	size_t size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
 	const char* loc = __FUNCTION__;
 	auto& wrapper = m_Devices[0]->m_Wrapper;
 
@@ -679,7 +679,7 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 
 	if (b && !(b = wrapper.AddBuffer(m_CurvesCsaName, SizeOf(m_Csa.m_Entries))))					 { AddToReport(loc); }
 
-	if (b && !(b = wrapper.AddBuffer(m_AccumBufferName, accumLength)))								 { AddToReport(loc); }//Accum buffer.
+	if (b && !(b = wrapper.AddBuffer(m_AccumBufferName, size)))										 { AddToReport(loc); }//Accum buffer.
 
 	for (auto& device : m_Devices)
 	{
@@ -693,12 +693,15 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 
 		if (b && !(b = device->m_Wrapper.AddBuffer(m_CarToRasBufferName, sizeof(m_CarToRasCL))))					 { AddToReport(loc); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, histLength)))									 { AddToReport(loc); break; }//Histogram. Will memset to zero later.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, size)))										 { AddToReport(loc); break; }//Histogram. Will memset to zero later.
 
 		if (b && !(b = device->m_Wrapper.AddBuffer(m_PointsBufferName, IterGridKernelCount() * sizeof(PointCL<T>)))) { AddToReport(loc); break; }//Points between iter calls.
 
 		//Global shared is allocated once and written when building the kernel.
 	}
+
+	if (m_Devices.size() > 1)
+		b = CreateHostBuffer();
 
 	LeaveResize();
 
@@ -1596,7 +1599,33 @@ int RendererCL<T, bucketT>::MakeAndGetGammaCorrectionProgram()
 }
 
 /// <summary>
+/// Create the ClBuffer HOST_PTR wrapper around the CPU histogram buffer.
+/// This is only used with multiple devices, and therefore should only be called in such cases.
+/// </summary>
+/// <returns>True if success, felse false.</returns>
+template <typename T, typename bucketT>
+bool RendererCL<T, bucketT>::CreateHostBuffer()
+{
+	bool b = true;
+	size_t size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
+	const char* loc = __FUNCTION__;
+
+	if (b = Renderer<T, bucketT>::Alloc(true))//Allocate the histogram memory to point this HOST_PTR buffer to, other buffers not needed.
+	{
+		if (b && !(b = m_Devices[0]->m_Wrapper.AddHostBuffer(m_HostBufferName, size, reinterpret_cast<void*>(HistBuckets()))))
+			AddToReport(string(loc) + ": creating OpenCL HOST_PTR buffer to point to host side histogram failed.");//Host side histogram for temporary use with multiple devices.
+	}
+	else
+		AddToReport(string(loc) + ": allocating host side histogram failed.");//Allocating histogram failed, something is seriously wrong.
+
+	return b;
+}
+
+/// <summary>
 /// Sum all histograms from the secondary devices with the histogram on the primary device.
+/// This works by reading the histogram from those devices one at a time into the host side buffer, which
+/// is just an OpenCL pointer to the CPU histogram to use it as a temp space.
+/// Then pass that buffer to a kernel that sums it with the histogram on the primary device.
 /// </summary>
 /// <returns>True if success, else false.</returns>
 template <typename T, typename bucketT>
@@ -1617,30 +1646,25 @@ bool RendererCL<T, bucketT>::SumDeviceHist()
 
 		if ((b = (kernelIndex != -1)))
 		{
-			for (size_t device = 1; device < m_Devices.size(); device++)
+			for (size_t device = 1; device < m_Devices.size(); device++)//All secondary devices.
 			{
+				//m_HostBufferName will have been created as a ClBuffer to wrap the CPU histogram buffer as a temp space.
+				//So read into it, then pass to the kernel below to sum to the primary device's histogram.
 				if ((b = (ReadHist(device) && ClearHist(device))))//Must clear hist on secondary devices after reading and summing because they'll be reused on a quality increase (KEEP_ITERATING).
 				{
-					if ((b = wrapper.WriteBuffer(m_AccumBufferName, reinterpret_cast<void*>(HistBuckets()), SuperSize() * sizeof(v4bT))))
-					{
-						cl_uint argIndex = 0;
+					cl_uint argIndex = 0;
 
-						if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_AccumBufferName)))						 { break; }//Source buffer of v4bT.
+					if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HostBufferName)))						 { break; }//Source buffer of v4bT.
 
-						if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))						 { break; }//Dest buffer of v4bT.
+					if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))						 { break; }//Dest buffer of v4bT.
 
-						if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasW()))))						 { break; }//Width in pixels.
+					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasW()))))						 { break; }//Width in pixels.
 
-						if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasH()))))						 { break; }//Height in pixels.
+					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasH()))))						 { break; }//Height in pixels.
 
-						if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, (device == m_Devices.size() - 1) ? 1 : 0))) { break; }//Clear the source buffer on the last device.
+					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, (device == m_Devices.size() - 1) ? 1 : 0))) { break; }//Clear the source buffer on the last device.
 
-						if (b && !(b = wrapper.RunKernel   (kernelIndex, gridW, gridH, 1, blockW, blockH, 1)))					 { break; }
-					}
-					else
-					{
-						break;
-					}
+					if (b && !(b = wrapper.RunKernel   (kernelIndex, gridW, gridH, 1, blockW, blockH, 1)))					 { break; }
 				}
 				else
 				{

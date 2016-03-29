@@ -118,7 +118,7 @@ void OpenCLWrapper::ClearPrograms()
 /// Add a buffer with the specified size and name.
 /// Three possible actions to take:
 ///		Buffer didn't exist, so create and add.
-///		Buffer existed, but was a different size. Replace.
+///		Buffer existed, but was a different size, replace.
 ///		Buffer existed with the same size, do nothing.
 /// </summary>
 /// <param name="name">The name of the buffer</param>
@@ -145,7 +145,7 @@ bool OpenCLWrapper::AddBuffer(const string& name, size_t size, cl_mem_flags flag
 		}
 		else if (GetBufferSize(bufferIndex) != size)//If it did exist, only create and add if the sizes were different.
 		{
-			m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, flags, 0, nullptr, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
+			m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, flags, size_t(0), nullptr, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
 			cl::Buffer buff(m_Context, flags, size, nullptr, &err);//Create the new buffer.
 
 			if (!m_Info->CheckCL(err, "cl::Buffer()"))
@@ -156,7 +156,59 @@ bool OpenCLWrapper::AddBuffer(const string& name, size_t size, cl_mem_flags flag
 		}
 
 		//If the buffer existed and the sizes were the same, take no action.
-		return true;
+		return true;//Either operation succeeded.
+	}
+
+	return false;
+}
+
+/// <summary>
+/// Add a host side buffer with the specified name, size and host data pointer.
+/// Three possible actions to take:
+///		Buffer didn't exist, so create and add.
+///		Buffer existed, but was a different size or pointer, replace.
+///		Buffer existed with the same size and pointer, do nothing.
+/// </summary>
+/// <param name="name">The name of the buffer</param>
+/// <param name="size">The size in bytes of the buffer</param>
+/// <param name="data">The pointer to the beginning of the host side data.</param>
+/// <returns>True if success, else false.</returns>
+bool OpenCLWrapper::AddHostBuffer(const string& name, size_t size, void* data)
+{
+	cl_int err;
+
+	if (m_Init)
+	{
+		int bufferIndex = FindBufferIndex(name);
+
+		if (bufferIndex == -1)//If the buffer didn't exist, create and add.
+		{
+			cl::Buffer buff(m_Context, CL_MEM_USE_HOST_PTR, size, data, &err);
+
+			if (!m_Info->CheckCL(err, "cl::Buffer()"))
+				return false;
+
+			NamedBuffer nb(buff, name);
+			m_Buffers.push_back(nb);
+		}
+		else
+		{
+			if (GetBufferSize(bufferIndex) != size ||//If it did exist, only create and add if the sizes...
+					data != m_Buffers[bufferIndex].m_Buffer.getInfo<CL_MEM_HOST_PTR>(nullptr))//...or addresses were different.
+			{
+				m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, CL_MEM_USE_HOST_PTR, size_t(0), data, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
+				cl::Buffer buff(m_Context, CL_MEM_USE_HOST_PTR, size, data, &err);//Create the new buffer.
+
+				if (!m_Info->CheckCL(err, "cl::Buffer()"))
+					return false;
+
+				NamedBuffer nb(buff, name);//Make a named buffer out of the new buffer.
+				m_Buffers[bufferIndex] = nb;//Finally, assign.
+			}
+		}
+
+		//If the buffer existed and the sizes and pointers were the same, take no action.
+		return true;//Either operation succeeded.
 	}
 
 	return false;

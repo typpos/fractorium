@@ -1,4 +1,4 @@
-# Building Guide for Linux
+# Build Guide for Linux
 
 Install `git` and clone the repository:
 

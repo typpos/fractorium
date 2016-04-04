@@ -8,8 +8,6 @@
 /// DEOpenCLKernelCreator class.
 /// </summary>
 
-//#define ROW_ONLY_DE 1
-
 namespace EmberCLns
 {
 /// <summary>
@@ -51,25 +49,25 @@ private:
 	string CreateGaussianDEKernelNoLocalCache(size_t ss);
 
 	string m_LogScaleAssignDEKernel;
-	string m_LogScaleAssignDEEntryPoint;
+	string m_LogScaleAssignDEEntryPoint = "LogScaleAssignDensityFilterKernel";
 
 	string m_GaussianDEWithoutSsKernel;
-	string m_GaussianDEWithoutSsEntryPoint;
+	string m_GaussianDEWithoutSsEntryPoint = "GaussianDEWithoutSsKernel";
 
 	string m_GaussianDESsWithScfKernel;
-	string m_GaussianDESsWithScfEntryPoint;
+	string m_GaussianDESsWithScfEntryPoint = "GaussianDESsWithScfKernel";
 
 	string m_GaussianDESsWithoutScfKernel;
-	string m_GaussianDESsWithoutScfEntryPoint;
+	string m_GaussianDESsWithoutScfEntryPoint = "GaussianDESsWithoutScfKernel";
 
 	string m_GaussianDEWithoutSsNoCacheKernel;
-	string m_GaussianDEWithoutSsNoCacheEntryPoint;
+	string m_GaussianDEWithoutSsNoCacheEntryPoint = "GaussianDEWithoutSsNoCacheKernel";
 
 	string m_GaussianDESsWithScfNoCacheKernel;
-	string m_GaussianDESsWithScfNoCacheEntryPoint;
+	string m_GaussianDESsWithScfNoCacheEntryPoint = "GaussianDESsWithScfNoCacheKernel";
 
 	string m_GaussianDESsWithoutScfNoCacheKernel;
-	string m_GaussianDESsWithoutScfNoCacheEntryPoint;
+	string m_GaussianDESsWithoutScfNoCacheEntryPoint = "GaussianDESsWithoutScfNoCacheKernel";
 
 	bool m_DoublePrecision;
 	bool m_NVidia;

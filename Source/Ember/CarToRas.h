@@ -25,9 +25,7 @@ public:
 	/// <summary>
 	/// Empty constructor. This class should never be used unless it's been properly constructed with the constructor that takes arguments.
 	/// </summary>
-	CarToRas()
-	{
-	}
+	CarToRas() = default;
 
 	/// <summary>
 	/// Constructor that takes arguments to set up the bounds and passes them to Init().

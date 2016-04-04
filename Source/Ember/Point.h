@@ -25,10 +25,8 @@ public:
 	/// <summary>
 	/// Constructor to initialize spatial and color coordinates to zero, with full visibility.
 	/// </summary>
-	Point()
-	{
-		Init();
-	}
+	Point() = default;
+	~Point() = default;
 
 	/// <summary>
 	/// Default copy constructor.
@@ -75,29 +73,16 @@ public:
 		m_ColorX = point.m_ColorX;
 		//m_ColorY = point.m_ColorY;
 		m_VizAdjusted = point.m_VizAdjusted;
-
 		return *this;
 	}
 
-	/// <summary>
-	/// Set spatial and color coordinates to zero, with full visibility.
-	/// </summary>
-	void Init()
-	{
-		m_X = 0;
-		m_Y = 0;
-		m_Z = 0;
-		m_ColorX = 0;
-		//m_ColorY = 0;
-		m_VizAdjusted = 1;
-	}
-
-	T m_X;
-	T m_Y;
-	T m_Z;
-	T m_ColorX;
+	//Set spatial and color coordinates to zero, with full visibility.
+	T m_X = 0;
+	T m_Y = 0;
+	T m_Z = 0;
+	T m_ColorX = 0;
 	//T m_ColorY;
-	T m_VizAdjusted;
+	T m_VizAdjusted = 1;
 };
 
 /// <summary>
@@ -132,10 +117,10 @@ template <typename T>
 struct EMBER_API Color : public v4T
 {
 #ifndef _WIN32
-using v4T::r;
-using v4T::g;
-using v4T::b;
-using v4T::a;
+	using v4T::r;
+	using v4T::g;
+	using v4T::b;
+	using v4T::a;
 #endif
 public:
 	/// <summary>

@@ -46,7 +46,7 @@ bool EmberRender(EmberOptions& opt)
 	EmberToXml<T> emberToXml;
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> randVec;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
-	unique_ptr<RenderProgress<T>> progress(new RenderProgress<T>());
+	auto progress = make_unique<RenderProgress<T>>();
 	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	vector<string> errorReport = emberReport.ErrorReport();
 
@@ -282,7 +282,7 @@ bool EmberRender(EmberOptions& opt)
 			//TotalIterCount() is actually using ScaledQuality() which does not get reset upon ember assignment,
 			//so it ends up using the correct value for quality * strips.
 			iterCount = renderer->TotalIterCount(1);
-			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), opt.IntPalette(), opt.HexPalette());
+			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), opt.HexPalette());
 			os.str("");
 			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((double(stats.m_Iters) / double(iterCount)) * 100) << "%)";
 			VerbosePrint("\nIters ran/requested: " + os.str());

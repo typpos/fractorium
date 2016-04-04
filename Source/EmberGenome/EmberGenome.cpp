@@ -118,7 +118,7 @@ bool EmberGenome(EmberOptions& opt)
 	EmberToXml<T> emberToXml;
 	EmberReport emberReport, emberReport2;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
-	unique_ptr<RenderProgress<T>> progress(new RenderProgress<T>());
+	auto progress = make_unique<RenderProgress<T>>();
 	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));
 	vector<string> errorReport = emberReport.ErrorReport();
@@ -337,7 +337,7 @@ bool EmberGenome(EmberOptions& opt)
 				tools.ApplyTemplate(embers[i], *pTemplate);
 
 			tools.Offset(embers[i], T(opt.OffsetX()), T(opt.OffsetY()));
-			cout << emberToXml.ToString(embers[i], opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+			cout << emberToXml.ToString(embers[i], opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
 
 		cout << "</clone_all>\n";
@@ -399,7 +399,7 @@ bool EmberGenome(EmberOptions& opt)
 			if (pTemplate)
 				tools.ApplyTemplate(interpolated, *pTemplate);
 
-			cout << emberToXml.ToString(interpolated, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+			cout << emberToXml.ToString(interpolated, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
 
 		cout << "</animate>\n";
@@ -434,7 +434,7 @@ bool EmberGenome(EmberOptions& opt)
 					blend = T(frame) / T(opt.Frames());
 					tools.Spin(embers[i], pTemplate, result, frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
 					FormatName(result, os, padding);
-					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 				}
 
 				//The loop above will have rotated just shy of a complete rotation.
@@ -458,7 +458,7 @@ bool EmberGenome(EmberOptions& opt)
 					result.Clear();
 					tools.SpinInter(&embers[i], pTemplate, result, frameCount++, seqFlag, blend);
 					FormatName(result, os, padding);
-					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 				}
 			}
 		}
@@ -466,7 +466,7 @@ bool EmberGenome(EmberOptions& opt)
 		result = embers.back();
 		tools.Spin(embers.back(), pTemplate, result, frameCount, 0);
 		FormatName(result, os, padding);
-		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 
 		if (opt.Enclosed())
 			cout << "</sequence>\n";
@@ -501,9 +501,9 @@ bool EmberGenome(EmberOptions& opt)
 			tools.Spin(embers[0], pTemplate, result1, frame - 1, blend - spread);
 			tools.Spin(embers[0], pTemplate, result2, frame    , blend         );
 			tools.Spin(embers[0], pTemplate, result3, frame + 1, blend + spread);
-			cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
-			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
-			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+			cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
 		else
 		{
@@ -516,9 +516,9 @@ bool EmberGenome(EmberOptions& opt)
 			tools.SpinInter(embers.data(), pTemplate, result1, frame - 1, 0, blend - spread);
 			tools.SpinInter(embers.data(), pTemplate, result2, frame    , 0, blend         );
 			tools.SpinInter(embers.data(), pTemplate, result3, frame + 1, 0, blend + spread);
-			cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
-			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
-			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+			cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
 
 		if (opt.Enclosed())
@@ -548,7 +548,7 @@ bool EmberGenome(EmberOptions& opt)
 				tools.ApplyTemplate(embers[i], *pTemplate);
 
 			tools.Offset(embers[i], T(opt.OffsetX()), T(opt.OffsetY()));
-			cout << emberToXml.ToString(embers[i], opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+			cout << emberToXml.ToString(embers[i], opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
 
 		if (opt.Enclosed())
@@ -792,7 +792,7 @@ bool EmberGenome(EmberOptions& opt)
 				save.DeleteTotalXform(save.TotalXformCount() - 1);
 		}
 
-		cout << emberToXml.ToString(save, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), false, opt.HexPalette());
+		cout << emberToXml.ToString(save, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		VerbosePrint("\nDone. Action = " << os.str() << "\n");
 		cout.flush();
 		save.Clear();

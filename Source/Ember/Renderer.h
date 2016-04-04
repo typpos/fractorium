@@ -43,10 +43,12 @@ namespace EmberNs
 template <typename T, typename bucketT>
 class EMBER_API Renderer : public RendererBase
 {
-//using EmberReport::m_ErrorReport;
 public:
-	Renderer();
-	virtual ~Renderer();
+
+	Renderer() = default;
+	Renderer(const Renderer<T, bucketT>& renderer) = delete;
+	Renderer<T, bucketT>& operator = (const Renderer<T, bucketT>& renderer) = delete;
+	virtual ~Renderer() = default;
 
 	//Non-virtual processing functions.
 	void AddEmber(Ember<T>& ember);
@@ -56,14 +58,17 @@ public:
 	virtual void ComputeBounds() override;
 	virtual void ComputeQuality() override;
 	virtual void ComputeCamera() override;
-	virtual void SetEmber(Ember<T>& ember, eProcessAction action = eProcessAction::FULL_RENDER) override;
-	virtual void SetEmber(vector<Ember<T>>& embers) override;
+	virtual void SetEmber(const Ember<T>& ember, eProcessAction action = eProcessAction::FULL_RENDER) override;
+	template <typename C>
+	void SetEmber(const C& embers);
+	void MoveEmbers(vector<Ember<T>>& embers);
+	void SetExternalEmbersPointer(vector<Ember<T>>* embers);
 	virtual bool CreateDEFilter(bool& newAlloc) override;
 	virtual bool CreateSpatialFilter(bool& newAlloc) override;
 	virtual bool CreateTemporalFilter(bool& newAlloc) override;
 	virtual size_t HistBucketSize() const override { return sizeof(tvec4<bucketT, glm::defaultp>); }
 	virtual eRenderStatus Run(vector<byte>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) override;
-	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool intPalette = false, bool hexPalette = true) override;
+	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool hexPalette = true) override;
 
 protected:
 	//New virtual functions to be overridden in derived renderers that use the GPU, but not accessed outside.
@@ -158,7 +163,7 @@ protected:
 	T m_Scale;
 	T m_PixelsPerUnitX;
 	T m_PixelsPerUnitY;
-	T m_PixelAspectRatio;
+	T m_PixelAspectRatio = 1;
 	T m_LowerLeftX;
 	T m_LowerLeftY;
 	T m_UpperRightX;
@@ -173,12 +178,16 @@ protected:
 	Ember<T> m_Ember;
 	Ember<T> m_TempEmber;
 	Ember<T> m_LastEmber;
+private:
 	vector<Ember<T>> m_Embers;
+
+protected:
+	vector<Ember<T>>* m_EmbersP = &m_Embers;
 	vector<Ember<T>> m_ThreadEmbers;
 	CarToRas<T> m_CarToRas;
-	Iterator<T>* m_Iterator;
-	unique_ptr<StandardIterator<T>> m_StandardIterator;
-	unique_ptr<XaosIterator<T>> m_XaosIterator;
+	unique_ptr<StandardIterator<T>> m_StandardIterator = make_unique<StandardIterator<T>>();
+	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();
+	Iterator<T>* m_Iterator = m_StandardIterator.get();
 	Palette<bucketT> m_Dmap, m_Csa;
 	vector<tvec4<bucketT, glm::defaultp>> m_HistBuckets;
 	vector<tvec4<bucketT, glm::defaultp>> m_AccumulatorBuckets;

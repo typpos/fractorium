@@ -15,8 +15,8 @@ class StealthComboBox : public QComboBox
 	Q_OBJECT
 
 public:
-	explicit StealthComboBox(QWidget* p = 0) : QComboBox(p) { }
-	
+	explicit StealthComboBox(QWidget* p = nullptr) : QComboBox(p) { }
+
 	/// <summary>
 	/// Set the current index of the combo box without triggering signals.
 	/// </summary>

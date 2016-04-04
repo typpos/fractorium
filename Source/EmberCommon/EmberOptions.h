@@ -308,7 +308,7 @@ public:
 		INITBOOLOPTION(Verbose,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERBOSE,          _T("--verbose"),              false,                SO_NONE,    "\t--verbose                Verbose output.\n"));
 		INITBOOLOPTION(Debug,          Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DEBUG,            _T("--debug"),                false,                SO_NONE,    "\t--debug                  Debug output.\n"));
 		INITBOOLOPTION(DumpArgs,       Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_ARGS,        _T("--dumpargs"),             false,                SO_NONE,    "\t--dumpargs               Print all arguments entered from either the command line or environment variables.\n"));
-		INITBOOLOPTION(DoProgress,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PROGRESS,         _T("--progress"),             false,                SO_NONE,    "\t--progress               Display progress. This will slow down processing by about 10%%.\n"));
+		INITBOOLOPTION(DoProgress,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PROGRESS,         _T("--progress"),             false,                SO_NONE,    "\t--progress               Display progress. This will slow down processing by about 10%.\n"));
 		INITBOOLOPTION(OpenCLInfo,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_OPENCL_INFO, _T("--openclinfo"),           false,                SO_NONE,    "\t--openclinfo             Display platforms and devices for OpenCL.\n"));
 		INITBOOLOPTION(AllVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_ALL_VARS,		  _T("--allvars"),				false,				  SO_NONE,	  "\t--allvars				  Display the names of all supported variations.\n"));
 		INITBOOLOPTION(RegVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_REG_VARS,		  _T("--regvars"),				false,				  SO_NONE,	  "\t--regvars				  Display the names of all supported regular variations.\n"));
@@ -319,15 +319,14 @@ public:
 		INITBOOLOPTION(EarlyClip,      Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_EARLYCLIP,        _T("--earlyclip"),            false,                SO_NONE,    "\t--earlyclip              Perform clipping of RGB values before spatial filtering for better antialiasing and resizing [default: false].\n"));
 		INITBOOLOPTION(YAxisUp,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_POS_Y_UP,         _T("--yaxisup"),              false,                SO_NONE,    "\t--yaxisup                Orient the image with the positive y axis pointing up [default: false].\n"));
 		INITBOOLOPTION(Transparency,   Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_TRANSPARENCY,     _T("--transparency"),         false,                SO_NONE,    "\t--transparency           Include alpha channel in final output [default: false except for PNG].\n"));
-		INITBOOLOPTION(NameEnable,     Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_NAME_ENABLE,      _T("--name_enable"),          false,                SO_NONE,    "\t--name_enable            Use the name attribute contained in the xml as the output filename [default: false].\n"));
-		INITBOOLOPTION(IntPalette,     Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_INT_PALETTE,      _T("--intpalette"),           false,                SO_NONE,    "\t--intpalette             Force palette RGB values to be integers [default: false (float)].\n"));
+		INITBOOLOPTION(NameEnable,     Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_NAME_ENABLE,      _T("--name_enable"),          false,                SO_NONE,    "\t--name_enable            Use the name attribute contained in the Xml as the output filename [default: false].\n"));
 		INITBOOLOPTION(HexPalette,     Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_HEX_PALETTE,	  _T("--hex_palette"),			true,				  SO_OPT,	  "\t--hex_palette            Force palette RGB values to be hex [default: true].\n"));
 		INITBOOLOPTION(InsertPalette,  Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_INSERT_PALETTE,   _T("--insert_palette"),       false,                SO_NONE,    "\t--insert_palette         Insert the palette into the image for debugging purposes [default: false].\n"));
 		INITBOOLOPTION(JpegComments,   Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG_COMMENTS,	  _T("--enable_jpeg_comments"), true,				  SO_OPT,	  "\t--enable_jpeg_comments   Enables comments in the jpeg header [default: true].\n"));
 		INITBOOLOPTION(PngComments,    Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PNG_COMMENTS,	  _T("--enable_png_comments"),  true,				  SO_OPT,	  "\t--enable_png_comments    Enables comments in the png header [default: true].\n"));
 		INITBOOLOPTION(WriteGenome,    Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_WRITE_GENOME,     _T("--write_genome"),         false,                SO_NONE,    "\t--write_genome           Write out flame associated with center of motion blur window [default: false].\n"));
 		INITBOOLOPTION(ThreadedWrite,  Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_THREADED_WRITE,	  _T("--threaded_write"),		true,				  SO_OPT,	  "\t--threaded_write         Use a separate thread to write images to disk. This gives better performance, but doubles the memory required for the final output buffer. [default: true].\n"));
-		INITBOOLOPTION(Enclosed,	   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ENCLOSED,		  _T("--enclosed"),				true,				  SO_OPT,	  "\t--enclosed               Use enclosing XML tags [default: true].\n"));
+		INITBOOLOPTION(Enclosed,	   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ENCLOSED,		  _T("--enclosed"),				true,				  SO_OPT,	  "\t--enclosed               Use enclosing Xml tags [default: true].\n"));
 		INITBOOLOPTION(NoEdits,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NO_EDITS,         _T("--noedits"),              false,                SO_NONE,    "\t--noedits                Exclude edit tags when writing Xml [default: false].\n"));
 		INITBOOLOPTION(UnsmoothEdge,   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_UNSMOOTH_EDGE,    _T("--unsmoother"),           false,                SO_NONE,    "\t--unsmoother             Do not use smooth blending for sheep edges [default: false].\n"));
 		INITBOOLOPTION(LockAccum,	   Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_LOCK_ACCUM,       _T("--lock_accum"),           false,                SO_NONE,    "\t--lock_accum             Lock threads when accumulating to the histogram using the CPU. This will drop performance to that of single threading [default: false].\n"));
@@ -346,13 +345,13 @@ public:
 		INITUINTOPTION(ThreadCount,    Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_NTHREADS,         _T("--nthreads"),             0,                    SO_REQ_SEP, "\t--nthreads=<val>         The number of threads to use [default: use all available cores].\n"));
 		INITUINTOPTION(Strips,		   Eou(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_STRIPS,           _T("--nstrips"),              1,                    SO_REQ_SEP, "\t--nstrips=<val>          The number of fractions to split a single render frame into. Useful for print size renders or low memory systems [default: 1].\n"));
 		INITUINTOPTION(Supersample,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "\t--supersample=<val>      The supersample value used to override the one specified in the file [default: 0 (use value from file)].\n"));
-		INITUINTOPTION(BitsPerChannel, Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "\t--bpc=<val>              Bits per channel. 8 or 16 for PNG, 8 for all others [default: 8].\n"));
+		INITUINTOPTION(BitsPerChannel, Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "\t--bpc=<val>              Bits per channel. 8 or 16 for PNG, 8 for all others, always 8 with OpenCL [default: 8].\n"));
 		INITUINTOPTION(SubBatchSize,   Eou(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_SBS,			  _T("--sub_batch_size"),		DEFAULT_SBS,		  SO_REQ_SEP, "\t--sub_batch_size=<val>   The chunk size that iterating will be broken into [default: 10k].\n"));
-		INITUINTOPTION(Bits,           Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_BITS,             _T("--bits"),                 33,                   SO_REQ_SEP, "\t--bits=<val>             Determines the types used for the histogram and accumulator [default: 33].\n"
-										   "\t\t\t\t\t32:  Histogram: float, Accumulator: float.\n"
-										   "\t\t\t\t\t33:  Histogram: float, Accumulator: float.\n"//This differs from the original which used an int hist for bits 33.
-										   "\t\t\t\t\t64:  Histogram: double, Accumulator: double.\n"));
-		INITUINTOPTION(PrintEditDepth, Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"), 0,                       SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to xml. 0 prints all <edit> tags [default: 0].\n"));
+		INITUINTOPTION(Bits,           Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_BITS,             _T("--bits"),                 33,                   SO_REQ_SEP, "\t--bits=<val>             Determines the types used for the calculations [default: 33].\n"
+										   "\t\t\t\t\t32: float.\n"
+										   "\t\t\t\t\t33: float.\n"//This differs from the original which used an int hist for bits 33.
+										   "\t\t\t\t\t64: double.\n"));
+		INITUINTOPTION(PrintEditDepth, Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"), 0,                       SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
 		INITUINTOPTION(JpegQuality,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),             95,                      SO_REQ_SEP, "\t--jpeg=<val>             Jpeg quality 0-100 for compression [default: 95].\n"));
 		INITUINTOPTION(FirstFrame,     Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),            UINT_MAX,                SO_REQ_SEP, "\t--begin=<val>            Time of first frame to render [default: first time specified in file].\n"));
 		INITUINTOPTION(LastFrame,      Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_END,              _T("--end"),	            UINT_MAX,                SO_REQ_SEP, "\t--end=<val>              Time of last frame to render [default: last time specified in the input file].\n"));
@@ -390,7 +389,6 @@ public:
 		INITSTRINGOPTION(Suffix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUFFIX,           _T("--suffix"),               "",                   SO_REQ_SEP, "\t--suffix=<val>           Suffix to append to all output files.\n"));
 		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP, "\t--format=<val>           Format of the output file. Valid values are: bmp, jpg, png, ppm [default: png].\n"));
 		INITSTRINGOPTION(PalettePath,  Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_FILE,     _T("--flam3_palettes"),       "flam3-palettes.xml", SO_REQ_SEP, "\t--flam3_palettes=<val>   Path and name of the palette file [default: flam3-palettes.xml].\n"));
-		//INITSTRINGOPTION(PaletteImage, Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_IMAGE,    _T("--image"),                "",                   SO_REQ_SEP, "\t--image=<val>            Replace palette with png, jpg, or ppm image.\n"));
 		INITSTRINGOPTION(Id,           Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_ID,               _T("--id"),                   "",                   SO_REQ_SEP, "\t--id=<val>               ID to use in <edit> tags / image comments.\n"));
 		INITSTRINGOPTION(Url,          Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_URL,              _T("--url"),                  "",                   SO_REQ_SEP, "\t--url=<val>              URL to use in <edit> tags / image comments.\n"));
 		INITSTRINGOPTION(Nick,         Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_NICK,             _T("--nick"),                 "",                   SO_REQ_SEP, "\t--nick=<val>             Nickname to use in <edit> tags / image comments.\n"));
@@ -465,7 +463,6 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_POS_Y_UP, YAxisUp);
 					PARSEBOOLOPTION(eOptionIDs::OPT_TRANSPARENCY, Transparency);
 					PARSEBOOLOPTION(eOptionIDs::OPT_NAME_ENABLE, NameEnable);
-					PARSEBOOLOPTION(eOptionIDs::OPT_INT_PALETTE, IntPalette);
 					PARSEBOOLOPTION(eOptionIDs::OPT_HEX_PALETTE, HexPalette);
 					PARSEBOOLOPTION(eOptionIDs::OPT_INSERT_PALETTE, InsertPalette);
 					PARSEBOOLOPTION(eOptionIDs::OPT_JPEG_COMMENTS, JpegComments);
@@ -667,17 +664,29 @@ public:
 		if (optUsage == eOptionUse::OPT_USE_RENDER)
 		{
 			cout << "Usage:\n"
-				 "\tEmberRender.exe --in=test.flam3 [--out=outfile --format=png --verbose --progress --opencl]\n\n";
+#ifdef _WIN32
+				 "\tEmberRender.exe --in=test.flame [--out=outfile --format=png --verbose --progress --opencl]\n\n";
+#else
+				 "\temberrender --in=test.flame [--out=outfile --format=png --verbose --progress --opencl]\n\n";
+#endif
 		}
 		else if (optUsage == eOptionUse::OPT_USE_ANIMATE)
 		{
 			cout << "Usage:\n"
-				 "\tEmberAnimate.exe --in=sequence.flam3 [--format=png --verbose --progress --opencl]\n\n";
+#ifdef _WIN32
+				 "\tEmberAnimate.exe --in=sequence.flame [--format=png --verbose --progress --opencl]\n\n";
+#else
+				 "\temberanimate --in=sequence.flame [--format=png --verbose --progress --opencl]\n\n";
+#endif
 		}
 		else if (optUsage == eOptionUse::OPT_USE_GENOME)
 		{
 			cout << "Usage:\n"
-				 "\tEmberGenome.exe --sequence=test.flam3 > sequenceout.flam3\n\n";
+#ifdef _WIN32
+				 "\tEmberGenome.exe --sequence=test.flame > sequenceout.flame\n\n";
+#else
+				 "\tembergenome --sequence=test.flame > sequenceout.flame\n\n";
+#endif
 		}
 
 		cout << GetUsage(optUsage) << "\n";
@@ -730,7 +739,6 @@ public:
 	Eob YAxisUp;
 	Eob Transparency;
 	Eob NameEnable;
-	Eob IntPalette;
 	Eob HexPalette;
 	Eob InsertPalette;
 	Eob JpegComments;

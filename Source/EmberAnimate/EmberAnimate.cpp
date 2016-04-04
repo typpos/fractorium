@@ -38,7 +38,7 @@ bool EmberAnimate(EmberOptions& opt)
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
 	std::atomic<size_t> atomfTime;
 	vector<std::thread> threadVec;
-	unique_ptr<RenderProgress<T>> progress;
+	auto progress = make_unique<RenderProgress<T>>();
 	vector<unique_ptr<Renderer<T, float>>> renderers;
 	vector<string> errorReport;
 	std::recursive_mutex verboseCs;
@@ -58,10 +58,7 @@ bool EmberAnimate(EmberOptions& opt)
 		}
 
 		if (opt.DoProgress())
-		{
-			progress = unique_ptr<RenderProgress<T>>(new RenderProgress<T>());
 			renderers[0]->Callback(progress.get());
-		}
 
 		cout << "Using OpenCL to render.\n";
 
@@ -103,10 +100,7 @@ bool EmberAnimate(EmberOptions& opt)
 		}
 
 		if (opt.DoProgress())
-		{
-			progress = unique_ptr<RenderProgress<T>>(new RenderProgress<T>());
 			tempRenderer->Callback(progress.get());
-		}
 
 		if (opt.ThreadCount() == 0)
 		{
@@ -304,7 +298,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 	for (auto& r : renderers)
 	{
-		r->SetEmber(embers);
+		r->SetExternalEmbersPointer(&embers);//All will share a pointer to the original vector to conserve memory with large files. Ok because the vec doesn't get modified.
 		r->EarlyClip(opt.EarlyClip());
 		r->YAxisUp(opt.YAxisUp());
 		r->LockAccum(opt.LockAccum());
@@ -390,12 +384,12 @@ bool EmberAnimate(EmberOptions& opt)
 				}
 
 				Interpolater<T>::Interpolate(embers, localTime, 0, centerEmber);//Get center flame.
-				emberToXml.Save(flameName, centerEmber, opt.PrintEditDepth(), true, opt.IntPalette(), opt.HexPalette(), true, false, false);
+				emberToXml.Save(flameName, centerEmber, opt.PrintEditDepth(), true, opt.HexPalette(), true, false, false);
 				centerEmber.Clear();
 			}
 
 			stats = renderer->Stats();
-			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), opt.IntPalette(), opt.HexPalette());
+			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), opt.HexPalette());
 			os.str("");
 			size_t iterCount = renderer->TotalIterCount(1);
 			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((double(stats.m_Iters) / double(iterCount)) * 100) << "%)";

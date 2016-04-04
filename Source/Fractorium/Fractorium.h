@@ -65,6 +65,7 @@ class Fractorium : public QMainWindow
 
 	friend GLWidget;
 	friend QssDialog;
+	friend LibraryTreeWidget;
 	friend FractoriumOptionsDialog;
 	friend FractoriumFinalRenderDialog;
 	friend FractoriumAboutDialog;
@@ -82,7 +83,7 @@ class Fractorium : public QMainWindow
 #endif
 
 public:
-	Fractorium(QWidget* p = 0);
+	Fractorium(QWidget* p = nullptr);
 	~Fractorium();
 
 	//Geometry.

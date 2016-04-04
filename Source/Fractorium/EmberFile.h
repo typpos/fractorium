@@ -17,11 +17,10 @@ class EmberFile
 {
 public:
 	/// <summary>
-	/// Empty constructor that does nothing.
+	/// Default constructor and destructor.
 	/// </summary>
-	EmberFile()
-	{
-	}
+	EmberFile() = default;
+	~EmberFile() = default;
 
 	/// <summary>
 	/// Default copy constructor.
@@ -63,7 +62,31 @@ public:
 	EmberFile<T>& operator = (const EmberFile<U>& emberFile)
 	{
 		m_Filename = emberFile.m_Filename;
-		CopyVec(m_Embers, emberFile.m_Embers);
+		CopyCont(m_Embers, emberFile.m_Embers);
+		return *this;
+	}
+
+	/// <summary>
+	/// Move constructor.
+	/// </summary>
+	/// <param name="emberFile">The EmberFile object to move</param>
+	EmberFile(EmberFile<T>&& emberFile)
+	{
+		EmberFile<T>::operator=<T>(emberFile);
+	}
+
+	/// <summary>
+	/// Move assignment operator.
+	/// </summary>
+	/// <param name="emberFile">The EmberFile object to move</param>
+	EmberFile<T>& operator = (EmberFile<T>&& emberFile)
+	{
+		if (this != &emberFile)
+		{
+			m_Filename = emberFile.m_Filename;
+			m_Embers = std::move(emberFile.m_Embers);
+		}
+
 		return *this;
 	}
 
@@ -85,6 +108,19 @@ public:
 	}
 
 	/// <summary>
+	/// Get a pointer to the ember at the specified index.
+	/// </summary>
+	/// <param name="i">The index of the ember to retrieve</param>
+	/// <returns>A pointer to the ember if it was within bounds, else nullptr.</returns>
+	Ember<T>* Get(size_t i)
+	{
+		if (i < m_Embers.size())
+			return &(*Advance(m_Embers.begin(), i));
+
+		return nullptr;
+	}
+
+	/// <summary>
 	/// Delete the ember at the given index.
 	/// Will not delete anything if the size is already 1.
 	/// </summary>
@@ -94,7 +130,7 @@ public:
 	{
 		if (Size() > 1 && index < Size())
 		{
-			m_Embers.erase(m_Embers.begin() + index);
+			m_Embers.erase(Advance(m_Embers.begin(), index));
 			return true;
 		}
 		else
@@ -106,14 +142,14 @@ public:
 	/// </summary>
 	void MakeNamesUnique()
 	{
-		for (size_t i = 0; i < m_Embers.size(); i++)
+		for (auto it1 = m_Embers.begin(); it1 != m_Embers.end(); ++it1)
 		{
-			for (size_t j = 0; j < m_Embers.size(); j++)
+			for (auto it2 = m_Embers.begin(); it2 != m_Embers.end(); ++it2)
 			{
-				if (i != j && m_Embers[i].m_Name == m_Embers[j].m_Name)
+				if (it1 != it2 && it1->m_Name == it2->m_Name)
 				{
-					m_Embers[j].m_Name = IncrementTrailingUnderscoreInt(QString::fromStdString(m_Embers[j].m_Name)).toStdString();
-					j = 0;
+					it2->m_Name = IncrementTrailingUnderscoreInt(QString::fromStdString(it2->m_Name)).toStdString();
+					it2 = m_Embers.begin();
 				}
 			}
 		}
@@ -195,5 +231,5 @@ public:
 	}
 
 	QString m_Filename;
-	vector<Ember<T>> m_Embers;
+	list<Ember<T>> m_Embers;
 };

@@ -56,7 +56,7 @@ class EMBER_API QTIsaac
 public:
 	enum { N = (1 << ALPHA) };
 	UintBytes m_Cache;
-	size_t m_LastIndex;
+	size_t m_LastIndex = 0;
 
 	/// <summary>
 	/// The structure which holds all of the random information.
@@ -85,7 +85,6 @@ public:
 	QTIsaac(T a = 0, T b = 0, T c = 0, T* s = nullptr)
 	{
 		Srand(a, b, c, s);
-		m_LastIndex = 0;
 		m_Cache.Uint = Rand();
 		RandByte();//Need to call at least once so other libraries can link.
 	}

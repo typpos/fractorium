@@ -28,6 +28,9 @@ public:
 		Add(string(m_DefaultFilename));
 	}
 
+	~PaletteList() = default;
+	PaletteList(const PaletteList<T>& paletteList) = delete;
+
 	/// <summary>
 	/// Read an Xml palette file into memory.
 	/// This must be called before any palette file usage.

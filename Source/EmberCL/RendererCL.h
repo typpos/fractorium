@@ -95,7 +95,9 @@ class EMBERCL_API RendererCL : public Renderer<T, bucketT>, public RendererCLBas
 
 public:
 	RendererCL(const vector<pair<size_t, size_t>>& devices, bool shared = false, GLuint outputTexID = 0);
-	~RendererCL();
+	RendererCL(const RendererCL<T, bucketT>& renderer) = delete;
+	RendererCL<T, bucketT>& operator = (const RendererCL<T, bucketT>& renderer) = delete;
+	virtual ~RendererCL() = default;
 
 	//Non-virtual member functions for OpenCL specific tasks.
 	bool Init(const vector<pair<size_t, size_t>>& devices, bool shared, GLuint outputTexID);

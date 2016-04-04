@@ -25,8 +25,6 @@ public:
 	/// </summary>
 	Palette()
 	{
-		m_Name = "-";
-		m_Index = -1;
 		m_Entries.resize(COLORMAP_LENGTH);
 		Clear();
 	}
@@ -119,12 +117,9 @@ public:
 	}
 
 	/// <summary>
-	/// Empty destructor.
 	/// Needed to eliminate warnings about inlining.
 	/// </summary>
-	~Palette()
-	{
-	}
+	~Palette() = default;
 
 	/// <summary>
 	/// Default assignment operator.
@@ -149,7 +144,7 @@ public:
 		m_Index = palette.m_Index;
 		m_Name = palette.m_Name;
 		m_Filename = palette.m_Filename;
-		CopyVec(m_Entries, palette.m_Entries);
+		CopyCont(m_Entries, palette.m_Entries);
 		return *this;
 	}
 
@@ -159,6 +154,16 @@ public:
 	/// <param name="i">The index to get</param>
 	/// <returns>The color value at the specified index</returns>
 	v4T& operator[] (size_t i)
+	{
+		return m_Entries[i];
+	}
+
+	/// <summary>
+	/// Convenience [] operator to index into the color entries vector in a const context.
+	/// </summary>
+	/// <param name="i">The index to get</param>
+	/// <returns>The color value at the specified index</returns>
+	const v4T& operator[] (size_t i) const
 	{
 		return m_Entries[i];
 	}
@@ -421,7 +426,7 @@ public:
 	/// </summary>
 	/// <param name="rgb">The RGB buffer</param>
 	/// <param name="hsv">The HSV buffer</param>
-	static void RgbToHsv(T* rgb, T* hsv)
+	static void RgbToHsv(const T* rgb, T* hsv)
 	{
 		RgbToHsv(rgb[0], rgb[1], rgb[2], hsv[0], hsv[1], hsv[2]);
 	}
@@ -576,9 +581,9 @@ public:
 		}
 	}
 
-	int m_Index;//Index in the xml palette file of this palette, use -1 for random.
-	string m_Name;//Name of this palette.
+	int m_Index = -1;//Index in the xml palette file of this palette, use -1 for random.
+	string m_Name = "-";//Name of this palette.
 	shared_ptr<string> m_Filename;//Name of the parent file this palette came from, can be empty.
-	vector<v4T> m_Entries;//Storage for the color values.
+	vector<v4T> m_Entries;
 };
 }

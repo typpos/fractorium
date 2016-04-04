@@ -6,11 +6,11 @@
 /// </summary>
 void Fractorium::InitLibraryUI()
 {
+	ui.LibraryTree->SetMainWindow(this);
 	connect(ui.LibraryTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),		  this, SLOT(OnEmberTreeItemChanged(QTreeWidgetItem*, int)),	   Qt::QueuedConnection);
 	connect(ui.LibraryTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
 	connect(ui.LibraryTree, SIGNAL(itemActivated(QTreeWidgetItem*, int)),	  this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
 }
-
 
 /// <summary>
 /// Get the index of the currently selected ember in the library tree.
@@ -52,44 +52,30 @@ void Fractorium::SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vector<by
 
 /// <summary>
 /// Set all libary tree entries to the name of the corresponding ember they represent.
-/// </summary>
-template <typename T>
-void FractoriumEmberController<T>::SyncNames()
-{
-	EmberTreeWidgetItem<T>* item;
-	auto tree = m_Fractorium->ui.LibraryTree;
-	tree->blockSignals(true);
-
-	if (auto top = tree->topLevelItem(0))
-	{
-		for (int i = 0; i < top->childCount(); i++)//Iterate through all of the children, which will represent the open embers.
-		{
-			if ((item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i))) && i < m_EmberFile.Size())//Cast the child widget to the EmberTreeWidgetItem type.
-				item->setText(0, QString::fromStdString(m_EmberFile.m_Embers[i].m_Name));
-		}
-	}
-
-	tree->blockSignals(false);
-}
-
-/// <summary>
 /// Set all libary tree entries to point to the underlying ember they represent.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::SyncPointers()
+void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 {
-	EmberTreeWidgetItem<T>* item;
+	auto it = m_EmberFile.m_Embers.begin();
 	auto tree = m_Fractorium->ui.LibraryTree;
 	tree->blockSignals(true);
 
 	if (auto top = tree->topLevelItem(0))
 	{
-		size_t childCount = top->childCount();
-
-		for (int i = 0; i < childCount; i++)//Iterate through all of the children, which will represent the open embers.
+		for (int i = 0; i < top->childCount() && it != m_EmberFile.m_Embers.end(); ++i, ++it)//Iterate through all of the children, which will represent the open embers.
 		{
-			if ((item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i))) && i < m_EmberFile.Size())//Cast the child widget to the EmberTreeWidgetItem type.
-				item->SetEmberPointer(&m_EmberFile.m_Embers[i]);
+			if (auto item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))//Cast the child widget to the EmberTreeWidgetItem type.
+			{
+				if (update & eLibraryUpdate::INDEX)
+					it->m_Index = i;
+
+				if (update & eLibraryUpdate::NAME)
+					item->setText(0, QString::fromStdString(it->m_Name));
+
+				if (update & eLibraryUpdate::POINTER)
+					item->SetEmberPointer(&(*it));
+			}
 		}
 	}
 
@@ -105,7 +91,8 @@ void FractoriumEmberController<T>::SyncPointers()
 template <typename T>
 void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 {
-	uint j, size = 64;
+	uint size = 64;
+	uint i = 0;
 	auto tree = m_Fractorium->ui.LibraryTree;
 	vector<byte> v(size * size * 4);
 	StopPreviewRender();
@@ -116,18 +103,16 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 	QFileInfo info(m_EmberFile.m_Filename);
 	fileItem->setText(0, info.fileName());
 	fileItem->setToolTip(0, m_EmberFile.m_Filename);
-	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled);
 
-	for (j = 0; j < m_EmberFile.Size(); j++)
+	for (auto& it : m_EmberFile.m_Embers)
 	{
-		auto ember = &m_EmberFile.m_Embers[j];
-		auto emberItem = new EmberTreeWidgetItem<T>(ember, fileItem);
-		emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+		auto emberItem = new EmberTreeWidgetItem<T>(&it, fileItem);
 
-		if (ember->m_Name.empty())
-			emberItem->setText(0, ToString(j));
+		if (it.m_Name.empty())
+			emberItem->setText(0, ToString(i++));
 		else
-			emberItem->setText(0, ember->m_Name.c_str());
+			emberItem->setText(0, it.m_Name.c_str());
 
 		emberItem->setToolTip(0, emberItem->text(0));
 		emberItem->SetImage(v, size, size);
@@ -152,35 +137,33 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 template <typename T>
 void FractoriumEmberController<T>::UpdateLibraryTree()
 {
-	uint i, size = 64;
-	auto tree = m_Fractorium->ui.LibraryTree;
+	uint size = 64;
 	vector<byte> v(size * size * 4);
+	auto tree = m_Fractorium->ui.LibraryTree;
 
 	if (auto top = tree->topLevelItem(0))
 	{
-		int childCount = top->childCount();
+		int origChildCount = top->childCount();
+		int i = origChildCount;
 		tree->blockSignals(true);
 
-		for (i = childCount; i < m_EmberFile.Size(); i++)
+		for (auto it = Advance(m_EmberFile.m_Embers.begin(), i); it != m_EmberFile.m_Embers.end(); ++it)
 		{
-			Ember<T>* ember = &m_EmberFile.m_Embers[i];
-			auto emberItem = new EmberTreeWidgetItem<T>(ember, top);
-			emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+			auto emberItem = new EmberTreeWidgetItem<T>(&(*it), top);
 
-			if (ember->m_Name.empty())
-				emberItem->setText(0, ToString(i));
+			if (it->m_Name.empty())
+				emberItem->setText(0, ToString(i++));
 			else
-				emberItem->setText(0, ember->m_Name.c_str());
+				emberItem->setText(0, it->m_Name.c_str());
 
 			emberItem->setToolTip(0, emberItem->text(0));
 			emberItem->SetImage(v, size, size);
 		}
 
-		//When adding elements to the vector, they may have been reshuffled which will have invalidated
-		//the pointers contained in the EmberTreeWidgetItems. So reassign all pointers here.
-		SyncPointers();
+		//When adding elements, ensure all indices are sequential.
+		SyncLibrary(eLibraryUpdate::INDEX);
 		tree->blockSignals(false);
-		RenderPreviews(childCount, uint(m_EmberFile.Size()));
+		RenderPreviews(origChildCount, uint(m_EmberFile.Size()));
 	}
 }
 
@@ -200,9 +183,8 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 	try
 	{
 		auto tree = m_Fractorium->ui.LibraryTree;
-		auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item);
 
-		if (emberItem)
+		if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item))
 		{
 			if (emberItem->text(0).isEmpty())//Prevent empty string.
 			{
@@ -214,10 +196,10 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 			tree->blockSignals(true);
 			emberItem->UpdateEmberName();//Copy edit text to the ember's name variable.
 			m_EmberFile.MakeNamesUnique();//Ensure all names remain unique.
-			SyncNames();//Copy all ember names to the tree items since some might have changed to be made unique.
+			SyncLibrary(eLibraryUpdate::NAME);//Copy all ember names to the tree items since some might have changed to be made unique.
 			string newName = emberItem->GetEmber()->m_Name;//Get the new, final, unique name.
 
-			if (m_Ember.m_Name == oldName && oldName != newName)//If the ember edited was the current one, and the name was indeed changed, update the name of the current one.
+			if (m_EmberFilePointer == emberItem->GetEmber() && oldName != newName)//If the ember edited was the current one, and the name was indeed changed, update the name of the current one.
 			{
 				m_Ember.m_Name = newName;
 				m_LastSaveCurrent = "";//Reset will force the dialog to show on the next save current since the user probably wants a different name.
@@ -259,12 +241,31 @@ void FractoriumEmberController<T>::EmberTreeItemDoubleClicked(QTreeWidgetItem* i
 {
 	if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item))
 	{
+		//qDebug() << "Setting current ember to: " << QString::fromStdString(emberItem->GetEmber()->m_Name);
 		ClearUndo();
 		SetEmber(*emberItem->GetEmber());
 	}
 }
 
 void Fractorium::OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { m_Controller->EmberTreeItemDoubleClicked(item, col); }
+
+/// <summary>
+/// Move a library item at one index to the next index.
+/// </summary>
+/// <param name="startRow">The index of the source item to move</param>
+/// <param name="destRow">The destination index to move the item to</param>
+template <typename T>
+void FractoriumEmberController<T>::MoveLibraryItems(int startRow, int destRow)
+{
+	int i = 0;
+	auto tree = m_Fractorium->ui.LibraryTree;
+	auto top = tree->topLevelItem(0);
+	auto b = m_EmberFile.m_Embers.begin();
+	auto s = Advance(b, startRow);
+	auto d = Advance(b, destRow);
+	m_EmberFile.m_Embers.splice(d, m_EmberFile.m_Embers, s);
+	SyncLibrary(eLibraryUpdate::INDEX);//Only indices need syncing.
+}
 
 /// <summary>
 /// Delete the currently selected item in the tree.
@@ -275,25 +276,18 @@ void Fractorium::OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { 
 template <typename T>
 void FractoriumEmberController<T>::Delete(const pair<size_t, QTreeWidgetItem*>& p)
 {
-	auto tree = m_Fractorium->ui.LibraryTree;
-	tree->blockSignals(true);
-
 	if (m_EmberFile.Delete(p.first))
 	{
 		delete p.second;
-		SyncPointers();
+		SyncLibrary(eLibraryUpdate::INDEX);
 	}
 
-	tree->blockSignals(false);
-
 	//If there is now only one item left and it wasn't selected, select it.
-	if (auto top = tree->topLevelItem(0))
-	{
+	if (auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
 		if (top->childCount() == 1)
 			if (auto item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(0)))
 				if (item->GetEmber()->m_Name != m_Ember.m_Name)
 					EmberTreeItemDoubleClicked(top->child(0), 0);
-	}
 }
 
 /// <summary>
@@ -326,7 +320,7 @@ void FractoriumEmberController<T>::RenderPreviews(uint start, uint end)
 		if (auto top = tree->topLevelItem(0))
 		{
 			int childCount = top->childCount();
-			vector<byte> emptyPreview(PREVIEW_SIZE * PREVIEW_SIZE * 3);
+			vector<byte> emptyPreview(PREVIEW_SIZE * PREVIEW_SIZE * 4);
 
 			for (int i = 0; i < childCount; i++)
 				if (auto treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))

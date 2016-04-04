@@ -58,24 +58,24 @@ private:
 	string CreateCalcNewRgbFunctionString(bool globalBucket);
 
 	string m_GammaCorrectionWithAlphaCalcKernel;
-	string m_GammaCorrectionWithAlphaCalcEntryPoint;
+	string m_GammaCorrectionWithAlphaCalcEntryPoint = "GammaCorrectionWithAlphaCalcKernel";
 
 	string m_GammaCorrectionWithoutAlphaCalcKernel;
-	string m_GammaCorrectionWithoutAlphaCalcEntryPoint;
+	string m_GammaCorrectionWithoutAlphaCalcEntryPoint = "GammaCorrectionWithoutAlphaCalcKernel";
 
 	string m_FinalAccumEarlyClipKernel;//False, false.
-	string m_FinalAccumEarlyClipEntryPoint;
+	string m_FinalAccumEarlyClipEntryPoint = "FinalAccumEarlyClipKernel";
 	string m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel;//True, true.
-	string m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint;
+	string m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel";
 	string m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel;//False, true.
-	string m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint;
+	string m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel";
 
 	string m_FinalAccumLateClipKernel;//False, false.
-	string m_FinalAccumLateClipEntryPoint;
+	string m_FinalAccumLateClipEntryPoint = "FinalAccumLateClipKernel";
 	string m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel;//True, true.
-	string m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint;
+	string m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel";
 	string m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel;//False, true.
-	string m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint;
+	string m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel";
 
 	string m_Empty;
 	bool m_DoublePrecision;

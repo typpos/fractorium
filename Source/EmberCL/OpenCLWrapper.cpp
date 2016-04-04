@@ -10,17 +10,11 @@ namespace EmberCLns
 /// </summary>
 OpenCLWrapper::OpenCLWrapper()
 {
-	m_Init = false;
-	m_Shared = false;
-	m_PlatformIndex = 0;
-	m_DeviceIndex = 0;
-	m_LocalMemSize = 0;
 	//Pre-allocate some space to avoid temporary copying.
 	m_Programs.reserve(4);
 	m_Buffers.reserve(4);
 	m_Images.reserve(4);
 	m_GLImages.reserve(4);
-	m_Info = OpenCLInfo::Instance();
 }
 
 /// <summary>

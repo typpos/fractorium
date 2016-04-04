@@ -52,18 +52,11 @@ class EMBER_API Iterator
 {
 public:
 	/// <summary>
-	/// Empty constructor.
+	/// Empty constructor and virtual destructor so proper derived class destructors get called.
 	/// </summary>
-	Iterator()
-	{
-	}
-
-	/// <summary>
-	/// Empty virtual destructor so proper derived class destructors get called.
-	/// </summary>
-	virtual ~Iterator()
-	{
-	}
+	Iterator() = default;
+	virtual ~Iterator() = default;
+	Iterator(const Iterator<T>& iter) = delete;
 
 	/// <summary>
 	/// Accessors.

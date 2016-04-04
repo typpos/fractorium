@@ -43,11 +43,11 @@ private:
 	string CreateSumHistKernelString() const;
 	string CreateProjectionString(const Ember<T>& ember) const;
 
-	string m_IterEntryPoint;
+	string m_IterEntryPoint = "IterateKernel";
 	string m_ZeroizeKernel;
-	string m_ZeroizeEntryPoint;
+	string m_ZeroizeEntryPoint = "ZeroizeKernel";
 	string m_SumHistKernel;
-	string m_SumHistEntryPoint;
+	string m_SumHistEntryPoint = "SumHisteKernel";
 	FunctionMapper m_FunctionMapper;
 };
 

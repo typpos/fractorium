@@ -20,10 +20,9 @@ public:
 	/// <summary>
 	/// Constructor that initializes the state to zero.
 	/// </summary>
-	RenderProgress()
-	{
-		Clear();
-	}
+	RenderProgress() = default;
+	RenderProgress(RenderProgress<T>& progress) = delete;
+	~RenderProgress() = default;
 
 	/// <summary>
 	/// The progress function which will be called from inside the renderer.
@@ -33,7 +32,7 @@ public:
 	/// <param name="fraction">The progress fraction from 0-100</param>
 	/// <param name="stage">The stage of iteration. 1 is iterating, 2 is density filtering, 2 is final accumulation.</param>
 	/// <param name="etaMs">The estimated milliseconds to completion of the current stage</param>
-	/// <returns>1 since this is intended to run in an environment where the render runs to completion, unlike interactive rendering.</returns>
+	/// <returns>The value of m_Running, which is always true since this is intended to run in an environment where the render runs to completion, unlike interactive rendering.</returns>
 	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs)
 	{
 		if (stage == 0 || stage == 1)
@@ -51,7 +50,7 @@ public:
 		}
 
 		m_LastStage = stage;
-		return 1;
+		return m_Running;
 	}
 
 	/// <summary>
@@ -59,15 +58,25 @@ public:
 	/// </summary>
 	void Clear()
 	{
+		m_Running = 1;
 		m_LastStage = 0;
 		m_LastLength = 0;
 		m_SS.clear();
 		m_S.clear();
 	}
 
+	/// <summary>
+	/// Stop this instance.
+	/// </summary>
+	void Stop()
+	{
+		m_Running = 0;
+	}
+
 private:
-	int m_LastStage;
-	int m_LastLength;
+	int m_Running = 1;
+	int m_LastStage = 0;
+	int m_LastLength = 0;
 	stringstream m_SS;
 	string m_S;
 	Timing t;
@@ -286,7 +295,7 @@ static Renderer<T, float>* CreateRenderer(eRendererType renderType, const vector
 		if (renderType == eRendererType::OPENCL_RENDERER && !devices.empty())
 		{
 			s = "OpenCL";
-			renderer = unique_ptr<Renderer<T, float>>(new RendererCL<T, float>(devices, shared, texId));
+			renderer = unique_ptr<Renderer<T, float>>(new RendererCL<T, float>(devices, shared, texId));//Can't use make_unique here.
 
 			if (!renderer.get() || !renderer->Ok())
 			{
@@ -294,13 +303,13 @@ static Renderer<T, float>* CreateRenderer(eRendererType renderType, const vector
 					errorReport.AddToReport(renderer->ErrorReport());
 
 				errorReport.AddToReport("Error initializing OpenCL renderer, using CPU renderer instead.");
-				renderer = unique_ptr<Renderer<T, float>>(new Renderer<T, float>());
+				renderer = make_unique<Renderer<T, float>>();
 			}
 		}
 		else
 		{
 			s = "CPU";
-			renderer = unique_ptr<Renderer<T, float>>(new Renderer<T, float>());
+			renderer = make_unique<Renderer<T, float>>();
 		}
 	}
 	catch (const std::exception& e)
@@ -343,7 +352,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 			for (size_t i = 0; i < devices.size(); i++)
 			{
 				vector<pair<size_t, size_t>> tempDevices{ devices[i] };
-				auto renderer = unique_ptr<Renderer<T, float>>(new RendererCL<T, float>(tempDevices, !i ? shared : false, texId));
+				auto renderer = unique_ptr<Renderer<T, float>>(new RendererCL<T, float>(tempDevices, !i ? shared : false, texId));//Can't use make_unique here.
 
 				if (!renderer.get() || !renderer->Ok())
 				{

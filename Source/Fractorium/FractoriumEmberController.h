@@ -19,6 +19,12 @@ enum class eEditUndoState : et { REGULAR_EDIT, UNDO_REDO, EDIT_UNDO };
 enum class eXformUpdate : et { UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_CURRENT_AND_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
 
 /// <summary>
+/// An enum representing the type of synchronizing to do between the list of Embers kept in memory
+/// and the widgets in the library tree.
+/// </summary>
+enum eLibraryUpdate { INDEX = 1, NAME = 2, POINTER = 4 };
+
+/// <summary>
 /// FractoriumEmberController and Fractorium need each other, but each can't include the other.
 /// So Fractorium includes this file, and Fractorium is declared as a forward declaration here.
 /// </summary>
@@ -42,6 +48,7 @@ class FractoriumEmberControllerBase : public RenderCallback
 {
 public:
 	FractoriumEmberControllerBase(Fractorium* fractorium);
+	FractoriumEmberControllerBase(const FractoriumEmberControllerBase& controller) = delete;
 	virtual ~FractoriumEmberControllerBase();
 
 	//Embers.
@@ -107,14 +114,14 @@ public:
 	//Toolbar.
 
 	//Library.
-	virtual void SyncNames() { }
-	virtual void SyncPointers() { }
+	virtual void SyncLibrary(eLibraryUpdate update) { }
 	virtual void FillLibraryTree(int selectIndex = -1) { }
 	virtual void UpdateLibraryTree() { }
 	virtual void EmberTreeItemChanged(QTreeWidgetItem* item, int col) { }
 	virtual void EmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { }
 	virtual void RenderPreviews(uint start = UINT_MAX, uint end = UINT_MAX) { }
 	virtual void StopPreviewRender() { }
+	virtual void MoveLibraryItems(int startRow, int destRow) { }
 	virtual void Delete(const pair<size_t, QTreeWidgetItem*>& p) { }
 
 	//Params.
@@ -237,17 +244,17 @@ protected:
 	eProcessState ProcessState() { return m_Renderer.get() ? m_Renderer->ProcessState() : eProcessState::NONE; }
 
 	//Non-templated members.
-	bool m_Rendering;
-	bool m_Shared;
+	bool m_Rendering = false;
+	bool m_Shared = true;
 	bool m_LastEditWasUndoRedo;
 	vector<pair<size_t, size_t>> m_Devices;
-	size_t m_SubBatchCount;
-	uint m_FailedRenders;
-	size_t m_UndoIndex;
-	double m_LockedScale;
-	eRendererType m_RenderType;
+	size_t m_SubBatchCount = 1;//Will be ovewritten by the options on first render.
+	uint m_FailedRenders = 0;
+	size_t m_UndoIndex = 0;
+	double m_LockedScale = 1;
+	eRendererType m_RenderType = eRendererType::CPU_RENDERER;
 	eEditUndoState m_EditState;
-	GLuint m_OutputTexID;
+	GLuint m_OutputTexID = 0;
 	Timing m_RenderElapsedTimer;
 	EmberStats m_Stats;
 	QImage m_FinalPaletteImage;
@@ -265,7 +272,7 @@ protected:
 	Fractorium* m_Fractorium;
 	std::unique_ptr<QTimer> m_RenderTimer;
 	std::unique_ptr<QTimer> m_RenderRestartTimer;
-	shared_ptr<OpenCLInfo> m_Info;
+	shared_ptr<OpenCLInfo> m_Info = OpenCLInfo::Instance();
 };
 
 /// <summary>
@@ -279,6 +286,7 @@ class FractoriumEmberController : public FractoriumEmberControllerBase
 {
 public:
 	FractoriumEmberController(Fractorium* fractorium);
+	FractoriumEmberController(const FractoriumEmberController<T>& controller) = delete;
 	virtual ~FractoriumEmberController();
 
 	//Embers.
@@ -347,10 +355,10 @@ public:
 	//Toolbar.
 
 	//Library.
-	virtual void SyncNames() override;
-	virtual void SyncPointers() override;
+	virtual void SyncLibrary(eLibraryUpdate update) override;
 	virtual void FillLibraryTree(int selectIndex = -1) override;
 	virtual void UpdateLibraryTree() override;
+	virtual void MoveLibraryItems(int startRow, int destRow) override;
 	virtual void Delete(const pair<size_t, QTreeWidgetItem*>& p) override;
 	virtual void EmberTreeItemChanged(QTreeWidgetItem* item, int col) override;
 	virtual void EmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) override;
@@ -489,11 +497,12 @@ private:
 	bool SyncSizes();
 
 	//Templated members.
-	bool m_PreviewRun;
-	bool m_PreviewRunning;
+	bool m_PreviewRun = false;
+	bool m_PreviewRunning = false;
 	vector<T> m_TempOpacities;
 	vector<T> m_NormalizedWeights;
 	Ember<T> m_Ember;
+	const void* m_EmberFilePointer = nullptr;
 	EmberFile<T> m_EmberFile;
 	deque<Ember<T>> m_UndoList;
 	vector<Xform<T>> m_CopiedXforms;
@@ -503,7 +512,7 @@ private:
 	VariationList<T>& m_VariationList;
 	unique_ptr<SheepTools<T, float>> m_SheepTools;
 	unique_ptr<GLEmberController<T>> m_GLController;
-	unique_ptr<EmberNs::Renderer<T, float>> m_PreviewRenderer;
+	unique_ptr<EmberNs::Renderer<T, float>> m_PreviewRenderer = make_unique<EmberNs::Renderer<T, float>>();
 	QFuture<void> m_PreviewResult;
 	std::function<void (uint, uint)> m_PreviewRenderFunc;
 };

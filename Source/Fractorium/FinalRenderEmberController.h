@@ -73,9 +73,9 @@ public:
 	void Output(const QString& s);
 
 protected:
-	bool m_Run;
-	bool m_PreviewRun;
-	size_t m_ImageCount;
+	bool m_Run = false;
+	bool m_PreviewRun = false;
+	size_t m_ImageCount = 0;
 	std::atomic<size_t> m_FinishedImageCount;
 
 	QFuture<void> m_Result;

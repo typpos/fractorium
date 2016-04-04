@@ -40,6 +40,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <list>
 #ifdef __APPLE__
 	#include <malloc/malloc.h>
 #else

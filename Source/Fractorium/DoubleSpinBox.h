@@ -16,7 +16,7 @@ class DoubleSpinBox : public QDoubleSpinBox
 	Q_OBJECT
 
 public:
-	explicit DoubleSpinBox(QWidget* parent = 0, int height = 16, double step = 0.05);
+	explicit DoubleSpinBox(QWidget* parent = nullptr, int height = 16, double step = 0.05);
 	virtual ~DoubleSpinBox() { }
 	void SetValueStealth(double d);
 	void DoubleClick(bool b);

@@ -144,7 +144,6 @@
     <ClInclude Include="..\..\..\Source\Ember\Isaac.h" />
     <ClInclude Include="..\..\..\Source\Ember\Timing.h" />
     <ClInclude Include="..\..\..\Source\Ember\XmlToEmber.h" />
-    <ClInclude Include="resource1.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Ember\Affine2D.cpp" />

@@ -140,7 +140,7 @@ Fractorium::Fractorium(QWidget* p)
 	connect(ui.LibraryDockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(dockLocationChanged(Qt::DockWidgetArea)));
 	connect(ui.LibraryDockWidget, SIGNAL(topLevelChanged(bool)),                   this, SLOT(OnDockTopLevelChanged(bool)));
 
-	//Always ensure the library tab is selected, which will show preview renders.
+	//Always ensure the library tab is selected if not restoring, which will show preview renders.
 	if (!restored)
 	{
 		ui.LibraryDockWidget->raise();
@@ -298,6 +298,7 @@ void Fractorium::dockLocationChanged(Qt::DockWidgetArea area)
 /// Event filter for taking special action on:
 /// Dock widget resize events, which in turn trigger GLParentScrollArea events.
 /// Library tree key events, specifically delete.
+/// Library tree drag n drop events.
 /// </summary>
 /// <param name="o">The object</param>
 /// <param name="e">The eevent</param>
@@ -309,7 +310,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 		m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width());
 		m_HeightSpin->DoubleClickNonZero(ui.GLParentScrollArea->height());
 	}
-	else if (QKeyEvent* ke = dynamic_cast<QKeyEvent*>(e))
+	else if (auto ke = dynamic_cast<QKeyEvent*>(e))
 	{
 		bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
 
@@ -499,7 +500,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 
 	QStringList filenames;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [ = ](const QString & filter) { m_Settings->OpenXmlExt(filter); });
+	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
 	m_FileDialog->setFileMode(QFileDialog::ExistingFiles);
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
 	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
@@ -527,6 +528,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 {
 	//Lazy instantiate since it takes a long time.
+	//QS
 	if (!m_FileDialog)
 	{
 		m_FileDialog = new QFileDialog(this);
@@ -538,7 +540,7 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 
 	QString filename;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [ = ](const QString & filter) { m_Settings->SaveXmlExt(filter); });
+	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->SaveXmlExt(filter); });
 	//This must come first because it clears various internal states which allow the file text to be properly set.
 	//This is most likely a bug in QFileDialog.
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
@@ -549,7 +551,19 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 	m_FileDialog->selectNameFilter(m_Settings->SaveXmlExt());
 
 	if (m_FileDialog->exec() == QDialog::Accepted)
+	{
 		filename = m_FileDialog->selectedFiles().value(0);
+		//For some reason, linux doesn't automatically append this, but Windows does. Force it to be safe.
+		auto filt = m_FileDialog->selectedNameFilter().split('*');//Qt makes it very hard to get the actual extension used.
+
+		if (filt.size() > 1)//Should always be true.
+		{
+			auto s = filt[1].replace(")", "");
+
+			if (!filename.endsWith(s))
+				filename.append(s);
+		}
+	}
 
 	return filename;
 }
@@ -574,7 +588,7 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 
 	QString filename;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [ = ](const QString & filter) { m_Settings->SaveImageExt(filter); });
+	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->SaveImageExt(filter); });
 	//This must come first because it clears various internal states which allow the file text to be properly set.
 	//This is most likely a bug in QFileDialog.
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);

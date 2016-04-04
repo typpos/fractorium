@@ -17,9 +17,7 @@ public:
 	/// <summary>
 	/// Default constructor, which calls the base, which sets first and second to their defaults.
 	/// </summary>
-	MotionParam()
-	{
-	}
+	MotionParam() = default;
 
 	/// <summary>
 	/// Member-wise constructor.
@@ -90,12 +88,8 @@ public:
 	/// <summary>
 	/// Default constructor to initialize motion freq and offset to 0 and the motion func to SIN.
 	/// </summary>
-	EmberMotion()
-	{
-		m_MotionFreq = 0;
-		m_MotionFunc = eMotion::MOTION_SIN;
-		m_MotionOffset = 0;
-	}
+	EmberMotion() = default;
+	~EmberMotion() = default;
 
 	/// <summary>
 	/// Default copy constructor.
@@ -136,16 +130,16 @@ public:
 	template <typename U>
 	EmberMotion& operator = (const EmberMotion<U>& other)
 	{
-		CopyVec(m_MotionParams, other.m_MotionParams);
+		CopyCont(m_MotionParams, other.m_MotionParams);
 		m_MotionFunc = other.m_MotionFunc;
 		m_MotionFreq = T(other.m_MotionFreq);
 		m_MotionOffset = T(other.m_MotionOffset);
 		return *this;
 	}
 
-	T m_MotionFreq;
-	T m_MotionOffset;
-	eMotion m_MotionFunc;
+	T m_MotionFreq = 0;
+	T m_MotionOffset = 0;
+	eMotion m_MotionFunc = eMotion::MOTION_SIN;
 	vector<MotionParam<T>> m_MotionParams;
 };
 }

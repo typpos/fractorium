@@ -1984,6 +1984,18 @@ void TestRotate()
 	auto xrot = glm::rotate(xtrans, angle * DEG_2_RAD_T, v3T(0, 0, 1));
 }
 
+template<typename T>
+class EmberContainerTester
+{
+public:
+	template <typename Alloc, template <typename, typename> class C>
+	static void TestEmberContainer(C<Ember<T>, Alloc>& cont)
+	{
+		Ember<T> e;
+		cont.push_back(e);
+	}
+};
+
 #define DO_NVIDIA 1
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -1991,8 +2003,17 @@ int _tmain(int argc, _TCHAR* argv[])
 	//int i;
 	bool b = true;
 	Timing t(4);
-	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(1, 2, 3);
-	mt19937 meow(1729);
+	vector<Ember<float>> fv;
+	vector<Ember<double>> dv;
+	list<Ember<float>> fl;
+	list<Ember<double>> dl;
+	EmberContainerTester<float>::TestEmberContainer(fv);
+	EmberContainerTester<double>::TestEmberContainer(dv);
+	EmberContainerTester<float>::TestEmberContainer(fl);
+	EmberContainerTester<double>::TestEmberContainer(dl);
+	CopyCont(fv, fl);
+	//QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(1, 2, 3);
+	//mt19937 meow(1729);
 	/*  TestAffine<float>();
 	    TestAffine<double>();*/
 	/*  TestRotate<float>();

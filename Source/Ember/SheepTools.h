@@ -65,18 +65,13 @@ public:
 		: m_VariationList(VariationList<T>::Instance())
 	{
 		Timing t;
-		m_Smooth = true;
-		m_SheepGen = -1;
-		m_SheepId = -1;
-		m_Stagger = 0;
-		m_OffsetX = 0;
-		m_OffsetY = 0;
 		m_PaletteList.Add(palettePath);
-		m_StandardIterator = unique_ptr<StandardIterator<T>>(new StandardIterator<T>());
-		m_XaosIterator = unique_ptr<XaosIterator<T>>(new XaosIterator<T>());
 		m_Renderer = unique_ptr<Renderer<T, bucketT>>(renderer);
 		m_Rand = QTIsaac<ISAAC_SIZE, ISAAC_INT>(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));
 	}
+
+	SheepTools(const SheepTools& sheepTools) = delete;
+	SheepTools<T, bucketT>& operator = (const SheepTools<T, bucketT>& sheepTools) = delete;
 
 	/// <summary>
 	/// Create the linear default ember with a random palette.
@@ -1329,12 +1324,12 @@ public:
 	}
 
 private:
-	bool m_Smooth;
-	intmax_t m_SheepGen;
-	intmax_t m_SheepId;
-	T m_Stagger;
-	T m_OffsetX;
-	T m_OffsetY;
+	bool m_Smooth = true;
+	intmax_t m_SheepGen = -1;
+	intmax_t m_SheepId = -1;
+	T m_Stagger = 0;
+	T m_OffsetX = 0;
+	T m_OffsetY = 0;
 	string m_Nick;
 	string m_Url;
 	string m_Id;
@@ -1345,8 +1340,8 @@ private:
 	vector<uint> m_Hist;
 	EmberToXml<T> m_EmberToXml;
 	Iterator<T>* m_Iterator;
-	unique_ptr<StandardIterator<T>> m_StandardIterator;
-	unique_ptr<XaosIterator<T>> m_XaosIterator;
+	unique_ptr<StandardIterator<T>> m_StandardIterator = make_unique<StandardIterator<T>>();
+	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();
 	unique_ptr<Renderer<T, bucketT>> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	PaletteList<T> m_PaletteList;

@@ -72,12 +72,16 @@ class EMBER_API EmberImageComments
 {
 public:
 	/// <summary>
-	/// Empty destructor.
+	/// Basic defaults.
+	/// </summary>
+	EmberImageComments() = default;
+	EmberImageComments(const EmberImageComments& comments) = default;
+	EmberImageComments& operator = (const EmberImageComments& comments) = default;
+
+	/// <summary>
 	/// Needed to eliminate warnings about inlining.
 	/// </summary>
-	~EmberImageComments()
-	{
-	}
+	~EmberImageComments() = default;
 
 	/// <summary>
 	/// Set all values to the empty string.
@@ -304,81 +308,105 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 }
 
 /// <summary>
-/// Clear dest and copy all of the elements of vector source with elements of type U to the vector
-/// dest with elements of type T.
+/// Thin wrapper around std::advance that returns the advanced iterator.
+/// Note the passed in iterator is constant so it will not be changed, unlike
+/// std::advance does.
 /// </summary>
-/// <param name="dest">The vector of type T to copy to</param>
-/// <param name="source">The vector of type U to copy from</param>
-template <typename T, typename U>
-static void CopyVec(vector<T>& dest, const vector<U>& source)
+/// <param name="it">A const reference to an iterator, a copy of which will be advanced.</param>
+/// <param name="off">How far to move the iterator forward</param>
+/// <returns>A copy of the passed in iterator, advanced the specified number of elements</returns>
+template<class iter, class diff>
+static iter Advance(const iter& it, diff off)
 {
-	dest.clear();
-	dest.resize(source.size());
-
-	for (size_t i = 0; i < source.size(); i++)
-		dest[i] = static_cast<T>(source[i]);//Valid assignment operator between T and U types must be defined somewhere.
+	auto temp = it;
+	std::advance(temp, off);
+	return temp;
 }
 
 /// <summary>
-/// Clear dest and copy all of the elements of vector source with elements of type U to the vector
+/// Clear dest and copy all of the elements of container source with elements of type U to the container
 /// dest with elements of type T.
-/// Call a function on each element after it's been copied.
 /// </summary>
-/// <param name="dest">The vector of type T to copy to</param>
-/// <param name="source">The vector of type U to copy from</param>
-/// <param name="perElementOperation">A function to call on each element after it's copied</param>
-template <typename T, typename U>
-static void CopyVec(vector<T>& dest, const vector<U>& source, std::function<void(T& t)> perElementOperation)
+/// <param name="dest">The container of type Cdest with elements of type T to copy to</param>
+/// <param name="source">The container of type Csource with elements of type U to copy from</param>
+template <typename T, typename U, typename Dalloc, typename Salloc, template <typename, typename> class Cdest, template <typename, typename> class Csource>
+static void CopyCont(Cdest<T, Dalloc>& dest, const Csource<U, Salloc>& source)
 {
 	dest.clear();
 	dest.resize(source.size());
+	auto it1 = source.begin();
+	auto it2 = dest.begin();
 
-	for (size_t i = 0; i < source.size(); i++)
+	for (; it1 != source.end(); it1++, it2++)
+		*it2 = static_cast<T>(*it1);//Valid assignment operator between T and U types must be defined somewhere.
+}
+
+/// <summary>
+/// Clear dest and copy all of the elements of container source with elements of type U to the container
+/// dest with elements of type T.
+/// Call a function on each element after it's been copied.
+/// </summary>
+/// <param name="dest">The container of type Cdest with elements of type T to copy to</param>
+/// <param name="source">The container of type Csource with elements of type U to copy from</param>
+/// <param name="perElementOperation">A function to call on each element after it's copied</param>
+template <typename T, typename U, typename Dalloc, typename Salloc, template <typename, typename> class Cdest, template <typename, typename> class Csource>
+static void CopyCont(Cdest<T, Dalloc>& dest, const Csource<U, Salloc>& source, std::function<void(T& t)> perElementOperation)
+{
+	dest.clear();
+	dest.resize(source.size());
+	auto it1 = source.begin();
+	auto it2 = dest.begin();
+
+	for (; it1 != source.end(); it1++, it2++)
 	{
-		dest[i] = static_cast<T>(source[i]);//Valid assignment operator between T and U types must be defined somewhere.
-		perElementOperation(dest[i]);
+		*it2 = static_cast<T>(*it1);//Valid assignment operator between T and U types must be defined somewhere.
+		perElementOperation(*it2);
 	}
 }
 
 /// <summary>
-/// Clear a vector of pointers to any type by checking each element for nullptr and calling delete on it, then clearing the entire vector.
+/// Clear a container of pointers to any type by checking each element for nullptr and calling delete on it, then clearing the entire vector.
 /// Optionally call array delete if the elements themselves are pointers to dynamically allocated arrays.
 /// </summary>
 /// <param name="vec">The vector to be cleared</param>
 /// <param name="arrayDelete">Whether to call delete or delete []. Default: false.</param>
-template <typename T>
-static void ClearVec(vector<T*>& vec, bool arrayDelete = false)
+template <typename T, typename Alloc, template <typename, typename> class C>
+static void ClearVec(C<T*, Alloc>& cont, bool arrayDelete = false)
 {
-	for (size_t i = 0; i < vec.size(); i++)
+	for (auto& it : cont)
 	{
-		if (vec[i])
+		if (it)
 		{
 			if (arrayDelete)
-				delete [] vec[i];
+				delete [] it;
 			else
-				delete vec[i];
+				delete it;
 		}
 
-		vec[i] = nullptr;
+		it = nullptr;
 	}
 
-	vec.clear();
+	cont.clear();
 }
 
 /// <summary>
 /// Determine whether all elements in two containers are equal.
+/// The container types do not have to match, but their element types do.
 /// </summary>
 /// <param name="c1">The first collection to compare</param>
 /// <param name="c2">The second collection to compare</param>
 /// <returns>True if the sizes and all elements in both collections are equal, else false.</returns>
-template <typename T>
-static bool Equal(const T& c1, const T& c2)
+template <typename T, typename C1Alloc, typename C2Alloc, template <typename, typename> class C1, template <typename, typename> class C2>
+static bool Equal(const C1<T, C1Alloc>& c1, const C2<T, C2Alloc>& c2)
 {
 	bool equal = c1.size() == c2.size();
 
 	if (equal)
 	{
-		for (auto it1 = c1.begin(), it2 = c2.begin(); it1 != c1.end(); ++it1, ++it2)
+		auto it1 = c1.begin();
+		auto it2 = c2.begin();
+
+		for (; it1 != c1.end(); ++it1, ++it2)
 		{
 			if (*it1 != *it2)
 			{
@@ -443,10 +471,7 @@ static inline T Clamp(T val, T min, T max)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-float Clamp<float>(float val, float min, float max)
+STATIC float Clamp<float>(float val, float min, float max)
 {
 	if (val < min)
 		return min;
@@ -459,10 +484,7 @@ float Clamp<float>(float val, float min, float max)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-double Clamp<double>(double val, double min, double max)
+STATIC double Clamp<double>(double val, double min, double max)
 {
 	if (val < min)
 		return min;
@@ -512,10 +534,7 @@ static inline void ClampRef(T& val, T min, T max)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-void ClampRef<float>(float& val, float min, float max)
+STATIC void ClampRef<float>(float& val, float min, float max)
 {
 	if (val < min)
 		val = min;
@@ -526,10 +545,7 @@ void ClampRef<float>(float& val, float min, float max)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-void ClampRef<double>(double& val, double min, double max)
+STATIC void ClampRef<double>(double& val, double min, double max)
 {
 	if (val < min)
 		val = min;
@@ -552,20 +568,14 @@ static inline void ClampLteRef(T& val, T lte)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-void ClampLteRef<float>(float& val, float lte)
+STATIC void ClampLteRef<float>(float& val, float lte)
 {
 	if (val > lte || !std::isfinite(val))
 		val = lte;
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-void ClampLteRef<double>(double& val, double lte)
+STATIC void ClampLteRef<double>(double& val, double lte)
 {
 	if (val > lte || !std::isfinite(val))
 		val = lte;
@@ -585,10 +595,7 @@ static inline T ClampGte(T val, T gte)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-float ClampGte<float>(float val, float gte)
+STATIC float ClampGte<float>(float val, float gte)
 {
 	if (val < gte || !std::isfinite(val))
 		return gte;
@@ -597,10 +604,7 @@ float ClampGte<float>(float val, float gte)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-double ClampGte<double>(double val, double gte)
+STATIC double ClampGte<double>(double val, double gte)
 {
 	if (val < gte || !std::isfinite(val))
 		return gte;
@@ -621,20 +625,14 @@ static inline void ClampGteRef(T& val, T gte)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-void ClampGteRef<float>(float& val, float gte)
+STATIC void ClampGteRef<float>(float& val, float gte)
 {
 	if (val < gte || !std::isfinite(val))
 		val = gte;
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-void ClampGteRef<double>(double& val, double gte)
+STATIC void ClampGteRef<double>(double& val, double gte)
 {
 	if (val < gte || !std::isfinite(val))
 		val = gte;
@@ -721,19 +719,13 @@ static inline T SafeTan(T x)
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-float SafeTan<float>(float x)
+STATIC float SafeTan<float>(float x)
 {
 	return std::tan(Clamp<float>(x, FLOAT_MIN_TAN, FLOAT_MAX_TAN));
 }
 
 template <>
-#ifdef _WIN32
-	static
-#endif
-double SafeTan<double>(double x)
+STATIC double SafeTan<double>(double x)
 {
 	return std::tan(x);
 }
@@ -940,10 +932,7 @@ static inline T Arg(char* name, T def)
 /// <param name="def">The default value to return if the environment variable was not present</param>
 /// <returns>The value of the specified environment variable if found, else default</returns>
 template <>
-#ifdef _WIN32
-	static
-#endif
-bool Arg<bool>(char* name, bool def)
+STATIC bool Arg<bool>(char* name, bool def)
 {
 	return (Arg<int>(name, -999) != -999) ? true : def;
 }
@@ -955,10 +944,7 @@ bool Arg<bool>(char* name, bool def)
 /// <param name="def">The default value to return if the environment variable was not present</param>
 /// <returns>The value of the specified environment variable if found, else default</returns>
 template <>
-#ifdef _WIN32
-	static
-#endif
-string Arg<string>(char* name, string def)
+STATIC string Arg<string>(char* name, string def)
 {
 	char* ch;
 	string returnVal;

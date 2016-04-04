@@ -38,7 +38,7 @@ public:
 	/// <param name="sourceEmbers">The array of embers to align</param>
 	/// <param name="destEmbers">The array which will contain the aligned embers </param>
 	/// <param name="count">The number of elements in sourceEmbers</param>
-	static void Align(Ember<T>* sourceEmbers, Ember<T>* destEmbers, size_t count)
+	static void Align(const Ember<T>* sourceEmbers, Ember<T>* destEmbers, size_t count)
 	{
 		bool aligned = true;
 		bool currentFinal, final = sourceEmbers[0].UseFinalXform();
@@ -297,7 +297,7 @@ public:
 	/// </summary>
 	/// <param name="embers">The vector of embers to inspect for xaos</param>
 	/// <returns>True if at least one ember contained xaos, else false.</returns>
-	static bool AnyXaosPresent(vector<Ember<T>>& embers)
+	static bool AnyXaosPresent(const vector<Ember<T>>& embers)
 	{
 		return AnyXaosPresent(embers.data(), embers.size());
 	}
@@ -308,7 +308,7 @@ public:
 	/// <param name="embers">The array of embers to inspect</param>
 	/// <param name="size">The size of the embers array</param>
 	/// <returns>True if at least one ember contained xaos, else false.</returns>
-	static bool AnyXaosPresent(Ember<T>* embers, size_t size)
+	static bool AnyXaosPresent(const Ember<T>* embers, size_t size)
 	{
 		for (size_t i = 0; i < size; i++)
 			if (embers[i].XaosPresent())
@@ -333,7 +333,7 @@ public:
 	/// <param name="embers">The array of embers to inspect</param>
 	/// <param name="size">The size of the embers array</param>
 	/// <returns>The greatest non-final xform count in any of the embers</returns>
-	static size_t MaxXformCount(Ember<T>* embers, size_t size)
+	static size_t MaxXformCount(const Ember<T>* embers, size_t size)
 	{
 		size_t i, maxCount = 0;
 
@@ -349,7 +349,7 @@ public:
 	/// </summary>
 	/// <param name="embers">The vector of embers to inspect the presence of a final xform</param>
 	/// <returns>True if any contained a non-empty final xform, else false.</returns>
-	static bool AnyFinalPresent(vector<Ember<T>>& embers)
+	static bool AnyFinalPresent(const vector<Ember<T>>& embers)
 	{
 		return AnyFinalPresent(embers.data(), embers.size());
 	}
@@ -360,7 +360,7 @@ public:
 	/// <param name="embers">The array of embers to inspect the presence of a final xform</param>
 	/// <param name="size">The size of the embers array</param>
 	/// <returns>True if any contained a final xform, else false.</returns>
-	static bool AnyFinalPresent(Ember<T>* embers, size_t size)
+	static bool AnyFinalPresent(const Ember<T>* embers, size_t size)
 	{
 		for (size_t i = 0; i < size; i++)
 			if (embers[i].UseFinalXform())
@@ -376,7 +376,7 @@ public:
 	/// <param name="time">The time position in the vector specifying the point of interpolation</param>
 	/// <param name="stagger">Stagger if > 0</param>
 	/// <param name="result">The interpolated result</param>
-	static void Interpolate(vector<Ember<T>>& embers, T time, T stagger, Ember<T>& result)
+	static void Interpolate(const vector<Ember<T>>& embers, T time, T stagger, Ember<T>& result)
 	{
 		Interpolate(embers.data(), embers.size(), time, stagger, result);
 	}
@@ -389,7 +389,7 @@ public:
 	/// <param name="time">The time position in the vector specifying the point of interpolation</param>
 	/// <param name="stagger">Stagger if > 0</param>
 	/// <param name="result">The interpolated result</param>
-	static void Interpolate(Ember<T>* embers, size_t size, T time, T stagger, Ember<T>& result)
+	static void Interpolate(const Ember<T>* embers, size_t size, T time, T stagger, Ember<T>& result)
 	{
 		if (size == 1)
 		{
@@ -585,7 +585,7 @@ public:
 	/// <param name="cxAng">The vec2 vector to store the polar angular values</param>
 	/// <param name="cxMag">The vec2 vector to store the polar magnitude values</param>
 	/// <param name="cxTrn">The vec2 vector to store the polar translation values</param>
-	static void ConvertLinearToPolar(vector<Ember<T>>& embers, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
+	static void ConvertLinearToPolar(const vector<Ember<T>>& embers, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
 	{
 		ConvertLinearToPolar(embers.data(), embers.size(), xfi, cflag, cxAng, cxMag, cxTrn);
 	}
@@ -601,7 +601,7 @@ public:
 	/// <param name="cxAng">The vec2 vector to store the polar angular values</param>
 	/// <param name="cxMag">The vec2 vector to store the polar magnitude values</param>
 	/// <param name="cxTrn">The vec2 vector to store the polar translation values</param>
-	static void ConvertLinearToPolar(Ember<T>* embers, size_t size, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
+	static void ConvertLinearToPolar(const Ember<T>* embers, size_t size, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
 	{
 		if (size == cxAng.size() &&
 				size == cxMag.size() &&
@@ -765,7 +765,7 @@ public:
 	/// <param name="cxMag">The vec2 vector to store the polar magnitude values</param>
 	/// <param name="cxTrn">The vec2 vector to store the polar translation values</param>
 	/// <param name="store">The Affine2D to store the inerpolated values in</param>
-	static void InterpAndConvertBack(vector<T>& coefs, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn, Affine2D<T>& store)
+	static void InterpAndConvertBack(const vector<T>& coefs, const vector<v2T>& cxAng, const vector<v2T>& cxMag, const vector<v2T>& cxTrn, Affine2D<T>& store)
 	{
 		size_t size = coefs.size();
 		glm::length_t i, col, accmode[2] = { 0, 0 };

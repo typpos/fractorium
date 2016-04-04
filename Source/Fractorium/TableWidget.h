@@ -24,14 +24,14 @@
 /// </summary>
 class TableWidget : public QTableWidget
 {
-	 Q_OBJECT
+	Q_OBJECT
 public:
 	/// <summary>
 	/// Constructor that passes the parent to the base and installs
 	/// the event filter.
 	/// </summary>
 	/// <param name="p">The parent widget</param>
-	explicit TableWidget(QWidget* p = 0)
+	explicit TableWidget(QWidget* p = nullptr)
 		: QTableWidget(p)
 	{
 		viewport()->installEventFilter(this);
@@ -46,7 +46,7 @@ protected:
 	/// <returns>True if mouse wheel, else return the result of calling the base fucntion.</returns>
 	bool eventFilter(QObject* obj, QEvent* e)
 	{
-		if(e->type() == QEvent::Wheel)
+		if (e->type() == QEvent::Wheel)
 		{
 			e->ignore();
 			return true;

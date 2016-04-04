@@ -6681,12 +6681,15 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QTreeWidget" name="LibraryTree">
+          <widget class="LibraryTreeWidget" name="LibraryTree">
            <property name="focusPolicy">
             <enum>Qt::WheelFocus</enum>
            </property>
            <property name="contextMenuPolicy">
-            <enum>Qt::CustomContextMenu</enum>
+            <enum>Qt::DefaultContextMenu</enum>
+           </property>
+           <property name="acceptDrops">
+            <bool>false</bool>
            </property>
            <property name="frameShape">
             <enum>QFrame::Panel</enum>
@@ -6696,6 +6699,21 @@
            </property>
            <property name="editTriggers">
             <set>QAbstractItemView::SelectedClicked</set>
+           </property>
+           <property name="showDropIndicator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="dragEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="dragDropMode">
+            <enum>QAbstractItemView::InternalMove</enum>
+           </property>
+           <property name="defaultDropAction">
+            <enum>Qt::MoveAction</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
            </property>
            <property name="indentation">
             <number>10</number>
@@ -7238,6 +7256,11 @@
    <class>CurvesGraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>CurvesGraphicsView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LibraryTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>LibraryTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

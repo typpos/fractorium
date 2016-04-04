@@ -10,13 +10,10 @@
 /// </summary>
 /// <param name="finalRender">Pointer to the final render dialog</param>
 FinalRenderEmberControllerBase::FinalRenderEmberControllerBase(FractoriumFinalRenderDialog* finalRenderDialog)
-	: FractoriumEmberControllerBase(finalRenderDialog->m_Fractorium)
+	: FractoriumEmberControllerBase(finalRenderDialog->m_Fractorium),
+	  m_FinalRenderDialog(finalRenderDialog)
 {
-	m_Run = false;
-	m_PreviewRun = false;
-	m_ImageCount = 0;
 	m_FinishedImageCount.store(0);
-	m_FinalRenderDialog = finalRenderDialog;
 	m_Settings = m_Fractorium->m_Settings;
 }
 
@@ -105,7 +102,7 @@ template<typename T>
 FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderDialog* finalRender)
 	: FinalRenderEmberControllerBase(finalRender)
 {
-	m_FinalPreviewRenderer = unique_ptr<EmberNs::Renderer<T, float>>(new EmberNs::Renderer<T, float>());
+	m_FinalPreviewRenderer = make_unique<EmberNs::Renderer<T, float>>();
 	m_FinalPreviewRenderer->Callback(nullptr);
 	m_FinalPreviewRenderer->NumChannels(4);
 	m_FinalPreviewRenderFunc = [&]()
@@ -157,10 +154,10 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		m_Run = true;
 		m_TotalTimer.Tic();//Begin timing for progress of all operations.
 		m_GuiState = m_FinalRenderDialog->State();//Cache render settings from the GUI before running.
-		size_t i;
+		size_t i = 0;
 		bool doAll = m_GuiState.m_DoAll && m_EmberFile.Size() > 1;
 		size_t currentStripForProgress = 0;//Sort of a hack to get the strip value to the progress function.
-		QString path = doAll ? ComposePath(QString::fromStdString(m_EmberFile.m_Embers[0].m_Name)) : ComposePath(Name());
+		QString path = doAll ? ComposePath(QString::fromStdString(m_EmberFile.m_Embers.begin()->m_Name)) : ComposePath(Name());
 		QString backup = path + "_backup.flame";
 
 		//Save backup Xml.
@@ -186,33 +183,40 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			//Different action required for rendering as animation or not.
 			if (m_GuiState.m_DoSequence && !m_Renderers.empty())
 			{
-				Ember<T>* firstEmber = &m_EmberFile.m_Embers[0];
+				Ember<T>* prev = nullptr;
+				vector<Ember<T>> embers;
+				vector<std::thread> threadVec;
+				std::atomic<size_t> atomfTime;
+				auto firstEmber = m_EmberFile.m_Embers.begin();
 
 				//Need to loop through and set all w, h, q, ts, ss and t vals.
-				for (i = 0; i < m_EmberFile.Size() && m_Run; i++)
+				for (auto& it : m_EmberFile.m_Embers)
 				{
-					SyncGuiToEmber(m_EmberFile.m_Embers[i], firstEmber->m_FinalRasW, firstEmber->m_FinalRasH);
+					if (!m_Run)
+						break;
 
-					if (i > 0)
+					SyncGuiToEmber(it, firstEmber->m_FinalRasW, firstEmber->m_FinalRasH);
+
+					if (&it == &(*firstEmber))//First.
 					{
-						if (m_EmberFile.m_Embers[i].m_Time <= m_EmberFile.m_Embers[i - 1].m_Time)
-							m_EmberFile.m_Embers[i].m_Time  = m_EmberFile.m_Embers[i - 1].m_Time + 1;
+						it.m_Time = 0;
 					}
-					else if (i == 0)
+					else//All others
 					{
-						m_EmberFile.m_Embers[i].m_Time = 0;
+						if (it.m_Time <= prev->m_Time)
+							it.m_Time  = prev->m_Time + 1;
 					}
 
-					m_EmberFile.m_Embers[i].m_TemporalSamples = m_GuiState.m_TemporalSamples;
+					it.m_TemporalSamples = m_GuiState.m_TemporalSamples;
+					prev = &it;
 				}
 
-				std::atomic<size_t> atomfTime;
-				vector<std::thread> threadVec;
 				//Not supporting strips with animation.
 				//Shouldn't be a problem because animations will be at max 4k x 2k which will take about 1GB
 				//even when using double precision, which most cards at the time of this writing already exceed.
 				m_GuiState.m_Strips = 1;
 				atomfTime.store(0);
+				CopyCont(embers, m_EmberFile.m_Embers);
 				std::function<void(size_t)> iterFunc = [&](size_t index)
 				{
 					size_t ftime;
@@ -223,13 +227,13 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 					EmberImageComments comments;
 					Timing renderTimer;
 					auto renderer = m_Renderers[index].get();
-					renderer->SetEmber(m_EmberFile.m_Embers);//Copy all embers to the local storage inside the renderer.
+					renderer->SetExternalEmbersPointer(&embers);//All will share a pointer to the original vector to conserve memory with large files. Ok because the vec doesn't get modified.
 
 					//Render each image, cancelling if m_Run ever gets set to false.
 					while (atomfTime.fetch_add(1), ((ftime = atomfTime.load() - 1) < m_EmberFile.Size()) && m_Run)//Needed to set 1 to claim this iter from other threads, so decrement it to be zero-indexed here.
 					{
 						T localTime = T(ftime);
-						Output("Image " + ToString(ftime + 1ULL) + ":\n" + ComposePath(QString::fromStdString(m_EmberFile.m_Embers[ftime].m_Name)));
+						Output("Image " + ToString(ftime + 1ULL) + ":\n" + ComposePath(QString::fromStdString(m_EmberFile.Get(ftime)->m_Name)));
 						renderer->Reset();//Have to manually set this since the ember is not set each time through.
 						renderTimer.Tic();//Toc() is called in RenderComplete().
 
@@ -247,10 +251,10 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 								writeThread.join();
 
 							stats = renderer->Stats();
-							comments = renderer->ImageComments(stats, 0, false, true);
+							comments = renderer->ImageComments(stats, 0, true);
 							writeThread = std::thread([&](size_t tempTime, size_t threadFinalImageIndex)
 							{
-								SaveCurrentRender(m_EmberFile.m_Embers[tempTime],
+								SaveCurrentRender(*m_EmberFile.Get(tempTime),
 												  comments,//These all don't change during the renders, so it's ok to access them in the thread.
 												  finalImages[threadFinalImageIndex],
 												  renderer->FinalRasW(),
@@ -259,7 +263,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 												  renderer->BytesPerChannel());
 							}, ftime, finalImageIndex);
 							m_FinishedImageCount.fetch_add(1);
-							RenderComplete(m_EmberFile.m_Embers[ftime], stats, renderTimer);
+							RenderComplete(*m_EmberFile.Get(ftime), stats, renderTimer);
 
 							if (!index)//Only first device has a progress callback, so it also makes sense to only manually set the progress on the first device as well.
 								HandleFinishedProgress();
@@ -290,16 +294,19 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			else if (m_Renderer.get())//Make sure a renderer was created and render all images, but not as an animation sequence (without temporal samples motion blur).
 			{
 				//Render each image, cancelling if m_Run ever gets set to false.
-				for (i = 0; i < m_EmberFile.Size() && m_Run; i++)
+				for (auto& it : m_EmberFile.m_Embers)
 				{
-					Output("Image " + ToString<qulonglong>(m_FinishedImageCount.load() + 1) + ":\n" + ComposePath(QString::fromStdString(m_EmberFile.m_Embers[i].m_Name)));
-					m_EmberFile.m_Embers[i].m_TemporalSamples = 1;//No temporal sampling.
-					m_Renderer->SetEmber(m_EmberFile.m_Embers[i]);
+					if (!m_Run)
+						break;
+
+					Output("Image " + ToString<qulonglong>(m_FinishedImageCount.load() + 1) + ":\n" + ComposePath(QString::fromStdString(it.m_Name)));
+					it.m_TemporalSamples = 1;//No temporal sampling.
+					m_Renderer->SetEmber(it);
 					m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 					m_Stats.Clear();
 					Memset(m_FinalImage);
 					m_RenderTimer.Tic();//Toc() is called in RenderComplete().
-					StripsRender<T>(m_Renderer.get(), m_EmberFile.m_Embers[i], m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
+					StripsRender<T>(m_Renderer.get(), it, m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
 					[&](size_t strip) { currentStripForProgress = strip; },//Pre strip.
 					[&](size_t strip) { m_Stats += m_Renderer->Stats(); },//Post strip.
 					[&](size_t strip)//Error.
@@ -371,28 +378,24 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 template <typename T> void FinalRenderEmberController<T>::SetEmberFile(const EmberFile<float>& emberFile)
 {
 	m_EmberFile = emberFile;
-
-	if (m_EmberFile.Size())
-		m_Ember = &(m_EmberFile.m_Embers[0]);
+	m_Ember = m_EmberFile.Get(0);
 }
 template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation)
 {
 	emberFile.m_Filename = m_EmberFile.m_Filename;
-	CopyVec(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
 }
 
 #ifdef DO_DOUBLE
 template <typename T> void FinalRenderEmberController<T>::SetEmberFile(const EmberFile<double>& emberFile)
 {
 	m_EmberFile = emberFile;
-
-	if (m_EmberFile.Size())
-		m_Ember = &(m_EmberFile.m_Embers[0]);
+	m_Ember = m_EmberFile.Get(0);
 }
 template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation)
 {
 	emberFile.m_Filename = m_EmberFile.m_Filename;
-	CopyVec(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
 }
 #endif
 
@@ -407,12 +410,12 @@ void FinalRenderEmberController<T>::SetEmber(size_t index)
 {
 	if (index < m_EmberFile.Size())
 	{
-		m_Ember = &(m_EmberFile.m_Embers[index]);
+		m_Ember = m_EmberFile.Get(index);
 		SyncCurrentToGui();
 	}
 	else if (m_EmberFile.Size() > 1)
 	{
-		m_Ember = &(m_EmberFile.m_Embers[0]);//Should never happen.
+		m_Ember = m_EmberFile.Get(0);//Should never happen.
 	}
 }
 
@@ -774,7 +777,7 @@ void FinalRenderEmberController<T>::CancelPreviewRender()
 template<typename T>
 void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember)
 {
-	auto comments = m_Renderer->ImageComments(m_Stats, 0, false, true);
+	auto comments = m_Renderer->ImageComments(m_Stats, 0, true);
 	SaveCurrentRender(ember, comments, m_FinalImage, m_Renderer->FinalRasW(), m_Renderer->FinalRasH(), m_Renderer->NumChannels(), m_Renderer->BytesPerChannel());
 }
 

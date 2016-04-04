@@ -73,13 +73,13 @@ private:
 	void DrawAffineHelper(int index, bool selected, bool pre, bool final, bool background);
 	GLEmberControllerBase* GLController();
 
-	bool m_Init;
-	bool m_Drawing;
-	GLint m_MaxTexSize;
-	GLint m_TexWidth;
-	GLint m_TexHeight;
-	GLint m_ViewWidth;
-	GLint m_ViewHeight;
-	GLuint m_OutputTexID;
-	Fractorium* m_Fractorium;
+	bool m_Init = false;
+	bool m_Drawing = false;
+	GLint m_MaxTexSize = 16384;
+	GLint m_TexWidth = 0;
+	GLint m_TexHeight = 0;
+	GLint m_ViewWidth = 0;
+	GLint m_ViewHeight = 0;
+	GLuint m_OutputTexID = 0;
+	Fractorium* m_Fractorium = nullptr;
 };

@@ -11,21 +11,12 @@
 FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractorium)
 {
 	Timing t;
-	m_Rendering = false;
-	m_Shared = true;
-	m_FailedRenders = 0;
-	m_UndoIndex = 0;
-	m_LockedScale = 1;
-	m_RenderType = eRendererType::CPU_RENDERER;
-	m_OutputTexID = 0;
-	m_SubBatchCount = 1;//Will be ovewritten by the options on first render.
 	m_Fractorium = fractorium;
-	m_Info = OpenCLInfo::Instance();
 	m_Rand = QTIsaac<ISAAC_SIZE, ISAAC_INT>(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));//Ensure a different rand seed on each instance.
-	m_RenderTimer = std::unique_ptr<QTimer>(new QTimer(m_Fractorium));
+	m_RenderTimer = make_unique<QTimer>(m_Fractorium);
 	m_RenderTimer->setInterval(0);
 	m_Fractorium->connect(m_RenderTimer.get(), SIGNAL(timeout()), SLOT(IdleTimer()));
-	m_RenderRestartTimer = std::unique_ptr<QTimer>(new QTimer(m_Fractorium));
+	m_RenderRestartTimer = make_unique<QTimer>(m_Fractorium);
 	m_Fractorium->connect(m_RenderRestartTimer.get(), SIGNAL(timeout()), SLOT(StartRenderTimer()));
 }
 
@@ -52,10 +43,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 	  m_VariationList(VariationList<T>::Instance())
 {
 	bool b = false;
-	m_PreviewRun = false;
-	m_PreviewRunning = false;
-	m_GLController = unique_ptr<GLEmberController<T>>(new GLEmberController<T>(fractorium, fractorium->ui.GLDisplay, this));
-	m_PreviewRenderer = unique_ptr<EmberNs::Renderer<T, float>>(new EmberNs::Renderer<T, float>());
+	m_GLController = make_unique<GLEmberController<T>>(fractorium, fractorium->ui.GLDisplay, this);
 	//Initial combo change event to fill the palette table will be called automatically later.
 	//Look hard for a palette.
 	static vector<string> paths =
@@ -72,8 +60,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 	{
 		if (b = InitPaletteList(path))
 		{
-			m_SheepTools = unique_ptr<SheepTools<T, float>>(new SheepTools<T, float>(
-							   m_PaletteList.Name(0), new EmberNs::Renderer<T, float>()));
+			m_SheepTools = make_unique<SheepTools<T, float>>(m_PaletteList.Name(0), new EmberNs::Renderer<T, float>());
 			break;
 		}
 	}
@@ -102,9 +89,11 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 
 		if (auto top = tree->topLevelItem(0))
 		{
-			for (auto i = start; m_PreviewRun && i < end && i < m_EmberFile.Size(); i++)
+			size_t i = start;
+
+			for (auto b = Advance(m_EmberFile.m_Embers.begin(), start); m_PreviewRun && i < end && b != m_EmberFile.m_Embers.end(); ++b, ++i)
 			{
-				Ember<T> ember = m_EmberFile.m_Embers[i];
+				Ember<T> ember = *b;
 				ember.SyncSize();
 				ember.SetSizeAndAdjustScale(PREVIEW_SIZE, PREVIEW_SIZE, false, eScaleType::SCALE_WIDTH);
 				ember.m_TemporalSamples = 1;
@@ -124,7 +113,6 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 												  Q_ARG(vector<byte>&, m_PreviewFinalImage),
 												  Q_ARG(uint, PREVIEW_SIZE),
 												  Q_ARG(uint, PREVIEW_SIZE));
-						//treeItem->SetImage(m_PreviewFinalImage, PREVIEW_SIZE, PREVIEW_SIZE);
 					}
 				}
 			}
@@ -152,7 +140,7 @@ template <typename T> void FractoriumEmberController<T>::SetEmberFile(const Embe
 template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation)
 {
 	emberFile.m_Filename = m_EmberFile.m_Filename;
-	CopyVec(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
 }
 
 template <typename T> void FractoriumEmberController<T>::SetTempPalette(const Palette<float>& palette) { m_TempPalette = palette; }
@@ -164,7 +152,7 @@ template <typename T> void FractoriumEmberController<T>::SetEmberFile(const Embe
 template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation)
 {
 	emberFile.m_Filename = m_EmberFile.m_Filename;
-	CopyVec(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
 }
 
 template <typename T> void FractoriumEmberController<T>::SetTempPalette(const Palette<double>& palette) { m_TempPalette = palette; }
@@ -200,7 +188,7 @@ void FractoriumEmberController<T>::SetEmber(size_t index)
 		}
 
 		ClearUndo();
-		SetEmber(m_EmberFile.m_Embers[index]);
+		SetEmber(*m_EmberFile.Get(index));
 	}
 }
 
@@ -340,10 +328,10 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	size_t w = m_Ember.m_FinalRasW;//Cache values for use below.
 	size_t h = m_Ember.m_FinalRasH;
 	m_Ember = ember;
+	m_EmberFilePointer = &ember;
 
 	if (!verbatim)
 	{
-		//m_Ember.SetSizeAndAdjustScale(m_Fractorium->ui.GLDisplay->width(), m_Fractorium->ui.GLDisplay->height(), true, SCALE_WIDTH);
 		m_Ember.m_TemporalSamples = 1;//Change once animation is supported.
 		m_Ember.m_Quality = m_Fractorium->m_QualitySpin->value();
 		m_Ember.m_Supersample = m_Fractorium->m_SupersampleSpin->value();

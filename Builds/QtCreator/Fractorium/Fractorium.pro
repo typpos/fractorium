@@ -113,7 +113,8 @@ SOURCES += \
     $$PRJ_SRC_DIR/QssDialog.cpp \
     $$PRJ_SRC_DIR/QssTextEdit.cpp \
     $$PRJ_SRC_DIR/SpinBox.cpp \
-    $$PRJ_SRC_DIR/VariationsDialog.cpp
+    $$PRJ_SRC_DIR/VariationsDialog.cpp \
+	$$PRJ_SRC_DIR/LibraryTreeWidget.cpp
 
 HEADERS += \
     $$SRC_COMMON_DIR/EmberCommon.h \
@@ -148,7 +149,8 @@ HEADERS += \
     $$PRJ_SRC_DIR/TableWidget.h \
     $$PRJ_SRC_DIR/TwoButtonComboWidget.h \
     $$PRJ_SRC_DIR/VariationsDialog.h \
-    $$PRJ_SRC_DIR/VariationTreeWidgetItem.h
+    $$PRJ_SRC_DIR/VariationTreeWidgetItem.h \
+	$$PRJ_SRC_DIR/LibraryTreeWidget.h
 
 FORMS += \
     $$PRJ_SRC_DIR/AboutDialog.ui \

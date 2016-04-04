@@ -44,9 +44,12 @@ public:
 	/// Default constructor which calls Init() to set default values.
 	/// </summary>
 	Ember()
-		: m_VariationList(VariationList<T>::Instance())
 	{
-		Init();
+		m_Background.Reset();
+		m_Curves.Init();
+		m_Xforms.reserve(12);
+		m_CamMat = m3T(0);
+		m_ProjFunc = &EmberNs::Ember<T>::ProjectNone;
 	}
 
 	/// <summary>
@@ -54,8 +57,6 @@ public:
 	/// </summary>
 	/// <param name="ember">The Ember object to copy</param>
 	Ember(const Ember<T>& ember)
-		: m_Edits(nullptr),
-		  m_VariationList(VariationList<T>::Instance())
 	{
 		Ember<T>::operator=<T>(ember);
 	}
@@ -66,8 +67,6 @@ public:
 	/// <param name="ember">The Ember object to copy</param>
 	template <typename U>
 	Ember(const Ember<U>& ember)
-		: m_Edits(nullptr),
-		  m_VariationList(VariationList<T>::Instance())
 	{
 		Ember<T>::operator=<U>(ember);
 	}
@@ -178,72 +177,8 @@ public:
 		if (ember.m_Edits)
 			m_Edits = xmlCopyDoc(ember.m_Edits, 1);
 
-		CopyVec(m_EmberMotionElements, ember.m_EmberMotionElements);
+		CopyCont(m_EmberMotionElements, ember.m_EmberMotionElements);
 		return *this;
-	}
-
-	/// <summary>
-	/// Set common default values.
-	/// </summary>
-	void Init()
-	{
-		m_FinalRasW = 1920;
-		m_FinalRasH = 1080;
-		m_OrigFinalRasW = 1920;
-		m_OrigFinalRasH = 1080;
-		m_OrigPixPerUnit = 240;
-		m_SubBatchSize = DEFAULT_SBS;
-		m_FuseCount = 15;
-		m_Supersample = 1;
-		m_TemporalSamples = 100;
-		m_Symmetry = 0;
-		m_Quality = 100;
-		m_PixelsPerUnit = 240;
-		m_Zoom = 0;
-		m_ProjFunc = &EmberNs::Ember<T>::ProjectNone;
-		m_CamZPos = 0;
-		m_CamPerspective = 0;
-		m_CamYaw = 0;
-		m_CamPitch = 0;
-		m_CamDepthBlur = 0;
-		m_BlurCoef = 0;
-		m_CamMat = m3T(0);
-		m_CenterX = 0;
-		m_CenterY = 0;
-		m_RotCenterY = 0;
-		m_Rotate = 0;
-		m_Brightness = 4;
-		m_Gamma = 4;
-		m_Vibrancy = 1;
-		m_GammaThresh = T(0.01);
-		m_HighlightPower = -1;
-		m_Time = 0;
-		m_Background.Reset();
-		m_Interp = eInterp::EMBER_INTERP_SMOOTH;
-		m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
-		//DE filter.
-		m_MinRadDE = 0;
-		m_MaxRadDE = 9;
-		m_CurveDE = T(0.4);
-		//Spatial filter.
-		m_SpatialFilterType = eSpatialFilterType::GAUSSIAN_SPATIAL_FILTER;
-		m_SpatialFilterRadius = T(0.5);
-		//Temporal filter.
-		m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
-		m_TemporalFilterExp = 0;
-		m_TemporalFilterWidth = 1;
-		//Palette.
-		m_PaletteMode = ePaletteMode::PALETTE_LINEAR;
-		m_PaletteInterp = ePaletteInterp::INTERP_HSV;
-		//Curves.
-		m_Curves.Init();
-		m_Name = "No name";
-		m_ParentFilename = "No parent";
-		//Internal values.
-		m_Index = 0;
-		m_ScaleType = eScaleType::SCALE_NONE;
-		m_Xforms.reserve(12);
-		m_Edits = nullptr;
 	}
 
 	/// <summary>
@@ -286,7 +221,7 @@ public:
 	/// <param name="xformPad">The total number of xforms if additional padding xforms are desired. Default: 0.</param>
 	/// <param name="doFinal">Whether to copy the final xform. Default: false.</param>
 	/// <returns>The newly constructed ember</returns>
-	Ember<T> Copy(size_t xformPad = 0, bool doFinal = false)
+	Ember<T> Copy(size_t xformPad = 0, bool doFinal = false) const
 	{
 		Ember<T> ember(*this);
 		ember.PadXforms(xformPad);
@@ -443,7 +378,7 @@ public:
 	/// </summary>
 	/// <param name="xform">A pointer to the xform to test</param>
 	/// <returns>True if matched, else false.</returns>
-	bool IsFinalXform(Xform<T>* xform)
+	bool IsFinalXform(Xform<T>* xform) const
 	{
 		return &m_FinalXform == xform;
 	}
@@ -695,7 +630,7 @@ public:
 	/// <param name="embers">Vector of embers</param>
 	/// <param name="coefs">Coefficients vector which must be the same length as the vector of embers</param>
 	/// <param name="stagger">Stagger if greater than 0</param>
-	void Interpolate(vector<Ember<T>>& embers, vector<T>& coefs, T stagger)
+	void Interpolate(const vector<Ember<T>>& embers, vector<T>& coefs, T stagger)
 	{
 		Interpolate(embers.data(), embers.size(), coefs, stagger);
 	}
@@ -708,7 +643,7 @@ public:
 	/// <param name="size">Number of elements in the buffer of embers</param>
 	/// <param name="coefs">Coefficients vector which must be the same length as the vector of embers</param>
 	/// <param name="stagger">Stagger if greater than 0</param>
-	void Interpolate(Ember<T>* embers, size_t size, vector<T>& coefs, T stagger)
+	void Interpolate(const Ember<T>* embers, size_t size, vector<T>& coefs, T stagger)
 	{
 		if (size != coefs.size() || size < 2)
 			return;
@@ -996,7 +931,7 @@ public:
 	/// </summary>
 	/// <param name="embers">Vector of embers</param>
 	/// <param name="t">Used in calculating Catmull-Rom coefficients</param>
-	void InterpolateCatmullRom(vector<Ember<T>>& embers, T t)
+	void InterpolateCatmullRom(const vector<Ember<T>>& embers, T t)
 	{
 		InterpolateCatmullRom(embers.data(), embers.size(), t);
 	}
@@ -1008,7 +943,7 @@ public:
 	/// <param name="embers">Pointer to buffer of embers</param>
 	/// <param name="size">Number of elements in the buffer of embers</param>
 	/// <param name="t">Used in calculating Catmull-Rom coefficients</param>
-	void InterpolateCatmullRom(Ember<T>* embers, size_t size, T t)
+	void InterpolateCatmullRom(const Ember<T>* embers, size_t size, T t)
 	{
 		T t2 = t * t;
 		T t3 = t2 * t;
@@ -1537,50 +1472,50 @@ public:
 
 	//The width and height in pixels of the final output image. The size of the histogram and DE filtering buffers will differ from this.
 	//Xml fields: "size".
-	size_t m_FinalRasW;
-	size_t m_FinalRasH;
-	size_t m_OrigFinalRasW;//Keep track of the originals read from the Xml, because...
-	size_t m_OrigFinalRasH;//the dimension may change in an editor and the originals are needed for the aspect ratio.
-	T m_OrigPixPerUnit;
+	size_t m_FinalRasW = 1920;
+	size_t m_FinalRasH = 1080;
+	size_t m_OrigFinalRasW = 1920;//Keep track of the originals read from the Xml, because...
+	size_t m_OrigFinalRasH = 1080;//the dimension may change in an editor and the originals are needed for the aspect ratio.
+	T m_OrigPixPerUnit = 240;
 
 	//The iteration depth. This was a rendering parameter in flam3 but has been made a member here
 	//so that it can be adjusted more easily.
-	size_t m_SubBatchSize;
+	size_t m_SubBatchSize = DEFAULT_SBS;
 
 	//The number of iterations to disregard for each sub batch. This was a rendering parameter in flam3 but has been made a member here
 	//so that it can be adjusted more easily.
-	size_t m_FuseCount;
+	size_t m_FuseCount = 15;
 
 	//The multiplier in size of the histogram and DE filtering buffers. Must be at least one, preferrably never larger than 4, only useful at 2.
 	//Xml field: "supersample" or "overample (deprecated)".
-	size_t m_Supersample;
+	size_t m_Supersample = 1;
 
 	//When animating, split each pass into this many pieces, each doing a fraction of the total iterations. Each temporal sample
 	//will render an interpolated instance of the ember that is a fraction of the current ember and the next one.
 	//When rendering a single image, this field is always set to 1.
 	//Xml field: "temporal_samples".
-	size_t m_TemporalSamples;
+	size_t m_TemporalSamples = 100;
 
 	//Whether or not any symmetry was added. This field is in a bit of a state of conflict right now as flam3 has a severe bug.
 	//Xml field: "symmetry".
-	intmax_t m_Symmetry;
+	intmax_t m_Symmetry = 0;
 
 	//The number of iterations per pixel of the final output image. Note this is not affected by the increase in pixels in the
 	//histogram and DE filtering buffer due to supersampling. It can be affected by a non-zero zoom value though.
 	//10 is a good value for interactive/real-time rendering, 100-200 is good for previewing, 1000 is good for final output. Above that is mostly a waste of energy.
 	//Xml field: "quality".
-	T m_Quality;
+	T m_Quality = 100;
 
 	//The number of pixels in the final output image that corresponds to the distance from 0-1 in the cartesian plane used for iterating.
 	//A larger value produces a more zoomed in imgage. A value of 240 is commonly used, but in practice it varies widely depending on the image.
 	//Note that increasing this value does not adjust the quality by a proportional amount, so an increased value may produce a degraded image.
 	//Xml field: "scale".
-	T m_PixelsPerUnit;
+	T m_PixelsPerUnit = 240;
 
 	//A value greater than 0 will zoom in the field of view, however it will also increase the quality by a proportional amount. This is used to
 	//overcome the shortcoming of scale by also adjusting the quality.
 	//Xml field: "zoom".
-	T m_Zoom;
+	T m_Zoom = 0;
 
 	//3D fields.
 private:
@@ -1589,22 +1524,22 @@ private:
 
 public:
 	//Xml field: "cam_zpos".
-	T m_CamZPos;
+	T m_CamZPos = 0;
 
 	//Xml field: "cam_persp".
-	T m_CamPerspective;
+	T m_CamPerspective = 0;
 
 	//Xml field: "cam_yaw".
-	T m_CamYaw;
+	T m_CamYaw = 0;
 
 	//Xml field: "cam_pitch".
-	T m_CamPitch;
+	T m_CamPitch = 0;
 
 	//Xml field: "cam_dof".
-	T m_CamDepthBlur;
+	T m_CamDepthBlur = 0;
 
 private:
-	T m_BlurCoef;
+	T m_BlurCoef = 0;
 
 public:
 	m3T m_CamMat;
@@ -1612,38 +1547,38 @@ public:
 	//The camera offset from the center of the cartesian plane. Since this is the camera offset, the final output image will be moved in the opposite
 	//direction of the values specified. There is also a second copy of the Y coordinate needed because m_CenterY will be modified during strips rendering.
 	//Xml field: "center".
-	T m_CenterX;
-	T m_CenterY;
-	T m_RotCenterY;
+	T m_CenterX = 0;
+	T m_CenterY = 0;
+	T m_RotCenterY = 0;
 
 	//Rotate the camera by this many degrees. Since this is a camera rotation, the final output image will be rotated counter-clockwise.
 	//Xml field: "rotate".
-	T m_Rotate;
+	T m_Rotate = 0;
 
 	//Determine how bright to make the image during final accumulation.
 	//Xml field: "brightness".
-	T m_Brightness;
+	T m_Brightness = 4;
 
 	//Gamma level used in gamma correction during final accumulation.
 	//Xml field: "gamma".
-	T m_Gamma;
+	T m_Gamma = 4;
 
 	//Used in color correction during final accumulation.
 	//Xml field: "vibrancy".
-	T m_Vibrancy;
+	T m_Vibrancy = 1;
 
 	//Gamma threshold used in gamma correction during final accumulation.
 	//Xml field: "gamma_threshold".
-	T m_GammaThresh;
+	T m_GammaThresh = T(0.01);
 
 	//Value to control saturation of some pixels in gamma correction during final accumulation.
 	//Xml field: "highlight_power".
-	T m_HighlightPower;
+	T m_HighlightPower = -1;
 
 	//When animating a file full of many embers, this value is used to specify the time in the animation
 	//that this ember should be rendered. They must all be sequential and increase by a default value of 1.
 	//Xml field: "time".
-	T m_Time;
+	T m_Time = 0;
 
 	//The background color of the image used in final accumulation, ranged 0-1.
 	//Xml field: "background".
@@ -1653,66 +1588,66 @@ public:
 
 	//The type of interpolation to use when interpolating between embers for animation.
 	//Xml field: "interpolation".
-	eInterp m_Interp;
+	eInterp m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 
 	//The type of interpolation to use on affine transforms when interpolating embers for animation.
 	//Xml field: "interpolation_type" or "interpolation_space (deprecated)".
-	eAffineInterp m_AffineInterp;
+	eAffineInterp m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
 
 	//The type of interpolation to use for the palette when interpolating embers for animation.
 	//Xml field: "palette_interpolation".
-	ePaletteInterp m_PaletteInterp;
+	ePaletteInterp m_PaletteInterp = ePaletteInterp::INTERP_HSV;
 
 	//Temporal Filter.
 
 	//Only used if temporal filter type is exp, else unused.
 	//Xml field: "temporal_filter_exp".
-	T m_TemporalFilterExp;
+	T m_TemporalFilterExp = 0;
 
 	//The width of the temporal filter.
 	//Xml field: "temporal_filter_width".
-	T m_TemporalFilterWidth;
+	T m_TemporalFilterWidth = 1;
 
 	//The type of the temporal filter: Gaussian, Box or Exp.
 	//Xml field: "temporal_filter_type".
-	eTemporalFilterType m_TemporalFilterType;
+	eTemporalFilterType m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
 
 	//Density Estimation Filter.
 
 	//The minimum radius of the DE filter.
 	//Xml field: "estimator_minimum".
-	T m_MinRadDE;
+	T m_MinRadDE = 0;
 
 	//The maximum radius of the DE filter.
 	//Xml field: "estimator_radius".
-	T m_MaxRadDE;
+	T m_MaxRadDE = 9;
 
 	//The shape of the curve that governs how quickly or slowly the filter drops off as it moves away from the center point.
 	//Xml field: "estimator_curve".
-	T m_CurveDE;
+	T m_CurveDE = T(0.4);
 
 	//Spatial Filter.
 
 	//The radius of the spatial filter used in final accumulation.
 	//Xml field: "filter".
-	T m_SpatialFilterRadius;
+	T m_SpatialFilterRadius = T(0.5);
 
 	//The type of spatial filter used in final accumulation:
 	//Gaussian, Hermite, Box, Triangle, Bell, Bspline, Lanczos3
 	//Lanczos2, Mitchell, Blackman, Catrom, Hamming, Hanning, Quadratic.
 	//Xml field: "filter_shape".
-	eSpatialFilterType m_SpatialFilterType;
+	eSpatialFilterType m_SpatialFilterType = eSpatialFilterType::GAUSSIAN_SPATIAL_FILTER;
 
 	//Palette.
 
 	//The method used for retrieving a color from the palette when accumulating to the histogram: step, linear.
 	//Xml field: "palette_mode".
-	ePaletteMode m_PaletteMode;
+	ePaletteMode m_PaletteMode = ePaletteMode::PALETTE_LINEAR;
 
 	//The color palette to use. Can be specified inline as Xml color fields, or as a hex buffer. Can also be specified
 	//as an index into the palette file with an optional hue rotation applied. Inserting as a hex buffer is the preferred method.
 	//Xml field: "color" or "colors" or "palette" .
-	Palette<T> m_Palette;
+	Palette<T> m_Palette;//Final palette that is actually used is a copy of this inside of render, which will be of type bucketT (float).
 
 	//Curves used to adjust the color during final accumulation.
 	Curves<T> m_Curves;
@@ -1721,18 +1656,18 @@ public:
 
 	//The name of this ember.
 	//Xml field: "name".
-	string m_Name;
+	string m_Name = string("No name");
 
 	//The name of the file that this ember was contained in.
 	//Xml field: "".
-	string m_ParentFilename;
+	string m_ParentFilename = string("No parent");
 
 	//An Xml edit document describing information about the author as well as an edit history of the ember.
 	//Xml field: "edit".
-	xmlDocPtr m_Edits;
+	xmlDocPtr m_Edits = nullptr;
 
 	//The 0-based position of this ember in the file it was contained in.
-	size_t m_Index;
+	size_t m_Index = 0;
 
 	//The list of motion elements for the top-level flame params
 	vector<EmberMotion<T>> m_EmberMotionElements;
@@ -1741,7 +1676,7 @@ private:
 	/// <summary>
 	/// The type of scaling used when resizing.
 	/// </summary>
-	eScaleType m_ScaleType;
+	eScaleType m_ScaleType = eScaleType::SCALE_NONE;
 
 	//The vector containing all of the xforms.
 	//Xml field: "xform".
@@ -1753,7 +1688,7 @@ private:
 	Xform<T> m_FinalXform;
 
 	//Single global reference to create variations with.
-	VariationList<T>& m_VariationList;
+	VariationList<T>& m_VariationList = VariationList<T>::Instance();
 
 	/// <summary>
 	/// Interpolation function that takes the address of a member variable of type T as a template parameter.
@@ -1763,7 +1698,7 @@ private:
 	/// <param name="coefs">The list of coefficients to interpolate</param>
 	/// <param name="size">The size of the lists, both must match.</param>
 	template <T Ember<T>::*m>
-	void InterpT(Ember<T>* embers, vector<T>& coefs, size_t size)
+	void InterpT(const Ember<T>* embers, const vector<T>& coefs, size_t size)
 	{
 		this->*m = 0;
 
@@ -1778,7 +1713,7 @@ private:
 	/// <param name="coefs">The list of coefficients to interpolate</param>
 	/// <param name="size">The size of the lists, both must match.</param>
 	template <typename M, M Ember<T>::*m>
-	void InterpX(Ember<T>* embers, vector<T>& coefs, size_t size)
+	void InterpX(const Ember<T>* embers, const vector<T>& coefs, size_t size)
 	{
 		this->*m = M();
 
@@ -1793,7 +1728,7 @@ private:
 	/// <param name="coefs">The list of coefficients to interpolate</param>
 	/// <param name="size">The size of the lists, both must match.</param>
 	template <size_t Ember<T>::*m>
-	void InterpI(Ember<T>* embers, vector<T>& coefs, size_t size)
+	void InterpI(const Ember<T>* embers, const vector<T>& coefs, size_t size)
 	{
 		T t = 0;
 
@@ -1813,7 +1748,7 @@ private:
 	/// <param name="coefs">The list of coefficients to interpolate</param>
 	/// <param name="size">The size of the lists, both must match.</param>
 	template <T Xform<T>::*m>
-	void InterpXform(Xform<T>* xform, size_t i, Ember<T>* embers, vector<T>& coefs, size_t size)
+	void InterpXform(Xform<T>* xform, size_t i, const Ember<T>* embers, const vector<T>& coefs, size_t size)
 	{
 		xform->*m = T(0);
 

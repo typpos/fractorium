@@ -11,12 +11,6 @@ GLWidget::GLWidget(QWidget* p)
 	: QOpenGLWidget(p)
 {
 	QSurfaceFormat qsf;
-	m_Init = false;
-	m_Drawing = false;
-	m_TexWidth = 0;
-	m_TexHeight = 0;
-	m_OutputTexID = 0;
-	m_Fractorium = nullptr;
 	qsf.setSwapInterval(1);//Vsync.
 	qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	qsf.setVersion(2, 0);

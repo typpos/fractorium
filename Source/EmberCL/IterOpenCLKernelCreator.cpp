@@ -12,9 +12,6 @@ namespace EmberCLns
 template <typename T>
 IterOpenCLKernelCreator<T>::IterOpenCLKernelCreator()
 {
-	m_IterEntryPoint = "IterateKernel";
-	m_ZeroizeEntryPoint = "ZeroizeKernel";
-	m_SumHistEntryPoint = "SumHisteKernel";
 	m_ZeroizeKernel = CreateZeroizeKernelString();
 	m_SumHistKernel = CreateSumHistKernelString();
 }
@@ -23,11 +20,11 @@ IterOpenCLKernelCreator<T>::IterOpenCLKernelCreator()
 /// Accessors.
 /// </summary>
 
-template <typename T> const string& IterOpenCLKernelCreator<T>::ZeroizeKernel() const { return m_ZeroizeKernel; }
+template <typename T> const string& IterOpenCLKernelCreator<T>::ZeroizeKernel() const     { return m_ZeroizeKernel;     }
 template <typename T> const string& IterOpenCLKernelCreator<T>::ZeroizeEntryPoint() const { return m_ZeroizeEntryPoint; }
-template <typename T> const string& IterOpenCLKernelCreator<T>::SumHistKernel() const { return m_SumHistKernel; }
+template <typename T> const string& IterOpenCLKernelCreator<T>::SumHistKernel() const     { return m_SumHistKernel;     }
 template <typename T> const string& IterOpenCLKernelCreator<T>::SumHistEntryPoint() const { return m_SumHistEntryPoint; }
-template <typename T> const string& IterOpenCLKernelCreator<T>::IterEntryPoint() const { return m_IterEntryPoint; }
+template <typename T> const string& IterOpenCLKernelCreator<T>::IterEntryPoint() const    { return m_IterEntryPoint;    }
 
 /// <summary>
 /// Create the iteration kernel string using the Cuburn method.

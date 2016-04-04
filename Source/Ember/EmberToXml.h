@@ -23,9 +23,9 @@ public:
 	/// <summary>
 	/// Empty constructor.
 	/// </summary>
-	EmberToXml()
-	{
-	}
+	EmberToXml() = default;
+	~EmberToXml() = default;
+	EmberToXml(const EmberToXml<T>& e) = delete;
 
 	/// <summary>
 	/// Save the ember to the specified file.
@@ -34,33 +34,32 @@ public:
 	/// <param name="ember">The ember to save</param>
 	/// <param name="printEditDepth">How deep the edit depth goes</param>
 	/// <param name="doEdits">If true included edit tags, else don't.</param>
-	/// <param name="intPalette">If true use integers instead of floating point numbers when embedding a non-hex formatted palette, else use floating point numbers.</param>
 	/// <param name="hexPalette">If true, embed a hexadecimal palette instead of Xml Color tags, else use Xml color tags.</param>
 	/// <param name="append">If true, append to the file if it already exists, else create a new file.</param>
 	/// <param name="start">Whether a new file is to be started</param>
 	/// <param name="finish">Whether an existing file is to be ended</param>
 	/// <returns>True if successful, else false</returns>
-	bool Save(const string& filename, Ember<T>& ember, size_t printEditDepth, bool doEdits, bool intPalette, bool hexPalette, bool append = false, bool start = false, bool finish = false)
+	bool Save(const string& filename, Ember<T>& ember, size_t printEditDepth, bool doEdits, bool hexPalette, bool append = false, bool start = false, bool finish = false)
 	{
 		vector<Ember<T>> vec;
 		vec.push_back(ember);
-		return Save(filename, vec, printEditDepth, doEdits, intPalette, hexPalette, append, start, finish);
+		return Save(filename, vec, printEditDepth, doEdits, hexPalette, append, start, finish);
 	}
 
 	/// <summary>
-	/// Save a vector of embers to the specified file.
+	/// Save a container of embers to the specified file.
 	/// </summary>
 	/// <param name="filename">Full path and filename</param>
-	/// <param name="embers">The vector of embers to save</param>
+	/// <param name="embers">The container of embers to save</param>
 	/// <param name="printEditDepth">How deep the edit depth goes</param>
 	/// <param name="doEdits">If true included edit tags, else don't.</param>
-	/// <param name="intPalette">If true use integers instead of floating point numbers when embedding a non-hex formatted palette, else use floating point numbers.</param>
 	/// <param name="hexPalette">If true, embed a hexadecimal palette instead of Xml Color tags, else use Xml color tags.</param>
 	/// <param name="append">If true, append to the file if it already exists, else create a new file.</param>
 	/// <param name="start">Whether a new file is to be started</param>
 	/// <param name="finish">Whether an existing file is to be ended</param>
 	/// <returns>True if successful, else false</returns>
-	bool Save(const string& filename, vector<Ember<T>>& embers, size_t printEditDepth, bool doEdits, bool intPalette, bool hexPalette, bool append = false, bool start = false, bool finish = false)
+	template <typename Alloc, template <typename, typename> class C>
+	bool Save(const string& filename, C<Ember<T>, Alloc>& embers, size_t printEditDepth, bool doEdits, bool hexPalette, bool append = false, bool start = false, bool finish = false)
 	{
 		bool b = false;
 		bool hasTimes = false;
@@ -77,15 +76,19 @@ public:
 
 			if (f.is_open())
 			{
+				auto prev = embers.begin();
+
 				//Check to see if there are valid times by checking if any differed.
 				//If so, assume they were intentionally entered times.
-				for (size_t i = 1; i < embers.size(); i++)
+				for (auto it = Advance(embers.begin(), 1); it != embers.end(); ++it)
 				{
-					if (embers[i].m_Time != embers[i - 1].m_Time)
+					if (it->m_Time != prev->m_Time)
 					{
 						hasTimes = true;
 						break;
 					}
+
+					prev = it;
 				}
 
 				if (!hasTimes)
@@ -101,7 +104,7 @@ public:
 
 				for (auto& ember : embers)
 				{
-					string s = ToString(ember, "", printEditDepth, doEdits, intPalette, hexPalette);
+					string s = ToString(ember, "", printEditDepth, doEdits, hexPalette);
 					f.write(s.c_str(), s.size());
 				}
 
@@ -144,10 +147,9 @@ public:
 	/// <param name="extraAttributes">If true, add extra attributes, else don't</param>
 	/// <param name="printEditDepth">How deep the edit depth goes</param>
 	/// <param name="doEdits">If true included edit tags, else don't.</param>
-	/// <param name="intPalette">If true use integers instead of floating point numbers when embedding a non-hex formatted palette, else use floating point numbers.</param>
 	/// <param name="hexPalette">If true, embed a hexadecimal palette instead of Xml Color tags, else use Xml color tags.</param>
 	/// <returns>The Xml string representation of the passed in ember</returns>
-	string ToString(Ember<T>& ember, const string& extraAttributes, size_t printEditDepth, bool doEdits, bool intPalette, bool hexPalette = true)
+	string ToString(Ember<T>& ember, const string& extraAttributes, size_t printEditDepth, bool doEdits, bool hexPalette = true)
 	{
 		size_t i, j;
 		string s;
@@ -292,19 +294,9 @@ public:
 
 				//The original used a precision of 6 which is totally unnecessary, use 2.
 				if (IsClose(a, 255.0))
-				{
-					if (intPalette)
-						os << "<color index=\"" << i << "\" rgb=\"" << int(std::rint(r)) << " " << int(std::rint(g)) << " " << int(std::rint(b)) << "\"/>";
-					else
-						os << "<color index=\"" << i << "\" rgb=\"" << std::fixed << std::setprecision(2) << r << " " << g << " " << b << "\"/>";
-				}
+					os << "<color index=\"" << i << "\" rgb=\"" << std::fixed << std::setprecision(2) << r << " " << g << " " << b << "\"/>";
 				else
-				{
-					if (intPalette)
-						os << "   <color index=\"" << i << "\" rgba=\"" << int(std::rint(r)) << " " << int(std::rint(g)) << " " << int(std::rint(b)) << " " << int(std::rint(a)) << "\"/>";
-					else
-						os << "   <color index=\"" << i << "\" rgba=\"" << std::fixed << std::setprecision(2) << r << " " << g << " " << b << " " << a << "\"/>";
-				}
+					os << "   <color index=\"" << i << "\" rgba=\"" << std::fixed << std::setprecision(2) << r << " " << g << " " << b << " " << a << "\"/>";
 
 				os << "\n";
 			}

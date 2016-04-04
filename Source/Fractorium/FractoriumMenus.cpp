@@ -55,7 +55,6 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 	Ember<T> ember;
 	StopPreviewRender();
 	m_EmberFile.Clear();
-	m_EmberFile.m_Embers.reserve(count);
 	m_EmberFile.m_Filename = EmberFile<T>::DefaultFilename();
 
 	for (size_t i = 0; i < count; i++)
@@ -206,7 +205,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 			}
 
 			if (!errors.empty())
-				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
+				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit, false);//Concat errors from all files.
 		}
 
 		if (append)
@@ -216,12 +215,14 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 
 			m_EmberFile.m_Embers.insert(m_EmberFile.m_Embers.end(), emberFile.m_Embers.begin(), emberFile.m_Embers.end());
 		}
-		else
-			m_EmberFile = emberFile;
+		else if (emberFile.Size() > 0)//Ensure at least something was read.
+			m_EmberFile = std::move(emberFile);//Move the temp to avoid creating dupes because we no longer need it.
 
 		//Resync indices and names.
-		for (i = 0; i < m_EmberFile.Size(); i++)
-			m_EmberFile.m_Embers[i].m_Index = i;
+		i = 0;
+
+		for (auto& it : m_EmberFile.m_Embers)
+			it.m_Index = i++;
 
 		m_EmberFile.MakeNamesUnique();
 
@@ -281,7 +282,7 @@ void FractoriumEmberController<T>::SaveCurrentAsXml()
 		if (tempEdit)
 			xmlFreeDoc(tempEdit);
 
-		if (writer.Save(filename.toStdString().c_str(), ember, 0, true, false, true))
+		if (writer.Save(filename.toStdString().c_str(), ember, 0, true, true))
 		{
 			s->SaveFolder(fileInfo.canonicalPath());
 
@@ -324,7 +325,7 @@ void FractoriumEmberController<T>::SaveEntireFileAsXml()
 		for (auto& ember : emberFile.m_Embers)
 			ApplyXmlSavingTemplate(ember);
 
-		if (writer.Save(filename.toStdString().c_str(), emberFile.m_Embers, 0, true, false, true))
+		if (writer.Save(filename.toStdString().c_str(), emberFile.m_Embers, 0, true, true))
 		{
 			if (!s->SaveAutoUnique() || m_LastSaveAll == "")//Only save filename on first time through when doing auto unique names.
 				m_LastSaveAll = filename;
@@ -349,7 +350,7 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 	auto& pixels = *m_Controller->FinalImage();
 	auto rendererCL = dynamic_cast<RendererCLBase*>(m_Controller->Renderer());
 	auto stats = m_Controller->Stats();
-	auto comments = renderer->ImageComments(stats, 0, false, true);
+	auto comments = renderer->ImageComments(stats, 0, true);
 
 	if (rendererCL && renderer->PrepFinalAccumVector(pixels))
 	{
@@ -370,18 +371,19 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::SaveCurrentToOpenedFile()
 {
-	uint i;
+	uint i = 0;
 	bool fileFound = false;
 
-	for (i = 0; i < m_EmberFile.Size(); i++)
+	for (auto& it : m_EmberFile.m_Embers)
 	{
-		if ((m_Ember.m_Name == m_EmberFile.m_Embers[i].m_Name) &&//Check both to be extra sure.
-				(m_Ember.m_Index == m_EmberFile.m_Embers[i].m_Index))
+		if (&it == m_EmberFilePointer)//Just compare memory addresses.
 		{
-			m_EmberFile.m_Embers[i] = m_Ember;
+			it = m_Ember;//Save it to the opened file in memory.
 			fileFound = true;
 			break;
 		}
+
+		i++;
 	}
 
 	if (!fileFound)
@@ -470,7 +472,7 @@ void FractoriumEmberController<T>::CopyXml()
 	ember.m_Quality         = settings->XmlQuality();
 	ember.m_Supersample     = settings->XmlSupersample();
 	ember.m_TemporalSamples = settings->XmlTemporalSamples();
-	QApplication::clipboard()->setText(QString::fromStdString(emberToXml.ToString(ember, "", 0, false, false, true)));
+	QApplication::clipboard()->setText(QString::fromStdString(emberToXml.ToString(ember, "", 0, false, true)));
 }
 
 void Fractorium::OnActionCopyXml(bool checked) { m_Controller->CopyXml(); }
@@ -490,7 +492,7 @@ void FractoriumEmberController<T>::CopyAllXml()
 	{
 		Ember<T> ember = e;
 		ApplyXmlSavingTemplate(ember);
-		os << emberToXml.ToString(ember, "", 0, false, false, true);
+		os << emberToXml.ToString(ember, "", 0, false, true);
 	}
 
 	os << "</flames>\n";
@@ -563,9 +565,10 @@ void Fractorium::OnActionPasteXmlAppend(bool checked) { m_Controller->PasteXmlAp
 template <typename T>
 void FractoriumEmberController<T>::PasteXmlOver()
 {
+	size_t i = 0;
 	string s, errors;
 	XmlToEmber<T> parser;
-	auto backupEmber = m_EmberFile.m_Embers[0];
+	auto backupEmber = m_EmberFile.m_Embers.begin();
 	auto codec = QTextCodec::codecForName("UTF-8");
 	auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
@@ -589,20 +592,20 @@ void FractoriumEmberController<T>::PasteXmlOver()
 
 	if (m_EmberFile.Size())
 	{
-		for (auto i = 0; i < m_EmberFile.Size(); i++)
+		for (auto it : m_EmberFile.m_Embers)
 		{
-			m_EmberFile.m_Embers[i].m_Index = i;
-			ConstrainDimensions(m_EmberFile.m_Embers[i]);//Do not exceed the max texture size.
+			it.m_Index = i++;
+			ConstrainDimensions(it);//Do not exceed the max texture size.
 
 			//Also ensure it has a name.
-			if (m_EmberFile.m_Embers[i].m_Name == "" || m_EmberFile.m_Embers[i].m_Name == "No name")
-				m_EmberFile.m_Embers[i].m_Name = ToString<qulonglong>(m_EmberFile.m_Embers[i].m_Index).toStdString();
+			if (it.m_Name == "" || it.m_Name == "No name")
+				it.m_Name = ToString<qulonglong>(it.m_Index).toStdString();
 		}
 	}
 	else
 	{
-		backupEmber.m_Index = 0;
-		m_EmberFile.m_Embers.push_back(backupEmber);
+		backupEmber->m_Index = 0;
+		m_EmberFile.m_Embers.push_back(*backupEmber);
 	}
 
 	m_EmberFile.MakeNamesUnique();

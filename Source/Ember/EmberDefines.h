@@ -94,8 +94,10 @@ static inline size_t NowMs()
 //These two must always match.
 #ifdef _WIN32
 	#define ALIGN __declspec(align(16))
+	#define STATIC static
 #else
 	#define ALIGN __attribute__ ((aligned (16)))
+	#define STATIC
 #endif
 
 #define ALIGN_CL "((aligned (16)))"//The extra parens are necessary.

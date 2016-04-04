@@ -8,31 +8,8 @@ namespace EmberNs
 /// The thread count is set to the number of cores detected on the system.
 /// </summary>
 RendererBase::RendererBase()
-	: m_TaskGroup(new tbb::task_group)
 {
-	m_Abort = false;
-	m_LockAccum = false;
-	m_EarlyClip = false;
-	m_YAxisUp = false;
-	m_InsertPalette = false;
-	m_ReclaimOnResize = false;
-	m_CurvesSet = false;
-	m_NumChannels = 3;
-	m_BytesPerChannel = 1;
-	m_SuperSize = 0;
-	m_Transparency = false;
 	ThreadCount(Timing::ProcessorCount());
-	m_Callback = nullptr;
-	m_ProgressParameter = nullptr;
-	m_LastTemporalSample = 0;
-	m_LastIter = 0;
-	m_LastIterPercent = 0;
-	m_InteractiveFilter = eInteractiveFilter::FILTER_LOG;
-	m_Priority = eThreadPriority::NORMAL;
-	m_ProcessState = eProcessState::NONE;
-	m_ProcessAction = eProcessAction::FULL_RENDER;
-	m_InRender = false;
-	m_InFinalAccum = false;
 }
 
 /// <summary>

@@ -44,7 +44,7 @@ public:
 	{
 		int size = 64;
 		m_Image = QImage(width, height, QImage::Format_RGBA8888);
-		memcpy(m_Image.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
+		memcpy(m_Image.scanLine(0), v.data(), SizeOf(v));//Memcpy the data in.
 		m_Pixmap = QPixmap::fromImage(m_Image).scaled(QSize(size, size), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);//Create a QPixmap out of the QImage, scaled to size.
 		setData(0, Qt::DecorationRole, m_Pixmap);
 	}
@@ -68,10 +68,11 @@ public:
 	/// </summary>
 	/// <param name="ember">A pointer to the ember this item will represent</param>
 	/// <param name="p">The parent widget of this item</param>
-	explicit EmberTreeWidgetItem(Ember<T>* ember, QTreeWidget* p = 0)
-		: EmberTreeWidgetItemBase(p)
+	explicit EmberTreeWidgetItem(Ember<T>* ember, QTreeWidget* p = nullptr)
+		: EmberTreeWidgetItemBase(p),
+		  m_Ember(ember)
 	{
-		m_Ember = ember;
+		setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
 	}
 
 	/// <summary>
@@ -80,10 +81,11 @@ public:
 	/// </summary>
 	/// <param name="ember">A pointer to the ember this item will represent</param>
 	/// <param name="p">The parent widget of this item</param>
-	explicit EmberTreeWidgetItem(Ember<T>* ember, QTreeWidgetItem* p = 0)
-		: EmberTreeWidgetItemBase(p)
+	explicit EmberTreeWidgetItem(Ember<T>* ember, QTreeWidgetItem* p = nullptr)
+		: EmberTreeWidgetItemBase(p),
+		  m_Ember(ember)
 	{
-		m_Ember = ember;
+		setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
 	}
 
 	/// <summary>

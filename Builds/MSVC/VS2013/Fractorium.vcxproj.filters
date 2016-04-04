@@ -257,6 +257,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_AboutDialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LibraryTreeWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LibraryTreeWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\LibraryTreeWidget.cpp">
+      <Filter>Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_Fractorium.h">
@@ -392,6 +401,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\..\Source\Fractorium\csshighlighter.h">
       <Filter>Dialogs\Qss</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\LibraryTreeWidget.h">
+      <Filter>Widgets</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

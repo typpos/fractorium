@@ -69,9 +69,9 @@ public:
 		  T pe = 1,
 		  T pc = 0,
 		  T pf = 0)
+		: Xform()
 
 	{
-		Init();
 		m_Weight = weight;
 		m_ColorX = colorX;
 		m_ColorSpeed = colorSpeed;
@@ -184,8 +184,8 @@ public:
 		if (!m_ParentEmber && (typeid(T) == typeid(U)))
 			m_ParentEmber = reinterpret_cast<Ember<T>*>(xform.ParentEmber());
 
-		CopyVec<T, U>(m_Xaos, xform.XaosVec());
-		CopyVec(m_Motion, xform.m_Motion);
+		CopyCont(m_Xaos, xform.XaosVec());//<T, U> needed?//TODO
+		CopyCont(m_Motion, xform.m_Motion);
 		m_Name = xform.m_Name;
 		return *this;
 	}

@@ -77,14 +77,6 @@ void RendererCL<T, bucketT>::Init()
 }
 
 /// <summary>
-/// Virtual destructor.
-/// </summary>
-template <typename T, typename bucketT>
-RendererCL<T, bucketT>::~RendererCL()
-{
-}
-
-/// <summary>
 /// Non-virtual member functions for OpenCL specific tasks.
 /// </summary>
 

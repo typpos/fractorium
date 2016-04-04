@@ -4,27 +4,6 @@
 namespace EmberNs
 {
 /// <summary>
-/// Constructor that sets default values and allocates iterators.
-/// The thread count is set to the number of cores detected on the system.
-/// </summary>
-template <typename T, typename bucketT>
-Renderer<T, bucketT>::Renderer()
-{
-	m_PixelAspectRatio = 1;
-	m_StandardIterator = unique_ptr<StandardIterator<T>>(new StandardIterator<T>());
-	m_XaosIterator = unique_ptr<XaosIterator<T>>(new XaosIterator<T>());
-	m_Iterator = m_StandardIterator.get();
-}
-
-/// <summary>
-/// Virtual destructor so derived class destructors get called.
-/// </summary>
-template <typename T, typename bucketT>
-Renderer<T, bucketT>::~Renderer()
-{
-}
-
-/// <summary>
 /// Non-virtual processing functions.
 /// </summary>
 
@@ -89,7 +68,7 @@ void Renderer<T, bucketT>::ComputeBounds()
 	////Check the size of the density estimation filter.
 	////If the radius of the density estimation filter is greater than the
 	////gutter width, have to pad with more.  Otherwise, use the same value.
-	//for (auto& ember : m_Embers)
+	//for (auto& ember : *m_EmbersP)
 	//	maxDEFilterWidth = std::max<size_t>(size_t(ceil(ember.m_MaxRadDE) * m_Ember.m_Supersample), maxDEFilterWidth);
 	//
 	////Need an extra ss = (int)floor(m_Supersample / 2.0) of pixels so that a local iteration count for DE can be determined.//SMOULDER
@@ -162,7 +141,7 @@ void Renderer<T, bucketT>::ComputeCamera()
 /// However, changing only the brightness and setting action to ACCUM_ONLY is perfectly fine.
 /// </param>
 template <typename T, typename bucketT>
-void Renderer<T, bucketT>::SetEmber(Ember<T>& ember, eProcessAction action)
+void Renderer<T, bucketT>::SetEmber(const Ember<T>& ember, eProcessAction action)
 {
 	ChangeVal([&]
 	{
@@ -170,23 +149,61 @@ void Renderer<T, bucketT>::SetEmber(Ember<T>& ember, eProcessAction action)
 		m_Embers.push_back(ember);
 		m_Embers[0].m_TemporalSamples = 1;//Set temporal samples here to 1 because using the real value only makes sense when using a vector of Embers for animation.
 		m_Ember = m_Embers[0];
+		m_EmbersP = &m_Embers;
 	}, action);
 }
 
 /// <summary>
-/// Set the vector of embers and set the m_Ember member to a copy of the first element.
+/// Copy the embers in the passed in container to the internal vector of embers
+/// and set the m_Ember member to a copy of the first element.
 /// Reset the rendering process.
 /// </summary>
-/// <param name="embers">The vector of embers</param>
+/// <param name="embers">The container of embers to be copied</param>
 template <typename T, typename bucketT>
-void Renderer<T, bucketT>::SetEmber(vector<Ember<T>>& embers)
+template <typename C>
+void Renderer<T, bucketT>::SetEmber(const C& embers)
 {
 	ChangeVal([&]
 	{
-		m_Embers = embers;
+		CopyCont(m_Embers, embers);
+		m_EmbersP = &m_Embers;
 
 		if (!m_Embers.empty())
 			m_Ember = m_Embers[0];
+	}, eProcessAction::FULL_RENDER);
+}
+
+/// <summary>
+/// Move the embers in the passed in vector to the internal vector of embers
+/// and set the m_Ember member to a copy of the first element.
+/// Reset the rendering process.
+/// This is preferred over SetEmber when the size of embers is large and/or
+/// the caller no longer needs to use the argument after this function returns.
+/// </summary>
+/// <param name="embers">The vector of embers to be moved</param>
+template <typename T, typename bucketT>
+void Renderer<T, bucketT>::MoveEmbers(vector<Ember<T>>& embers)
+{
+	ChangeVal([&]
+	{
+		m_Embers = std::move(embers);
+		m_EmbersP = &m_Embers;
+
+		if (!m_Embers.empty())
+			m_Ember = m_Embers[0];
+	}, eProcessAction::FULL_RENDER);
+}
+
+template <typename T, typename bucketT>
+void Renderer<T, bucketT>::SetExternalEmbersPointer(vector<Ember<T>>* embers)
+{
+	ChangeVal([&]
+	{
+		m_Embers.clear();
+		m_EmbersP = embers;
+
+		if (!m_EmbersP->empty())
+			m_Ember = (*m_EmbersP)[0];
 	}, eProcessAction::FULL_RENDER);
 }
 
@@ -213,7 +230,7 @@ bool Renderer<T, bucketT>::CreateDEFilter(bool& newAlloc)
 				(m_Ember.m_CurveDE != m_DensityFilter->Curve()) ||
 				(m_Ember.m_Supersample != m_DensityFilter->Supersample()))
 		{
-			m_DensityFilter = unique_ptr<DensityFilter<bucketT>>(new DensityFilter<bucketT>(bucketT(m_Ember.m_MinRadDE), bucketT(m_Ember.m_MaxRadDE), bucketT(m_Ember.m_CurveDE), m_Ember.m_Supersample));
+			m_DensityFilter = make_unique<DensityFilter<bucketT>>(bucketT(m_Ember.m_MinRadDE), bucketT(m_Ember.m_MaxRadDE), bucketT(m_Ember.m_CurveDE), m_Ember.m_Supersample);
 			newAlloc = true;
 		}
 
@@ -384,7 +401,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	//Vib, gam and background are normally summed for each temporal sample. However if iteration is skipped, make sure to get the latest.
 	if ((filterAndAccumOnly || accumOnly) && TemporalSamples() == 1)//Disallow jumping when temporal samples > 1.
 	{
-		m_Ember = m_Embers[0];
+		m_Ember = (*m_EmbersP)[0];
 		m_Vibrancy = Vibrancy();
 		m_Gamma = Gamma();
 		m_Background = m_Ember.m_Background;
@@ -398,8 +415,8 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 
 	//it.Tic();
 	//Interpolate.
-	if (m_Embers.size() > 1)
-		Interpolater<T>::Interpolate(m_Embers, T(time), 0, m_Ember);
+	if (m_EmbersP->size() > 1)
+		Interpolater<T>::Interpolate(*m_EmbersP, T(time), 0, m_Ember);
 
 	//it.Toc("Interp 1");
 
@@ -436,8 +453,8 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	//Interpolate and get an ember for DE purposes.
 	//Additional interpolation will be done in the temporal samples loop.
 	//it.Tic();
-	if (m_Embers.size() > 1)
-		Interpolater<T>::Interpolate(m_Embers, deTime, 0, m_Ember);
+	if (m_EmbersP->size() > 1)
+		Interpolater<T>::Interpolate(*m_EmbersP, deTime, 0, m_Ember);
 
 	//it.Toc("Interp 2");
 	ClampGteRef<T>(m_Ember.m_MinRadDE, 0);
@@ -461,8 +478,8 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 
 		//Interpolate again.
 		//it.Tic();
-		if (TemporalSamples() > 1 && m_Embers.size() > 1)
-			Interpolater<T>::Interpolate(m_Embers, temporalTime, 0, m_Ember);//This will perform all necessary precalcs via the ember/xform/variation assignment operators.
+		if (TemporalSamples() > 1 && m_EmbersP->size() > 1)
+			Interpolater<T>::Interpolate(*m_EmbersP, temporalTime, 0, m_Ember);//This will perform all necessary precalcs via the ember/xform/variation assignment operators.
 
 		//it.Toc("Interp 3");
 
@@ -678,16 +695,15 @@ Finish:
 /// Run() should have completed before calling this.
 /// </summary>
 /// <param name="printEditDepth">The depth of the edit tags</param>
-/// <param name="intPalette">If true use integers instead of floating point numbers when embedding a non-hex formatted palette, else use floating point numbers.</param>
 /// <param name="hexPalette">If true, embed a hexadecimal palette instead of Xml Color tags, else use Xml color tags.</param>
 /// <returns>The EmberImageComments object with image comments filled out</returns>
 template <typename T, typename bucketT>
-EmberImageComments Renderer<T, bucketT>::ImageComments(const EmberStats& stats, size_t printEditDepth, bool intPalette, bool hexPalette)
+EmberImageComments Renderer<T, bucketT>::ImageComments(const EmberStats& stats, size_t printEditDepth, bool hexPalette)
 {
 	ostringstream ss;
 	EmberImageComments comments;
 	ss.imbue(std::locale(""));
-	comments.m_Genome = m_EmberToXml.ToString(m_Ember, "", printEditDepth, false, intPalette, hexPalette);
+	comments.m_Genome = m_EmberToXml.ToString(m_Ember, "", printEditDepth, false, hexPalette);
 	ss << (double(stats.m_Badvals) / double(stats.m_Iters));//Percentage of bad values to iters.
 	comments.m_Badvals = ss.str(); ss.str("");
 	ss << stats.m_Iters;
@@ -1702,8 +1718,12 @@ void Renderer<T, bucketT>::CurveAdjust(bucketT& a, const glm::length_t& index)
 //So the explicit instantiation must be declared here rather than in Ember.cpp where
 //all of the other classes are done.
 template EMBER_API class Renderer<float, float>;
+template EMBER_API void  Renderer<float, float>::SetEmber(const vector<Ember<float>>& embers);
+template EMBER_API void  Renderer<float, float>::SetEmber(const list<Ember<float>>& embers);
 
 #ifdef DO_DOUBLE
 	template EMBER_API class Renderer<double, float>;
+	template EMBER_API void  Renderer<double, float>::SetEmber(const vector<Ember<double>>& embers);
+	template EMBER_API void  Renderer<double, float>::SetEmber(const list<Ember<double>>& embers);
 #endif
 }

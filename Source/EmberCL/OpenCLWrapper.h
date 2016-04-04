@@ -184,18 +184,18 @@ public:
 private:
 	bool CreateSPK(const string& name, const string& program, const string& entryPoint, Spk& spk, bool doublePrecision);
 
-	bool m_Init;
-	bool m_Shared;
-	size_t m_PlatformIndex;
-	size_t m_DeviceIndex;
-	size_t m_LocalMemSize;
+	bool m_Init = false;
+	bool m_Shared = false;
+	size_t m_PlatformIndex = 0;
+	size_t m_DeviceIndex = 0;
+	size_t m_LocalMemSize = 0;
 	size_t m_GlobalMemSize;
 	size_t m_MaxAllocSize;
 	cl::Platform m_Platform;
 	cl::Context m_Context;
 	cl::Device m_Device;
 	cl::CommandQueue m_Queue;
-	shared_ptr<OpenCLInfo> m_Info;
+	shared_ptr<OpenCLInfo> m_Info = OpenCLInfo::Instance();
 	std::vector<cl::Device> m_DeviceVec;
 	std::vector<Spk> m_Programs;
 	std::vector<NamedBuffer> m_Buffers;

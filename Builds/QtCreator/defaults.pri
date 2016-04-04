@@ -158,7 +158,7 @@ win32 {
 	QMAKE_CXXFLAGS += -fPIC
 	QMAKE_CXXFLAGS += -fpermissive
 	QMAKE_CXXFLAGS += -pedantic
-	QMAKE_CXXFLAGS += -std=c++11
+	QMAKE_CXXFLAGS += -std=c++14
 	QMAKE_CXXFLAGS += -Wnon-virtual-dtor
 	QMAKE_CXXFLAGS += -Wshadow
 	QMAKE_CXXFLAGS += -Winit-self

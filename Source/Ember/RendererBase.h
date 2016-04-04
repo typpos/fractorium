@@ -21,10 +21,13 @@ namespace EmberNs
 class EMBER_API RenderCallback
 {
 public:
+	RenderCallback() = default;
+	RenderCallback(RenderCallback& callback) = delete;
+
 	/// <summary>
 	/// Virtual destructor to ensure anything declared in derived classes gets cleaned up.
 	/// </summary>
-	virtual ~RenderCallback() { }
+	virtual ~RenderCallback() = default;
 
 	/// <summary>
 	/// Empty progress function to be implemented in derived classes to take action on progress updates.
@@ -91,10 +94,11 @@ enum class eRendererType : et { CPU_RENDERER, OPENCL_RENDERER };
 /// </summary>
 class EMBER_API RendererBase : public EmberReport
 {
-//using EmberReport::m_ErrorReport;
 public:
 	RendererBase();
-	virtual ~RendererBase() { }
+	RendererBase(const RendererBase& renderer) = delete;
+	RendererBase& operator = (const RendererBase& renderer) = delete;
+	virtual ~RendererBase() = default;
 
 	//Non-virtual processing functions.
 	void ChangeVal(std::function<void(void)> func, eProcessAction action);
@@ -106,10 +110,8 @@ public:
 	//Virtual processing functions.
 	virtual bool Ok() const;
 	virtual size_t MemoryAvailable();
-	virtual void SetEmber(Ember<float>& ember, eProcessAction action = eProcessAction::FULL_RENDER) { }
-	virtual void SetEmber(vector<Ember<float>>& embers) { }
-	virtual void SetEmber(Ember<double>& ember, eProcessAction action = eProcessAction::FULL_RENDER) { }
-	virtual void SetEmber(vector<Ember<double>>& embers) { }
+	virtual void SetEmber(const Ember<float>& ember, eProcessAction action = eProcessAction::FULL_RENDER) { }
+	virtual void SetEmber(const Ember<double>& ember, eProcessAction action = eProcessAction::FULL_RENDER) { }
 	virtual bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec);
 
 	//Abstract processing functions.
@@ -120,7 +122,7 @@ public:
 	virtual void ComputeQuality() = 0;
 	virtual void ComputeCamera() = 0;
 	virtual eRenderStatus Run(vector<byte>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) = 0;
-	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool intPalette = false, bool hexPalette = true) = 0;
+	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool hexPalette = true) = 0;
 	virtual DensityFilterBase* GetDensityFilter() = 0;
 
 	//Non-virtual renderer properties, getters only.
@@ -193,41 +195,41 @@ public:
 	bool InRender();
 	bool InFinalAccum();
 
-	void* m_ProgressParameter;
+	void* m_ProgressParameter = nullptr;
 
 protected:
-	bool m_EarlyClip;
-	bool m_YAxisUp;
-	bool m_Transparency;
-	bool m_LockAccum;
-	bool m_InRender;
-	bool m_InFinalAccum;
-	bool m_InsertPalette;
-	bool m_ReclaimOnResize;
-	bool m_CurvesSet;
-	volatile bool m_Abort;
+	bool m_EarlyClip = false;
+	bool m_YAxisUp = false;
+	bool m_Transparency = false;
+	bool m_LockAccum = false;
+	bool m_InRender = false;
+	bool m_InFinalAccum = false;
+	bool m_InsertPalette = false;
+	bool m_ReclaimOnResize = false;
+	bool m_CurvesSet = false;
+	volatile bool m_Abort = false;
 	size_t m_SuperRasW;
 	size_t m_SuperRasH;
-	size_t m_SuperSize;
+	size_t m_SuperSize = 0;
 	size_t m_GutterWidth;
 	size_t m_DensityFilterOffset;
-	size_t m_NumChannels;
-	size_t m_BytesPerChannel;
+	size_t m_NumChannels = 3;
+	size_t m_BytesPerChannel = 1;
 	size_t m_ThreadsToUse;
 	size_t m_VibGamCount;
-	size_t m_LastTemporalSample;
-	size_t m_LastIter;
-	double m_LastIterPercent;
-	eThreadPriority m_Priority;
-	eProcessAction m_ProcessAction;
-	eProcessState m_ProcessState;
-	eInteractiveFilter m_InteractiveFilter;
+	size_t m_LastTemporalSample = 0;
+	size_t m_LastIter = 0;
+	double m_LastIterPercent = 0;
+	eThreadPriority m_Priority = eThreadPriority::NORMAL;
+	eProcessAction m_ProcessAction = eProcessAction::FULL_RENDER;
+	eProcessState m_ProcessState = eProcessState::NONE;
+	eInteractiveFilter m_InteractiveFilter = eInteractiveFilter::FILTER_LOG;
 	EmberStats m_Stats;
-	RenderCallback* m_Callback;
+	RenderCallback* m_Callback = nullptr;
 	vector<size_t> m_SubBatch;
 	vector<size_t> m_BadVals;
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> m_Rand;
-	auto_ptr<tbb::task_group> m_TaskGroup;
+	unique_ptr<tbb::task_group> m_TaskGroup = make_unique<tbb::task_group>();
 	std::recursive_mutex m_RenderingCs, m_AccumCs, m_FinalAccumCs, m_ResizeCs;
 	Timing m_RenderTimer, m_IterTimer, m_ProgressTimer;
 };

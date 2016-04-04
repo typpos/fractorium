@@ -296,14 +296,15 @@ public:
 	}
 
 	/// <summary>
-	/// Parse the specified buffer and place the results in the vector of embers passed in.
+	/// Parse the specified buffer and place the results in the container of embers passed in.
 	/// </summary>
 	/// <param name="buf">The buffer to parse</param>
 	/// <param name="filename">Full path and filename, optionally empty</param>
 	/// <param name="embers">The newly constructed embers based on what was parsed</param>
 	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
 	/// <returns>True if there were no errors, else false.</returns>
-	bool Parse(byte* buf, const char* filename, vector<Ember<T>>& embers, bool useDefaults = true)
+	template <typename Alloc, template <typename, typename> class C>
+	bool Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults = true)
 	{
 		char* bn;
 		const char* xmlPtr;
@@ -318,7 +319,7 @@ public:
 		//Parse XML string into internal document.
 		xmlPtr = CX(&buf[0]);
 		bufSize = strlen(xmlPtr);
-		embers.reserve(bufSize / 2500);//The Xml text for an ember is around 2500 bytes, but can be much more. Pre-allocate to aovid unnecessary resizing.
+		//embers.reserve(bufSize / 2500);//The Xml text for an ember is around 2500 bytes, but can be much more. Pre-allocate to aovid unnecessary resizing.
 		doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "ISO-8859-1", XML_PARSE_NONET);//Forbid network access during read.
 		//t.Toc("xmlReadMemory");
 
@@ -336,6 +337,8 @@ public:
 		ScanForEmberNodes(rootnode, bn, embers, useDefaults);
 		xmlFreeDoc(doc);
 		emberSize = embers.size();
+		auto b = embers.begin();
+		auto secondToLast = Advance(embers.begin(), emberSize - 2);
 		//t.Toc("ScanForEmberNodes");
 
 		//Check to see if the first control point or the second-to-last
@@ -343,11 +346,11 @@ public:
 		//and should be reset to linear (with a warning).
 		if (emberSize > 0)
 		{
-			if (embers[0].m_Interp == eInterp::EMBER_INTERP_SMOOTH)
-				embers[0].m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			if (b->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
+				b->m_Interp = eInterp::EMBER_INTERP_LINEAR;
 
-			if (emberSize >= 2 && embers[emberSize - 2].m_Interp == eInterp::EMBER_INTERP_SMOOTH)
-				embers[emberSize - 2].m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			if (emberSize >= 2 && secondToLast->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
+				secondToLast->m_Interp = eInterp::EMBER_INTERP_LINEAR;
 		}
 
 		//Finally, ensure that consecutive 'rotate' parameters never exceed
@@ -355,17 +358,22 @@ public:
 		//An adjustment of +/- 360 degrees is made until this is true.
 		if (emberSize > 1)
 		{
-			for (size_t i = 1; i < emberSize; i++)
+			auto prev = embers.begin();
+			auto second = Advance(embers.begin(), 1);
+
+			for (auto it = second; it != embers.end(); ++it)
 			{
 				//Only do this adjustment if not in compat mode.
-				if (embers[i - 1].m_AffineInterp != eAffineInterp::AFFINE_INTERP_COMPAT && embers[i - 1].m_AffineInterp != eAffineInterp::AFFINE_INTERP_OLDER)
+				if (prev->m_AffineInterp != eAffineInterp::AFFINE_INTERP_COMPAT && prev->m_AffineInterp != eAffineInterp::AFFINE_INTERP_OLDER)
 				{
-					while (embers[i].m_Rotate < embers[i - 1].m_Rotate - 180)
-						embers[i].m_Rotate += 360;
+					while (it->m_Rotate < prev->m_Rotate - 180)
+						it->m_Rotate += 360;
 
-					while (embers[i].m_Rotate > embers[i - 1].m_Rotate + 180)
-						embers[i].m_Rotate -= 360;
+					while (it->m_Rotate > prev->m_Rotate + 180)
+						it->m_Rotate -= 360;
 				}
+
+				prev = it;
 			}
 		}
 
@@ -373,14 +381,16 @@ public:
 	}
 
 	/// <summary>
-	/// Parse the specified file and place the results in the vector of embers passed in.
+	/// Parse the specified file and place the results in the container of embers passed in.
 	/// This will strip out ampersands because the Xml parser can't handle them.
 	/// </summary>
 	/// <param name="filename">Full path and filename</param>
 	/// <param name="embers">The newly constructed embers based on what was parsed</param>
 	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present. Default: true.</param>
 	/// <returns>True if there were no errors, else false.</returns>
-	bool Parse(const char* filename, vector<Ember<T>>& embers, bool useDefaults = true)
+	//template <typename T, typename Alloc, template <typename, typename> class C>
+	template <typename Alloc, template <typename, typename> class C>
+	bool Parse(const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults = true)
 	{
 		const char* loc = __FUNCTION__;
 		string buf;
@@ -465,13 +475,14 @@ public:
 
 private:
 	/// <summary>
-	/// Scan the file for ember nodes, and parse them out into the vector of embers.
+	/// Scan the file for ember nodes, and parse them out into the container of embers.
 	/// </summary>
 	/// <param name="curNode">The current node to parse</param>
 	/// <param name="parentFile">The full path and filename</param>
 	/// <param name="embers">The newly constructed embers based on what was parsed</param>
 	/// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present.</param>
-	void ScanForEmberNodes(xmlNode* curNode, char* parentFile, vector<Ember<T>>& embers, bool useDefaults)
+	template <typename Alloc, template <typename, typename> class C>
+	void ScanForEmberNodes(xmlNode* curNode, char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults)
 	{
 		bool parseEmberSuccess;
 		xmlNodePtr thisNode = nullptr;

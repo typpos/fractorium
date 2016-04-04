@@ -10,22 +10,14 @@ namespace EmberCLns
 FinalAccumOpenCLKernelCreator::FinalAccumOpenCLKernelCreator(bool doublePrecision)
 {
 	m_DoublePrecision = doublePrecision;
-	m_GammaCorrectionWithAlphaCalcEntryPoint    = "GammaCorrectionWithAlphaCalcKernel";
-	m_GammaCorrectionWithoutAlphaCalcEntryPoint = "GammaCorrectionWithoutAlphaCalcKernel";
-	m_GammaCorrectionWithAlphaCalcKernel    = CreateGammaCorrectionKernelString(true);
-	m_GammaCorrectionWithoutAlphaCalcKernel = CreateGammaCorrectionKernelString(false);
-	m_FinalAccumEarlyClipEntryPoint                               = "FinalAccumEarlyClipKernel";
-	m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint    = "FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel";
-	m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel";
+	m_GammaCorrectionWithAlphaCalcKernel                      = CreateGammaCorrectionKernelString(true);
+	m_GammaCorrectionWithoutAlphaCalcKernel                   = CreateGammaCorrectionKernelString(false);
 	m_FinalAccumEarlyClipKernel                               = CreateFinalAccumKernelString(true, false, false);
 	m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel    = CreateFinalAccumKernelString(true, true,  true);
 	m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel = CreateFinalAccumKernelString(true, false, true);
-	m_FinalAccumLateClipEntryPoint                               = "FinalAccumLateClipKernel";
-	m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint    = "FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel";
-	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint = "FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel";
-	m_FinalAccumLateClipKernel                               = CreateFinalAccumKernelString(false, false, false);
-	m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel    = CreateFinalAccumKernelString(false, true,  true);
-	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel = CreateFinalAccumKernelString(false, false, true);
+	m_FinalAccumLateClipKernel                                = CreateFinalAccumKernelString(false, false, false);
+	m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel     = CreateFinalAccumKernelString(false, true,  true);
+	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel  = CreateFinalAccumKernelString(false, false, true);
 }
 
 /// <summary>

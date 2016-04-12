@@ -3473,8 +3473,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>263</width>
-                <height>700</height>
+                <width>118</width>
+                <height>618</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5491,8 +5491,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>259</width>
-                   <height>652</height>
+                   <width>133</width>
+                   <height>52</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -6517,7 +6517,6 @@
     <addaction name="ActionSaveCurrentAsXml"/>
     <addaction name="ActionSaveEntireFileAsXml"/>
     <addaction name="ActionSaveCurrentScreen"/>
-    <addaction name="ActionSaveCurrentToOpenedFile"/>
     <addaction name="separator"/>
     <addaction name="ActionExit"/>
    </widget>
@@ -6759,7 +6758,6 @@
    <addaction name="separator"/>
    <addaction name="ActionSaveCurrentAsXml"/>
    <addaction name="ActionSaveEntireFileAsXml"/>
-   <addaction name="ActionSaveCurrentToOpenedFile"/>
    <addaction name="ActionSaveCurrentScreen"/>
    <addaction name="separator"/>
    <addaction name="ActionCopyXml"/>
@@ -6818,21 +6816,6 @@
    </property>
    <property name="text">
     <string>E&amp;xit</string>
-   </property>
-  </action>
-  <action name="ActionSaveCurrentToOpenedFile">
-   <property name="icon">
-    <iconset resource="Fractorium.qrc">
-     <normaloff>:/Fractorium/Icons/document-hf-insert.png</normaloff>:/Fractorium/Icons/document-hf-insert.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Save Current to Opened File</string>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;body&gt;&lt;p&gt;Save the currently displayed flame back to the opened file in memory.&lt;/p&gt;&lt;p&gt;This overwrites the original flame but does not store the file back to disk.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+B</string>
    </property>
   </action>
   <action name="ActionSaveCurrentAsXml">

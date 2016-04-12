@@ -421,7 +421,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	//it.Toc("Interp 1");
 
 	//Save only for palette insertion.
-	if (m_InsertPalette && BytesPerChannel() == 1)
+	if (m_InsertPalette)
 		m_TempEmber = m_Ember;
 
 	if (!resume)//Only need to create this when starting a new render.
@@ -1232,22 +1232,38 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 		}
 	});
 
-	//Insert the palette into the image for debugging purposes. Only works with 8bpc and is not implemented on the GPU.
-	if (m_InsertPalette && BytesPerChannel() == 1)
+	//Insert the palette into the image for debugging purposes. Not implemented on the GPU.
+	if (m_InsertPalette)
 	{
 		size_t i, j, ph = 100;
 
 		if (ph >= FinalRasH())
 			ph = FinalRasH();
 
-		for (j = 0; j < ph; j++)
+		if (BytesPerChannel() == 1)
 		{
-			for (i = 0; i < FinalRasW(); i++)
+			for (j = 0; j < ph; j++)
 			{
-				byte* p = pixels + (NumChannels() * (i + j * FinalRasW()));
-				p[0] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][0] * WHITE);//The palette is [0..1], output image is [0..255].
-				p[1] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][1] * WHITE);
-				p[2] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][2] * WHITE);
+				for (i = 0; i < FinalRasW(); i++)
+				{
+					auto p = pixels + (NumChannels() * (i + j * FinalRasW()));
+					p[0] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][0] * WHITE);//The palette is [0..1], output image is [0..255].
+					p[1] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][1] * WHITE);
+					p[2] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][2] * WHITE);
+				}
+			}
+		}
+		else//BPC == 2.
+		{
+			for (j = 0; j < ph; j++)
+			{
+				for (i = 0; i < FinalRasW(); i++)
+				{
+					auto p16 = reinterpret_cast<glm::uint16*>(pixels + (PixelSize() * (i + j * FinalRasW())));
+					p16[0] = glm::uint16(m_TempEmber.m_Palette[i * 256 / FinalRasW()][0] * WHITE * bucketT(256)); //The palette is [0..1], output image is [0..65535].
+					p16[1] = glm::uint16(m_TempEmber.m_Palette[i * 256 / FinalRasW()][1] * WHITE * bucketT(256));
+					p16[2] = glm::uint16(m_TempEmber.m_Palette[i * 256 / FinalRasW()][2] * WHITE * bucketT(256));
+				}
 			}
 		}
 	}

@@ -115,7 +115,6 @@ public slots:
 	void OnActionSaveCurrentAsXml(bool checked);
 	void OnActionSaveEntireFileAsXml(bool checked);
 	void OnActionSaveCurrentScreen(bool checked);
-	void OnActionSaveCurrentToOpenedFile(bool checked);
 	void OnActionExit(bool checked);
 
 	void OnActionUndo(bool checked);//Edit.

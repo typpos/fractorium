@@ -371,7 +371,9 @@ bool FractoriumEmberController<T>::Render()
 	if (ProcessState() != eProcessState::ACCUM_DONE)
 	{
 		//if (m_Renderer->Run(m_FinalImage, 0) == RENDER_OK)//Full, non-incremental render for debugging.
-		if (m_Renderer->Run(m_FinalImage, 0, m_SubBatchCount, (iterBegin || m_Fractorium->m_Settings->ContinuousUpdate())) == eRenderStatus::RENDER_OK)//Force output on iterBegin or if the settings specify to always do it.
+		bool update = iterBegin || m_Fractorium->m_Settings->ContinuousUpdate();
+
+		if (m_Renderer->Run(m_FinalImage, 0, m_SubBatchCount, update) == eRenderStatus::RENDER_OK)//Force output on iterBegin or if the settings specify to always do it.
 		{
 			//The amount to increment sub batch while rendering proceeds is purely empirical.
 			//Change later if better values can be derived/observed.
@@ -445,12 +447,15 @@ bool FractoriumEmberController<T>::Render()
 				FillSummary();//Only update summary on render completion since it's not the type of thing the user needs real-time updates on.
 			}
 
-			//Update the GL window on start because the output will be forced.
+			//Update the GL window on start or continuous rendering because the output will be forced.
 			//Update it on finish because the rendering process is completely done.
-			if (iterBegin || ProcessState() == eProcessState::ACCUM_DONE)
+			if (update || ProcessState() == eProcessState::ACCUM_DONE)
 			{
 				if (m_FinalImage.size() == m_Renderer->FinalBufferSize())//Make absolutely sure the correct amount of data is passed.
 					gl->update();
+
+				if (ProcessState() == eProcessState::ACCUM_DONE)
+					SaveCurrentToOpenedFile();
 
 				//Uncomment for debugging kernel build and execution errors.
 				//m_Fractorium->ui.InfoRenderingTextEdit->setText(QString::fromStdString(m_Fractorium->m_Wrapper.DumpInfo()));

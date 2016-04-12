@@ -106,6 +106,12 @@ bool EmberRender(EmberOptions& opt)
 			cout << "Bits per channel cannot be anything other than 8 with OpenCL, setting to 8.\n";
 			opt.BitsPerChannel(8);
 		}
+
+		if (opt.InsertPalette())
+		{
+			cout << "Inserting palette not supported with OpenCL, insertion will not take place.\n";
+			opt.InsertPalette(false);
+		}
 	}
 
 	if (opt.Format() != "jpg" &&
@@ -127,12 +133,6 @@ bool EmberRender(EmberOptions& opt)
 	{
 		cout << "Unexpected bits per channel specified " << opt.BitsPerChannel() << ". Setting to 8.\n";
 		opt.BitsPerChannel(8);
-	}
-
-	if (opt.InsertPalette() && opt.BitsPerChannel() != 8)
-	{
-		cout << "Inserting palette only supported with 8 bits per channel, insertion will not take place.\n";
-		opt.InsertPalette(false);
 	}
 
 	if (opt.AspectRatio() < 0)
@@ -180,9 +180,6 @@ bool EmberRender(EmberOptions& opt)
 
 		if (opt.DeMax() > -1)
 			embers[i].m_MaxRadDE = T(opt.DeMax());
-
-		if (opt.SubBatchSize() != DEFAULT_SBS)
-			embers[i].m_SubBatchSize = opt.SubBatchSize();
 
 		embers[i].m_TemporalSamples = 1;//Force temporal samples to 1 for render.
 		embers[i].m_Quality *= T(opt.QualityScale());
@@ -282,7 +279,7 @@ bool EmberRender(EmberOptions& opt)
 			//TotalIterCount() is actually using ScaledQuality() which does not get reset upon ember assignment,
 			//so it ends up using the correct value for quality * strips.
 			iterCount = renderer->TotalIterCount(1);
-			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), opt.HexPalette());
+			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), true);
 			os.str("");
 			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((double(stats.m_Iters) / double(iterCount)) * 100) << "%)";
 			VerbosePrint("\nIters ran/requested: " + os.str());
@@ -356,21 +353,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 #ifdef DO_DOUBLE
 
-		if (opt.Bits() == 64)
-		{
+		if (!opt.Sp())
 			b = EmberRender<double>(opt);
-		}
 		else
 #endif
-			if (opt.Bits() == 33)
-			{
-				b = EmberRender<float>(opt);
-			}
-			else if (opt.Bits() == 32)
-			{
-				cout << "Bits 32/int histogram no longer supported. Using bits == 33 (float).\n";
-				b = EmberRender<float>(opt);
-			}
+			b = EmberRender<float>(opt);
 	}
 
 	return b ? 0 : 1;

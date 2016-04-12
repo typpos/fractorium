@@ -447,6 +447,8 @@ void FractoriumEmberController<T>::FillXforms(int index)
 		{
 			auto cb1 = new QCheckBox(MakeXformCaption(i), m_Fractorium);
 			auto cb2 = new QCheckBox(MakeXformCaption(i + 1), m_Fractorium);
+			QObject::connect(cb1, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });//Ensure circles are drawn immediately after toggle.
+			QObject::connect(cb2, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });
 			m_Fractorium->m_XformSelections.push_back(cb1);
 			m_Fractorium->m_XformSelections.push_back(cb2);
 			m_Fractorium->m_XformsSelectionLayout->addRow(cb1, cb2);
@@ -455,6 +457,7 @@ void FractoriumEmberController<T>::FillXforms(int index)
 		else if (i < count)
 		{
 			auto cb = new QCheckBox(MakeXformCaption(i), m_Fractorium);
+			QObject::connect(cb, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });
 			m_Fractorium->m_XformSelections.push_back(cb);
 			m_Fractorium->m_XformsSelectionLayout->addRow(cb, new QWidget(m_Fractorium));
 			i++;

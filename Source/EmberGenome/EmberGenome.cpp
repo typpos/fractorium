@@ -306,24 +306,12 @@ bool EmberGenome(EmberOptions& opt)
 	else if (opt.Clone()    != "") filename = opt.Clone();
 	else if (opt.Mutate()   != "") filename = opt.Mutate();
 
-	if (ParseEmberFile(parser, filename, embers))
-	{
-		if (opt.SubBatchSize() != DEFAULT_SBS)
-			for (i = 0; i < embers.size(); i++)
-				embers[i].m_SubBatchSize = opt.SubBatchSize();
-	}
-	else
+	if (!ParseEmberFile(parser, filename, embers))
 		return false;
 
 	if (doCross1)
 	{
-		if (ParseEmberFile(parser, opt.Cross1(), embers2))
-		{
-			if (opt.SubBatchSize() != DEFAULT_SBS)
-				for (i = 0; i < embers2.size(); i++)
-					embers2[i].m_SubBatchSize = opt.SubBatchSize();
-		}
-		else
+		if (!ParseEmberFile(parser, opt.Cross1(), embers2))
 			return false;
 	}
 
@@ -826,21 +814,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 #ifdef DO_DOUBLE
 
-		if (opt.Bits() == 64)
-		{
+		if (!opt.Sp())
 			b = EmberGenome<double>(opt);
-		}
 		else
 #endif
-			if (opt.Bits() == 33)
-			{
-				b = EmberGenome<float>(opt);
-			}
-			else if (opt.Bits() == 32)
-			{
-				cerr << "Bits 32/int histogram no longer supported. Using bits == 33 (float).\n";
-				b = EmberGenome<float>(opt);
-			}
+			b = EmberGenome<float>(opt);
 	}
 
 	return b ? 0 : 1;

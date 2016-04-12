@@ -42,6 +42,7 @@ enum class eOptionIDs : et
 
 	//Boolean args.
 	OPT_OPENCL,
+	OPT_SP,
 	OPT_EARLYCLIP,
 	OPT_POS_Y_UP,
 	OPT_TRANSPARENCY,
@@ -60,13 +61,10 @@ enum class eOptionIDs : et
 	OPT_DUMP_KERNEL,
 
 	//Value args.
-	OPT_SEED,//Int value args.
-	OPT_NTHREADS,
+	OPT_NTHREADS,//Int value args.
 	OPT_STRIPS,
 	OPT_SUPERSAMPLE,
-	OPT_BITS,
 	OPT_BPC,
-	OPT_SBS,
 	OPT_PRINT_EDIT_DEPTH,
 	OPT_JPEG,
 	OPT_BEGIN,
@@ -297,35 +295,38 @@ public:
 	/// </summary>
 	EmberOptions()
 	{
-		m_BoolArgs.reserve(25);
-		m_IntArgs.reserve(25);
-		m_UintArgs.reserve(25);
-		m_DoubleArgs.reserve(25);
-		m_StringArgs.reserve(35);
+		const size_t size = 30;
+		m_BoolArgs.reserve(size);
+		m_IntArgs.reserve(size);
+		m_UintArgs.reserve(size);
+		m_DoubleArgs.reserve(size);
+		m_StringArgs.reserve(size);
+		//Informational bools.
+		INITBOOLOPTION(Help,           Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_HELP,             _T("--help"),                 false,                SO_NONE,    "\t--help                   Show this screen and exit.\n"));
+		INITBOOLOPTION(Version,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERSION,          _T("--version"),              false,                SO_NONE,    "\t--version                Show version and exit.\n"));
+		INITBOOLOPTION(OpenCLInfo,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_OPENCL_INFO, _T("--openclinfo"),           false,                SO_NONE,    "\t--openclinfo             Display platforms and devices for OpenCL and exit.\n"));
+		INITBOOLOPTION(AllVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ALL_VARS,         _T("--allvars"),              false,                SO_NONE,    "\t--allvars				  Display the names of all supported variations and exit.\n"));
+		INITBOOLOPTION(RegVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REG_VARS,         _T("--regvars"),              false,                SO_NONE,    "\t--regvars				  Display the names of all supported regular variations and exit.\n"));
+		INITBOOLOPTION(PreVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PRE_VARS,         _T("--prevars"),              false,                SO_NONE,    "\t--prevars				  Display the names of all supported pre variations and exit.\n"));
+		INITBOOLOPTION(PostVars,       Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_POST_VARS,        _T("--postvars"),             false,                SO_NONE,    "\t--postvars               Display the names of all supported post variations and exit.\n"));
 		//Diagnostic bools.
-		INITBOOLOPTION(Help,           Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_HELP,             _T("--help"),                 false,                SO_NONE,    "\t--help                   Show this screen.\n"));
-		INITBOOLOPTION(Version,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERSION,          _T("--version"),              false,                SO_NONE,    "\t--version                Show version.\n"));
-		INITBOOLOPTION(Verbose,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERBOSE,          _T("--verbose"),              false,                SO_NONE,    "\t--verbose                Verbose output.\n"));
-		INITBOOLOPTION(Debug,          Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DEBUG,            _T("--debug"),                false,                SO_NONE,    "\t--debug                  Debug output.\n"));
-		INITBOOLOPTION(DumpArgs,       Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_ARGS,        _T("--dumpargs"),             false,                SO_NONE,    "\t--dumpargs               Print all arguments entered from either the command line or environment variables.\n"));
-		INITBOOLOPTION(DoProgress,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PROGRESS,         _T("--progress"),             false,                SO_NONE,    "\t--progress               Display progress. This will slow down processing by about 10%.\n"));
-		INITBOOLOPTION(OpenCLInfo,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_OPENCL_INFO, _T("--openclinfo"),           false,                SO_NONE,    "\t--openclinfo             Display platforms and devices for OpenCL.\n"));
-		INITBOOLOPTION(AllVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_ALL_VARS,		  _T("--allvars"),				false,				  SO_NONE,	  "\t--allvars				  Display the names of all supported variations.\n"));
-		INITBOOLOPTION(RegVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_REG_VARS,		  _T("--regvars"),				false,				  SO_NONE,	  "\t--regvars				  Display the names of all supported regular variations.\n"));
-		INITBOOLOPTION(PreVars,		   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_PRE_VARS,		  _T("--prevars"),				false,				  SO_NONE,	  "\t--prevars				  Display the names of all supported pre variations.\n"));
-		INITBOOLOPTION(PostVars,	   Eob(eOptionUse::OPT_USE_GENOME,	eOptionIDs::OPT_POST_VARS,		  _T("--postvars"),				false,				  SO_NONE,	  "\t--postvars               Display the names of all supported post variations.\n"));
+		INITBOOLOPTION(Verbose,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERBOSE,          _T("--verbose"),              false,                SO_NONE,    "\t--verbose                Verbose output [default: false].\n"));
+		INITBOOLOPTION(Debug,          Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_DEBUG,            _T("--debug"),                false,                SO_NONE,    "\t--debug                  Debug output [default: false].\n"));
+		INITBOOLOPTION(DumpArgs,       Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_ARGS,        _T("--dumpargs"),             false,                SO_NONE,    "\t--dumpargs               Print all arguments entered from either the command line or environment variables [default: false].\n"));
+		INITBOOLOPTION(DoProgress,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PROGRESS,         _T("--progress"),             false,                SO_NONE,    "\t--progress               Display progress. This will slow down processing by about 10% [default: false].\n"));
 		//Execution bools.
 		INITBOOLOPTION(EmberCL,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_OPENCL,           _T("--opencl"),               false,                SO_NONE,    "\t--opencl                 Use OpenCL renderer (EmberCL) for rendering [default: false].\n"));
+		INITBOOLOPTION(Sp,             Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_SP,               _T("--sp"),                   false,                SO_NONE,    "\t--sp                     Use single precision for rendering instead of double precision [default: false].\n"));
 		INITBOOLOPTION(EarlyClip,      Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_EARLYCLIP,        _T("--earlyclip"),            false,                SO_NONE,    "\t--earlyclip              Perform clipping of RGB values before spatial filtering for better antialiasing and resizing [default: false].\n"));
 		INITBOOLOPTION(YAxisUp,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_POS_Y_UP,         _T("--yaxisup"),              false,                SO_NONE,    "\t--yaxisup                Orient the image with the positive y axis pointing up [default: false].\n"));
 		INITBOOLOPTION(Transparency,   Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_TRANSPARENCY,     _T("--transparency"),         false,                SO_NONE,    "\t--transparency           Include alpha channel in final output [default: false except for PNG].\n"));
 		INITBOOLOPTION(NameEnable,     Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_NAME_ENABLE,      _T("--name_enable"),          false,                SO_NONE,    "\t--name_enable            Use the name attribute contained in the Xml as the output filename [default: false].\n"));
-		INITBOOLOPTION(HexPalette,     Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_HEX_PALETTE,	  _T("--hex_palette"),			true,				  SO_OPT,	  "\t--hex_palette            Force palette RGB values to be hex [default: true].\n"));
-		INITBOOLOPTION(InsertPalette,  Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_INSERT_PALETTE,   _T("--insert_palette"),       false,                SO_NONE,    "\t--insert_palette         Insert the palette into the image for debugging purposes [default: false].\n"));
-		INITBOOLOPTION(JpegComments,   Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG_COMMENTS,	  _T("--enable_jpeg_comments"), true,				  SO_OPT,	  "\t--enable_jpeg_comments   Enables comments in the jpeg header [default: true].\n"));
-		INITBOOLOPTION(PngComments,    Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PNG_COMMENTS,	  _T("--enable_png_comments"),  true,				  SO_OPT,	  "\t--enable_png_comments    Enables comments in the png header [default: true].\n"));
+		INITBOOLOPTION(HexPalette,     Eob(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_HEX_PALETTE,      _T("--hex_palette"),          true,                 SO_OPT,     "\t--hex_palette            Force palette RGB values to be hex when saving to Xml [default: true].\n"));
+		INITBOOLOPTION(InsertPalette,  Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_INSERT_PALETTE,   _T("--insert_palette"),       false,                SO_NONE,    "\t--insert_palette         Insert the palette into the image for debugging purposes. Disabled when running with OpenCL [default: false].\n"));
+		INITBOOLOPTION(JpegComments,   Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG_COMMENTS,	  _T("--enable_jpeg_comments"), false,				  SO_OPT,	  "\t--enable_jpeg_comments   Enables embedding the flame parameters and user identifying information in the jpeg header [default: false].\n"));
+		INITBOOLOPTION(PngComments,    Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PNG_COMMENTS,	  _T("--enable_png_comments"),  false,				  SO_OPT,	  "\t--enable_png_comments    Enables embedding the flame parameters and user identifying information png header [default: false].\n"));
 		INITBOOLOPTION(WriteGenome,    Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_WRITE_GENOME,     _T("--write_genome"),         false,                SO_NONE,    "\t--write_genome           Write out flame associated with center of motion blur window [default: false].\n"));
-		INITBOOLOPTION(ThreadedWrite,  Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_THREADED_WRITE,	  _T("--threaded_write"),		true,				  SO_OPT,	  "\t--threaded_write         Use a separate thread to write images to disk. This gives better performance, but doubles the memory required for the final output buffer. [default: true].\n"));
+		INITBOOLOPTION(ThreadedWrite,  Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_THREADED_WRITE,   _T("--threaded_write"),       true,                 SO_OPT,     "\t--threaded_write         Use a separate thread to write images to disk. This gives better performance, but doubles the memory required for the final output buffer. [default: true].\n"));
 		INITBOOLOPTION(Enclosed,	   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ENCLOSED,		  _T("--enclosed"),				true,				  SO_OPT,	  "\t--enclosed               Use enclosing Xml tags [default: true].\n"));
 		INITBOOLOPTION(NoEdits,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NO_EDITS,         _T("--noedits"),              false,                SO_NONE,    "\t--noedits                Exclude edit tags when writing Xml [default: false].\n"));
 		INITBOOLOPTION(UnsmoothEdge,   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_UNSMOOTH_EDGE,    _T("--unsmoother"),           false,                SO_NONE,    "\t--unsmoother             Do not use smooth blending for sheep edges [default: false].\n"));
@@ -341,16 +342,10 @@ public:
 		INITINTOPTION(Priority,		   Eoi(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PRIORITY,		  _T("--priority"),	int(eThreadPriority::NORMAL),  SO_REQ_SEP,	  "\t--priority=<val>         The priority of the CPU rendering threads, 1, 25, 50, 75, 99. This does not apply to OpenCL rendering.\n"));
 #endif
 		//Uint.
-		INITUINTOPTION(Seed,           Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_SEED,             _T("--seed"),                 0,                    SO_REQ_SEP, "\t--seed=<val>             Integer seed to use for the random number generator [default: random].\n"));
 		INITUINTOPTION(ThreadCount,    Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_NTHREADS,         _T("--nthreads"),             0,                    SO_REQ_SEP, "\t--nthreads=<val>         The number of threads to use [default: use all available cores].\n"));
 		INITUINTOPTION(Strips,		   Eou(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_STRIPS,           _T("--nstrips"),              1,                    SO_REQ_SEP, "\t--nstrips=<val>          The number of fractions to split a single render frame into. Useful for print size renders or low memory systems [default: 1].\n"));
-		INITUINTOPTION(Supersample,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "\t--supersample=<val>      The supersample value used to override the one specified in the file [default: 0 (use value from file)].\n"));
+		INITUINTOPTION(Supersample,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "\t--supersample=<val>      The supersample value used to override the one specified in the file [default: 0 (use value from file), Range: 0 - 4].\n"));
 		INITUINTOPTION(BitsPerChannel, Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "\t--bpc=<val>              Bits per channel. 8 or 16 for PNG, 8 for all others, always 8 with OpenCL [default: 8].\n"));
-		INITUINTOPTION(SubBatchSize,   Eou(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_SBS,			  _T("--sub_batch_size"),		DEFAULT_SBS,		  SO_REQ_SEP, "\t--sub_batch_size=<val>   The chunk size that iterating will be broken into [default: 10k].\n"));
-		INITUINTOPTION(Bits,           Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_BITS,             _T("--bits"),                 33,                   SO_REQ_SEP, "\t--bits=<val>             Determines the types used for the calculations [default: 33].\n"
-										   "\t\t\t\t\t32: float.\n"
-										   "\t\t\t\t\t33: float.\n"//This differs from the original which used an int hist for bits 33.
-										   "\t\t\t\t\t64: double.\n"));
 		INITUINTOPTION(PrintEditDepth, Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"), 0,                       SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
 		INITUINTOPTION(JpegQuality,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),             95,                      SO_REQ_SEP, "\t--jpeg=<val>             Jpeg quality 0-100 for compression [default: 95].\n"));
 		INITUINTOPTION(FirstFrame,     Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),            UINT_MAX,                SO_REQ_SEP, "\t--begin=<val>            Time of first frame to render [default: first time specified in file].\n"));
@@ -459,6 +454,7 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_PRE_VARS, PreVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_POST_VARS, PostVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_OPENCL, EmberCL);
+					PARSEBOOLOPTION(eOptionIDs::OPT_SP, Sp);
 					PARSEBOOLOPTION(eOptionIDs::OPT_EARLYCLIP, EarlyClip);
 					PARSEBOOLOPTION(eOptionIDs::OPT_POS_Y_UP, YAxisUp);
 					PARSEBOOLOPTION(eOptionIDs::OPT_TRANSPARENCY, Transparency);
@@ -478,13 +474,10 @@ public:
 					PARSEINTOPTION(eOptionIDs::OPT_SHEEP_GEN, SheepGen);
 					PARSEINTOPTION(eOptionIDs::OPT_SHEEP_ID, SheepId);
 					PARSEINTOPTION(eOptionIDs::OPT_PRIORITY, Priority);
-					PARSEUINTOPTION(eOptionIDs::OPT_SEED, Seed);//uint args.
-					PARSEUINTOPTION(eOptionIDs::OPT_NTHREADS, ThreadCount);
+					PARSEUINTOPTION(eOptionIDs::OPT_NTHREADS, ThreadCount);//uint args.
 					PARSEUINTOPTION(eOptionIDs::OPT_STRIPS, Strips);
 					PARSEUINTOPTION(eOptionIDs::OPT_SUPERSAMPLE, Supersample);
-					PARSEUINTOPTION(eOptionIDs::OPT_BITS, Bits);
 					PARSEUINTOPTION(eOptionIDs::OPT_BPC, BitsPerChannel);
-					PARSEUINTOPTION(eOptionIDs::OPT_SBS, SubBatchSize);
 					PARSEUINTOPTION(eOptionIDs::OPT_PRINT_EDIT_DEPTH, PrintEditDepth);
 					PARSEUINTOPTION(eOptionIDs::OPT_JPEG, JpegQuality);
 					PARSEUINTOPTION(eOptionIDs::OPT_BEGIN, FirstFrame);
@@ -735,6 +728,7 @@ public:
 	Eob PostVars;
 
 	Eob EmberCL;//Value bool.
+	Eob Sp;
 	Eob EarlyClip;
 	Eob YAxisUp;
 	Eob Transparency;
@@ -755,12 +749,10 @@ public:
 	Eoi SheepGen;
 	Eoi SheepId;
 	Eoi Priority;
-	Eou Seed;//Value uint.
-	Eou ThreadCount;
+	Eou ThreadCount;//Value uint.
 	Eou Strips;
 	Eou Supersample;
 	Eou BitsPerChannel;
-	Eou SubBatchSize;
 	Eou Bits;
 	Eou PrintEditDepth;
 	Eou JpegQuality;

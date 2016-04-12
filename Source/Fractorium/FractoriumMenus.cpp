@@ -14,7 +14,6 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionOpen,						  SIGNAL(triggered(bool)), this, SLOT(OnActionOpen(bool)),						  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentAsXml,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentAsXml(bool)),			  Qt::QueuedConnection);
 	connect(ui.ActionSaveEntireFileAsXml,		  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveEntireFileAsXml(bool)),		  Qt::QueuedConnection);
-	connect(ui.ActionSaveCurrentToOpenedFile,	  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentToOpenedFile(bool)),	  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentScreen,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentScreen(bool)),			  Qt::QueuedConnection);
 	connect(ui.ActionExit,						  SIGNAL(triggered(bool)), this, SLOT(OnActionExit(bool)),						  Qt::QueuedConnection);
 	//Edit menu.
@@ -399,8 +398,6 @@ void FractoriumEmberController<T>::SaveCurrentToOpenedFile()
 	}
 }
 
-void Fractorium::OnActionSaveCurrentToOpenedFile(bool checked) { m_Controller->SaveCurrentToOpenedFile(); }
-
 /// <summary>
 /// Exit the application.
 /// </summary>
@@ -422,7 +419,9 @@ void FractoriumEmberController<T>::Undo()
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::max<size_t>(0u, m_UndoIndex - 1u);
+		auto temp = m_EmberFilePointer;//m_EmberFilePointer will be set to point to whatever is passed in, which we don't want since it's coming from the undo list...
 		SetEmber(m_UndoList[m_UndoIndex], true);
+		m_EmberFilePointer = temp;//...keep it pointing to the original one in the file.
 		m_EditState = eEditUndoState::UNDO_REDO;
 
 		if (index >= 0)
@@ -446,7 +445,9 @@ void FractoriumEmberController<T>::Redo()
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::min<size_t>(m_UndoIndex + 1, m_UndoList.size() - 1);
+		auto temp = m_EmberFilePointer;
 		SetEmber(m_UndoList[m_UndoIndex], true);
+		m_EmberFilePointer = temp;//...keep it pointing to the original one in the file.
 		m_EditState = eEditUndoState::UNDO_REDO;
 
 		if (index >= 0)
@@ -813,7 +814,7 @@ void Fractorium::OnActionFinalRender(bool checked)
 	//First completely stop what the current rendering process is doing.
 	m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
 	m_Controller->StopPreviewRender();
-	OnActionSaveCurrentToOpenedFile(true);//Save whatever was edited back to the current open file.
+	m_Controller->SaveCurrentToOpenedFile();//Save whatever was edited back to the current open file.
 	m_RenderStatusLabel->setText("Renderer stopped.");
 	m_FinalRenderDialog->show();
 }

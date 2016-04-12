@@ -153,12 +153,6 @@ bool EmberAnimate(EmberOptions& opt)
 		opt.BitsPerChannel(8);
 	}
 
-	if (opt.InsertPalette() && opt.BitsPerChannel() != 8)
-	{
-		cout << "Inserting palette only supported with 8 bits per channel, insertion will not take place.\n";
-		opt.InsertPalette(false);
-	}
-
 	if (opt.AspectRatio() < 0)
 	{
 		cout << "Invalid pixel aspect ratio " << opt.AspectRatio() << "\n. Must be positive, setting to 1.\n";
@@ -235,9 +229,6 @@ bool EmberAnimate(EmberOptions& opt)
 		if (opt.DeMax() > -1)
 			embers[i].m_MaxRadDE = T(opt.DeMax());
 
-		if (opt.SubBatchSize() != DEFAULT_SBS)
-			embers[i].m_SubBatchSize = opt.SubBatchSize();
-
 		embers[i].m_Quality *= T(opt.QualityScale());
 		embers[i].m_FinalRasW = size_t(T(embers[i].m_FinalRasW) * opt.SizeScale());
 		embers[i].m_FinalRasH = size_t(T(embers[i].m_FinalRasH) * opt.SizeScale());
@@ -302,7 +293,6 @@ bool EmberAnimate(EmberOptions& opt)
 		r->EarlyClip(opt.EarlyClip());
 		r->YAxisUp(opt.YAxisUp());
 		r->LockAccum(opt.LockAccum());
-		r->InsertPalette(opt.InsertPalette());
 		r->PixelAspectRatio(T(opt.AspectRatio()));
 		r->Transparency(opt.Transparency());
 		r->NumChannels(channels);
@@ -389,7 +379,7 @@ bool EmberAnimate(EmberOptions& opt)
 			}
 
 			stats = renderer->Stats();
-			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), opt.HexPalette());
+			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), true);
 			os.str("");
 			size_t iterCount = renderer->TotalIterCount(1);
 			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((double(stats.m_Iters) / double(iterCount)) * 100) << "%)";
@@ -466,21 +456,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 #ifdef DO_DOUBLE
 
-		if (opt.Bits() == 64)
-		{
+		if (!opt.Sp())
 			b = EmberAnimate<double>(opt);
-		}
 		else
 #endif
-			if (opt.Bits() == 33)
-			{
-				b = EmberAnimate<float>(opt);
-			}
-			else if (opt.Bits() == 32)
-			{
-				cout << "Bits 32/int histogram no longer supported. Using bits == 33 (float).\n";
-				b = EmberAnimate<float>(opt);
-			}
+			b = EmberAnimate<float>(opt);
 	}
 
 	return b ? 0 : 1;

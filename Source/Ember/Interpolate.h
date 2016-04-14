@@ -44,7 +44,7 @@ public:
 		bool currentFinal, final = sourceEmbers[0].UseFinalXform();
 		size_t i, xf, currentCount, maxCount = sourceEmbers[0].XformCount();
 		Xform<T>* destOtherXform;
-		VariationList<T>& variationList(VariationList<T>::Instance());
+		auto variationList = VariationList<T>::Instance();
 
 		//Determine the max number of xforms present in sourceEmbers.
 		//Also check if final xforms are used in any of them.
@@ -138,7 +138,7 @@ public:
 									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_SPH) ||
 									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_JULIA))
 							{
-								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_LINEAR, -1));
+								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_LINEAR, -1));
 								//Set the coefs appropriately.
 								destXform->m_Affine.A(-1);
 								destXform->m_Affine.D(0);
@@ -167,7 +167,7 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_RECTANGLES))
 							{
-								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_RECTANGLES))
+								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_RECTANGLES))
 								{
 									var->SetParamVal("rectangles_x", 0);
 									var->SetParamVal("rectangles_y", 0);
@@ -179,7 +179,7 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS2))
 							{
-								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_RINGS2))
+								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_RINGS2))
 								{
 									var->SetParamVal("rings2_val", 0);
 									destXform->AddVariation(var);
@@ -190,13 +190,13 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN2))
 							{
-								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_FAN2));
+								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_FAN2));
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_BLOB))
 							{
-								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_BLOB))
+								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_BLOB))
 								{
 									var->SetParamVal("blob_low", 1);
 									destXform->AddVariation(var);
@@ -207,13 +207,13 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_PERSPECTIVE))
 							{
-								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_PERSPECTIVE));
+								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_PERSPECTIVE));
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_CURL))
 							{
-								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_CURL))
+								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_CURL))
 								{
 									var->SetParamVal("curl_c1", 0);
 									destXform->AddVariation(var);
@@ -224,7 +224,7 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_SUPER_SHAPE))
 							{
-								if (auto var = variationList.GetParametricVariationCopy(eVariationId::VAR_SUPER_SHAPE))
+								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_SUPER_SHAPE))
 								{
 									var->SetParamVal("super_shape_n1", 2);
 									var->SetParamVal("super_shape_n2", 2);
@@ -254,13 +254,13 @@ public:
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN))
 							{
-								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_FAN));
+								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_FAN));
 								found++;
 							}
 
 							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS))
 							{
-								destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_RINGS));
+								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_RINGS));
 								found++;
 							}
 						}
@@ -280,7 +280,7 @@ public:
 					//If there still are no matches, switch back to linear.
 					if (found == 0)
 					{
-						destXform->AddVariation(variationList.GetVariationCopy(eVariationId::VAR_LINEAR));
+						destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 					}
 					else if (found > 0)
 					{

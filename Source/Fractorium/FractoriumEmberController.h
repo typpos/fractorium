@@ -52,21 +52,21 @@ public:
 	virtual ~FractoriumEmberControllerBase();
 
 	//Embers.
-	virtual void SetEmber(const Ember<float>& ember, bool verbatim = false) { }
+	virtual void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) { }
 	virtual void CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }//Uncomment default lambdas once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
 	virtual void SetEmberFile(const EmberFile<float>& emberFile) { }
 	virtual void CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }
 	virtual void SetTempPalette(const Palette<float>& palette) { }
 	virtual void CopyTempPalette(Palette<float>& palette) { }
 #ifdef DO_DOUBLE
-	virtual void SetEmber(const Ember<double>& ember, bool verbatim = false) { }
+	virtual void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) { }
 	virtual void CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
 	virtual void SetEmberFile(const EmberFile<double>& emberFile) { }
 	virtual void CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
 	virtual void SetTempPalette(const Palette<double>& palette) { }
 	virtual void CopyTempPalette(Palette<double>& palette) { }
 #endif
-	virtual void SetEmber(size_t index) { }
+	virtual void SetEmber(size_t index, bool verbatim) { }
 	//virtual void Clear() { }
 	virtual void AddXform() { }
 	virtual void AddLinkedXform() { }
@@ -95,7 +95,7 @@ public:
 	virtual void OpenAndPrepFiles(const QStringList& filenames, bool append) { }
 	virtual void SaveCurrentAsXml() { }
 	virtual void SaveEntireFileAsXml() { }
-	virtual void SaveCurrentToOpenedFile() { }
+	virtual uint SaveCurrentToOpenedFile() { return 0; }
 	virtual void Undo() { }//Edit.
 	virtual void Redo() { }
 	virtual void CopyXml() { }
@@ -290,21 +290,21 @@ public:
 	virtual ~FractoriumEmberController();
 
 	//Embers.
-	virtual void SetEmber(const Ember<float>& ember, bool verbatim = false) override;
+	virtual void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) override;
 	virtual void CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
 	virtual void SetEmberFile(const EmberFile<float>& emberFile) override;
 	virtual void CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
 	virtual void SetTempPalette(const Palette<float>& palette) override;
 	virtual void CopyTempPalette(Palette<float>& palette) override;
 #ifdef DO_DOUBLE
-	virtual void SetEmber(const Ember<double>& ember, bool verbatim = false) override;
+	virtual void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) override;
 	virtual void CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 	virtual void SetEmberFile(const EmberFile<double>& emberFile) override;
 	virtual void CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 	virtual void SetTempPalette(const Palette<double>& palette) override;
 	virtual void CopyTempPalette(Palette<double>& palette) override;
 #endif
-	virtual void SetEmber(size_t index) override;
+	virtual void SetEmber(size_t index, bool verbatim) override;
 	//virtual void Clear() override { }
 	virtual void AddXform() override;
 	virtual void AddLinkedXform() override;
@@ -336,7 +336,7 @@ public:
 	virtual void OpenAndPrepFiles(const QStringList& filenames, bool append) override;
 	virtual void SaveCurrentAsXml() override;
 	virtual void SaveEntireFileAsXml() override;
-	virtual void SaveCurrentToOpenedFile() override;
+	virtual uint SaveCurrentToOpenedFile() override;
 	virtual void Undo() override;
 	virtual void Redo() override;
 	virtual void CopyXml() override;
@@ -472,7 +472,7 @@ public:
 private:
 	//Embers.
 	void ApplyXmlSavingTemplate(Ember<T>& ember);
-	template <typename U> void SetEmberPrivate(const Ember<U>& ember, bool verbatim);
+	template <typename U> void SetEmberPrivate(const Ember<U>& ember, bool verbatim, bool updatePointer);
 
 	//Params.
 	void ParamsToEmber(Ember<T>& ember);
@@ -509,7 +509,7 @@ private:
 	Xform<T> m_CopiedFinalXform;
 	Palette<T> m_TempPalette;
 	PaletteList<T> m_PaletteList;
-	VariationList<T>& m_VariationList;
+	shared_ptr<VariationList<T>> m_VariationList;
 	unique_ptr<SheepTools<T, float>> m_SheepTools;
 	unique_ptr<GLEmberController<T>> m_GLController;
 	unique_ptr<EmberNs::Renderer<T, float>> m_PreviewRenderer = make_unique<EmberNs::Renderer<T, float>>();

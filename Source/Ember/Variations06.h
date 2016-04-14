@@ -281,7 +281,6 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Scale,	 prefix + "hexes_scale", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_RotSin, prefix + "hexes_rotsin"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_RotCos, prefix + "hexes_rotcos"));
-		m_VarFuncs = VarFuncs<T>::Instance();
 	}
 
 private:
@@ -291,7 +290,7 @@ private:
 	T m_Scale;
 	T m_RotSin;//Precalc.
 	T m_RotCos;
-	std::shared_ptr<VarFuncs<T>> m_VarFuncs;
+	shared_ptr<VarFuncs<T>> m_VarFuncs = VarFuncs<T>::Instance();
 };
 
 /// <summary>
@@ -3774,7 +3773,7 @@ public:
 		//No possible solution was found, so it is unused here.
 		//The full calculation is recomputed for every point.
 		return
-			"static void Position(__global real_t* p, __global real3* grad, int x, int y, real_t z, real_t s, real_t d, real2* v)\n"
+			"static void Position(__global real_t* p, __global real_t* grad, int x, int y, real_t z, real_t s, real_t d, real2* v)\n"
 			"{\n"
 			"	real3 e, f;\n"
 			"	e.x = x * 2.5;\n"
@@ -3823,7 +3822,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	for (dj = -1; dj < 2; dj++)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		Position(globalShared + NOISE_INDEX, (__global real3*)(globalShared + NOISE_POINTS), cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
+		   << "\t\t		Position(globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
 		   << "\t\t		i++;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -3839,7 +3838,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	for (dj = -1; dj < 2; dj++)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		Position(globalShared + NOISE_INDEX, (__global real3*)(globalShared + NOISE_POINTS), cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
+		   << "\t\t		Position(globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
 		   << "\t\t		i++;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -3870,7 +3869,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.reserve(8);
 		m_Params.push_back(ParamWithName<T>(&m_CellSize, prefix + "crackle_cellsize", 1));
@@ -3912,7 +3910,7 @@ private:
 	T m_Z;
 	T m_HalfCellSize;//Precalc
 	v2T m_C[CACHE_WIDTH][CACHE_WIDTH];//Not kept as a precalc because it crashes Nvidia GPUs.
-	std::shared_ptr<VarFuncs<T>> m_VarFuncs;
+	shared_ptr<VarFuncs<T>> m_VarFuncs = VarFuncs<T>::Instance();
 };
 
 /// <summary>

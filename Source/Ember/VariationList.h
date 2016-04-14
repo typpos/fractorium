@@ -21,10 +21,7 @@ template <typename T>
 class EMBER_API VariationList
 {
 public:
-	static VariationList<T>& Instance();
 	~VariationList();
-	VariationList<T>(const VariationList<T>& varList) = delete;
-	VariationList<T>& operator = (const VariationList<T>& varList) = delete;
 	const Variation<T>* GetVariation(size_t index) const;
 	const Variation<T>* GetVariation(size_t index, eVariationType varType) const;
 	Variation<T>* GetVariationCopy(size_t index, T weight = 1) const;
@@ -47,6 +44,8 @@ public:
 	const vector<Variation<T>*>& RegVars()  const;
 	const vector<Variation<T>*>& PreVars()  const;
 	const vector<Variation<T>*>& PostVars() const;
+
+	SINGLETON_INSTANCE_DECL(VariationList);//Implemented in VariationList.cpp
 
 private:
 	VariationList();

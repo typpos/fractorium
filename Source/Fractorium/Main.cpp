@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
 	putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
 #endif
 	int rv = -1;
+	auto vlf = VariationList<float>::Instance();//Create two instances that will stay alive until this function exits.
+	auto vld = VariationList<double>::Instance();//No further creations should occur after this.
 
 	try
 	{

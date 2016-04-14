@@ -17,7 +17,7 @@ namespace EmberCLns
 /// This class derives from EmberReport, so the caller is able
 /// to retrieve a text dump of error information if any errors occur.
 /// </summary>
-class EMBERCL_API OpenCLInfo : public EmberReport, public Singleton<OpenCLInfo>
+class EMBERCL_API OpenCLInfo : public EmberReport
 {
 public:
 	const vector<cl::Platform>& Platforms() const;
@@ -54,7 +54,7 @@ public:
 		return val;
 	}
 
-	SINGLETON_DERIVED_IMPL(OpenCLInfo);
+	SINGLETON_INSTANCE_DECL(OpenCLInfo);
 
 private:
 	OpenCLInfo();

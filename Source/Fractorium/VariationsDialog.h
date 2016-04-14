@@ -41,7 +41,7 @@ private:
 	void GuiToData();
 	void Populate();
 	void SetCheckFromMap(QTableWidgetItem* cb, const Variation<float>* var);
-	VariationList<float>& m_VariationList;
+	shared_ptr<VariationList<float>> m_VariationList;
 	QMap<QString, QVariant> m_Vars;
 	FractoriumSettings* m_Settings;
 	Ui::VariationsDialog ui;

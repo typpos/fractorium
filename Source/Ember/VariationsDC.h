@@ -1314,6 +1314,7 @@ public:
 		   << "\t\t			break; \n"
 		   << "\n"
 		   << "\t\t		case " << SHAPE_BLUR << ": \n"
+		   << "\t\t		default: \n"
 		   << "\t\t			r = (1 + " << edge << ") * MwcNext01(mwc); \n"
 		   << "\n"
 		   << "\t\t			if (r > 1 - " << edge << ")\n"
@@ -1369,6 +1370,7 @@ public:
 		   << "\t\t			break; \n"
 		   << "\n"
 		   << "\t\t		case " << MAP_BUBBLE2 << ": \n"
+		   << "\t\t		default: \n"
 		   << "\t\t			r = 0.25 - (SQR(vx) + SQR(vy)); \n"
 		   << "\n"
 		   << "\t\t			if (r < 0)\n"
@@ -1382,13 +1384,13 @@ public:
 		   << "\t\t			break; \n"
 		   << "\t\t	}\n"
 		   << "\n"
-		   << "\t\t	p = PerlinNoise3D(&v, globalShared + NOISE_INDEX, (__global real3*)(globalShared + NOISE_POINTS), " << amps << ", " << freqs << ", iOctaves); \n"
+		   << "\t\t	p = PerlinNoise3D(&v, globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, " << amps << ", " << freqs << ", iOctaves); \n"
 		   << "\n"
 		   << "\t\t	if (p > 0)\n"
 		   << "\t\t		e = p * (1 + e * e * 20) + 2 * e; \n"
 		   << "\t\t	else\n"
 		   << "\t\t		e = p * (1 + e * e * 20) - 2 * e; \n"
-		   << "}\n"
+		   << "\t\t}\n"
 		   << "\t\twhile ((e < " << notchBottom << " || e > " << notchTop << ") && t++ < iBailout); \n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vx; \n"
@@ -1413,7 +1415,6 @@ protected:
 	void Init()
 	{
 		string prefix = Prefix();
-		m_VarFuncs = VarFuncs<T>::Instance();
 		m_Params.clear();
 		m_Params.reserve(15);
 		m_Params.push_back(ParamWithName<T>(&m_Shape,		  prefix + "dc_perlin_shape", 0, eParamType::INTEGER, 0, 2));//Params.
@@ -1448,7 +1449,7 @@ private:
 	T m_SelectBailout;
 	T m_NotchBottom;//Precalc.
 	T m_NotchTop;
-	shared_ptr<VarFuncs<T>> m_VarFuncs;
+	shared_ptr<VarFuncs<T>> m_VarFuncs = VarFuncs<T>::Instance();
 };
 
 MAKEPREPOSTPARVAR(DCBubble, dc_bubble, DC_BUBBLE)

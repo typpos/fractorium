@@ -76,7 +76,7 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 void Fractorium::OnActionNewFlock(bool checked)
 {
 	m_Controller->NewFlock(m_Settings->RandomCount());
-	m_Controller->SetEmber(0);
+	m_Controller->SetEmber(0, false);
 }
 
 /// <summary>
@@ -102,7 +102,7 @@ void FractoriumEmberController<T>::NewEmptyFlameInCurrentFile()
 	m_EmberFile.m_Embers.push_back(ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
 	m_EmberFile.MakeNamesUnique();
 	UpdateLibraryTree();
-	SetEmber(m_EmberFile.Size() - 1);
+	SetEmber(m_EmberFile.Size() - 1, false);
 }
 
 void Fractorium::OnActionNewEmptyFlameInCurrentFile(bool checked) { m_Controller->NewEmptyFlameInCurrentFile(); }
@@ -124,7 +124,7 @@ void FractoriumEmberController<T>::NewRandomFlameInCurrentFile()
 	m_EmberFile.m_Embers.push_back(ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
 	m_EmberFile.MakeNamesUnique();
 	UpdateLibraryTree();
-	SetEmber(m_EmberFile.Size() - 1);
+	SetEmber(m_EmberFile.Size() - 1, false);
 }
 
 void Fractorium::OnActionNewRandomFlameInCurrentFile(bool checked) { m_Controller->NewRandomFlameInCurrentFile(); }
@@ -144,7 +144,7 @@ void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 	m_EmberFile.m_Embers.push_back(ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
 	m_EmberFile.MakeNamesUnique();
 	UpdateLibraryTree();
-	SetEmber(m_EmberFile.Size() - 1);
+	SetEmber(m_EmberFile.Size() - 1, false);
 }
 
 void Fractorium::OnActionCopyFlameInCurrentFile(bool checked) { m_Controller->CopyFlameInCurrentFile(); }
@@ -231,7 +231,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 			FillLibraryTree(append ? previousSize - 1 : 0);
 
 		ClearUndo();
-		SetEmber(previousSize);
+		SetEmber(previousSize, false);
 	}
 }
 
@@ -365,37 +365,45 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 
 /// <summary>
 /// Save the current ember back to its position in the opened file.
+/// This will not take any action if the previews are still rendering because
+/// this writes to memory the preview renderer might be reading, and also stops the
+/// preview renderer.
 /// This does not save to disk.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::SaveCurrentToOpenedFile()
+uint FractoriumEmberController<T>::SaveCurrentToOpenedFile()
 {
 	uint i = 0;
 	bool fileFound = false;
 
-	for (auto& it : m_EmberFile.m_Embers)
+	if (!m_PreviewRunning)
 	{
-		if (&it == m_EmberFilePointer)//Just compare memory addresses.
+		for (auto& it : m_EmberFile.m_Embers)
 		{
-			it = m_Ember;//Save it to the opened file in memory.
-			fileFound = true;
-			break;
+			if (&it == m_EmberFilePointer)//Just compare memory addresses.
+			{
+				it = m_Ember;//Save it to the opened file in memory.
+				fileFound = true;
+				break;
+			}
+
+			i++;
 		}
 
-		i++;
+		if (!fileFound)
+		{
+			StopPreviewRender();
+			m_EmberFile.m_Embers.push_back(m_Ember);
+			m_EmberFile.MakeNamesUnique();
+			UpdateLibraryTree();
+		}
+		else
+		{
+			RenderPreviews(i, i + 1);
+		}
 	}
 
-	if (!fileFound)
-	{
-		StopPreviewRender();
-		m_EmberFile.m_Embers.push_back(m_Ember);
-		m_EmberFile.MakeNamesUnique();
-		UpdateLibraryTree();
-	}
-	else
-	{
-		RenderPreviews(i, i + 1);
-	}
+	return i;
 }
 
 /// <summary>
@@ -419,9 +427,7 @@ void FractoriumEmberController<T>::Undo()
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::max<size_t>(0u, m_UndoIndex - 1u);
-		auto temp = m_EmberFilePointer;//m_EmberFilePointer will be set to point to whatever is passed in, which we don't want since it's coming from the undo list...
-		SetEmber(m_UndoList[m_UndoIndex], true);
-		m_EmberFilePointer = temp;//...keep it pointing to the original one in the file.
+		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list...
 		m_EditState = eEditUndoState::UNDO_REDO;
 
 		if (index >= 0)
@@ -445,9 +451,7 @@ void FractoriumEmberController<T>::Redo()
 		int index = m_Ember.GetTotalXformIndex(CurrentXform());
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::min<size_t>(m_UndoIndex + 1, m_UndoList.size() - 1);
-		auto temp = m_EmberFilePointer;
-		SetEmber(m_UndoList[m_UndoIndex], true);
-		m_EmberFilePointer = temp;//...keep it pointing to the original one in the file.
+		SetEmber(m_UndoList[m_UndoIndex], true, false);
 		m_EditState = eEditUndoState::UNDO_REDO;
 
 		if (index >= 0)
@@ -552,7 +556,7 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 
 		m_EmberFile.MakeNamesUnique();
 		UpdateLibraryTree();
-		SetEmber(previousSize);
+		SetEmber(previousSize, false);
 	}
 }
 
@@ -611,7 +615,7 @@ void FractoriumEmberController<T>::PasteXmlOver()
 
 	m_EmberFile.MakeNamesUnique();
 	FillLibraryTree();
-	SetEmber(0);
+	SetEmber(0, false);
 }
 
 void Fractorium::OnActionPasteXmlOver(bool checked) { m_Controller->PasteXmlOver(); }

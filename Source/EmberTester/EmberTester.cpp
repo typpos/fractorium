@@ -89,7 +89,7 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 {
 	uint index = 0;
 	ostringstream ss;
-	VariationList<T>& varList(VariationList<T>::Instance());
+	auto varList = VariationList<T>::Instance();
 	PaletteList<T> paletteList;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	paletteList.Add("flam3-palettes.xml");
@@ -118,7 +118,7 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 	emberNoVars.m_Palette = *paletteList.GetPalette(paletteList.m_DefaultFilename, 0);
 	embers.push_back(emberNoVars);
 
-	while (index < varList.RegSize())
+	while (index < varList->RegSize())
 	{
 		/*  if (index != eVariationId::VAR_SYNTH)
 		    {
@@ -127,9 +127,9 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 		    }
 		*/
 		Ember<T> ember1;
-		unique_ptr<Variation<T>> regVar(varList.GetVariationCopy(index, eVariationType::VARTYPE_REG));
-		unique_ptr<Variation<T>> preVar(varList.GetVariationCopy("pre_" + regVar->Name()));
-		unique_ptr<Variation<T>> postVar(varList.GetVariationCopy("post_" + regVar->Name()));
+		unique_ptr<Variation<T>> regVar(varList->GetVariationCopy(index, eVariationType::VARTYPE_REG));
+		unique_ptr<Variation<T>> preVar(varList->GetVariationCopy("pre_" + regVar->Name()));
+		unique_ptr<Variation<T>> postVar(varList->GetVariationCopy("post_" + regVar->Name()));
 		ember1.m_FinalRasW = 640;
 		ember1.m_FinalRasH = 480;
 		ember1.m_Quality = 100;
@@ -337,12 +337,12 @@ template <typename T>
 static vector<Variation<T>*> FindVarsWith(vector<string>& stringVec, bool findAll = true)
 {
 	int index = 0;
-	VariationList<T>& vl(VariationList<T>::Instance());
+	auto vl = VariationList<T>::Instance();
 	vector<Variation<T>*> vec;
 
-	while (index < vl.RegSize())
+	while (index < vl->RegSize())
 	{
-		auto regVar = vl.GetVariation(index, eVariationType::VARTYPE_REG);
+		auto regVar = vl->GetVariation(index, eVariationType::VARTYPE_REG);
 
 		if (SearchVar(regVar, stringVec, false))
 		{
@@ -360,10 +360,10 @@ static vector<Variation<T>*> FindVarsWith(vector<string>& stringVec, bool findAl
 
 bool TestVarCounts()
 {
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 #ifdef DO_DOUBLE
-	VariationList<double>& vld(VariationList<double>::Instance());
-	bool success((vlf.Size() == vld.Size()) && (vlf.Size() == size_t(eVariationId::LAST_VAR)));
+	auto vld(VariationList<double>::Instance());
+	bool success((vlf->Size() == vld->Size()) && (vlf->Size() == size_t(eVariationId::LAST_VAR)));
 #else
 	bool success = true;
 #endif
@@ -371,12 +371,12 @@ bool TestVarCounts()
 
 	if (!success)
 	{
-		cout << "Variation list size " << vlf.Size() << " does not equal the max var ID enum " << et(eVariationId::LAST_VAR) << "." << endl;
+		cout << "Variation list size " << vlf->Size() << " does not equal the max var ID enum " << et(eVariationId::LAST_VAR) << "." << endl;
 	}
 
 	for (; start < et(eVariationId::LAST_VAR); start++)
 	{
-		auto var = vlf.GetVariation((eVariationId)start);
+		auto var = vlf->GetVariation((eVariationId)start);
 
 		if (!var)
 		{
@@ -392,15 +392,15 @@ template <typename T>
 bool TestVarUnique()
 {
 	bool success = true;
-	VariationList<T>& vl(VariationList<T>::Instance());
+	auto vl = VariationList<T>::Instance();
 	vector<eVariationId> ids;
 	vector<string> names;
-	ids.reserve(vl.Size());
-	names.reserve(vl.Size());
+	ids.reserve(vl->Size());
+	names.reserve(vl->Size());
 
-	for (size_t i = 0; i < vl.Size(); i++)
+	for (size_t i = 0; i < vl->Size(); i++)
 	{
-		auto var = vl.GetVariation(i);
+		auto var = vl->GetVariation(i);
 
 		if (std::find(ids.begin(), ids.end(), var->VariationId()) != ids.end())
 		{
@@ -580,11 +580,11 @@ bool TestVarEqual(const Variation<sT>* var1, const Variation<dT>* var2)
 bool TestVarPrePostNames()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 		string name = var->Name();
 
 		if (var->VarType() == eVariationType::VARTYPE_REG)
@@ -646,11 +646,11 @@ template <typename sT, typename dT>
 bool TestVarCopy()
 {
 	bool success = true;
-	VariationList<sT>& vlf(VariationList<sT>::Instance());
+	auto vlf(VariationList<sT>::Instance());
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 		Variation<dT>* destVar = NULL;
 		unique_ptr<Variation<sT>> copyVar(var->Copy());//Test Copy().
 
@@ -676,11 +676,11 @@ bool TestVarCopy()
 bool TestParVars()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 
-	for (size_t i = 0; i < vlf.ParametricSize(); i++)
+	for (size_t i = 0; i < vlf->ParametricSize(); i++)
 	{
-		if (auto parVar = vlf.GetParametricVariation(i))
+		if (auto parVar = vlf->GetParametricVariation(i))
 		{
 			if (parVar->ParamCount() < 1)
 			{
@@ -730,19 +730,19 @@ bool TestParVars()
 bool TestVarRegPrePost()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 
-	for (size_t i = 0; i < vlf.RegSize(); i++)
+	for (size_t i = 0; i < vlf->RegSize(); i++)
 	{
-		auto regVar = vlf.GetVariation(i, eVariationType::VARTYPE_REG);
+		auto regVar = vlf->GetVariation(i, eVariationType::VARTYPE_REG);
 
 		if (regVar)
 		{
 			if (regVar->Name().find("dc_") != 0)
 			{
 				string name = regVar->Name();
-				auto preVar = vlf.GetVariation("pre_" + name);
-				auto postVar = vlf.GetVariation("post_" + name);
+				auto preVar = vlf->GetVariation("pre_" + name);
+				auto postVar = vlf->GetVariation("post_" + name);
 
 				if (!preVar)
 				{
@@ -782,11 +782,11 @@ bool TestVarRegPrePost()
 bool TestVarPrecalcUsedCL()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 		string s = var->OpenCLString();
 
 		if (var->NeedPrecalcAngles())
@@ -951,7 +951,7 @@ bool TestVarPrecalcUsedCL()
 bool TestVarAssignTypes()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 	vector<string> vset, vsum;
 	vset.push_back("vIn.x");
 	vset.push_back("vIn.y");
@@ -972,9 +972,9 @@ bool TestVarAssignTypes()
 	vsum.push_back("precalcAtanxy");
 	vsum.push_back("precalcAtanyx");
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 		string s = var->OpenCLString();
 
 		//Only test pre and post. The assign type for regular is ignored, and will always be summed.
@@ -1009,7 +1009,7 @@ bool TestVarAssignTypes()
 bool TestVarAssignVals()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 	vector<string> xout, yout, zout;
 	xout.push_back("vOut.x =");
 	xout.push_back("vOut.x +=");
@@ -1027,9 +1027,9 @@ bool TestVarAssignVals()
 	zout.push_back("vOut.z *=");
 	zout.push_back("vOut.z /=");
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 
 		if (!SearchVar(var, xout, false))
 		{
@@ -1056,13 +1056,13 @@ bool TestVarAssignVals()
 bool TestZepsFloor()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 	vector<string> zeps;
 	zeps.push_back("Zeps(floor");
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 
 		if (SearchVar(var, zeps, false))
 		{
@@ -1077,16 +1077,16 @@ bool TestZepsFloor()
 bool TestConstants()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 	vector<string> stringVec;
 	stringVec.push_back("2 * M_PI");
 	stringVec.push_back("2*M_PI");
 	stringVec.push_back("M_PI*2");
 	stringVec.push_back("M_PI * 2");
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 
 		if (SearchVar(var, stringVec, false))
 		{
@@ -1101,13 +1101,13 @@ bool TestConstants()
 bool TestGlobalFuncs()
 {
 	bool success = true;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 	vector<string> funcs;
 	FunctionMapper mapper;
 
-	for (size_t i = 0; i < vlf.Size(); i++)
+	for (size_t i = 0; i < vlf->Size(); i++)
 	{
-		auto var = vlf.GetVariation(i);
+		auto var = vlf->GetVariation(i);
 		funcs = var->OpenCLGlobalFuncNames();
 
 		for (auto& func : funcs)
@@ -1130,30 +1130,30 @@ bool TestGlobalFuncs()
 void PrintAllVars()
 {
 	uint i = 0;
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 
-	while (auto var = vlf.GetVariation(i++))
+	while (auto var = vlf->GetVariation(i++))
 		cout << var->Name() << endl;
 }
 
 void TestXformsInOutPoints()
 {
 	uint index = 0;
-	VariationList<float>& varList(VariationList<float>::Instance());
+	auto varList(VariationList<float>::Instance());
 	PaletteList<float> paletteList;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	paletteList.Add("flam3-palettes.xml");
 
-	while (index < varList.RegSize())
+	while (index < varList->RegSize())
 	{
 		vector<Xform<float>> xforms;
-		unique_ptr<Variation<float>> regVar(varList.GetVariationCopy(index, eVariationType::VARTYPE_REG));
+		unique_ptr<Variation<float>> regVar(varList->GetVariationCopy(index, eVariationType::VARTYPE_REG));
 		string s = regVar->OpenCLString() + regVar->OpenCLFuncsString();
 
 		if (s.find("MwcNext") == string::npos)
 		{
-			unique_ptr<Variation<float>> preVar(varList.GetVariationCopy("pre_" + regVar->Name()));
-			unique_ptr<Variation<float>> postVar(varList.GetVariationCopy("post_" + regVar->Name()));
+			unique_ptr<Variation<float>> preVar(varList->GetVariationCopy("pre_" + regVar->Name()));
+			unique_ptr<Variation<float>> postVar(varList->GetVariationCopy("post_" + regVar->Name()));
 			Xform<float> xform0(0.25f, rand.Frand01<float>(), rand.Frand11<float>(), 1, rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>());
 			Xform<float> xform1(0.25f, rand.Frand01<float>(), rand.Frand11<float>(), 1, rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>());
 			Xform<float> xform2(0.25f, rand.Frand01<float>(), rand.Frand11<float>(), 1, rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>(), rand.Frand11<float>());
@@ -1257,13 +1257,13 @@ void TestVarTime()
 	IteratorHelper<T> helper;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	vector<pair<string, double>> times;
-	times.reserve(vlf.RegSize());
+	times.reserve(vlf->RegSize());
 
-	while (i < vlf.RegSize())
+	while (i < vlf->RegSize())
 	{
 		double sum = 0;
 		Xform<T> xform;
-		Variation<T>* var = vlf.GetVariationCopy(i, eVariationType::VARTYPE_REG);
+		Variation<T>* var = vlf->GetVariationCopy(i, eVariationType::VARTYPE_REG);
 		xform.AddVariation(var);
 
 		for (int iter = 0; iter < iters; iter++)
@@ -1365,18 +1365,18 @@ void TestVarsSimilar()
 	IteratorHelper<T> helper;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	vector<pair<string, double>> diffs;
-	diffs.reserve(vlf.RegSize());
+	diffs.reserve(vlf->RegSize());
 
-	while (i < vlf.RegSize())
+	while (i < vlf->RegSize())
 	{
 		double diff = 0, highest = TMAX;
 		Xform<T> xform;
-		Variation<T>* var = vlf.GetVariationCopy(i, eVariationType::VARTYPE_REG);
+		Variation<T>* var = vlf->GetVariationCopy(i, eVariationType::VARTYPE_REG);
 		pair<string, double> match("", TMAX);
 		compIndex = 0;
 		xform.AddVariation(var);
 
-		while (compIndex < vlf.RegSize())
+		while (compIndex < vlf->RegSize())
 		{
 			if (compIndex == i)
 			{
@@ -1386,7 +1386,7 @@ void TestVarsSimilar()
 
 			double sum = 0, xdiff = 0, ydiff = 0, zdiff = 0;
 			Xform<T> xformComp;
-			Variation<T>* varComp = vlf.GetVariationCopy(compIndex, eVariationType::VARTYPE_REG);
+			Variation<T>* varComp = vlf->GetVariationCopy(compIndex, eVariationType::VARTYPE_REG);
 			xformComp.AddVariation(varComp);
 			ParametricVariation<T>* parVar = dynamic_cast<ParametricVariation<T>*>(var);
 			ParametricVariation<T>* parVarComp = dynamic_cast<ParametricVariation<T>*>(varComp);
@@ -1536,11 +1536,11 @@ void TestCpuGpuResults(size_t platform, size_t device)
 	RendererCL<T, float> renderer(devices);
 	points.resize(renderer.TotalIterKernelCount());
 
-	while (i < vlf.RegSize())
+	while (i < vlf->RegSize())
 	{
 		bool bad = false;
 		double sum = 0;
-		Variation<T>* var = vlf.GetVariation(i, eVariationType::VARTYPE_REG);
+		Variation<T>* var = vlf->GetVariation(i, eVariationType::VARTYPE_REG);
 		string s = var->OpenCLString() + var->OpenCLFuncsString();
 
 		if (s.find("MwcNext") != string::npos)
@@ -1631,7 +1631,7 @@ void TestGpuVectorRead(size_t platform, size_t device)
 	vector<pair<size_t, size_t>> devices{ std::make_pair(platform, device) };
 	RendererCL<T, float> renderer(devices);
 	points.resize(renderer.TotalIterKernelCount());
-	Variation<T>* var = vlf.GetVariation(eVariationId::VAR_LINEAR);
+	Variation<T>* var = vlf->GetVariation(eVariationId::VAR_LINEAR);
 	bool newAlloc = false;
 	Point<T> p, p2;
 	Ember<T> ember;
@@ -2132,12 +2132,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	TestCasting();
 	t.Toc("TestCasting()");
 	t.Tic();
-	VariationList<float>& vlf(VariationList<float>::Instance());
+	auto vlf(VariationList<float>::Instance());
 	t.Toc("Creating VariationList<float>");
-	cout << "There are " << vlf.Size() << " variations present." << endl;
+	cout << "There are " << vlf->Size() << " variations present." << endl;
 #ifdef DO_DOUBLE
 	t.Tic();
-	VariationList<double>& vld(VariationList<double>::Instance());
+	auto vld(VariationList<double>::Instance());
 	t.Toc("Creating VariationList<double>");
 #endif
 	t.Tic();

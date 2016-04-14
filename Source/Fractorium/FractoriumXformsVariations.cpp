@@ -84,8 +84,8 @@ void FractoriumEmberController<T>::FilteredVariations()
 	m_FilteredVariations.clear();
 	m_FilteredVariations.reserve(map.size());
 
-	for (auto i = 0; i < m_VariationList.Size(); i++)
-		if (auto var = m_VariationList.GetVariation(i))
+	for (auto i = 0; i < m_VariationList->Size(); i++)
+		if (auto var = m_VariationList->GetVariation(i))
 			if (map.contains(var->Name().c_str()) && map[var->Name().c_str()].toBool())
 				m_FilteredVariations.push_back(var->VariationId());
 }
@@ -107,9 +107,9 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 	tree->clear();
 	tree->blockSignals(true);
 
-	for (size_t i = 0; i < m_VariationList.Size(); i++)
+	for (size_t i = 0; i < m_VariationList->Size(); i++)
 	{
-		auto var = m_VariationList.GetVariation(i);
+		auto var = m_VariationList->GetVariation(i);
 		auto parVar = dynamic_cast<const ParametricVariation<T>*>(var);
 		//First add the variation, with a spinner for its weight.
 		auto item = new VariationTreeWidgetItem(var->VariationId(), tree);
@@ -206,7 +206,7 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 	{
 		UpdateXform([&](Xform<T>* xform)
 		{
-			auto var = m_VariationList.GetVariation(sender->GetVariationId());//The variation attached to the sender, for reference only.
+			auto var = m_VariationList->GetVariation(sender->GetVariationId());//The variation attached to the sender, for reference only.
 			auto parVar = dynamic_cast<const ParametricVariation<T>*>(var);//The parametric cast of that variation.
 			auto xformVar = xform->GetVariationById(var->VariationId());//The corresponding variation in the currently selected xform.
 			auto widgetItem = sender->WidgetItem();
@@ -294,7 +294,7 @@ void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 		auto item = dynamic_cast<VariationTreeWidgetItem*>(tree->topLevelItem(i));
 		auto var = xform->GetVariationById(item->Id());//See if this variation in the tree was contained in the xform.
 		auto parVar = dynamic_cast<ParametricVariation<T>*>(var);//Attempt cast to parametric variation for later.
-		auto origParVar = dynamic_cast<const ParametricVariation<T>*>(m_VariationList.GetVariation(item->Id()));
+		auto origParVar = dynamic_cast<const ParametricVariation<T>*>(m_VariationList->GetVariation(item->Id()));
 
 		if (auto spinBox = dynamic_cast<VariationTreeDoubleSpinBox*>(tree->itemWidget(item, 1)))//Get the widget for the item, and cast the widget to the VariationTreeDoubleSpinBox type.
 		{

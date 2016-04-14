@@ -64,13 +64,13 @@ bool EmberGenome(EmberOptions& opt)
 		return true;
 	}
 
-	VariationList<T>& varList(VariationList<T>::Instance());
+	auto varList = VariationList<T>::Instance();
 
 	if (opt.AllVars() || opt.RegVars() || opt.PreVars() || opt.PostVars())
 	{
 		if (opt.AllVars())
 		{
-			auto& vars = varList.AllVars();
+			auto& vars = varList->AllVars();
 
 			for (auto& v : vars)
 				cout << v->Name() << "\n";
@@ -82,13 +82,13 @@ bool EmberGenome(EmberOptions& opt)
 			vector<Variation<T>*> vars;
 
 			if (opt.RegVars())
-				vars.insert(vars.end(), varList.RegVars().begin(), varList.RegVars().end());
+				vars.insert(vars.end(), varList->RegVars().begin(), varList->RegVars().end());
 
 			if (opt.PreVars())
-				vars.insert(vars.end(), varList.PreVars().begin(), varList.PreVars().end());
+				vars.insert(vars.end(), varList->PreVars().begin(), varList->PreVars().end());
 
 			if (opt.PostVars())
-				vars.insert(vars.end(), varList.PostVars().begin(), varList.PostVars().end());
+				vars.insert(vars.end(), varList->PostVars().begin(), varList->PostVars().end());
 
 			for (auto& v : vars)
 				cout << v->Name() << "\n";
@@ -192,16 +192,16 @@ bool EmberGenome(EmberOptions& opt)
 		noVars.push_back(eVariationId::VAR_SPLITS);
 
 		//Loop over the novars and set ivars to the complement.
-		for (i = 0; i < varList.Size(); i++)
+		for (i = 0; i < varList->Size(); i++)
 		{
 			for (j = 0; j < noVars.size(); j++)
 			{
-				if (noVars[j] == varList.GetVariation(i)->VariationId())
+				if (noVars[j] == varList->GetVariation(i)->VariationId())
 					break;
 			}
 
 			if (j == noVars.size())
-				vars.push_back(varList.GetVariation(i)->VariationId());
+				vars.push_back(varList->GetVariation(i)->VariationId());
 		}
 	}
 	else
@@ -214,7 +214,7 @@ bool EmberGenome(EmberOptions& opt)
 			{
 				if (parser.Aton(token.c_str(), val))
 				{
-					if (val < varList.Size())
+					if (val < varList->Size())
 						vars.push_back(static_cast<eVariationId>(val));
 				}
 			}
@@ -227,22 +227,22 @@ bool EmberGenome(EmberOptions& opt)
 			{
 				if (parser.Aton(token.c_str(), val))
 				{
-					if (val < varList.Size())
+					if (val < varList->Size())
 						noVars.push_back(static_cast<eVariationId>(val));
 				}
 			}
 
 			//Loop over the novars and set ivars to the complement.
-			for (i = 0; i < varList.Size(); i++)
+			for (i = 0; i < varList->Size(); i++)
 			{
 				for (j = 0; j < noVars.size(); j++)
 				{
-					if (noVars[j] == varList.GetVariation(i)->VariationId())
+					if (noVars[j] == varList->GetVariation(i)->VariationId())
 						break;
 				}
 
 				if (j == noVars.size())
-					vars.push_back(varList.GetVariation(i)->VariationId());
+					vars.push_back(varList->GetVariation(i)->VariationId());
 			}
 		}
 	}

@@ -13,7 +13,7 @@ namespace EmberNs
 /// This class is a singleton since all of its data is shared and read-only.
 /// </summary>
 template <typename T>
-class EMBER_API VarFuncs : public Singleton<VarFuncs<T>>
+class EMBER_API VarFuncs
 {
 public:
 	/// <summary>
@@ -542,7 +542,7 @@ public:
 		}
 	}
 
-	SINGLETON_DERIVED_IMPL(VarFuncs<T>);
+	SINGLETON_INSTANCE_DECL(VarFuncs);//Implemented in VariationList.cpp
 
 private:
 	/// <summary>

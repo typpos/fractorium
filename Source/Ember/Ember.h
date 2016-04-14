@@ -239,7 +239,7 @@ public:
 				ember.m_FinalXform.m_ColorSpeed = 0;
 				ember.m_FinalXform.m_Motion.clear();
 				ember.m_FinalXform.ClearAndDeleteVariations();
-				ember.m_FinalXform.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR, 0));//Do this so it doesn't appear empty.
+				ember.m_FinalXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR, 0));//Do this so it doesn't appear empty.
 			}
 		}
 
@@ -1036,7 +1036,7 @@ public:
 			m_Xforms[i].m_Affine.D(0);
 			m_Xforms[i].m_Affine.E(1);
 			m_Xforms[i].m_Affine.F(0);
-			m_Xforms[i].AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
+			m_Xforms[i].AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 			result++;
 			sym = -sym;
 		}
@@ -1058,7 +1058,7 @@ public:
 			m_Xforms[i].m_Affine.E(m_Xforms[i].m_Affine.A());
 			m_Xforms[i].m_Affine.C(0);
 			m_Xforms[i].m_Affine.F(0);
-			m_Xforms[i].AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
+			m_Xforms[i].AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 			result++;
 		}
 
@@ -1688,7 +1688,7 @@ private:
 	Xform<T> m_FinalXform;
 
 	//Single global reference to create variations with.
-	VariationList<T>& m_VariationList = VariationList<T>::Instance();
+	shared_ptr<VariationList<T>> m_VariationList = VariationList<T>::Instance();
 
 	/// <summary>
 	/// Interpolation function that takes the address of a member variable of type T as a template parameter.

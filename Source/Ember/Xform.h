@@ -879,7 +879,7 @@ public:
 	bool Flatten(vector<string>& names)
 	{
 		bool shouldFlatten = true;
-		VariationList<T>& vl(VariationList<T>::Instance());
+		auto vl = VariationList<T>::Instance();
 
 		if (GetVariationById(eVariationId::VAR_FLATTEN) == nullptr)
 		{
@@ -898,7 +898,7 @@ public:
 					}
 
 					//Now traverse the parameters for this variation.
-					if (ParametricVariation<T>* parVar = dynamic_cast<ParametricVariation<T>*>(var))//If any parametric variation parameter is present and non-zero, don't flatten.
+					if (auto parVar = dynamic_cast<ParametricVariation<T>*>(var))//If any parametric variation parameter is present and non-zero, don't flatten.
 					{
 						for (auto& s : names)
 						{
@@ -915,7 +915,7 @@ public:
 
 			if (shouldFlatten)//Flatten was not present and neither was any variation name or parameter in the list.
 			{
-				auto var = vl.GetVariationCopy(eVariationId::VAR_FLATTEN);
+				auto var = vl->GetVariationCopy(eVariationId::VAR_FLATTEN);
 
 				if (AddVariation(var))
 				{

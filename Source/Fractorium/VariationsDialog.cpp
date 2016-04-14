@@ -128,26 +128,26 @@ void FractoriumVariationsDialog::OnSelectNoneButtonClicked(bool checked)
 void FractoriumVariationsDialog::Populate()
 {
 	auto table = ui.VariationsTable;
-	int size = int(std::max<size_t>(std::max<size_t>(m_VariationList.RegSize(), m_VariationList.PreSize()), m_VariationList.PostSize()));
+	int size = int(std::max<size_t>(std::max<size_t>(m_VariationList->RegSize(), m_VariationList->PreSize()), m_VariationList->PostSize()));
 	table->setRowCount(size);
 
 	for (auto i = 0; i < size; i++)
 	{
-		if (auto pre = m_VariationList.GetVariation(i, eVariationType::VARTYPE_PRE))
+		if (auto pre = m_VariationList->GetVariation(i, eVariationType::VARTYPE_PRE))
 		{
 			auto cb = new QTableWidgetItem(pre->Name().c_str());
 			table->setItem(i, 0, cb);
 			SetCheckFromMap(cb, pre);
 		}
 
-		if (auto reg = m_VariationList.GetVariation(i, eVariationType::VARTYPE_REG))
+		if (auto reg = m_VariationList->GetVariation(i, eVariationType::VARTYPE_REG))
 		{
 			auto cb = new QTableWidgetItem(reg->Name().c_str());
 			table->setItem(i, 1, cb);
 			SetCheckFromMap(cb, reg);
 		}
 
-		if (auto post = m_VariationList.GetVariation(i, eVariationType::VARTYPE_POST))
+		if (auto post = m_VariationList->GetVariation(i, eVariationType::VARTYPE_POST))
 		{
 			auto cb = new QTableWidgetItem(post->Name().c_str());
 			table->setItem(i, 2, cb);
@@ -209,7 +209,7 @@ void FractoriumVariationsDialog::DataToGui()
 {
 	ForEachCell([&](QTableWidgetItem * cb)
 	{
-		if (auto var = m_VariationList.GetVariation(cb->text().toStdString()))
+		if (auto var = m_VariationList->GetVariation(cb->text().toStdString()))
 			SetCheckFromMap(cb, var);
 	});
 }
@@ -221,7 +221,7 @@ void FractoriumVariationsDialog::GuiToData()
 {
 	ForEachCell([&](QTableWidgetItem * cb)
 	{
-		if (auto var = m_VariationList.GetVariation(cb->text().toStdString()))
+		if (auto var = m_VariationList->GetVariation(cb->text().toStdString()))
 			m_Vars[cb->text()] = (cb->checkState() == Qt::Checked);
 	});
 }

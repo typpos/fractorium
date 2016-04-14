@@ -193,13 +193,16 @@ private:
 /// member variables cannot be exported across module boundaries.
 /// Derived classes should inherit from this using the CRTP, and declare a friend to it.
 /// They also should make their constructors private and destructors public.
+/// This has a severe flaw in that it cannot be used across module boundaries, else
+/// every module will have its own copy. This makes it function as a per-module
+/// singleton, which is unlikely to ever be desired.
 /// Attribution: This class is a combination of
 /// http://btorpey.github.io/blog/2014/02/12/shared-singletons/
 /// and
 /// http://enki-tech.blogspot.com/2012/08/c11-generic-singleton.html
 /// </summary>
 template <class T>
-class Singleton
+class EMBER_API Singleton
 {
 public:
 	/// <summary>
@@ -242,6 +245,28 @@ public:
 	private: \
 	x(const x& other) = delete; \
 	const x& operator=(const x& other) = delete
+
+//Use this if not deriving from the Singleton class and are declaring Instance() in a header and implementing it in a cpp file.
+#define SINGLETON_INSTANCE_DECL(x) \
+	static std::shared_ptr<x> Instance(); \
+	x(const x& other) = delete; \
+	const x& operator=(const x& other) = delete//Semicolon deliberately omitted to force it on the caller.
+
+//Use this if not deriving from the Singleton class and are implementing Instance() in a cpp file.
+#define SINGLETON_INSTANCE_IMPL(x) \
+	std::shared_ptr<x> x::Instance() \
+	{ \
+		static weak_ptr<x> staticInstance; \
+		auto temp = staticInstance.lock(); \
+		\
+		if (!temp) \
+		{ \
+			temp.reset(new x()); \
+			staticInstance = temp; \
+		} \
+		\
+		return temp; \
+	}
 
 /// <summary>
 /// Open a file in binary mode and read its entire contents into a vector of bytes. Optionally null terminate.

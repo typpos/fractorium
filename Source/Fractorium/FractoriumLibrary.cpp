@@ -243,7 +243,7 @@ void FractoriumEmberController<T>::EmberTreeItemDoubleClicked(QTreeWidgetItem* i
 	{
 		//qDebug() << "Setting current ember to: " << QString::fromStdString(emberItem->GetEmber()->m_Name);
 		ClearUndo();
-		SetEmber(*emberItem->GetEmber());
+		SetEmber(*emberItem->GetEmber(), false, true);
 	}
 }
 

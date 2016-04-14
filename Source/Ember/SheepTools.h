@@ -83,9 +83,9 @@ public:
 		Xform<T> xform1(T(0.25), T(1),    T(0.5), T(1), T(0.5), T(0), T(0), T(0.5), T(0.5),  T(0.25));
 		Xform<T> xform2(T(0.25), T(0.66), T(0.5), T(1), T(0.5), T(0), T(0), T(0.5), T(-0.5), T(0.25));
 		Xform<T> xform3(T(0.25), T(0.33), T(0.5), T(1), T(0.5), T(0), T(0), T(0.5), T(0.0),  T(-0.5));
-		xform1.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
-		xform2.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
-		xform3.AddVariation(m_VariationList.GetVariationCopy(eVariationId::VAR_LINEAR));
+		xform1.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		xform2.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		xform3.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 		ember.AddXform(xform1);
 		ember.AddXform(xform2);
 		ember.AddXform(xform3);
@@ -599,7 +599,7 @@ public:
 		bool postid, addfinal = false;
 		int var, samed, multid, samepost;
 		glm::length_t i, j, k, n;
-		size_t varCount = m_VariationList.Size();
+		size_t varCount = m_VariationList->Size();
 		Palette<T> palette;
 		static size_t xformDistrib[] =
 		{
@@ -683,12 +683,12 @@ public:
 				if (var > -1)
 				{
 					if (xform->TotalVariationCount() < maxVars)
-						xform->AddVariation(m_VariationList.GetVariation(var)->Copy());//Use only one variation specified for all xforms.
+						xform->AddVariation(m_VariationList->GetVariation(var)->Copy());//Use only one variation specified for all xforms.
 				}
 				else if (multid && var == -1)
 				{
 					if (xform->TotalVariationCount() < maxVars)
-						xform->AddVariation(m_VariationList.GetVariation(m_Rand.Rand() % varCount)->Copy());//Choose a random var for this xform.
+						xform->AddVariation(m_VariationList->GetVariation(m_Rand.Rand() % varCount)->Copy());//Choose a random var for this xform.
 				}
 				else
 				{
@@ -721,7 +721,7 @@ public:
 								if (var != -2)
 								{
 									//Pick a random variation and use a random weight from 0-1.
-									Variation<T>* v = m_VariationList.GetVariationCopy(static_cast<size_t>(m_Rand.Rand() % varCount), m_Rand.Frand<T>(T(0.001), 1));
+									Variation<T>* v = m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand() % varCount), m_Rand.Frand<T>(T(0.001), 1));
 
 									if (v && !xform->AddVariation(v))
 										delete v;//It already existed and therefore was not added.
@@ -729,7 +729,7 @@ public:
 								else
 								{
 									//Pick a random variation from the suppled IDs and use a random weight from 0-1.
-									Variation<T>* v = m_VariationList.GetVariationCopy(useVars[m_Rand.Rand() % useVars.size()], m_Rand.Frand<T>(T(0.001), 1));
+									Variation<T>* v = m_VariationList->GetVariationCopy(useVars[m_Rand.Rand() % useVars.size()], m_Rand.Frand<T>(T(0.001), 1));
 
 									if (v && !xform->AddVariation(v))
 										delete v;
@@ -759,12 +759,12 @@ public:
 						if (var != -2)
 						{
 							//Pick a random variation and use a random weight from 0-1.
-							xform->AddVariation(m_VariationList.GetVariationCopy(static_cast<size_t>(m_Rand.Rand() % varCount), m_Rand.Frand<T>(T(0.001), 1)));
+							xform->AddVariation(m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand() % varCount), m_Rand.Frand<T>(T(0.001), 1)));
 						}
 						else
 						{
 							//Pick a random variation from the suppled IDs and use a random weight from 0-1.
-							xform->AddVariation(m_VariationList.GetVariationCopy(useVars[m_Rand.Rand() % useVars.size()], m_Rand.Frand<T>(T(0.001), 1)));
+							xform->AddVariation(m_VariationList->GetVariationCopy(useVars[m_Rand.Rand() % useVars.size()], m_Rand.Frand<T>(T(0.001), 1)));
 						}
 					}
 				}
@@ -1345,6 +1345,6 @@ private:
 	unique_ptr<Renderer<T, bucketT>> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	PaletteList<T> m_PaletteList;
-	VariationList<T>& m_VariationList;
+	shared_ptr<VariationList<T>> m_VariationList;
 };
 }

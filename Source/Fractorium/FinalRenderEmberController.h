@@ -109,7 +109,7 @@ public:
 	virtual void SetEmberFile(const EmberFile<double>& emberFile) override;
 	virtual void CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 #endif
-	virtual void SetEmber(size_t index) override;
+	virtual void SetEmber(size_t index, bool verbatim) override;
 	virtual bool Render() override;
 	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared = true) override;
 	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;

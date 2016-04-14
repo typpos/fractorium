@@ -400,7 +400,7 @@ void FractoriumFinalRenderDialog::OnDoSequenceCheckBoxStateChanged(int state)
 /// <param name="d">Ignored</param>
 void FractoriumFinalRenderDialog::OnCurrentSpinChanged(int d)
 {
-	m_Controller->SetEmber(d - 1);
+	m_Controller->SetEmber(d - 1, false);
 	m_Controller->SyncCurrentToGui();
 	SetMemory();
 }
@@ -743,7 +743,7 @@ bool FractoriumFinalRenderDialog::CreateControllerFromGUI(bool createRenderer)
 		if (m_Controller.get())
 		{
 			m_Controller->SetEmberFile(efd);//Convert float to double or set double verbatim;
-			m_Controller->SetEmber(index);
+			m_Controller->SetEmber(index, false);
 		}
 	}
 

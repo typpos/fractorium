@@ -337,8 +337,8 @@ public:
 		ScanForEmberNodes(rootnode, bn, embers, useDefaults);
 		xmlFreeDoc(doc);
 		emberSize = embers.size();
-		auto b = embers.begin();
-		auto secondToLast = Advance(embers.begin(), emberSize - 2);
+		auto first = embers.begin();
+
 		//t.Toc("ScanForEmberNodes");
 
 		//Check to see if the first control point or the second-to-last
@@ -346,11 +346,16 @@ public:
 		//and should be reset to linear (with a warning).
 		if (emberSize > 0)
 		{
-			if (b->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
-				b->m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			if (first->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
+				first->m_Interp = eInterp::EMBER_INTERP_LINEAR;
 
-			if (emberSize >= 2 && secondToLast->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
-				secondToLast->m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			if (emberSize >= 2)
+			{
+				auto secondToLast = Advance(embers.begin(), emberSize - 2);
+
+				if (secondToLast->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
+					secondToLast->m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			}
 		}
 
 		//Finally, ensure that consecutive 'rotate' parameters never exceed
@@ -1263,7 +1268,7 @@ private:
 				//Only correct names if it came from an outside source. Names originating from this library are always considered correct.
 				string s = fromEmber ? string(CCX(curAtt->name)) : GetCorrectedVariationName(m_BadVariationNames, curAtt);
 
-				if (auto var = m_VariationList.GetVariation(s))
+				if (auto var = m_VariationList->GetVariation(s))
 				{
 					T weight = 0;
 					Aton(attStr, weight);
@@ -1543,7 +1548,7 @@ private:
 	static bool m_Init;
 	static unordered_map<string, string> m_BadParamNames;
 	static vector<pair<pair<string, string>, vector<string>>> m_BadVariationNames;
-	VariationList<T>& m_VariationList;//The variation list used to make copies of variations to populate the embers with.
+	shared_ptr<VariationList<T>> m_VariationList;//The variation list used to make copies of variations to populate the embers with.
 	PaletteList<T> m_PaletteList;
 };
 }

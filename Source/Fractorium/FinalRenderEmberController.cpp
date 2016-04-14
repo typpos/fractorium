@@ -406,7 +406,7 @@ template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFil
 /// </summary>
 /// <param name="index">The index in the file from which to retrieve the ember</param>
 template <typename T>
-void FinalRenderEmberController<T>::SetEmber(size_t index)
+void FinalRenderEmberController<T>::SetEmber(size_t index, bool verbatim)
 {
 	if (index < m_EmberFile.Size())
 	{

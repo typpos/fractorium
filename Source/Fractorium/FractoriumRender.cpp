@@ -455,7 +455,7 @@ bool FractoriumEmberController<T>::Render()
 					gl->update();
 
 				if (ProcessState() == eProcessState::ACCUM_DONE)
-					SaveCurrentToOpenedFile();
+					SaveCurrentToOpenedFile();//Will not save if the previews are still rendering.
 
 				//Uncomment for debugging kernel build and execution errors.
 				//m_Fractorium->ui.InfoRenderingTextEdit->setText(QString::fromStdString(m_Fractorium->m_Wrapper.DumpInfo()));
@@ -671,6 +671,7 @@ bool Fractorium::CreateControllerFromOptions()
 		auto blur = m_PaletteBlurSpin->value();
 		auto freq = m_PaletteFrequencySpin->value();
 		double scale;
+		uint current = 0;
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efd;
@@ -686,6 +687,7 @@ bool Fractorium::CreateControllerFromOptions()
 		if (m_Controller.get())
 		{
 			scale = m_Controller->LockedScale();
+			current = m_Controller->SaveCurrentToOpenedFile();
 			m_Controller->StopPreviewRender();//Must stop any previews first, else changing controllers will crash the program.
 			m_Controller->CopyTempPalette(tempPalette);//Convert float to double or save double verbatim;
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
@@ -713,8 +715,8 @@ bool Fractorium::CreateControllerFromOptions()
 		if (m_Controller.get())
 		{
 			ed.m_Palette = tempPalette;//Restore base temp palette. Adjustments will be then be applied and stored back in in m_Ember.m_Palette below.
-			m_Controller->SetEmber(ed);//Convert float to double or set double verbatim. This will assign m_Ember.m_Palette (which was just tempPalette) to m_TempPalette.
 			m_Controller->SetEmberFile(efd);
+			m_Controller->SetEmber(current, true);
 			m_Controller->LockedScale(scale);
 			//Setting these and updating the GUI overwrites the work of clearing them done in SetEmber() above.
 			//It's a corner case, but doesn't seem to matter.

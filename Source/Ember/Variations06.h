@@ -3768,24 +3768,29 @@ public:
 
 	virtual string OpenCLFuncsString() const override
 	{
-		//CPU version uses a cache of points if the abs() values are <= 10. However, this crashes on Nvidia GPUs.
-		//The problem was traced to the usage of the cache array.
-		//No possible solution was found, so it is unused here.
-		//The full calculation is recomputed for every point.
-		return
-			"static void Position(__global real_t* p, __global real_t* grad, int x, int y, real_t z, real_t s, real_t d, real2* v)\n"
-			"{\n"
-			"	real3 e, f;\n"
-			"	e.x = x * 2.5;\n"
-			"	e.y = y * 2.5;\n"
-			"	e.z = z * 2.5;\n"
-			"	f.x = y * 2.5 + 30.2;\n"
-			"	f.y = x * 2.5 - 12.1;\n"
-			"	f.z = z * 2.5 + 19.8;\n"
-			"	(*v).x = (x + d * SimplexNoise3D(&e, p, grad)) * s;\n"
-			"	(*v).y = (y + d * SimplexNoise3D(&f, p, grad)) * s;\n"
-			"}\n"
-			"\n";
+		ostringstream os;
+		os <<
+		   "static void Position(__constant real2* cache, __global real_t* p, __global real_t* grad, int x, int y, real_t z, real_t s, real_t d, real2* v)\n"
+		   "{\n"
+		   "	if (abs(x) <= " << CACHE_NUM << " && abs(y) <= " << CACHE_NUM << ")\n"
+		   "	{\n"
+		   "		*v = cache[((x + " << CACHE_NUM << ") * " << CACHE_WIDTH << ") + (y + " << CACHE_NUM << ")];\n"
+		   "	}\n"
+		   "	else\n"
+		   "	{\n"
+		   "		real3 e, f;\n"
+		   "		e.x = x * 2.5;\n"
+		   "		e.y = y * 2.5;\n"
+		   "		e.z = z * 2.5;\n"
+		   "		f.x = y * 2.5 + 30.2;\n"
+		   "		f.y = x * 2.5 - 12.1;\n"
+		   "		f.z = z * 2.5 + 19.8;\n"
+		   "		(*v).x = (x + d * SimplexNoise3D(&e, p, grad)) * s;\n"
+		   "		(*v).y = (y + d * SimplexNoise3D(&f, p, grad)) * s;\n"
+		   "	}\n"
+		   "}\n"
+		   "\n";
+		return os.str();
 	}
 
 	virtual string OpenCLString() const override
@@ -3800,6 +3805,7 @@ public:
 		string scale        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string z            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string halfCellSize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cache        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint di = -1, dj = -1;\n"
 		   << "\t\tint i = 0;\n"
@@ -3822,7 +3828,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	for (dj = -1; dj < 2; dj++)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		Position(globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
+		   << "\t\t		Position((__constant real2*)(&" << cache << "), globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]); \n"
 		   << "\t\t		i++;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -3838,7 +3844,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	for (dj = -1; dj < 2; dj++)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		Position(globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
+		   << "\t\t		Position((__constant real2*)(&" << cache << "), globalShared + NOISE_INDEX, globalShared + NOISE_POINTS, cv.x + di, cv.y + dj, " << z << ", " << halfCellSize << ", " << distort << ", &p[i]);\n"
 		   << "\t\t		i++;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -3877,6 +3883,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Scale,	 prefix + "crackle_scale", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Z,		 prefix + "crackle_z"));
 		m_Params.push_back(ParamWithName<T>(true, &m_HalfCellSize, prefix + "crackle_half_cellsize"));
+		m_Params.push_back(ParamWithName<T>(true, &(m_C[0][0].x),  prefix + "crackle_cache", sizeof(m_C)));
 	}
 
 private:

@@ -26,6 +26,7 @@ bool EmberRender(EmberOptions& opt)
 		return true;
 	}
 
+	VerbosePrint("Using " << (sizeof(T) == sizeof(float) ? "single" : "double") << " precision.");
 	Timing t;
 	bool writeSuccess = false;
 	byte* finalImagep;

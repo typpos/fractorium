@@ -24,6 +24,7 @@ bool EmberAnimate(EmberOptions& opt)
 		return true;
 	}
 
+	VerbosePrint("Using " << (sizeof(T) == sizeof(float) ? "single" : "double") << " precision.");
 	//Regular variables.
 	Timing t;
 	bool unsorted = false;

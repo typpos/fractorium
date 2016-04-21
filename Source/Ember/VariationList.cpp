@@ -17,14 +17,6 @@ namespace EmberNs
 	m_Variations.push_back(new Post##varName##Variation<T>());
 
 /// <summary>
-/// Singleton patterns, return a reference to the only instance of this object in existence.
-/// </summary>
-template <typename T>
-SINGLETON_INSTANCE_IMPL(VarFuncs<T>)
-template <typename T>
-SINGLETON_INSTANCE_IMPL(VariationList<T>)
-
-/// <summary>
 /// Constructor which initializes all of the variation objects and stores them in the list.
 /// </summary>
 template <typename T>

@@ -68,8 +68,6 @@ OpenCLInfo::OpenCLInfo()
 	}
 }
 
-SINGLETON_INSTANCE_IMPL(OpenCLInfo)
-
 /// <summary>
 /// Get a const reference to the vector of available platforms.
 /// </summary>

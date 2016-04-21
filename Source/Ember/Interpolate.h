@@ -440,15 +440,16 @@ public:
 				Align(&embers[i1], &localEmbers[0], 2);
 				smoothFlag = false;
 			}
-
-			if (i2 == size - 1)
+			else if (i2 == size - 1)
 			{
 				Align(&embers[i1], &localEmbers[0], 2);
 				smoothFlag = false;
 			}
-
-			Align(&embers[i1 - 1], &localEmbers[0], 4);//Should really be doing some sort of checking here to ensure the ember vectors have 4 elements.
-			smoothFlag = true;
+			else
+			{
+				Align(&embers[i1 - 1], &localEmbers[0], 4);//Should really be doing some sort of checking here to ensure the ember vectors have 4 elements.
+				smoothFlag = true;
+			}
 		}
 
 		result.m_Time = time;

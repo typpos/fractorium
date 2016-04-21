@@ -18,10 +18,10 @@ namespace EmberNs
 /// Template argument expected to be float or double.
 /// </summary>
 template <typename T>
-class EMBER_API VariationList
+class EMBER_API VariationList: public Singleton<VariationList<T>>
 {
 public:
-	~VariationList();
+	//~VariationList();
 	const Variation<T>* GetVariation(size_t index) const;
 	const Variation<T>* GetVariation(size_t index, eVariationType varType) const;
 	Variation<T>* GetVariationCopy(size_t index, T weight = 1) const;
@@ -45,7 +45,7 @@ public:
 	const vector<Variation<T>*>& PreVars()  const;
 	const vector<Variation<T>*>& PostVars() const;
 
-	SINGLETON_INSTANCE_DECL(VariationList);//Implemented in VariationList.cpp
+	SINGLETON_DERIVED_DECL(VariationList<T>);
 
 private:
 	VariationList();

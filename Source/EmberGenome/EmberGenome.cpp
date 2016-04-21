@@ -339,7 +339,7 @@ bool EmberGenome(EmberOptions& opt)
 		{
 			if (i > 0 && embers[i].m_Time <= embers[i - 1].m_Time)
 			{
-				cerr << "Error: control points must be sorted by time, but " << embers[i].m_Time << " <= " << embers[i - 1].m_Time << ", index " << i << ".\n";
+				cerr << "Error: control points must be sorted by time, but time " << embers[i].m_Time << " <= " << embers[i - 1].m_Time << ", index " << i << ".\n";
 				return false;
 			}
 
@@ -403,6 +403,15 @@ bool EmberGenome(EmberOptions& opt)
 		{
 			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
 			return false;
+		}
+
+		for (i = 0; i < embers.size(); i++)
+		{
+			if (i > 0 && embers[i].m_Time <= embers[i - 1].m_Time)
+			{
+				cerr << "Error: control points must be sorted by time, but time " << embers[i].m_Time << " <= " << embers[i - 1].m_Time << ", index " << i << ".\n";
+				return false;
+			}
 		}
 
 		if (opt.Enclosed())
@@ -529,8 +538,8 @@ bool EmberGenome(EmberOptions& opt)
 			oldY = embers[i].m_CenterY;
 			embers[i].m_FinalRasH = size_t(T(embers[i].m_FinalRasH) / T(opt.Frames()));
 			embers[i].m_CenterY = embers[i].m_CenterY - ((opt.Frames() - 1) * embers[i].m_FinalRasH) /
-								  (2 * embers[i].m_PixelsPerUnit * pow(T(2.0), embers[i].m_Zoom));
-			embers[i].m_CenterY += embers[i].m_FinalRasH * opt.Frame() / (embers[i].m_PixelsPerUnit * pow(T(2.0), embers[i].m_Zoom));
+								  (2 * embers[i].m_PixelsPerUnit * std::pow(T(2.0), embers[i].m_Zoom));
+			embers[i].m_CenterY += embers[i].m_FinalRasH * opt.Frame() / (embers[i].m_PixelsPerUnit * std::pow(T(2.0), embers[i].m_Zoom));
 			tools.RotateOldCenterBy(embers[i].m_CenterX, embers[i].m_CenterY, oldX, oldY, embers[i].m_Rotate);
 
 			if (pTemplate)

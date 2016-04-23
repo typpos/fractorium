@@ -117,6 +117,7 @@ bool EmberGenome(EmberOptions& opt)
 	Ember<T>* aselp0, *aselp1, *pTemplate = nullptr;
 	XmlToEmber<T> parser;
 	EmberToXml<T> emberToXml;
+	Interpolater<T> interpolater;
 	EmberReport emberReport, emberReport2;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
 	auto progress = make_unique<RenderProgress<T>>();
@@ -370,7 +371,7 @@ bool EmberGenome(EmberOptions& opt)
 
 			if (!exactTimeMatch)
 			{
-				Interpolater<T>::Interpolate(embers, T(ftime), T(opt.Stagger()), interpolated);
+				interpolater.Interpolate(embers, T(ftime), T(opt.Stagger()), interpolated);
 
 				for (i = 0; i < embers.size(); i++)
 				{
@@ -397,31 +398,20 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (opt.Sequence() != "")
 	{
-		frame = std::max(opt.Frame(), opt.Time());
-
 		if (opt.Frames() == 0)
 		{
 			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
 			return false;
 		}
 
-		for (i = 0; i < embers.size(); i++)
-		{
-			if (i > 0 && embers[i].m_Time <= embers[i - 1].m_Time)
-			{
-				cerr << "Error: control points must be sorted by time, but time " << embers[i].m_Time << " <= " << embers[i - 1].m_Time << ", index " << i << ".\n";
-				return false;
-			}
-		}
-
 		if (opt.Enclosed())
 			cout << "<sequence version=\"EMBER-" << EmberVersion() << "\">\n";
 
-		spread = 1 / T(opt.Frames());
 		frameCount = 0;
 		os.str("");
 		os << setfill('0');
 		auto padding = streamsize(std::log10(((opt.Frames() * opt.Loops()) + opt.Frames()) * embers.size())) + 1;
+		t.Tic();
 
 		for (i = 0; i < embers.size(); i++)
 		{
@@ -451,7 +441,7 @@ bool EmberGenome(EmberOptions& opt)
 
 				for (frame = 0; frame < opt.Frames(); frame++)
 				{
-					seqFlag = (frame == 0 || frame == opt.Frames() - 1);
+					seqFlag = (frame == 0 || (frame == opt.Frames() - 1));
 					blend = frame / T(opt.Frames());
 					result.Clear();
 					tools.SpinInter(&embers[i], pTemplate, result, frameCount++, seqFlag, blend);
@@ -465,6 +455,7 @@ bool EmberGenome(EmberOptions& opt)
 		tools.Spin(embers.back(), pTemplate, result, frameCount, 0);
 		FormatName(result, os, padding);
 		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+		t.Toc("Sequencing");
 
 		if (opt.Enclosed())
 			cout << "</sequence>\n";

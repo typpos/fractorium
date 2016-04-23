@@ -416,7 +416,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	//it.Tic();
 	//Interpolate.
 	if (m_EmbersP->size() > 1)
-		Interpolater<T>::Interpolate(*m_EmbersP, T(time), 0, m_Ember);
+		m_Interpolater.Interpolate(*m_EmbersP, T(time), 0, m_Ember);
 
 	//it.Toc("Interp 1");
 
@@ -454,7 +454,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	//Additional interpolation will be done in the temporal samples loop.
 	//it.Tic();
 	if (m_EmbersP->size() > 1)
-		Interpolater<T>::Interpolate(*m_EmbersP, deTime, 0, m_Ember);
+		m_Interpolater.Interpolate(*m_EmbersP, deTime, 0, m_Ember);
 
 	//it.Toc("Interp 2");
 	ClampGteRef<T>(m_Ember.m_MinRadDE, 0);
@@ -479,7 +479,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 		//Interpolate again.
 		//it.Tic();
 		if (TemporalSamples() > 1 && m_EmbersP->size() > 1)
-			Interpolater<T>::Interpolate(*m_EmbersP, temporalTime, 0, m_Ember);//This will perform all necessary precalcs via the ember/xform/variation assignment operators.
+			m_Interpolater.Interpolate(*m_EmbersP, temporalTime, 0, m_Ember);//This will perform all necessary precalcs via the ember/xform/variation assignment operators.
 
 		//it.Toc("Interp 3");
 

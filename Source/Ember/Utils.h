@@ -1029,6 +1029,26 @@ static vector<string> Split(const string& str, char del)
 }
 
 /// <summary>
+/// Thin wrapper around joining a thread.
+/// </summary>
+/// <param name="th">The thread to join</param>
+static void Join(std::thread& th)
+{
+	if (th.joinable())
+		th.join();
+}
+
+/// <summary>
+/// Thin wrapper around joining a vector of threads.
+/// </summary>
+/// <param name="vec">The vector of threads to join</param>
+static void Join(std::vector<std::thread>& vec)
+{
+	for (auto& it : vec)
+		Join(it);
+}
+
+/// <summary>
 /// Return a character pointer to a version string composed of the EMBER_OS and EMBER_VERSION values.
 /// </summary>
 static inline const char* EmberVersion()

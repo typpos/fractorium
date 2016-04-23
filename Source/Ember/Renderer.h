@@ -184,6 +184,7 @@ private:
 protected:
 	vector<Ember<T>>* m_EmbersP = &m_Embers;
 	vector<Ember<T>> m_ThreadEmbers;
+	Interpolater<T> m_Interpolater;
 	CarToRas<T> m_CarToRas;
 	unique_ptr<StandardIterator<T>> m_StandardIterator = make_unique<StandardIterator<T>>();
 	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();

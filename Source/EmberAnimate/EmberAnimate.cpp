@@ -35,6 +35,7 @@ bool EmberAnimate(EmberOptions& opt)
 	vector<Ember<T>> embers;
 	XmlToEmber<T> parser;
 	EmberToXml<T> emberToXml;
+	Interpolater<T> interpolater;
 	EmberReport emberReport;
 	const vector<pair<size_t, size_t>> devices = Devices(opt.Devices());
 	std::atomic<size_t> atomfTime;
@@ -275,7 +276,7 @@ bool EmberAnimate(EmberOptions& opt)
 			opt.FirstFrame(size_t(embers[0].m_Time));
 
 		if (opt.LastFrame() == UINT_MAX)
-			opt.LastFrame(ClampGte<size_t>(size_t(embers.back().m_Time),//Make sure time - 1 is positive before converting to size_t.
+			opt.LastFrame(ClampGte<size_t>(size_t(embers.back().m_Time),
 										   opt.FirstFrame() + opt.Dtime()));//Make sure the final value is at least first frame + dtime.
 	}
 
@@ -340,9 +341,20 @@ bool EmberAnimate(EmberOptions& opt)
 		std::thread writeThread;
 		os.imbue(std::locale(""));
 
-		while (atomfTime.fetch_add(opt.Dtime()), ((ftime = atomfTime.load()) <= opt.LastFrame()))
+		//The conditions of this loop use atomics to synchronize when running on multiple GPUs.
+		//The order is reversed from the usual loop: rather than compare and increment the counter,
+		//it's incremented, then compared. This is done to ensure the GPU on this thread "claims" this
+		//frame before working on it.
+		//The mechanism for incrementing is:
+		//	Do an atomic add, which returns the previous value.
+		//	Add the time increment Dtime() to the return value to mimic what the new atomic value should be.
+		//	Assign the result to the ftime counter.
+		//	Do a <= comparison to LastFrame().
+		//		If true, enter the loop and immediately decrement the counter by Dtime() to make up for the fact
+		//		that it was first incremented before comparing.
+		while ((ftime = (atomfTime.fetch_add(opt.Dtime()) + opt.Dtime())) <= opt.LastFrame())
 		{
-			T localTime = T(ftime) - 1;
+			T localTime = T(ftime) - opt.Dtime();
 
 			if (opt.Verbose() && ((opt.LastFrame() - opt.FirstFrame()) / opt.Dtime() >= 1))
 			{
@@ -374,7 +386,7 @@ bool EmberAnimate(EmberOptions& opt)
 					cout << "Writing " << flameName << "\n";
 				}
 
-				Interpolater<T>::Interpolate(embers, localTime, 0, centerEmber);//Get center flame.
+				interpolater.Interpolate(embers, localTime, 0, centerEmber);//Get center flame.
 				emberToXml.Save(flameName, centerEmber, opt.PrintEditDepth(), true, opt.HexPalette(), true, false, false);
 				centerEmber.Clear();
 			}
@@ -400,9 +412,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 			//Run image writing in a thread. Although doing it this way duplicates the final output memory, it saves a lot of time
 			//when running with OpenCL. Call join() to ensure the previous thread call has completed.
-			if (writeThread.joinable())
-				writeThread.join();
-
+			Join(writeThread);
 			auto threadVecIndex = finalImageIndex;//Cache before launching thread.
 
 			if (opt.ThreadedWrite())//Copies are passed of all but the first parameter to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
@@ -414,8 +424,7 @@ bool EmberAnimate(EmberOptions& opt)
 				saveFunc(finalImages[threadVecIndex], filename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());//Will always use the first index, thereby not requiring more memory.
 		}
 
-		if (writeThread.joinable())//One final check to make sure all writing is done before exiting this thread.
-			writeThread.join();
+		Join(writeThread);//One final check to make sure all writing is done before exiting this thread.
 	};
 	threadVec.reserve(renderers.size());
 
@@ -427,10 +436,7 @@ bool EmberAnimate(EmberOptions& opt)
 		}, r));
 	}
 
-	for (auto& th : threadVec)
-		if (th.joinable())
-			th.join();
-
+	Join(threadVec);
 	t.Toc("\nFinished in: ", true);
 	return true;
 }

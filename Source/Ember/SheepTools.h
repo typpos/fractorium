@@ -452,14 +452,13 @@ public:
 		else if (crossMode == eCrossMode::CROSS_INTERPOLATE)
 		{
 			//Linearly interpolate somewhere between the two.
-			Ember<T> parents[2];
 			//t = 0.5;//If you ever need to test.
 			t = m_Rand.Frand01<T>();
-			parents[0] = ember0;
-			parents[1] = ember1;
-			parents[0].m_Time = T(0);
-			parents[1].m_Time = T(1);
-			Interpolater<T>::Interpolate(parents, 2, t, 0, emberOut);
+			m_Parents[0] = ember0;
+			m_Parents[1] = ember1;
+			m_Parents[0].m_Time = T(0);
+			m_Parents[1].m_Time = T(1);
+			m_Interpolater.Interpolate(m_Parents, 2, t, 0, emberOut);
 
 			for (i = 0; i < emberOut.TotalXformCount(); i++)
 				emberOut.GetTotalXform(i)->DeleteMotionElements();
@@ -990,21 +989,20 @@ public:
 	void Edge(Ember<T>* embers, Ember<T>& result, T blend, bool seqFlag)
 	{
 		size_t i, si;
-		Ember<T> spun[2], prealign[2];
 
 		//Insert motion magic here :
 		//If there are motion elements, modify the contents of
 		//the result xforms before rotate is called.
 		for (si = 0; si < 2; si++)
 		{
-			prealign[si] = embers[si];
+			m_EdgePrealign[si] = embers[si];
 
 			for (i = 0; i < embers[si].TotalXformCount(); i++)
 			{
 				auto xform = embers[si].GetTotalXform(i);
 
 				if (!xform->m_Motion.empty())
-					xform->ApplyMotion(*(prealign[si].GetTotalXform(i)), blend);//Apply motion parameters to result.xform[i] using blend parameter.
+					xform->ApplyMotion(*(m_EdgePrealign[si].GetTotalXform(i)), blend);//Apply motion parameters to result.xform[i] using blend parameter.
 			}
 		}
 
@@ -1012,20 +1010,20 @@ public:
 		//This keeps the original interpolation type intact.
 		if (seqFlag && blend == 0)
 		{
-			result = prealign[0];
+			result = m_EdgePrealign[0];
 		}
 		else
 		{
 			//Align what's going to be interpolated.
-			Interpolater<T>::Align(prealign, spun, 2);
-			spun[0].m_Time = 0;
-			spun[1].m_Time = 1;
+			Interpolater<T>::Align(m_EdgePrealign, m_EdgeSpun, 2);
+			m_EdgeSpun[0].m_Time = 0;
+			m_EdgeSpun[1].m_Time = 1;
 			//Call this first to establish the asymmetric reference angles.
-			Interpolater<T>::AsymmetricRefAngles(spun, 2);
+			Interpolater<T>::AsymmetricRefAngles(m_EdgeSpun, 2);
 			//Rotate the aligned xforms.
-			spun[0].RotateAffines(-blend * 360);
-			spun[1].RotateAffines(-blend * 360);
-			Interpolater<T>::Interpolate(spun, 2, m_Smooth ? Interpolater<T>::Smoother(blend) : blend, m_Stagger, result);
+			m_EdgeSpun[0].RotateAffines(-blend * 360);
+			m_EdgeSpun[1].RotateAffines(-blend * 360);
+			m_Interpolater.Interpolate(m_EdgeSpun, 2, m_Smooth ? Interpolater<T>::Smoother(blend) : blend, m_Stagger, result);
 		}
 
 		//Make sure there are no motion elements in the result.
@@ -1340,6 +1338,10 @@ private:
 	vector<uint> m_Hist;
 	EmberToXml<T> m_EmberToXml;
 	Iterator<T>* m_Iterator;
+	Interpolater<T> m_Interpolater;
+	Ember<T> m_Parents[2];
+	Ember<T> m_EdgeSpun[2];
+	Ember<T> m_EdgePrealign[2];
 	unique_ptr<StandardIterator<T>> m_StandardIterator = make_unique<StandardIterator<T>>();
 	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();
 	unique_ptr<Renderer<T, bucketT>> m_Renderer;

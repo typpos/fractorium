@@ -1866,8 +1866,8 @@ void TestThreadedKernel()
 					cout << "Successful run inside thread 2..." << endl;
 				}
 			});
-			th1.join();
-			th2.join();
+			Join(th1);
+			Join(th2);
 			cout << "Successful join of kernel thread..." << endl;
 		}
 	}

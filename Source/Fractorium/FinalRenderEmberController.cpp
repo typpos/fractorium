@@ -230,15 +230,27 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 					renderer->SetExternalEmbersPointer(&embers);//All will share a pointer to the original vector to conserve memory with large files. Ok because the vec doesn't get modified.
 
 					//Render each image, cancelling if m_Run ever gets set to false.
-					while (atomfTime.fetch_add(1), ((ftime = atomfTime.load() - 1) < m_EmberFile.Size()) && m_Run)//Needed to set 1 to claim this iter from other threads, so decrement it to be zero-indexed here.
+					//Render each image, cancelling if m_Run ever gets set to false.
+					//The conditions of this loop use atomics to synchronize when running on multiple GPUs.
+					//The order is reversed from the usual loop: rather than compare and increment the counter,
+					//it's incremented, then compared. This is done to ensure the GPU on this thread "claims" this
+					//frame before working on it.
+					//The mechanism for incrementing is:
+					//	Do an atomic add, which returns the previous value.
+					//	Add 1 to the return value to mimic what the new atomic value should be.
+					//	Assign the result to the ftime counter.
+					//	Do a <= comparison to m_EmberFile.Size() and check m_Run.
+					//		If true, enter the loop and immediately decrement the counter by 1 to make up for the fact
+					//		that it was first incremented before comparing.
+					while (((ftime = (atomfTime.fetch_add(1) + 1)) <= m_EmberFile.Size()) && m_Run)//Needed to set 1 to claim this iter from other threads, so decrement it below to be zero-indexed here.
 					{
-						T localTime = T(ftime);
+						--ftime;
 						Output("Image " + ToString(ftime + 1ULL) + ":\n" + ComposePath(QString::fromStdString(m_EmberFile.Get(ftime)->m_Name)));
 						renderer->Reset();//Have to manually set this since the ember is not set each time through.
 						renderTimer.Tic();//Toc() is called in RenderComplete().
 
 						//Can't use strips render here. Run() must be called directly for animation.
-						if (renderer->Run(finalImages[finalImageIndex], localTime) != eRenderStatus::RENDER_OK)
+						if (renderer->Run(finalImages[finalImageIndex], T(ftime)) != eRenderStatus::RENDER_OK)
 						{
 							Output("Rendering failed.\n");
 							m_Fractorium->ErrorReportToQTextEdit(renderer->ErrorReport(), m_FinalRenderDialog->ui.FinalRenderTextOutput, false);//Internally calls invoke.
@@ -247,9 +259,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 						}
 						else
 						{
-							if (writeThread.joinable())
-								writeThread.join();
-
+							Join(writeThread);
 							stats = renderer->Stats();
 							comments = renderer->ImageComments(stats, 0, true);
 							writeThread = std::thread([&](size_t tempTime, size_t threadFinalImageIndex)
@@ -272,8 +282,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 						finalImageIndex ^= 1;//Toggle the index.
 					}
 
-					if (writeThread.joinable())//One final check to make sure all writing is done before exiting this thread.
-						writeThread.join();
+					Join(writeThread);//One final check to make sure all writing is done before exiting this thread.
 				};
 				threadVec.reserve(m_Renderers.size());
 
@@ -285,10 +294,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 					}, r));
 				}
 
-				for (auto& th : threadVec)
-					if (th.joinable())
-						th.join();
-
+				Join(threadVec);
 				HandleFinishedProgress();//One final check that all images were finished.
 			}
 			else if (m_Renderer.get())//Make sure a renderer was created and render all images, but not as an animation sequence (without temporal samples motion blur).

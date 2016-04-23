@@ -78,22 +78,9 @@ public:
 			{
 				auto prev = embers.begin();
 
-				//Check to see if there are valid times by checking if any differed.
-				//If so, assume they were intentionally entered times.
-				for (auto it = Advance(embers.begin(), 1); it != embers.end(); ++it)
-				{
-					if (it->m_Time != prev->m_Time)
-					{
-						hasTimes = true;
-						break;
-					}
-
-					prev = it;
-				}
-
-				if (!hasTimes)
-					for (auto& ember : embers)
-						ember.m_Time = t++;
+				//Always ensure times make sense.
+				for (auto& ember : embers)
+					ember.m_Time = t++;
 
 				if ((append && start) || !append)
 				{

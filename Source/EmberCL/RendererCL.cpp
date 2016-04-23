@@ -929,9 +929,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 				func(m_Devices[device].get());
 		}
 
-		for (auto& th : threads)
-			if (th.joinable())
-				th.join();
+		Join(threads);
 
 		if (b)
 		{
@@ -992,7 +990,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 		auto& wrapper = m_Devices[dev]->m_Wrapper;
 		intmax_t itersRemaining = 0;
 
-		while (atomLaunchesRan.fetch_add(1), (b && (atomLaunchesRan.load() <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && !m_Abort))
+		while (b && (atomLaunchesRan.fetch_add(1) + 1 <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && !m_Abort)
 		{
 			cl_uint argIndex = 0;
 #ifdef TEST_CL
@@ -1102,10 +1100,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			iterFunc(device, index);
 	}
 
-	for (auto& th : threadVec)
-		if (th.joinable())
-			th.join();
-
+	Join(threadVec);
 	itersRan = atomItersRan.load();
 
 	if (m_Devices.size() > 1)//Determine whether/when to sum histograms of secondary devices with the primary.

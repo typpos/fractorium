@@ -376,7 +376,7 @@ public:
 	/// <param name="time">The time position in the vector specifying the point of interpolation</param>
 	/// <param name="stagger">Stagger if > 0</param>
 	/// <param name="result">The interpolated result</param>
-	static void Interpolate(const vector<Ember<T>>& embers, T time, T stagger, Ember<T>& result)
+	void Interpolate(const vector<Ember<T>>& embers, T time, T stagger, Ember<T>& result)
 	{
 		Interpolate(embers.data(), embers.size(), time, stagger, result);
 	}
@@ -389,7 +389,7 @@ public:
 	/// <param name="time">The time position in the vector specifying the point of interpolation</param>
 	/// <param name="stagger">Stagger if > 0</param>
 	/// <param name="result">The interpolated result</param>
-	static void Interpolate(const Ember<T>* embers, size_t size, T time, T stagger, Ember<T>& result)
+	void Interpolate(const Ember<T>* embers, size_t size, T time, T stagger, Ember<T>& result)
 	{
 		if (size == 1)
 		{
@@ -398,8 +398,6 @@ public:
 		}
 
 		size_t i1, i2;
-		vector<T> c(2);
-		Ember<T> localEmbers[4];
 		bool smoothFlag = false;
 
 		if (embers[0].m_Time >= time)
@@ -423,31 +421,31 @@ public:
 			i2 = i1 + 1;
 		}
 
-		c[0] = (embers[i2].m_Time - time) / (embers[i2].m_Time - embers[i1].m_Time);
-		c[1] = 1 - c[0];
+		m_Coeffs[0] = (embers[i2].m_Time - time) / (embers[i2].m_Time - embers[i1].m_Time);
+		m_Coeffs[1] = 1 - m_Coeffs[0];
 
 		//To interpolate the xforms, make copies of the source embers
 		//and ensure that they both have the same number of xforms before progressing.
 		if (embers[i1].m_Interp == eInterp::EMBER_INTERP_LINEAR)
 		{
-			Align(&embers[i1], &localEmbers[0], 2);
+			Align(&embers[i1], &m_Embers[0], 2);
 			smoothFlag = false;
 		}
 		else
 		{
 			if (i1 == 0)
 			{
-				Align(&embers[i1], &localEmbers[0], 2);
+				Align(&embers[i1], &m_Embers[0], 2);
 				smoothFlag = false;
 			}
 			else if (i2 == size - 1)
 			{
-				Align(&embers[i1], &localEmbers[0], 2);
+				Align(&embers[i1], &m_Embers[0], 2);
 				smoothFlag = false;
 			}
 			else
 			{
-				Align(&embers[i1 - 1], &localEmbers[0], 4);//Should really be doing some sort of checking here to ensure the ember vectors have 4 elements.
+				Align(&embers[i1 - 1], &m_Embers[0], 4);//Should really be doing some sort of checking here to ensure the ember vectors have 4 elements.
 				smoothFlag = true;
 			}
 		}
@@ -458,9 +456,9 @@ public:
 		result.m_PaletteInterp = ePaletteInterp::INTERP_HSV;
 
 		if (!smoothFlag)
-			result.Interpolate(&localEmbers[0], 2, c, stagger);
+			result.Interpolate(&m_Embers[0], 2, m_Coeffs, stagger);
 		else
-			result.InterpolateCatmullRom(&localEmbers[0], 4, c[1]);
+			result.InterpolateCatmullRom(&m_Embers[0], 4, m_Coeffs[1]);
 	}
 
 	/// <summary>
@@ -492,9 +490,9 @@ public:
 	{
 		for (size_t i = 0; i < source->TotalVariationCount(); i++)//Iterate through the first xform's variations.
 		{
-			Variation<T>* var = source->GetVariation(i);//Grab the variation at index in in the first xform.
-			Variation<T>* var2 = dest->GetVariationById(var->VariationId());//See if the same variation exists in the second xform.
-			ParametricVariation<T>* parVar = dynamic_cast<ParametricVariation<T>*>(var);//Parametric cast of the first var for later.
+			auto var = source->GetVariation(i);//Grab the variation at index in in the first xform.
+			auto var2 = dest->GetVariationById(var->VariationId());//See if the same variation exists in the second xform.
+			auto parVar = dynamic_cast<ParametricVariation<T>*>(var);//Parametric cast of the first var for later.
 
 			if (!var2)//Only take action if the second xform did not contain this variation.
 			{
@@ -502,7 +500,7 @@ public:
 				{
 					if (parVar)
 					{
-						Variation<T>* parVarCopy = parVar->Copy();
+						auto parVarCopy = parVar->Copy();
 
 						if (clearWeights)
 							parVarCopy->m_Weight = 0;
@@ -512,7 +510,7 @@ public:
 				}
 				else//Add regardless of type.
 				{
-					Variation<T>* varCopy = var->Copy();
+					auto varCopy = var->Copy();
 
 					if (clearWeights)
 						varCopy->m_Weight = 0;
@@ -732,8 +730,7 @@ public:
 			{
 				for (size_t col = 0; col < 2; col++)
 				{
-					int sym0, sym1;
-					int padSymFlag;
+					bool sym0, sym1, padSymFlag = false;
 					d = cxang[k][col] - cxang[k - 1][col];
 
 					//Adjust to avoid the -pi/pi discontinuity.
@@ -745,7 +742,6 @@ public:
 					//If this is an asymmetric case, store the NON-symmetric angle
 					//Check them pairwise and store the reference angle in the second
 					//to avoid overwriting if asymmetric on both sides.
-					padSymFlag = 0;
 					sym0 = (embers[k - 1].GetXform(xfi)->m_Animate == 0 || (embers[k - 1].GetXform(xfi)->Empty() && padSymFlag));
 					sym1 = (embers[k    ].GetXform(xfi)->m_Animate == 0 || (embers[k    ].GetXform(xfi)->Empty() && padSymFlag));
 
@@ -936,5 +932,9 @@ public:
 
 		return ad > bd;
 	}
+
+private:
+	vector<T> m_Coeffs = vector<T>(2);
+	Ember<T> m_Embers[4];
 };
 }

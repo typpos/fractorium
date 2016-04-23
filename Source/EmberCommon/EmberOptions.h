@@ -145,11 +145,9 @@ private:
 	/// </summary>
 	EmberOptionEntry()
 	{
-		m_OptionUse = eOptionUse::OPT_USE_ALL;
-		m_Option.nArgType = SO_NONE;
 		m_Option.nId = 0;
 		m_Option.pszArg = _T("--fillmein");
-		m_DocString = "Dummy doc";
+		m_Option.nArgType = SO_NONE;
 	}
 
 public:
@@ -203,13 +201,13 @@ public:
 	/// <summary>
 	/// Functor accessors.
 	/// </summary>
-	inline T    operator() (void) { return m_Val; }
+	inline T    operator() (void) const { return m_Val; }
 	inline void operator() (T t) { m_Val = t; }
 
 private:
-	eOptionUse m_OptionUse;
+	eOptionUse m_OptionUse = eOptionUse::OPT_USE_ALL;
 	CSimpleOpt::SOption m_Option;
-	string m_DocString;
+	string m_DocString = "Dummy doc";
 	string m_NameWithoutDashes;
 	T m_Val;
 };

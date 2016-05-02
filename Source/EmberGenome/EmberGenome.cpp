@@ -74,8 +74,6 @@ bool EmberGenome(EmberOptions& opt)
 
 			for (auto& v : vars)
 				cout << v->Name() << "\n";
-
-			return true;
 		}
 		else
 		{
@@ -100,8 +98,8 @@ bool EmberGenome(EmberOptions& opt)
 	VerbosePrint("Using " << (sizeof(T) == sizeof(float) ? "single" : "double") << " precision.");
 	//Regular variables.
 	Timing t;
-	bool exactTimeMatch, randomMode, didColor, seqFlag;
-	size_t i, j, i0, i1, rep, val, frame, frameCount, count = 0;
+	bool exactTimeMatch, randomMode, didColor, seqFlag, random = false;
+	size_t i, i0, i1, rep, val, frame, frameCount, count = 0;
 	size_t ftime, firstFrame, lastFrame;
 	size_t n, tot, totb, totw;
 	T avgPix, fractionBlack, fractionWhite, blend, spread, mix0, mix1;
@@ -113,7 +111,6 @@ bool EmberGenome(EmberOptions& opt)
 	eCrossMode crossMeth;
 	eMutateMode mutMeth;
 	Ember<T> orig, save, selp0, selp1, parent0, parent1;
-	Ember<T> result, result1, result2, result3, interpolated;
 	Ember<T>* aselp0, *aselp1, *pTemplate = nullptr;
 	XmlToEmber<T> parser;
 	EmberToXml<T> emberToXml;
@@ -193,18 +190,10 @@ bool EmberGenome(EmberOptions& opt)
 		noVars.push_back(eVariationId::VAR_SPLIT);
 		noVars.push_back(eVariationId::VAR_SPLITS);
 
-		//Loop over the novars and set ivars to the complement.
+		//Set ivars to the complement of novars.
 		for (i = 0; i < varList->Size(); i++)
-		{
-			for (j = 0; j < noVars.size(); j++)
-			{
-				if (noVars[j] == varList->GetVariation(i)->VariationId())
-					break;
-			}
-
-			if (j == noVars.size())
+			if (!Contains(noVars, varList->GetVariation(i)->VariationId()))
 				vars.push_back(varList->GetVariation(i)->VariationId());
-		}
 	}
 	else
 	{
@@ -234,18 +223,10 @@ bool EmberGenome(EmberOptions& opt)
 				}
 			}
 
-			//Loop over the novars and set ivars to the complement.
+			//Set ivars to the complement of novars.
 			for (i = 0; i < varList->Size(); i++)
-			{
-				for (j = 0; j < noVars.size(); j++)
-				{
-					if (noVars[j] == varList->GetVariation(i)->VariationId())
-						break;
-				}
-
-				if (j == noVars.size())
+				if (!Contains(noVars, varList->GetVariation(i)->VariationId()))
 					vars.push_back(varList->GetVariation(i)->VariationId());
-			}
 		}
 	}
 
@@ -253,19 +234,17 @@ bool EmberGenome(EmberOptions& opt)
 	bool doInter  = opt.Inter()  != "";
 	bool doRotate = opt.Rotate() != "";
 	bool doClone  = opt.Clone()  != "";
-	bool doStrip  = opt.Strip()  != "";
 	bool doCross0 = opt.Cross0() != "";
 	bool doCross1 = opt.Cross1() != "";
 	count += (doMutate ? 1 : 0);
 	count += (doInter  ? 1 : 0);
 	count += (doRotate ? 1 : 0);
 	count += (doClone  ? 1 : 0);
-	count += (doStrip  ? 1 : 0);
 	count += ((doCross0 || doCross1) ? 1 : 0);
 
 	if (count > 1)
 	{
-		cerr << "Can only specify one of mutate, clone, cross, rotate, strip, or inter. Returning without executing.\n";
+		cerr << "Can only specify one of mutate, clone, cross, rotate, or inter. Returning without executing.\n";
 		return false;
 	}
 
@@ -297,24 +276,26 @@ bool EmberGenome(EmberOptions& opt)
 	else if (doInter)  filename = opt.Inter();
 	else if (doRotate) filename = opt.Rotate();
 	else if (doClone)  filename = opt.Clone();
-	else if (doStrip)  filename = opt.Strip();
 	else if (doCross0) filename = opt.Cross0();
 	else if (opt.CloneAll() != "") filename = opt.CloneAll();
 	else if (opt.Animate()  != "") filename = opt.Animate();
 	else if (opt.Sequence() != "") filename = opt.Sequence();
 	else if (opt.Inter()    != "") filename = opt.Inter();
 	else if (opt.Rotate()   != "") filename = opt.Rotate();
-	else if (opt.Strip()    != "") filename = opt.Strip();
 	else if (opt.Clone()    != "") filename = opt.Clone();
 	else if (opt.Mutate()   != "") filename = opt.Mutate();
+	else random = true;
 
-	if (!ParseEmberFile(parser, filename, embers))
-		return false;
-
-	if (doCross1)
+	if (!random)
 	{
-		if (!ParseEmberFile(parser, opt.Cross1(), embers2))
+		if (!ParseEmberFile(parser, filename, embers))
 			return false;
+
+		if (doCross1)
+		{
+			if (!ParseEmberFile(parser, opt.Cross1(), embers2))
+				return false;
+		}
 	}
 
 	if (opt.CloneAll() != "")
@@ -336,6 +317,8 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (opt.Animate() != "")
 	{
+		Ember<T> interpolated;
+
 		for (i = 0; i < embers.size(); i++)
 		{
 			if (i > 0 && embers[i].m_Time <= embers[i - 1].m_Time)
@@ -398,6 +381,8 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (opt.Sequence() != "")
 	{
+		Ember<T> result;
+
 		if (opt.Frames() == 0)
 		{
 			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
@@ -465,7 +450,7 @@ bool EmberGenome(EmberOptions& opt)
 
 	if (doInter || doRotate)
 	{
-		frame = std::max(opt.Frame(), opt.Time());
+		Ember<T> result, result1, result2, result3;
 
 		if (opt.Frames() == 0)
 		{
@@ -473,8 +458,9 @@ bool EmberGenome(EmberOptions& opt)
 			return false;
 		}
 
-		blend = frame / T(opt.Frames());
-		spread = 1 / T(opt.Frames());
+		frame = opt.Frame();
+		blend = frame / T(opt.Frames());//Percentage between first and second flame to treat as the center flame.
+		spread = 1 / T(opt.Frames());//Amount to move backward and forward from the center flame.
 
 		if (opt.Enclosed())
 			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";
@@ -487,10 +473,14 @@ bool EmberGenome(EmberOptions& opt)
 				return false;
 			}
 
-			tools.Spin(embers[0], pTemplate, result1, frame - 1, blend - spread);
+			if (frame)//Cannot spin backward below frame zero.
+			{
+				tools.Spin(embers[0], pTemplate, result1, frame - 1, blend - spread);
+				cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			}
+
 			tools.Spin(embers[0], pTemplate, result2, frame    , blend         );
 			tools.Spin(embers[0], pTemplate, result3, frame + 1, blend + spread);
-			cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
@@ -502,42 +492,16 @@ bool EmberGenome(EmberOptions& opt)
 				return false;
 			}
 
-			tools.SpinInter(embers.data(), pTemplate, result1, frame - 1, 0, blend - spread);
-			tools.SpinInter(embers.data(), pTemplate, result2, frame    , 0, blend         );
-			tools.SpinInter(embers.data(), pTemplate, result3, frame + 1, 0, blend + spread);
-			cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			if (frame)//Cannot interpolate backward below frame zero.
+			{
+				tools.SpinInter(embers.data(), pTemplate, result1, frame - 1, false, blend - spread);
+				cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
+			}
+
+			tools.SpinInter(embers.data(), pTemplate, result2, frame    , false, blend         );
+			tools.SpinInter(embers.data(), pTemplate, result3, frame + 1, false, blend + spread);
 			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
-		}
-
-		if (opt.Enclosed())
-			cout << "</pick>\n";
-
-		return true;
-	}
-
-	if (doStrip)
-	{
-		if (opt.Enclosed())
-			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";
-
-		for (i = 0; i < embers.size(); i++)
-		{
-			T oldX, oldY;
-			embers[i].DeleteMotionElements();
-			oldX = embers[i].m_CenterX;
-			oldY = embers[i].m_CenterY;
-			embers[i].m_FinalRasH = size_t(T(embers[i].m_FinalRasH) / T(opt.Frames()));
-			embers[i].m_CenterY = embers[i].m_CenterY - ((opt.Frames() - 1) * embers[i].m_FinalRasH) /
-								  (2 * embers[i].m_PixelsPerUnit * std::pow(T(2.0), embers[i].m_Zoom));
-			embers[i].m_CenterY += embers[i].m_FinalRasH * opt.Frame() / (embers[i].m_PixelsPerUnit * std::pow(T(2.0), embers[i].m_Zoom));
-			tools.RotateOldCenterBy(embers[i].m_CenterX, embers[i].m_CenterY, oldX, oldY, embers[i].m_Rotate);
-
-			if (pTemplate)
-				tools.ApplyTemplate(embers[i], *pTemplate);
-
-			tools.Offset(embers[i], T(opt.OffsetX()), T(opt.OffsetY()));
-			cout << emberToXml.ToString(embers[i], opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
 
 		if (opt.Enclosed())
@@ -567,7 +531,7 @@ bool EmberGenome(EmberOptions& opt)
 		count = 0;
 		os.str("");
 		save.Clear();
-		VerbosePrint("Flame = " << rep + 1 << "/" << opt.Repeat() << "..");
+		VerbosePrint("Flame = " << rep + 1 << "/" << opt.Repeat() << "...");
 
 		if (opt.Clone() != "")
 		{
@@ -657,7 +621,7 @@ bool EmberGenome(EmberOptions& opt)
 						crossMeth = eCrossMode::CROSS_NOT_SPECIFIED;
 					}
 
-					tools.Cross(embers[i0], embers2[i1], orig, crossMeth);
+					os << tools.Cross(embers[i0], embers2[i1], orig, crossMeth);
 
 					if (embers[i0].m_Name != "" || embers2[i1].m_Name != "")
 					{
@@ -671,6 +635,8 @@ bool EmberGenome(EmberOptions& opt)
 					os << "random";
 					randomMode = true;
 					tools.Random(orig, vars, opt.Symmetry(), 0, MAX_CL_VARS);
+					orig.m_FinalRasW = 1920;
+					orig.m_FinalRasH = 1080;
 					aselp0 = nullptr;
 					aselp1 = nullptr;
 				}

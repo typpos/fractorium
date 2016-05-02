@@ -93,6 +93,7 @@ QDoubleSpinBox
 QCheckBox
 {
 	spacing: 5px;
+	outline: 0px;
 }
 
 QCheckBox::indicator,

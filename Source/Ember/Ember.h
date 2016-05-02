@@ -1311,7 +1311,7 @@ public:
 		if (useDefaults)
 		{
 			//If defaults are on, set to reasonable values.
-			m_HighlightPower = -1;
+			m_HighlightPower = 1;
 			m_Background.Reset();
 			m_FinalRasW = 100;
 			m_FinalRasH = 100;
@@ -1327,6 +1327,8 @@ public:
 			m_BlurCoef = 0;
 			m_CamMat = m3T(0);
 			m_Quality = 1;
+			m_SubBatchSize = 10240;
+			m_FuseCount = 15;
 			m_MaxRadDE = T(9.0);
 			m_MinRadDE = 0;
 			m_CurveDE = T(0.4);
@@ -1337,7 +1339,8 @@ public:
 			m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
 			m_TemporalFilterWidth = 1;
 			m_TemporalFilterExp = 0;
-			m_PaletteMode = ePaletteMode::PALETTE_STEP;
+			m_PaletteMode = ePaletteMode::PALETTE_LINEAR;
+			m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 		}
 		else
 		{
@@ -1358,6 +1361,8 @@ public:
 			m_BlurCoef = 999999;
 			m_CamMat = m3T(999999);
 			m_Quality = -1;
+			m_SubBatchSize = 0;
+			m_FuseCount = 0;
 			m_MaxRadDE = -1;
 			m_MinRadDE = -1;
 			m_CurveDE = -1;
@@ -1369,6 +1374,7 @@ public:
 			m_TemporalFilterWidth = -1;
 			m_TemporalFilterExp = -999;
 			m_PaletteMode = ePaletteMode::PALETTE_STEP;
+			m_Interp = eInterp::EMBER_INTERP_LINEAR;
 		}
 
 		m_Xforms.clear();
@@ -1573,7 +1579,7 @@ public:
 
 	//Value to control saturation of some pixels in gamma correction during final accumulation.
 	//Xml field: "highlight_power".
-	T m_HighlightPower = -1;
+	T m_HighlightPower = 1;
 
 	//When animating a file full of many embers, this value is used to specify the time in the animation
 	//that this ember should be rendered. They must all be sequential and increase by a default value of 1.

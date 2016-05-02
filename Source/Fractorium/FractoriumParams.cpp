@@ -26,7 +26,7 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1, 9999,  0.5,  SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0,  4.0,  4.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,   10, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)),  true,  0.1,  0.1,  0.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,   30, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0,  1.0,  0.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_HighlightSpin,	   spinHeight, -1.0,   10,  0.1,  SIGNAL(valueChanged(double)), SLOT(OnHighlightPowerChanged(double)), true, -1.0, -1.0, -1.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_HighlightSpin,	   spinHeight,  1.0,   10,  0.1,  SIGNAL(valueChanged(double)), SLOT(OnHighlightPowerChanged(double)), true, -1.0, -1.0, -1.0);
 	m_GammaThresholdSpin->setDecimals(4);
 	m_BackgroundColorButton = new QPushButton("...", table);
 	m_BackgroundColorButton->setMinimumWidth(21);
@@ -96,6 +96,15 @@ void Fractorium::InitParamsUI()
 }
 
 /// <summary>
+/// Return whether the apply all checkbox is checked.
+/// </summary>
+/// <returns>True if checked, else false.</returns>
+bool Fractorium::ApplyAll()
+{
+	return ui.ApplyAllParamsCheckBox->isChecked();
+}
+
+/// <summary>
 /// Color.
 /// </summary>
 
@@ -106,7 +115,13 @@ void Fractorium::InitParamsUI()
 /// </summary>
 /// <param name="d">The brightness</param>
 template <typename T>
-void FractoriumEmberController<T>::BrightnessChanged(double d) { Update([&] { m_Ember.m_Brightness = d; }, true, eProcessAction::FILTER_AND_ACCUM); }
+void FractoriumEmberController<T>::BrightnessChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_Brightness = d;
+	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnBrightnessChanged(double d) { m_Controller->BrightnessChanged(d); }
 
 /// <summary>
@@ -116,7 +131,13 @@ void Fractorium::OnBrightnessChanged(double d) { m_Controller->BrightnessChanged
 /// else if early clip is true, filter and accum, else final accum only.
 /// </summary>
 /// <param name="d">The gamma value</param>
-template <typename T> void FractoriumEmberController<T>::GammaChanged(double d) { Update([&] { m_Ember.m_Gamma = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
+template <typename T> void FractoriumEmberController<T>::GammaChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_Gamma = d;
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnGammaChanged(double d) { m_Controller->GammaChanged(d); }
 
 /// <summary>
@@ -125,7 +146,13 @@ void Fractorium::OnGammaChanged(double d) { m_Controller->GammaChanged(d); }
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The gamma threshold</param>
-template <typename T> void FractoriumEmberController<T>::GammaThresholdChanged(double d) { Update([&] { m_Ember.m_GammaThresh = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
+template <typename T> void FractoriumEmberController<T>::GammaThresholdChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_GammaThresh = d;
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnGammaThresholdChanged(double d) { m_Controller->GammaThresholdChanged(d); }
 
 /// <summary>
@@ -134,7 +161,13 @@ void Fractorium::OnGammaThresholdChanged(double d) { m_Controller->GammaThreshol
 /// Resets the rendering process to the final accumulation stage if temporal samples is 1, else full reset.
 /// </summary>
 /// <param name="d">The vibrancy</param>
-template <typename T> void FractoriumEmberController<T>::VibrancyChanged(double d) { Update([&] { m_Ember.m_Vibrancy = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
+template <typename T> void FractoriumEmberController<T>::VibrancyChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_Vibrancy = d;
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnVibrancyChanged(double d) { m_Controller->VibrancyChanged(d); }
 
 /// <summary>
@@ -143,7 +176,13 @@ void Fractorium::OnVibrancyChanged(double d) { m_Controller->VibrancyChanged(d);
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The highlight power</param>
-template <typename T> void FractoriumEmberController<T>::HighlightPowerChanged(double d) { Update([&] { m_Ember.m_HighlightPower = d; }, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY); }
+template <typename T> void FractoriumEmberController<T>::HighlightPowerChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_HighlightPower = d;
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnHighlightPowerChanged(double d) { m_Controller->HighlightPowerChanged(d); }
 
 /// <summary>
@@ -166,24 +205,21 @@ void Fractorium::OnBackgroundColorButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::BackgroundChanged(const QColor& color)
 {
-	Update([&]
+	int itemRow = 5;
+	auto colorTable = m_Fractorium->ui.ColorTable;
+	colorTable->item(itemRow, 1)->setBackgroundColor(color);
+	auto r = ToString(color.red());
+	auto g = ToString(color.green());
+	auto b = ToString(color.blue());
+	colorTable->item(itemRow, 1)->setTextColor(VisibleColor(color));
+	colorTable->item(itemRow, 1)->setText("rgb(" + r + ", " + g + ", " + b + ")");
+	UpdateAll([&](Ember<T>& ember)
 	{
-		int itemRow = 5;
-		auto colorTable = m_Fractorium->ui.ColorTable;
-		colorTable->item(itemRow, 1)->setBackgroundColor(color);
-
-		auto r = ToString(color.red());
-		auto g = ToString(color.green());
-		auto b = ToString(color.blue());
-
-		colorTable->item(itemRow, 1)->setTextColor(VisibleColor(color));
-		colorTable->item(itemRow, 1)->setText("rgb(" + r + ", " + g + ", " + b + ")");
-
 		//Color is 0-255, normalize to 0-1.
-		m_Ember.m_Background.r = color.red()   / 255.0;
-		m_Ember.m_Background.g = color.green() / 255.0;
-		m_Ember.m_Background.b = color.blue()  / 255.0;
-	});
+		ember.m_Background.r = color.red()   / 255.0;
+		ember.m_Background.g = color.green() / 255.0;
+		ember.m_Background.b = color.blue()  / 255.0;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnColorSelected(const QColor& color) { m_Controller->BackgroundChanged(color); }
@@ -194,7 +230,13 @@ void Fractorium::OnColorSelected(const QColor& color) { m_Controller->Background
 /// Resets the rendering process.
 /// </summary>
 /// <param name="index">The index of the palette mode combo box</param>
-template <typename T> void FractoriumEmberController<T>::PaletteModeChanged(uint i) { Update([&] { m_Ember.m_PaletteMode = i == 0 ? ePaletteMode::PALETTE_STEP : ePaletteMode::PALETTE_LINEAR; }); }
+template <typename T> void FractoriumEmberController<T>::PaletteModeChanged(uint i)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_PaletteMode = i == 0 ? ePaletteMode::PALETTE_STEP : ePaletteMode::PALETTE_LINEAR;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnPaletteModeComboCurrentIndexChanged(int index) { m_Controller->PaletteModeChanged(index); }
 
 /// <summary>
@@ -206,7 +248,13 @@ void Fractorium::OnPaletteModeComboCurrentIndexChanged(int index) { m_Controller
 /// Dimensions are set automatically to match the dimensions of GLWidget.
 /// </summary>
 /// <param name="d">Ignored</param>
-template <typename T> void FractoriumEmberController<T>::WidthChanged(uint i) { Update([&] { m_Ember.m_FinalRasW = i; }); }
+template <typename T> void FractoriumEmberController<T>::WidthChanged(uint i)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_FinalRasW = i;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnWidthChanged(int i) { m_Controller->WidthChanged(i); }
 
 /// <summary>
@@ -214,7 +262,13 @@ void Fractorium::OnWidthChanged(int i) { m_Controller->WidthChanged(i); }
 /// Dimensions are set automatically to match the dimensions of GLWidget.
 /// </summary>
 /// <param name="d">Ignored</param>
-template <typename T> void FractoriumEmberController<T>::HeightChanged(uint i) { Update([&] { m_Ember.m_FinalRasH = i; }); }
+template <typename T> void FractoriumEmberController<T>::HeightChanged(uint i)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_FinalRasH = i;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnHeightChanged(int i) { m_Controller->HeightChanged(i); }
 
 /// <summary>
@@ -222,7 +276,13 @@ void Fractorium::OnHeightChanged(int i) { m_Controller->HeightChanged(i); }
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The x offset value</param>
-template <typename T> void FractoriumEmberController<T>::CenterXChanged(double d) { Update([&] { m_Ember.m_CenterX = d; }); }
+template <typename T> void FractoriumEmberController<T>::CenterXChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CenterX = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnCenterXChanged(double d) { m_Controller->CenterXChanged(d); }
 
 /// <summary>
@@ -230,7 +290,13 @@ void Fractorium::OnCenterXChanged(double d) { m_Controller->CenterXChanged(d); }
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The y offset value</param>
-template <typename T> void FractoriumEmberController<T>::CenterYChanged(double d) { Update([&] { m_Ember.m_CenterY = m_Ember.m_RotCenterY = d; }); }
+template <typename T> void FractoriumEmberController<T>::CenterYChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CenterY = ember.m_RotCenterY = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnCenterYChanged(double d) { m_Controller->CenterYChanged(d); }
 
 /// <summary>
@@ -241,7 +307,13 @@ void Fractorium::OnCenterYChanged(double d) { m_Controller->CenterYChanged(d); }
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The scale value</param>
-template <typename T> void FractoriumEmberController<T>::ScaleChanged(double d) { Update([&] { m_Ember.m_PixelsPerUnit = d; }); }
+template <typename T> void FractoriumEmberController<T>::ScaleChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_PixelsPerUnit = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnScaleChanged(double d) { m_Controller->ScaleChanged(d); }
 
 /// <summary>
@@ -252,7 +324,13 @@ void Fractorium::OnScaleChanged(double d) { m_Controller->ScaleChanged(d); }
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The zoom value</param>
-template <typename T> void FractoriumEmberController<T>::ZoomChanged(double d) { Update([&] { m_Ember.m_Zoom = d; }); }
+template <typename T> void FractoriumEmberController<T>::ZoomChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_Zoom = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnZoomChanged(double d) { m_Controller->ZoomChanged(d); }
 
 /// <summary>
@@ -261,22 +339,58 @@ void Fractorium::OnZoomChanged(double d) { m_Controller->ZoomChanged(d); }
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The rotation in angles</param>
-template <typename T> void FractoriumEmberController<T>::RotateChanged(double d) { Update([&] { m_Ember.m_Rotate = d; }); }
+template <typename T> void FractoriumEmberController<T>::RotateChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_Rotate = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnRotateChanged(double d) { m_Controller->RotateChanged(d); }
 
-template <typename T> void FractoriumEmberController<T>::ZPosChanged(double d) { Update([&] { m_Ember.m_CamZPos = d; }); }
+template <typename T> void FractoriumEmberController<T>::ZPosChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CamZPos = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnZPosChanged(double d) {  m_Controller->ZPosChanged(d); }
 
-template <typename T> void FractoriumEmberController<T>::PerspectiveChanged(double d) { Update([&] { m_Ember.m_CamPerspective = d; }); }
+template <typename T> void FractoriumEmberController<T>::PerspectiveChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CamPerspective = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnPerspectiveChanged(double d) { m_Controller->PerspectiveChanged(d); }
 
-template <typename T> void FractoriumEmberController<T>::PitchChanged(double d) { Update([&] { m_Ember.m_CamPitch = d* DEG_2_RAD; }); }
+template <typename T> void FractoriumEmberController<T>::PitchChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CamPitch = d * DEG_2_RAD;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnPitchChanged(double d) { m_Controller->PitchChanged(d); }
 
-template <typename T> void FractoriumEmberController<T>::YawChanged(double d) { Update([&] { m_Ember.m_CamYaw = d* DEG_2_RAD; }); }
+template <typename T> void FractoriumEmberController<T>::YawChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CamYaw = d * DEG_2_RAD;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnYawChanged(double d) { m_Controller->YawChanged(d); }
 
-template <typename T> void FractoriumEmberController<T>::DepthBlurChanged(double d) { Update([&] { m_Ember.m_CamDepthBlur = d; }); }
+template <typename T> void FractoriumEmberController<T>::DepthBlurChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CamDepthBlur = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnDepthBlurChanged(double d) { m_Controller->DepthBlurChanged(d); }
 
 /// <summary>
@@ -291,10 +405,10 @@ void Fractorium::OnDepthBlurChanged(double d) { m_Controller->DepthBlurChanged(d
 /// <param name="d">The spatial filter width</param>
 template <typename T> void FractoriumEmberController<T>::SpatialFilterWidthChanged(double d)
 {
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
-		m_Ember.m_SpatialFilterRadius = d;
-	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+		ember.m_SpatialFilterRadius = d;
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnSpatialFilterWidthChanged(double d) { m_Controller->SpatialFilterWidthChanged(d); }
@@ -307,10 +421,10 @@ void Fractorium::OnSpatialFilterWidthChanged(double d) { m_Controller->SpatialFi
 /// <param name="text">The spatial filter type</param>
 template <typename T> void FractoriumEmberController<T>::SpatialFilterTypeChanged(const QString& text)
 {
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
-		m_Ember.m_SpatialFilterType = SpatialFilterCreator<T>::FromString(text.toStdString());
-	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+		ember.m_SpatialFilterType = SpatialFilterCreator<T>::FromString(text.toStdString());
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnSpatialFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->SpatialFilterTypeChanged(text); }
@@ -322,7 +436,13 @@ void Fractorium::OnSpatialFilterTypeComboCurrentIndexChanged(const QString& text
 /// In the future, when animation is implemented, this will have an effect.
 /// </summary>
 /// <param name="d">The temporal filter width</param>
-template <typename T> void FractoriumEmberController<T>::TemporalFilterWidthChanged(double d) { Update([&] { m_Ember.m_TemporalFilterWidth = d; }, true, eProcessAction::NOTHING); }//Don't do anything until animation is implemented.
+template <typename T> void FractoriumEmberController<T>::TemporalFilterWidthChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_TemporalFilterWidth = d;
+	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+}
 void Fractorium::OnTemporalFilterWidthChanged(double d) { m_Controller->TemporalFilterWidthChanged(d); }
 
 /// <summary>
@@ -332,7 +452,13 @@ void Fractorium::OnTemporalFilterWidthChanged(double d) { m_Controller->Temporal
 /// In the future, when animation is implemented, this will have an effect.
 /// </summary>
 /// <param name="text">The name of the temporal filter</param>
-template <typename T> void FractoriumEmberController<T>::TemporalFilterTypeChanged(const QString& text) { Update([&] { m_Ember.m_TemporalFilterType = TemporalFilterCreator<T>::FromString(text.toStdString()); }, true, eProcessAction::NOTHING); }//Don't do anything until animation is implemented.
+template <typename T> void FractoriumEmberController<T>::TemporalFilterTypeChanged(const QString& text)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_TemporalFilterType = TemporalFilterCreator<T>::FromString(text.toStdString());
+	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+}
 void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->TemporalFilterTypeChanged(text); }
 
 /// <summary>
@@ -349,10 +475,10 @@ void FractoriumEmberController<T>::DEFilterMinRadiusWidthChanged(double d)
 		return;
 	}
 
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
-		m_Ember.m_MinRadDE = d;
-	}, true, eProcessAction::FILTER_AND_ACCUM);
+		ember.m_MinRadDE = d;
+	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnDEFilterMinRadiusWidthChanged(double d) { m_Controller->DEFilterMinRadiusWidthChanged(d); }
@@ -371,10 +497,10 @@ void FractoriumEmberController<T>::DEFilterMaxRadiusWidthChanged(double d)
 		return;
 	}
 
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
-		m_Ember.m_MaxRadDE = d;
-	}, true, eProcessAction::FILTER_AND_ACCUM);
+		ember.m_MaxRadDE = d;
+	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d) { m_Controller->DEFilterMaxRadiusWidthChanged(d); }
@@ -386,10 +512,10 @@ void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d) { m_Controller->DEFil
 /// <param name="d">The curve value</param>
 template <typename T> void FractoriumEmberController<T>::DEFilterCurveWidthChanged(double d)
 {
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
-		m_Ember.m_CurveDE = d;
-	}, true, eProcessAction::FILTER_AND_ACCUM);
+		ember.m_CurveDE = d;
+	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnDEFilterCurveWidthChanged(double d) { m_Controller->DEFilterCurveWidthChanged(d); }
@@ -404,7 +530,13 @@ void Fractorium::OnDEFilterCurveWidthChanged(double d) { m_Controller->DEFilterC
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The sub batch size value to set</param>
-template <typename T> void FractoriumEmberController<T>::SbsChanged(int d) { Update([&] { m_Ember.m_SubBatchSize = d; }); }
+template <typename T> void FractoriumEmberController<T>::SbsChanged(int d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_SubBatchSize = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnSbsChanged(int d) { m_Controller->SbsChanged(d); }
 
 /// <summary>
@@ -413,7 +545,13 @@ void Fractorium::OnSbsChanged(int d) { m_Controller->SbsChanged(d); }
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The fuse count value to set</param>
-template <typename T> void FractoriumEmberController<T>::FuseChanged(int d) { Update([&] { m_Ember.m_FuseCount = d; }); }
+template <typename T> void FractoriumEmberController<T>::FuseChanged(int d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_FuseCount = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnFuseChanged(int d) { m_Controller->FuseChanged(d); }
 
 /// <summary>
@@ -426,8 +564,8 @@ void Fractorium::OnFuseChanged(int d) { m_Controller->FuseChanged(d); }
 /// the rendering process is continued, else it's reset.
 /// </summary>
 /// <param name="d">The quality in terms of iterations per pixel</param>
-template <typename T> void FractoriumEmberController<T>::QualityChanged(double d) { /*Update([&] { m_Ember.m_Quality = d; }, true, d > m_Ember.m_Quality ? KEEP_ITERATING : eProcessAction::FULL_RENDER);*/ }
-void Fractorium::OnQualityChanged(double d) { /*m_Controller->QualityChanged(d);*/ }
+template <typename T> void FractoriumEmberController<T>::QualityChanged(double d) { }
+void Fractorium::OnQualityChanged(double d) { m_Controller->QualityChanged(d); }
 
 /// <summary>
 /// Set the supersample.
@@ -440,7 +578,13 @@ void Fractorium::OnQualityChanged(double d) { /*m_Controller->QualityChanged(d);
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The supersample value to set</param>
-template <typename T> void FractoriumEmberController<T>::SupersampleChanged(int d) { Update([&] { m_Ember.m_Supersample = d; }); }
+template <typename T> void FractoriumEmberController<T>::SupersampleChanged(int d)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_Supersample = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnSupersampleChanged(int d) { m_Controller->SupersampleChanged(d); }
 
 /// <summary>
@@ -450,7 +594,13 @@ void Fractorium::OnSupersampleChanged(int d) { m_Controller->SupersampleChanged(
 /// In the future, when animation is implemented, this will have an effect.
 /// </summary>
 /// <param name="d">The temporal samples value</param>
-template <typename T> void FractoriumEmberController<T>::TemporalSamplesChanged(int i) { Update([&] { m_Ember.m_TemporalSamples = i; }, true, eProcessAction::NOTHING); }//Don't do anything until animation is implemented.
+template <typename T> void FractoriumEmberController<T>::TemporalSamplesChanged(int i)
+{
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_TemporalSamples = i;
+	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+}
 void Fractorium::OnTemporalSamplesChanged(int d) { m_Controller->TemporalSamplesChanged(d); }
 
 /// <summary>
@@ -463,15 +613,15 @@ void Fractorium::OnTemporalSamplesChanged(int d) { m_Controller->TemporalSamples
 template <typename T>
 void FractoriumEmberController<T>::AffineInterpTypeChanged(int i)
 {
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
 		if (i == 0)
-			m_Ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LINEAR;
+			ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LINEAR;
 		else if (i == 1)
-			m_Ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
+			ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
 		else
-			m_Ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LINEAR;
-	}, true, eProcessAction::NOTHING);
+			ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LINEAR;
+	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnAffineInterpTypeComboCurrentIndexChanged(int index) { m_Controller->AffineInterpTypeChanged(index); }
@@ -486,15 +636,15 @@ void Fractorium::OnAffineInterpTypeComboCurrentIndexChanged(int index) { m_Contr
 template <typename T>
 void FractoriumEmberController<T>::InterpTypeChanged(int i)
 {
-	Update([&]
+	UpdateAll([&](Ember<T>& ember)
 	{
 		if (i == 0)
-			m_Ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
 		else if (i == 1)
-			m_Ember.m_Interp = eInterp::EMBER_INTERP_SMOOTH;
+			ember.m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 		else
-			m_Ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
-	}, true, eProcessAction::NOTHING);
+			ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
+	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnInterpTypeComboCurrentIndexChanged(int index) { m_Controller->InterpTypeChanged(index); }
@@ -509,13 +659,13 @@ void Fractorium::OnInterpTypeComboCurrentIndexChanged(int index) { m_Controller-
 template <typename T>
 void FractoriumEmberController<T>::SetCenter(double x, double y)
 {
-	m_Ember.m_CenterX = x;
-	m_Ember.m_CenterY = m_Ember.m_RotCenterY = y;
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.m_CenterX = x;
+		ember.m_CenterY = ember.m_RotCenterY = y;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 	m_Fractorium->m_CenterXSpin->SetValueStealth(x);//Don't trigger a redraw twice.
 	m_Fractorium->m_CenterYSpin->SetValueStealth(y);
-
-	if (m_Renderer.get())//On startup, this will be null at first because a resize takes place before the rendering thread is started.
-		CenterXChanged(m_Ember.m_CenterX);//Trigger update using both new values.
 }
 
 /// <summary>

@@ -184,7 +184,7 @@ public:
 		if (!m_ParentEmber && (typeid(T) == typeid(U)))
 			m_ParentEmber = reinterpret_cast<Ember<T>*>(xform.ParentEmber());
 
-		CopyCont(m_Xaos, xform.XaosVec());//<T, U> needed?//TODO
+		CopyCont(m_Xaos, xform.XaosVec());
 		CopyCont(m_Motion, xform.m_Motion);
 		m_Name = xform.m_Name;
 		return *this;

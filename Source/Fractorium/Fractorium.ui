@@ -141,6 +141,16 @@
         <number>4</number>
        </property>
        <item>
+        <widget class="QCheckBox" name="ApplyAllParamsCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply adjustments to all flames in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Apply All</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QScrollArea" name="FlameTabScrollArea">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -157,7 +167,7 @@
             <x>0</x>
             <y>0</y>
             <width>230</width>
-            <height>950</height>
+            <height>933</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -176,7 +186,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <item row="10" column="0">
+           <item row="12" column="0">
             <widget class="TableWidget" name="IterationTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -346,7 +356,23 @@
              </item>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="18" column="0">
+            <spacer name="FlameTabVerticalSpacer5">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="5" column="0">
             <widget class="QTableWidget" name="GeometryTableHeader">
              <property name="enabled">
               <bool>true</bool>
@@ -427,7 +453,7 @@
              </column>
             </widget>
            </item>
-           <item row="9" column="0">
+           <item row="11" column="0">
             <widget class="QTableWidget" name="IterationTableHeader">
              <property name="enabled">
               <bool>true</bool>
@@ -508,7 +534,7 @@
              </column>
             </widget>
            </item>
-           <item row="0" column="0">
+           <item row="1" column="0">
             <widget class="QTableWidget" name="ColorTableHeader">
              <property name="enabled">
               <bool>true</bool>
@@ -595,7 +621,7 @@
              </column>
             </widget>
            </item>
-           <item row="8" column="0">
+           <item row="10" column="0">
             <spacer name="FlameTabVerticalSpacer3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -611,7 +637,7 @@
              </property>
             </spacer>
            </item>
-           <item row="6" column="0">
+           <item row="8" column="0">
             <widget class="QTableWidget" name="FilterTableHeader">
              <property name="enabled">
               <bool>true</bool>
@@ -692,7 +718,7 @@
              </column>
             </widget>
            </item>
-           <item row="5" column="0">
+           <item row="7" column="0">
             <spacer name="FlameTabVerticalSpacer2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -708,7 +734,7 @@
              </property>
             </spacer>
            </item>
-           <item row="2" column="0">
+           <item row="4" column="0">
             <spacer name="FlameTabVerticalSpacer1">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -724,7 +750,7 @@
              </property>
             </spacer>
            </item>
-           <item row="4" column="0">
+           <item row="6" column="0">
             <widget class="TableWidget" name="GeometryTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1014,7 +1040,7 @@
              </item>
             </widget>
            </item>
-           <item row="7" column="0">
+           <item row="9" column="0">
             <widget class="TableWidget" name="FilterTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1199,7 +1225,7 @@
              </item>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="3" column="0">
             <widget class="TableWidget" name="ColorTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1423,7 +1449,7 @@
              </item>
             </widget>
            </item>
-           <item row="14" column="0">
+           <item row="16" column="0">
             <widget class="QTableWidget" name="AnimationTableHeader">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1504,7 +1530,7 @@
              </column>
             </widget>
            </item>
-           <item row="13" column="0">
+           <item row="15" column="0">
             <spacer name="FlameTabVerticalSpacer4">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -1520,7 +1546,7 @@
              </property>
             </spacer>
            </item>
-           <item row="15" column="0">
+           <item row="17" column="0">
             <widget class="QTableWidget" name="AnimationTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1660,22 +1686,6 @@
               </property>
              </item>
             </widget>
-           </item>
-           <item row="16" column="0">
-            <spacer name="FlameTabVerticalSpacer5">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
@@ -3217,7 +3227,7 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0" colspan="2">
+           <item row="4" column="0" colspan="2">
             <widget class="TableWidget" name="XformColorValuesTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -3403,7 +3413,37 @@
              </item>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="3" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="RandomColorIndicesButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Random Indices</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="ToggleColorIndicesButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Toggle Indices</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="0">
             <widget class="QCheckBox" name="SoloXformCheckBox">
              <property name="text">
               <string>Solo</string>
@@ -3473,8 +3513,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>118</width>
-                <height>618</height>
+                <width>263</width>
+                <height>700</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5491,8 +5531,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>133</width>
-                   <height>52</height>
+                   <width>259</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -6767,6 +6807,7 @@
    <addaction name="ActionRedo"/>
    <addaction name="separator"/>
    <addaction name="ActionStartStopRenderer"/>
+   <addaction name="ActionRenderPreviews"/>
    <addaction name="ActionStopRenderingPreviews"/>
    <addaction name="ActionFinalRender"/>
    <addaction name="separator"/>

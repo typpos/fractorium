@@ -376,7 +376,7 @@ public:
 				else
 				{
 					ember.m_Palette.Clear(false);
-					cout << "Failure getting random palette, palette set to white\n";
+					cerr << "Failure getting random palette, palette set to white\n";
 				}
 			}
 		}
@@ -538,7 +538,7 @@ public:
 			}
 			while ((i > 1) && !(got0 && got1));
 
-			os << "cross alternate ";
+			os << " cross alternate ";
 			os << trystr;
 		}
 
@@ -799,7 +799,7 @@ public:
 
 		if (best < 0)
 		{
-			cout << "Error in TryColors(), skipping ImproveColors()\n";
+			cerr << "Error in TryColors(), skipping ImproveColors()\n";
 			return;
 		}
 
@@ -810,7 +810,7 @@ public:
 
 			if (b < 0)
 			{
-				cout << "Error in TryColors, aborting tries.\n";
+				cerr << "Error in TryColors, aborting tries.\n";
 				break;
 			}
 
@@ -826,10 +826,12 @@ public:
 
 	/// <summary>
 	/// Run a test render to improve the colors.
+	/// This checks to see how much of the possible color space is actually used in the final output image.
+	/// Images which contain a small number or range of colors will return a lower value.
 	/// </summary>
 	/// <param name="ember">The ember to render</param>
-	/// <param name="colorResolution">The resolution of the test histogram. This value ^ 3 will be used for the total size. Common value is 10.</param>
-	/// <returns>The number of histogram cells that weren't black</returns>
+	/// <param name="colorResolution">The color resolution of the test histogram. This value ^ 3 will be used for the total size. Common value is 10.</param>
+	/// <returns>The percentage possible color values that were present in the final output image</returns>
 	T TryColors(Ember<T>& ember, size_t colorResolution)
 	{
 		byte* p;
@@ -848,37 +850,31 @@ public:
 		adjustedEmber.m_PixelsPerUnit *= scalar;
 		adjustedEmber.m_TemporalSamples = 1;
 		m_Renderer->SetEmber(adjustedEmber);
-		m_Renderer->BytesPerChannel(1);
 		m_Renderer->EarlyClip(true);
-		m_Renderer->PixelAspectRatio(1);
-		m_Renderer->ThreadCount(Timing::ProcessorCount());
-		m_Renderer->Callback(nullptr);
 
 		if (m_Renderer->Run(m_FinalImage) != eRenderStatus::RENDER_OK)
 		{
-			cout << "Error rendering test image for TryColors().  Aborting.\n";
+			cerr << "Error rendering test image for TryColors().  Aborting.\n";
 			return -1;
 		}
 
 		m_Hist.resize(res3);
-		memset(m_Hist.data(), 0, res3);
+		Memset(m_Hist);
 		p = m_FinalImage.data();
 
 		for (i = 0; i < m_Renderer->FinalDimensions(); i++)
 		{
 			m_Hist[(p[0] * res / 256) +
 				   (p[1] * res / 256) * res +
-				   (p[2] * res / 256) * res * res]++;
-			p += m_Renderer->NumChannels();
+				   (p[2] * res / 256) * res * res]++;//A specific histogram index representing the sum of R,G,B values.
+			p += m_Renderer->PixelSize();//Advance the pointer by 1 pixel.
 		}
 
 		for (i = 0; i < res3; i++)
-		{
-			if (m_Hist[i])
+			if (m_Hist[i])//The greater range of RGB values used...
 				hits++;
-		}
 
-		return T(hits / res3);
+		return T(hits / res3);//...the higher this returned ratio will be.
 	}
 
 	/// <summary>
@@ -897,7 +893,7 @@ public:
 			else
 			{
 				ember.m_Palette.Clear(false);
-				cout << "Error retrieving random palette, setting to all white.\n";
+				cerr << "Error retrieving random palette, setting to all white.\n";
 			}
 		}
 
@@ -1115,7 +1111,7 @@ public:
 			if (templ.m_Background[i] >= 0)
 				ember.m_Background[i] = templ.m_Background[i];
 
-		if (templ.m_Zoom < 999999998)
+		if (templ.m_Zoom < 999999)
 			ember.m_Zoom = templ.m_Zoom;
 
 		if (templ.m_Supersample > 0)
@@ -1126,6 +1122,12 @@ public:
 
 		if (templ.m_Quality > 0)
 			ember.m_Quality = templ.m_Quality;
+
+		if (templ.m_SubBatchSize > 0)
+			ember.m_SubBatchSize = templ.m_SubBatchSize;
+
+		if (templ.m_FuseCount > 0)
+			ember.m_FuseCount = templ.m_FuseCount;
 
 		if (templ.m_TemporalSamples > 0)
 			ember.m_TemporalSamples = templ.m_TemporalSamples;
@@ -1155,10 +1157,10 @@ public:
 		if (templ.m_SpatialFilterType > eSpatialFilterType::GAUSSIAN_SPATIAL_FILTER)
 			ember.m_SpatialFilterType = templ.m_SpatialFilterType;
 
-		if (templ.m_Interp >= eInterp::EMBER_INTERP_LINEAR)
+		if (templ.m_Interp != eInterp::EMBER_INTERP_SMOOTH)
 			ember.m_Interp = templ.m_Interp;
 
-		if (templ.m_AffineInterp >= eAffineInterp::AFFINE_INTERP_LINEAR)
+		if (templ.m_AffineInterp != eAffineInterp::AFFINE_INTERP_LOG)
 			ember.m_AffineInterp = templ.m_AffineInterp;
 
 		if (templ.m_TemporalFilterType >= eTemporalFilterType::BOX_TEMPORAL_FILTER)
@@ -1167,13 +1169,13 @@ public:
 		if (templ.m_TemporalFilterWidth > 0)
 			ember.m_TemporalFilterWidth = templ.m_TemporalFilterWidth;
 
-		if (templ.m_TemporalFilterExp > -900)
+		if (templ.m_TemporalFilterExp > -999)
 			ember.m_TemporalFilterExp = templ.m_TemporalFilterExp;
 
-		if (templ.m_HighlightPower >= 0)
+		if (templ.m_HighlightPower != 1)
 			ember.m_HighlightPower = templ.m_HighlightPower;
 
-		if (templ.m_PaletteMode >= ePaletteMode::PALETTE_STEP)
+		if (templ.m_PaletteMode != ePaletteMode::PALETTE_LINEAR)
 			ember.m_PaletteMode = templ.m_PaletteMode;
 	}
 

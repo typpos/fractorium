@@ -427,9 +427,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 	if (mod.testFlag(Qt::ShiftModifier))
 		SetShift();
 
-	//if (mod.testFlag(Qt::ControlModifier))// || mod.testFlag(Qt::Key_C))
-	//	m_DragModifier |= DragModControl;
-	if (mod.testFlag(Qt::AltModifier))// || mod.testFlag(Qt::Key_A))
+	if (mod.testFlag(Qt::AltModifier))
 		SetAlt();
 
 	if (m_DragState == eDragState::DragNone)//Only take action if the user wasn't already dragging.

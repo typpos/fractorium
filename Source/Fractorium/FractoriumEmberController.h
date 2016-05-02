@@ -186,6 +186,8 @@ public:
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender) { }
 	virtual void XformScrollColorIndexChanged(int d) { }
+	virtual void RandomColorIndicesButtonClicked() { }
+	virtual void ToggleColorIndicesButtonClicked() { }
 	virtual void XformColorSpeedChanged(double d) { }
 	virtual void XformOpacityChanged(double d) { }
 	virtual void XformDirectColorChanged(double d) { }
@@ -431,6 +433,8 @@ public:
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender) override;
 	virtual void XformScrollColorIndexChanged(int d) override;
+	virtual void RandomColorIndicesButtonClicked() override;
+	virtual void ToggleColorIndicesButtonClicked() override;
 	virtual void XformColorSpeedChanged(double d) override;
 	virtual void XformOpacityChanged(double d) override;
 	virtual void XformDirectColorChanged(double d) override;
@@ -494,6 +498,7 @@ private:
 
 	//Rendering/progress.
 	void Update(std::function<void (void)> func, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER);
+	void UpdateAll(std::function<void (Ember<T>&)> func, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, bool applyAll = false);
 	bool SyncSizes();
 
 	//Templated members.

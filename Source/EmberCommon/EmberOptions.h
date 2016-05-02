@@ -121,7 +121,6 @@ enum class eOptionIDs : et
 	OPT_METHOD,
 	OPT_INTER,
 	OPT_ROTATE,
-	OPT_STRIP,
 	OPT_SEQUENCE,
 	OPT_USE_VARS,
 	OPT_DONT_USE_VARS,
@@ -303,9 +302,9 @@ public:
 		INITBOOLOPTION(Help,           Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_HELP,             _T("--help"),                 false,                SO_NONE,    "\t--help                   Show this screen and exit.\n"));
 		INITBOOLOPTION(Version,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERSION,          _T("--version"),              false,                SO_NONE,    "\t--version                Show version and exit.\n"));
 		INITBOOLOPTION(OpenCLInfo,     Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_DUMP_OPENCL_INFO, _T("--openclinfo"),           false,                SO_NONE,    "\t--openclinfo             Display platforms and devices for OpenCL and exit.\n"));
-		INITBOOLOPTION(AllVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ALL_VARS,         _T("--allvars"),              false,                SO_NONE,    "\t--allvars				  Display the names of all supported variations and exit.\n"));
-		INITBOOLOPTION(RegVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REG_VARS,         _T("--regvars"),              false,                SO_NONE,    "\t--regvars				  Display the names of all supported regular variations and exit.\n"));
-		INITBOOLOPTION(PreVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PRE_VARS,         _T("--prevars"),              false,                SO_NONE,    "\t--prevars				  Display the names of all supported pre variations and exit.\n"));
+		INITBOOLOPTION(AllVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ALL_VARS,         _T("--allvars"),              false,                SO_NONE,    "\t--allvars                Display the names of all supported variations and exit.\n"));
+		INITBOOLOPTION(RegVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REG_VARS,         _T("--regvars"),              false,                SO_NONE,    "\t--regvars                Display the names of all supported regular variations and exit.\n"));
+		INITBOOLOPTION(PreVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PRE_VARS,         _T("--prevars"),              false,                SO_NONE,    "\t--prevars                Display the names of all supported pre variations and exit.\n"));
 		INITBOOLOPTION(PostVars,       Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_POST_VARS,        _T("--postvars"),             false,                SO_NONE,    "\t--postvars               Display the names of all supported post variations and exit.\n"));
 		//Diagnostic bools.
 		INITBOOLOPTION(Verbose,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERBOSE,          _T("--verbose"),              false,                SO_NONE,    "\t--verbose                Verbose output [default: false].\n"));
@@ -344,17 +343,17 @@ public:
 		INITUINTOPTION(Strips,		   Eou(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_STRIPS,           _T("--nstrips"),              1,                    SO_REQ_SEP, "\t--nstrips=<val>          The number of fractions to split a single render frame into. Useful for print size renders or low memory systems [default: 1].\n"));
 		INITUINTOPTION(Supersample,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "\t--supersample=<val>      The supersample value used to override the one specified in the file [default: 0 (use value from file), Range: 0 - 4].\n"));
 		INITUINTOPTION(BitsPerChannel, Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "\t--bpc=<val>              Bits per channel. 8 or 16 for PNG, 8 for all others, always 8 with OpenCL [default: 8].\n"));
-		INITUINTOPTION(PrintEditDepth, Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"), 0,                       SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
-		INITUINTOPTION(JpegQuality,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),             95,                      SO_REQ_SEP, "\t--jpeg=<val>             Jpeg quality 0-100 for compression [default: 95].\n"));
-		INITUINTOPTION(FirstFrame,     Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),            UINT_MAX,                SO_REQ_SEP, "\t--begin=<val>            Time of first frame to render [default: first time specified in file].\n"));
-		INITUINTOPTION(LastFrame,      Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_END,              _T("--end"),	            UINT_MAX,                SO_REQ_SEP, "\t--end=<val>              Time of last frame to render [default: last time specified in the input file].\n"));
-		INITUINTOPTION(Time,           Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_TIME,             _T("--time"),             0,                       SO_REQ_SEP, "\t--time=<val>             Time of first and last frame (ie do one frame).\n"));
-		INITUINTOPTION(Frame,          Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_FRAME,            _T("--frame"),            0,                       SO_REQ_SEP, "\t--frame=<val>            Synonym for \"time\".\n"));
-		INITUINTOPTION(Dtime,          Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_DTIME,            _T("--dtime"),            1,                       SO_REQ_SEP, "\t--dtime=<val>            Time between frames [default: 1].\n"));
-		INITUINTOPTION(Frames,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NFRAMES,          _T("--nframes"),          20,                      SO_REQ_SEP, "\t--nframes=<val>          Number of frames per loop and per interpolation in the animation [default: 20].\n"));
-		INITUINTOPTION(Repeat,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REPEAT,           _T("--repeat"),           1,                       SO_REQ_SEP, "\t--repeat=<val>           Number of new flames to create. Ignored if sequence, inter or rotate were specified [default: 1].\n"));
-		INITUINTOPTION(Tries,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_TRIES,            _T("--tries"),            10,                      SO_REQ_SEP, "\t--tries=<val>            Number times to try creating a flame that meets the specified constraints. Ignored if sequence, inter or rotate were specified [default: 10].\n"));
-		INITUINTOPTION(MaxXforms,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_MAX_XFORMS,       _T("--maxxforms"),        UINT_MAX,                SO_REQ_SEP, "\t--maxxforms=<val>        The maximum number of xforms allowed in the final output.\n"));
+		INITUINTOPTION(PrintEditDepth, Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"),     0,                    SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
+		INITUINTOPTION(JpegQuality,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),                 95,                   SO_REQ_SEP, "\t--jpeg=<val>             Jpeg quality 0-100 for compression [default: 95].\n"));
+		INITUINTOPTION(FirstFrame,     Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),                UINT_MAX,             SO_REQ_SEP, "\t--begin=<val>            Time of first frame to render [default: first time specified in file].\n"));
+		INITUINTOPTION(LastFrame,      Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_END,              _T("--end"),	                UINT_MAX,             SO_REQ_SEP, "\t--end=<val>              Time of last frame to render [default: last time specified in the input file].\n"));
+		INITUINTOPTION(Time,           Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_TIME,             _T("--time"),                 0,                    SO_REQ_SEP, "\t--time=<val>             Time of first and last frame (ie do one frame).\n"));
+		INITUINTOPTION(Frame,          Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_FRAME,            _T("--frame"),                0,                    SO_REQ_SEP, "\t--frame=<val>            Synonym for \"time\".\n"));
+		INITUINTOPTION(Dtime,          Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_DTIME,            _T("--dtime"),                1,                    SO_REQ_SEP, "\t--dtime=<val>            Time between frames [default: 1].\n"));
+		INITUINTOPTION(Frames,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NFRAMES,          _T("--nframes"),              20,                   SO_REQ_SEP, "\t--nframes=<val>          Number of frames per loop and per interpolation in the animation [default: 20].\n"));
+		INITUINTOPTION(Repeat,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REPEAT,           _T("--repeat"),               1,                    SO_REQ_SEP, "\t--repeat=<val>           Number of new flames to create. Ignored if sequence, inter or rotate were specified [default: 1].\n"));
+		INITUINTOPTION(Tries,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_TRIES,            _T("--tries"),                10,                   SO_REQ_SEP, "\t--tries=<val>            Number times to try creating a flame that meets the specified constraints. Ignored if sequence, inter or rotate were specified [default: 10].\n"));
+		INITUINTOPTION(MaxXforms,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_MAX_XFORMS,       _T("--maxxforms"),            UINT_MAX,             SO_REQ_SEP, "\t--maxxforms=<val>        The maximum number of xforms allowed in the final output.\n"));
 		//Double.
 		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1,                    SO_REQ_SEP, "\t--ss=<val>               Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
 		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1,                    SO_REQ_SEP, "\t--qs=<val>               Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
@@ -397,7 +396,6 @@ public:
 		INITSTRINGOPTION(Method,       Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_METHOD,           _T("--method"),               "",                   SO_REQ_SEP, "\t--method=<val>           Method used for genetic cross: alternate, interpolate, or union. For mutate: all_vars, one_xform, add_symmetry, post_xforms, color_palette, delete_xform, all_coefs [default: random].\n"));//Original ommitted this important documentation for mutate!
 		INITSTRINGOPTION(Inter,        Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_INTER,            _T("--inter"),                "",                   SO_REQ_SEP, "\t--inter=<val>            Interpolate the input file.\n"));
 		INITSTRINGOPTION(Rotate,       Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ROTATE,           _T("--rotate"),               "",                   SO_REQ_SEP, "\t--rotate=<val>           Rotate the input file.\n"));
-		INITSTRINGOPTION(Strip,        Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STRIP,            _T("--strip"),                "",                   SO_REQ_SEP, "\t--strip=<val>            Break strip out of each flame in the input file.\n"));
 		INITSTRINGOPTION(Sequence,     Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SEQUENCE,         _T("--sequence"),             "",                   SO_REQ_SEP, "\t--sequence=<val>         360 degree rotation 'loops' times of each control point in the input file plus rotating transitions.\n"));
 		INITSTRINGOPTION(UseVars,      Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_USE_VARS,         _T("--use_vars"),             "",                   SO_REQ_SEP, "\t--use_vars=<val>         Comma separated list of variation #'s to use when generating a random flame.\n"));
 		INITSTRINGOPTION(DontUseVars,  Eos(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_DONT_USE_VARS,    _T("--dont_use_vars"),        "",                   SO_REQ_SEP, "\t--dont_use_vars=<val>    Comma separated list of variation #'s to NOT use when generating a random flame.\n"));
@@ -526,7 +524,6 @@ public:
 					PARSESTRINGOPTION(eOptionIDs::OPT_METHOD, Method);
 					PARSESTRINGOPTION(eOptionIDs::OPT_INTER, Inter);
 					PARSESTRINGOPTION(eOptionIDs::OPT_ROTATE, Rotate);
-					PARSESTRINGOPTION(eOptionIDs::OPT_STRIP, Strip);
 					PARSESTRINGOPTION(eOptionIDs::OPT_SEQUENCE, Sequence);
 					PARSESTRINGOPTION(eOptionIDs::OPT_USE_VARS, UseVars);
 					PARSESTRINGOPTION(eOptionIDs::OPT_DONT_USE_VARS, DontUseVars);
@@ -804,7 +801,6 @@ public:
 	Eos Method;
 	Eos Inter;
 	Eos Rotate;
-	Eos Strip;
 	Eos Sequence;
 	Eos UseVars;
 	Eos DontUseVars;

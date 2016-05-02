@@ -21,7 +21,6 @@ template <typename T>
 class EMBER_API VariationList: public Singleton<VariationList<T>>
 {
 public:
-	//~VariationList();
 	const Variation<T>* GetVariation(size_t index) const;
 	const Variation<T>* GetVariation(size_t index, eVariationType varType) const;
 	Variation<T>* GetVariationCopy(size_t index, T weight = 1) const;

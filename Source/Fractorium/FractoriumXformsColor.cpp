@@ -13,6 +13,8 @@ void Fractorium::InitXformsColorUI()
 	ui.XformPaletteRefTable->setItem(0, 0, m_PaletteRefItem);
 	ui.XformPaletteRefTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	connect(ui.XformPaletteRefTable->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this, SLOT(OnXformRefPaletteResized(int, int, int)), Qt::QueuedConnection);
+	connect(ui.RandomColorIndicesButton, SIGNAL(clicked(bool)), this, SLOT(OnRandomColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.ToggleColorIndicesButton, SIGNAL(clicked(bool)), this, SLOT(OnToggleColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorIndexTable,  this, row, 1, m_XformColorIndexSpin,  spinHeight,  0, 1, 0.01, SIGNAL(valueChanged(double)), SLOT(OnXformColorIndexChanged(double)),  false,   0,   1,   0);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorValuesTable, this, row, 1, m_XformColorSpeedSpin,  spinHeight, -1, 1,  0.1, SIGNAL(valueChanged(double)), SLOT(OnXformColorSpeedChanged(double)),  true,  0.5, 0.5, 0.5);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorValuesTable, this, row, 1, m_XformOpacitySpin,	    spinHeight,  0, 1,  0.1, SIGNAL(valueChanged(double)), SLOT(OnXformOpacityChanged(double)),	    true,    1,   1,   0);
@@ -21,8 +23,8 @@ void Fractorium::InitXformsColorUI()
 	m_XformColorSpeedSpin->setDecimals(3);
 	m_XformOpacitySpin->setDecimals(3);
 	m_XformDirectColorSpin->setDecimals(3);
-	connect(ui.XformColorScroll,  SIGNAL(valueChanged(int)),							this, SLOT(OnXformScrollColorIndexChanged(int)),			Qt::QueuedConnection);
-	connect(ui.SoloXformCheckBox, SIGNAL(stateChanged(int)),							this, SLOT(OnSoloXformCheckBoxStateChanged(int)),			Qt::QueuedConnection);
+	connect(ui.XformColorScroll,  SIGNAL(valueChanged(int)), this, SLOT(OnXformScrollColorIndexChanged(int)),  Qt::QueuedConnection);
+	connect(ui.SoloXformCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSoloXformCheckBoxStateChanged(int)), Qt::QueuedConnection);
 }
 
 /// <summary>
@@ -69,6 +71,35 @@ void FractoriumEmberController<T>::XformScrollColorIndexChanged(int d)
 }
 
 void Fractorium::OnXformScrollColorIndexChanged(int d) { m_Controller->XformScrollColorIndexChanged(d); }
+
+/// <summary>
+/// Set all xform color indices to a random value between 0 and 1, inclusive.
+/// Called when the Random Indices button is clicked.
+/// Resets the rendering process.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::RandomColorIndicesButtonClicked()
+{
+	UpdateXform([&](Xform<T>* xform) { xform->m_ColorX = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL);
+	m_Fractorium->m_XformColorIndexSpin->SetValueStealth(CurrentXform()->m_ColorX);
+	m_Fractorium->OnXformColorIndexChanged(CurrentXform()->m_ColorX, false);//Update GUI, no need to update renderer because UpdateXform() did it.
+}
+void Fractorium::OnRandomColorIndicesButtonClicked(bool b) { m_Controller->RandomColorIndicesButtonClicked(); }
+
+/// <summary>
+/// Resets the rendering process.
+/// Set all xform color indices to either 0 and 1, sequentially toggling.
+/// Called when the Toggle Indices button is clicked.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::ToggleColorIndicesButtonClicked()
+{
+	char ch = 1;
+	UpdateXform([&](Xform<T>* xform) { xform->m_ColorX = T(ch ^= 1); }, eXformUpdate::UPDATE_ALL);
+	m_Fractorium->m_XformColorIndexSpin->SetValueStealth(CurrentXform()->m_ColorX);
+	m_Fractorium->OnXformColorIndexChanged(CurrentXform()->m_ColorX, false);//Update GUI, no need to update renderer because UpdateXform() did it.
+}
+void Fractorium::OnToggleColorIndicesButtonClicked(bool b) { m_Controller->ToggleColorIndicesButtonClicked(); }
 
 /// <summary>
 /// Set the color speed of the selected xforms.

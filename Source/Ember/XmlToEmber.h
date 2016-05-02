@@ -524,6 +524,12 @@ private:
 						AddToReport(string(loc) + " : Error assigning palette with index " + Itos(currentEmber.PaletteIndex()));
 				}
 
+				if (!currentEmber.XformCount())//Ensure there is always at least one xform or else the renderer will crash when trying to render.
+				{
+					Xform<T> xform;
+					currentEmber.AddXform(xform);
+				}
+
 				//if (!Interpolater<T>::InterpMissingColors(currentEmber.m_Palette.m_Entries))
 				//	AddToReport(string(loc) + " : Error interpolating missing palette colors");
 				currentEmber.CacheXforms();

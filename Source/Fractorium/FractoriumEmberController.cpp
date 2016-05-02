@@ -200,9 +200,30 @@ void FractoriumEmberController<T>::SetEmber(size_t index, bool verbatim)
 /// <param name="updateRender">True to update renderer, else false. Default: true.</param>
 /// <param name="action">The action to add to the rendering queue. Default: eProcessAction::FULL_RENDER.</param>
 template <typename T>
-void FractoriumEmberController<T>::Update(std::function<void (void)> func, bool updateRender, eProcessAction action)
+void FractoriumEmberController<T>::Update(std::function<void(void)> func, bool updateRender, eProcessAction action)
 {
 	func();
+
+	if (updateRender)
+		UpdateRender(action);
+}
+
+/// <summary>
+/// Wrapper to call a function on the current ember and optionally all other embers in the file.
+/// Then optionally add the requested action to the rendering queue.
+/// </summary>
+/// <param name="func">The function to call</param>
+/// <param name="updateRender">True to update renderer, else false. Default: true.</param>
+/// <param name="action">The action to add to the rendering queue. Default: eProcessAction::FULL_RENDER.</param>
+/// <param name="applyAll">True to apply the action to all embers in the file in addition to the curent one, false to apply the action only to the current one.</param>
+template <typename T>
+void FractoriumEmberController<T>::UpdateAll(std::function<void(Ember<T>& ember)> func, bool updateRender, eProcessAction action, bool applyAll)
+{
+	func(m_Ember);
+
+	if (applyAll)
+		for (auto& it : m_EmberFile.m_Embers)
+			func(it);
 
 	if (updateRender)
 		UpdateRender(action);
@@ -352,7 +373,7 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 
 	string filename = QDir::homePath().toStdString() + "/.config/fractorium/last.flame";
 #endif
-	writer.Save(filename.c_str(), m_Ember, 0, true, false, true);
+	writer.Save(filename.c_str(), m_Ember, 0, true, true, false, true, true);
 	m_GLController->ResetMouseState();
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 	FillParamTablesAndPalette();

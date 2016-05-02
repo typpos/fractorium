@@ -87,6 +87,7 @@ public:
 	~Fractorium();
 
 	//Geometry.
+	bool ApplyAll();
 	void SetCenter(float x, float y);
 	void SetRotation(double rot, bool stealth);
 	void SetScale(double scale);
@@ -241,6 +242,8 @@ public slots:
 	void OnXformColorIndexChanged(double d);
 	void OnXformColorIndexChanged(double d, bool updateRender);
 	void OnXformScrollColorIndexChanged(int d);
+	void OnRandomColorIndicesButtonClicked(bool b);
+	void OnToggleColorIndicesButtonClicked(bool b);
 	void OnXformColorSpeedChanged(double d);
 	void OnXformOpacityChanged(double d);
 	void OnXformDirectColorChanged(double d);

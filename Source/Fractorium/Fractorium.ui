@@ -143,7 +143,7 @@
        <item>
         <widget class="QCheckBox" name="ApplyAllParamsCheckBox">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply adjustments to all flames in the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply adjustments to all flames in the file. Also applies to flatten/unflatten menu items.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Apply All</string>
@@ -3513,8 +3513,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>263</width>
-                <height>700</height>
+                <width>118</width>
+                <height>618</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5531,8 +5531,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>259</width>
-                   <height>652</height>
+                   <width>133</width>
+                   <height>52</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">

@@ -753,7 +753,18 @@ void Fractorium::OnActionAddBothSymmetry(bool checked) { m_Controller->AddBothSy
 /// Resets the rendering process.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::Flatten() { UpdateXform([&] (Xform<T>* xform) { m_Ember.Flatten(XmlToEmber<T>::m_FlattenNames); FillVariationTreeWithXform(xform); }); }
+void FractoriumEmberController<T>::Flatten()
+{
+	UpdateXform([&] (Xform<T>* xform)
+	{
+		m_Ember.Flatten(XmlToEmber<T>::m_FlattenNames);
+		FillVariationTreeWithXform(xform);
+	}, eXformUpdate::UPDATE_CURRENT, false);//Don't update render, it'll update below.
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.Flatten(XmlToEmber<T>::m_FlattenNames);
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnActionFlatten(bool checked) { m_Controller->Flatten(); }
 
 /// <summary>
@@ -761,7 +772,18 @@ void Fractorium::OnActionFlatten(bool checked) { m_Controller->Flatten(); }
 /// Resets the rendering process.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::Unflatten() { UpdateXform([&] (Xform<T>* xform) { m_Ember.Unflatten(); FillVariationTreeWithXform(xform); }); }
+void FractoriumEmberController<T>::Unflatten()
+{
+	UpdateXform([&] (Xform<T>* xform)
+	{
+		m_Ember.Unflatten();
+		FillVariationTreeWithXform(xform);
+	}, eXformUpdate::UPDATE_CURRENT, false);//Don't update render, it'll update below.
+	UpdateAll([&](Ember<T>& ember)
+	{
+		ember.Unflatten();
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
 void Fractorium::OnActionUnflatten(bool checked) { m_Controller->Unflatten(); }
 
 /// <summary>

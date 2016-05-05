@@ -64,13 +64,13 @@ enum class eOptionIDs : et
 	OPT_NTHREADS,//Int value args.
 	OPT_STRIPS,
 	OPT_SUPERSAMPLE,
+	OPT_TEMPSAMPLES,
 	OPT_BPC,
 	OPT_PRINT_EDIT_DEPTH,
 	OPT_JPEG,
 	OPT_BEGIN,
 	OPT_END,
 	OPT_FRAME,
-	OPT_TIME,
 	OPT_DTIME,
 	OPT_NFRAMES,
 	OPT_SYMMETRY,
@@ -200,7 +200,7 @@ public:
 	/// <summary>
 	/// Functor accessors.
 	/// </summary>
-	inline T    operator() (void) const { return m_Val; }
+	inline const T& operator() (void) const { return m_Val; }
 	inline void operator() (T t) { m_Val = t; }
 
 private:
@@ -320,8 +320,8 @@ public:
 		INITBOOLOPTION(NameEnable,     Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_NAME_ENABLE,      _T("--name_enable"),          false,                SO_NONE,    "\t--name_enable            Use the name attribute contained in the Xml as the output filename [default: false].\n"));
 		INITBOOLOPTION(HexPalette,     Eob(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_HEX_PALETTE,      _T("--hex_palette"),          true,                 SO_OPT,     "\t--hex_palette            Force palette RGB values to be hex when saving to Xml [default: true].\n"));
 		INITBOOLOPTION(InsertPalette,  Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_INSERT_PALETTE,   _T("--insert_palette"),       false,                SO_NONE,    "\t--insert_palette         Insert the palette into the image for debugging purposes. Disabled when running with OpenCL [default: false].\n"));
-		INITBOOLOPTION(JpegComments,   Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG_COMMENTS,	  _T("--enable_jpeg_comments"), false,				  SO_OPT,	  "\t--enable_jpeg_comments   Enables embedding the flame parameters and user identifying information in the jpeg header [default: false].\n"));
-		INITBOOLOPTION(PngComments,    Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PNG_COMMENTS,	  _T("--enable_png_comments"),  false,				  SO_OPT,	  "\t--enable_png_comments    Enables embedding the flame parameters and user identifying information png header [default: false].\n"));
+		INITBOOLOPTION(JpegComments,   Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG_COMMENTS,	  _T("--enable_jpg_comments"),  false,				  SO_NONE,	  "\t--enable_jpg_comments    Enables embedding the flame parameters and user identifying information in the jpeg header [default: false].\n"));
+		INITBOOLOPTION(PngComments,    Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PNG_COMMENTS,	  _T("--enable_png_comments"),  false,				  SO_NONE,	  "\t--enable_png_comments    Enables embedding the flame parameters and user identifying information in the png header [default: false].\n"));
 		INITBOOLOPTION(WriteGenome,    Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_WRITE_GENOME,     _T("--write_genome"),         false,                SO_NONE,    "\t--write_genome           Write out flame associated with center of motion blur window [default: false].\n"));
 		INITBOOLOPTION(ThreadedWrite,  Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_THREADED_WRITE,   _T("--threaded_write"),       true,                 SO_OPT,     "\t--threaded_write         Use a separate thread to write images to disk. This gives better performance, but doubles the memory required for the final output buffer. [default: true].\n"));
 		INITBOOLOPTION(Enclosed,	   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ENCLOSED,		  _T("--enclosed"),				true,				  SO_OPT,	  "\t--enclosed               Use enclosing Xml tags [default: true].\n"));
@@ -339,21 +339,21 @@ public:
 		INITINTOPTION(Priority,		   Eoi(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PRIORITY,		  _T("--priority"),	int(eThreadPriority::NORMAL),  SO_REQ_SEP,	  "\t--priority=<val>         The priority of the CPU rendering threads, 1, 25, 50, 75, 99. This does not apply to OpenCL rendering.\n"));
 #endif
 		//Uint.
-		INITUINTOPTION(ThreadCount,    Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_NTHREADS,         _T("--nthreads"),             0,                    SO_REQ_SEP, "\t--nthreads=<val>         The number of threads to use [default: use all available cores].\n"));
-		INITUINTOPTION(Strips,		   Eou(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_STRIPS,           _T("--nstrips"),              1,                    SO_REQ_SEP, "\t--nstrips=<val>          The number of fractions to split a single render frame into. Useful for print size renders or low memory systems [default: 1].\n"));
-		INITUINTOPTION(Supersample,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "\t--supersample=<val>      The supersample value used to override the one specified in the file [default: 0 (use value from file), Range: 0 - 4].\n"));
-		INITUINTOPTION(BitsPerChannel, Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "\t--bpc=<val>              Bits per channel. 8 or 16 for PNG, 8 for all others, always 8 with OpenCL [default: 8].\n"));
-		INITUINTOPTION(PrintEditDepth, Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"),     0,                    SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
-		INITUINTOPTION(JpegQuality,    Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),                 95,                   SO_REQ_SEP, "\t--jpeg=<val>             Jpeg quality 0-100 for compression [default: 95].\n"));
-		INITUINTOPTION(FirstFrame,     Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),                UINT_MAX,             SO_REQ_SEP, "\t--begin=<val>            Time of first frame to render [default: first time specified in file].\n"));
-		INITUINTOPTION(LastFrame,      Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_END,              _T("--end"),	                UINT_MAX,             SO_REQ_SEP, "\t--end=<val>              Time of last frame to render [default: last time specified in the input file].\n"));
-		INITUINTOPTION(Time,           Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_TIME,             _T("--time"),                 0,                    SO_REQ_SEP, "\t--time=<val>             Time of first and last frame (ie do one frame).\n"));
-		INITUINTOPTION(Frame,          Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_FRAME,            _T("--frame"),                0,                    SO_REQ_SEP, "\t--frame=<val>            Synonym for \"time\".\n"));
-		INITUINTOPTION(Dtime,          Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_DTIME,            _T("--dtime"),                1,                    SO_REQ_SEP, "\t--dtime=<val>            Time between frames [default: 1].\n"));
-		INITUINTOPTION(Frames,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NFRAMES,          _T("--nframes"),              20,                   SO_REQ_SEP, "\t--nframes=<val>          Number of frames per loop and per interpolation in the animation [default: 20].\n"));
-		INITUINTOPTION(Repeat,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REPEAT,           _T("--repeat"),               1,                    SO_REQ_SEP, "\t--repeat=<val>           Number of new flames to create. Ignored if sequence, inter or rotate were specified [default: 1].\n"));
-		INITUINTOPTION(Tries,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_TRIES,            _T("--tries"),                10,                   SO_REQ_SEP, "\t--tries=<val>            Number times to try creating a flame that meets the specified constraints. Ignored if sequence, inter or rotate were specified [default: 10].\n"));
-		INITUINTOPTION(MaxXforms,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_MAX_XFORMS,       _T("--maxxforms"),            UINT_MAX,             SO_REQ_SEP, "\t--maxxforms=<val>        The maximum number of xforms allowed in the final output.\n"));
+		INITUINTOPTION(ThreadCount,     Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_NTHREADS,         _T("--nthreads"),             0,                    SO_REQ_SEP, "\t--nthreads=<val>         The number of threads to use [default: use all available cores].\n"));
+		INITUINTOPTION(Strips,		    Eou(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_STRIPS,           _T("--nstrips"),              1,                    SO_REQ_SEP, "\t--nstrips=<val>          The number of fractions to split a single render frame into. Useful for print size renders or low memory systems [default: 1].\n"));
+		INITUINTOPTION(Supersample,     Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "\t--supersample=<val>      The supersample value used to override the one specified in the file [default: 0 (use value from file), Range: 0 - 4].\n"));
+		INITUINTOPTION(TemporalSamples, Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_TEMPSAMPLES,      _T("--ts"),                   0,                    SO_REQ_SEP, "\t--ts=<val>               The temporal samples value used to override all of the temporal sample values specified in the file when animating [default: 0 (use value from file)].\n"));
+		INITUINTOPTION(BitsPerChannel,  Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "\t--bpc=<val>              Bits per channel. 8 or 16 for PNG, 8 for all others, always 8 with OpenCL [default: 8].\n"));
+		INITUINTOPTION(PrintEditDepth,  Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"),     0,                    SO_REQ_SEP, "\t--print_edit_depth=<val> Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
+		INITUINTOPTION(JpegQuality,     Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),                 95,                   SO_REQ_SEP, "\t--jpeg=<val>             Jpeg quality 0-100 for compression [default: 95].\n"));
+		INITUINTOPTION(FirstFrame,      Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),                UINT_MAX,             SO_REQ_SEP, "\t--begin=<val>            Time of first frame to render [default: first time specified in file].\n"));
+		INITUINTOPTION(LastFrame,       Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_END,              _T("--end"),	                 UINT_MAX,             SO_REQ_SEP, "\t--end=<val>              Time of last frame to render [default: last time specified in the input file].\n"));
+		INITUINTOPTION(Frame,           Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_FRAME,            _T("--frame"),                UINT_MAX,             SO_REQ_SEP, "\t--frame=<val>            Time of first and last frame (ie do one frame).\n"));
+		INITUINTOPTION(Dtime,           Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_DTIME,            _T("--dtime"),                1,                    SO_REQ_SEP, "\t--dtime=<val>            Time between frames [default: 1].\n"));
+		INITUINTOPTION(Frames,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NFRAMES,          _T("--nframes"),              20,                   SO_REQ_SEP, "\t--nframes=<val>          Number of frames per loop and per interpolation in the animation [default: 20].\n"));
+		INITUINTOPTION(Repeat,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REPEAT,           _T("--repeat"),               1,                    SO_REQ_SEP, "\t--repeat=<val>           Number of new flames to create. Ignored if sequence, inter or rotate were specified [default: 1].\n"));
+		INITUINTOPTION(Tries,           Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_TRIES,            _T("--tries"),                10,                   SO_REQ_SEP, "\t--tries=<val>            Number times to try creating a flame that meets the specified constraints. Ignored if sequence, inter or rotate were specified [default: 10].\n"));
+		INITUINTOPTION(MaxXforms,       Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_MAX_XFORMS,       _T("--maxxforms"),            UINT_MAX,             SO_REQ_SEP, "\t--maxxforms=<val>        The maximum number of xforms allowed in the final output.\n"));
 		//Double.
 		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1,                    SO_REQ_SEP, "\t--ss=<val>               Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
 		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1,                    SO_REQ_SEP, "\t--qs=<val>               Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
@@ -473,13 +473,13 @@ public:
 					PARSEUINTOPTION(eOptionIDs::OPT_NTHREADS, ThreadCount);//uint args.
 					PARSEUINTOPTION(eOptionIDs::OPT_STRIPS, Strips);
 					PARSEUINTOPTION(eOptionIDs::OPT_SUPERSAMPLE, Supersample);
+					PARSEUINTOPTION(eOptionIDs::OPT_TEMPSAMPLES, TemporalSamples);
 					PARSEUINTOPTION(eOptionIDs::OPT_BPC, BitsPerChannel);
 					PARSEUINTOPTION(eOptionIDs::OPT_PRINT_EDIT_DEPTH, PrintEditDepth);
 					PARSEUINTOPTION(eOptionIDs::OPT_JPEG, JpegQuality);
 					PARSEUINTOPTION(eOptionIDs::OPT_BEGIN, FirstFrame);
 					PARSEUINTOPTION(eOptionIDs::OPT_END, LastFrame);
 					PARSEUINTOPTION(eOptionIDs::OPT_FRAME, Frame);
-					PARSEUINTOPTION(eOptionIDs::OPT_TIME, Time);
 					PARSEUINTOPTION(eOptionIDs::OPT_DTIME, Dtime);
 					PARSEUINTOPTION(eOptionIDs::OPT_NFRAMES, Frames);
 					PARSEUINTOPTION(eOptionIDs::OPT_REPEAT, Repeat);
@@ -747,6 +747,7 @@ public:
 	Eou ThreadCount;//Value uint.
 	Eou Strips;
 	Eou Supersample;
+	Eou TemporalSamples;
 	Eou BitsPerChannel;
 	Eou Bits;
 	Eou PrintEditDepth;
@@ -754,7 +755,6 @@ public:
 	Eou FirstFrame;
 	Eou LastFrame;
 	Eou Frame;
-	Eou Time;
 	Eou Dtime;
 	Eou Frames;
 	Eou Repeat;

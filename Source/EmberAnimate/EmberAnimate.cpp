@@ -78,8 +78,25 @@ bool EmberAnimate(EmberOptions& opt)
 
 		opt.ThreadCount(1);
 
-		for (auto& r : renderers)
-			r->ThreadCount(opt.ThreadCount(), opt.IsaacSeed() != "" ? opt.IsaacSeed().c_str() : nullptr);
+		if (opt.IsaacSeed().empty())
+		{
+			for (auto& r : renderers)
+				r->ThreadCount(opt.ThreadCount(), nullptr);
+		}
+		else
+		{
+			for (i = 0; i < renderers.size(); i++)
+			{
+				string ns;
+				auto& is = opt.IsaacSeed();
+				ns.reserve(is.size());
+
+				for (auto& c : is)
+					ns.push_back(c + char(i * opt.ThreadCount()));
+
+				renderers[i]->ThreadCount(opt.ThreadCount(), ns.c_str());
+			}
+		}
 
 		if (opt.BitsPerChannel() != 8)
 		{
@@ -167,34 +184,16 @@ bool EmberAnimate(EmberOptions& opt)
 		opt.Dtime(1);
 	}
 
-	if (opt.Frame())
+	if (opt.Frame() != UINT_MAX)
 	{
-		if (opt.Time())
-		{
-			cout << "Cannot specify both time and frame.\n";
-			return false;
-		}
-
-		if (opt.FirstFrame() || opt.LastFrame())
+		if (opt.FirstFrame() != UINT_MAX || opt.LastFrame() != UINT_MAX)
 		{
 			cout << "Cannot specify both frame and begin or end.\n";
 			return false;
 		}
 
 		opt.FirstFrame(opt.Frame());
-		opt.LastFrame(opt.Frame());
-	}
-
-	if (opt.Time())
-	{
-		if (opt.FirstFrame() || opt.LastFrame())
-		{
-			cout << "Cannot specify both time and begin or end.\n";
-			return false;
-		}
-
-		opt.FirstFrame(opt.Time());
-		opt.LastFrame(opt.Time());
+		opt.LastFrame(opt.Frame() + 1);
 	}
 
 	//Prep all embers, by ensuring they:
@@ -221,6 +220,9 @@ bool EmberAnimate(EmberOptions& opt)
 
 		if (opt.Supersample() > 0)
 			embers[i].m_Supersample = opt.Supersample();
+
+		if (opt.TemporalSamples() > 0)
+			embers[i].m_TemporalSamples = opt.TemporalSamples();
 
 		if (opt.Quality() > 0)
 			embers[i].m_Quality = T(opt.Quality());
@@ -270,7 +272,7 @@ bool EmberAnimate(EmberOptions& opt)
 		std::sort(embers.begin(), embers.end(), &CompareEmbers<T>);
 	}
 
-	if (!opt.Time() && !opt.Frame())
+	if (opt.Frame() == UINT_MAX)
 	{
 		if (opt.FirstFrame() == UINT_MAX)
 			opt.FirstFrame(size_t(embers[0].m_Time));
@@ -278,12 +280,6 @@ bool EmberAnimate(EmberOptions& opt)
 		if (opt.LastFrame() == UINT_MAX)
 			opt.LastFrame(ClampGte<size_t>(size_t(embers.back().m_Time),
 										   opt.FirstFrame() + opt.Dtime()));//Make sure the final value is at least first frame + dtime.
-	}
-
-	if (!opt.Out().empty())
-	{
-		cout << "Single output file " << opt.Out() << " specified for multiple images. They would be all overwritten and only the last image will remain, exiting.\n";
-		return false;
 	}
 
 	//Final setup steps before running.
@@ -366,7 +362,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 			if ((renderer->Run(finalImages[finalImageIndex], localTime) != eRenderStatus::RENDER_OK) || renderer->Aborted() || finalImages[finalImageIndex].empty())
 			{
-				cout << "Error: image rendering failed, skipping to next image.\n";
+				cout << "Error: image rendering failed, aborting.\n";
 				renderer->DumpErrorReport();//Something went wrong, print errors.
 				atomfTime.store(opt.LastFrame() + 1);//Abort all threads if any of them encounter an error.
 				break;

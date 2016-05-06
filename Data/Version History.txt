@@ -1,4 +1,105 @@
-0.9.9.5 03/04/2016
+0.9.9.6 Beta 05/05/2016
+--User changes
+	-The concept of "saving back to file in memory" has been removed. The current ember is saved back to memory whenever the render completes and the thumbnail will be updated each time.
+		--Edits will not save back to the file in memory on render completion when preview renderer is running.
+	-Make the default interpolation type be smooth.
+	-Highlight power is now on by default.
+	-Better handling of crossed min/max DE filter values on the GUI.
+	-Changes to spatial and density filter values will no longer restart the entire render because a fixed size gutter is used.
+	-crackle is now 5-10 times faster as a result of using cached values as is done on the CPU. These were previously omitted due to a bug elsewhere in the code that was erroneously attributed to the crackle caching mechanism.
+	-Allow for adjustments on the Flame tab to apply to all open flames in the file.
+		--Add apply all functionality to flatten/unflatten menu items.
+	-Add two new buttons to the color tab to randomize and toggle the xform color indices.
+	-Change drag n drop behavior: the default is now to append, hold Ctrl to overwrite.
+	-Set max value of zoom to 25 because it will crash with values around 28 or 29 due to numeric overflow when scaling quality.
+	-Update links in About Dialog.
+	-Move the color curves control to the Palette tab.
+	-Change dark.qss to hide dotted selection outline around checkboxes. Users must reload it to take effect.
+	-Allow for dragging around flames in the library tab. This is useful for setting up the order of an animation.
+	-Make the opening of large files in Fractorium much more efficient when not-appending.
+	-Make the opening of large files in all EmberRender and EmberAnimate more efficient.
+	-Better error reporting when opening files.
+	-Command line programs now default to using double precision.
+		--Report precision in command line programs.
+	-Cleanup some options text for the command line programs.
+	-Make randoms in EmberGenome have default dimensions of 1920 x 1080.
+	-Changed/removed several command line options:
+		--Remove the option --intpalette to format the palette in the xml as ints. If they are not hex formatted, then they should always be float. This option was pointless.
+		--The --bits argument has been removed and replaced with --sp to specify single precision. If omitted, DP is used.
+		--Remove the --seed option, it was never used.
+		--Remove the --sub_batch_size option, it has been part of the Xml for a long time.
+		--Remove --hex_palette option for EmberRender, it only makes sense in EmberAnimate and EmberGenome.
+		--Set enable_jpg_comments and enable_png_comments to false by default. It was a very bad idea to have them be true because it reveals the flame parameters used to render the image which many artists guard closely.
+		--Remove --time option for EmberAnimate, it was redundant with --frame.
+		--Make --enable_jpg_comments and --enable_png_comments just be bools that when present mean true, rather than having to specify =true.
+		--Add a new argument --ts for EmberAnimate to allow the user to specify the temporal samples value to use for the entire animation. Useful for testing.
+		--Remove the --strip option from EmberGenome. It was useless and was likely just a carry over from flam3 during its early debugging stages when testing strips.
+		--Prevent --inter and --rotate in EmberGenome from rotating backward before the first flame since it doesn't really make sense.
+	-Support reading cam_zoom from xml as zoom since JWildfire uses cam_zoom.
+	-Ensure every loaded flame has at least one xform in it.
+	-Always force times of each flame to increase from zero when saving a file.
+	-Remove check for times when doing a sequence in EmberGenome because the original times are never used there.
+	
+--Bug fixes
+	-Place last.flame in ~/.config/fractorium on Linux.
+	-Attempt to prevent crash when selecting OpenCL in the final render dialog when unsupported hardware is present.
+		--This works by selecting the last known good device in the main window.
+	-Correctly label interpolation types in the combo in the animation table on the Flame tab.
+	-Remove extra space in info tree text when dealing with a linked xform.
+	-Update summary xform name field whenever xform name changes.
+	-Get rid of selection border on summary tab xform tree cells.
+	-Only add variations from Xml that have a non-zero weight. There seemed to be spurious flattens coming from Apo with a weight of 0.
+	-Get rid of leftover artifacts that would appear on preview thumbnails when either switching SP/DP or re-rendering previews.
+	-Filename extension was not being appended on Linux when saving as Xml, thus making it impossible to drag that file back in becase drop is filtered on extension.
+	-Continuous update was broken.
+	-Force repaint on xform selection checkbox change to ensure circles are immediately drawn around selected xforms.
+	-dc_perlin was crashing on Nvidia when using SP.
+	-Crash when opening an Xml with less than 2 flames in it.
+	-Fix crash when using smooth interpolation in EmberGenome.
+	-Print error and exit EmberGenome when sequencing if times are not sorted.
+	-Multi-GPU synchronization was not actually thread safe and was likely doing less iters than requested. It is now properly synchronized.
+	-The saving of last.flame during editing was appending the file when it should have been replacing.
+	-It was impossible for EmberGenome to create a random flame. It can now be done by specifying no arguments: EmberGenome.exe
+	-Crossing in EmberGenome was not logging the performed actions to the edit Xml tag.
+	-Apply sub batch size and fuse count to template files used on the command line.
+	-Use new default filter types (log and smooth) with template files.
+	-Properly seed rands in EmberAnimate when specifying --isaac_seed and using more than one device with --opencl.
+  
+--Code changes
+	-Make DE block size always be 16x16, this should help stability on some Nvidia cards. No changes for AMD cards since they were that size already.
+		--Since the block size is now so small, do not reduce it further when supersampling.
+	-Clean up some variable names and documentation around OpenCL DE to be more clear.
+	-Gutters are now a fixed size of 8 * supersample.
+	-Use stl data() member to get pointer to first element instead of &vec[0].
+	-Eliminate extra calls in renderer to ComputeBounds(), CreateSpatialFilter() and CreateTemporalFilter() to only be done at the start of a render.
+	-Another attempt at vectorizing LogScaleDensityFilter(). Vectorizes, but not sure if it helps.
+	-Some other loop optimizations in Renderer.
+	-No longer check temporal samples in response to some control changes, they are always 1 in the interactive renderer.
+	-Make summing histograms from one or more secondary devices to the primary a little more elegant by using HOST_PTR. This requires one less copy.
+	-Move GCC compiler spec to C++14. Building with 5.3 now on linux.
+	-Use inline member data initializers.
+	-Make a #define for static for use in Utils.h to make things a little cleaner.
+	-Make various functions able to take arbitrary collections as their parameters rather than just vectors.
+	-Make library collection a list rather than vector. This alleviates the need to re-sync pointers whenever the collection changes.
+	-Subclass QTreeWidget for the library tree. Two new files added for this.
+	-Remove all usage of #ifdef ROW_ONLY_DE in DEOpenCLKernelCreator, it was never used.
+	-Add move constructor and assignment operator to EmberFile.
+	-Add the ability to use a pointer to outside memory in the renderer for the vector of Ember<T>.
+	-Make a lot more functions const where they should be.
+	-Remove save back to file in memory icon, document-hf-insert.png.
+	-Use raw array of floats in OpenCL for perlin noise, rather than float3/double3.
+	-Add some default cases to dc_perlin.
+	-Redo singleton pattern yet again.
+	-Pass XML_PARSE_HUGE to xmlReadMemory() to allow for reading large Xml files.
+	-Optimize Interpolater by making it a non-static class by adding some members used for caching values during interpolation.
+	-Cache values in SheepTools as well, which was already a non-static class.
+	-Use cerr in SheepTools instead of cout.
+	-Set m_SubBatchSize and m_FuseCount to default values in Ember::Clear().
+	-Make EmberOptionEntry<T>::operator() return a const reference instead of a copy.
+	-General cleanup.
+ 
+b5341c7
+0.9.9.5 Beta 03/04/2016
 --User changes
 	-None.
 	
@@ -30,7 +131,7 @@
 	-Make CircleTrans1 a little safer by calling Zeps() on m_Sc during precalc.
 	-Major work on Qt Creator builds.
 
-0.9.9.4 02/21/2016
+0.9.9.4 Beta 02/21/2016
 --User changes
 	-Allow for stopping the renderer in the main window. This makes it more efficient when entering many parameters, such as when following a tutorial.
 	-Add support for new variations: erf, gamma, jac_cn, jac_dn, jac_sn, logDB, pressure_wave, pRose3D, splits3D, w, waves2b, x, xerf, y, z.
@@ -97,7 +198,7 @@
 	-Cleanup warnings.
 	-General cleanup.
  
-0.9.9.3 01/17/2016
+0.9.9.3 Beta 01/17/2016
 --User changes
 	-Add new variations: crackle, dc_perlin and post_smartcrop.
 	-Make default palette interp mode be linear instead of step.
@@ -146,7 +247,7 @@
 	-Replace fabs() with std::abs().
 	-General cleanup.
 	
-0.9.9.2 11/22/2015
+0.9.9.2 Beta 11/22/2015
 --User changes
 	-Add a new dialog for editing QSS stylesheets. Allow for saving, reloading and setting styles as default.
 	-Include a dark style with the installation called dark.qss.

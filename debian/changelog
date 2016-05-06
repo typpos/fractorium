@@ -1,3 +1,9 @@
+fractorium (0.9.9.6-0ubuntu1) xenial; urgency=low
+
+  * release 0.9.9.6
+
+ -- Gambhiro Bhikkhu <gambhiro.bhikkhu.85@gmail.com>  Fri, 06 May 2016 12:58:22 +0100
+
 fractorium (0.9.9.5-0ubuntu1) wily; urgency=low
 
   * release 0.9.9.5

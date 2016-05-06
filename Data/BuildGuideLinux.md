@@ -9,7 +9,7 @@ git clone https://github.com/mfeemster/fractorium
 
 Install the dependencies.
 
-For Ubuntu 15.04 (vivid) and 15.10 (wily):
+Ubuntu 15.04 (vivid), 15.10 (wily), 16.04 (xenial):
 
 ```
 sudo apt-get install g++ libgl1-mesa-dev libgl-dev libglm-dev libjpeg-dev libpng12-dev libqt5opengl5-dev libtbb-dev libxml2-dev ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers qt5-default qt5-qmake qtbase5-dev

@@ -80,6 +80,8 @@ public:
 
 		if (!m_Init)
 		{
+			//This list is for variation params which are incorrect, but their parent variation name may or may not be correct.
+			//This has some overlap with the list below since some of these have parent variation names that are incorrect.
 			m_BadParamNames = unordered_map<string, string>
 			{
 				{ "swtin_distort"           , "stwin_distort"               },//stwin.
@@ -215,7 +217,7 @@ public:
 				"post_rotate_y",
 				"curl3D_cz",
 			};
-			//This is a vector of the param names as they are in the legacy, badly named flam3/Apophysis code.
+			//This is a vector of the incorrect variation names and their param names as they are in the legacy, badly named flam3/Apophysis code.
 			vector<string> badParams =
 			{
 				"bwraps7_cellsize",

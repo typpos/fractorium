@@ -533,6 +533,103 @@ static size_t VerifyStrips(size_t height, size_t strips,
 }
 
 /// <summary>
+/// Search the variation's OpenCL string to determine whether it contains any of the search strings in stringVec.
+/// This is useful for finding variations with certain characteristics since it's not possible
+/// to query the CPU C++ code at runtime.
+/// </summary>
+/// <param name="var">The variation whose OpenCL string will be searched</param>
+/// <param name="stringVec">The vector of strings to search for</param>
+/// <param name="matchAll">True to find all variations which match any strings, false to break after the first match is found.</param>
+/// <returns>True if there was at least one match, else false.</returns>
+template <typename T>
+bool SearchVar(const Variation<T>* var, const vector<string>& stringVec, bool matchAll)
+{
+	bool ret = false;
+	size_t i;
+	auto cl = var->OpenCLFuncsString() + "\n" + var->OpenCLString();
+
+	if (matchAll)
+	{
+		for (i = 0; i < stringVec.size(); i++)
+			if (cl.find(stringVec[i]) == std::string::npos)
+				break;
+
+		ret = (i == stringVec.size());
+	}
+	else
+	{
+		for (i = 0; i < stringVec.size(); i++)
+		{
+			if (cl.find(stringVec[i]) != std::string::npos)
+			{
+				ret = true;
+				break;
+			}
+		}
+	}
+
+	return ret;
+}
+
+/// <summary>
+/// Find all variations whose OpenCL string contains any of the search strings in stringVec.
+/// This is useful for finding variations with certain characteristics since it's not possible
+/// to query the CPU C++ code at runtime.
+/// </summary>
+/// <param name="stringVec">The vector of variation pointers to search</param>
+/// <param name="stringVec">The vector of strings to search for</param>
+/// <param name="findAll">True to find all variations which match any strings, false to break after the first match is found.</param>
+/// <returns>A vector of pointers to variations whose OpenCL string matched at least one string in stringVec</returns>
+template <typename T>
+static vector<const Variation<T>*> FindVarsWith(const vector<const Variation<T>*>& vars, const vector<string>& stringVec, bool findAll = true)
+{
+	vector<const Variation<T>*> vec;
+	auto vl = VariationList<T>::Instance();
+
+	for (auto& v : vars)
+	{
+		if (SearchVar<T>(v, stringVec, false))
+		{
+			vec.push_back(v);
+
+			if (!findAll)
+				break;
+		}
+	}
+
+	return vec;
+}
+
+/// <summary>
+/// Find all variations whose OpenCL string does not contain any of the search strings in stringVec.
+/// This is useful for finding variations without certain characteristics since it's not possible
+/// to query the CPU C++ code at runtime.
+/// </summary>
+/// <param name="stringVec">The vector of variation pointers to search</param>
+/// <param name="stringVec">The vector of strings to search for</param>
+/// <param name="findAll">True to find all variations which don't match any strings, false to break after the first non-match is found.</param>
+/// <returns>A vector of pointers to variations whose OpenCL string did not match any string in stringVec</returns>
+template <typename T>
+static vector<const Variation<T>*> FindVarsWithout(const vector<const Variation<T>*>& vars, const vector<string>& stringVec, bool findAll = true)
+{
+	vector<const Variation<T>*> vec;
+	auto vl = VariationList<T>::Instance();
+
+	for (auto& v : vars)
+	{
+		if (!SearchVar<T>(v, stringVec, false))
+		{
+			vec.push_back(v);
+
+			if (!findAll)
+				break;
+		}
+	}
+
+	return vec;
+}
+
+/// <summary>
 /// Simple macro to print a string if the --verbose options has been specified.
 /// </summary>
 #define VerbosePrint(s) if (opt.Verbose()) cout << s << "\n"

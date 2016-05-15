@@ -66,7 +66,9 @@ bool EmberGenome(EmberOptions& opt)
 
 	auto varList = VariationList<T>::Instance();
 
-	if (opt.AllVars() || opt.RegVars() || opt.PreVars() || opt.PostVars())
+	if (opt.AllVars() || opt.SumVars() || opt.AssignVars() || opt.PpSumVars() || opt.PpAssignVars() ||
+			opt.DcVars() || opt.ParVars() || opt.NonParVars() ||
+			opt.RegVars() || opt.PreVars() || opt.PostVars())
 	{
 		if (opt.AllVars())
 		{
@@ -75,9 +77,76 @@ bool EmberGenome(EmberOptions& opt)
 			for (auto& v : vars)
 				cout << v->Name() << "\n";
 		}
+		else if (opt.SumVars())
+		{
+			auto& reg = varList->RegVars();
+			auto matches = FindVarsWithout<T>(varList->RegVars(), vector<string> { "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
+											  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z="
+																				 });
+
+			for (auto& v : matches)
+				cout << v->Name() << "\n";
+		}
+		else if (opt.AssignVars())
+		{
+			auto matches = FindVarsWith<T>(varList->RegVars(), vector<string> { "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
+										   "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z="
+																			  });
+
+			for (auto& v : matches)
+				cout << v->Name() << "\n";
+		}
+		else if (opt.PpSumVars())
+		{
+			auto& pre = varList->PreVars();
+			auto& post = varList->PostVars();
+
+			for (auto& v : pre)
+				if (v->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
+					cout << v->Name() << "\n";
+
+			for (auto& v : post)
+				if (v->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
+					cout << v->Name() << "\n";
+		}
+		else if (opt.PpAssignVars())
+		{
+			auto& pre = varList->PreVars();
+			auto& post = varList->PostVars();
+
+			for (auto& v : pre)
+				if (v->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
+					cout << v->Name() << "\n";
+
+			for (auto& v : post)
+				if (v->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
+					cout << v->Name() << "\n";
+		}
+		else if (opt.DcVars())
+		{
+			auto& all = varList->AllVars();
+			auto matches = FindVarsWith<T>(all, vector<string> { "m_ColorX" });
+
+			for (auto& v : matches)
+				cout << v->Name() << "\n";
+		}
+		else if (opt.ParVars())
+		{
+			auto& par = varList->ParametricVariations();
+
+			for (auto& v : par)
+				cout << v->Name() << "\n";
+		}
+		else if (opt.NonParVars())
+		{
+			auto& par = varList->NonParametricVariations();
+
+			for (auto& v : par)
+				cout << v->Name() << "\n";
+		}
 		else
 		{
-			vector<Variation<T>*> vars;
+			vector<const Variation<T>*> vars;
 
 			if (opt.RegVars())
 				vars.insert(vars.end(), varList->RegVars().begin(), varList->RegVars().end());

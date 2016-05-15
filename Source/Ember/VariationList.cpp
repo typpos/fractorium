@@ -357,13 +357,14 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(DCTriangle)
 	ADDPREPOSTREGVAR(DCZTransl)
 
-	for (auto var : m_Variations) var->Precalc();
+	for (auto var : m_Variations) const_cast<Variation<T>*>(var)->Precalc();//Modify once here, then const after this.
 
 	std::sort(m_Variations.begin(), m_Variations.end(), [&](const Variation<T>* var1, const Variation<T>* var2) { return var1->VariationId() < var2->VariationId(); });
 	m_RegVariations.reserve(m_Variations.size() / 3);
 	m_PreVariations.reserve(m_Variations.size() / 3);
 	m_PostVariations.reserve(m_Variations.size() / 3);
 	m_ParametricVariations.reserve(size_t(m_Variations.size() * .90));//This is a rough guess at how many are parametric.
+	m_NonParametricVariations.reserve(size_t(m_Variations.size() * 0.20));//This is a rough guess at how many are not parametric. These don't add to 1 just to allow extra padding.
 
 	//Place pointers to variations in vectors specific to their type.
 	//Many of the elements in m_ParametricVariations will be present in the reg, pre and post vectors.
@@ -377,8 +378,10 @@ VariationList<T>::VariationList()
 		else if (var->VarType() == eVariationType::VARTYPE_POST)
 			m_PostVariations.push_back(var);
 
-		if (auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
+		if (auto parVar = dynamic_cast<const ParametricVariation<T>*>(var))
 			m_ParametricVariations.push_back(parVar);
+		else
+			m_NonParametricVariations.push_back(var);
 	}
 }
 
@@ -543,10 +546,13 @@ template <typename T> size_t VariationList<T>::RegSize() const { return m_RegVar
 template <typename T> size_t VariationList<T>::PreSize() const { return m_PreVariations.size(); }
 template <typename T> size_t VariationList<T>::PostSize() const { return m_PostVariations.size(); }
 template <typename T> size_t VariationList<T>::ParametricSize() const { return m_ParametricVariations.size(); }
-template <typename T> const vector<Variation<T>*>& VariationList<T>::AllVars() const { return m_Variations; }
-template <typename T> const vector<Variation<T>*>& VariationList<T>::RegVars() const { return m_RegVariations; }
-template <typename T> const vector<Variation<T>*>& VariationList<T>::PreVars() const { return m_PreVariations; }
-template <typename T> const vector<Variation<T>*>& VariationList<T>::PostVars() const { return m_PostVariations; }
+template <typename T> size_t VariationList<T>::NonParametricSize() const { return m_NonParametricVariations.size(); }
+template <typename T> const vector<const Variation<T>*>& VariationList<T>::AllVars() const { return m_Variations; }
+template <typename T> const vector<const Variation<T>*>& VariationList<T>::RegVars() const { return m_RegVariations; }
+template <typename T> const vector<const Variation<T>*>& VariationList<T>::PreVars() const { return m_PreVariations; }
+template <typename T> const vector<const Variation<T>*>& VariationList<T>::PostVars() const { return m_PostVariations; }
+template <typename T> const vector<const Variation<T>*>& VariationList<T>::NonParametricVariations() const { return m_NonParametricVariations; }
+template <typename T> const vector<const ParametricVariation<T>*>& VariationList<T>::ParametricVariations() const { return m_ParametricVariations; }
 
 /// <summary>
 /// Make a dyncamically allocated copy of a variation and assign it a specified weight.

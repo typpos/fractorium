@@ -430,6 +430,9 @@ bool FractoriumEmberController<T>::Render()
 						if (m_UndoList.size() >= UNDO_SIZE)
 							m_UndoList.pop_front();
 					}
+
+					//else
+					//	qDebug() << "Mouse was down, not adding to undo list.";
 				}
 				else if (!m_LastEditWasUndoRedo && m_UndoIndex < m_UndoList.size() - 1)//They were anywhere but the end of the undo list, then did a manual edit, so clear the undo list.
 				{

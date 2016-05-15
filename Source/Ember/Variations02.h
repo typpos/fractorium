@@ -4109,16 +4109,16 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string r   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string a   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string b   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string cx  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string cy  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string cz  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string c2  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string c2x = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string c2y = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string c2z = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string r   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cz  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -4298,8 +4298,8 @@ public:
 		int i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string zscale = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string vpi    = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string zscale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vpi    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t c0 = vIn.x * " << vpi << ";\n"
 		   << "\t\treal_t c1 = vIn.y * " << vpi << ";\n"
@@ -4371,14 +4371,14 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string t3 = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string t2 = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string t1 = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string tc = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string b3 = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string b2 = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string b1 = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string bc = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string t3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string t2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string t1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string bc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xsqr = vIn.x * vIn.x;\n"
 		   << "\t\treal_t ysqr = vIn.y * vIn.y;\n"
@@ -4474,16 +4474,16 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string frequency = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string velocity  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string amplitude = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string centerx   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string centery   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string phase     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string scale     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string f         = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string a         = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string p         = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string frequency = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string velocity  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amplitude = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string centerx   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string centery   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phase     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string f         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string is        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string vxp       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -4604,13 +4604,13 @@ public:
 		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string shiftX = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string shiftY = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string sx     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string sy     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string ax     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string ay     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string vv     = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string shiftX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string shiftY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sx     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sy     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ax     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ay     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vv     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t c0 = " << ax << " / (1 + exp(" << sx << " * vIn.x));\n"
 		   << "\t\treal_t c1 = " << ay << " / (1 + exp(" << sy << " * vIn.y));\n"

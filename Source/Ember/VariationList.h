@@ -38,11 +38,14 @@ public:
 	size_t PreSize() const;
 	size_t PostSize() const;
 	size_t ParametricSize() const;
+	size_t NonParametricSize() const;
 
-	const vector<Variation<T>*>& AllVars()  const;
-	const vector<Variation<T>*>& RegVars()  const;
-	const vector<Variation<T>*>& PreVars()  const;
-	const vector<Variation<T>*>& PostVars() const;
+	const vector<const Variation<T>*>& AllVars()  const;
+	const vector<const Variation<T>*>& RegVars()  const;
+	const vector<const Variation<T>*>& PreVars()  const;
+	const vector<const Variation<T>*>& PostVars() const;
+	const vector<const Variation<T>*>& NonParametricVariations() const;
+	const vector<const ParametricVariation<T>*>& ParametricVariations() const;
 
 	SINGLETON_DERIVED_DECL(VariationList<T>);
 
@@ -50,10 +53,11 @@ private:
 	VariationList();
 	Variation<T>* MakeCopyWithWeight(const Variation<T>* var, T weight) const;
 
-	vector<Variation<T>*> m_Variations;//A list of pointers to dynamically allocated variation objects.
-	vector<Variation<T>*> m_RegVariations;
-	vector<Variation<T>*> m_PreVariations;
-	vector<Variation<T>*> m_PostVariations;
-	vector<ParametricVariation<T>*> m_ParametricVariations;//A list of pointers to elements in m_Variations which are derived from ParametricVariation.
+	vector<const Variation<T>*> m_Variations;//A list of pointers to dynamically allocated variation objects.
+	vector<const Variation<T>*> m_RegVariations;
+	vector<const Variation<T>*> m_PreVariations;
+	vector<const Variation<T>*> m_PostVariations;
+	vector<const Variation<T>*> m_NonParametricVariations;
+	vector<const ParametricVariation<T>*> m_ParametricVariations;//A list of pointers to elements in m_Variations which are derived from ParametricVariation.
 };
 }

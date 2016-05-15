@@ -83,7 +83,6 @@ void Renderer<T, bucketT>::ComputeBounds()
 	//It also prevents the renderer from only performing filtering or final accum based on a filter parameter change, since that
 	//change may have changed the gutter.
 	//By using a fixed gutter, a filter change can be applied without fully restarting iteration.
-	//m_GutterWidth = 10;
 	m_GutterWidth = 10 * Supersample();//Should be enough to fully accommodate most spatial and density filter widths.
 	m_SuperRasW = (Supersample() * FinalRasW()) + (2 * m_GutterWidth);
 	m_SuperRasH = (Supersample() * FinalRasH()) + (2 * m_GutterWidth);

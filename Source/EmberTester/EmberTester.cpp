@@ -299,65 +299,6 @@ void TestAtomicAdd()
 	}
 }
 
-template <typename T>
-bool SearchVar(const Variation<T>* var, vector<string>& stringVec, bool matchAll)
-{
-	bool ret = false;
-	size_t i;
-	auto cl = var->OpenCLFuncsString() + "\n" + var->OpenCLString();
-
-	if (matchAll)
-	{
-		for (i = 0; i < stringVec.size(); i++)
-		{
-			if (cl.find(stringVec[i]) == std::string::npos)
-			{
-				break;
-			}
-		}
-
-		ret = (i == stringVec.size());
-	}
-	else
-	{
-		for (i = 0; i < stringVec.size(); i++)
-		{
-			if (cl.find(stringVec[i]) != std::string::npos)
-			{
-				ret = true;
-				break;
-			}
-		}
-	}
-
-	return ret;
-}
-
-template <typename T>
-static vector<Variation<T>*> FindVarsWith(vector<string>& stringVec, bool findAll = true)
-{
-	int index = 0;
-	auto vl = VariationList<T>::Instance();
-	vector<Variation<T>*> vec;
-
-	while (index < vl->RegSize())
-	{
-		auto regVar = vl->GetVariation(index, eVariationType::VARTYPE_REG);
-
-		if (SearchVar(regVar, stringVec, false))
-		{
-			vec.push_back(regVar->Copy());
-
-			if (!findAll)
-				break;
-		}
-
-		index++;
-	}
-
-	return vec;
-}
-
 bool TestVarCounts()
 {
 	auto vlf(VariationList<float>::Instance());
@@ -1306,7 +1247,8 @@ void TestVarTime()
 void TestCasting()
 {
 	vector<string> stringVec;
-	vector<Variation<float>*> varVec;
+	auto varList = VariationList<float>::Instance();
+	auto& vars = varList->AllVars();
 	stringVec.push_back("T(");
 	stringVec.push_back(".0f");
 	stringVec.push_back(".1f");
@@ -1318,21 +1260,20 @@ void TestCasting()
 	stringVec.push_back(".7f");
 	stringVec.push_back(".8f");
 	stringVec.push_back(".9f");
-	varVec = FindVarsWith<float>(stringVec);
+	auto varVec = FindVarsWith<float>(vars, stringVec);
 
 	for (auto& it : varVec)
 	{
 		cout << "Variation " << it->Name() << " contained an improper float cast." << endl;
 	}
-
-	ClearVec<Variation<float>>(varVec);
 }
 
 template <typename T>
 void TestOperations()
 {
 	vector<string> stringVec;
-	vector<Variation<T>*> varVec;
+	auto varList = VariationList<T>::Instance();
+	auto& vars = varList->AllVars();
 	//stringVec.push_back("%");
 	//varVec = FindVarsWith<T>(Vec);
 	//
@@ -1345,7 +1286,7 @@ void TestOperations()
 	//ClearVec<Variation<T>>(varVec);
 	stringVec.push_back("MwcNext(mwc) %");
 	stringVec.push_back("MwcNext(mwc)%");
-	varVec = FindVarsWith<T>(stringVec);
+	auto varVec = FindVarsWith<T>(vars, stringVec);
 
 	for (size_t i = 0; i < varVec.size(); i++)
 	{
@@ -1353,7 +1294,6 @@ void TestOperations()
 	}
 
 	stringVec.clear();
-	ClearVec<Variation<T>>(varVec);
 }
 
 template <typename T>

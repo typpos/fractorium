@@ -39,6 +39,13 @@ enum class eOptionIDs : et
 	OPT_REG_VARS,
 	OPT_PRE_VARS,
 	OPT_POST_VARS,
+	OPT_SUM_VARS,
+	OPT_ASSIGN_VARS,
+	OPT_PPSUM_VARS,
+	OPT_PPASSIGN_VARS,
+	OPT_DC_VARS,
+	OPT_PAR_VARS,
+	OPT_NON_PAR_VARS,
 
 	//Boolean args.
 	OPT_OPENCL,
@@ -292,7 +299,7 @@ public:
 	/// </summary>
 	EmberOptions()
 	{
-		const size_t size = 30;
+		const size_t size = 40;
 		m_BoolArgs.reserve(size);
 		m_IntArgs.reserve(size);
 		m_UintArgs.reserve(size);
@@ -306,6 +313,13 @@ public:
 		INITBOOLOPTION(RegVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REG_VARS,         _T("--regvars"),              false,                SO_NONE,    "\t--regvars                Display the names of all supported regular variations and exit.\n"));
 		INITBOOLOPTION(PreVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PRE_VARS,         _T("--prevars"),              false,                SO_NONE,    "\t--prevars                Display the names of all supported pre variations and exit.\n"));
 		INITBOOLOPTION(PostVars,       Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_POST_VARS,        _T("--postvars"),             false,                SO_NONE,    "\t--postvars               Display the names of all supported post variations and exit.\n"));
+		INITBOOLOPTION(SumVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SUM_VARS,         _T("--sumvars"),              false,                SO_NONE,    "\t--sumvars                Display the names of all regular variations which have the default behavior of summing their output, and exit.\n"));
+		INITBOOLOPTION(AssignVars,     Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ASSIGN_VARS,      _T("--assignvars"),           false,                SO_NONE,    "\t--assignvars             Display the names of all regular variations which have the non-standard behavior of assigning their output, and exit.\n"));
+		INITBOOLOPTION(PpSumVars,      Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PPSUM_VARS,       _T("--ppsumvars"),            false,                SO_NONE,    "\t--ppsumvars              Display the names of all pre/post variations which have the non-standard behavior of summing their output, and exit.\n"));
+		INITBOOLOPTION(PpAssignVars,   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PPASSIGN_VARS,    _T("--ppassignvars"),         false,                SO_NONE,    "\t--ppassignvars           Display the names of all pre/post variations which have the default behavior of assigning their output, and exit.\n"));
+		INITBOOLOPTION(DcVars,         Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_DC_VARS,          _T("--dcvars"),               false,                SO_NONE,    "\t--dcvars                 Display the names of all variations which alter the color index and exit.\n"));
+		INITBOOLOPTION(ParVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PAR_VARS,         _T("--parvars"),              false,                SO_NONE,    "\t--parvars                Display the names of all variations which have parameters and exit.\n"));
+		INITBOOLOPTION(NonParVars,     Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NON_PAR_VARS,     _T("--nonparvars"),           false,                SO_NONE,    "\t--nonparvars             Display the names of all variations which do not have parameters (weight only) and exit.\n"));
 		//Diagnostic bools.
 		INITBOOLOPTION(Verbose,        Eob(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_VERBOSE,          _T("--verbose"),              false,                SO_NONE,    "\t--verbose                Verbose output [default: false].\n"));
 		INITBOOLOPTION(Debug,          Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_DEBUG,            _T("--debug"),                false,                SO_NONE,    "\t--debug                  Debug output [default: false].\n"));
@@ -449,6 +463,13 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_REG_VARS, RegVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_PRE_VARS, PreVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_POST_VARS, PostVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_SUM_VARS, SumVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_ASSIGN_VARS, AssignVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_PPSUM_VARS, PpSumVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_PPASSIGN_VARS, PpAssignVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_DC_VARS, DcVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_PAR_VARS, ParVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_NON_PAR_VARS, NonParVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_OPENCL, EmberCL);
 					PARSEBOOLOPTION(eOptionIDs::OPT_SP, Sp);
 					PARSEBOOLOPTION(eOptionIDs::OPT_EARLYCLIP, EarlyClip);
@@ -721,6 +742,13 @@ public:
 	Eob RegVars;
 	Eob PreVars;
 	Eob PostVars;
+	Eob SumVars;
+	Eob AssignVars;
+	Eob PpSumVars;
+	Eob PpAssignVars;
+	Eob DcVars;
+	Eob ParVars;
+	Eob NonParVars;
 
 	Eob EmberCL;//Value bool.
 	Eob Sp;

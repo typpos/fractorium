@@ -1143,11 +1143,11 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string strength = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string offset   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string centerX  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string centerY  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string s2       = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string strength = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string offset   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string centerX  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string centerY  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string s2       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t sx = vIn.x - " << centerX << ";\n"
 		   << "\t\treal_t sy = vIn.y - " << centerY << ";\n"
@@ -1221,12 +1221,12 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string n    = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string a    = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string b    = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string sep  = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string absN = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
-		string cn   = "parVars[" + ToUpper(m_Params[i++].Name())  + index;
+		string n    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sep  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string absN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t jun = Zeps(fabs(" << n << "));\n"
 		   << "\n"
@@ -2033,7 +2033,7 @@ public:
 				<< "\t\tconst int esc = rad > " << radius << ";\n"
 				<< "\t\tconst int cr0 = (int)" << zero << ";\n"
 				<< "\n"
-				<< "\t\tif (cr0 &&  esc)\n"
+				<< "\t\tif (cr0 && esc)\n"
 				<< "\t\t{\n"
 				<< "\t\t	vOut.x = vOut.y = 0;\n";
 

@@ -38,7 +38,7 @@ void FinalRenderEmberController<T>::CancelRender()
 				m_Renderer->Abort();
 
 				while (m_Renderer->InRender())
-					QApplication::processEvents();
+					std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 				m_Renderer->EnterRender();
 				m_Renderer->EnterFinalAccum();

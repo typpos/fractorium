@@ -636,7 +636,10 @@ void FractoriumFinalRenderDialog::OnCancelRenderClicked(bool checked)
 /// <param name="e">The event</param>
 void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 {
-	if (CreateControllerFromGUI(true))
+	if (m_Controller.get() && m_Controller->m_Run)
+		return;
+
+	if (CreateControllerFromGUI(true))//Create controller if it does not exist, or if it does and the renderer is not running.
 	{
 		int index = int(m_Fractorium->m_Controller->Index()) + 1;
 #ifdef DO_DOUBLE

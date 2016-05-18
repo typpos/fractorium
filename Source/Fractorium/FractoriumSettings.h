@@ -21,6 +21,15 @@
 #define OPENCLSUBBATCH	     "render/openclsubbatch"
 #define RANDOMCOUNT			 "render/randomcount"
 
+#define VARFILTERSUM         "varfilter/sumcheckbox"
+#define VARFILTERASSIGN      "varfilter/assigncheckbox"
+#define VARFILTERPPSUM       "varfilter/ppsumcheckbox"
+#define VARFILTERPPASSIGN    "varfilter/ppassigncheckbox"
+#define VARFILTERSDC         "varfilter/dccheckbox"
+#define VARFILTERSSTATE      "varfilter/statecheckbox"
+#define VARFILTERPARAM       "varfilter/paramcheckbox"
+#define VARFILTERNONPARAM    "varfilter/nonparamcheckbox"
+
 #define FINALEARLYCLIP       "finalrender/earlyclip"
 #define FINALYAXISUP         "finalrender/finalyaxisup"
 #define FINALTRANSPARENCY    "finalrender/transparency"

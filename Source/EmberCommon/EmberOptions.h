@@ -44,6 +44,7 @@ enum class eOptionIDs : et
 	OPT_PPSUM_VARS,
 	OPT_PPASSIGN_VARS,
 	OPT_DC_VARS,
+	OPT_STATE_VARS,
 	OPT_PAR_VARS,
 	OPT_NON_PAR_VARS,
 
@@ -318,6 +319,7 @@ public:
 		INITBOOLOPTION(PpSumVars,      Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PPSUM_VARS,       _T("--ppsumvars"),            false,                SO_NONE,    "\t--ppsumvars              Display the names of all pre/post variations which have the non-standard behavior of summing their output, and exit.\n"));
 		INITBOOLOPTION(PpAssignVars,   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PPASSIGN_VARS,    _T("--ppassignvars"),         false,                SO_NONE,    "\t--ppassignvars           Display the names of all pre/post variations which have the default behavior of assigning their output, and exit.\n"));
 		INITBOOLOPTION(DcVars,         Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_DC_VARS,          _T("--dcvars"),               false,                SO_NONE,    "\t--dcvars                 Display the names of all variations which alter the color index and exit.\n"));
+		INITBOOLOPTION(StateVars,      Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STATE_VARS,       _T("--statevars"),            false,                SO_NONE,    "\t--statevars              Display the names of all variations which alter their state on each iteration and exit.\n"));
 		INITBOOLOPTION(ParVars,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PAR_VARS,         _T("--parvars"),              false,                SO_NONE,    "\t--parvars                Display the names of all variations which have parameters and exit.\n"));
 		INITBOOLOPTION(NonParVars,     Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NON_PAR_VARS,     _T("--nonparvars"),           false,                SO_NONE,    "\t--nonparvars             Display the names of all variations which do not have parameters (weight only) and exit.\n"));
 		//Diagnostic bools.
@@ -468,6 +470,7 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_PPSUM_VARS, PpSumVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_PPASSIGN_VARS, PpAssignVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_DC_VARS, DcVars);
+					PARSEBOOLOPTION(eOptionIDs::OPT_STATE_VARS, StateVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_PAR_VARS, ParVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_NON_PAR_VARS, NonParVars);
 					PARSEBOOLOPTION(eOptionIDs::OPT_OPENCL, EmberCL);
@@ -747,6 +750,7 @@ public:
 	Eob PpSumVars;
 	Eob PpAssignVars;
 	Eob DcVars;
+	Eob StateVars;
 	Eob ParVars;
 	Eob NonParVars;
 

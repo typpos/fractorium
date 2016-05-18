@@ -29,6 +29,7 @@ public slots:
 	void OnSelectAllButtonClicked(bool checked);
 	void OnInvertSelectionButtonClicked(bool checked);
 	void OnSelectNoneButtonClicked(bool checked);
+	void OnSelectionCheckBoxStateChanged(int i);
 	void OnVariationsTableItemChanged(QTableWidgetItem* item);
 	virtual void accept() override;
 	virtual void reject() override;
@@ -37,11 +38,13 @@ protected:
 	virtual void showEvent(QShowEvent* e) override;
 
 private:
+	void ClearTypesStealth();
 	void DataToGui();
 	void GuiToData();
 	void Populate();
 	void SetCheckFromMap(QTableWidgetItem* cb, const Variation<float>* var);
 	shared_ptr<VariationList<float>> m_VariationList;
+	vector<QCheckBox*> m_CheckBoxes;
 	QMap<QString, QVariant> m_Vars;
 	FractoriumSettings* m_Settings;
 	Ui::VariationsDialog ui;

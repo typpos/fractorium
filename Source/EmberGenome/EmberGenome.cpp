@@ -67,9 +67,12 @@ bool EmberGenome(EmberOptions& opt)
 	auto varList = VariationList<T>::Instance();
 
 	if (opt.AllVars() || opt.SumVars() || opt.AssignVars() || opt.PpSumVars() || opt.PpAssignVars() ||
-			opt.DcVars() || opt.ParVars() || opt.NonParVars() ||
+			opt.DcVars() || opt.StateVars() || opt.ParVars() || opt.NonParVars() ||
 			opt.RegVars() || opt.PreVars() || opt.PostVars())
 	{
+		vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
+							   "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };
+
 		if (opt.AllVars())
 		{
 			auto& vars = varList->AllVars();
@@ -80,18 +83,14 @@ bool EmberGenome(EmberOptions& opt)
 		else if (opt.SumVars())
 		{
 			auto& reg = varList->RegVars();
-			auto matches = FindVarsWithout<T>(varList->RegVars(), vector<string> { "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
-											  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z="
-																				 });
+			auto matches = FindVarsWithout<T>(varList->RegVars(), assign);
 
 			for (auto& v : matches)
 				cout << v->Name() << "\n";
 		}
 		else if (opt.AssignVars())
 		{
-			auto matches = FindVarsWith<T>(varList->RegVars(), vector<string> { "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
-										   "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z="
-																			  });
+			auto matches = FindVarsWith<T>(varList->RegVars(), assign);
 
 			for (auto& v : matches)
 				cout << v->Name() << "\n";
@@ -130,18 +129,26 @@ bool EmberGenome(EmberOptions& opt)
 			for (auto& v : matches)
 				cout << v->Name() << "\n";
 		}
+		else if (opt.StateVars())
+		{
+			auto& all = varList->AllVars();
+
+			for (auto& v : all)
+				if (!v->StateOpenCLString().empty())
+					cout << v->Name() << "\n";
+		}
 		else if (opt.ParVars())
 		{
-			auto& par = varList->ParametricVariations();
+			auto& parVars = varList->ParametricVariations();
 
-			for (auto& v : par)
+			for (auto& v : parVars)
 				cout << v->Name() << "\n";
 		}
 		else if (opt.NonParVars())
 		{
-			auto& par = varList->NonParametricVariations();
+			auto& vars = varList->NonParametricVariations();
 
-			for (auto& v : par)
+			for (auto& v : vars)
 				cout << v->Name() << "\n";
 		}
 		else

@@ -80,8 +80,7 @@ bool FinalRenderEmberControllerBase::CreateRendererFromGUI()
 	bool useOpenCL = m_Info->Ok() && m_FinalRenderDialog->OpenCL();
 	auto v = Devices(m_FinalRenderDialog->Devices());
 	return CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER,
-						  v,
-						  false);//Not shared.
+						  v, false); //Not shared.
 }
 
 /// <summary>

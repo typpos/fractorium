@@ -379,7 +379,25 @@ VariationList<T>::VariationList()
 			m_PostVariations.push_back(var);
 
 		if (auto parVar = dynamic_cast<const ParametricVariation<T>*>(var))
-			m_ParametricVariations.push_back(parVar);
+		{
+			bool b = false;
+			auto& params = parVar->ParamsVec();
+
+			//Some non-parametric variations are actually stored as ParametricVariation<T> just to hold some precalcs.
+			//So to populate parametric, check to see at least one parameter was not a precalc, if so, treat this as parametric.
+			for (auto& param : params)
+			{
+				if (!param.IsPrecalc())
+				{
+					m_ParametricVariations.push_back(parVar);
+					b = true;
+					break;
+				}
+			}
+
+			if (!b)
+				m_NonParametricVariations.push_back(var);//Only get here if all parameters were non-precalc, so treat this as non-parametric.
+		}
 		else
 			m_NonParametricVariations.push_back(var);
 	}
@@ -432,7 +450,7 @@ const Variation<T>* VariationList<T>::GetVariation(size_t index, eVariationType 
 }
 
 /// <summary>
-/// Gets a pointer to a copy of the variation at the specified index.
+/// Get a pointer to a copy of the variation at the specified index.
 /// Optionally specify a weight to assign the new copy.
 /// </summary>
 /// <param name="index">The index in the list to make a copy of</param>
@@ -459,7 +477,7 @@ const Variation<T>* VariationList<T>::GetVariation(eVariationId id) const
 }
 
 /// <summary>
-/// Gets a pointer to a copy of the variation with the specified ID.
+/// Get a pointer to a copy of the variation with the specified ID.
 /// Optionally specify a weight to assign the new copy.
 /// </summary>
 /// <param name="id">The id of the variation in the list to make a copy of</param>
@@ -474,17 +492,10 @@ Variation<T>* VariationList<T>::GetVariationCopy(eVariationId id, T weight) cons
 /// <param name="name">The name to search for</param>
 /// <returns>A pointer to the variation if found, else nullptr.</returns>
 template <typename T>
-const Variation<T>* VariationList<T>::GetVariation(const string& name) const
-{
-	for (auto var : m_Variations)
-		if (var && !_stricmp(name.c_str(), var->Name().c_str()))
-			return var;
-
-	return nullptr;
-}
+const Variation<T>* VariationList<T>::GetVariation(const string& name) const { return SearchVarName(m_Variations, name); }
 
 /// <summary>
-/// Gets a pointer to a copy of the variation with the specified name.
+/// Get a pointer to a copy of the variation with the specified name.
 /// Optionally specify a weight to assign the new copy.
 /// </summary>
 /// <param name="name">The name of the variation in the list to make a copy of</param>
@@ -510,18 +521,37 @@ const ParametricVariation<T>* VariationList<T>::GetParametricVariation(size_t in
 template <typename T>
 const ParametricVariation<T>* VariationList<T>::GetParametricVariation(const string& name) const
 {
-	for (auto var : m_ParametricVariations)
-		if (var && !_stricmp(name.c_str(), var->Name().c_str()))
-			return var;
-
-	return nullptr;
+	return SearchVarName(m_ParametricVariations, name);
 }
 
+/// <summary>
+/// Get a pointer to a copy of the parametric variation at the specified index.
+/// Optionally specify a weight to assign the new copy.
+/// </summary>
+/// <param name="index">The index in the list to make a copy of</param>
+/// <param name="weight">The weight to assign the new copy. Default: 1</param>
+/// <returns>A pointer to the parametric variation at the index if in range, else nullptr.</returns>
 template <typename T>
 ParametricVariation<T>* VariationList<T>::GetParametricVariationCopy(eVariationId id, T weight) const
 {
 	return dynamic_cast<ParametricVariation<T>*>(MakeCopyWithWeight(GetVariation(id), weight));
 }
+
+/// <summary>
+/// Get a pointer to the pre variation with the specified name.
+/// </summary>
+/// <param name="name">The name to search for</param>
+/// <returns>A pointer to the pre variation if found, else nullptr.</returns>
+template <typename T>
+const Variation<T>* VariationList<T>::GetPreVariation(const string& name) const { return SearchVarName(m_PreVariations, name); }
+
+/// <summary>
+/// Get a pointer to the post variation with the specified name.
+/// </summary>
+/// <param name="name">The name to search for</param>
+/// <returns>A pointer to the post variation if found, else nullptr.</returns>
+template <typename T>
+const Variation<T>* VariationList<T>::GetPostVariation(const string& name) const { return SearchVarName(m_PostVariations, name); }
 
 /// <summary>
 /// Get the index of the variation with the specified name.
@@ -570,6 +600,25 @@ Variation<T>* VariationList<T>::MakeCopyWithWeight(const Variation<T>* var, T we
 		var2->m_Weight = weight;
 		return var2;
 	}
+
+	return nullptr;
+}
+
+/// <summary>
+/// Search the passed in container of variations for a name which matches the passed in name.
+/// Note that since the elements of vars is a nested template, they can be Variation<T>*
+/// or anything which derives from that.
+/// </summary>
+/// <param name="vars">The vector of variations to search</param>
+/// <param name="name">The name to search for</param>
+/// <returns>True if found, else false.</returns>
+template <typename T>
+template <template <typename> class U>
+const U<T>* VariationList<T>::SearchVarName(const vector<const U<T>*>& vars, const string& name) const
+{
+	for (auto var : vars)
+		if (var && !_stricmp(name.c_str(), var->Name().c_str()))
+			return var;
 
 	return nullptr;
 }

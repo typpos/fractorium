@@ -18,6 +18,33 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(FractoriumSettings* setti
 	m_Vars = m_Settings->Variations();
 	Populate();
 	OnSelectAllButtonClicked(true);
+	m_CheckBoxes.push_back(ui.SumCheckBox);
+	m_CheckBoxes.push_back(ui.AssignCheckBox);
+	m_CheckBoxes.push_back(ui.PpSumCheckBox);
+	m_CheckBoxes.push_back(ui.PpAssignCheckBox);
+	m_CheckBoxes.push_back(ui.DcCheckBox);
+	m_CheckBoxes.push_back(ui.StateCheckBox);
+	m_CheckBoxes.push_back(ui.ParamCheckBox);
+	m_CheckBoxes.push_back(ui.NonParamCheckBox);
+	ui.SumCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERSUM).toInt()));
+	ui.AssignCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERASSIGN).toInt()));
+	ui.PpSumCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERPPSUM).toInt()));
+	ui.PpAssignCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERPPASSIGN).toInt()));
+	ui.DcCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERSDC).toInt()));
+	ui.StateCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERSSTATE).toInt()));
+	ui.ParamCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERPARAM).toInt()));
+	ui.NonParamCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERNONPARAM).toInt()));
+
+	for (auto& cb : m_CheckBoxes)
+	{
+		if (cb->checkState() == Qt::CheckState::PartiallyChecked)
+		{
+			auto f = cb->font();
+			f.setStrikeOut(true);
+			cb->setFont(f);
+		}
+	}
+
 	table->verticalHeader()->setSectionsClickable(true);
 	table->horizontalHeader()->setSectionsClickable(true);
 	table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -25,6 +52,14 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(FractoriumSettings* setti
 	connect(ui.SelectAllButton,		  SIGNAL(clicked(bool)),				  this, SLOT(OnSelectAllButtonClicked(bool)),				   Qt::QueuedConnection);
 	connect(ui.InvertSelectionButton, SIGNAL(clicked(bool)),				  this, SLOT(OnInvertSelectionButtonClicked(bool)),			   Qt::QueuedConnection);
 	connect(ui.SelectNoneButton,	  SIGNAL(clicked(bool)),				  this, SLOT(OnSelectNoneButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.SumCheckBox     , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.AssignCheckBox  , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.PpSumCheckBox   , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.PpAssignCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.DcCheckBox      , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.StateCheckBox   , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.ParamCheckBox   , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.NonParamCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
 }
 
 /// <summary>
@@ -77,6 +112,14 @@ void FractoriumVariationsDialog::SyncSettings()
 			m[cb->text()] = cb->checkState() == Qt::CheckState::Checked;
 	});
 	m_Settings->Variations(m);
+	m_Settings->setValue(VARFILTERSUM     , int(ui.SumCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERASSIGN  , int(ui.AssignCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERPPSUM   , int(ui.PpSumCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERPPASSIGN, int(ui.PpAssignCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERSDC     , int(ui.DcCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERSSTATE  , int(ui.StateCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERPARAM   , int(ui.ParamCheckBox->checkState()));
+	m_Settings->setValue(VARFILTERNONPARAM, int(ui.NonParamCheckBox->checkState()));
 }
 
 /// <summary>
@@ -90,11 +133,28 @@ const QMap<QString, QVariant>& FractoriumVariationsDialog::Map()
 }
 
 /// <summary>
+/// Clears the type checkboxes without triggering any events.
+/// </summary>
+void FractoriumVariationsDialog::ClearTypesStealth()
+{
+	for (auto& cb : m_CheckBoxes)
+	{
+		cb->blockSignals(true);
+		cb->setCheckState(Qt::CheckState::Unchecked);
+		auto f = cb->font();
+		f.setStrikeOut(cb->checkState() == Qt::CheckState::PartiallyChecked);
+		cb->setFont(f);
+		cb->blockSignals(false);
+	}
+}
+
+/// <summary>
 /// Check all of the checkboxes.
 /// </summary>
 /// <param name="checked">Ignored</param>
 void FractoriumVariationsDialog::OnSelectAllButtonClicked(bool checked)
 {
+	ClearTypesStealth();
 	ForEachCell([&](QTableWidgetItem * cb) { cb->setCheckState(Qt::CheckState::Checked); });
 }
 
@@ -104,6 +164,7 @@ void FractoriumVariationsDialog::OnSelectAllButtonClicked(bool checked)
 /// <param name="checked">Ignored</param>
 void FractoriumVariationsDialog::OnInvertSelectionButtonClicked(bool checked)
 {
+	ClearTypesStealth();
 	ForEachCell([&](QTableWidgetItem * cb)
 	{
 		if (cb->checkState() != Qt::CheckState::Checked)
@@ -119,7 +180,184 @@ void FractoriumVariationsDialog::OnInvertSelectionButtonClicked(bool checked)
 /// <param name="checked">Ignored</param>
 void FractoriumVariationsDialog::OnSelectNoneButtonClicked(bool checked)
 {
+	ClearTypesStealth();
 	ForEachCell([&](QTableWidgetItem * cb) { cb->setCheckState(Qt::CheckState::Unchecked); });
+}
+
+/// <summary>
+/// Called when any of the selection checkboxes change state.
+/// This will re-evaluate the entire grid of checkboxes.
+/// </summary>
+/// <param name="i">Ignored</param>
+void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
+{
+	static vector<string> dc{ "m_ColorX" };
+	static vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
+								  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };
+	//static vector<const Variation<T>*> excluded;
+	static std::set<eVariationId> excluded;
+	excluded.clear();
+	//excluded.reserve(size_t(eVariationId::LAST_VAR));
+
+	if (auto s = dynamic_cast<QCheckBox*>(sender()))
+	{
+		auto f = s->font();
+		f.setStrikeOut(s->checkState() == Qt::CheckState::PartiallyChecked);
+		s->setFont(f);
+	}
+
+	ForEachCell([&](QTableWidgetItem * cb) { cb->setCheckState(Qt::CheckState::Unchecked); });
+	ForEachCell([&](QTableWidgetItem * cb)
+	{
+		if (auto var = m_VariationList->GetVariation(cb->text().toStdString()))
+		{
+			if (ui.StateCheckBox->checkState() != Qt::CheckState::Unchecked)
+			{
+				if (!var->StateOpenCLString().empty())
+				{
+					if (ui.StateCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(var->VariationId());
+					}
+					else if (!Contains(excluded, var->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+
+			if (ui.SumCheckBox->isChecked() != Qt::CheckState::Unchecked)
+			{
+				if (var->VarType() == eVariationType::VARTYPE_REG && !SearchVar(var, assign, false))
+				{
+					if (ui.SumCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(var->VariationId());
+					}
+					else if (!Contains(excluded, var->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+
+			if (ui.AssignCheckBox->isChecked() != Qt::CheckState::Unchecked)
+			{
+				if (var->VarType() == eVariationType::VARTYPE_REG && SearchVar(var, assign, false))
+				{
+					if (ui.AssignCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(var->VariationId());
+					}
+					else if (!Contains(excluded, var->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+
+			if (ui.DcCheckBox->isChecked() != Qt::CheckState::Unchecked)
+			{
+				if (SearchVar(var, dc, false))
+				{
+					if (ui.DcCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(var->VariationId());
+					}
+					else if (!Contains(excluded, var->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+
+			if (ui.NonParamCheckBox->isChecked() != Qt::CheckState::Unchecked)
+			{
+				if (!m_VariationList->GetParametricVariation(cb->text().toStdString()))
+				{
+					if (ui.NonParamCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(var->VariationId());
+					}
+					else if (!Contains(excluded, var->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+		}
+
+		if (ui.PpSumCheckBox->isChecked() != Qt::CheckState::Unchecked)
+		{
+			if (auto pre = m_VariationList->GetPreVariation(cb->text().toStdString()))
+			{
+				if (pre->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
+				{
+					if (ui.PpSumCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(pre->VariationId());
+					}
+					else if (!Contains(excluded, pre->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+
+			if (auto post = m_VariationList->GetPostVariation(cb->text().toStdString()))
+			{
+				if (post->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
+				{
+					if (ui.PpSumCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(post->VariationId());
+					}
+					else if (!Contains(excluded, post->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+		}
+
+		if (ui.PpAssignCheckBox->isChecked() != Qt::CheckState::Unchecked)
+		{
+			if (auto pre = m_VariationList->GetPreVariation(cb->text().toStdString()))
+			{
+				if (pre->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
+				{
+					if (ui.PpAssignCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(pre->VariationId());
+					}
+					else if (!Contains(excluded, pre->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+
+			if (auto post = m_VariationList->GetPostVariation(cb->text().toStdString()))
+			{
+				if (post->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
+				{
+					if (ui.PpAssignCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+					{
+						cb->setCheckState(Qt::CheckState::Unchecked);
+						excluded.insert(post->VariationId());
+					}
+					else if (!Contains(excluded, post->VariationId()))
+						cb->setCheckState(Qt::CheckState::Checked);
+				}
+			}
+		}
+
+		if (ui.ParamCheckBox->isChecked() != Qt::CheckState::Unchecked)
+		{
+			if (auto parVar = m_VariationList->GetParametricVariation(cb->text().toStdString()))
+			{
+				if (ui.ParamCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
+				{
+					cb->setCheckState(Qt::CheckState::Unchecked);
+					excluded.insert(parVar->VariationId());
+				}
+				else if (!Contains(excluded, parVar->VariationId()))
+					cb->setCheckState(Qt::CheckState::Checked);
+			}
+		}
+	});
 }
 
 /// <summary>

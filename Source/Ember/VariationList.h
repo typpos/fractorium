@@ -32,6 +32,8 @@ public:
 	const ParametricVariation<T>* GetParametricVariation(size_t index) const;
 	const ParametricVariation<T>* GetParametricVariation(const string& name) const;
 	ParametricVariation<T>* GetParametricVariationCopy(eVariationId id, T weight = 1) const;
+	const Variation<T>* GetPreVariation(const string& name) const;
+	const Variation<T>* GetPostVariation(const string& name) const;
 	int GetVariationIndex(const string& name) const;
 	size_t Size() const;
 	size_t RegSize() const;
@@ -52,6 +54,8 @@ public:
 private:
 	VariationList();
 	Variation<T>* MakeCopyWithWeight(const Variation<T>* var, T weight) const;
+	template <template <typename> class U>
+	const U<T>* SearchVarName(const vector<const U<T>*>& vars, const string& name) const;
 
 	vector<const Variation<T>*> m_Variations;//A list of pointers to dynamically allocated variation objects.
 	vector<const Variation<T>*> m_RegVariations;

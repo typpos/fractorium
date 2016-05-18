@@ -122,6 +122,125 @@
      </item>
     </layout>
    </item>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QGroupBox" name="TypeGroupBox">
+     <property name="title">
+      <string>Select by variation type</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="PpSumCheckBox">
+        <property name="toolTip">
+         <string>Select all pre/post variations which have the non-standard behavior of summing their outputs</string>
+        </property>
+        <property name="text">
+         <string>PP Sum</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="SumCheckBox">
+        <property name="toolTip">
+         <string>Select all regular variations which have the default behavior of summing their outputs</string>
+        </property>
+        <property name="text">
+         <string>Sum</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="AssignCheckBox">
+        <property name="toolTip">
+         <string>Select all regular variations which have the non-standard behavior of assigning their outputs</string>
+        </property>
+        <property name="text">
+         <string>Assign</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="DcCheckBox">
+        <property name="toolTip">
+         <string>Select all variations which use direct coloring</string>
+        </property>
+        <property name="text">
+         <string>DC</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="StateCheckBox">
+        <property name="toolTip">
+         <string>Select all variations which alter their state on each iteration</string>
+        </property>
+        <property name="text">
+         <string>State</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="ParamCheckBox">
+        <property name="toolTip">
+         <string>Select all variations which have parameters</string>
+        </property>
+        <property name="text">
+         <string>Param</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QCheckBox" name="NonParamCheckBox">
+        <property name="toolTip">
+         <string>Select all variations which do not have parameters (weight only)</string>
+        </property>
+        <property name="text">
+         <string>Non Param</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QCheckBox" name="PpAssignCheckBox">
+        <property name="toolTip">
+         <string>Select all pre/post variations which have the default behavior of assigning their outputs</string>
+        </property>
+        <property name="text">
+         <string>PP Assign</string>
+        </property>
+        <property name="tristate">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

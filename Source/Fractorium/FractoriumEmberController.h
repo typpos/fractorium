@@ -178,6 +178,7 @@ public:
 	virtual void MoveXforms(double x, double y, bool pre) { }
 	virtual void ScaleXforms(double scale, bool pre) { }
 	virtual void ResetXformsAffine(bool pre) { }
+	virtual void RandomXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
 	double LockedScale() { return m_LockedScale; }
 	void LockedScale(double scale) { m_LockedScale = scale; }
@@ -424,6 +425,7 @@ public:
 	virtual void MoveXforms(double x, double y, bool pre) override;
 	virtual void ScaleXforms(double scale, bool pre) override;
 	virtual void ResetXformsAffine(bool pre) override;
+	virtual void RandomXformsAffine(bool pre) override;
 	virtual void FillBothAffines() override;
 	virtual void LockAffineScaleCheckBoxStateChanged(int state) override;
 	void FillAffineWithXform(Xform<T>* xform, bool pre);

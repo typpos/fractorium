@@ -75,6 +75,7 @@ void Fractorium::InitXformsAffineUI()
 	connect(ui.PreScaleDownButton,         SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
 	connect(ui.PreScaleUpButton,           SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
 	connect(ui.PreResetButton,             SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PreRandomButton,            SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
 	connect(ui.PostFlipHorizontalButton,   SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
 	connect(ui.PostFlipVerticalButton,     SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
 	connect(ui.PostRotate90CcButton,       SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
@@ -88,6 +89,7 @@ void Fractorium::InitXformsAffineUI()
 	connect(ui.PostScaleDownButton,        SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
 	connect(ui.PostScaleUpButton,          SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
 	connect(ui.PostResetButton,            SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
+	connect(ui.PostRandomButton,           SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
 	connect(ui.PreAffineGroupBox,		   SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
 	connect(ui.PostAffineGroupBox,		   SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
 	connect(ui.ShowPreAffineAllRadio,      SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
@@ -569,12 +571,30 @@ void FractoriumEmberController<T>::ResetXformsAffine(bool pre)
 	FillAffineWithXform(CurrentXform(), pre);
 }
 
+void Fractorium::OnResetAffineButtonClicked(bool checked) { m_Controller->ResetXformsAffine(sender() == ui.PreResetButton); }
+
 /// <summary>
-/// Reset pre/post affine to the identity matrix.
-/// Called when reset pre/post affine buttons are clicked.
+/// Randomize all values in selected pre/post affines to a range of -1 to 1.
+/// Called when random pre/post affine buttons are clicked.
 /// Resets the rendering process.
 /// </summary>
-void Fractorium::OnResetAffineButtonClicked(bool checked) { m_Controller->ResetXformsAffine(sender() == ui.PreResetButton); }
+template <typename T>
+void FractoriumEmberController<T>::RandomXformsAffine(bool pre)
+{
+	UpdateXform([&](Xform<T>* xform)
+	{
+		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+		xform->m_Affine.A(m_Rand.Frand11<T>());
+		xform->m_Affine.B(m_Rand.Frand11<T>());
+		xform->m_Affine.C(m_Rand.Frand11<T>());
+		xform->m_Affine.D(m_Rand.Frand11<T>());
+		xform->m_Affine.E(m_Rand.Frand11<T>());
+		xform->m_Affine.F(m_Rand.Frand11<T>());
+	}, eXformUpdate::UPDATE_SELECTED);
+	FillAffineWithXform(CurrentXform(), pre);
+}
+
+void Fractorium::OnRandomAffineButtonClicked(bool checked) { m_Controller->RandomXformsAffine(sender() == ui.PreRandomButton); }
 
 /// <summary>
 /// Fill the GUI with the pre and post affine xform values.

@@ -233,6 +233,7 @@ public slots:
 	void OnScaleDownButtonClicked(bool checked);
 	void OnScaleUpButtonClicked(bool checked);
 	void OnResetAffineButtonClicked(bool checked);
+	void OnRandomAffineButtonClicked(bool checked);
 
 	void OnAffineGroupBoxToggled(bool on);
 	void OnAffineDrawAllCurrentRadioButtonToggled(bool checked);

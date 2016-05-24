@@ -3513,8 +3513,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>118</width>
-                <height>618</height>
+                <width>263</width>
+                <height>700</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -3547,13 +3547,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>100</width>
-                   <height>270</height>
+                   <height>297</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>270</height>
+                   <height>297</height>
                   </size>
                  </property>
                  <property name="autoFillBackground">
@@ -3752,6 +3752,32 @@
                       </property>
                      </widget>
                     </item>
+                    <item row="2" column="4">
+                     <widget class="QPushButton" name="PreMoveRightButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Move xform x units right</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_right.png</normaloff>:/Fractorium/Icons/arrow_right.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
                     <item row="1" column="4">
                      <widget class="QPushButton" name="PreRotate90CButton">
                       <property name="minimumSize">
@@ -3778,8 +3804,8 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="4">
-                     <widget class="QPushButton" name="PreMoveRightButton">
+                    <item row="2" column="0">
+                     <widget class="QPushButton" name="PreMoveUpButton">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3793,14 +3819,14 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units right</string>
+                       <string>Move xform x units up</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_right.png</normaloff>:/Fractorium/Icons/arrow_right.png</iconset>
+                        <normaloff>:/Fractorium/Icons/arrow_up.png</normaloff>:/Fractorium/Icons/arrow_up.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -3857,8 +3883,8 @@
                       </item>
                      </widget>
                     </item>
-                    <item row="2" column="0">
-                     <widget class="QPushButton" name="PreMoveUpButton">
+                    <item row="3" column="3">
+                     <widget class="QPushButton" name="PreScaleUpButton">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3872,19 +3898,19 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units up</string>
+                       <string>Scale xform x percent up</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_up.png</normaloff>:/Fractorium/Icons/arrow_up.png</iconset>
+                        <normaloff>:/Fractorium/Icons/arrow_out.png</normaloff>:/Fractorium/Icons/arrow_out.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="1">
-                     <widget class="QPushButton" name="PreMoveDownButton">
+                    <item row="3" column="1">
+                     <widget class="QPushButton" name="PreScaleDownButton">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3898,19 +3924,51 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units down</string>
+                       <string>Scale xform x percent down</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_down.png</normaloff>:/Fractorium/Icons/arrow_down.png</iconset>
+                        <normaloff>:/Fractorium/Icons/arrow_in.png</normaloff>:/Fractorium/Icons/arrow_in.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="2">
-                     <widget class="QComboBox" name="PreMoveCombo">
+                    <item row="0" column="3">
+                     <widget class="QPushButton" name="PreFlipHorizontalButton">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Flip xform horizontally</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QPushButton" name="PreResetButton">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -3920,30 +3978,31 @@
                       <property name="minimumSize">
                        <size>
                         <width>75</width>
-                        <height>23</height>
+                        <height>24</height>
                        </size>
                       </property>
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
-                        <height>23</height>
+                        <height>24</height>
                        </size>
                       </property>
-                      <property name="editable">
-                       <bool>true</bool>
+                      <property name="toolTip">
+                       <string>Reset xform to the identity matrix</string>
                       </property>
-                      <property name="frame">
-                       <bool>true</bool>
+                      <property name="text">
+                       <string>Reset</string>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>1</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
-                    <item row="2" column="3">
-                     <widget class="QPushButton" name="PreMoveLeftButton">
+                    <item row="0" column="1">
+                     <widget class="QPushButton" name="PreFlipVerticalButton">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3957,14 +4016,66 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units left</string>
+                       <string>Flip xform vertically</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_left.png</normaloff>:/Fractorium/Icons/arrow_left.png</iconset>
+                        <normaloff>:/Fractorium/Icons/shape_flip_vertical.png</normaloff>:/Fractorium/Icons/shape_flip_vertical.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="3">
+                     <widget class="QPushButton" name="PreRotateCButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Rotate xform x degrees clockwise</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QPushButton" name="PreRotateCcButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Rotate xform x degrees counter clockwise</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -4042,8 +4153,8 @@
                       </item>
                      </widget>
                     </item>
-                    <item row="1" column="1">
-                     <widget class="QPushButton" name="PreRotateCcButton">
+                    <item row="2" column="3">
+                     <widget class="QPushButton" name="PreMoveLeftButton">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -4057,77 +4168,19 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform x degrees counter clockwise</string>
+                       <string>Move xform x units left</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</iconset>
+                        <normaloff>:/Fractorium/Icons/arrow_left.png</normaloff>:/Fractorium/Icons/arrow_left.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="3">
-                     <widget class="QPushButton" name="PreRotateCButton">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Rotate xform x degrees clockwise</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QPushButton" name="PreFlipVerticalButton">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Flip xform vertically</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/shape_flip_vertical.png</normaloff>:/Fractorium/Icons/shape_flip_vertical.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="2">
-                     <widget class="QPushButton" name="PreResetButton">
+                    <item row="2" column="2">
+                     <widget class="QComboBox" name="PreMoveCombo">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -4137,6 +4190,33 @@
                       <property name="minimumSize">
                        <size>
                         <width>75</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="editable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="frame">
+                       <bool>true</bool>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QPushButton" name="PreMoveDownButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
                         <height>24</height>
                        </size>
                       </property>
@@ -4147,15 +4227,19 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Reset xform to the identity matrix</string>
+                       <string>Move xform x units down</string>
                       </property>
                       <property name="text">
-                       <string>Reset</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_down.png</normaloff>:/Fractorium/Icons/arrow_down.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="3">
-                     <widget class="QPushButton" name="PreFlipHorizontalButton">
+                    <item row="4" column="2">
+                     <widget class="QPushButton" name="PreRandomButton">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -4174,67 +4258,8 @@
                         <height>24</height>
                        </size>
                       </property>
-                      <property name="toolTip">
-                       <string>Flip xform horizontally</string>
-                      </property>
                       <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="1">
-                     <widget class="QPushButton" name="PreScaleDownButton">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Scale xform x percent down</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_in.png</normaloff>:/Fractorium/Icons/arrow_in.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="3">
-                     <widget class="QPushButton" name="PreScaleUpButton">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Scale xform x percent up</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_out.png</normaloff>:/Fractorium/Icons/arrow_out.png</iconset>
+                       <string>Random</string>
                       </property>
                      </widget>
                     </item>
@@ -4307,13 +4332,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>100</width>
-                   <height>270</height>
+                   <height>297</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>270</height>
+                   <height>297</height>
                   </size>
                  </property>
                  <property name="autoFillBackground">
@@ -4489,8 +4514,8 @@
                     <property name="spacing">
                      <number>3</number>
                     </property>
-                    <item row="1" column="0">
-                     <widget class="QPushButton" name="PostRotate90CcButton">
+                    <item row="1" column="3">
+                     <widget class="QPushButton" name="PostRotateCButton">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -4507,19 +4532,19 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform 90 degrees counter clockwise</string>
+                       <string>Rotate xform x degrees clockwise</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_turn_left.png</normaloff>:/Fractorium/Icons/arrow_turn_left.png</iconset>
+                        <normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="4">
-                     <widget class="QPushButton" name="PostRotate90CButton">
+                    <item row="1" column="1">
+                     <widget class="QPushButton" name="PostRotateCcButton">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -4536,19 +4561,19 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform 90 degrees clockwise</string>
+                       <string>Rotate xform x degrees counter clockwise</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_turn_right.png</normaloff>:/Fractorium/Icons/arrow_turn_right.png</iconset>
+                        <normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="4">
-                     <widget class="QPushButton" name="PostMoveRightButton">
+                    <item row="0" column="3">
+                     <widget class="QPushButton" name="PostFlipHorizontalButton">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -4565,75 +4590,19 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units right</string>
+                       <string>Flip xform horizontally</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_right.png</normaloff>:/Fractorium/Icons/arrow_right.png</iconset>
+                        <normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</iconset>
                       </property>
                      </widget>
                     </item>
-                    <item row="3" column="2">
-                     <widget class="QComboBox" name="PostScaleCombo">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>75</width>
-                        <height>23</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>23</height>
-                       </size>
-                      </property>
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                      <property name="frame">
-                       <bool>true</bool>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>110</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>125</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>150</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>175</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>200</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QPushButton" name="PostMoveUpButton">
+                    <item row="0" column="1">
+                     <widget class="QPushButton" name="PostFlipVerticalButton">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -4650,108 +4619,14 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units up</string>
+                       <string>Flip xform vertically</string>
                       </property>
                       <property name="text">
                        <string/>
                       </property>
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_up.png</normaloff>:/Fractorium/Icons/arrow_up.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1">
-                     <widget class="QPushButton" name="PostMoveDownButton">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Move xform x units down</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_down.png</normaloff>:/Fractorium/Icons/arrow_down.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="2">
-                     <widget class="QComboBox" name="PostMoveCombo">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>75</width>
-                        <height>23</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>23</height>
-                       </size>
-                      </property>
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                      <property name="frame">
-                       <bool>true</bool>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>1</string>
-                       </property>
-                      </item>
-                     </widget>
-                    </item>
-                    <item row="2" column="3">
-                     <widget class="QPushButton" name="PostMoveLeftButton">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Move xform x units left</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_left.png</normaloff>:/Fractorium/Icons/arrow_left.png</iconset>
+                        <normaloff>:/Fractorium/Icons/shape_flip_vertical.png</normaloff>:/Fractorium/Icons/shape_flip_vertical.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -4830,122 +4705,6 @@
                         <string>180</string>
                        </property>
                       </item>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QPushButton" name="PostRotateCcButton">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Rotate xform x degrees counter clockwise</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_anticlockwise.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="3">
-                     <widget class="QPushButton" name="PostRotateCButton">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Rotate xform x degrees clockwise</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</normaloff>:/Fractorium/Icons/arrow_rotate_clockwise.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="3">
-                     <widget class="QPushButton" name="PostFlipHorizontalButton">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Flip xform horizontally</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</normaloff>:/Fractorium/Icons/shape_flip_horizontal.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QPushButton" name="PostFlipVerticalButton">
-                      <property name="enabled">
-                       <bool>true</bool>
-                      </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>24</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Flip xform vertically</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="Fractorium.qrc">
-                        <normaloff>:/Fractorium/Icons/shape_flip_vertical.png</normaloff>:/Fractorium/Icons/shape_flip_vertical.png</iconset>
-                      </property>
                      </widget>
                     </item>
                     <item row="0" column="2">
@@ -5034,6 +4793,297 @@
                       <property name="icon">
                        <iconset resource="Fractorium.qrc">
                         <normaloff>:/Fractorium/Icons/arrow_in.png</normaloff>:/Fractorium/Icons/arrow_in.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="3">
+                     <widget class="QPushButton" name="PostMoveLeftButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Move xform x units left</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_left.png</normaloff>:/Fractorium/Icons/arrow_left.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="2">
+                     <widget class="QComboBox" name="PostMoveCombo">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>75</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="editable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="frame">
+                       <bool>true</bool>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="2" column="4">
+                     <widget class="QPushButton" name="PostMoveRightButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Move xform x units right</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_right.png</normaloff>:/Fractorium/Icons/arrow_right.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="4">
+                     <widget class="QPushButton" name="PostRotate90CButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Rotate xform 90 degrees clockwise</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_turn_right.png</normaloff>:/Fractorium/Icons/arrow_turn_right.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QPushButton" name="PostMoveUpButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Move xform x units up</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_up.png</normaloff>:/Fractorium/Icons/arrow_up.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QPushButton" name="PostRotate90CcButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Rotate xform 90 degrees counter clockwise</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_turn_left.png</normaloff>:/Fractorium/Icons/arrow_turn_left.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="2">
+                     <widget class="QComboBox" name="PostScaleCombo">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>75</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="editable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="frame">
+                       <bool>true</bool>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>110</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>125</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>150</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>175</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>200</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QPushButton" name="PostMoveDownButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Move xform x units down</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="Fractorium.qrc">
+                        <normaloff>:/Fractorium/Icons/arrow_down.png</normaloff>:/Fractorium/Icons/arrow_down.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="2">
+                     <widget class="QPushButton" name="PostRandomButton">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Random</string>
                       </property>
                      </widget>
                     </item>
@@ -5531,8 +5581,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>133</width>
-                   <height>52</height>
+                   <width>259</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">

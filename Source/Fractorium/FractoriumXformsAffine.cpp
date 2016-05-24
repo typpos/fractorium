@@ -246,7 +246,7 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		DoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
 
 		if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
@@ -255,21 +255,21 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 			{
 				case 0:
 				case 3:
-					affine->A(cos(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
-					affine->D(sin(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
+					affine.A(cos(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
+					affine.D(sin(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
 					break;
 
 				case 1:
 				case 4:
-					affine->B(cos(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
-					affine->E(sin(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
+					affine.B(cos(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
+					affine.E(sin(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
 					break;
 
 				case 2:
 				case 5:
 				default:
-					affine->C(cos(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
-					affine->F(sin(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
+					affine.C(cos(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
+					affine.F(sin(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
 					break;
 			}
 		}
@@ -278,27 +278,27 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 			switch (index)
 			{
 				case 0:
-					affine->A(d);
+					affine.A(d);
 					break;
 
 				case 1:
-					affine->B(d);
+					affine.B(d);
 					break;
 
 				case 2:
-					affine->C(d);
+					affine.C(d);
 					break;
 
 				case 3:
-					affine->D(d);
+					affine.D(d);
 					break;
 
 				case 4:
-					affine->E(d);
+					affine.E(d);
 					break;
 
 				case 5:
-					affine->F(d);
+					affine.F(d);
 					break;
 			}
 		}
@@ -328,24 +328,24 @@ void FractoriumEmberController<T>::FlipXforms(bool horizontal, bool vertical, bo
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 
 		if (horizontal)
 		{
-			affine->A(-affine->A());
-			affine->B(-affine->B());
+			affine.A(-affine.A());
+			affine.B(-affine.B());
 
 			if (!m_Fractorium->LocalPivot())
-				affine->C(-affine->C());
+				affine.C(-affine.C());
 		}
 
 		if (vertical)
 		{
-			affine->D(-affine->D());
-			affine->E(-affine->E());
+			affine.D(-affine.D());
+			affine.E(-affine.E());
 
 			if (!m_Fractorium->LocalPivot())
-				affine->F(-affine->F());
+				affine.F(-affine.F());
 		}
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
@@ -365,8 +365,8 @@ void FractoriumEmberController<T>::RotateXformsByAngle(double angle, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-		affine->Rotate(angle * DEG_2_RAD_T);
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
+		affine.Rotate(angle * DEG_2_RAD_T);
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
 }
@@ -426,9 +426,9 @@ void FractoriumEmberController<T>::MoveXforms(double x, double y, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-		affine->C(affine->C() + x);
-		affine->F(affine->F() + y);
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
+		affine.C(affine.C() + x);
+		affine.F(affine.F() + y);
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
 }
@@ -512,11 +512,11 @@ void FractoriumEmberController<T>::ScaleXforms(double scale, bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-		affine->A(affine->A() * scale);
-		affine->B(affine->B() * scale);
-		affine->D(affine->D() * scale);
-		affine->E(affine->E() * scale);
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
+		affine.A(affine.A() * scale);
+		affine.B(affine.B() * scale);
+		affine.D(affine.D() * scale);
+		affine.E(affine.E() * scale);
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
 }
@@ -565,8 +565,8 @@ void FractoriumEmberController<T>::ResetXformsAffine(bool pre)
 {
 	UpdateXform([&] (Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-		affine->MakeID();
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
+		affine.MakeID();
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
 }
@@ -583,13 +583,13 @@ void FractoriumEmberController<T>::RandomXformsAffine(bool pre)
 {
 	UpdateXform([&](Xform<T>* xform)
 	{
-		auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-		xform->m_Affine.A(m_Rand.Frand11<T>());
-		xform->m_Affine.B(m_Rand.Frand11<T>());
-		xform->m_Affine.C(m_Rand.Frand11<T>());
-		xform->m_Affine.D(m_Rand.Frand11<T>());
-		xform->m_Affine.E(m_Rand.Frand11<T>());
-		xform->m_Affine.F(m_Rand.Frand11<T>());
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
+		affine.A(m_Rand.Frand11<T>());
+		affine.B(m_Rand.Frand11<T>());
+		affine.C(m_Rand.Frand11<T>());
+		affine.D(m_Rand.Frand11<T>());
+		affine.E(m_Rand.Frand11<T>());
+		affine.F(m_Rand.Frand11<T>());
 	}, eXformUpdate::UPDATE_SELECTED);
 	FillAffineWithXform(CurrentXform(), pre);
 }

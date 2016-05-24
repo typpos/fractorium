@@ -871,11 +871,11 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	auto index = ember->GetXformIndex(xform);
 	auto size = ember->m_Palette.m_Entries.size();
 	auto color = ember->m_Palette.m_Entries[Clamp<T>(xform->m_ColorX * size, 0, size - 1)];
-	auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+	auto& affine = pre ? xform->m_Affine : xform->m_Post;
 	//For some incredibly strange reason, even though glm and OpenGL use matrices with a column-major
 	//data layout, nothing will work here unless they are flipped to row major order. This is how it was
 	//done in Fractron.
-	m4T mat = (*affine * m_FractoriumEmberController->AffineScaleCurrentToLocked()).ToMat4RowMajor();
+	m4T mat = (affine * m_FractoriumEmberController->AffineScaleCurrentToLocked()).ToMat4RowMajor();
 	m_GL->glPushMatrix();
 	m_GL->glLoadIdentity();
 	MultMatrix(mat);
@@ -1184,7 +1184,7 @@ void GLEmberController<T>::CalcDragXAxis()
 		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
-			auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+			auto& affine = pre ? xform->m_Affine : xform->m_Post;
 			auto srcRotated = m_DragSrcTransforms[index++];
 
 			if (worldPivotShiftAlt)
@@ -1192,21 +1192,21 @@ void GLEmberController<T>::CalcDragXAxis()
 				srcRotated.X(srcRotated.O() + srcRotated.X());
 				srcRotated.O(v2T(0));
 				srcRotated.Rotate(angle);
-				affine->X(srcRotated.X() - affine->O());
+				affine.X(srcRotated.X() - affine.O());
 			}
 			else if (GetAlt())
 			{
 				srcRotated.Rotate(angle);
-				affine->X(srcRotated.X());
+				affine.X(srcRotated.X());
 			}
 			else
 			{
 				srcRotated.Rotate(angle);
-				*affine = srcRotated;
+				affine = srcRotated;
 			}
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine->O() + affine->X()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.X()) * scaleBack, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
 	}
 	else
@@ -1222,16 +1222,16 @@ void GLEmberController<T>::CalcDragXAxis()
 		auto origXPlusOff = v3T(m_DragSrcTransform.X(), 0) + (diff * scale);
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
-			auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+			auto& affine = pre ? xform->m_Affine : xform->m_Post;
 			auto axis = v3T(m_DragSrcTransforms[index++].X(), 0) + (diff * scale);
 
 			if (GetAlt())
-				affine->X(v2T(origXPlusOff));//Absolute, not ratio.
+				affine.X(v2T(origXPlusOff));//Absolute, not ratio.
 			else
-				affine->RotateScaleXTo(v2T(axis));
+				affine.RotateScaleXTo(v2T(axis));
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine->O() + affine->X()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.X()) * scaleBack, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
 	}
 }
@@ -1274,7 +1274,7 @@ void GLEmberController<T>::CalcDragYAxis()
 		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
-			auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+			auto& affine = pre ? xform->m_Affine : xform->m_Post;
 			auto srcRotated = m_DragSrcTransforms[index++];
 
 			if (worldPivotShiftAlt)
@@ -1282,21 +1282,21 @@ void GLEmberController<T>::CalcDragYAxis()
 				srcRotated.Y(srcRotated.O() + srcRotated.Y());
 				srcRotated.O(v2T(0));
 				srcRotated.Rotate(angle);
-				affine->Y(srcRotated.Y() - affine->O());
+				affine.Y(srcRotated.Y() - affine.O());
 			}
 			else if (GetAlt())
 			{
 				srcRotated.Rotate(angle);
-				affine->Y(srcRotated.Y());
+				affine.Y(srcRotated.Y());
 			}
 			else
 			{
 				srcRotated.Rotate(angle);
-				*affine = srcRotated;
+				affine = srcRotated;
 			}
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine->O() + affine->Y()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.Y()) * scaleBack, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
 	}
 	else
@@ -1312,16 +1312,16 @@ void GLEmberController<T>::CalcDragYAxis()
 		auto origXPlusOff = v3T(m_DragSrcTransform.Y(), 0) + (diff * scale);
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
-			auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+			auto& affine = pre ? xform->m_Affine : xform->m_Post;
 			auto axis = v3T(m_DragSrcTransforms[index++].Y(), 0) + (diff * scale);
 
 			if (GetAlt())
-				affine->Y(v2T(origXPlusOff));//Absolute, not ratio.
+				affine.Y(v2T(origXPlusOff));//Absolute, not ratio.
 			else
-				affine->RotateScaleYTo(v2T(axis));
+				affine.RotateScaleYTo(v2T(axis));
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine->O() + affine->Y()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.Y()) * scaleBack, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
 	}
 }
@@ -1356,18 +1356,18 @@ void GLEmberController<T>::CalcDragTranslation()
 		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
-			auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+			auto& affine = pre ? xform->m_Affine : xform->m_Post;
 			auto srcRotated = m_DragSrcTransforms[index++];
 			srcRotated.RotateTrans(angle);
 
 			if (worldPivotShift)
 			{
 				srcRotated.Rotate(angle);
-				affine->X(srcRotated.X());
-				affine->Y(srcRotated.Y());
+				affine.X(srcRotated.X());
+				affine.Y(srcRotated.Y());
 			}
 
-			affine->O(srcRotated.O());
+			affine.O(srcRotated.O());
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
 				m_DragHandlePos = v3T(srcRotated.O(), 0) * scaleBack;
@@ -1381,10 +1381,10 @@ void GLEmberController<T>::CalcDragTranslation()
 		{
 			m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 			{
-				auto affine = pre ? &xform->m_Affine : &xform->m_Post;
+				auto& affine = pre ? xform->m_Affine : xform->m_Post;
 				auto offset = m_DragSrcTransforms[index++].O() + (scale * v2T(diff));
 				auto snapped = SnapToGrid(offset);
-				affine->O(v2T(snapped.x, snapped.y));
+				affine.O(v2T(snapped.x, snapped.y));
 			}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
 			m_DragHandlePos = SnapToGrid(m_MouseWorldPos);
 		}
@@ -1392,8 +1392,8 @@ void GLEmberController<T>::CalcDragTranslation()
 		{
 			m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 			{
-				auto affine = pre ? &xform->m_Affine : &xform->m_Post;
-				affine->O(m_DragSrcTransforms[index++].O() + (scale * v2T(diff)));
+				auto& affine = pre ? xform->m_Affine : xform->m_Post;
+				affine.O(m_DragSrcTransforms[index++].O() + (scale * v2T(diff)));
 			}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
 			m_DragHandlePos = m_MouseWorldPos;
 		}

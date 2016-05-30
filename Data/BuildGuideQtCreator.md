@@ -33,7 +33,7 @@ Create a new folder in your development area named fractorium:
 
 `cd fractorium`
 
-`git clone https://github.com/mfeemster/fractorium.git`
+`git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git`
 
 ###Prerequisites
 

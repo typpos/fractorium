@@ -6,7 +6,7 @@ Install `git` and clone the repository:
 
 ```
 brew install git
-git clone https://github.com/mfeemster/fractorium
+git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 ```
 
 Install the dependencies:

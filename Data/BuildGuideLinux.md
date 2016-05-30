@@ -4,7 +4,7 @@ Install `git` and clone the repository:
 
 ```
 sudo apt-get install git
-git clone https://github.com/mfeemster/fractorium
+git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 ```
 
 Install the dependencies.

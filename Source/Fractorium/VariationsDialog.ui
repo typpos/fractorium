@@ -150,7 +150,7 @@
       <item row="0" column="0">
        <widget class="QCheckBox" name="SumCheckBox">
         <property name="toolTip">
-         <string>Select all regular variations which have the default behavior of summing their outputs</string>
+         <string>Select all regular variations which have the standard behavior of summing their outputs</string>
         </property>
         <property name="text">
          <string>Sum</string>
@@ -228,7 +228,7 @@
       <item row="0" column="3">
        <widget class="QCheckBox" name="PpAssignCheckBox">
         <property name="toolTip">
-         <string>Select all pre/post variations which have the default behavior of assigning their outputs</string>
+         <string>Select all pre/post variations which have the standard behavior of assigning their outputs</string>
         </property>
         <property name="text">
          <string>PP Assign</string>

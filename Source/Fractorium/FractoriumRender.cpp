@@ -690,8 +690,8 @@ bool Fractorium::CreateControllerFromOptions()
 		if (m_Controller.get())
 		{
 			scale = m_Controller->LockedScale();
-			current = m_Controller->SaveCurrentToOpenedFile();
-			m_Controller->StopPreviewRender();//Must stop any previews first, else changing controllers will crash the program.
+			m_Controller->StopPreviewRender();//Must stop any previews first, else changing controllers will crash the program and SaveCurrentToOpenedFile() will return 0.
+			current = m_Controller->SaveCurrentToOpenedFile(false);
 			m_Controller->CopyTempPalette(tempPalette);//Convert float to double or save double verbatim;
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
 			//m_Controller->CopyEmber(ed);

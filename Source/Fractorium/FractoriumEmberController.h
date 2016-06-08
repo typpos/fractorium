@@ -95,7 +95,7 @@ public:
 	virtual void OpenAndPrepFiles(const QStringList& filenames, bool append) { }
 	virtual void SaveCurrentAsXml() { }
 	virtual void SaveEntireFileAsXml() { }
-	virtual uint SaveCurrentToOpenedFile() { return 0; }
+	virtual uint SaveCurrentToOpenedFile(bool render = true) { return 0; }
 	virtual void Undo() { }//Edit.
 	virtual void Redo() { }
 	virtual void CopyXml() { }
@@ -339,7 +339,7 @@ public:
 	virtual void OpenAndPrepFiles(const QStringList& filenames, bool append) override;
 	virtual void SaveCurrentAsXml() override;
 	virtual void SaveEntireFileAsXml() override;
-	virtual uint SaveCurrentToOpenedFile() override;
+	virtual uint SaveCurrentToOpenedFile(bool render = true) override;
 	virtual void Undo() override;
 	virtual void Redo() override;
 	virtual void CopyXml() override;

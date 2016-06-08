@@ -370,8 +370,9 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 /// preview renderer.
 /// This does not save to disk.
 /// </summary>
+/// <param name="render">Whether to re-render the preview thumbnail after saving to the open file. Default: true.</param>
 template <typename T>
-uint FractoriumEmberController<T>::SaveCurrentToOpenedFile()
+uint FractoriumEmberController<T>::SaveCurrentToOpenedFile(bool render)
 {
 	uint i = 0;
 	bool fileFound = false;
@@ -395,12 +396,12 @@ uint FractoriumEmberController<T>::SaveCurrentToOpenedFile()
 			StopPreviewRender();
 			m_EmberFile.m_Embers.push_back(m_Ember);
 			m_EmberFile.MakeNamesUnique();
-			UpdateLibraryTree();
+
+			if (render)
+				UpdateLibraryTree();
 		}
-		else
-		{
+		else if (render)
 			RenderPreviews(i, i + 1);
-		}
 	}
 
 	return i;
@@ -832,7 +833,7 @@ void Fractorium::OnActionFinalRender(bool checked)
 	//First completely stop what the current rendering process is doing.
 	m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
 	m_Controller->StopPreviewRender();
-	m_Controller->SaveCurrentToOpenedFile();//Save whatever was edited back to the current open file.
+	m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
 	m_RenderStatusLabel->setText("Renderer stopped.");
 	m_FinalRenderDialog->show();
 }

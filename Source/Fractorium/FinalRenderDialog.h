@@ -40,13 +40,18 @@ class FractoriumFinalRenderDialog : public QDialog
 	friend Fractorium;
 	friend FinalRenderEmberControllerBase;
 	friend FinalRenderEmberController<float>;
+	friend PreviewRenderer<float>;
+	friend FinalRenderPreviewRenderer<float>;
 
 #ifdef DO_DOUBLE
 	friend FinalRenderEmberController<double>;
+	friend PreviewRenderer<double>;
+	friend FinalRenderPreviewRenderer<double>;
 #endif
 
 public:
 	FractoriumFinalRenderDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f = 0);
+	void Show(bool fromSequence);
 	bool EarlyClip();
 	bool YAxisUp();
 	bool Transparency();
@@ -113,6 +118,7 @@ private:
 	bool CreateControllerFromGUI(bool createRenderer);
 	bool SetMemory();
 
+	bool m_FromSequence;
 	int m_MemoryCellIndex;
 	int m_ItersCellIndex;
 	int m_PathCellIndex;

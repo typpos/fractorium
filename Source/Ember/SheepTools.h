@@ -1323,6 +1323,16 @@ public:
 		m_Comment = comment;
 	}
 
+	/// <summary>
+	/// Set stagger value.
+	/// Greater than 0 means interpolate xforms one at a time, else interpolate all at once.
+	/// </summary>
+	/// <param name="stagger">The stagger value to set.</param>
+	void Stagger(T stagger)
+	{
+		m_Stagger = stagger;
+	}
+
 private:
 	bool m_Smooth = true;
 	intmax_t m_SheepGen = -1;

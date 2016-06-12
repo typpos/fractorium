@@ -52,7 +52,7 @@ template <typename T>
 void FractoriumEmberController<T>::NewFlock(size_t count)
 {
 	Ember<T> ember;
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	m_EmberFile.Clear();
 	m_EmberFile.m_Filename = EmberFile<T>::DefaultFilename();
 
@@ -91,7 +91,7 @@ void FractoriumEmberController<T>::NewEmptyFlameInCurrentFile()
 	Ember<T> ember;
 	Xform<T> xform;
 	QDateTime local(QDateTime::currentDateTime());
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	ParamsToEmber(ember);
 	xform.m_Weight = T(0.25);
 	xform.m_ColorX = m_Rand.Frand01<T>();
@@ -116,7 +116,7 @@ template <typename T>
 void FractoriumEmberController<T>::NewRandomFlameInCurrentFile()
 {
 	Ember<T> ember;
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	m_SheepTools->Random(ember, m_FilteredVariations, static_cast<int>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
 	ParamsToEmber(ember);
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
@@ -138,7 +138,7 @@ template <typename T>
 void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 {
 	auto ember = m_Ember;
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
 	ember.m_Index = m_EmberFile.Size();
 	m_EmberFile.m_Embers.push_back(ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
@@ -172,7 +172,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 		vector<Ember<T>> embers;
 		vector<string> errors;
 		uint previousSize = append ? uint(m_EmberFile.Size()) : 0u;
-		StopPreviewRender();
+		StopAllPreviewRenderers();
 		emberFile.m_Filename = filenames[0];
 
 		for (auto& filename : filenames)
@@ -377,7 +377,7 @@ uint FractoriumEmberController<T>::SaveCurrentToOpenedFile(bool render)
 	uint i = 0;
 	bool fileFound = false;
 
-	if (!m_PreviewRunning)
+	if (!m_LibraryPreviewRenderer->Running())
 	{
 		for (auto& it : m_EmberFile.m_Embers)
 		{
@@ -393,7 +393,7 @@ uint FractoriumEmberController<T>::SaveCurrentToOpenedFile(bool render)
 
 		if (!fileFound)
 		{
-			StopPreviewRender();
+			StopAllPreviewRenderers();
 			m_EmberFile.m_Embers.push_back(m_Ember);
 			m_EmberFile.MakeNamesUnique();
 
@@ -401,7 +401,7 @@ uint FractoriumEmberController<T>::SaveCurrentToOpenedFile(bool render)
 				UpdateLibraryTree();
 		}
 		else if (render)
-			RenderPreviews(i, i + 1);
+			RenderLibraryPreviews(i, i + 1);
 	}
 
 	return i;
@@ -532,7 +532,7 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 	}
 
 	b.clear();
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	parser.Parse(reinterpret_cast<byte*>(const_cast<char*>(s.c_str())), "", embers);
 	errors = parser.ErrorReportString();
 
@@ -586,7 +586,7 @@ void FractoriumEmberController<T>::PasteXmlOver()
 	}
 
 	b.clear();
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	m_EmberFile.m_Embers.clear();//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
 	parser.Parse(reinterpret_cast<byte*>(const_cast<char*>(s.c_str())), "", m_EmberFile.m_Embers);
 	errors = parser.ErrorReportString();
@@ -812,14 +812,14 @@ void Fractorium::OnActionClearFlame(bool checked) { m_Controller->ClearFlame(); 
 /// </summary>
 void Fractorium::OnActionRenderPreviews(bool checked)
 {
-	m_Controller->RenderPreviews();
+	m_Controller->RenderLibraryPreviews();
 }
 
 /// <summary>
 /// Stop all previews from being rendered. This is handy if the user
 /// opens a large file with many embers in it, such as an animation sequence.
 /// </summary>
-void Fractorium::OnActionStopRenderingPreviews(bool checked) { m_Controller->StopPreviewRender(); }
+void Fractorium::OnActionStopRenderingPreviews(bool checked) { m_Controller->StopLibraryPreviewRender(); }
 
 /// <summary>
 /// Show the final render dialog as a modeless dialog to allow
@@ -832,10 +832,10 @@ void Fractorium::OnActionFinalRender(bool checked)
 {
 	//First completely stop what the current rendering process is doing.
 	m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
-	m_Controller->StopPreviewRender();
+	m_Controller->StopAllPreviewRenderers();
 	m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
 	m_RenderStatusLabel->setText("Renderer stopped.");
-	m_FinalRenderDialog->show();
+	m_FinalRenderDialog->Show(false);
 }
 
 /// <summary>

@@ -406,3 +406,47 @@ static QList<T> GetAllParents(QWidget* widget)
 
 	return parents;
 }
+
+/// <summary>
+/// Constrain the value in low to be less than or equal to the value in high.
+/// Template expected to be any control which has member functions value() and setValue().
+/// Most likely QSpinBox or QDoubleSpinbox.
+/// </summary>
+/// <param name="low">The control which must contain the lower value</param>
+/// <param name="high">The control which must contain the higher value</param>
+/// <returns>True if the value of low had to be changed, else false.</returns>
+template <typename T>
+bool ConstrainLow(T* low, T* high)
+{
+	if (low->value() > high->value())
+	{
+		low->blockSignals(true);
+		low->setValue(high->value());
+		low->blockSignals(false);
+		return true;
+	}
+
+	return false;
+}
+
+/// <summary>
+/// Constrain the value in high to be greater than or equal to the value in low.
+/// Template expected to be any control which has member functions value() and setValue().
+/// Most likely QSpinBox or QDoubleSpinbox.
+/// </summary>
+/// <param name="low">The control which must contain the lower value</param>
+/// <param name="high">The control which must contain the higher value</param>
+/// <returns>True if the value of high had to be changed, else false.</returns>
+template <typename T>
+bool ConstrainHigh(T* low, T* high)
+{
+	if (high->value() < low->value())
+	{
+		high->blockSignals(true);
+		high->setValue(low->value());
+		high->blockSignals(false);
+		return true;
+	}
+
+	return false;
+}

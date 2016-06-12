@@ -2,6 +2,8 @@
 #include "EmberAnimate.h"
 #include "JpegUtils.h"
 
+using namespace EmberCommon;
+
 /// <summary>
 /// The core of the EmberAnimate.exe program.
 /// Template argument expected to be float or double.
@@ -368,7 +370,7 @@ bool EmberAnimate(EmberOptions& opt)
 				break;
 			}
 
-			fnstream << inputPath << opt.Prefix() << setfill('0') << setw(padding) << ftime << opt.Suffix() << "." << opt.Format();
+			fnstream << inputPath << opt.Prefix() << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << opt.Suffix() << "." << opt.Format();
 			filename = fnstream.str();
 			fnstream.str("");
 

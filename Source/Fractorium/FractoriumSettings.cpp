@@ -135,6 +135,51 @@ uint FractoriumSettings::RandomCount()							 { return value(RANDOMCOUNT).toUInt
 void FractoriumSettings::RandomCount(uint i)					 { setValue(RANDOMCOUNT, i);			   }
 
 /// <summary>
+/// Sequence generation settings.
+/// </summary>
+
+uint FractoriumSettings::FramesPerRot()          { return value(FRAMESPERROT).toUInt();    }
+void FractoriumSettings::FramesPerRot(uint i)    { setValue(FRAMESPERROT, i);              }
+uint FractoriumSettings::FramesPerRotMax()       { return value(FRAMESPERROTMAX).toUInt(); }
+void FractoriumSettings::FramesPerRotMax(uint i) { setValue(FRAMESPERROTMAX, i);           }
+uint FractoriumSettings::Rotations()             { return value(ROTATIONS).toUInt();       }
+void FractoriumSettings::Rotations(uint i)       { setValue(ROTATIONS, i);                 }
+uint FractoriumSettings::RotationsMax()          { return value(ROTATIONSMAX).toUInt();    }
+void FractoriumSettings::RotationsMax(uint i)    { setValue(ROTATIONSMAX, i);              }
+uint FractoriumSettings::BlendFrames()           { return value(BLENDFRAMES).toUInt();     }
+void FractoriumSettings::BlendFrames(uint i)     { setValue(BLENDFRAMES, i);               }
+uint FractoriumSettings::BlendFramesMax()        { return value(BLENDFRAMESMAX).toUInt();  }
+void FractoriumSettings::BlendFramesMax(uint i)  { setValue(BLENDFRAMESMAX, i);            }
+
+/// <summary>
+/// Variations filter settings.
+/// </summary>
+
+int  FractoriumSettings::VarFilterSum()           { return value(VARFILTERSUM).toInt();      }
+void FractoriumSettings::VarFilterSum(int i)      { setValue(VARFILTERSUM, i);               }
+
+int  FractoriumSettings::VarFilterAssign()        { return value(VARFILTERASSIGN).toInt();   }
+void FractoriumSettings::VarFilterAssign(int i)   { setValue(VARFILTERASSIGN, i);            }
+
+int  FractoriumSettings::VarFilterPpsum()         { return value(VARFILTERPPSUM).toInt();    }
+void FractoriumSettings::VarFilterPpsum(int i)    { setValue(VARFILTERPPSUM, i);             }
+
+int  FractoriumSettings::VarFilterPpassign()      { return value(VARFILTERPPASSIGN).toInt(); }
+void FractoriumSettings::VarFilterPpassign(int i) { setValue(VARFILTERPPASSIGN, i);          }
+
+int  FractoriumSettings::VarFilterSdc()           { return value(VARFILTERSDC).toInt();      }
+void FractoriumSettings::VarFilterSdc(int i)      { setValue(VARFILTERSDC, i);               }
+
+int  FractoriumSettings::VarFilterState()         { return value(VARFILTERSTATE).toInt();    }
+void FractoriumSettings::VarFilterState(int i)    { setValue(VARFILTERSTATE, i);             }
+
+int  FractoriumSettings::VarFilterParam()         { return value(VARFILTERPARAM).toInt();    }
+void FractoriumSettings::VarFilterParam(int i)    { setValue(VARFILTERPARAM, i);             }
+
+int  FractoriumSettings::VarFilterNonparam()      { return value(VARFILTERNONPARAM).toInt(); }
+void FractoriumSettings::VarFilterNonparam(int i) { setValue(VARFILTERNONPARAM, i);          }
+
+/// <summary>
 /// Final render settings.
 /// </summary>
 

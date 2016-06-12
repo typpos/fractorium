@@ -75,16 +75,23 @@ class Fractorium : public QMainWindow
 	friend FractoriumEmberController<float>;
 	friend FinalRenderEmberControllerBase;
 	friend FinalRenderEmberController<float>;
+	friend PreviewRenderer<float>;
+	friend TreePreviewRenderer<float>;
 
 #ifdef DO_DOUBLE
 	friend GLEmberController<double>;
 	friend FractoriumEmberController<double>;
 	friend FinalRenderEmberController<double>;
+	friend PreviewRenderer<double>;
+	friend TreePreviewRenderer<double>;
 #endif
 
 public:
 	Fractorium(QWidget* p = nullptr);
 	~Fractorium();
+
+	//Library.
+	void SyncFileCountToSequenceCount();
 
 	//Geometry.
 	bool ApplyAll();
@@ -156,6 +163,25 @@ public slots:
 	void OnEmberTreeItemChanged(QTreeWidgetItem* item, int col);
 	void OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col);
 	void OnDelete(const pair<size_t, QTreeWidgetItem*>& p);
+	void OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col);
+	void OnSequenceStartPreviewsButtonClicked(bool checked);
+	void OnSequenceStopPreviewsButtonClicked(bool checked);
+	void OnSequenceAllButtonClicked(bool checked);
+	void OnSequenceGenerateButtonClicked(bool checked);
+	void OnSequenceRenderButtonClicked(bool checked);
+	void OnSequenceSaveButtonClicked(bool checked);
+	void OnSequenceOpenButtonClicked(bool checked);
+	void OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state);
+	void OnSequenceRandomizeRotationsCheckBoxStateChanged(int state);
+	void OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state);
+	void OnSequenceStartFlameSpinBoxChanged(int d);
+	void OnSequenceStopFlameSpinBoxChanged(int d);
+	void OnSequenceFramesPerRotSpinBoxChanged(int d);
+	void OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int d);
+	void OnSequenceRotationsSpinBoxChanged(double d);
+	void OnSequenceRandomRotationsMaxSpinBoxChanged(double d);
+	void OnSequenceBlendFramesSpinBoxChanged(int d);
+	void OnSequenceRandomBlendMaxFramesSpinBoxChanged(int d);
 
 	//Params.
 	void OnBrightnessChanged(double d);//Color.
@@ -342,6 +368,7 @@ private:
 
 	//Library.
 	pair<size_t, QTreeWidgetItem*> GetCurrentEmberIndex();
+	void SyncSequenceSettings();
 
 	//Params.
 

@@ -7,9 +7,34 @@
 void Fractorium::InitLibraryUI()
 {
 	ui.LibraryTree->SetMainWindow(this);
-	connect(ui.LibraryTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),		  this, SLOT(OnEmberTreeItemChanged(QTreeWidgetItem*, int)),	   Qt::QueuedConnection);
-	connect(ui.LibraryTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
-	connect(ui.LibraryTree, SIGNAL(itemActivated(QTreeWidgetItem*, int)),	  this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
+	ui.SequenceFramesPerRotSpinBox->setValue(m_Settings->FramesPerRot());
+	ui.SequenceRandomFramesPerRotMaxSpinBox->setValue(m_Settings->FramesPerRotMax());
+	ui.SequenceRotationsSpinBox->setValue(m_Settings->Rotations());
+	ui.SequenceRandomRotationsMaxSpinBox->setValue(m_Settings->RotationsMax());
+	ui.SequenceBlendFramesSpinBox->setValue(m_Settings->BlendFrames());
+	ui.SequenceRandomBlendMaxFramesSpinBox->setValue(m_Settings->BlendFramesMax());
+	connect(ui.LibraryTree,  SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemChanged(QTreeWidgetItem*, int)),	    Qt::QueuedConnection);
+	connect(ui.LibraryTree,  SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
+	connect(ui.LibraryTree,  SIGNAL(itemActivated(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
+	connect(ui.SequenceTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnSequenceTreeItemChanged(QTreeWidgetItem*, int)),	Qt::QueuedConnection);
+	connect(ui.SequenceStartPreviewsButton, SIGNAL(clicked(bool)), this, SLOT(OnSequenceStartPreviewsButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.SequenceStopPreviewsButton,  SIGNAL(clicked(bool)), this, SLOT(OnSequenceStopPreviewsButtonClicked(bool)),  Qt::QueuedConnection);
+	connect(ui.SequenceAllButton,           SIGNAL(clicked(bool)), this, SLOT(OnSequenceAllButtonClicked(bool)),           Qt::QueuedConnection);
+	connect(ui.SequenceGenerateButton,      SIGNAL(clicked(bool)), this, SLOT(OnSequenceGenerateButtonClicked(bool)),      Qt::QueuedConnection);
+	connect(ui.SequenceRenderButton,        SIGNAL(clicked(bool)), this, SLOT(OnSequenceRenderButtonClicked(bool)),        Qt::QueuedConnection);
+	connect(ui.SequenceSaveButton,          SIGNAL(clicked(bool)), this, SLOT(OnSequenceSaveButtonClicked(bool)),          Qt::QueuedConnection);
+	connect(ui.SequenceOpenButton,          SIGNAL(clicked(bool)), this, SLOT(OnSequenceOpenButtonClicked(bool)),          Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeFramesPerRotCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeRotationsCheckBox,    SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeRotationsCheckBoxStateChanged(int)),    Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeBlendFramesCheckBox,  SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int)),  Qt::QueuedConnection);
+	connect(ui.SequenceStartFlameSpinBox,            SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceStartFlameSpinBoxChanged(int)),            Qt::QueuedConnection);
+	connect(ui.SequenceStopFlameSpinBox,             SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceStopFlameSpinBoxChanged(int)),             Qt::QueuedConnection);
+	connect(ui.SequenceFramesPerRotSpinBox,          SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceFramesPerRotSpinBoxChanged(int)),          Qt::QueuedConnection);
+	connect(ui.SequenceRandomFramesPerRotMaxSpinBox, SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int)), Qt::QueuedConnection);
+	connect(ui.SequenceRotationsSpinBox,             SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRotationsSpinBoxChanged(double)),          Qt::QueuedConnection);
+	connect(ui.SequenceRandomRotationsMaxSpinBox,    SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRandomRotationsMaxSpinBoxChanged(double)), Qt::QueuedConnection);
+	connect(ui.SequenceBlendFramesSpinBox,           SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceBlendFramesSpinBoxChanged(int)),           Qt::QueuedConnection);
+	connect(ui.SequenceRandomBlendMaxFramesSpinBox,  SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomBlendMaxFramesSpinBoxChanged(int)),  Qt::QueuedConnection);
 }
 
 /// <summary>
@@ -95,7 +120,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 	uint i = 0;
 	auto tree = m_Fractorium->ui.LibraryTree;
 	vector<byte> v(size * size * 4);
-	StopPreviewRender();
+	StopAllPreviewRenderers();
 	tree->clear();
 	QCoreApplication::flush();
 	tree->blockSignals(true);
@@ -125,8 +150,9 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 			if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(selectIndex)))
 				emberItem->setSelected(true);
 
+	m_Fractorium->SyncFileCountToSequenceCount();
 	QCoreApplication::flush();
-	RenderPreviews(0, uint(m_EmberFile.Size()));
+	RenderLibraryPreviews(0, uint(m_EmberFile.Size()));
 	tree->expandAll();
 }
 
@@ -162,8 +188,9 @@ void FractoriumEmberController<T>::UpdateLibraryTree()
 
 		//When adding elements, ensure all indices are sequential.
 		SyncLibrary(eLibraryUpdate::INDEX);
+		m_Fractorium->SyncFileCountToSequenceCount();
 		tree->blockSignals(false);
-		RenderPreviews(origChildCount, uint(m_EmberFile.Size()));
+		RenderLibraryPreviews(origChildCount, uint(m_EmberFile.Size()));
 	}
 }
 
@@ -280,6 +307,7 @@ void FractoriumEmberController<T>::Delete(const pair<size_t, QTreeWidgetItem*>& 
 	{
 		delete p.second;
 		SyncLibrary(eLibraryUpdate::INDEX);
+		m_Fractorium->SyncFileCountToSequenceCount();
 	}
 
 	//If there is now only one item left and it wasn't selected, select it.
@@ -308,13 +336,12 @@ void Fractorium::OnDelete(const pair<size_t, QTreeWidgetItem*>& p)
 /// <param name="start">The 0-based index to start rendering previews for</param>
 /// <param name="end">The 0-based index which is one beyond the last ember to render a preview for</param>
 template <typename T>
-void FractoriumEmberController<T>::RenderPreviews(uint start, uint end)
+void FractoriumEmberController<T>::RenderPreviews(QTreeWidget* tree, TreePreviewRenderer<T>* renderer, EmberFile<T>& file, uint start, uint end)
 {
-	StopPreviewRender();
+	renderer->Stop();
 
 	if (start == UINT_MAX && end == UINT_MAX)
 	{
-		auto tree = m_Fractorium->ui.LibraryTree;
 		tree->blockSignals(true);
 
 		if (auto top = tree->topLevelItem(0))
@@ -323,36 +350,401 @@ void FractoriumEmberController<T>::RenderPreviews(uint start, uint end)
 			vector<byte> emptyPreview(PREVIEW_SIZE * PREVIEW_SIZE * 4);
 
 			for (int i = 0; i < childCount; i++)
-				if (auto treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
+				if (auto treeItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(i)))
 					treeItem->SetImage(emptyPreview, PREVIEW_SIZE, PREVIEW_SIZE);
 		}
 
 		tree->blockSignals(false);
-		m_PreviewResult = QtConcurrent::run(m_PreviewRenderFunc, 0, uint(m_EmberFile.Size()));
+		renderer->Render(0, uint(file.Size()));
 	}
 	else
-		m_PreviewResult = QtConcurrent::run(m_PreviewRenderFunc, start, end);
+		renderer->Render(start, end);
 }
 
 /// <summary>
-/// Stop the preview rendering thread.
+/// Wrapper around calling RenderPreviews with the appropriate values passed in for the previews in the main library tree.
+/// </summary>
+/// <param name="start">The 0-based index to start rendering previews for</param>
+/// <param name="end">The 0-based index which is one beyond the last ember to render a preview for</param>
+template <typename T>
+void FractoriumEmberController<T>::RenderLibraryPreviews(uint start, uint end)
+{
+	RenderPreviews(m_Fractorium->ui.LibraryTree, m_LibraryPreviewRenderer.get(), m_EmberFile, start, end);
+}
+
+template <typename T>
+void FractoriumEmberController<T>::StopLibraryPreviewRender() { m_LibraryPreviewRenderer->Stop(); }
+
+/// <summary>
+/// Thing wrapper around StopLibraryPreviewRender() and StopSequencePreviewRender() to stop both preview renderers.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::StopPreviewRender()
+void FractoriumEmberController<T>::StopAllPreviewRenderers()
 {
-	m_PreviewRun = false;
-	m_PreviewRenderer->Abort();
+	StopLibraryPreviewRender();
+	StopSequencePreviewRender();
+}
 
-	while (m_PreviewRunning)
-		QApplication::processEvents();
-
-	m_PreviewResult.cancel();
-
-	while (m_PreviewResult.isRunning())
-		QApplication::processEvents();
-
-	QCoreApplication::sendPostedEvents(m_Fractorium->ui.LibraryTree);
+/// <summary>
+/// Fill the sequence tree with the names of the embers in the
+/// currently generated sequence.
+/// Start the sequence preview render thread.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::FillSequenceTree()
+{
+	uint size = 64;
+	uint i = 0;
+	auto tree = m_Fractorium->ui.SequenceTree;
+	vector<byte> v(size * size * 4);
+	m_SequencePreviewRenderer->Stop();
+	tree->clear();
 	QCoreApplication::flush();
+	tree->blockSignals(true);
+	auto fileItem = new QTreeWidgetItem(tree);
+	QFileInfo info(m_SequenceFile.m_Filename);
+	fileItem->setText(0, info.fileName());
+	fileItem->setToolTip(0, m_SequenceFile.m_Filename);
+	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+
+	for (auto& it : m_SequenceFile.m_Embers)
+	{
+		auto emberItem = new EmberTreeWidgetItemBase(fileItem);
+
+		if (it.m_Name.empty())
+			emberItem->setText(0, ToString(i++));
+		else
+			emberItem->setText(0, it.m_Name.c_str());
+
+		emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+		emberItem->setToolTip(0, emberItem->text(0));
+		emberItem->SetImage(v, size, size);
+	}
+
+	tree->blockSignals(false);
+	QCoreApplication::flush();
+	RenderSequencePreviews(0, uint(m_SequenceFile.Size()));
+	tree->expandAll();
+}
+
+/// <summary>
+/// Copy the text of the root item to the name of the sequence file.
+/// Called whenever the text of the root item is changed.
+/// </summary>
+/// <param name="item">The root sequence tree item which changed</param>
+/// <param name="col">The column clicked, ignored.</param>
+template <typename T>
+void FractoriumEmberController<T>::SequenceTreeItemChanged(QTreeWidgetItem* item, int col)
+{
+	if (auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
+	{
+		QString text = parentItem->text(0);
+
+		if (text != "")
+			m_SequenceFile.m_Filename = text;
+	}
+}
+
+void Fractorium::OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col) { m_Controller->SequenceTreeItemChanged(item, col); }
+
+/// <summary>
+/// Wrapper around calling RenderPreviews with the appropriate values passed in for the previews in the sequence tree.
+/// Called when Render Previews is clicked.
+/// </summary>
+/// <param name="start">Ignored, render all.</param>
+/// <param name="end">Ignored, render all.</param>
+template <typename T>
+void FractoriumEmberController<T>::RenderSequencePreviews(uint start, uint end) { RenderPreviews(m_Fractorium->ui.SequenceTree, m_SequencePreviewRenderer.get(), m_SequenceFile, start, end); }
+void Fractorium::OnSequenceStartPreviewsButtonClicked(bool checked) { m_Controller->RenderSequencePreviews(); }
+
+/// <summary>
+/// Stop rendering the sequence previews.
+/// Called when Stop Previews is clicked.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::StopSequencePreviewRender() { m_SequencePreviewRenderer->Stop(); }
+void Fractorium::OnSequenceStopPreviewsButtonClicked(bool checked) { m_Controller->StopSequencePreviewRender(); }
+
+/// <summary>
+/// Set the start and stop spin boxes to 0 and the length of the ember file minus 1, respectively.
+/// Called whenever the count of the current file changes or when All is clicked.
+/// </summary>
+void Fractorium::SyncFileCountToSequenceCount()
+{
+	if (auto top = ui.LibraryTree->topLevelItem(0))
+	{
+		int count = top->childCount() - 1;
+		ui.SequenceStartFlameSpinBox->setMinimum(0);
+		ui.SequenceStartFlameSpinBox->setMaximum(count);
+		ui.SequenceStartFlameSpinBox->setValue(0);
+		ui.SequenceStopFlameSpinBox->setMinimum(0);
+		ui.SequenceStopFlameSpinBox->setMaximum(count);
+		ui.SequenceStopFlameSpinBox->setValue(count);
+	}
+}
+
+void Fractorium::OnSequenceAllButtonClicked(bool checked) { SyncFileCountToSequenceCount(); }
+
+/// <summary>
+/// Generate an animation sequence and place it in the sequence tree. This code is
+/// mostly similar to that of EmberGenome.
+/// It differs in a few ways:
+///		The number of frames used in a rotation and in blending can differ. In EmberGenome, they are the same.
+///		The number of rotations, frames used in rotations and frames used in blending can all be randomized.
+/// Called when the Generate button is clicked.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
+{
+	StopAllPreviewRenderers();
+	SaveCurrentToOpenedFile(false);
+	Ember<T> result;
+	auto& ui = m_Fractorium->ui;
+	auto s = m_Fractorium->m_Settings;
+	bool randStagger = ui.SequenceRandomizeStaggerCheckBox->isChecked();
+	bool randFramesRot = ui.SequenceRandomizeFramesPerRotCheckBox->isChecked();
+	bool randRot = ui.SequenceRandomizeRotationsCheckBox->isChecked();
+	bool randBlend = ui.SequenceRandomizeBlendFramesCheckBox->isChecked();
+	bool stagger = ui.SequenceStaggerCheckBox->isChecked();
+	double rots = ui.SequenceRotationsSpinBox->value();
+	double rotsMax = ui.SequenceRandomRotationsMaxSpinBox->value();
+	int framesPerRot = ui.SequenceFramesPerRotSpinBox->value();
+	int framesPerRotMax = ui.SequenceRandomFramesPerRotMaxSpinBox->value();
+	int framesBlend = ui.SequenceBlendFramesSpinBox->value();
+	int framesBlendMax = ui.SequenceRandomBlendMaxFramesSpinBox->value();
+	size_t start = ui.SequenceStartFlameSpinBox->value();
+	size_t stop = ui.SequenceStopFlameSpinBox->value();
+	size_t startCount = ui.SequenceStartCountSpinBox->value();
+	size_t keyFrames = (stop - start) + 1;
+	size_t frameCount = 0;
+	double frames = 0;
+	vector<pair<size_t, size_t>> devices;//Dummy.
+	EmberReport emberReport;
+	ostringstream os;
+	string palettePath =
+#ifdef _WIN32
+		"./flam3-palettes.xml";
+#else
+		"~/.config/fractorium";
+#endif
+	SheepTools<T, float> tools(palettePath, EmberCommon::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
+	tools.SetSpinParams(true,
+						randStagger ? m_Rand.RandBit() : stagger,
+						0,
+						0,
+						s->Nick().toStdString(),
+						s->Url().toStdString(),
+						s->Id().toStdString(),
+						"",
+						0,
+						0);
+
+	if (randFramesRot)
+		frames = ui.SequenceRandomFramesPerRotMaxSpinBox->value();
+	else
+		frames = ui.SequenceFramesPerRotSpinBox->value();
+
+	if (randRot)
+		frames *= ui.SequenceRandomRotationsMaxSpinBox->value();
+	else
+		frames *= ui.SequenceRotationsSpinBox->value();
+
+	if (randBlend)
+		frames += ui.SequenceRandomBlendMaxFramesSpinBox->value();
+	else
+		frames += ui.SequenceBlendFramesSpinBox->value();
+
+	frames *= keyFrames;
+	frames += startCount;
+	os << setfill('0') << setprecision(0) << fixed;
+	m_SequenceFile.Clear();
+	m_SequenceFile.m_Filename = EmberFile<T>::DefaultFilename("Sequence_");
+	double blend;
+	size_t frame;
+	Ember<T> embers[2];//Spin needs contiguous array below, and this will also get modified, so a copy is needed to avoid modifying the embers in the original file.
+	auto padding = streamsize(std::log10(frames)) + 1;
+	auto it = Advance(m_EmberFile.m_Embers.begin(), start);
+
+	for (size_t i = start; i <= stop && it != m_EmberFile.m_Embers.end(); i++, ++it)
+	{
+		double rotations = randRot ? m_Rand.Frand<double>(rots, rotsMax) : rots;
+		embers[0] = *it;
+
+		if (rotations > 0)
+		{
+			double rotFrames = randFramesRot ? m_Rand.Frand<double>(framesPerRot, framesPerRotMax) : framesPerRot;
+			size_t roundFrames = size_t(std::round(rotFrames * rotations));
+
+			for (frame = 0; frame < roundFrames; frame++)
+			{
+				blend = frame / rotFrames;
+				tools.Spin(embers[0], nullptr, result, startCount + frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
+				FormatName(result, os, padding);
+				m_SequenceFile.m_Embers.push_back(result);
+			}
+
+			//The loop above will have rotated just shy of a complete rotation.
+			//Rotate the next step and save in result, but do not print.
+			//result will be the starting point for the interp phase below.
+			frame = roundFrames;
+			blend = frame / rotFrames;
+			tools.Spin(embers[0], nullptr, result, startCount + frameCount, blend);//Do not increment frameCount here.
+			FormatName(result, os, padding);
+		}
+
+		if (i < stop)
+		{
+			if (rotations > 0)//Store the last result as the flame to interpolate from. This applies for whole or fractional values of opt.Loops().
+				embers[0] = result;
+
+			auto it2 = it;//Need a quick temporary to avoid modifying it which is used in the loop.
+			embers[1] = *(++it2);//Get the next ember to be used with blending below.
+			size_t blendFrames = randBlend ? m_Rand.Frand<double>(framesBlend, framesBlendMax) : framesBlend;
+
+			for (frame = 0; frame < blendFrames; frame++)
+			{
+				bool seqFlag = frame == 0 || (frame == blendFrames - 1);
+				blend = frame / double(blendFrames);
+				result.Clear();
+
+				if (randStagger)
+					tools.Stagger(m_Rand.RandBit());
+
+				tools.SpinInter(&embers[0], nullptr, result, startCount + frameCount++, seqFlag, blend);
+				FormatName(result, os, padding);
+				m_SequenceFile.m_Embers.push_back(result);
+			}
+		}
+	}
+
+	it = Advance(m_EmberFile.m_Embers.begin(), stop);
+	tools.Spin(*it, nullptr, result, startCount + frameCount, 0);
+	FormatName(result, os, padding);
+	m_SequenceFile.m_Embers.push_back(result);
+	FillSequenceTree();//The sequence has been generated, now create preview thumbnails.
+}
+
+void Fractorium::OnSequenceGenerateButtonClicked(bool checked) { m_Controller->SequenceGenerateButtonClicked(); }
+
+/// <summary>
+/// Show the final render dialog and load the sequence into it.
+/// This will automatically check the Render All and Render as Animation sequence checkboxes.
+/// Called when the Render Sequence button is clicked.
+/// </summary>
+/// <param name="checked">Ignored.</param>
+void Fractorium::OnSequenceRenderButtonClicked(bool checked)
+{
+	//First completely stop what the current rendering process is doing.
+	m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
+	m_Controller->StopAllPreviewRenderers();
+	m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
+	m_RenderStatusLabel->setText("Renderer stopped.");
+	m_FinalRenderDialog->Show(true);//Show with a bool specifying that it came from the sequence generator.
+}
+
+/// <summary>
+/// Save the sequence to a file.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::SequenceSaveButtonClicked()
+{
+	auto s = m_Fractorium->m_Settings;
+	QString filename = m_Fractorium->SetupSaveXmlDialog(m_SequenceFile.m_Filename);
+
+	if (filename != "")
+	{
+		EmberToXml<T> writer;
+		QFileInfo fileInfo(filename);
+
+		if (writer.Save(filename.toStdString().c_str(), m_SequenceFile.m_Embers, 0, true, true))
+			s->SaveFolder(fileInfo.canonicalPath());
+		else
+			m_Fractorium->ShowCritical("Save Failed", "Could not save sequence file, try saving to a different folder.");
+	}
+}
+
+void Fractorium::OnSequenceSaveButtonClicked(bool checked) { m_Controller->SequenceSaveButtonClicked(); }
+
+/// <summary>
+/// Open one or more sequence file, concatenate them all, place them in the sequence
+/// tree and begin rendering the sequence previews.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::SequenceOpenButtonClicked()
+{
+	m_SequencePreviewRenderer->Stop();
+	auto filenames = m_Fractorium->SetupOpenXmlDialog();
+
+	if (!filenames.empty())
+	{
+		size_t i;
+		EmberFile<T> emberFile;
+		XmlToEmber<T> parser;
+		vector<Ember<T>> embers;
+		vector<string> errors;
+		emberFile.m_Filename = filenames[0];
+
+		for (auto& filename : filenames)
+		{
+			embers.clear();
+
+			if (parser.Parse(filename.toStdString().c_str(), embers) && !embers.empty())
+			{
+				for (i = 0; i < embers.size(); i++)
+					if (embers[i].m_Name == "" || embers[i].m_Name == "No name")//Ensure it has a name.
+						embers[i].m_Name = ToString<qulonglong>(i).toStdString();
+
+				emberFile.m_Embers.insert(emberFile.m_Embers.end(), embers.begin(), embers.end());
+				errors = parser.ErrorReport();
+			}
+			else
+			{
+				errors = parser.ErrorReport();
+				m_Fractorium->ShowCritical("Open Failed", "Could not open sequence file, see info tab for details.");
+			}
+
+			if (!errors.empty())
+				m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit, false);//Concat errors from all files.
+		}
+
+		if (emberFile.Size() > 0)//Ensure at least something was read.
+		{
+			emberFile.MakeNamesUnique();
+			m_SequenceFile = std::move(emberFile);//Move the temp to avoid creating dupes because we no longer need it.
+			FillSequenceTree();
+		}
+	}
+}
+
+void Fractorium::OnSequenceOpenButtonClicked(bool checked) { m_Controller->SequenceOpenButtonClicked(); }
+
+void Fractorium::OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state) { ui.SequenceRandomFramesPerRotMaxSpinBox->setEnabled(state); }
+void Fractorium::OnSequenceRandomizeRotationsCheckBoxStateChanged(int state) { ui.SequenceRandomRotationsMaxSpinBox->setEnabled(state); }
+void Fractorium::OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state) { ui.SequenceRandomBlendMaxFramesSpinBox->setEnabled(state); }
+
+/// <summary>
+/// Constrain all min/max spinboxes.
+/// </summary>
+void Fractorium::OnSequenceStartFlameSpinBoxChanged(int d) { ConstrainLow(ui.SequenceStartFlameSpinBox, ui.SequenceStopFlameSpinBox); }
+void Fractorium::OnSequenceStopFlameSpinBoxChanged(int d) { ConstrainHigh(ui.SequenceStartFlameSpinBox, ui.SequenceStopFlameSpinBox); }
+void Fractorium::OnSequenceFramesPerRotSpinBoxChanged(int d) { if (ui.SequenceRandomizeFramesPerRotCheckBox->isChecked()) ConstrainLow(ui.SequenceFramesPerRotSpinBox, ui.SequenceRandomFramesPerRotMaxSpinBox); }
+void Fractorium::OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int d) {	ConstrainHigh(ui.SequenceFramesPerRotSpinBox, ui.SequenceRandomFramesPerRotMaxSpinBox); }
+void Fractorium::OnSequenceRotationsSpinBoxChanged(double d) { if (ui.SequenceRandomizeRotationsCheckBox->isChecked()) ConstrainLow(ui.SequenceRotationsSpinBox, ui.SequenceRandomRotationsMaxSpinBox); }
+void Fractorium::OnSequenceRandomRotationsMaxSpinBoxChanged(double d) {	ConstrainHigh(ui.SequenceRotationsSpinBox, ui.SequenceRandomRotationsMaxSpinBox); }
+void Fractorium::OnSequenceBlendFramesSpinBoxChanged(int d) { if (ui.SequenceRandomizeBlendFramesCheckBox->isChecked()) ConstrainLow(ui.SequenceBlendFramesSpinBox, ui.SequenceRandomBlendMaxFramesSpinBox); }
+void Fractorium::OnSequenceRandomBlendMaxFramesSpinBoxChanged(int d) { ConstrainHigh(ui.SequenceBlendFramesSpinBox, ui.SequenceRandomBlendMaxFramesSpinBox); }
+
+/// <summary>
+/// Save all sequence settings to match the values in the controls.
+/// </summary>
+void Fractorium::SyncSequenceSettings()
+{
+	m_Settings->FramesPerRot(ui.SequenceFramesPerRotSpinBox->value());
+	m_Settings->FramesPerRotMax(ui.SequenceRandomFramesPerRotMaxSpinBox->value());
+	m_Settings->Rotations(ui.SequenceRotationsSpinBox->value());
+	m_Settings->RotationsMax(ui.SequenceRandomRotationsMaxSpinBox->value());
+	m_Settings->BlendFrames(ui.SequenceBlendFramesSpinBox->value());
+	m_Settings->BlendFramesMax(ui.SequenceRandomBlendMaxFramesSpinBox->value());
 }
 
 template class FractoriumEmberController<float>;

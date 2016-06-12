@@ -24,7 +24,7 @@ void Fractorium::InitParamsUI()
 	//Color.
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.05, 1000,    1,  SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	   true,  4.0,  4.0,  4.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1, 9999,  0.5,  SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0,  4.0,  4.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,   10, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)),  true,  0.1,  0.1,  0.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,   10, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)), true,  0.1,  0.1,  0.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,   30, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0,  1.0,  0.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_HighlightSpin,	   spinHeight,  1.0,   10,  0.1,  SIGNAL(valueChanged(double)), SLOT(OnHighlightPowerChanged(double)), true, -1.0, -1.0, -1.0);
 	m_GammaThresholdSpin->setDecimals(4);
@@ -469,19 +469,17 @@ void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& tex
 template <typename T>
 void FractoriumEmberController<T>::DEFilterMinRadiusWidthChanged(double d)
 {
-	if (m_Fractorium->m_DEFilterMinRadiusSpin->value() > m_Fractorium->m_DEFilterMaxRadiusSpin->value())
-	{
-		m_Fractorium->m_DEFilterMinRadiusSpin->SetValueStealth(m_Fractorium->m_DEFilterMaxRadiusSpin->value());
-		return;
-	}
-
 	UpdateAll([&](Ember<T>& ember)
 	{
 		ember.m_MinRadDE = d;
 	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
 
-void Fractorium::OnDEFilterMinRadiusWidthChanged(double d) { m_Controller->DEFilterMinRadiusWidthChanged(d); }
+void Fractorium::OnDEFilterMinRadiusWidthChanged(double d)
+{
+	if (!ConstrainLow(m_DEFilterMinRadiusSpin, m_DEFilterMaxRadiusSpin))
+		m_Controller->DEFilterMinRadiusWidthChanged(d);
+}
 
 /// <summary>
 /// Set the density estimation filter max radius value.
@@ -491,19 +489,17 @@ void Fractorium::OnDEFilterMinRadiusWidthChanged(double d) { m_Controller->DEFil
 template <typename T>
 void FractoriumEmberController<T>::DEFilterMaxRadiusWidthChanged(double d)
 {
-	if (m_Fractorium->m_DEFilterMaxRadiusSpin->value() < m_Fractorium->m_DEFilterMinRadiusSpin->value())
-	{
-		m_Fractorium->m_DEFilterMaxRadiusSpin->SetValueStealth(m_Fractorium->m_DEFilterMinRadiusSpin->value());
-		return;
-	}
-
 	UpdateAll([&](Ember<T>& ember)
 	{
 		ember.m_MaxRadDE = d;
 	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
 
-void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d) { m_Controller->DEFilterMaxRadiusWidthChanged(d); }
+void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d)
+{
+	if (!ConstrainHigh(m_DEFilterMinRadiusSpin, m_DEFilterMaxRadiusSpin))
+		m_Controller->DEFilterMaxRadiusWidthChanged(d);
+}
 
 /// <summary>
 /// Set the density estimation filter curve value.

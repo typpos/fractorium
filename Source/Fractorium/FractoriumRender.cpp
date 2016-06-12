@@ -580,13 +580,11 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 		else
 			m_Renderer->InteractiveFilter(s->OpenCLDEFilter() ? eInteractiveFilter::FILTER_DE : eInteractiveFilter::FILTER_LOG);
 
-		if ((m_Renderer->EarlyClip() != m_PreviewRenderer->EarlyClip()) ||
-				(m_Renderer->YAxisUp() != m_PreviewRenderer->YAxisUp()))
+		if ((m_Renderer->EarlyClip() != m_LibraryPreviewRenderer->EarlyClip()) ||
+				(m_Renderer->YAxisUp() != m_LibraryPreviewRenderer->YAxisUp()) ||
+				(m_Renderer->Transparency() != m_LibraryPreviewRenderer->Transparency()))
 		{
-			StopPreviewRender();
-			m_PreviewRenderer->EarlyClip(m_Renderer->EarlyClip());
-			m_PreviewRenderer->YAxisUp(m_Renderer->YAxisUp());
-			RenderPreviews();
+			RenderLibraryPreviews();
 		}
 
 		m_FailedRenders = 0;
@@ -690,7 +688,7 @@ bool Fractorium::CreateControllerFromOptions()
 		if (m_Controller.get())
 		{
 			scale = m_Controller->LockedScale();
-			m_Controller->StopPreviewRender();//Must stop any previews first, else changing controllers will crash the program and SaveCurrentToOpenedFile() will return 0.
+			m_Controller->StopAllPreviewRenderers();//Must stop any previews first, else changing controllers will crash the program and SaveCurrentToOpenedFile() will return 0.
 			current = m_Controller->SaveCurrentToOpenedFile(false);
 			m_Controller->CopyTempPalette(tempPalette);//Convert float to double or save double verbatim;
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
@@ -698,10 +696,10 @@ bool Fractorium::CreateControllerFromOptions()
 			//m_Controller->CopyEmberFile(efd);
 #ifdef DO_DOUBLE
 			m_Controller->CopyEmber(ed, [&](Ember<double>& ember) { });
-			m_Controller->CopyEmberFile(efd, [&](Ember<double>& ember) { });
+			m_Controller->CopyEmberFile(efd, false, [&](Ember<double>& ember) { });
 #else
 			m_Controller->CopyEmber(ed, [&](Ember<float>& ember) { });
-			m_Controller->CopyEmberFile(efd, [&](Ember<float>& ember) { });
+			m_Controller->CopyEmberFile(efd, false, [&](Ember<float>& ember) { });
 #endif
 			m_Controller->Shutdown();
 		}
@@ -718,7 +716,7 @@ bool Fractorium::CreateControllerFromOptions()
 		if (m_Controller.get())
 		{
 			ed.m_Palette = tempPalette;//Restore base temp palette. Adjustments will be then be applied and stored back in in m_Ember.m_Palette below.
-			m_Controller->SetEmberFile(efd);
+			m_Controller->SetEmberFile(efd, true);
 			m_Controller->SetEmber(current, true);
 			m_Controller->LockedScale(scale);
 			//Setting these and updating the GUI overwrites the work of clearing them done in SetEmber() above.

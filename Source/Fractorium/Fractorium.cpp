@@ -198,6 +198,7 @@ Fractorium::Fractorium(QWidget* p)
 /// </summary>
 Fractorium::~Fractorium()
 {
+	SyncSequenceSettings();
 	m_VarDialog->SyncSettings();
 	m_Settings->setValue("windowState", saveState());
 	m_Settings->sync();
@@ -373,7 +374,7 @@ void Fractorium::closeEvent(QCloseEvent* e)
 	if (m_Controller.get())
 	{
 		m_Controller->StopRenderTimer(true);//Will wait until fully exited and stopped.
-		m_Controller->StopPreviewRender();
+		m_Controller->StopAllPreviewRenderers();
 	}
 
 	if (e)
@@ -665,13 +666,15 @@ void Fractorium::ShowCritical(const QString& title, const QString& text, bool in
 /// </summary>
 void Fractorium::SetTabOrders()
 {
-	QWidget* w = SetTabOrder(this, ui.ColorTable, m_BrightnessSpin);//Flame.
+	QWidget* w = SetTabOrder(this, ui.ColorTable, m_BrightnessSpin);//Flame color.
 	w = SetTabOrder(this, w, m_GammaSpin);
 	w = SetTabOrder(this, w, m_GammaThresholdSpin);
 	w = SetTabOrder(this, w, m_VibrancySpin);
 	w = SetTabOrder(this, w, m_HighlightSpin);
 	w = SetTabOrder(this, w, m_BackgroundColorButton);
 	w = SetTabOrder(this, w, m_PaletteModeCombo);
+	w = SetTabOrder(this, w, m_WidthSpin);//Flame geometry.
+	w = SetTabOrder(this, w, m_HeightSpin);
 	w = SetTabOrder(this, w, m_CenterXSpin);
 	w = SetTabOrder(this, w, m_CenterYSpin);
 	w = SetTabOrder(this, w, m_ScaleSpin);
@@ -682,18 +685,44 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PitchSpin);
 	w = SetTabOrder(this, w, m_YawSpin);
 	w = SetTabOrder(this, w, m_DepthBlurSpin);
-	w = SetTabOrder(this, w, m_SpatialFilterWidthSpin);
+	w = SetTabOrder(this, w, m_SpatialFilterWidthSpin);//Flame filter.
 	w = SetTabOrder(this, w, m_SpatialFilterTypeCombo);
-	w = SetTabOrder(this, w, m_TemporalFilterTypeCombo);
 	w = SetTabOrder(this, w, m_DEFilterMinRadiusSpin);
 	w = SetTabOrder(this, w, m_DEFilterMaxRadiusSpin);
 	w = SetTabOrder(this, w, m_DECurveSpin);
-	w = SetTabOrder(this, w, m_TemporalSamplesSpin);
+	w = SetTabOrder(this, w, m_SbsSpin);//Flame iteration.
+	w = SetTabOrder(this, w, m_FuseSpin);
 	w = SetTabOrder(this, w, m_QualitySpin);
 	w = SetTabOrder(this, w, m_SupersampleSpin);
+	w = SetTabOrder(this, w, m_InterpTypeCombo);//Flame animation.
 	w = SetTabOrder(this, w, m_AffineInterpTypeCombo);
-	w = SetTabOrder(this, w, m_InterpTypeCombo);
+	w = SetTabOrder(this, w, m_TemporalSamplesSpin);
+	w = SetTabOrder(this, w, m_TemporalFilterWidthSpin);
+	w = SetTabOrder(this, w, m_TemporalFilterTypeCombo);
+	w = SetTabOrder(this, ui.LibraryTree, ui.SequenceStartCountSpinBox);//Library.
+	w = SetTabOrder(this, w, ui.SequenceStartPreviewsButton);
+	w = SetTabOrder(this, w, ui.SequenceStopPreviewsButton);
+	w = SetTabOrder(this, w, ui.SequenceStartFlameSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceStopFlameSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceAllButton);
+	w = SetTabOrder(this, w, ui.SequenceRandomizeStaggerCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceStaggerCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomizeFramesPerRotCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceFramesPerRotSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomFramesPerRotMaxSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomizeRotationsCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceRotationsSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomRotationsMaxSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomizeBlendFramesCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceBlendFramesSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomBlendMaxFramesSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceGenerateButton);
+	w = SetTabOrder(this, w, ui.SequenceRenderButton);
+	w = SetTabOrder(this, w, ui.SequenceSaveButton);
+	w = SetTabOrder(this, w, ui.SequenceOpenButton);
+	w = SetTabOrder(this, w, ui.SequenceTree);
 	w = SetTabOrder(this, ui.CurrentXformCombo, ui.AddXformButton);//Xforms.
+	w = SetTabOrder(this, w, ui.AddLinkedXformButton);
 	w = SetTabOrder(this, w, ui.DuplicateXformButton);
 	w = SetTabOrder(this, w, ui.ClearXformButton);
 	w = SetTabOrder(this, w, ui.DeleteXformButton);
@@ -701,11 +730,14 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_XformWeightSpin);
 	w = SetTabOrder(this, w, m_XformWeightSpinnerButtonWidget->m_Button);
 	w = SetTabOrder(this, m_XformColorIndexSpin, ui.XformColorScroll);//Xforms color.
+	w = SetTabOrder(this, w, ui.RandomColorIndicesButton);
+	w = SetTabOrder(this, w, ui.ToggleColorIndicesButton);
 	w = SetTabOrder(this, w, m_XformColorSpeedSpin);
 	w = SetTabOrder(this, w, m_XformOpacitySpin);
 	w = SetTabOrder(this, w, m_XformDirectColorSpin);
 	w = SetTabOrder(this, w, ui.SoloXformCheckBox);
-	w = SetTabOrder(this, ui.PreAffineGroupBox, m_PreX1Spin);//Xforms affine.
+	w = SetTabOrder(this, ui.LockAffineCheckBox, ui.PreAffineGroupBox);//Xforms affine.
+	w = SetTabOrder(this, w, m_PreX1Spin);
 	w = SetTabOrder(this, w, m_PreX2Spin);
 	w = SetTabOrder(this, w, m_PreY1Spin);
 	w = SetTabOrder(this, w, m_PreY2Spin);
@@ -727,6 +759,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PreScaleDownButton);
 	w = SetTabOrder(this, w, ui.PreScaleCombo);
 	w = SetTabOrder(this, w, ui.PreScaleUpButton);
+	w = SetTabOrder(this, w, ui.PreRandomButton);
 	w = SetTabOrder(this, w, ui.ShowPreAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineAllRadio);
 	w = SetTabOrder(this, w, ui.PostAffineGroupBox);
@@ -752,21 +785,33 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PostScaleDownButton);
 	w = SetTabOrder(this, w, ui.PostScaleCombo);
 	w = SetTabOrder(this, w, ui.PostScaleUpButton);
+	w = SetTabOrder(this, w, ui.PostRandomButton);
 	w = SetTabOrder(this, w, ui.ShowPostAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPostAffineAllRadio);
+	w = SetTabOrder(this, w, ui.PolarAffineCheckBox);
 	w = SetTabOrder(this, w, ui.LocalPivotRadio);
 	w = SetTabOrder(this, w, ui.WorldPivotRadio);
 	w = SetTabOrder(this, ui.VariationsFilterLineEdit, ui.VariationsFilterClearButton);//Xforms variation.
 	w = SetTabOrder(this, w, ui.VariationsTree);
 	//Xforms xaos is done dynamically every time.
-	w = SetTabOrder(this, m_PaletteHueSpin, m_PaletteContrastSpin);//Palette.
+	w = SetTabOrder(this, ui.PaletteFilenameCombo, m_PaletteHueSpin);//Palette.
+	w = SetTabOrder(this, w, m_PaletteContrastSpin);
 	w = SetTabOrder(this, w, m_PaletteSaturationSpin);
 	w = SetTabOrder(this, w, m_PaletteBlurSpin);
 	w = SetTabOrder(this, w, m_PaletteBrightnessSpin);
 	w = SetTabOrder(this, w, m_PaletteFrequencySpin);
+	w = SetTabOrder(this, w, ui.PaletteRandomSelect);
+	w = SetTabOrder(this, w, ui.PaletteRandomAdjust);
 	w = SetTabOrder(this, w, ui.PaletteFilterLineEdit);
 	w = SetTabOrder(this, w, ui.PaletteFilterClearButton);
 	w = SetTabOrder(this, w, ui.PaletteListTable);
+	w = SetTabOrder(this, w, ui.ResetCurvesButton);//Palette curves.
+	w = SetTabOrder(this, w, ui.CurvesView);
+	w = SetTabOrder(this, w, ui.CurvesGroupBox);
+	w = SetTabOrder(this, w, ui.CurvesAllRadio);
+	w = SetTabOrder(this, w, ui.CurvesRedRadio);
+	w = SetTabOrder(this, w, ui.CurvesGreenRadio);
+	w = SetTabOrder(this, w, ui.CurvesBlueRadio);
 	w = SetTabOrder(this, ui.SummaryTable, ui.SummaryTree);//Info summary.
 	w = SetTabOrder(this, ui.InfoBoundsGroupBox, ui.InfoBoundsFrame);//Info bounds.
 	w = SetTabOrder(this, w, ui.InfoBoundsTable);

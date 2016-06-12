@@ -28,7 +28,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 	connect(ui.FinalRenderDoublePrecisionCheckBox, SIGNAL(stateChanged(int)),		 this, SLOT(OnDoublePrecisionCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	connect(ui.FinalRenderDoAllCheckBox,		   SIGNAL(stateChanged(int)),		 this, SLOT(OnDoAllCheckBoxStateChanged(int)),			 Qt::QueuedConnection);
 	connect(ui.FinalRenderDoSequenceCheckBox,	   SIGNAL(stateChanged(int)),		 this, SLOT(OnDoSequenceCheckBoxStateChanged(int)),		 Qt::QueuedConnection);
-	connect(ui.FinalRenderCurrentSpin,			   SIGNAL(valueChanged(int)),		 this, SLOT(OnCurrentSpinChanged(int)),		 Qt::QueuedConnection);
+	connect(ui.FinalRenderCurrentSpin,			   SIGNAL(valueChanged(int)),		 this, SLOT(OnCurrentSpinChanged(int)),		             Qt::QueuedConnection);
 	connect(ui.FinalRenderApplyToAllCheckBox,	   SIGNAL(stateChanged(int)),		 this, SLOT(OnApplyAllCheckBoxStateChanged(int)),		 Qt::QueuedConnection);
 	connect(ui.FinalRenderKeepAspectCheckBox,	   SIGNAL(stateChanged(int)),		 this, SLOT(OnKeepAspectCheckBoxStateChanged(int)),		 Qt::QueuedConnection);
 	connect(ui.FinalRenderScaleNoneRadioButton,	   SIGNAL(toggled(bool)),			 this, SLOT(OnScaleRadioButtonChanged(bool)),			 Qt::QueuedConnection);
@@ -187,6 +187,16 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 	w = SetTabOrder(this, w, ui.FinalRenderStartButton);
 	w = SetTabOrder(this, w, ui.FinalRenderStopButton);
 	w = SetTabOrder(this, w, ui.FinalRenderCloseButton);
+}
+
+/// <summary>
+/// Show the final render dialog and specify whether it was called from the toolbar or the sequence render button.
+/// </summary>
+/// <param name="fromSequence">True if this is called from the sequence render button, else false.</param>
+void FractoriumFinalRenderDialog::Show(bool fromSequence)
+{
+	m_FromSequence = fromSequence;
+	show();
 }
 
 /// <summary>
@@ -636,7 +646,7 @@ void FractoriumFinalRenderDialog::OnCancelRenderClicked(bool checked)
 /// <param name="e">The event</param>
 void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 {
-	if (m_Controller.get() && m_Controller->m_Run)
+	if (m_Controller.get() && m_Controller->m_Run)//On Linux, this event will be called when the main window minimized/maximized while rendering, so filter it out.
 		return;
 
 	if (CreateControllerFromGUI(true))//Create controller if it does not exist, or if it does and the renderer is not running.
@@ -645,16 +655,17 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efi;
-		m_Fractorium->m_Controller->CopyEmberFile(efi, [&](Ember<double>& ember)
+		m_Fractorium->m_Controller->CopyEmberFile(efi, m_FromSequence, [&](Ember<double>& ember)
 		{
 			ember.SyncSize();
 			ember.m_Quality = m_Settings->FinalQuality();
 			ember.m_Supersample = m_Settings->FinalSupersample();
+			ember.m_TemporalSamples = m_Settings->FinalTemporalSamples();
 		});//Copy the whole file, will take about 0.2ms per ember in the file.
 #else
 		Ember<float> ed;
 		EmberFile<float> efi;
-		m_Fractorium->m_Controller->CopyEmberFile(efi, [&](Ember<float>& ember)
+		m_Fractorium->m_Controller->CopyEmberFile(efi, m_FromSequence, [&](Ember<float>& ember)
 		{
 			ember.SyncSize();
 			ember.m_Quality = m_Settings->FinalQuality();
@@ -662,7 +673,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 			ember.m_TemporalSamples = m_Settings->FinalTemporalSamples();
 		});//Copy the whole file, will take about 0.2ms per ember in the file.
 #endif
-		m_Controller->SetEmberFile(efi);//Copy the temp file into the final render controller.
+		m_Controller->SetEmberFile(efi, true);//Move the temp file into the final render controller.
 		ui.FinalRenderCurrentSpin->setMaximum(int(efi.Size()));
 		ui.FinalRenderCurrentSpin->blockSignals(true);
 		ui.FinalRenderCurrentSpin->setValue(index);//Set the currently selected ember to the one that was being edited.
@@ -675,6 +686,12 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 
 		if (Exists(s))
 			Path(m_Controller->ComposePath(m_Controller->Name()));//Update the GUI.
+	}
+
+	if (m_FromSequence)
+	{
+		ui.FinalRenderDoAllCheckBox->setChecked(true);
+		ui.FinalRenderDoSequenceCheckBox->setChecked(true);
 	}
 
 	ui.FinalRenderTextOutput->clear();
@@ -726,9 +743,9 @@ bool FractoriumFinalRenderDialog::CreateControllerFromGUI(bool createRenderer)
 		if (m_Controller.get())
 		{
 #ifdef DO_DOUBLE
-			m_Controller->CopyEmberFile(efd, [&](Ember<double>& ember) { });//Convert float to double or save double verbatim;
+			m_Controller->CopyEmberFile(efd, false, [&](Ember<double>& ember) { });//Convert float to double or save double verbatim;
 #else
-			m_Controller->CopyEmberFile(efd, [&](Ember<float>& ember) { });//Convert float to double or save double verbatim;
+			m_Controller->CopyEmberFile(efd, false, [&](Ember<float>& ember) { });//Convert float to double or save double verbatim;
 #endif
 			m_Controller->Shutdown();
 		}
@@ -745,7 +762,7 @@ bool FractoriumFinalRenderDialog::CreateControllerFromGUI(bool createRenderer)
 		//Restore the ember and ember file.
 		if (m_Controller.get())
 		{
-			m_Controller->SetEmberFile(efd);//Convert float to double or set double verbatim;
+			m_Controller->SetEmberFile(efd, true);//Convert float to double and move or move double verbatim.
 			m_Controller->SetEmber(index, false);
 		}
 	}

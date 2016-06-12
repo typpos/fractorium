@@ -29,6 +29,9 @@ enum eLibraryUpdate { INDEX = 1, NAME = 2, POINTER = 4 };
 /// So Fractorium includes this file, and Fractorium is declared as a forward declaration here.
 /// </summary>
 class Fractorium;
+template <typename T> class PreviewRenderer;
+template <typename T> class TreePreviewRenderer;
+
 #define PREVIEW_SIZE 256
 #define UNDO_SIZE 128
 
@@ -54,20 +57,19 @@ public:
 	//Embers.
 	virtual void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) { }
 	virtual void CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }//Uncomment default lambdas once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
-	virtual void SetEmberFile(const EmberFile<float>& emberFile) { }
-	virtual void CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }
+	virtual void SetEmberFile(const EmberFile<float>& emberFile, bool move) { }
+	virtual void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }
 	virtual void SetTempPalette(const Palette<float>& palette) { }
 	virtual void CopyTempPalette(Palette<float>& palette) { }
 #ifdef DO_DOUBLE
 	virtual void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) { }
 	virtual void CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
-	virtual void SetEmberFile(const EmberFile<double>& emberFile) { }
-	virtual void CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
+	virtual void SetEmberFile(const EmberFile<double>& emberFile, bool move) { }
+	virtual void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
 	virtual void SetTempPalette(const Palette<double>& palette) { }
 	virtual void CopyTempPalette(Palette<double>& palette) { }
 #endif
 	virtual void SetEmber(size_t index, bool verbatim) { }
-	//virtual void Clear() { }
 	virtual void AddXform() { }
 	virtual void AddLinkedXform() { }
 	virtual void DuplicateXform() { }
@@ -119,10 +121,18 @@ public:
 	virtual void UpdateLibraryTree() { }
 	virtual void EmberTreeItemChanged(QTreeWidgetItem* item, int col) { }
 	virtual void EmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { }
-	virtual void RenderPreviews(uint start = UINT_MAX, uint end = UINT_MAX) { }
-	virtual void StopPreviewRender() { }
+	virtual void RenderLibraryPreviews(uint start = UINT_MAX, uint end = UINT_MAX) { }
+	virtual void RenderSequencePreviews(uint start = UINT_MAX, uint end = UINT_MAX) { }
+	virtual void SequenceTreeItemChanged(QTreeWidgetItem* item, int col) { }
+	virtual void StopLibraryPreviewRender() { }
+	virtual void StopSequencePreviewRender() { }
+	virtual void StopAllPreviewRenderers() { }
 	virtual void MoveLibraryItems(int startRow, int destRow) { }
 	virtual void Delete(const pair<size_t, QTreeWidgetItem*>& p) { }
+	virtual void FillSequenceTree() { }
+	virtual void SequenceGenerateButtonClicked() { }
+	virtual void SequenceSaveButtonClicked() { }
+	virtual void SequenceOpenButtonClicked() { }
 
 	//Params.
 	virtual void SetCenter(double x, double y) { }
@@ -287,6 +297,9 @@ protected:
 template<typename T>
 class FractoriumEmberController : public FractoriumEmberControllerBase
 {
+	friend PreviewRenderer<T>;
+	friend TreePreviewRenderer<T>;
+
 public:
 	FractoriumEmberController(Fractorium* fractorium);
 	FractoriumEmberController(const FractoriumEmberController<T>& controller) = delete;
@@ -295,20 +308,19 @@ public:
 	//Embers.
 	virtual void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) override;
 	virtual void CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
-	virtual void SetEmberFile(const EmberFile<float>& emberFile) override;
-	virtual void CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
+	virtual void SetEmberFile(const EmberFile<float>& emberFile, bool move) override;
+	virtual void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
 	virtual void SetTempPalette(const Palette<float>& palette) override;
 	virtual void CopyTempPalette(Palette<float>& palette) override;
 #ifdef DO_DOUBLE
 	virtual void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) override;
 	virtual void CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
-	virtual void SetEmberFile(const EmberFile<double>& emberFile) override;
-	virtual void CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
+	virtual void SetEmberFile(const EmberFile<double>& emberFile, bool move) override;
+	virtual void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 	virtual void SetTempPalette(const Palette<double>& palette) override;
 	virtual void CopyTempPalette(Palette<double>& palette) override;
 #endif
 	virtual void SetEmber(size_t index, bool verbatim) override;
-	//virtual void Clear() override { }
 	virtual void AddXform() override;
 	virtual void AddLinkedXform() override;
 	virtual void DuplicateXform() override;
@@ -316,7 +328,6 @@ public:
 	virtual void DeleteXforms() override;
 	virtual void AddFinalXform() override;
 	virtual bool UseFinalXform() override { return m_Ember.UseFinalXform(); }
-	//virtual bool IsFinal(uint i) { return false; }
 	virtual size_t XformCount() const override { return m_Ember.XformCount(); }
 	virtual size_t TotalXformCount() const override { return m_Ember.TotalXformCount(); }
 	virtual QString Name() const override { return QString::fromStdString(m_Ember.m_Name); }
@@ -365,8 +376,17 @@ public:
 	virtual void Delete(const pair<size_t, QTreeWidgetItem*>& p) override;
 	virtual void EmberTreeItemChanged(QTreeWidgetItem* item, int col) override;
 	virtual void EmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) override;
-	virtual void RenderPreviews(uint start = UINT_MAX, uint end = UINT_MAX) override;
-	virtual void StopPreviewRender() override;
+	void RenderPreviews(QTreeWidget* tree, TreePreviewRenderer<T>* renderer, EmberFile<T>& file, uint start = UINT_MAX, uint end = UINT_MAX);
+	virtual void RenderLibraryPreviews(uint start = UINT_MAX, uint end = UINT_MAX) override;
+	virtual void RenderSequencePreviews(uint start = UINT_MAX, uint end = UINT_MAX) override;
+	virtual void SequenceTreeItemChanged(QTreeWidgetItem* item, int col) override;
+	virtual void StopLibraryPreviewRender() override;
+	virtual void StopSequencePreviewRender() override;
+	virtual void StopAllPreviewRenderers() override;
+	virtual void FillSequenceTree() override;
+	virtual void SequenceGenerateButtonClicked() override;
+	virtual void SequenceSaveButtonClicked() override;
+	virtual void SequenceOpenButtonClicked() override;
 
 	//Params.
 	virtual void SetCenter(double x, double y) override;
@@ -504,13 +524,13 @@ private:
 	bool SyncSizes();
 
 	//Templated members.
-	bool m_PreviewRun = false;
 	bool m_PreviewRunning = false;
 	vector<T> m_TempOpacities;
 	vector<T> m_NormalizedWeights;
 	Ember<T> m_Ember;
 	const void* m_EmberFilePointer = nullptr;
 	EmberFile<T> m_EmberFile;
+	EmberFile<T> m_SequenceFile;
 	deque<Ember<T>> m_UndoList;
 	vector<Xform<T>> m_CopiedXforms;
 	Xform<T> m_CopiedFinalXform;
@@ -519,8 +539,115 @@ private:
 	shared_ptr<VariationList<T>> m_VariationList;
 	unique_ptr<SheepTools<T, float>> m_SheepTools;
 	unique_ptr<GLEmberController<T>> m_GLController;
-	unique_ptr<EmberNs::Renderer<T, float>> m_PreviewRenderer = make_unique<EmberNs::Renderer<T, float>>();
-	QFuture<void> m_PreviewResult;
-	std::function<void (uint, uint)> m_PreviewRenderFunc;
+	unique_ptr<TreePreviewRenderer<T>> m_LibraryPreviewRenderer;
+	unique_ptr<TreePreviewRenderer<T>> m_SequencePreviewRenderer;
 };
 
+/// <summary>
+/// Base class for encapsulating a preview renderer which will be used
+/// in such places as the main library tree, the sequence tree and the
+/// single preview thumbnail shown in the final render dialog.
+/// Derived classes will implement PreviewRenderFunc() to handle the rendering
+/// functionality specific to their previews.
+/// </summary>
+template <typename T>
+class PreviewRenderer
+{
+public:
+	PreviewRenderer()
+	{
+	}
+
+	void Render(uint start, uint end)
+	{
+		Stop();
+		m_PreviewResult = QtConcurrent::run([&](uint s, uint e)
+		{
+			rlg l(m_PreviewCs);
+			m_PreviewRun = true;
+			PreviewRenderFunc(s, e);
+			m_PreviewRun = false;
+		}, start, end);
+	}
+
+	void Stop()
+	{
+		m_PreviewRun = false;
+		m_PreviewRenderer.Abort();
+		m_PreviewResult.cancel();
+
+		while (m_PreviewResult.isRunning())
+			QApplication::processEvents();
+	}
+
+	bool EarlyClip()
+	{
+		return m_PreviewRenderer.EarlyClip();
+	}
+
+	bool YAxisUp()
+	{
+		return m_PreviewRenderer.YAxisUp();
+	}
+
+	bool Transparency()
+	{
+		return m_PreviewRenderer.Transparency();
+	}
+
+	bool Running()
+	{
+		return m_PreviewRun || m_PreviewResult.isRunning();
+	}
+
+	virtual void PreviewRenderFunc(uint start, uint end) {}
+
+protected:
+	volatile bool m_PreviewRun = false;
+	Ember<T> m_PreviewEmber;
+	vector<byte> m_PreviewFinalImage;
+	EmberNs::Renderer<T, float> m_PreviewRenderer;
+
+private:
+	QFuture<void> m_PreviewResult;
+	std::recursive_mutex m_PreviewCs;
+};
+
+/// <summary>
+/// Thin derivation to handle preview rendering multiple embers previews to a tree.
+/// </summary>
+template <typename T>
+class TreePreviewRenderer : public PreviewRenderer<T>
+{
+public:
+	using PreviewRenderer<T>::m_PreviewRun;
+	using PreviewRenderer<T>::m_PreviewEmber;
+	using PreviewRenderer<T>::m_PreviewRenderer;
+	using PreviewRenderer<T>::m_PreviewFinalImage;
+	
+	/// <summary>
+	/// Initializes a new instance of the <see cref="TreePreviewRenderer{T}"/> class.
+	/// </summary>
+	/// <param name="controller">A pointer to the controller this instance is a member of</param>
+	/// <param name="tree">A pointer to the tree to render to</param>
+	/// <param name="emberFile">A reference to the ember file to render</param>
+	TreePreviewRenderer(FractoriumEmberController<T>* controller, QTreeWidget* tree, EmberFile<T>& emberFile) :
+		m_Controller(controller),
+		m_Tree(tree),
+		m_EmberFile(emberFile)
+	{
+		auto f = m_Controller->m_Fractorium;
+		m_PreviewRenderer.Callback(nullptr);
+		m_PreviewRenderer.NumChannels(4);
+		m_PreviewRenderer.EarlyClip(f->m_Settings->EarlyClip());
+		m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());
+		m_PreviewRenderer.Transparency(f->m_Settings->Transparency());
+	}
+
+	virtual void PreviewRenderFunc(uint start, uint end) override;
+
+protected:
+	FractoriumEmberController<T>* m_Controller;
+	QTreeWidget* m_Tree;
+	EmberFile<T>& m_EmberFile;
+};

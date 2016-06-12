@@ -2,7 +2,7 @@
 #include "EmberRender.h"
 #include "JpegUtils.h"
 
-//template <class OpenCLInfo> weak_ptr<OpenCLInfo> Singleton<OpenCLInfo>::m_Instance = weak_ptr<OpenCLInfo>();
+using namespace EmberCommon;
 
 /// <summary>
 /// The core of the EmberRender.exe program.
@@ -273,7 +273,7 @@ bool EmberRender(EmberOptions& opt)
 			else
 			{
 				ostringstream fnstream;
-				fnstream << inputPath << opt.Prefix() << setfill('0') << setw(padding) << i << opt.Suffix() << "." << opt.Format();
+				fnstream << inputPath << opt.Prefix() << setfill('0') << setprecision(0) << fixed << setw(padding) << i << opt.Suffix() << "." << opt.Format();
 				filename = fnstream.str();
 			}
 

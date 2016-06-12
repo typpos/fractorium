@@ -44,6 +44,8 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 {
 	bool b = false;
 	m_GLController = make_unique<GLEmberController<T>>(fractorium, fractorium->ui.GLDisplay, this);
+	m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile);
+	m_SequencePreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.SequenceTree, m_SequenceFile);
 	//Initial combo change event to fill the palette table will be called automatically later.
 	//Look hard for a palette.
 	static vector<string> paths =
@@ -70,57 +72,6 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 
 	BackgroundChanged(QColor(0, 0, 0));//Default to black.
 	ClearUndo();
-	m_PreviewRenderer->Callback(nullptr);
-	m_PreviewRenderer->NumChannels(4);
-	m_PreviewRenderer->EarlyClip(m_Fractorium->m_Settings->EarlyClip());
-	m_PreviewRenderer->YAxisUp(m_Fractorium->m_Settings->YAxisUp());
-	m_PreviewRenderer->SetEmber(m_Ember);//Give it an initial ember, will be updated many times later.
-	//m_PreviewRenderer->ThreadCount(1);//For debugging.
-	m_PreviewRenderFunc = [&](uint start, uint end)
-	{
-		while (m_PreviewRun || m_PreviewRunning)
-		{
-		}
-
-		m_PreviewRun = true;
-		m_PreviewRunning = true;
-		m_PreviewRenderer->ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Leave one processor free so the GUI can breathe.
-		auto tree = m_Fractorium->ui.LibraryTree;
-
-		if (auto top = tree->topLevelItem(0))
-		{
-			size_t i = start;
-
-			for (auto b = Advance(m_EmberFile.m_Embers.begin(), start); m_PreviewRun && i < end && b != m_EmberFile.m_Embers.end(); ++b, ++i)
-			{
-				Ember<T> ember = *b;
-				ember.SyncSize();
-				ember.SetSizeAndAdjustScale(PREVIEW_SIZE, PREVIEW_SIZE, false, eScaleType::SCALE_WIDTH);
-				ember.m_TemporalSamples = 1;
-				ember.m_Quality = 25;
-				ember.m_Supersample = 1;
-				m_PreviewRenderer->SetEmber(ember);
-
-				if (m_PreviewRenderer->Run(m_PreviewFinalImage) == eRenderStatus::RENDER_OK)
-				{
-					if (auto treeItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(int(i))))
-					{
-						//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
-						//This ensures the events are processed in order as each preview is updated, and that control does not return here
-						//until the update is complete.
-						QMetaObject::invokeMethod(m_Fractorium, "SetLibraryTreeItemData", Qt::BlockingQueuedConnection,
-												  Q_ARG(EmberTreeWidgetItemBase*, dynamic_cast<EmberTreeWidgetItemBase*>(treeItem)),
-												  Q_ARG(vector<byte>&, m_PreviewFinalImage),
-												  Q_ARG(uint, PREVIEW_SIZE),
-												  Q_ARG(uint, PREVIEW_SIZE));
-					}
-				}
-			}
-		}
-
-		m_PreviewRun = false;
-		m_PreviewRunning = false;
-	};
 }
 
 /// <summary>
@@ -136,11 +87,19 @@ FractoriumEmberController<T>::~FractoriumEmberController() { }
 /// </summary>
 template <typename T> void FractoriumEmberController<T>::SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) { SetEmberPrivate<float>(ember, verbatim, updatePointer); }
 template <typename T> void FractoriumEmberController<T>::CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation) { ember = m_Ember; perEmberOperation(ember); }
-template <typename T> void FractoriumEmberController<T>::SetEmberFile(const EmberFile<float>& emberFile) { m_EmberFile = emberFile; }
-template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation)
+template <typename T> void FractoriumEmberController<T>::SetEmberFile(const EmberFile<float>& emberFile, bool move) { move ? m_EmberFile = std::move(emberFile) : m_EmberFile = emberFile; }
+template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation)
 {
-	emberFile.m_Filename = m_EmberFile.m_Filename;
-	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	if (sequence)
+	{
+		emberFile.m_Filename = m_SequenceFile.m_Filename;
+		CopyCont(emberFile.m_Embers, m_SequenceFile.m_Embers, perEmberOperation);
+	}
+	else
+	{
+		emberFile.m_Filename = m_EmberFile.m_Filename;
+		CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	}
 }
 
 template <typename T> void FractoriumEmberController<T>::SetTempPalette(const Palette<float>& palette) { m_TempPalette = palette; }
@@ -148,11 +107,19 @@ template <typename T> void FractoriumEmberController<T>::CopyTempPalette(Palette
 #ifdef DO_DOUBLE
 template <typename T> void FractoriumEmberController<T>::SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) { SetEmberPrivate<double>(ember, verbatim, updatePointer); }
 template <typename T> void FractoriumEmberController<T>::CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation) { ember = m_Ember; perEmberOperation(ember); }
-template <typename T> void FractoriumEmberController<T>::SetEmberFile(const EmberFile<double>& emberFile) { m_EmberFile = emberFile; }
-template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation)
+template <typename T> void FractoriumEmberController<T>::SetEmberFile(const EmberFile<double>& emberFile, bool move) { move ? m_EmberFile = std::move(emberFile) : m_EmberFile = emberFile; }
+template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation)
 {
-	emberFile.m_Filename = m_EmberFile.m_Filename;
-	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	if (sequence)
+	{
+		emberFile.m_Filename = m_SequenceFile.m_Filename;
+		CopyCont(emberFile.m_Embers, m_SequenceFile.m_Embers, perEmberOperation);
+	}
+	else
+	{
+		emberFile.m_Filename = m_EmberFile.m_Filename;
+		CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
+	}
 }
 
 template <typename T> void FractoriumEmberController<T>::SetTempPalette(const Palette<double>& palette) { m_TempPalette = palette; }
@@ -387,8 +354,58 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 		m_Fractorium->CenterScrollbars();
 }
 
+/// <summary>
+/// Thin derivation to handle preview rendering multiple embers previews to a tree.
+/// </summary>
+/// <param name="start">The 0-based index to start rendering previews for</param>
+/// <param name="end">The 0-based index which is one beyond the last ember to render a preview for</param>
+template <typename T>
+void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
+{
+	auto f = m_Controller->m_Fractorium;
+	m_PreviewRenderer.EarlyClip(f->m_Settings->EarlyClip());
+	m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());
+	m_PreviewRenderer.Transparency(f->m_Settings->Transparency());
+	m_PreviewRenderer.ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Leave one processor free so the GUI can breathe.
+
+	if (auto top = m_Tree->topLevelItem(0))
+	{
+		size_t i = start;
+
+		for (auto b = Advance(m_EmberFile.m_Embers.begin(), start); m_PreviewRun && i < end && b != m_EmberFile.m_Embers.end(); ++b, ++i)
+		{
+			m_PreviewEmber = *b;
+			m_PreviewEmber.SyncSize();
+			m_PreviewEmber.SetSizeAndAdjustScale(PREVIEW_SIZE, PREVIEW_SIZE, false, eScaleType::SCALE_WIDTH);
+			m_PreviewEmber.m_TemporalSamples = 1;
+			m_PreviewEmber.m_Quality = 25;
+			m_PreviewEmber.m_Supersample = 1;
+			m_PreviewRenderer.SetEmber(m_PreviewEmber);
+
+			if (m_PreviewRenderer.Run(m_PreviewFinalImage) == eRenderStatus::RENDER_OK)
+			{
+				if (auto treeItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(int(i))))
+				{
+					//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
+					//This ensures the events are processed in order as each preview is updated, and that control does not return here
+					//until the update is complete.
+					QMetaObject::invokeMethod(f, "SetLibraryTreeItemData", Qt::BlockingQueuedConnection,
+											  Q_ARG(EmberTreeWidgetItemBase*, treeItem),
+											  Q_ARG(vector<byte>&, m_PreviewFinalImage),
+											  Q_ARG(uint, PREVIEW_SIZE),
+											  Q_ARG(uint, PREVIEW_SIZE));
+				}
+			}
+		}
+	}
+}
+
 template class FractoriumEmberController<float>;
+template class PreviewRenderer<float>;
+template class TreePreviewRenderer<float>;
 
 #ifdef DO_DOUBLE
 	template class FractoriumEmberController<double>;
+	template class PreviewRenderer<double>;
+	template class TreePreviewRenderer<double>;
 #endif

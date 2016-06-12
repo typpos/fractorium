@@ -13,6 +13,7 @@
 /// </summary>
 class Fractorium;
 class FractoriumFinalRenderDialog;
+template <typename T> class FinalRenderPreviewRenderer;
 
 /// <summary>
 /// Used to hold the options specified in the current state of the Gui for performing the final render.
@@ -74,19 +75,16 @@ public:
 
 protected:
 	bool m_Run = false;
-	bool m_PreviewRun = false;
 	size_t m_ImageCount = 0;
 	std::atomic<size_t> m_FinishedImageCount;
 
 	QFuture<void> m_Result;
-	QFuture<void> m_FinalPreviewResult;
 	std::function<void (void)> m_FinalRenderFunc;
-	std::function<void (void)> m_FinalPreviewRenderFunc;
 
 	FractoriumSettings* m_Settings;
 	FractoriumFinalRenderDialog* m_FinalRenderDialog;
 	FinalRenderGuiState m_GuiState;
-	std::recursive_mutex m_PreviewCs, m_ProgressCs;
+	std::recursive_mutex m_ProgressCs;
 	Timing m_RenderTimer;
 	Timing m_TotalTimer;
 };
@@ -98,16 +96,18 @@ protected:
 template<typename T>
 class FinalRenderEmberController : public FinalRenderEmberControllerBase
 {
+	friend FinalRenderPreviewRenderer<T>;
+
 public:
 	FinalRenderEmberController(FractoriumFinalRenderDialog* finalRender);
 	virtual ~FinalRenderEmberController() { }
 
 	//Virtual functions overridden from FractoriumEmberControllerBase.
-	virtual void SetEmberFile(const EmberFile<float>& emberFile) override;
-	virtual void CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
+	virtual void SetEmberFile(const EmberFile<float>& emberFile, bool move) override;
+	virtual void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
 #ifdef DO_DOUBLE
-	virtual void SetEmberFile(const EmberFile<double>& emberFile) override;
-	virtual void CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
+	virtual void SetEmberFile(const EmberFile<double>& emberFile, bool move) override;
+	virtual void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 #endif
 	virtual void SetEmber(size_t index, bool verbatim) override;
 	virtual bool Render() override;
@@ -132,7 +132,6 @@ public:
 	EmberNs::Renderer<T, float>* FirstOrDefaultRenderer();
 
 protected:
-	void CancelPreviewRender();
 	void HandleFinishedProgress();
 	void SaveCurrentRender(Ember<T>& ember);
 	void SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<byte>& pixels, size_t width, size_t height, size_t channels, size_t bpc);
@@ -143,10 +142,32 @@ protected:
 	void SetProgressComplete(int val);
 
 	Ember<T>* m_Ember;
-	Ember<T> m_PreviewEmber;
 	EmberFile<T> m_EmberFile;
 	EmberToXml<T> m_XmlWriter;
-	unique_ptr<EmberNs::Renderer<T, float>> m_FinalPreviewRenderer;
+	unique_ptr<FinalRenderPreviewRenderer<T>> m_FinalPreviewRenderer;
 	vector<unique_ptr<EmberNs::Renderer<T, float>>> m_Renderers;
 };
 
+/// <summary>
+/// Thin derivation to handle preview rendering that is specific to the final render dialog.
+/// This differs from the preview renderers on the main window because they render multiple embers
+/// to a tree, whereas this renders a single preview.
+/// </summary>
+template <typename T>
+class FinalRenderPreviewRenderer : public PreviewRenderer<T>
+{
+public:
+	using PreviewRenderer<T>::m_PreviewRun;
+	using PreviewRenderer<T>::m_PreviewEmber;
+	using PreviewRenderer<T>::m_PreviewRenderer;
+	using PreviewRenderer<T>::m_PreviewFinalImage;
+	
+	FinalRenderPreviewRenderer(FinalRenderEmberController<T>* controller) : m_Controller(controller)
+	{
+	}
+
+	virtual void PreviewRenderFunc(uint start, uint end) override;
+
+private:
+	FinalRenderEmberController<T>* m_Controller;
+};

@@ -26,14 +26,14 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(FractoriumSettings* setti
 	m_CheckBoxes.push_back(ui.StateCheckBox);
 	m_CheckBoxes.push_back(ui.ParamCheckBox);
 	m_CheckBoxes.push_back(ui.NonParamCheckBox);
-	ui.SumCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERSUM).toInt()));
-	ui.AssignCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERASSIGN).toInt()));
-	ui.PpSumCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERPPSUM).toInt()));
-	ui.PpAssignCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERPPASSIGN).toInt()));
-	ui.DcCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERSDC).toInt()));
-	ui.StateCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERSSTATE).toInt()));
-	ui.ParamCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERPARAM).toInt()));
-	ui.NonParamCheckBox->setCheckState(Qt::CheckState(m_Settings->value(VARFILTERNONPARAM).toInt()));
+	ui.SumCheckBox->setCheckState     (Qt::CheckState(m_Settings->VarFilterSum     ()));
+	ui.AssignCheckBox->setCheckState  (Qt::CheckState(m_Settings->VarFilterAssign  ()));
+	ui.PpSumCheckBox->setCheckState   (Qt::CheckState(m_Settings->VarFilterPpsum   ()));
+	ui.PpAssignCheckBox->setCheckState(Qt::CheckState(m_Settings->VarFilterPpassign()));
+	ui.DcCheckBox->setCheckState      (Qt::CheckState(m_Settings->VarFilterSdc     ()));
+	ui.StateCheckBox->setCheckState   (Qt::CheckState(m_Settings->VarFilterState   ()));
+	ui.ParamCheckBox->setCheckState   (Qt::CheckState(m_Settings->VarFilterParam   ()));
+	ui.NonParamCheckBox->setCheckState(Qt::CheckState(m_Settings->VarFilterNonparam()));
 
 	for (auto& cb : m_CheckBoxes)
 	{
@@ -112,14 +112,14 @@ void FractoriumVariationsDialog::SyncSettings()
 			m[cb->text()] = cb->checkState() == Qt::CheckState::Checked;
 	});
 	m_Settings->Variations(m);
-	m_Settings->setValue(VARFILTERSUM     , int(ui.SumCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERASSIGN  , int(ui.AssignCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERPPSUM   , int(ui.PpSumCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERPPASSIGN, int(ui.PpAssignCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERSDC     , int(ui.DcCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERSSTATE  , int(ui.StateCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERPARAM   , int(ui.ParamCheckBox->checkState()));
-	m_Settings->setValue(VARFILTERNONPARAM, int(ui.NonParamCheckBox->checkState()));
+	m_Settings->VarFilterSum     (int(ui.SumCheckBox->checkState()));
+	m_Settings->VarFilterAssign  (int(ui.AssignCheckBox->checkState()));
+	m_Settings->VarFilterPpsum   (int(ui.PpSumCheckBox->checkState()));
+	m_Settings->VarFilterPpassign(int(ui.PpAssignCheckBox->checkState()));
+	m_Settings->VarFilterSdc     (int(ui.DcCheckBox->checkState()));
+	m_Settings->VarFilterState   (int(ui.StateCheckBox->checkState()));
+	m_Settings->VarFilterParam   (int(ui.ParamCheckBox->checkState()));
+	m_Settings->VarFilterNonparam(int(ui.NonParamCheckBox->checkState()));
 }
 
 /// <summary>

@@ -3,6 +3,8 @@
 #include "EmberGenome.h"
 #include "JpegUtils.h"
 
+using namespace EmberCommon;
+
 /// <summary>
 /// Set various default test values on the passed in ember.
 /// </summary>
@@ -32,14 +34,6 @@ void SetDefaultTestValues(Ember<T>& ember)
 	ember.m_MaxRadDE = 0;
 	ember.m_MinRadDE = 0;
 	ember.m_CurveDE = T(0.6);
-}
-
-template <typename T>
-void FormatName(Ember<T>& result, ostringstream& os, streamsize padding)
-{
-	os << std::setw(padding) << result.m_Time;
-	result.m_Name = os.str();
-	os.str("");
 }
 
 /// <summary>
@@ -470,18 +464,20 @@ bool EmberGenome(EmberOptions& opt)
 
 		frameCount = 0;
 		os.str("");
-		os << setfill('0');
-		auto padding = streamsize(std::log10(((opt.Frames() * opt.Loops()) + opt.Frames()) * embers.size())) + 1;
+		os << setfill('0') << setprecision(0) << fixed;
+		auto padding = opt.Padding() ? streamsize(opt.Padding()) : (streamsize(std::log10(opt.StartCount() + (((opt.Frames() * opt.Loops()) + opt.Frames()) * embers.size()))) + 1);
 		t.Tic();
 
 		for (i = 0; i < embers.size(); i++)
 		{
 			if (opt.Loops() > 0)
 			{
-				for (frame = 0; frame < std::round(opt.Frames() * opt.Loops()); frame++)
+				size_t roundFrames = size_t(std::round(opt.Frames() * opt.Loops()));
+
+				for (frame = 0; frame < roundFrames; frame++)
 				{
 					blend = T(frame) / T(opt.Frames());
-					tools.Spin(embers[i], pTemplate, result, frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
+					tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
 					FormatName(result, os, padding);
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 				}
@@ -489,9 +485,9 @@ bool EmberGenome(EmberOptions& opt)
 				//The loop above will have rotated just shy of a complete rotation.
 				//Rotate the next step and save in result, but do not print.
 				//result will be the starting point for the interp phase below.
-				frame = size_t(std::round(opt.Frames() * opt.Loops()));
+				frame = roundFrames;
 				blend = T(frame) / T(opt.Frames());
-				tools.Spin(embers[i], pTemplate, result, frameCount, blend);//Do not increment frameCount here.
+				tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount, blend);//Do not increment frameCount here.
 				FormatName(result, os, padding);
 			}
 
@@ -502,18 +498,17 @@ bool EmberGenome(EmberOptions& opt)
 
 				for (frame = 0; frame < opt.Frames(); frame++)
 				{
-					seqFlag = (frame == 0 || (frame == opt.Frames() - 1));
+					seqFlag = frame == 0 || (frame == opt.Frames() - 1);
 					blend = frame / T(opt.Frames());
 					result.Clear();
-					tools.SpinInter(&embers[i], pTemplate, result, frameCount++, seqFlag, blend);
+					tools.SpinInter(&embers[i], pTemplate, result, opt.StartCount() + frameCount++, seqFlag, blend);
 					FormatName(result, os, padding);
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 				}
 			}
 		}
 
-		result = embers.back();
-		tools.Spin(embers.back(), pTemplate, result, frameCount, 0);
+		tools.Spin(embers.back(), pTemplate, result, opt.StartCount() + frameCount, 0);
 		FormatName(result, os, padding);
 		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		t.Toc("Sequencing");

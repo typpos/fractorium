@@ -21,12 +21,19 @@
 #define OPENCLSUBBATCH	     "render/openclsubbatch"
 #define RANDOMCOUNT			 "render/randomcount"
 
+#define FRAMESPERROT		 "sequence/framesperrot"
+#define FRAMESPERROTMAX		 "sequence/framesperrotmax"
+#define ROTATIONS			 "sequence/rotations"
+#define ROTATIONSMAX		 "sequence/rotationsmax"
+#define BLENDFRAMES			 "sequence/blendframes"
+#define BLENDFRAMESMAX		 "sequence/blendframesmax"
+
 #define VARFILTERSUM         "varfilter/sumcheckbox"
 #define VARFILTERASSIGN      "varfilter/assigncheckbox"
 #define VARFILTERPPSUM       "varfilter/ppsumcheckbox"
 #define VARFILTERPPASSIGN    "varfilter/ppassigncheckbox"
 #define VARFILTERSDC         "varfilter/dccheckbox"
-#define VARFILTERSSTATE      "varfilter/statecheckbox"
+#define VARFILTERSTATE       "varfilter/statecheckbox"
 #define VARFILTERPARAM       "varfilter/paramcheckbox"
 #define VARFILTERNONPARAM    "varfilter/nonparamcheckbox"
 
@@ -125,6 +132,43 @@ public:
 
 	uint RandomCount();
 	void RandomCount(uint i);
+
+	uint FramesPerRot();
+	void FramesPerRot(uint i);
+	uint FramesPerRotMax();
+	void FramesPerRotMax(uint i);
+	uint Rotations();
+	void Rotations(uint i);
+	uint RotationsMax();
+	void RotationsMax(uint i);
+	uint BlendFrames();
+	void BlendFrames(uint i);
+	uint BlendFramesMax();
+	void BlendFramesMax(uint i);
+
+	int VarFilterSum();
+	void VarFilterSum(int i);
+
+	int VarFilterAssign();
+	void VarFilterAssign(int i);
+
+	int VarFilterPpsum();
+	void VarFilterPpsum(int i);
+
+	int VarFilterPpassign();
+	void VarFilterPpassign(int i);
+
+	int VarFilterSdc();
+	void VarFilterSdc(int i);
+
+	int VarFilterState();
+	void VarFilterState(int i);
+
+	int VarFilterParam();
+	void VarFilterParam(int i);
+
+	int VarFilterNonparam();
+	void VarFilterNonparam(int i);
 
 	bool FinalEarlyClip();
 	void FinalEarlyClip(bool b);

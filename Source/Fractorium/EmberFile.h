@@ -159,9 +159,9 @@ public:
 	/// Return the default filename based on the current date/time.
 	/// </summary>
 	/// <returns>The default filename</returns>
-	static QString DefaultFilename()
+	static QString DefaultFilename(QString prefix = "Flame_")
 	{
-		return "Flame_" + QDateTime(QDateTime::currentDateTime()).toString("yyyy-MM-dd-hhmmss");
+		return prefix + QDateTime(QDateTime::currentDateTime()).toString("yyyy-MM-dd-hhmmss");
 	}
 
 	/// <summary>

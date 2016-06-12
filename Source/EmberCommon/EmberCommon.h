@@ -7,6 +7,8 @@
 /// Ember and its derivatives.
 /// </summary>
 
+namespace EmberCommon
+{
 /// <summary>
 /// Derivation of the RenderCallback class to do custom printing action
 /// whenever the progress function is internally called inside of Ember
@@ -148,6 +150,20 @@ static bool InitPaletteList(const string& filename)
 }
 
 /// <summary>
+/// Formats a filename with digits using the passed in amount of 0 padding.
+/// </summary>
+/// <param name="result">The ember whose name will be set</param>
+/// <param name="os">The ostringstream which will be used to format</param>
+/// <param name="padding">The amount of padding to use</param>
+template <typename T>
+void FormatName(Ember<T>& result, ostringstream& os, streamsize padding)
+{
+	os << std::setw(padding) << result.m_Time;
+	result.m_Name = os.str();
+	os.str("");
+}
+
+/// <summary>
 /// Convert an RGBA buffer to an RGB buffer.
 /// The two buffers can point to the same memory location if needed.
 /// </summary>
@@ -162,7 +178,7 @@ static void RgbaToRgb(vector<byte>& rgba, vector<byte>& rgb, size_t width, size_
 
 	for (size_t i = 0, j = 0; i < (width * height * 4); i += 4, j += 3)
 	{
-		rgb[j]	   = rgba[i];
+		rgb[j] = rgba[i];
 		rgb[j + 1] = rgba[i + 1];
 		rgb[j + 2] = rgba[i + 2];
 	}
@@ -371,7 +387,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 		else
 		{
 			s = "CPU";
-			v.push_back(std::move(unique_ptr<Renderer<T, float>>(::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, shared, texId, errorReport))));
+			v.push_back(std::move(unique_ptr<Renderer<T, float>>(EmberCommon::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, shared, texId, errorReport))));
 		}
 	}
 	catch (const std::exception& e)
@@ -388,7 +404,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 		try
 		{
 			s = "CPU";
-			v.push_back(std::move(unique_ptr<Renderer<T, float>>(::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, shared, texId, errorReport))));
+			v.push_back(std::move(unique_ptr<Renderer<T, float>>(EmberCommon::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, shared, texId, errorReport))));
 		}
 		catch (const std::exception& e)
 		{
@@ -627,6 +643,7 @@ static vector<const Variation<T>*> FindVarsWithout(const vector<const Variation<
 	}
 
 	return vec;
+}
 }
 
 /// <summary>

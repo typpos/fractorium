@@ -85,4 +85,6 @@
 using namespace std;
 using namespace EmberNs;
 using namespace EmberCLns;
+using namespace EmberCommon;
+
 #endif

@@ -243,6 +243,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>SelectAllButton</tabstop>
+  <tabstop>InvertSelectionButton</tabstop>
+  <tabstop>SelectNoneButton</tabstop>
+  <tabstop>SumCheckBox</tabstop>
+  <tabstop>AssignCheckBox</tabstop>
+  <tabstop>PpSumCheckBox</tabstop>
+  <tabstop>PpAssignCheckBox</tabstop>
+  <tabstop>DcCheckBox</tabstop>
+  <tabstop>StateCheckBox</tabstop>
+  <tabstop>ParamCheckBox</tabstop>
+  <tabstop>NonParamCheckBox</tabstop>
+  <tabstop>VariationsTable</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

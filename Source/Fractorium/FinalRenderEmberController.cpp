@@ -101,50 +101,7 @@ template<typename T>
 FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderDialog* finalRender)
 	: FinalRenderEmberControllerBase(finalRender)
 {
-	m_FinalPreviewRenderer = make_unique<EmberNs::Renderer<T, float>>();
-	m_FinalPreviewRenderer->Callback(nullptr);
-	m_FinalPreviewRenderer->NumChannels(4);
-	m_FinalPreviewRenderFunc = [&]()
-	{
-		rlg l(m_PreviewCs);//Thread prep.
-		m_PreviewRun = true;
-		m_FinalPreviewRenderer->Abort();
-		T scalePercentage;
-		size_t maxDim = 100;
-		QLabel* widget = m_FinalRenderDialog->ui.FinalRenderPreviewLabel;
-
-		//Determine how to scale the scaled ember to fit in the label with a max of 100x100.
-		if (m_Ember->m_FinalRasW >= m_Ember->m_FinalRasH)
-			scalePercentage = T(maxDim) / m_Ember->m_FinalRasW;
-		else
-			scalePercentage = T(maxDim) / m_Ember->m_FinalRasH;
-
-		m_PreviewEmber = *m_Ember;
-		m_PreviewEmber.m_Quality = 100;
-		m_PreviewEmber.m_TemporalSamples = 1;
-		m_PreviewEmber.m_FinalRasW = std::max<size_t>(1, std::min<size_t>(maxDim, size_t(scalePercentage * m_Ember->m_FinalRasW)));//Ensure neither is zero.
-		m_PreviewEmber.m_FinalRasH = std::max<size_t>(1, std::min<size_t>(maxDim, size_t(scalePercentage * m_Ember->m_FinalRasH)));
-		m_PreviewEmber.m_PixelsPerUnit = scalePercentage * m_Ember->m_PixelsPerUnit;
-		m_FinalPreviewRenderer->EarlyClip(m_FinalRenderDialog->EarlyClip());
-		m_FinalPreviewRenderer->YAxisUp(m_FinalRenderDialog->YAxisUp());
-		m_FinalPreviewRenderer->Transparency(m_FinalRenderDialog->Transparency());
-		m_FinalPreviewRenderer->SetEmber(m_PreviewEmber);
-		m_FinalPreviewRenderer->PrepFinalAccumVector(m_PreviewFinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
-		auto strips = VerifyStrips(m_PreviewEmber.m_FinalRasH, m_FinalRenderDialog->Strips(),
-		[&](const string & s) { }, [&](const string & s) { }, [&](const string & s) { });
-		StripsRender<T>(m_FinalPreviewRenderer.get(), m_PreviewEmber, m_PreviewFinalImage, 0, strips, m_FinalRenderDialog->YAxisUp(),
-		[&](size_t strip) { },//Pre strip.
-		[&](size_t strip) { },//Post strip.
-		[&](size_t strip) { },//Error.
-		[&](Ember<T>& finalEmber)//Final strip.
-		{
-			QImage image(int(finalEmber.m_FinalRasW), int(finalEmber.m_FinalRasH), QImage::Format_RGBA8888);//The label wants RGBA.
-			memcpy(image.scanLine(0), m_PreviewFinalImage.data(), finalEmber.m_FinalRasW * finalEmber.m_FinalRasH * 4);//Memcpy the data in.
-			QPixmap pixmap(QPixmap::fromImage(image));
-			QMetaObject::invokeMethod(widget, "setPixmap", Qt::QueuedConnection, Q_ARG(QPixmap, pixmap));
-		});
-		m_PreviewRun = false;
-	};
+	m_FinalPreviewRenderer = make_unique<FinalRenderPreviewRenderer<T>>(this);
 	//The main rendering function which will be called in a Qt thread.
 	//A backup Xml is made before the rendering process starts just in case it crashes before finishing.
 	//If it finishes successfully, delete the backup file.
@@ -380,24 +337,24 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 /// These are used to preserve the current ember/file when switching between renderers.
 /// Note that some precision will be lost when going from double to float.
 /// </summary>
-template <typename T> void FinalRenderEmberController<T>::SetEmberFile(const EmberFile<float>& emberFile)
+template <typename T> void FinalRenderEmberController<T>::SetEmberFile(const EmberFile<float>& emberFile, bool move)
 {
-	m_EmberFile = emberFile;
+	move ? m_EmberFile = std::move(emberFile) : m_EmberFile = emberFile;
 	m_Ember = m_EmberFile.Get(0);
 }
-template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, std::function<void(Ember<float>& ember)> perEmberOperation)
+template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation)
 {
 	emberFile.m_Filename = m_EmberFile.m_Filename;
 	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
 }
 
 #ifdef DO_DOUBLE
-template <typename T> void FinalRenderEmberController<T>::SetEmberFile(const EmberFile<double>& emberFile)
+template <typename T> void FinalRenderEmberController<T>::SetEmberFile(const EmberFile<double>& emberFile, bool move)
 {
-	m_EmberFile = emberFile;
+	move ? m_EmberFile = std::move(emberFile) : m_EmberFile = emberFile;
 	m_Ember = m_EmberFile.Get(0);
 }
-template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, std::function<void(Ember<double>& ember)> perEmberOperation)
+template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation)
 {
 	emberFile.m_Filename = m_EmberFile.m_Filename;
 	CopyCont(emberFile.m_Embers, m_EmberFile.m_Embers, perEmberOperation);
@@ -692,8 +649,7 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 		m_Renderer->ComputeBounds();
 		m_Renderer->ComputeQuality();
 		m_Renderer->ComputeCamera();
-		CancelPreviewRender();
-		m_FinalPreviewRenderFunc();
+		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);
 		p = m_Renderer->MemoryRequired(strips, true, m_FinalRenderDialog->DoSequence());
 		iterCount = m_Renderer->TotalIterCount(strips);
 	}
@@ -710,8 +666,7 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 			renderer->ComputeCamera();
 		}
 
-		CancelPreviewRender();
-		m_FinalPreviewRenderFunc();
+		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);
 		strips = 1;
 		p = m_Renderers[0]->MemoryRequired(1, true, m_FinalRenderDialog->DoSequence());
 		iterCount = m_Renderers[0]->TotalIterCount(strips);
@@ -757,22 +712,6 @@ EmberNs::Renderer<T, float>* FinalRenderEmberController<T>::FirstOrDefaultRender
 		throw "No final renderer, exiting.";
 		return nullptr;
 	}
-}
-
-/// <summary>
-/// Stop the preview renderer.
-/// This is meant to only be called programatically and never by the user.
-/// </summary>
-template <typename T>
-void FinalRenderEmberController<T>::CancelPreviewRender()
-{
-	m_FinalPreviewRenderer->Abort();
-
-	while (m_FinalPreviewRenderer->InRender()) { QApplication::processEvents(); }
-
-	while (m_PreviewRun) { QApplication::processEvents(); }
-
-	while (m_FinalPreviewResult.isRunning()) { QApplication::processEvents(); }
 }
 
 /// <summary>
@@ -1015,6 +954,56 @@ QString FinalRenderEmberController<T>::CheckMemory(const tuple<size_t, size_t, s
 		s += "Rendering will most likely fail.";
 
 	return s;
+}
+
+/// <summary>
+/// Thin derivation to handle preview rendering that is specific to the final render dialog.
+/// This differs from the preview renderers on the main window because they render multiple embers
+/// to a tree, whereas this renders a single preview.
+/// </summary>
+/// <param name="start">Ignored</param>
+/// <param name="end">Ignored</param>
+template <typename T>
+void FinalRenderPreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
+{
+	T scalePercentage;
+	size_t maxDim = 100;
+	auto d = m_Controller->m_FinalRenderDialog;
+	QLabel* widget = d->ui.FinalRenderPreviewLabel;
+	//Determine how to scale the scaled ember to fit in the label with a max of 100x100.
+	auto e = m_Controller->m_Ember;
+
+	if (e->m_FinalRasW >= e->m_FinalRasH)
+		scalePercentage = T(maxDim) / e->m_FinalRasW;
+	else
+		scalePercentage = T(maxDim) / e->m_FinalRasH;
+
+	m_PreviewEmber = *e;
+	m_PreviewEmber.m_Quality = 100;
+	m_PreviewEmber.m_TemporalSamples = 1;
+	m_PreviewEmber.m_FinalRasW = std::max<size_t>(1, std::min<size_t>(maxDim, size_t(scalePercentage * e->m_FinalRasW)));//Ensure neither is zero.
+	m_PreviewEmber.m_FinalRasH = std::max<size_t>(1, std::min<size_t>(maxDim, size_t(scalePercentage * e->m_FinalRasH)));
+	m_PreviewEmber.m_PixelsPerUnit = scalePercentage * e->m_PixelsPerUnit;
+	m_PreviewRenderer.EarlyClip(d->EarlyClip());
+	m_PreviewRenderer.YAxisUp(d->YAxisUp());
+	m_PreviewRenderer.Transparency(d->Transparency());
+	m_PreviewRenderer.Callback(nullptr);
+	m_PreviewRenderer.NumChannels(4);
+	m_PreviewRenderer.SetEmber(m_PreviewEmber);
+	m_PreviewRenderer.PrepFinalAccumVector(m_PreviewFinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
+	auto strips = VerifyStrips(m_PreviewEmber.m_FinalRasH, d->Strips(),
+	[&](const string & s) {}, [&](const string & s) {}, [&](const string & s) {});
+	StripsRender<T>(&m_PreviewRenderer, m_PreviewEmber, m_PreviewFinalImage, 0, strips, d->YAxisUp(),
+	[&](size_t strip) {},//Pre strip.
+	[&](size_t strip) {},//Post strip.
+	[&](size_t strip) {},//Error.
+	[&](Ember<T>& finalEmber)//Final strip.
+	{
+		QImage image(int(finalEmber.m_FinalRasW), int(finalEmber.m_FinalRasH), QImage::Format_RGBA8888);//The label wants RGBA.
+		memcpy(image.scanLine(0), m_PreviewFinalImage.data(), finalEmber.m_FinalRasW * finalEmber.m_FinalRasH * 4);//Memcpy the data in.
+		QPixmap pixmap(QPixmap::fromImage(image));
+		QMetaObject::invokeMethod(widget, "setPixmap", Qt::QueuedConnection, Q_ARG(QPixmap, pixmap));
+	});
 }
 
 template class FinalRenderEmberController<float>;

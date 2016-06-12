@@ -13,6 +13,7 @@
 /// </summary>
 
 using namespace EmberNs;
+using namespace EmberCommon;
 
 template <typename T>
 void SaveFinalImage(Renderer<T, T>& renderer, vector<byte>& pixels, char* suffix)

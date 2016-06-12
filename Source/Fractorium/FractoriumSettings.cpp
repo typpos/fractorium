@@ -138,16 +138,27 @@ void FractoriumSettings::RandomCount(uint i)					 { setValue(RANDOMCOUNT, i);			
 /// Sequence generation settings.
 /// </summary>
 
+double FractoriumSettings::Stagger()             { return value(STAGGER).toDouble();       }
+void FractoriumSettings::Stagger(double d)       { setValue(STAGGER, d);                   }
+
+double FractoriumSettings::StaggerMax()          { return value(STAGGERMAX).toDouble();    }
+void FractoriumSettings::StaggerMax(double d)    { setValue(STAGGERMAX, d);                }
+
 uint FractoriumSettings::FramesPerRot()          { return value(FRAMESPERROT).toUInt();    }
 void FractoriumSettings::FramesPerRot(uint i)    { setValue(FRAMESPERROT, i);              }
+
 uint FractoriumSettings::FramesPerRotMax()       { return value(FRAMESPERROTMAX).toUInt(); }
 void FractoriumSettings::FramesPerRotMax(uint i) { setValue(FRAMESPERROTMAX, i);           }
-uint FractoriumSettings::Rotations()             { return value(ROTATIONS).toUInt();       }
-void FractoriumSettings::Rotations(uint i)       { setValue(ROTATIONS, i);                 }
-uint FractoriumSettings::RotationsMax()          { return value(ROTATIONSMAX).toUInt();    }
-void FractoriumSettings::RotationsMax(uint i)    { setValue(ROTATIONSMAX, i);              }
+
+uint FractoriumSettings::Rotations()             { return value(ROTATIONS).toDouble();     }
+void FractoriumSettings::Rotations(double d)     { setValue(ROTATIONS, d);                 }
+
+uint FractoriumSettings::RotationsMax()          { return value(ROTATIONSMAX).toDouble();  }
+void FractoriumSettings::RotationsMax(double d)  { setValue(ROTATIONSMAX, d);              }
+
 uint FractoriumSettings::BlendFrames()           { return value(BLENDFRAMES).toUInt();     }
 void FractoriumSettings::BlendFrames(uint i)     { setValue(BLENDFRAMES, i);               }
+
 uint FractoriumSettings::BlendFramesMax()        { return value(BLENDFRAMESMAX).toUInt();  }
 void FractoriumSettings::BlendFramesMax(uint i)  { setValue(BLENDFRAMESMAX, i);            }
 

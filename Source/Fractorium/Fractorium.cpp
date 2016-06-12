@@ -706,7 +706,8 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.SequenceStopFlameSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceAllButton);
 	w = SetTabOrder(this, w, ui.SequenceRandomizeStaggerCheckBox);
-	w = SetTabOrder(this, w, ui.SequenceStaggerCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceStaggerSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomStaggerMaxSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomizeFramesPerRotCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceFramesPerRotSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomFramesPerRotMaxSpinBox);

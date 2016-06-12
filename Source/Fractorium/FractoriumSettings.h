@@ -21,6 +21,8 @@
 #define OPENCLSUBBATCH	     "render/openclsubbatch"
 #define RANDOMCOUNT			 "render/randomcount"
 
+#define STAGGER		         "sequence/stagger"
+#define STAGGERMAX		     "sequence/staggermax"
 #define FRAMESPERROT		 "sequence/framesperrot"
 #define FRAMESPERROTMAX		 "sequence/framesperrotmax"
 #define ROTATIONS			 "sequence/rotations"
@@ -133,16 +135,27 @@ public:
 	uint RandomCount();
 	void RandomCount(uint i);
 
+	double Stagger();
+	void Stagger(double i);
+
+	double StaggerMax();
+	void StaggerMax(double i);
+
 	uint FramesPerRot();
 	void FramesPerRot(uint i);
+
 	uint FramesPerRotMax();
 	void FramesPerRotMax(uint i);
+
 	uint Rotations();
-	void Rotations(uint i);
+	void Rotations(double d);
+
 	uint RotationsMax();
-	void RotationsMax(uint i);
+	void RotationsMax(double d);
+
 	uint BlendFrames();
 	void BlendFrames(uint i);
+
 	uint BlendFramesMax();
 	void BlendFramesMax(uint i);
 

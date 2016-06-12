@@ -171,9 +171,12 @@ public slots:
 	void OnSequenceRenderButtonClicked(bool checked);
 	void OnSequenceSaveButtonClicked(bool checked);
 	void OnSequenceOpenButtonClicked(bool checked);
+	void OnSequenceRandomizeStaggerCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeRotationsCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state);
+	void OnSequenceStaggerSpinBoxChanged(double d);
+	void OnSequenceRandomStaggerMaxSpinBoxChanged(double d);
 	void OnSequenceStartFlameSpinBoxChanged(int d);
 	void OnSequenceStopFlameSpinBoxChanged(int d);
 	void OnSequenceFramesPerRotSpinBoxChanged(int d);

@@ -441,9 +441,9 @@ void FractoriumEmberController<T>::FillSequenceTree()
 template <typename T>
 void FractoriumEmberController<T>::SequenceTreeItemChanged(QTreeWidgetItem* item, int col)
 {
-	if (auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
+	if (item == m_Fractorium->ui.SequenceTree->topLevelItem(0))
 	{
-		QString text = parentItem->text(0);
+		QString text = item->text(0);
 
 		if (text != "")
 			m_SequenceFile.m_Filename = text;
@@ -660,6 +660,9 @@ void FractoriumEmberController<T>::SequenceSaveButtonClicked()
 	{
 		EmberToXml<T> writer;
 		QFileInfo fileInfo(filename);
+
+		for (auto& ember : m_SequenceFile.m_Embers)
+			ApplyXmlSavingTemplate(ember);
 
 		if (writer.Save(filename.toStdString().c_str(), m_SequenceFile.m_Embers, 0, true, true))
 			s->SaveFolder(fileInfo.canonicalPath());

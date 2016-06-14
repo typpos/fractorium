@@ -692,6 +692,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 	{
 		ui.FinalRenderDoAllCheckBox->setChecked(true);
 		ui.FinalRenderDoSequenceCheckBox->setChecked(true);
+		ui.FinalRenderApplyToAllCheckBox->setChecked(true);
 	}
 
 	ui.FinalRenderTextOutput->clear();

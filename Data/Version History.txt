@@ -1,3 +1,7 @@
+1.0.0.1 06/21/2016	
+--Bug fixes
+ -Highlight power values less than 0 were accidentally disabled on the UI.
+
 1.0.0.0 06/17/2016
 --User changes
  -Officially transition out of beta into a full 1.0 release.

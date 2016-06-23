@@ -107,9 +107,9 @@ tar --exclude='package-linux.sh' \
 [ $? -ne 0 ] && echo "Tar command failed." && exit 2
 
 cd "$PPA_DIR"
-bzr dh-make $PROJECT $VERSION $TAR_NAME
+bzr dh_make $PROJECT $VERSION $TAR_NAME
 
-[ $? -ne 0 ] && echo "bzr dh-make command failed." && exit 2
+[ $? -ne 0 ] && echo "bzr dh_make command failed." && exit 2
 
 rm "$PPA_DIR/fractorium/debian" -r
 cp -R "$PROJECT_ROOT/debian" "$PPA_DIR/fractorium"

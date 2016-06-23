@@ -1,8 +1,6 @@
 # Linux Release
 
-We will build a `.deb` binary and test it. Then we will build a source tarball,
-upload to Launchpad PPA, let it autobuild, and copy the published `.deb` link
-from there.
+These are instructions for publishing a Linux deb package. It can be built locally or the PPA repository can build it. The latter is preferable.
 
 ## Summary
 
@@ -18,7 +16,7 @@ $ ./package-linux.sh --binary-only --unsigned
 
 Type `s` for single binary, `Enter`. It displays a confirm message, `Enter`.
 
-When the build finished, find the `.deb` in `$HOME/PPA/fractorium-VERSION`.
+When the build finished, find the `.deb` in `~/PPA/fractorium-VERSION`.
 
 ### Publishing to Launchpad PPA
 
@@ -40,7 +38,8 @@ It asks for your GPG key passphrase to sign the source tarball.
 Now upload the source tarball to Launchpad:
 
 ```
-$ dput ppa:fractorium/ppa fractorium_1.0.0.0a-0ubuntu1_source.changes
+$ cd ~/PPA/fractorium-VERSION/
+$ dput ppa:fractorium/ppa fractorium_VERSION-0ubuntu1_source.changes
 ```
 
 An email will arrive to say if the package was accepted or rejected.
@@ -50,13 +49,14 @@ link to the `.deb` from "Package Details".
 
 ## Narrative
 
-Starting with a fresh clone from my fork at bitbucket.
+Starting with a fresh clone from bitbucket.org:
 
 ```
+$ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 $ cd fractorium
 ```
 
-First, testing locally on my machine.
+Test that the package creator script:
 
 `package-linux.sh` with no arguments builds a signed source for the Launchpad PPA.
 
@@ -70,14 +70,14 @@ $ ./package-linux.sh --binary-only --unsigned
 Error: Different version numbers were found. Please update the correct file,
 the version numbers should agree up to the digits in:
 
-0.9.9.6
-1.0.0.0
+a.b.c.d
+w.x.y.z
 
-./debian/changelog            : 0.9.9.6
-./Source/Ember/EmberDefines.h : 1.0.0.0
+./debian/changelog            : a.b.c.d
+./Source/Ember/EmberDefines.h : w.x.y.z
 ```
 
-So, I should bump the version number in `debian/changelog`. Let's get the time in the correct format:
+Change the version number in `debian/changelog` to match the one in `EmberDefines.h`. Next, get the time in the correct format and add it to a new entry in the changelog:
 
 ```
 $ date -R
@@ -88,11 +88,11 @@ Add a new log message at the top of `debian/changelog`, copying the last message
 and changing the version number and time.
 
 ```
-fractorium (1.0.0.0-0ubuntu1) xenial; urgency=low
+fractorium (w.x.y.z-0ubuntu1) xenial; urgency=low
 
-  * release 1.0.0.0
+  * release w.x.y.z
 
- -- Gambhiro Bhikkhu <gambhiro.bhikkhu.85@gmail.com>  Sat, 18 Jun 2016 13:12:15 +0100
+ -- Matt Feemster <matt.feemster@gmail.com>  Sat, 18 Jun 2016 13:12:15 +0100
 ```
 
 Now try again:
@@ -101,7 +101,7 @@ Now try again:
 $ ./package-linux.sh --binary-only --unsigned
 ```
 
-Question about type of build:
+You will be prompted with a question about the type of build:
 
 ```
 Type of package: single binary, indep binary, multiple binary, library, kernel module, kernel patch?
@@ -110,23 +110,23 @@ Type of package: single binary, indep binary, multiple binary, library, kernel m
 
 Type `s` for single binary, `Enter`.
 
-It displays a confirm message, `Enter`.
+It displays a confirmation message, `Enter`.
 
 The build starts. It copied the files which are not ignored in `.gitignore` out
-to `$HOME/PPA/fractorium-1.0.0.0/`, and building there.
+to `~/PPA/fractorium-VERSION/`, and built it there.
 
-The build finished, let's go and see:
+Verify the build finished:
 
 ```
-$ cd $HOME/PPA/fractorium-1.0.0.0
+$ cd ~/PPA/fractorium-w.x.y.z
 $ ls -lh
 total 7.7M
-drwxrwxr-x 2 yume yume 4.0K Jun 18 13:31 build-area
-drwxrwxr-x 8 yume yume 4.0K Jun 18 13:19 fractorium
--rw------- 1 yume yume  780 Jun 18 13:31 fractorium_1.0.0.0-0ubuntu1_amd64.changes
--rw------- 1 yume yume 3.5M Jun 18 13:31 fractorium_1.0.0.0-0ubuntu1_amd64.deb
--rw-rw-r-- 1 yume yume 2.1M Jun 18 13:18 fractorium_1.0.0.0.orig.tar.gz
--rw-rw-r-- 1 yume yume 2.1M Jun 18 13:18 fractorium-1.0.0.0.tar.gz
+drwxrwxr-x 2 user user 4.0K Jun 18 13:31 build-area
+drwxrwxr-x 8 user user 4.0K Jun 18 13:19 fractorium
+-rw------- 1 user user  780 Jun 18 13:31 fractorium_w.x.y.z-0ubuntu1_amd64.changes
+-rw------- 1 user user 3.5M Jun 18 13:31 fractorium_w.x.y.z-0ubuntu1_amd64.deb
+-rw-rw-r-- 1 user user 2.1M Jun 18 13:18 fractorium_w.x.y.z.orig.tar.gz
+-rw-rw-r-- 1 user user 2.1M Jun 18 13:18 fractorium-w.x.y.z.tar.gz
 ```
 
 This `.deb` is ready to use.
@@ -136,10 +136,10 @@ This `.deb` is ready to use.
 You could upload this `.deb` to the website if you don't want to bother with the
 Launchpad PPA. The advantages of the PPA are
 
-- testing the package and build procedure
-- users will automatically get the updated version when they run their regular upgrades
+- Testing the package and build procedure
+- Users will automatically get the updated version when they run their regular upgrades
 
-ppl get used to always looking for the PPA of a project and installing from there:
+People prefer using the PPA to install and remain up to date like so:
 
 ```
 sudo apt-add-repository ppa:fractorium/ppa
@@ -149,30 +149,29 @@ sudo apt-get install fractorium
 
 (aside end)
 
-Back to installing the `.deb`:
+Installing the `.deb`:
 
 ```
-sudo dpkg -i fractorium_1.0.0.0-0ubuntu1_amd64.deb
+sudo dpkg -i fractorium_w.x.y.z-0ubuntu1_amd64.deb
 ```
 
-When I open fractorium with its menu icon, the About page has the updated
-version number. I run a few random flames, drag some xforms around. All seems
-well.
+Verify fractorium loads with its menu icon, and the About page has the updated
+version number. Run a few random flames, drag some xforms around, and test GPU support if you have it.
 
-Now let's upload the source to the Launchpad PPA for the auto-build.
+Upload the source to the Launchpad PPA for the auto-build.
 
-Back in the fractorium folder:
+In the original fractorium source folder:
 
 ```
 $ ./package-linux.sh
-PPA work folder already exists: /home/yume/PPA/fractorium-1.0.0.0
+PPA work folder already exists: /home/yume/PPA/fractorium-w.x.y.z
 Move this folder aside or remove it.
 ```
 
-That's right, it expects to be able to create a clean folder with that name. I don't need the earlier files, so let's remove it:
+It expects to be able to create a clean folder with that name and the earlier files aren't needed to remove it:
 
 ```
-$ rm -r /home/yume/PPA/fractorium-1.0.0.0
+$ rm -r ~/PPA/fractorium-1.0.0.0
 ```
 
 Try again:
@@ -181,54 +180,52 @@ Try again:
 $ ./package-linux.sh
 ```
 
-Very good. Press `s` at the type of package question.
+Press `s` at the type of package question.
 
 This is quick, it only creates a source tarball to upload.
 
-Before finishing, it asks for my GPG key passphrase to sign the source tarball.
+Before finishing, it asks for your GPG key passphrase to sign the source tarball.
 
-Now let's upload it to Launchpad:
+Upload it to Launchpad:
 
 ```
-$ cd /home/yume/PPA/fractorium-1.0.0.0/
-$ dput ppa:fractorium/ppa fractorium_1.0.0.0-0ubuntu1_source.changes 
+$ cd ~/PPA/fractorium-w.x.y.z/
+$ dput ppa:fractorium/ppa fractorium_w.x.y.z-0ubuntu1_source.changes 
 ```
 
-It verifies my signature and says `Uploading to ppa (via ftp to ppa.launchpad.net)`.
+It verifies your signature and says `Uploading to ppa (via ftp to ppa.launchpad.net)`.
 
-Upload finished, now I open my email and wait for a message from Launchpad. It
+Upload finished, now open your email and wait for a message from Launchpad. It
 arrives, saying the package was accepted.
 
 ```
-[~fractorium/ubuntu/ppa/xenial] fractorium 1.0.0.0-0ubuntu1 (Accepted)
+[~fractorium/ubuntu/ppa/xenial] fractorium w.x.y.z-0ubuntu1 (Accepted)
 ```
 
-I open https://launchpad.net/~fractorium/+archive/ubuntu/ppa from the email and check that the build started:
+Open https://launchpad.net/~fractorium/+archive/ubuntu/ppa from the email and check that the build started:
 
 ```
-[BUILDING]	amd64 build of fractorium 1.0.0.0-0ubuntu1 in ubuntu xenial RELEASE
+[BUILDING]	amd64 build of fractorium w.x.y.z-0ubuntu1 in ubuntu xenial RELEASE
 Build started 2 minutes ago on lgw01-09
 ```
 
-Good, let's wait.
+This will take several minutes.
 
-If the package had been rejected, or if the autobuild now fails, then I would be
-fixing the build on my machine. When I want to try again, I would add a new
+If the package had been rejected, or if the autobuild now fails, then fix the build on your machine. When you want to try again, add a new
 message to the top of `debian/changelog`, with a modified version number and
 time. For these minor changes it is enough to append a letter to the version
 number, such as `fractorium 1.0.0.0a`. Then create a tarball again with
 `package-linux.sh`, and upload to Launchpad with `dput`.
 
-If fact I just remembered I should update the project links and description in
-`debian/control`. So I will do that now, bump the version number to
-`fractorium 1.0.0.0a` and update the time to `date -R`.
+Update the project links and description in
+`debian/control`. Bump the version number to `fractorium 1.0.0.0a` and update the time to `date -R`.
 
 Publish update:
 
 ```
 $ ./package-linux.sh
-$ cd ~/PPA/fractorium-1.0.0.0a
-$ dput ppa:fractorium/ppa fractorium_1.0.0.0a-0ubuntu1_source.changes
+$ cd ~/PPA/fractorium-w.x.y.za
+$ dput ppa:fractorium/ppa fractorium_w.x.y.za-0ubuntu1_source.changes
 ```
 
 Email says package accepted. Building has started. Finished:
@@ -245,7 +242,7 @@ But also:
 ```
 Binary packages awaiting publication:
 
-fractorium-1.0.0.0a-0ubuntu1
+fractorium-w.x.y.za-0ubuntu1
 ```
 
 It usually takes a bit more time until the `.deb` is published in the PPA repository.
@@ -253,19 +250,19 @@ It usually takes a bit more time until the `.deb` is published in the PPA reposi
 Commit the changes:
 
 ```
-$ git checkout -b linux-1.0.0.0a
+$ git checkout -b linux-w.x.y.za
 $ git add -A .
-$ git commit -m "linux 1.0.0.0a"
+$ git commit -m "linux w.x.y.za"
 ```
 
-After a little while the package is published now, so I go to:
+After a little while the package is published now, so go to:
 
 - https://launchpad.net/~fractorium/+archive/ubuntu/ppa
 - Select "Package Details"
 - Open the dropdown arrow at the package listing, see "Publishing Details"
 - Under "Package Files", copy the link to the `.deb`
 
-https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_1.0.0.0a-0ubuntu1_amd64.deb
+https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_w.x.y.za-0ubuntu1_amd64.deb
 
 Update the README.md link to this.
 

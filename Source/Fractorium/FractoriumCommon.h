@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FractoriumPch.h"
+#include "FractoriumSettings.h"
 
 /// <summary>
 /// Fractorium global utility functions.
@@ -30,6 +31,7 @@
 template<typename spinType, typename valType>
 static void SetupSpinner(QTableWidget* table, const QObject* receiver, int& row, int col, spinType*& spinBox, int height, valType min, valType max, valType step, const char* signal, const char* slot, bool incRow = true, valType val = 0, valType doubleClickZero = -999, valType doubleClickNonZero = -999)
 {
+	auto settings = FractoriumSettings::DefInstance();
 	spinBox = new spinType(table, height, step);
 	spinBox->setRange(min, max);
 	spinBox->setValue(val);
@@ -449,4 +451,22 @@ bool ConstrainHigh(T* low, T* high)
 	}
 
 	return false;
+}
+
+/// <summary>
+/// Move all, possibly disjointly, selected items in a range to
+/// a new location and update all existing locations.
+/// Atribution: Sean Parent, Going Native 2013.
+/// </summary>
+/// <param name="f">The location of the first selected item, or the start of the collection.</param>
+/// <param name="l">The location of the last selected item, or the end of the collection.</param>
+/// <returns>A pair of iterators representing the start and end locations of the list of newly moved items</returns>
+template <typename I, typename S>
+pair<I, I> Gather(I f, I l, I p, S s)
+{
+	return
+	{
+		stable_partition(f, p, [&](const typename iterator_traits<I>::value_type & x) { return !s(x); }),
+		stable_partition(p, l, s)
+	};
 }

@@ -155,10 +155,9 @@ bool EmberAnimate(EmberOptions& opt)
 
 	if (opt.Format() != "jpg" &&
 			opt.Format() != "png" &&
-			opt.Format() != "ppm" &&
 			opt.Format() != "bmp")
 	{
-		cout << "Format must be jpg, png, ppm, or bmp not " << opt.Format() << ". Setting to jpg.\n";
+		cout << "Format must be jpg, png, or bmp not " << opt.Format() << ". Setting to jpg.\n";
 	}
 
 	channels = opt.Format() == "png" ? 4 : 3;
@@ -317,8 +316,6 @@ bool EmberAnimate(EmberOptions& opt)
 			writeSuccess = WritePng(filename.c_str(), finalImagep, w, h, opt.BitsPerChannel() / 8, opt.PngComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 		else if (opt.Format() == "jpg")
 			writeSuccess = WriteJpeg(filename.c_str(), finalImagep, w, h, int(opt.JpegQuality()), opt.JpegComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-		else if (opt.Format() == "ppm")
-			writeSuccess = WritePpm(filename.c_str(), finalImagep, w, h);
 		else if (opt.Format() == "bmp")
 			writeSuccess = WriteBmp(filename.c_str(), finalImagep, w, h);
 

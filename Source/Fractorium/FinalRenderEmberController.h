@@ -81,7 +81,7 @@ protected:
 	QFuture<void> m_Result;
 	std::function<void (void)> m_FinalRenderFunc;
 
-	FractoriumSettings* m_Settings;
+	shared_ptr<FractoriumSettings> m_Settings;
 	FractoriumFinalRenderDialog* m_FinalRenderDialog;
 	FinalRenderGuiState m_GuiState;
 	std::recursive_mutex m_ProgressCs;
@@ -161,7 +161,7 @@ public:
 	using PreviewRenderer<T>::m_PreviewEmber;
 	using PreviewRenderer<T>::m_PreviewRenderer;
 	using PreviewRenderer<T>::m_PreviewFinalImage;
-	
+
 	FinalRenderPreviewRenderer(FinalRenderEmberController<T>* controller) : m_Controller(controller)
 	{
 	}

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1451</width>
+    <width>1712</width>
     <height>1054</height>
    </rect>
   </property>
@@ -74,7 +74,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1016</width>
+      <width>1284</width>
       <height>987</height>
      </rect>
     </property>
@@ -143,7 +143,7 @@
        <item>
         <widget class="QCheckBox" name="ApplyAllParamsCheckBox">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply adjustments to all flames in the file. Also applies to flatten/unflatten menu items.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply adjustments to all flames in the file.&lt;/p&gt;&lt;p&gt;Also applies to flatten/unflatten menu items and some other xform operations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Apply All</string>
@@ -318,6 +318,9 @@
               <property name="text">
                <string>Sub Batch Size</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Iteration is broken up into chunks, and after each chunk the point trajectory is set to a random number before beginning the next chunk.&lt;/p&gt;&lt;p&gt;For images which need a tighter, more concentrated look, increase this value because larger values reset the trajectory less often.&lt;/p&gt;&lt;p&gt;In practice, this has no noticeable effect on most images and therefore will almost never need to be adjusted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="0" column="1">
               <property name="text">
@@ -327,6 +330,9 @@
              <item row="1" column="0">
               <property name="text">
                <string>Fuse Count</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of iterations discarded at the beginning of each sub batch.&lt;/p&gt;&lt;p&gt;For images which need a tighter, more concentrated look, increase this value because larger values allow greater convergence before plotting.&lt;/p&gt;&lt;p&gt;In practice, this has no noticeable effect on most images and therefore will almost never need to be adjusted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="1" column="1">
@@ -338,6 +344,9 @@
               <property name="text">
                <string>Quality</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of iterations per pixel in the final output image. Keep this value low for a responsive UI while editing, then increase it when using the Final Render Dialog.&lt;/p&gt;&lt;p&gt;If this value is increased while a render is in progress, the updated value will be used once it finishes and it will pick up rendering where it left off.&lt;/p&gt;&lt;p&gt;This allows successive quality increases without restarting the render.&lt;/p&gt;&lt;p&gt;One way to increase the quality in this manner is to just type another digit in the field.&lt;/p&gt;&lt;p&gt;Decreases in quality will restart the process from the beginning.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="2" column="1">
               <property name="text">
@@ -347,6 +356,9 @@
              <item row="3" column="0">
               <property name="text">
                <string>Supersample</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The value to multiply the dimensions of the histogram and density filter buffer by to help eliminate jagged lines.&lt;/p&gt;&lt;p&gt;During interactive editing, it should always be 1, and should only be increased when preparing for a final render. Values greater than one will significantly impact performance and will increase memory usage.&lt;/p&gt;&lt;p&gt;While a value of 2 offers some visual improvement, values greater than 2 usually don’t offer noticeable improvement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="3" column="1">
@@ -852,10 +864,16 @@
               <property name="text">
                <string>Width</string>
               </property>
+              <property name="toolTip">
+               <string/>
+              </property>
              </row>
              <row>
               <property name="text">
                <string>Height</string>
+              </property>
+              <property name="toolTip">
+               <string/>
               </property>
              </row>
              <row>
@@ -922,6 +940,9 @@
               <property name="text">
                <string>Width</string>
               </property>
+              <property name="toolTip">
+               <string>Width of the final image. Double click to sync to window width.</string>
+              </property>
              </item>
              <item row="0" column="1">
               <property name="text">
@@ -931,6 +952,9 @@
              <item row="1" column="0">
               <property name="text">
                <string>Height</string>
+              </property>
+              <property name="toolTip">
+               <string>Height of the final image. Double click to sync to window height.</string>
               </property>
              </item>
              <item row="1" column="1">
@@ -942,6 +966,9 @@
               <property name="text">
                <string>Center X</string>
               </property>
+              <property name="toolTip">
+               <string>Horizontal center of the image. Drag with the middle mouse button to pan.</string>
+              </property>
              </item>
              <item row="2" column="1">
               <property name="text">
@@ -951,6 +978,9 @@
              <item row="3" column="0">
               <property name="text">
                <string>Center Y</string>
+              </property>
+              <property name="toolTip">
+               <string>Vertical center of the image. Drag with the middle mouse button to pan.</string>
               </property>
              </item>
              <item row="3" column="1">
@@ -962,6 +992,9 @@
               <property name="text">
                <string>Scale</string>
               </property>
+              <property name="toolTip">
+               <string>Zoom level of the image. Adjust by scrolling the mouse wheel or dragging with the right mouse button.</string>
+              </property>
              </item>
              <item row="4" column="1">
               <property name="text">
@@ -971,6 +1004,9 @@
              <item row="5" column="0">
               <property name="text">
                <string>Zoom</string>
+              </property>
+              <property name="toolTip">
+               <string>Zoom level of the image. This will greatly increase render time, so prefer using scale instead of zoom.</string>
               </property>
              </item>
              <item row="5" column="1">
@@ -982,6 +1018,9 @@
               <property name="text">
                <string>Rotate</string>
               </property>
+              <property name="toolTip">
+               <string>Rotation of the image around the Z axis. Adjust by dragging the right mouse button.</string>
+              </property>
              </item>
              <item row="6" column="1">
               <property name="text">
@@ -990,7 +1029,10 @@
              </item>
              <item row="7" column="0">
               <property name="text">
-               <string>Z Pos</string>
+               <string>Z Pos (3D)</string>
+              </property>
+              <property name="toolTip">
+               <string>Zoom used for 3D effect. Only works when at least one of the other 3D fields below have non-zero values.</string>
               </property>
              </item>
              <item row="7" column="1">
@@ -1000,7 +1042,10 @@
              </item>
              <item row="8" column="0">
               <property name="text">
-               <string>Perspective</string>
+               <string>Perspective (3D)</string>
+              </property>
+              <property name="toolTip">
+               <string>Camera tilt angle</string>
               </property>
              </item>
              <item row="8" column="1">
@@ -1010,7 +1055,10 @@
              </item>
              <item row="9" column="0">
               <property name="text">
-               <string>Pitch</string>
+               <string>Pitch (3D)</string>
+              </property>
+              <property name="toolTip">
+               <string>Rotation angle around the X axis</string>
               </property>
              </item>
              <item row="9" column="1">
@@ -1020,7 +1068,10 @@
              </item>
              <item row="10" column="0">
               <property name="text">
-               <string>Yaw</string>
+               <string>Yaw (3D)</string>
+              </property>
+              <property name="toolTip">
+               <string>Rotation angle around the Z axis. This is more powerful than the Rotate field because it takes other 3D transformations into account.</string>
               </property>
              </item>
              <item row="10" column="1">
@@ -1030,7 +1081,10 @@
              </item>
              <item row="11" column="0">
               <property name="text">
-               <string>Depth Blur</string>
+               <string>Depth Blur (3D)</string>
+              </property>
+              <property name="toolTip">
+               <string>Blurriness of points farther away on the Z axis</string>
               </property>
              </item>
              <item row="11" column="1">
@@ -1177,6 +1231,9 @@
               <property name="text">
                <string>Spatial Filter Width</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The width of the spatial filter applied to the final image.&lt;/p&gt;&lt;p&gt;Adjusting this value can help smooth out jagged lines. Values above 1.0 might make the image look too blurry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="0" column="1">
               <property name="text">
@@ -1186,6 +1243,9 @@
              <item row="1" column="0">
               <property name="text">
                <string>Spatial Filter Type</string>
+              </property>
+              <property name="toolTip">
+               <string>The type of the spatial filter applied to the final image. Experimenting with these can provide interesting effects.</string>
               </property>
              </item>
              <item row="1" column="1">
@@ -1197,6 +1257,9 @@
               <property name="text">
                <string>DE Filter Min Radius</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The minimum filter radius to use when performing density filtering. Increasing this value will add additional blurring even in high density areas, so it can be thought of as a sort of anti-aliasing technique.&lt;/p&gt;&lt;p&gt;However, larger values will result in too much blurring which is generally undesirable. This must always be less than or equal to the DE max radius.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="2" column="1">
               <property name="text">
@@ -1207,6 +1270,9 @@
               <property name="text">
                <string>DE Filter Max Radius</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The maximum filter radius to use when performing density filtering. Increasing this value will add additional blurring only to low density areas, which is generally desirable.&lt;/p&gt;&lt;p&gt;This must always be greater than or equal to the DE min radius.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="3" column="1">
               <property name="text">
@@ -1216,6 +1282,9 @@
              <item row="4" column="0">
               <property name="text">
                <string>DE Curve</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The speed with which the density filter values decrease when moving away from the center pixel being filtered.&lt;/p&gt;&lt;p&gt;This value will almost never need to be anything other than the default.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="4" column="1">
@@ -1381,6 +1450,9 @@
               <property name="text">
                <string>Brightness</string>
               </property>
+              <property name="toolTip">
+               <string>The brightness of the final output image.</string>
+              </property>
              </item>
              <item row="0" column="1">
               <property name="text">
@@ -1390,6 +1462,9 @@
              <item row="1" column="0">
               <property name="text">
                <string>Gamma</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The gamma of the final output image.&lt;/p&gt;&lt;p&gt;Higher values will give better color, but will reveal more scattered points. Lower values will reduce scattered points but will wash the colors out to white.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="1" column="1">
@@ -1401,6 +1476,9 @@
               <property name="text">
                <string>Gamma Threshold</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The gamma threshold of the final output image.&lt;/p&gt;&lt;p&gt;Higher values will reduce scattered points, but will also reduce color quality. Lower values will reveal more scattered points, but give better color.&lt;/p&gt;&lt;p&gt;This field shows 4 decimal places because it is extremely sensitive in some cases.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="2" column="1">
               <property name="text">
@@ -1410,6 +1488,9 @@
              <item row="3" column="0">
               <property name="text">
                <string>Vibrancy</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scale factor to apply to the alpha channel log scaling when gamma correcting the final output image.&lt;/p&gt;&lt;p&gt;Higher values will give more saturated colors. Lower values will wash the colors out to white.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="3" column="1">
@@ -1421,6 +1502,9 @@
               <property name="text">
                <string>Highlight Power</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used to mitigate over saturated areas that are too white.&lt;/p&gt;&lt;p&gt;A value of -1 disables this, all other values control how quickly each pixel saturates to white.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="4" column="1">
               <property name="text">
@@ -1431,6 +1515,9 @@
               <property name="text">
                <string>Background</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The background color of the image. Click the ... button to display a color chooser dialog.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="5" column="1">
               <property name="text">
@@ -1440,6 +1527,9 @@
              <item row="6" column="0">
               <property name="text">
                <string>Palette Mode</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The mode used for palette indexing when accumulating to the histogram. Changing this rarely makes any noticeable difference in the final image.&lt;/p&gt;&lt;p&gt;Step: If the specified palette index is a fraction, round down to the nearest integer.&lt;/p&gt;&lt;p&gt;Linear: Blend the specified index with the one after it.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="6" column="1">
@@ -1664,25 +1754,40 @@
               <property name="text">
                <string>Interpolation</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method to use when interpolating flames during sequence generation. Linear uses basic linear interpolation when generating all of the steps between key frames, while Smooth uses log interpolation.&lt;/p&gt;&lt;p&gt;The first and last key frames in a sequence must use Linear.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="1" column="0">
               <property name="text">
                <string>Affine Interpolation</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method to use when interpolating affine transforms during sequence generation.&lt;/p&gt;&lt;p&gt;Linear uses basic linear interpolation for each coefficient of affines, while Log converts to polar coordinates before interpolating.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="2" column="0">
               <property name="text">
                <string>Temporal Samples</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of temporal samples used to blend between sequence frames during animation.&lt;/p&gt;&lt;p&gt;Even after a sequence has been generated that produces a number of steps between key frames, when performing the animation render, each of those sequence steps is blended between the surrounding sequence steps.&lt;/p&gt;&lt;p&gt;Temporal samples is the number of blended steps between each sequence step that get combined into a single output frame.&lt;/p&gt;&lt;p&gt;Values between 100 and 1000 are often used. Higher values will produce more of a motion blurring effect when animating.&lt;/p&gt;&lt;p&gt;When rendering a single image, this value will always be set to 1 by Fractorium right before rendering regardless of the value set in the UI.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="3" column="0">
               <property name="text">
                <string>Temporal Filter Width</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The width of the temporal filter used during animation.&lt;/p&gt;&lt;p&gt;When computing the temporal samples to render, boundary frames must be computed to know what to blend between. By default this is just the sequence frames before and after the one currently being rendered.&lt;/p&gt;&lt;p&gt;However, the time bounds of what’s being blended can be less than that, or even greater which means it will be blended across several sequence steps.&lt;/p&gt;&lt;p&gt;In practice, this will almost always have its default value of 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="4" column="0">
               <property name="text">
                <string>Temporal Filter Type</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The type of the temporal filter used during animation.&lt;/p&gt;&lt;p&gt;This is similar to the spatial filter in that the type can be chosen to produce different effects.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
             </widget>
@@ -1771,7 +1876,7 @@
          <item>
           <widget class="QPushButton" name="RandomXaosButton">
            <property name="toolTip">
-            <string>Randomize all xaos values in all xforms</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xaos values to a random decimal value between 0 and 3, inclusive.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Random Xaos</string>
@@ -2252,25 +2357,40 @@
           <property name="text">
            <string>Hue</string>
           </property>
+          <property name="toolTip">
+           <string>The degrees to rotate the hue of the HSV representation of the RGB color by</string>
+          </property>
          </item>
          <item row="0" column="2">
           <property name="text">
            <string>Contrast</string>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The difference between the lightest and darkest colors in the palette.&lt;/p&gt;&lt;p&gt;Negative values decrease the difference, and bring the colors toward gray.&lt;/p&gt;&lt;p&gt;Positive values increase the difference and make the colors more saturated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </item>
          <item row="1" column="0">
           <property name="text">
            <string>Saturation</string>
           </property>
+          <property name="toolTip">
+           <string>The percentage to add to the saturation (intensity) component of the HSV representation of the RGB color</string>
+          </property>
          </item>
          <item row="1" column="2">
           <property name="text">
            <string>Blur</string>
           </property>
+          <property name="toolTip">
+           <string>The width in pixels of the blurring</string>
+          </property>
          </item>
          <item row="2" column="0">
           <property name="text">
            <string>Brightness</string>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The value to add to each channel. Negative values bring it toward black, positive values toward white.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </item>
          <item row="2" column="1">
@@ -2281,6 +2401,9 @@
          <item row="2" column="2">
           <property name="text">
            <string>Frequency</string>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times to repeat the palette&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </item>
         </widget>
@@ -2353,6 +2476,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset all of the curves to their default position. This has the effect of disabling application of the color curves.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Reset Curves</string>
          </property>
@@ -2423,6 +2549,9 @@
        </item>
        <item row="11" column="0">
         <widget class="QGroupBox" name="CurvesGroupBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When curves are on top of each other, it can be hard to grab them with the mouse, so use these radio buttons to specify which color you intend to grab.&lt;/p&gt;&lt;p&gt;If they are not on top of each other, just dragging the desired dot with the mouse will work.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="title">
           <string>Curve</string>
          </property>
@@ -2986,6 +3115,9 @@
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
+             <property name="toolTip">
+              <string/>
+             </property>
              <property name="autoFillBackground">
               <bool>false</bool>
              </property>
@@ -3070,8 +3202,19 @@
              <row/>
              <column/>
              <column/>
+             <item row="0" column="0">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="toolTip">
+               <string/>
+              </property>
+             </item>
              <item row="0" column="1">
               <property name="text">
+               <string/>
+              </property>
+              <property name="toolTip">
                <string/>
               </property>
               <property name="textAlignment">
@@ -3377,6 +3520,9 @@
               <property name="text">
                <string>Color Speed</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The speed with which the color indices are pulled toward the current xform’s color index. Negative values push the color index away.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="0" column="1">
               <property name="text">
@@ -3395,6 +3541,9 @@
               <property name="text">
                <string>Opacity</string>
               </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How visible the current xform’s contribution to the image is.&lt;/p&gt;&lt;p&gt;0 is invisible, 1 is fully visible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
              </item>
              <item row="1" column="1">
               <property name="text">
@@ -3404,6 +3553,9 @@
              <item row="2" column="0">
               <property name="text">
                <string>Direct Color</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Amount of directly computed color value to add to the color index.&lt;/p&gt;&lt;p&gt;Used only with variations that use direct coloring which are usually prefixed with dc_.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="2" column="1">
@@ -3445,6 +3597,9 @@
            </item>
            <item row="5" column="0">
             <widget class="QCheckBox" name="SoloXformCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the current xform is the only visible one. This feature is useful for determining how much each xform contributes to the final image.&lt;/p&gt;&lt;p&gt;Note that checking this does not affect the opacity values stored in the Xml file when saved. It is only a temporary adjustment when editing within the program.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Solo</string>
              </property>
@@ -3489,6 +3644,9 @@
            </property>
            <item>
             <widget class="QCheckBox" name="LockAffineCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checking this box will lock the display size of the affines at their current level, allowing for easy manipulation no matter what zoom level is used.&lt;/p&gt;&lt;p&gt;Unchecking this resets the scale used to draw the affines to its native value.&lt;/p&gt;&lt;p&gt;Note this only affects the display and does not alter any internal values used for rendering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Lock Affine Scale</string>
              </property>
@@ -3513,8 +3671,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>118</width>
-                <height>672</height>
+                <width>263</width>
+                <height>700</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -3988,7 +4146,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Reset xform to the identity matrix</string>
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset pre affine xform to the identity matrix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="text">
                        <string>Reset</string>
@@ -4258,6 +4416,9 @@
                         <height>24</height>
                        </size>
                       </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set each of the six pre affine values to a separate random number between -1 and 1, inclusive.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
                       <property name="text">
                        <string>Random</string>
                       </property>
@@ -4267,6 +4428,9 @@
                   </item>
                   <item>
                    <widget class="QGroupBox" name="PreAffineShowGroupBox">
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show current only draws the current xform’s pre affine transform.&lt;/p&gt;&lt;p&gt;Show all draws all xforms’ pre affine transforms. This can sometimes clutter the view if the flame contains many xforms.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
                     <property name="autoFillBackground">
                      <bool>false</bool>
                     </property>
@@ -4731,7 +4895,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Reset xform to the identity matrix</string>
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset post affine xform to the identity matrix&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                       <property name="text">
                        <string>Reset</string>
@@ -5082,6 +5246,9 @@
                         <height>24</height>
                        </size>
                       </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set each of the six post affine values to a separate random number between -1 and 1, inclusive.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
                       <property name="text">
                        <string>Random</string>
                       </property>
@@ -5093,6 +5260,9 @@
                    <widget class="QGroupBox" name="PostAffineShowGroupBox">
                     <property name="enabled">
                      <bool>true</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show current only draws the current xform’s post affine transform.&lt;/p&gt;&lt;p&gt;Show all draws all xforms’ post affine transforms. This can sometimes clutter the view if the flame contains many xforms.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="autoFillBackground">
                      <bool>false</bool>
@@ -5144,6 +5314,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="PolarAffineCheckBox">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to display affine values in polar coordinates, uncheck to display them in Cartesian form.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
                  <property name="text">
                   <string>Polar</string>
                  </property>
@@ -5151,6 +5324,9 @@
                </item>
                <item>
                 <widget class="QGroupBox" name="PivotGroupBox">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This affects the behavior of dragging the affines in the render window.&lt;/p&gt;&lt;p&gt;When dragging the X or Y component of an affine transform and holding Shift+Alt:&lt;/p&gt;&lt;p&gt;--Local: Rotate the point around the center of the transform.&lt;/p&gt;&lt;p&gt;--World: Rotate the point around 0, 0.&lt;/p&gt;&lt;p&gt;When dragging the center of an affine transform and holding Shift:&lt;/p&gt;&lt;p&gt;--Local: Rotate entire transform around the origin, keeping its local orientation fixed.&lt;/p&gt;&lt;p&gt;--World: Rotate entire transform around the origin, also rotating the local orientation.&lt;/p&gt;&lt;p&gt;When reflecting an affine transform:&lt;/p&gt;&lt;p&gt;--Local: Reflect horizontally and vertically around the center of the transform.&lt;/p&gt;&lt;p&gt;--World: Reflect horizontally around the Y axis, and vertically around the X axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
                  <property name="autoFillBackground">
                   <bool>false</bool>
                  </property>
@@ -5581,8 +5757,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>133</width>
-                   <height>52</height>
+                   <width>259</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -5635,7 +5811,7 @@
        <item row="2" column="0">
         <widget class="QCheckBox" name="AnimateXformCheckBox">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate this xform when creating a sequence for animation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate this xform during the rotation phase when creating a sequence for animation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Animate</string>
@@ -5766,6 +5942,9 @@
               </property>
               <attribute name="title">
                <string>Summary</string>
+              </attribute>
+              <attribute name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A rough overview of the attributes of the current flame&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
                <property name="spacing">
@@ -6103,6 +6282,9 @@
               </property>
               <attribute name="title">
                <string>Bounds</string>
+              </attribute>
+              <attribute name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Information that is only useful as an engineering interest, and a log output in the event something went wrong&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_9">
                <property name="spacing">
@@ -6586,7 +6768,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1451</width>
+     <width>1712</width>
      <height>21</height>
     </rect>
    </property>
@@ -6778,6 +6960,9 @@
         <property name="defaultDropAction">
          <enum>Qt::MoveAction</enum>
         </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
+        </property>
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
@@ -6811,8 +6996,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>424</width>
-           <height>589</height>
+           <width>432</width>
+           <height>572</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -6842,6 +7027,369 @@
             <property name="spacing">
              <number>4</number>
             </property>
+            <item row="6" column="1">
+             <layout class="QGridLayout" name="SequenceBlendRotationsGridLayout" columnstretch="2,1">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QSpinBox" name="SequenceRotationsPerBlendSpinBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>95</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times the xforms will do a 360 degree rotation while interpolating from one keyframe to the next. Note that only xforms which have the animate flag set to true will be rotated.&lt;/p&gt;&lt;p&gt;Set to 0 to omit rotation while interpolating.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="prefix">
+                 <string>Rot per blend: </string>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="SequenceRotationsPerBlendCWCheckBox">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Direction of rotation during interpolation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>CW</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="6" column="0">
+             <widget class="QCheckBox" name="SequenceRandomizeRotationsPerBlendCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" alignment="Qt::AlignLeft">
+             <widget class="QCheckBox" name="SequenceRandomizeStaggerCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check any checkbox to have the value corresponding to its row be randomly selected between the values of first and second controls on that row&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Random</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QSpinBox" name="SequenceBlendFramesSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of frames used to interpolate from one keyframe to the next. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string/>
+              </property>
+              <property name="prefix">
+               <string>Blend frames: </string>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>120</number>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" alignment="Qt::AlignLeft">
+             <widget class="QCheckBox" name="SequenceRandomizeBlendFramesCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QSpinBox" name="SequenceStartFlameSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>125</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 0-based index of the first flame in the file to start the sequence with&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Start flame: </string>
+              </property>
+              <property name="maximum">
+               <number>999999999</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QSpinBox" name="SequenceRandomBlendMaxFramesSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Blend frames max: </string>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>120</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QDoubleSpinBox" name="SequenceRandomRotationsMaxSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Rotations max: </string>
+              </property>
+              <property name="maximum">
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QSpinBox" name="SequenceStartCountSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The starting number to use as the name of the first flame in the sequence. This is useful when using an animation program that expects a certain number for the filename.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Start count: </string>
+              </property>
+              <property name="maximum">
+               <number>999999999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="SequenceStopFlameSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 0-based index of the last flame in the file to end the sequence on&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Stop flame: </string>
+              </property>
+              <property name="maximum">
+               <number>999999999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="SequenceAllButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>33</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>All</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="SequenceStartPreviewsButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Start Previews</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QDoubleSpinBox" name="SequenceRandomStaggerMaxSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Stagger max: </string>
+              </property>
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDoubleSpinBox" name="SequenceStaggerSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A decimal number between 0 and 1 which governs the xform interpolation behavior like so:&lt;/p&gt;&lt;p&gt;	0 (default): xforms will interpolate all at once.&lt;/p&gt;&lt;p&gt;	0.5: the interpolation of each xform is staggered so that when the first xform is half done, the second one starts, and so on.&lt;/p&gt;&lt;p&gt;	1: each xform interpolates consecutively with no overlap.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Stagger: </string>
+              </property>
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="SequenceStopPreviewsButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Stop Previews</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QSpinBox" name="SequenceRotationsPerBlendMaxSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Rot per blend max: </string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
             <item row="4" column="1">
              <widget class="QSpinBox" name="SequenceFramesPerRotSpinBox">
               <property name="sizePolicy">
@@ -6849,6 +7397,9 @@
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of frames for each rotation specified by Rotations. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="buttonSymbols">
                <enum>QAbstractSpinBox::NoButtons</enum>
@@ -6867,29 +7418,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
-             <widget class="QDoubleSpinBox" name="SequenceRotationsSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Rotations: </string>
-              </property>
-              <property name="maximum">
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>3.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0" alignment="Qt::AlignLeft">
+            <item row="4" column="0">
              <widget class="QCheckBox" name="SequenceRandomizeFramesPerRotCheckBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -6936,86 +7465,7 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="0" alignment="Qt::AlignLeft">
-             <widget class="QCheckBox" name="SequenceRandomizeStaggerCheckBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-              <property name="text">
-               <string>Random</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QSpinBox" name="SequenceBlendFramesSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="suffix">
-               <string/>
-              </property>
-              <property name="prefix">
-               <string>Blend frames: </string>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>120</number>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="2">
-             <widget class="QSpinBox" name="SequenceRandomBlendMaxFramesSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Blend max frames: </string>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>120</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="2">
-             <widget class="QDoubleSpinBox" name="SequenceRandomRotationsMaxSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Rotations max: </string>
-              </property>
-              <property name="maximum">
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>3.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0" alignment="Qt::AlignLeft">
+            <item row="3" column="0">
              <widget class="QCheckBox" name="SequenceRandomizeRotationsCheckBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -7028,194 +7478,50 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="0" alignment="Qt::AlignLeft">
-             <widget class="QCheckBox" name="SequenceRandomizeBlendFramesCheckBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QSpinBox" name="SequenceStartFlameSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>125</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Start flame: </string>
-              </property>
-              <property name="maximum">
-               <number>999999999</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QSpinBox" name="SequenceStopFlameSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Stop flame: </string>
-              </property>
-              <property name="maximum">
-               <number>999999999</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QPushButton" name="SequenceAllButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>33</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>All</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QSpinBox" name="SequenceStartCountSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Start count: </string>
-              </property>
-              <property name="maximum">
-               <number>999999999</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="SequenceStartPreviewsButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Start Previews</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <widget class="QPushButton" name="SequenceStopPreviewsButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Stop Previews</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="1">
-             <widget class="QDoubleSpinBox" name="SequenceStaggerSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+             <layout class="QGridLayout" name="SequenceRotationsGridLayout" rowstretch="0" columnstretch="2,1" columnminimumwidth="0,0">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
               </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
+              <property name="spacing">
+               <number>4</number>
               </property>
-              <property name="prefix">
-               <string>Stagger: </string>
-              </property>
-              <property name="maximum">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QDoubleSpinBox" name="SequenceRandomStaggerMaxSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Stagger max: </string>
-              </property>
-              <property name="maximum">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="value">
-               <double>1.000000000000000</double>
-              </property>
-             </widget>
+              <item row="0" column="0">
+               <widget class="QDoubleSpinBox" name="SequenceRotationsSpinBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times the xforms of a keyframe will do a 360 degree rotation before moving on to the next interpolation step. Note that only xforms which have the animate flag set to true will be rotated.&lt;/p&gt;&lt;p&gt;Set to 0 to omit rotation before interpolating.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="prefix">
+                 <string>Rotations: </string>
+                </property>
+                <property name="maximum">
+                 <double>10000.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>3.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="SequenceRotationsCWCheckBox">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Direction of loop rotation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>CW</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
@@ -7226,6 +7532,9 @@
             </property>
             <item>
              <widget class="QPushButton" name="SequenceGenerateButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generate the sequence from the main library file, using the values specified in the controls.&lt;/p&gt;&lt;p&gt;When sequence generation completes, the thumbnails will begin rendering. Click Stop Previews to abort this process.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
               <property name="text">
                <string>Generate</string>
               </property>
@@ -7233,6 +7542,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="SequenceRenderButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Send the generated sequence to the Final Render dialog with the Render All and Render as Animation Sequence checkboxes automatically checked&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
               <property name="text">
                <string>Render</string>
               </property>
@@ -7240,6 +7552,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="SequenceSaveButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the generated sequence out as a file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
               <property name="text">
                <string>Save</string>
               </property>
@@ -7247,6 +7562,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="SequenceOpenButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open an existing sequence file to be loaded into the sequence tree.&lt;/p&gt;&lt;p&gt;More than one file can be selected, although this may not give a visually appealing sequence if the flames used to create them were not contiguous between files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
               <property name="text">
                <string>Open</string>
               </property>

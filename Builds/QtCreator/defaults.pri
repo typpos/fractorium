@@ -1,4 +1,4 @@
-VERSION = 0.9.9.5
+VERSION = 1.0.0.2
 win32:CONFIG += skip_target_version_ext
 #message(PWD: $$absolute_path($$PWD))
 
@@ -61,13 +61,19 @@ win32 {
 	LIBS = ""
 	LIBS += OpenGL32.lib
 	LIBS += WS2_32.lib
-	LIBS += $$(AMDAPPSDKROOT)/lib/x86_64/OpenCL.lib
-	LIBS += $$(CUDA_PATH)/lib/x64/OpenCL.lib
-	LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
-	LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib /NODEFAULTLIB:LIBCMT
-	LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
-	LIBS += $$absolute_path($$EXTERNAL_LIB)/tbb.lib
-	LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
+_AMDAPPSDK = $$(AMDAPPSDKROOT)
+
+isEmpty(_AMDAPPSDK) {
+        LIBS += $$(CUDA_PATH)/lib/x64/OpenCL.lib
+}
+else {
+        LIBS += $$(AMDAPPSDKROOT)/lib/x86_64/OpenCL.lib
+}
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/tbb.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
 }
 
 !win32 {

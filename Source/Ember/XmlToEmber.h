@@ -442,42 +442,6 @@ public:
 		return b;
 	}
 
-	/// <summary>
-	/// Convert an integer to a string.
-	/// Just a wrapper around _itoa_s() which wraps the result in a std::string.
-	/// </summary>
-	/// <param name="i">The integer to convert</param>
-	/// <param name="radix">The radix of the integer. Default: 10.</param>
-	/// <returns>The converted string</returns>
-	static string Itos(int i, int radix = 10)
-	{
-		char ch[16];
-#ifdef _WIN32
-		_itoa_s(i, ch, 16, radix);
-#else
-		sprintf(ch, "%d", i);
-#endif
-		return string(ch);
-	}
-
-	/// <summary>
-	/// Convert an unsigned 64-bit integer to a string.
-	/// Just a wrapper around _ui64toa_s() which wraps the result in a std::string.
-	/// </summary>
-	/// <param name="i">The unsigned 64-bit integer to convert</param>
-	/// <param name="radix">The radix of the integer. Default: 10.</param>
-	/// <returns>The converted string</returns>
-	static string Itos64(size_t i, int radix = 10)
-	{
-		char ch[64];
-#ifdef _WIN32
-		_ui64toa_s(i, ch, 64, radix);
-#else
-		sprintf(ch, "%lu", i);
-#endif
-		return string(ch);
-	}
-
 	static vector<string> m_FlattenNames;
 
 private:
@@ -523,7 +487,7 @@ private:
 					if (auto pal = m_PaletteList.GetPalette(PaletteList<T>::m_DefaultFilename, currentEmber.PaletteIndex()))
 						currentEmber.m_Palette = *pal;
 					else
-						AddToReport(string(loc) + " : Error assigning palette with index " + Itos(currentEmber.PaletteIndex()));
+						AddToReport(string(loc) + " : Error assigning palette with index " + std::to_string(currentEmber.PaletteIndex()));
 				}
 
 				if (!currentEmber.XformCount())//Ensure there is always at least one xform or else the renderer will crash when trying to render.
@@ -532,8 +496,6 @@ private:
 					currentEmber.AddXform(xform);
 				}
 
-				//if (!Interpolater<T>::InterpMissingColors(currentEmber.m_Palette.m_Entries))
-				//	AddToReport(string(loc) + " : Error interpolating missing palette colors");
 				currentEmber.CacheXforms();
 				currentEmber.m_Index = embers.size();
 				currentEmber.m_ParentFilename = parentFileString;
@@ -562,7 +524,6 @@ private:
 		const char* loc = __FUNCTION__;
 		int soloXform = -1;
 		size_t i, count = 0, index = 0;
-		double vals[16];
 		xmlAttrPtr att, curAtt;
 		xmlNodePtr editNode, childNode, motionNode;
 		currentEmber.m_Palette.Clear();//Wipe out the current palette.
@@ -655,28 +616,16 @@ private:
 			}
 			else if (!Compare(curAtt->name, "size"))
 			{
-				if (sscanf_s(attStr, "%lu %lu", &currentEmber.m_FinalRasW, &currentEmber.m_FinalRasH) != 2)
-				{
-					AddToReport(string(loc) + " : Invalid size attribute " + string(attStr));
-					//Assign reasonable defaults.
-					currentEmber.m_FinalRasW = 1000;
-					currentEmber.m_FinalRasH = 1000;
-				}
-
+				istringstream is(attStr);
+				is >> currentEmber.m_FinalRasW >> currentEmber.m_FinalRasH;
 				currentEmber.m_OrigFinalRasW = currentEmber.m_FinalRasW;
 				currentEmber.m_OrigFinalRasH = currentEmber.m_FinalRasH;
 			}
 			else if (!Compare(curAtt->name, "center"))
 			{
-				if (sscanf_s(attStr, "%lf %lf", &vals[0], &vals[1]) != 2)
-				{
-					AddToReport(string(loc) + " : Invalid center attribute " + string(attStr));
-					vals[0] = 0;
-					vals[1] = 0;
-				}
-
-				currentEmber.m_CenterX = T(vals[0]);
-				currentEmber.m_CenterY = currentEmber.m_RotCenterY = T(vals[1]);
+				istringstream is(attStr);
+				is >> currentEmber.m_CenterX >> currentEmber.m_CenterY;
+				currentEmber.m_RotCenterY = currentEmber.m_CenterY;
 			}
 			else if (!Compare(curAtt->name, "filter_shape"))
 			{
@@ -700,29 +649,22 @@ private:
 			}
 			else if (!Compare(curAtt->name, "background"))
 			{
-				if (sscanf_s(attStr, "%lf %lf %lf", &vals[0], &vals[1], &vals[2]) != 3)
-				{
-					AddToReport(string(loc) + " : Invalid background attribute " + string(attStr));
-					vals[0] = 0;
-					vals[1] = 0;
-					vals[2] = 0;
-				}
-
-				currentEmber.m_Background[0] = T(vals[0]);//[0..1]
-				currentEmber.m_Background[1] = T(vals[1]);
-				currentEmber.m_Background[2] = T(vals[2]);
+				istringstream is(attStr);
+				is >> currentEmber.m_Background[0]//[0..1]
+				   >> currentEmber.m_Background[1]
+				   >> currentEmber.m_Background[2];
 			}
 			else if (!Compare(curAtt->name, "curves"))
 			{
-				stringstream ss(attStr);
+				istringstream is(attStr);
 
 				for (i = 0; i < 4; i++)
 				{
 					for (glm::length_t j = 0; j < 4; j++)
 					{
-						ss >> currentEmber.m_Curves.m_Points[i][j].x;
-						ss >> currentEmber.m_Curves.m_Points[i][j].y;
-						ss >> currentEmber.m_Curves.m_Weights[i][j];
+						is >> currentEmber.m_Curves.m_Points[i][j].x
+						   >> currentEmber.m_Curves.m_Points[i][j].y
+						   >> currentEmber.m_Curves.m_Weights[i][j];
 					}
 				}
 			}
@@ -748,36 +690,24 @@ private:
 
 				for (curAtt = att; curAtt; curAtt = curAtt->next)
 				{
-					attStr = reinterpret_cast<char*>(xmlGetProp(childNode, curAtt->name));
 					a = 255;
+					attStr = reinterpret_cast<char*>(xmlGetProp(childNode, curAtt->name));
+					istringstream is(attStr);
 					//This signifies that a palette is not being retrieved from the palette file, rather it's being parsed directly out of the ember xml.
 					//This also means the palette has already been hue adjusted and it doesn't need to be done again, which would be necessary if it were
 					//coming from the palette file.
 					currentEmber.m_Palette.m_Index = -1;
 
 					if (!Compare(curAtt->name, "index"))
-					{
 						Aton(attStr, index);
-					}
 					else if (!Compare(curAtt->name, "rgb"))
-					{
-						if (sscanf_s(attStr, "%lf %lf %lf", &r, &g, &b) != 3)
-							AddToReport(string(loc) + " : Invalid rgb attribute " + string(attStr));
-					}
+						is >> r >> g >> b;
 					else if (!Compare(curAtt->name, "rgba"))
-					{
-						if (sscanf_s(attStr, "%lf %lf %lf %lf", &r, &g, &b, &a) != 4)
-							AddToReport(string(loc) + " : Invalid rgba attribute " + string(attStr));
-					}
+						is >> r >> g >> b >> a;
 					else if (!Compare(curAtt->name, "a"))
-					{
-						if (sscanf_s(attStr, "%lf", &a) != 1)
-							AddToReport(string(loc) + " : Invalid a attribute " + string(attStr));
-					}
+						is >> a;
 					else
-					{
 						AddToReport(string(loc) + " : Unknown color attribute " + string(CCX(curAtt->name)));
-					}
 
 					xmlFree(attStr);
 				}
@@ -1051,13 +981,9 @@ private:
 						ret = ret && AttToEmberMotionFloat(att, attStr, eEmberMotionParam::FLAME_MOTION_VIBRANCY, motion);
 					else if (!Compare(curAtt->name, "background"))
 					{
-						double r, g, b;
-
-						if (sscanf_s(attStr, "%lf %lf %lf", &r, &g, &b) != 3)
-						{
-							AddToReport(string(loc) + " : Invalid flame motion background attribute " + string(attStr));
-							r = g = b = 0;
-						}
+						double r = 0, g = 0, b = 0;
+						istringstream is(attStr);
+						is >> r >> g >> b;
 
 						if (r != 0)
 							motion.m_MotionParams.push_back(MotionParam<T>(eEmberMotionParam::FLAME_MOTION_BACKGROUND_R, T(r)));
@@ -1070,13 +996,9 @@ private:
 					}
 					else if (!Compare(curAtt->name, "center"))
 					{
-						double cx, cy;
-
-						if (sscanf_s(attStr, "%lf %lf", &cx, &cy) != 2)
-						{
-							AddToReport(string(loc) + " : Invalid flame motion center attribute " + string(attStr));
-							cx = cy = 0;
-						}
+						double cx = 0, cy = 0;
+						istringstream is(attStr);
+						is >> cx >> cy;
 
 						if (cx != 0)
 							motion.m_MotionParams.push_back(MotionParam<T>(eEmberMotionParam::FLAME_MOTION_CENTER_X, T(cx)));
@@ -1148,7 +1070,6 @@ private:
 		size_t j;
 		T temp;
 		double a, b, c, d, e, f;
-		double vals[10];
 		xmlAttrPtr attPtr, curAtt;
 		//Loop through the attributes of the xform element.
 		attPtr = childNode->properties;
@@ -1203,30 +1124,17 @@ private:
 			}
 			else if (!Compare(curAtt->name, "color"))
 			{
-				xform.m_ColorX = xform.m_ColorY = 0;
-
-				//Try two coords first .
-				if (sscanf_s(attStr, "%lf %lf", &vals[0], &vals[1]) == 2)
-				{
-					xform.m_ColorX = T(vals[0]);
-					xform.m_ColorY = T(vals[1]);
-				}
-				else if (sscanf_s(attStr, "%lf", &vals[0]) == 1)//Try one color.
-				{
-					xform.m_ColorX = T(vals[0]);
-				}
-				else
-				{
-					xform.m_ColorX = xform.m_ColorY = T(0.5);
-					AddToReport(string(loc) + " : Malformed xform color attribute " + string(attStr) + ", using 0.5, 0.5");
-				}
+				istringstream is(attStr);
+				xform.m_ColorX = xform.m_ColorY = T(0.5);
+				is >> xform.m_ColorX;
+				is >> xform.m_ColorY;//Very unlikely to be present, but leave for future use.
 			}
 			else if (!Compare(curAtt->name, "chaos"))
 			{
-				stringstream ss(attStr);
+				istringstream is(attStr);
 				j = 0;
 
-				while (ss >> temp)
+				while (is >> temp)
 				{
 					xform.SetXaos(j, temp);
 					j++;
@@ -1243,12 +1151,9 @@ private:
 			}
 			else if (!Compare(curAtt->name, "coefs"))
 			{
-				if (sscanf_s(attStr, "%lf %lf %lf %lf %lf %lf", &a, &d, &b, &e, &c, &f) != 6)//Original did a complicated parsing scheme. This is easier.//ORIG
-				{
-					a = d = b = e = c = f = 0;
-					AddToReport(string(loc) + " : Bad coeffs attribute " + string(attStr));
-				}
-
+				istringstream is(attStr);
+				a = b = c = d = e = f = 0;
+				is >> a >> d >> b >> e >> c >> f;
 				xform.m_Affine.A(T(a));
 				xform.m_Affine.B(T(b));
 				xform.m_Affine.C(T(c));
@@ -1258,12 +1163,9 @@ private:
 			}
 			else if (!Compare(curAtt->name, "post"))
 			{
-				if (sscanf_s(attStr, "%lf %lf %lf %lf %lf %lf", &a, &d, &b, &e, &c, &f) != 6)//Original did a complicated parsing scheme. This is easier.//ORIG
-				{
-					a = d = b = e = c = f = 0;
-					AddToReport(string(loc) + " : Bad post coeffs attribute " + string(attStr));
-				}
-
+				istringstream is(attStr);
+				a = b = c = d = e = f = 0;
+				is >> a >> d >> b >> e >> c >> f;
 				xform.m_Post.A(T(a));
 				xform.m_Post.B(T(b));
 				xform.m_Post.C(T(c));
@@ -1469,64 +1371,33 @@ private:
 	/// <returns>True if there were no errors, else false.</returns>
 	bool ParseHexColors(char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan)
 	{
-		size_t colorIndex = 0;
-		size_t colorCount = 0;
-		uint r, g, b, a;
-		int ret;
-		char tmps[2];
-		size_t skip = std::abs(chan);
-		bool ok = true;
 		const char* loc = __FUNCTION__;
+		stringstream ss, temp(colstr); ss >> std::hex;
+		string s1, s;
+		size_t tmp, colorCount = 0, colorIndex = 0;
+		s.reserve(1536);
 
-		//Strip whitespace prior to first color.
-		while (isspace(static_cast<int>(colstr[colorIndex])))
-			colorIndex++;
+		while (temp >> s1)
+			s += s1;
 
-		do
+		auto length = s.size();
+
+		for (size_t strIndex = 0; strIndex < length;)
 		{
-			//Parse an RGB triplet at a time.
-			if (chan == 3)
-				ret = sscanf_s(&(colstr[colorIndex]), "%2x%2x%2x", &r, &g, &b);
-			else if (chan == -4)
-				ret = sscanf_s(&(colstr[colorIndex]), "00%2x%2x%2x", &r, &g, &b);
-			else // chan==4
-				ret = sscanf_s(&(colstr[colorIndex]), "%2x%2x%2x%2x", &r, &g, &b, &a);
-
-			a = 1;//Original allows for alpha, even though it will most likely never happen. Ember omits support for it.
-
-			if ((chan != 4 && ret != 3) || (chan == 4 && ret != 4))
+			for (glm::length_t i = 0; i < 3 && colorCount < ember.m_Palette.Size(); i++)
 			{
-				ok = false;
-				r = g = b = 0;
-				AddToReport(string(loc) + " : Problem reading hexadecimal color data, assigning to 0");
-				break;
+				const char tmpStr[3] = { s[strIndex++], s[strIndex++], 0 };//Read out and convert the string two characters at a time.
+				ss.clear();//Reset and fill the string stream.
+				ss.str(tmpStr);
+				ss >> tmp;//Do the conversion.
+				ember.m_Palette.m_Entries[colorCount][i] = T(tmp) / T(255);//Hex palette is [0..255], convert to [0..1].
 			}
 
-			colorIndex += 2 * skip;
-
-			while (isspace(static_cast<int>(colstr[colorIndex])))
-				colorIndex++;
-
-			ember.m_Palette.m_Entries[colorCount].r = T(r) / T(255);//Hex palette is [0..255], convert to [0..1].
-			ember.m_Palette.m_Entries[colorCount].g = T(g) / T(255);
-			ember.m_Palette.m_Entries[colorCount].b = T(b) / T(255);
-			ember.m_Palette.m_Entries[colorCount].a = T(a);
+			ember.m_Palette.m_Entries[colorCount][3] = T(1);
 			colorCount++;
 		}
-		while (colorCount < numColors && colorCount < ember.m_Palette.m_Entries.size());
 
-#ifdef _WIN32
-
-		if (sscanf_s(&(colstr[colorIndex]), "%1s", tmps, sizeof(tmps)) > 0) //Really need to migrate all of this parsing to C++.//TODO
-#else
-		if (sscanf_s(&(colstr[colorIndex]), "%1s", tmps) > 0)
-#endif
-		{
-			AddToReport(string(loc) + " : Extra data at end of hex color data " + string(&(colstr[colorIndex])));
-			ok = false;
-		}
-
-		return ok;
+		return length >= 256;
 	}
 
 	/// <summary>

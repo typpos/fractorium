@@ -24,7 +24,7 @@ class FractoriumOptionsDialog : public QDialog
 	friend Fractorium;
 
 public:
-	FractoriumOptionsDialog(FractoriumSettings* settings, QWidget* p = nullptr, Qt::WindowFlags f = 0);
+	FractoriumOptionsDialog(QWidget* p = nullptr, Qt::WindowFlags f = 0);
 
 public slots:
 	void OnOpenCLCheckBoxStateChanged(int state);
@@ -45,6 +45,7 @@ private:
 	bool OpenCL();
 	bool Double();
 	bool ShowAllXforms();
+	bool ToggleType();
 	bool AutoUnique();
 	uint ThreadCount();
 	uint RandomCount();
@@ -59,5 +60,5 @@ private:
 	QLineEdit* m_IdEdit;
 	QLineEdit* m_UrlEdit;
 	QLineEdit* m_NickEdit;
-	FractoriumSettings* m_Settings;
+	shared_ptr<FractoriumSettings> m_Settings;
 };

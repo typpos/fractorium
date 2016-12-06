@@ -121,9 +121,6 @@ public:
 			b = false;
 		}
 
-		if (f.is_open())
-			f.close();
-
 		return b;
 	}
 

@@ -354,9 +354,6 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	size_t i, temporalSample = 0;
 	T deTime;
 	auto success = eRenderStatus::RENDER_OK;
-	//double iterationTime = 0;
-	//double accumulationTime = 0;
-	//Timing it;
 
 	//Reset timers and progress percent if: Beginning anew or only filtering and/or accumulating.
 	if (!resume || accumOnly || filterAndAccumOnly)
@@ -1294,6 +1291,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 	size_t totalItersPerThread = size_t(ceil(double(iterCount) / double(m_ThreadsToUse)));
 	double percent, etaMs;
 	EmberStats stats;
+	//vector<double> accumTimes(4);
 
 	//Do this every iteration for an animation, or else do it once for a single image. CPU only.
 	if (!m_LastIter)
@@ -1302,106 +1300,91 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 		m_ThreadEmbers.insert(m_ThreadEmbers.begin(), m_ThreadsToUse, m_Ember);
 	}
 
-#ifdef TG
-	size_t threadIndex;
-
-	for (size_t i = 0; i < m_ThreadsToUse; i++)
-	{
-		threadIndex = i;
-		m_TaskGroup.run([&, threadIndex] ()
-		{
-#else
 	parallel_for(size_t(0), m_ThreadsToUse, [&] (size_t threadIndex)
 	{
-#endif
 #if defined(_WIN32)
-			SetThreadPriority(GetCurrentThread(), int(m_Priority));
+		SetThreadPriority(GetCurrentThread(), int(m_Priority));
 #elif defined(__APPLE__)
-			sched_param sp = {0};
-			sp.sched_priority = m_Priority;
-			pthread_setschedparam(pthread_self(), SCHED_RR, &sp);
+		sched_param sp = {0};
+		sp.sched_priority = m_Priority;
+		pthread_setschedparam(pthread_self(), SCHED_RR, &sp);
 #else
-			pthread_setschedprio(pthread_self(), int(m_Priority));
+		pthread_setschedprio(pthread_self(), int(m_Priority));
 #endif
-			//Timing t;
-			IterParams<T> params;
-			m_BadVals[threadIndex] = 0;
-			params.m_Count = std::min(totalItersPerThread, SubBatchSize());
-			params.m_Skip = FuseCount();
-			//params.m_OneColDiv2 = m_CarToRas.OneCol() / 2;
-			//params.m_OneRowDiv2 = m_CarToRas.OneRow() / 2;
+		//Timing t;
+		IterParams<T> params;
+		m_BadVals[threadIndex] = 0;
+		params.m_Count = std::min(totalItersPerThread, SubBatchSize());
+		params.m_Skip = FuseCount();
+		//params.m_OneColDiv2 = m_CarToRas.OneCol() / 2;
+		//params.m_OneRowDiv2 = m_CarToRas.OneRow() / 2;
 
-			//Sub batch iterations, loop 2.
-			for (m_SubBatch[threadIndex] = 0; (m_SubBatch[threadIndex] < totalItersPerThread) && !m_Abort; m_SubBatch[threadIndex] += params.m_Count)
+		//Sub batch iterations, loop 2.
+		for (m_SubBatch[threadIndex] = 0; (m_SubBatch[threadIndex] < totalItersPerThread) && !m_Abort; m_SubBatch[threadIndex] += params.m_Count)
+		{
+			//Must recalculate the number of iters to run on each sub batch because the last batch will most likely have less than SubBatchSize iters.
+			//For example, if 51,000 are requested, and the sbs is 10,000, it should run 5 sub batches of 10,000 iters, and one final sub batch of 1,000 iters.
+			params.m_Count = std::min(params.m_Count, totalItersPerThread - m_SubBatch[threadIndex]);
+			//Use first as random point, the rest are iterated points.
+			//Note that this gets reset with a new random point for each subBatchSize iterations.
+			//This helps correct if iteration happens to be on a bad trajectory.
+			m_Samples[threadIndex][0].m_X = m_Rand[threadIndex].template Frand11<T>();
+			m_Samples[threadIndex][0].m_Y = m_Rand[threadIndex].template Frand11<T>();
+			m_Samples[threadIndex][0].m_Z = 0;//m_Ember.m_CamZPos;//Apo set this to 0, then made the user use special variations to kick it. It seems easier to just set it to zpos.
+			m_Samples[threadIndex][0].m_ColorX = m_Rand[threadIndex].template Frand01<T>();
+			//Finally, iterate.
+			//t.Tic();
+			//Iterating, loop 3.
+			m_BadVals[threadIndex] += m_Iterator->Iterate(m_ThreadEmbers[threadIndex], params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
+			//m_BadVals[threadIndex] += m_Iterator->Iterate(m_Ember, params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
+			//iterationTime += t.Toc();
+
+			if (m_LockAccum)
+				m_AccumCs.lock();
+
+			//t.Tic();
+			//Map temp buffer samples into the histogram using the palette for color.
+			Accumulate(m_Rand[threadIndex], m_Samples[threadIndex].data(), params.m_Count, &m_Dmap);
+			//accumTimes[threadIndex] += t.Toc();
+
+			if (m_LockAccum)
+				m_AccumCs.unlock();
+
+			if (m_Callback && threadIndex == 0)
 			{
-				//Must recalculate the number of iters to run on each sub batch because the last batch will most likely have less than SubBatchSize iters.
-				//For example, if 51,000 are requested, and the sbs is 10,000, it should run 5 sub batches of 10,000 iters, and one final sub batch of 1,000 iters.
-				params.m_Count = std::min(params.m_Count, totalItersPerThread - m_SubBatch[threadIndex]);
-				//Use first as random point, the rest are iterated points.
-				//Note that this gets reset with a new random point for each subBatchSize iterations.
-				//This helps correct if iteration happens to be on a bad trajectory.
-				m_Samples[threadIndex][0].m_X = m_Rand[threadIndex].template Frand11<T>();
-				m_Samples[threadIndex][0].m_Y = m_Rand[threadIndex].template Frand11<T>();
-				m_Samples[threadIndex][0].m_Z = 0;//m_Ember.m_CamZPos;//Apo set this to 0, then made the user use special variations to kick it. It seems easier to just set it to zpos.
-				m_Samples[threadIndex][0].m_ColorX = m_Rand[threadIndex].template Frand01<T>();
-				//Finally, iterate.
-				//t.Tic();
-				//Iterating, loop 3.
-				m_BadVals[threadIndex] += m_Iterator->Iterate(m_ThreadEmbers[threadIndex], params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
-				//m_BadVals[threadIndex] += m_Iterator->Iterate(m_Ember, params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
-				//iterationTime += t.Toc();
-
-				if (m_LockAccum)
-					m_AccumCs.lock();
-
-				//t.Tic();
-				//Map temp buffer samples into the histogram using the palette for color.
-				Accumulate(m_Rand[threadIndex], m_Samples[threadIndex].data(), params.m_Count, &m_Dmap);
-
-				//accumulationTime += t.Toc();
-				if (m_LockAccum)
-					m_AccumCs.unlock();
-
-				if (m_Callback && threadIndex == 0)
-				{
-					percent = 100.0 *
+				percent = 100.0 *
+						  double
+						  (
 							  double
 							  (
 								  double
 								  (
-									  double
-									  (
-										  //Takes progress of current thread and multiplies by thread count.
-										  //This assumes the threads progress at roughly the same speed.
-										  double(m_LastIter + (m_SubBatch[threadIndex] * m_ThreadsToUse)) / double(ItersPerTemporalSample())
-									  ) + temporalSample
-								  ) / double(TemporalSamples())
-							  );
-					double percentDiff = percent - m_LastIterPercent;
-					double toc = m_ProgressTimer.Toc();
+									  //Takes progress of current thread and multiplies by thread count.
+									  //This assumes the threads progress at roughly the same speed.
+									  double(m_LastIter + (m_SubBatch[threadIndex] * m_ThreadsToUse)) / double(ItersPerTemporalSample())
+								  ) + temporalSample
+							  ) / double(TemporalSamples())
+						  );
+				double percentDiff = percent - m_LastIterPercent;
+				double toc = m_ProgressTimer.Toc();
 
-					if (percentDiff >= 10 || (toc > 1000 && percentDiff >= 1))//Call callback function if either 10% has passed, or one second (and 1%).
-					{
-						etaMs = ((100.0 - percent) / percent) * m_RenderTimer.Toc();
+				if (percentDiff >= 10 || (toc > 1000 && percentDiff >= 1))//Call callback function if either 10% has passed, or one second (and 1%).
+				{
+					etaMs = ((100.0 - percent) / percent) * m_RenderTimer.Toc();
 
-						if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 0, etaMs))
-							Abort();
+					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 0, etaMs))
+						Abort();
 
-						m_LastIterPercent = percent;
-						m_ProgressTimer.Tic();
-					}
+					m_LastIterPercent = percent;
+					m_ProgressTimer.Tic();
 				}
 			}
-		});
-#ifdef TG
-	}
-
-	m_TaskGroup.wait();
-#endif
-
+		}
+	});
 	stats.m_Iters = std::accumulate(m_SubBatch.begin(), m_SubBatch.end(), 0ULL);//Sum of iter count of all threads.
 	stats.m_Badvals = std::accumulate(m_BadVals.begin(), m_BadVals.end(), 0ULL);
 	stats.m_IterMs = m_IterTimer.Toc();
+	//cout << "Accum time: " << std::accumulate(accumTimes.begin(), accumTimes.end(), 0.0) << endl;
 	//t2.Toc(__FUNCTION__);
 	return stats;
 }
@@ -1609,19 +1592,49 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 							colorIndexFrac = colorIndex - bucketT(intColorIndex);//Interpolate between intColorIndex and intColorIndex + 1.
 						}
 
+						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
+						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
+						const bucketT* __restrict pal2 = glm::value_ptr(palette->m_Entries[intColorIndex + 1]);
+						auto cifm1 = bucketT(1) - colorIndexFrac;
+
+						//Loops are unrolled to allow auto vectorization.
 						if (p.m_VizAdjusted == 1)
-							m_HistBuckets[histIndex] += ((dmap[intColorIndex] * (1 - colorIndexFrac)) + (dmap[intColorIndex + 1] * colorIndexFrac));
+						{
+							hist[0] += (pal[0] * cifm1) + (pal2[0] * colorIndexFrac);
+							hist[1] += (pal[1] * cifm1) + (pal2[1] * colorIndexFrac);
+							hist[2] += (pal[2] * cifm1) + (pal2[2] * colorIndexFrac);
+							hist[3] += (pal[3] * cifm1) + (pal2[3] * colorIndexFrac);
+						}
 						else
-							m_HistBuckets[histIndex] += (((dmap[intColorIndex] * (1 - colorIndexFrac)) + (dmap[intColorIndex + 1] * colorIndexFrac)) * bucketT(p.m_VizAdjusted));
+						{
+							auto va = bucketT(p.m_VizAdjusted);
+							hist[0] += ((pal[0] * cifm1) + (pal2[0] * colorIndexFrac)) * va;
+							hist[1] += ((pal[1] * cifm1) + (pal2[1] * colorIndexFrac)) * va;
+							hist[2] += ((pal[2] * cifm1) + (pal2[2] * colorIndexFrac)) * va;
+							hist[3] += ((pal[3] * cifm1) + (pal2[3] * colorIndexFrac)) * va;
+						}
 					}
 					else if (PaletteMode() == ePaletteMode::PALETTE_STEP)
 					{
 						intColorIndex = Clamp<size_t>(size_t(p.m_ColorX * COLORMAP_LENGTH), 0, COLORMAP_LENGTH_MINUS_1);
+						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
+						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
 
 						if (p.m_VizAdjusted == 1)
-							m_HistBuckets[histIndex] += dmap[intColorIndex];
+						{
+							hist[0] += pal[0];
+							hist[1] += pal[1];
+							hist[2] += pal[2];
+							hist[3] += pal[3];
+						}
 						else
-							m_HistBuckets[histIndex] += (dmap[intColorIndex] * bucketT(p.m_VizAdjusted));
+						{
+							auto va = bucketT(p.m_VizAdjusted);
+							hist[0] += pal[0] * va;
+							hist[1] += pal[1] * va;
+							hist[2] += pal[2] * va;
+							hist[3] += pal[3] * va;
+						}
 					}
 				}
 			}

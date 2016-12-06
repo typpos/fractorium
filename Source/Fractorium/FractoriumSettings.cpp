@@ -5,12 +5,11 @@
 /// Constructor that passes the parent to the base and sets up reasonable defaults
 /// if the settings file was not present or corrupted.
 /// </summary>
-/// <param name="p">The parent widget</param>
-FractoriumSettings::FractoriumSettings(QObject* p)
+FractoriumSettings::FractoriumSettings()
 #ifdef _WIN32
-	: QSettings(QSettings::IniFormat, QSettings::UserScope, "Fractorium", "Fractorium", p)
+	: QSettings(QSettings::IniFormat, QSettings::UserScope, "Fractorium", "Fractorium", nullptr)
 #else
-	: QSettings(QSettings::IniFormat, QSettings::UserScope, "fractorium", "fractorium", p)
+	: QSettings(QSettings::IniFormat, QSettings::UserScope, "fractorium", "fractorium", nullptr)
 #endif
 {
 	EnsureDefaults();
@@ -109,6 +108,9 @@ void FractoriumSettings::Double(bool b)							 { setValue(DOUBLEPRECISION, b);		
 
 bool FractoriumSettings::ShowAllXforms()						 { return value(SHOWALLXFORMS).toBool();   }
 void FractoriumSettings::ShowAllXforms(bool b)					 { setValue(SHOWALLXFORMS, b);			   }
+
+bool FractoriumSettings::ToggleType()                            { return value(TOGGLETYPE).toBool();      }
+void FractoriumSettings::ToggleType(bool b)                      { setValue(TOGGLETYPE, b);                }
 
 bool FractoriumSettings::ContinuousUpdate()						 { return value(CONTUPDATE).toBool();	   }
 void FractoriumSettings::ContinuousUpdate(bool b)				 { setValue(CONTUPDATE, b);				   }

@@ -50,7 +50,7 @@ class FractoriumFinalRenderDialog : public QDialog
 #endif
 
 public:
-	FractoriumFinalRenderDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f = 0);
+	FractoriumFinalRenderDialog(QWidget* p, Qt::WindowFlags f = 0);
 	void Show(bool fromSequence);
 	bool EarlyClip();
 	bool YAxisUp();
@@ -132,7 +132,7 @@ private:
 	TwoButtonComboWidget* m_Tbcw;
 	QLineEdit* m_PrefixEdit;
 	QLineEdit* m_SuffixEdit;
-	FractoriumSettings* m_Settings;
+	shared_ptr<FractoriumSettings> m_Settings;
 	Fractorium* m_Fractorium;
 	shared_ptr<OpenCLInfo> m_Info;
 	vector<OpenCLWrapper> m_Wrappers;

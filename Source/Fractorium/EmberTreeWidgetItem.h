@@ -73,6 +73,7 @@ public:
 		  m_Ember(ember)
 	{
 		setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
+		setCheckState(0, Qt::Unchecked);
 	}
 
 	/// <summary>
@@ -86,6 +87,7 @@ public:
 		  m_Ember(ember)
 	{
 		setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
+		setCheckState(0, Qt::Unchecked);
 	}
 
 	/// <summary>

@@ -18,7 +18,7 @@ void LibraryTreeWidget::SetMainWindow(Fractorium* f)
 void LibraryTreeWidget::dropEvent(QDropEvent* de)
 {
 	QModelIndex droppedIndex = indexAt(de->pos());
-	auto items = selectionModel()->selectedIndexes();
+	auto items = selectionModel()->selectedRows();
 
 	if (!droppedIndex.isValid())//Don't process drop because it's outside of the droppable area.
 	{
@@ -33,7 +33,7 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 		if (dp == QAbstractItemView::BelowItem)
 			row++;
 
-		m_Fractorium->m_Controller->MoveLibraryItems(items[0].row(), row);
+		QTimer::singleShot(500, [ = ]() { m_Fractorium->m_Controller->MoveLibraryItems(items, row); });//Need to fire this after this event has internally reshuffled the items.
 	}
 
 	QTreeWidget::dropEvent(de);

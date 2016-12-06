@@ -229,7 +229,6 @@ protected:
 	vector<size_t> m_SubBatch;
 	vector<size_t> m_BadVals;
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> m_Rand;
-	unique_ptr<tbb::task_group> m_TaskGroup = make_unique<tbb::task_group>();
 	std::recursive_mutex m_RenderingCs, m_AccumCs, m_FinalAccumCs, m_ResizeCs;
 	Timing m_RenderTimer, m_IterTimer, m_ProgressTimer;
 };

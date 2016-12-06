@@ -183,25 +183,28 @@ void Fractorium::FillSummary()
 /// </summary>
 void Fractorium::UpdateHistogramBounds()
 {
-	if (RendererBase* r = m_Controller->Renderer())
+	static QString ul, ur, lr, ll, wh, g, de;
+
+	if (auto r = m_Controller->Renderer())
 	{
-		sprintf_s(m_ULString, sizeof(m_ULString), "UL: %3.3f, %3.3f", r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
-		sprintf_s(m_URString, sizeof(m_URString), "UR: %3.3f, %3.3f", -r->LowerLeftX(), r->UpperRightY());
-		sprintf_s(m_LRString, sizeof(m_LRString), "LR: %3.3f, %3.3f", -r->LowerLeftX(), r->LowerLeftY());
-		sprintf_s(m_LLString, sizeof(m_LLString), "LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
-		sprintf_s(m_WHString, sizeof(m_WHString), "W x H: %4lu x %4lu", r->SuperRasW(), r->SuperRasH());
-		ui.InfoBoundsLabelUL->setText(QString(m_ULString));
-		ui.InfoBoundsLabelUR->setText(QString(m_URString));
-		ui.InfoBoundsLabelLR->setText(QString(m_LRString));
-		ui.InfoBoundsLabelLL->setText(QString(m_LLString));
-		ui.InfoBoundsLabelWH->setText(QString(m_WHString));
-		ui.InfoBoundsTable->item(0, 1)->setText(ToString<qulonglong>(r->GutterWidth()));
+		ul.sprintf("UL: %3.3f, %3.3f", r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
+		ur.sprintf("UR: %3.3f, %3.3f", -r->LowerLeftX(), r->UpperRightY());
+		lr.sprintf("LR: %3.3f, %3.3f", -r->LowerLeftX(), r->LowerLeftY());
+		ll.sprintf("LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
+		wh.sprintf("W x H: %4u x %4u", r->SuperRasW(), r->SuperRasH());
+		g.sprintf("%u", (uint)r->GutterWidth());
+		ui.InfoBoundsLabelUL->setText(ul);
+		ui.InfoBoundsLabelUR->setText(ur);
+		ui.InfoBoundsLabelLR->setText(lr);
+		ui.InfoBoundsLabelLL->setText(ll);
+		ui.InfoBoundsLabelWH->setText(wh);
+		ui.InfoBoundsTable->item(0, 1)->setText(g);
 
 		if (r->GetDensityFilter())
 		{
-			uint deWidth = (r->GetDensityFilter()->FilterWidth() * 2) + 1;
-			sprintf_s(m_DEString, sizeof(m_DEString), "%d x %d", deWidth, deWidth);
-			ui.InfoBoundsTable->item(1, 1)->setText(QString(m_DEString));
+			auto deWidth = (r->GetDensityFilter()->FilterWidth() * 2) + 1;
+			de.sprintf("%d x %d", deWidth, deWidth);
+			ui.InfoBoundsTable->item(1, 1)->setText(de);
 		}
 		else
 			ui.InfoBoundsTable->item(1, 1)->setText("N/A");

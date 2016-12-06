@@ -9,6 +9,7 @@
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN//Exclude rarely-used stuff from Windows headers.
 #define _USE_MATH_DEFINES
+//#define CL_USE_DEPRECATED_OPENCL_1_2_APIS 1
 
 #include "Timing.h"
 #include "Renderer.h"

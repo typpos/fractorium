@@ -14,7 +14,7 @@ FinalRenderEmberControllerBase::FinalRenderEmberControllerBase(FractoriumFinalRe
 	  m_FinalRenderDialog(finalRenderDialog)
 {
 	m_FinishedImageCount.store(0);
-	m_Settings = m_Fractorium->m_Settings;
+	m_Settings = FractoriumSettings::DefInstance();
 }
 
 /// <summary>
@@ -28,8 +28,8 @@ void FinalRenderEmberController<T>::CancelRender()
 {
 	if (m_Result.isRunning())
 	{
-		tbb::task_group g;
-		g.run([&]
+		//tbb::task_group g;
+		std::thread th([&]
 		{
 			m_Run = false;
 
@@ -61,7 +61,7 @@ void FinalRenderEmberController<T>::CancelRender()
 				}
 			}
 		});
-		g.wait();
+		Join(th);
 
 		while (m_Result.isRunning())
 			QApplication::processEvents();

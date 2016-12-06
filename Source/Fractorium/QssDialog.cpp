@@ -57,27 +57,22 @@ QssDialog::QssDialog(Fractorium* parent) :
 	m_LastStyle = m_Parent->styleSheet();
 	setWindowTitle("QSS Editor - default.qss");
 	connect(ui->QssEdit, SIGNAL(textChanged()), this, SLOT(SlotTextChanged()));
-
 	QToolBar* toolBar = new QToolBar(this);
 	QMenu* colorActionMenu = new QMenu(this);
 	QMenu* geomActionMenu = new QMenu(this);
 	QMenu* borderActionMenu = new QMenu(this);
 	QMenu* styleActionMenu = new QMenu(this);
-
 	(m_ColorActionMapper = new QSignalMapper(this))->setMapping(m_AddColorAction, QString());
 	(m_GeomActionMapper = new QSignalMapper(this))->setMapping(m_AddGeomAction, QString());
 	(m_BorderActionMapper = new QSignalMapper(this))->setMapping(m_AddBorderAction, QString());
 	(m_StyleActionMapper = new QSignalMapper(this))->setMapping(m_AddStyleAction, QString());
-
 	connect(ui->QssLoadButton, SIGNAL(clicked()), this, SLOT(LoadButton_clicked()), Qt::QueuedConnection);
 	connect(ui->QssSaveButton, SIGNAL(clicked()), this, SLOT(SaveButton_clicked()), Qt::QueuedConnection);
 	connect(ui->QssBasicButton, SIGNAL(clicked()), this, SLOT(BasicButton_clicked()), Qt::QueuedConnection);
 	connect(ui->QssMediumButton, SIGNAL(clicked()), this, SLOT(MediumButton_clicked()), Qt::QueuedConnection);
 	connect(ui->QssAdvancedButton, SIGNAL(clicked()), this, SLOT(AdvancedButton_clicked()), Qt::QueuedConnection);
 	connect(m_AddFontAction, SIGNAL(triggered()), this, SLOT(SlotAddFont()));
-
 	QVector<QPair<QString, QString>> colorVec;
-
 	colorVec.reserve(12);
 	colorVec.push_back(QPair<QString, QString>("color", ""));
 	colorVec.push_back(QPair<QString, QString>("background-color", ""));
@@ -94,14 +89,12 @@ QssDialog::QssDialog(Fractorium* parent) :
 	for (auto& c : colorVec)
 	{
 		auto colorAction = colorActionMenu->addAction(c.first);
-
 		m_ColorMap[c.first] = c.second;
 		connect(colorAction, SIGNAL(triggered()), m_ColorActionMapper, SLOT(map()));
 		m_ColorActionMapper->setMapping(colorAction, c.first);
 	}
 
 	QVector<QPair<QString, QString>> geomVec;
-
 	geomVec.reserve(12);
 	geomVec.push_back(QPair<QString, QString>("width", "100px"));
 	geomVec.push_back(QPair<QString, QString>("height", "50px"));
@@ -120,14 +113,12 @@ QssDialog::QssDialog(Fractorium* parent) :
 	for (auto& g : geomVec)
 	{
 		auto geomAction = geomActionMenu->addAction(g.first);
-
 		m_GeomMap[g.first] = g.second;
 		connect(geomAction, SIGNAL(triggered()), m_GeomActionMapper, SLOT(map()));
 		m_GeomActionMapper->setMapping(geomAction, g.first);
 	}
 
 	QVector<QPair<QString, QString>> borderVec;
-
 	borderVec.reserve(8);
 	borderVec.push_back(QPair<QString, QString>("border", "1px solid black"));
 	borderVec.push_back(QPair<QString, QString>("border-top", "1px inset black"));
@@ -141,18 +132,16 @@ QssDialog::QssDialog(Fractorium* parent) :
 	for (auto& b : borderVec)
 	{
 		auto borderAction = borderActionMenu->addAction(b.first);
-
 		m_BorderMap[b.first] = b.second;
 		connect(borderAction, SIGNAL(triggered()), m_BorderActionMapper, SLOT(map()));
 		m_BorderActionMapper->setMapping(borderAction, b.first);
 	}
 
 	auto styles = QStyleFactory::keys();
-	
+
 	for (auto& s : styles)
 	{
 		auto styleAction = styleActionMenu->addAction(s);
-
 		m_StyleMap[s] = s;
 		connect(styleAction, SIGNAL(triggered()), m_StyleActionMapper, SLOT(map()));
 		m_StyleActionMapper->setMapping(styleAction, s);
@@ -162,12 +151,10 @@ QssDialog::QssDialog(Fractorium* parent) :
 	connect(m_GeomActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotAddGeom(QString)));
 	connect(m_BorderActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotAddBorder(QString)));
 	connect(m_StyleActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotSetTheme(QString)));
-
 	m_AddColorAction->setMenu(colorActionMenu);
 	m_AddGeomAction->setMenu(geomActionMenu);
 	m_AddBorderAction->setMenu(borderActionMenu);
 	m_AddStyleAction->setMenu(styleActionMenu);
-
 	toolBar->addAction(m_AddColorAction);
 	toolBar->addAction(m_AddGeomAction);
 	toolBar->addAction(m_AddBorderAction);
@@ -237,7 +224,6 @@ QList<QString> QssDialog::GetClassNames(bool includeObjectNames)
 			{
 				QSet<QString> dlgSet;
 				auto dlgWidgetList = dlg->findChildren<QWidget*>();//Find all children of the dialog.
-
 				dlgSet.insert(classAndName);//Add the basic dialog class name, opening curly brace will be added later.
 				classAndName += " ";
 
@@ -290,8 +276,10 @@ bool QssDialog::IsStyleSheetValid(const QString& styleSheet)
 {
 	QCss::Parser parser(styleSheet);
 	QCss::StyleSheet sheet;
+
 	if (parser.parse(&sheet))
 		return true;
+
 	QString fullSheet = QStringLiteral("* { ");
 	fullSheet += styleSheet;
 	fullSheet += QLatin1Char('}');
@@ -344,7 +332,7 @@ void QssDialog::showEvent(QShowEvent* e)
 		m_LastTheme = m_Parent->m_Theme;//The style() member cannot be relied upon, it is *not* the same object passed to setStyle();
 		SetText(m_LastStyle);
 	}
-	
+
 	QDialog::showEvent(e);
 }
 
@@ -378,12 +366,12 @@ void QssDialog::SlotAddColor(const QString& s)
 	if (color.alpha() == 255)
 	{
 		colorStr = QString(QStringLiteral("rgb(%1, %2, %3)")).arg(
-				color.red()).arg(color.green()).arg(color.blue());
+					   color.red()).arg(color.green()).arg(color.blue());
 	}
 	else
 	{
 		colorStr = QString(QStringLiteral("rgba(%1, %2, %3, %4)")).arg(
-				color.red()).arg(color.green()).arg(color.blue()).arg(color.alpha());
+					   color.red()).arg(color.green()).arg(color.blue()).arg(color.alpha());
 	}
 
 	InsertCssProperty(s, colorStr);
@@ -396,7 +384,6 @@ void QssDialog::SlotAddColor(const QString& s)
 void QssDialog::SlotAddGeom(const QString& s)
 {
 	auto val = m_GeomMap[s];
-
 	InsertCssProperty(s, val);
 }
 
@@ -407,7 +394,6 @@ void QssDialog::SlotAddGeom(const QString& s)
 void QssDialog::SlotAddBorder(const QString& s)
 {
 	auto val = m_BorderMap[s];
-
 	InsertCssProperty(s, val);
 }
 
@@ -446,14 +432,16 @@ void QssDialog::SlotAddFont()
 
 		switch (font.style())
 		{
-		case QFont::StyleItalic:
-			fontStr += QStringLiteral("italic ");
-			break;
-		case QFont::StyleOblique:
-			fontStr += QStringLiteral("oblique ");
-			break;
-		default:
-			break;
+			case QFont::StyleItalic:
+				fontStr += QStringLiteral("italic ");
+				break;
+
+			case QFont::StyleOblique:
+				fontStr += QStringLiteral("oblique ");
+				break;
+
+			default:
+				break;
 		}
 
 		fontStr += QString::number(font.pointSize());
@@ -526,10 +514,7 @@ void QssDialog::SaveButton_clicked()
 		string s = Text().toStdString();
 
 		if (of.is_open())
-		{
 			of << s;
-			of.close();
-		}
 		else
 			QMessageBox::critical(this, "File save error", "Failed to save " + path + ", style will not be set as default");
 	}
@@ -547,10 +532,7 @@ void QssDialog::SaveAsDefault()
 	auto s = Text().toStdString();
 
 	if (of.is_open())
-	{
 		of << s;
-		of.close();
-	}
 	else
 		QMessageBox::critical(this, "File save error", "Failed to save " + path + ", style will not be set as default");
 }
@@ -615,13 +597,12 @@ void QssDialog::InsertCssProperty(const QString& name, const QString& value)
 		cursor.beginEditBlock();
 		cursor.removeSelectedText();
 		cursor.movePosition(QTextCursor::EndOfLine);
-
 		//Simple check to see if we're in a selector scope.
 		const QTextDocument* doc = editor->document();
 		const QTextCursor closing = doc->find(QStringLiteral("}"), cursor, QTextDocument::FindBackward);
 		const QTextCursor opening = doc->find(QStringLiteral("{"), cursor, QTextDocument::FindBackward);
 		const bool inSelector = !opening.isNull() && (closing.isNull() ||
-			closing.position() < opening.position());
+								closing.position() < opening.position());
 		QString insertion;
 
 		//Reasonable attempt at positioning things correctly. This can and often is wrong, but is sufficient for our purposes.
@@ -666,9 +647,7 @@ void QssDialog::SetupFileDialog()
 QString QssDialog::OpenFile()
 {
 	QStringList filenames;
-
 	SetupFileDialog();
-	
 	m_FileDialog->setFileMode(QFileDialog::ExistingFile);
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
 	m_FileDialog->setNameFilter("Qss (*.qss)");
@@ -688,7 +667,6 @@ QString QssDialog::OpenFile()
 QString QssDialog::SaveFile()
 {
 	QStringList filenames;
-
 	SetupFileDialog();
 	m_FileDialog->setFileMode(QFileDialog::AnyFile);
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);

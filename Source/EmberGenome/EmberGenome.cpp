@@ -453,9 +453,21 @@ bool EmberGenome(EmberOptions& opt)
 	{
 		Ember<T> result;
 
-		if (opt.Frames() == 0)
+		if (!opt.LoopFrames() && !opt.InterpFrames())
 		{
-			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
+			cerr << "loop frames or interp frames must be positive and non-zero, not " << opt.LoopFrames() << ", " << opt.InterpFrames() << ".\n";
+			return false;
+		}
+
+		if (opt.LoopFrames() > 0 && !opt.Loops())
+		{
+			cerr << "loop frames cannot be positive while loops is zero: " << opt.LoopFrames() << ", " << opt.Loops() << ".\n";
+			return false;
+		}
+
+		if (opt.Loops() > 0 && !opt.LoopFrames())
+		{
+			cerr << "loops cannot be positive while loopframes is zero: " << opt.Loops() << ", " << opt.LoopFrames() << ".\n";
 			return false;
 		}
 
@@ -465,19 +477,19 @@ bool EmberGenome(EmberOptions& opt)
 		frameCount = 0;
 		os.str("");
 		os << setfill('0') << setprecision(0) << fixed;
-		auto padding = opt.Padding() ? streamsize(opt.Padding()) : (streamsize(std::log10(opt.StartCount() + (((opt.Frames() * opt.Loops()) + opt.Frames()) * embers.size()))) + 1);
+		auto padding = opt.Padding() ? streamsize(opt.Padding()) : (streamsize(std::log10(opt.StartCount() + (((opt.LoopFrames() * opt.Loops()) + opt.InterpFrames()) * embers.size()))) + 1);
 		t.Tic();
 
 		for (i = 0; i < embers.size(); i++)
 		{
 			if (opt.Loops() > 0)
 			{
-				size_t roundFrames = size_t(std::round(opt.Frames() * opt.Loops()));
+				size_t roundFrames = size_t(std::round(opt.LoopFrames() * opt.Loops()));
 
 				for (frame = 0; frame < roundFrames; frame++)
 				{
-					blend = T(frame) / T(opt.Frames());
-					tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
+					blend = T(frame) / T(opt.LoopFrames());
+					tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount++, blend, opt.CwLoops());//Result is cleared and reassigned each time inside of Spin().
 					FormatName(result, os, padding);
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 				}
@@ -486,8 +498,8 @@ bool EmberGenome(EmberOptions& opt)
 				//Rotate the next step and save in result, but do not print.
 				//result will be the starting point for the interp phase below.
 				frame = roundFrames;
-				blend = T(frame) / T(opt.Frames());
-				tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount, blend);//Do not increment frameCount here.
+				blend = T(frame) / T(opt.LoopFrames());
+				tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount, blend, opt.CwLoops());//Do not increment frameCount here.
 				FormatName(result, os, padding);
 			}
 
@@ -496,19 +508,19 @@ bool EmberGenome(EmberOptions& opt)
 				if (opt.Loops() > 0)//Store the last result as the flame to interpolate from. This applies for whole or fractional values of opt.Loops().
 					embers[i] = result;
 
-				for (frame = 0; frame < opt.Frames(); frame++)
+				for (frame = 0; frame < opt.InterpFrames(); frame++)
 				{
-					seqFlag = frame == 0 || (frame == opt.Frames() - 1);
-					blend = frame / T(opt.Frames());
+					seqFlag = frame == 0 || (frame == opt.InterpFrames() - 1);
+					blend = frame / T(opt.InterpFrames());
 					result.Clear();
-					tools.SpinInter(&embers[i], pTemplate, result, opt.StartCount() + frameCount++, seqFlag, blend);
+					tools.SpinInter(&embers[i], pTemplate, result, opt.StartCount() + frameCount++, seqFlag, blend, opt.InterpLoops(), opt.CwInterpLoops());
 					FormatName(result, os, padding);
 					cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 				}
 			}
 		}
 
-		tools.Spin(embers.back(), pTemplate, result, opt.StartCount() + frameCount, 0);
+		tools.Spin(embers.back(), pTemplate, result, opt.StartCount() + frameCount, 0, opt.CwInterpLoops());
 		FormatName(result, os, padding);
 		cout << emberToXml.ToString(result, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		t.Toc("Sequencing");
@@ -523,15 +535,15 @@ bool EmberGenome(EmberOptions& opt)
 	{
 		Ember<T> result, result1, result2, result3;
 
-		if (opt.Frames() == 0)
+		if (!opt.LoopFrames() && !opt.InterpFrames())
 		{
-			cerr << "nframes must be positive and non-zero, not " << opt.Frames() << ".\n";
+			cerr << "loop frames or interp frames must be positive and non-zero, not " << opt.LoopFrames() << ", " << opt.InterpFrames() << ".\n";
 			return false;
 		}
 
 		frame = opt.Frame();
-		blend = frame / T(opt.Frames());//Percentage between first and second flame to treat as the center flame.
-		spread = 1 / T(opt.Frames());//Amount to move backward and forward from the center flame.
+		blend = frame / T(opt.InterpFrames());//Percentage between first and second flame to treat as the center flame.
+		spread = 1 / T(opt.InterpFrames());//Amount to move backward and forward from the center flame.
 
 		if (opt.Enclosed())
 			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";
@@ -546,12 +558,12 @@ bool EmberGenome(EmberOptions& opt)
 
 			if (frame)//Cannot spin backward below frame zero.
 			{
-				tools.Spin(embers[0], pTemplate, result1, frame - 1, blend - spread);
+				tools.Spin(embers[0], pTemplate, result1, frame - 1, blend - spread, opt.CwLoops());
 				cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			}
 
-			tools.Spin(embers[0], pTemplate, result2, frame    , blend         );
-			tools.Spin(embers[0], pTemplate, result3, frame + 1, blend + spread);
+			tools.Spin(embers[0], pTemplate, result2, frame    , blend         , opt.CwLoops());
+			tools.Spin(embers[0], pTemplate, result3, frame + 1, blend + spread, opt.CwLoops());
 			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}
@@ -565,12 +577,12 @@ bool EmberGenome(EmberOptions& opt)
 
 			if (frame)//Cannot interpolate backward below frame zero.
 			{
-				tools.SpinInter(embers.data(), pTemplate, result1, frame - 1, false, blend - spread);
+				tools.SpinInter(embers.data(), pTemplate, result1, frame - 1, false, blend - spread, opt.InterpLoops(), opt.CwInterpLoops());
 				cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			}
 
-			tools.SpinInter(embers.data(), pTemplate, result2, frame    , false, blend         );
-			tools.SpinInter(embers.data(), pTemplate, result3, frame + 1, false, blend + spread);
+			tools.SpinInter(embers.data(), pTemplate, result2, frame    , false, blend         , opt.InterpLoops(), opt.CwInterpLoops());
+			tools.SpinInter(embers.data(), pTemplate, result3, frame + 1, false, blend + spread, opt.InterpLoops(), opt.CwInterpLoops());
 			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 		}

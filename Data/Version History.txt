@@ -1,3 +1,28 @@
+1.0.0.2 12/05/2016
+--User changes
+ -Add many tooltips to help clarify functionality.
+ -Select multiple flames in library for del/move. Still only one allowed to be set as the current.
+ -Show checkbox for current flame. Remember this is not necessarily what's selected.
+ -User can now drag a square to select xforms, which keeps in sync with checkboxes.
+ -Remove --nframes from command line. Replace with new params: --loopframes, --interpframes, --interploops.
+ -Add two new options to EmberGenome: --cwloops --cwinterploops to specify whether rotation should go clockwise instead of the default counter clockwise.
+ -Add these to Fractorium as checkboxes.
+ -Apply All now also works for toggling animate flag on xforms.
+ -Options dialog now allows user to set whether double click toggles spinners, or right click does.
+ 
+--Bug fixes
+ -Selecting final and non-final xforms, and then dragging the non-final did not drag the final with it.
+ -Selecting all xforms when a final was present, then deleting crashed the program.
+ -Remove support for ppm files in the command line programs, it's an outdated format.
+ -Switching between SP and DP kept reapplying the palette adjustments.
+
+--Code changes
+ -Move build system to Visual Studio 2015 and Qt 5.6.
+ -SSE used during addition of points to the histogram.
+ -Remove last remnants of old flam3 C code and replace with C++.
+ -Remove unused code involving tbb::task_group.
+ -Make settings object a global shared_ptr singleton, so it doesn't have to be passed around.
+
 1.0.0.1 06/21/2016	
 --Bug fixes
  -Highlight power values less than 0 were accidentally disabled on the UI.

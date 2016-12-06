@@ -13,6 +13,7 @@
 #define DOUBLEPRECISION		 "render/dp64"
 #define CONTUPDATE			 "render/continuousupdate"
 #define SHOWALLXFORMS	     "render/dragshowallxforms"
+#define TOGGLETYPE			 "render/toggletype"
 #define DEVICES				 "render/devices"
 #define THREADCOUNT          "render/threadcount"
 #define CPUDEFILTER			 "render/cpudefilter"
@@ -86,11 +87,11 @@
 /// runs of Fractorium. Each of these generally corresponds
 /// to items in the options dialog and the final render dialog.
 /// </summary>
-class FractoriumSettings : public QSettings
+class FractoriumSettings : public QSettings, public Singleton<FractoriumSettings>
 {
 	Q_OBJECT
 public:
-	FractoriumSettings(QObject* p);
+	SINGLETON_DERIVED_IMPL(FractoriumSettings);
 	void EnsureDefaults();
 
 	bool EarlyClip();
@@ -110,6 +111,9 @@ public:
 
 	bool ShowAllXforms();
 	void ShowAllXforms(bool b);
+
+	bool ToggleType();
+	void ToggleType(bool b);
 
 	bool ContinuousUpdate();
 	void ContinuousUpdate(bool b);
@@ -281,4 +285,7 @@ public:
 
 	QString Theme();
 	void Theme(const QString& s);
+
+private:
+	FractoriumSettings();
 };

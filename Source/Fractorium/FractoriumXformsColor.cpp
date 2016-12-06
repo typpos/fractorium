@@ -8,6 +8,9 @@ void Fractorium::InitXformsColorUI()
 {
 	int spinHeight = 20, row = 0;
 	m_XformColorValueItem = new QTableWidgetItem();
+	//Can't set this in the designer, so do it here.
+	m_XformColorValueItem->setToolTip("The index in the palette the current xform uses.\r\n\r\n"
+									  "This value can be changed by scrolling the mouse wheel in the box displaying the value or by dragging the scroll bar.");
 	ui.XformColorIndexTable->setItem(0, 0, m_XformColorValueItem);
 	m_PaletteRefItem = new QTableWidgetItem();
 	ui.XformPaletteRefTable->setItem(0, 0, m_PaletteRefItem);

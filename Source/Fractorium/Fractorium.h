@@ -162,7 +162,7 @@ public slots:
 	//Library.
 	void OnEmberTreeItemChanged(QTreeWidgetItem* item, int col);
 	void OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col);
-	void OnDelete(const pair<size_t, QTreeWidgetItem*>& p);
+	void OnDelete(const vector<pair<size_t, QTreeWidgetItem*>>& v);
 	void OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col);
 	void OnSequenceStartPreviewsButtonClicked(bool checked);
 	void OnSequenceStopPreviewsButtonClicked(bool checked);
@@ -175,6 +175,7 @@ public slots:
 	void OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeRotationsCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state);
+	void OnSequenceRandomizeRotationsPerBlendCheckBoxStateChanged(int state);
 	void OnSequenceStaggerSpinBoxChanged(double d);
 	void OnSequenceRandomStaggerMaxSpinBoxChanged(double d);
 	void OnSequenceStartFlameSpinBoxChanged(int d);
@@ -370,7 +371,7 @@ private:
 	void SyncOptionsToToolbar();
 
 	//Library.
-	pair<size_t, QTreeWidgetItem*> GetCurrentEmberIndex();
+	vector<pair<size_t, QTreeWidgetItem*>> GetCurrentEmberIndex();
 	void SyncSequenceSettings();
 
 	//Params.
@@ -459,7 +460,7 @@ private:
 	DoubleSpinBox* m_XformWeightSpin;
 	SpinnerButtonWidget* m_XformWeightSpinnerButtonWidget;
 	QFormLayout* m_XformsSelectionLayout;
-	QVector<QCheckBox*> m_XformSelections;
+	vector<QCheckBox*> m_XformSelections;
 
 	//Xforms Color.
 	QTableWidgetItem* m_XformColorValueItem;
@@ -522,13 +523,7 @@ private:
 	QProgressBar* m_ProgressBar;
 	QLabel* m_RenderStatusLabel;
 	QLabel* m_CoordinateStatusLabel;
-	FractoriumSettings* m_Settings;
-	char m_ULString[64];
-	char m_URString[64];
-	char m_LRString[64];
-	char m_LLString[64];
-	char m_WHString[64];
-	char m_DEString[64];
+	shared_ptr<FractoriumSettings> m_Settings;
 	char m_CoordinateString[128];
 	QColor m_XformComboColors[XFORM_COLOR_COUNT], m_FinalXformComboColor;
 	QIcon m_XformComboIcons[XFORM_COLOR_COUNT], m_FinalXformComboIcon;

@@ -222,6 +222,28 @@ public:
 		return temp;
 	}
 
+	/// <summary>
+	/// For creating an object without passing parameters.
+	/// When the derived class has a default constructor, this should
+	/// not be called. This is only for when the derived class constructor
+	/// requires arguments. In that case, Instance() must first be called
+	/// with the proper values. Then once the singleton is constructed, this
+	/// can be called to just retrieve the object without having to worry about
+	/// parameters.
+	/// This is enforced by throwing if this has been called before Instance() is called.
+	/// </summary>
+	/// <returns>The constructed object</returns>
+	static std::shared_ptr<T> DefInstance()
+	{
+		auto& staticInstance = GetStaticInstance();
+		auto temp = staticInstance.lock();
+
+		if (!temp)
+			throw "Cannot create singleton with defaults, must first call at least once with proper arguments.";
+
+		return temp;
+	}
+
 protected:
 	/// <summary>
 	/// Clever hack to get a static to behave like a member variable that can be seen between classes and functions in the hierarchy.
@@ -255,64 +277,34 @@ protected:
 /// Open a file in binary mode and read its entire contents into a vector of bytes. Optionally null terminate.
 /// </summary>
 /// <param name="filename">The full path to the file to read</param>
-/// <param name="buf">The vector which will be populated with the file's contents</param>
+/// <param name="buf">The string which will be populated with the file's contents</param>
 /// <param name="nullTerminate">Whether to append a NULL character as the last element of the vector. Needed when reading text files. Default: true.</param>
 /// <returns>True if successfully read and populated, else false</returns>
 static bool ReadFile(const char* filename, string& buf, bool nullTerminate = true)
 {
-	bool b = false;
-	FILE* f = nullptr;
-
 	try
 	{
-		fopen_s(&f, filename, "rb");//Open in binary mode.
+		ifstream ifs(filename, ios::binary | ios::ate);
+		auto pos = ifs.tellg();
+		buf.resize(pos + streampos(nullTerminate ? 1 : 0));
+		ifs.seekg(0, ios::beg);
+		ifs.read(&buf[0], pos);
 
-		if (f)
-		{
-			struct _stat statBuf;
-#if defined(_WIN32) || defined(__APPLE__)
-			int statResult = _fstat(f->_file, &statBuf);//Get data associated with file.
-#else
-			int statResult = _fstat(f->_fileno, &statBuf);//Get data associated with file.
-#endif
+		if (nullTerminate)//Optionally NULL terminate if they want to treat it as a string.
+			buf[buf.size() - 1] = 0;
 
-			if (statResult == 0)//Check if statistics are valid.
-			{
-				buf.resize(statBuf.st_size + (nullTerminate ? 1 : 0));//Allocate vector to be the size of the entire file, with an optional additional character for nullptr.
-
-				if (buf.size() == static_cast<size_t>(statBuf.st_size + 1))//Ensure allocation succeeded.
-				{
-					size_t bytesRead = fread(&buf[0], 1, statBuf.st_size, f);//Read the entire file at once.
-
-					if (bytesRead == (static_cast<size_t>(statBuf.st_size)))//Ensure the number of bytes read matched what was requested.
-					{
-						if (nullTerminate)//Optionally nullptr terminate if they want to treat it as a string.
-							buf[buf.size() - 1] = 0;
-
-						b = true;//Success.
-					}
-				}
-			}
-
-			fclose(f);
-			f = nullptr;
-		}
+		return true;
 	}
 	catch (const std::exception& e)
 	{
 		cout << "Error: Reading file " << filename << " failed: " << e.what() << "\n";
-		b = false;
 	}
 	catch (...)
 	{
 		cout << "Error: Reading file " << filename << " failed.\n";
-		b = false;
 	}
 
-	if (f)
-		fclose(f);
-
-	return b;
+	return false;
 }
 
 /// <summary>

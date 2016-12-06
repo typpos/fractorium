@@ -228,7 +228,7 @@ void FractoriumEmberController<T>::DeleteXforms()
 			checked++;
 
 		//Do not allow deleting the only remaining non-final xform.
-		if (haveFinal && count <= 2 && i == 0)
+		if (haveFinal && count <= 2 && !(i - offset))
 			return;
 
 		if (!haveFinal && count == 1)
@@ -354,10 +354,24 @@ void Fractorium::OnXformNameChanged(int row, int col) { m_Controller->XformNameC
 template <typename T>
 void FractoriumEmberController<T>::XformAnimateChanged(int state)
 {
-	UpdateXform([&](Xform<T>* xform)
+	bool final = IsFinal(CurrentXform());
+	auto index = m_Fractorium->ui.CurrentXformCombo->currentIndex();
+	UpdateAll([&](Ember<T>& ember)
 	{
-		xform->m_Animate = state > 0 ? 1 : 0;
-	}, eXformUpdate::UPDATE_SELECTED, false);
+		if (final)//If the current xform was final, only apply to other embers which also have a final xform.
+		{
+			if (ember.UseFinalXform())
+			{
+				auto xform = ember.NonConstFinalXform();
+				xform->m_Animate = state > 0 ? 1 : 0;
+			}
+		}
+		else//Current was not final, so apply to other embers which have a non-final xform at this index.
+		{
+			if (auto xform = ember.GetXform(index))
+				xform->m_Animate = state > 0 ? 1 : 0;
+		}
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnXformAnimateCheckBoxStateChanged(int state) { m_Controller->XformAnimateChanged(state); }

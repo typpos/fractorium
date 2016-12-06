@@ -151,7 +151,10 @@ void FractoriumEmberController<T>::SetEmber(size_t index, bool verbatim)
 			for (int i = 0; i < top->childCount(); i++)
 			{
 				if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
+				{
 					emberItem->setSelected(i == index);
+					emberItem->setCheckState(0, i == index ? Qt::Checked : Qt::Unchecked);
+				}
 			}
 		}
 
@@ -228,9 +231,9 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 			while (auto xform = m_Ember.GetTotalXform(i))
 			{
-				if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
+				if (i < m_Fractorium->m_XformSelections.size())
 				{
-					if (auto w = qobject_cast<QCheckBox*>(child->widget()))
+					if (auto w = m_Fractorium->m_XformSelections[i])
 					{
 						if (w->isChecked())
 						{
@@ -257,9 +260,9 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 			while (auto xform = (doFinal ? m_Ember.GetTotalXform(i) : m_Ember.GetXform(i)))
 			{
-				if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
+				if (i < m_Fractorium->m_XformSelections.size())
 				{
-					if (auto w = qobject_cast<QCheckBox*>(child->widget()))
+					if (auto w = m_Fractorium->m_XformSelections[i])
 					{
 						if (w->isChecked())
 						{

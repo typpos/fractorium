@@ -333,6 +333,22 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		m_GL->glEnd();
 		m_GL->glPointSize(1.0f);//Restore point size.
 	}
+	else if (m_DragState == eDragState::DragSelect)
+	{
+		m_GL->glLineWidth(2.0f);
+		m_GL->glBegin(GL_LINES);
+		m_GL->glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseDownWorldPos.y);//UL->UR
+		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseDownWorldPos.y);
+		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseWorldPos.y);//LL->LR
+		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseWorldPos.y);
+		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseDownWorldPos.y);//UL->LL
+		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseWorldPos.y);
+		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseDownWorldPos.y);//UR->LR
+		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseWorldPos.y);
+		m_GL->glEnd();
+		m_GL->glLineWidth(1.0f);
+	}
 	else if (m_HoverType != eHoverType::HoverNone && m_HoverXform == m_SelectedXform)//Draw large turquoise dot on hover if they are hovering over the selected xform.
 	{
 		m_GL->glPointSize(6.0f);
@@ -514,6 +530,9 @@ void GLEmberController<T>::MouseRelease(QMouseEvent* e)
 	if (m_DragState == eDragState::DragDragging && (e->button() & Qt::LeftButton))
 		UpdateHover(mouseFlipped);
 
+	if (m_DragState == eDragState::DragNone)
+		m_Fractorium->OnXformsSelectNoneButtonClicked(false);
+
 	m_DragState = eDragState::DragNone;
 	m_DragModifier = 0;
 	m_GL->repaint();//Force immediate redraw.
@@ -570,6 +589,26 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 
 		m_FractoriumEmberController->FillAffineWithXform(m_SelectedXform, pre);//Update the spinners in the affine tab of the main window.
 		m_FractoriumEmberController->UpdateRender();//Restart the rendering process.
+	}
+	else if ((m_DragState == eDragState::DragNone || m_DragState == eDragState::DragSelect) && (e->buttons() & Qt::LeftButton))
+	{
+		m_DragState = eDragState::DragSelect;//Only set drag state once the user starts moving the mouse with the left button down.
+		//Iterate over each xform, seeing if it's in the bounding box.
+		QPointF tl(m_MouseDownWorldPos.x, m_MouseDownWorldPos.y);
+		QPointF br(m_MouseWorldPos.x, m_MouseWorldPos.y);
+		QRectF qrf(tl, br);
+		T scale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+		int i = 0;
+		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
+		{
+			QPointF cd(xform->m_Affine.C() * scale, xform->m_Affine.F() * scale);
+			bool b = qrf.contains(cd);
+			m_FractoriumEmberController->XformCheckboxAt(i, [&](QCheckBox * cb)
+			{
+				cb->setChecked(b);
+			});
+			i++;
+		}, eXformUpdate::UPDATE_ALL, false);
 	}
 	else if (m_DragState == eDragState::DragPanning)//Translating the whole image.
 	{

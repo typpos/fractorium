@@ -1,5 +1,6 @@
 #include "FractoriumPch.h"
 #include "SpinBox.h"
+#include "FractoriumSettings.h"
 
 QTimer SpinBox::s_Timer;
 
@@ -15,7 +16,6 @@ QTimer SpinBox::s_Timer;
 SpinBox::SpinBox(QWidget* p, int h, int step)
 	: QSpinBox(p)
 {
-	m_Select = false;
 	m_DoubleClick = false;
 	m_DoubleClickNonZero = 0;
 	m_DoubleClickZero = 1;
@@ -135,36 +135,39 @@ void SpinBox::OnTimeout()
 bool SpinBox::eventFilter(QObject* o, QEvent* e)
 {
 	QMouseEvent* me = dynamic_cast<QMouseEvent*>(e);
+	auto settings = FractoriumSettings::DefInstance();
 
-	if (isEnabled() &&
-			me &&
-			me->type() == QMouseEvent::MouseButtonPress &&
-			me->button() == Qt::RightButton)
+	if (isEnabled() && me)
 	{
-		m_MouseDownPoint = m_MouseMovePoint = me->pos();
-		StartTimer();
-	}
-	else if (isEnabled() &&
-			 me &&
-			 me->type() == QMouseEvent::MouseButtonRelease &&
-			 me->button() == Qt::RightButton)
-	{
-		StopTimer();
-		m_MouseDownPoint = m_MouseMovePoint = me->pos();
-	}
-	else if (isEnabled() &&
-			 me &&
-			 me->type() == QMouseEvent::MouseMove &&
-			 QGuiApplication::mouseButtons() & Qt::RightButton)
-	{
-		m_MouseMovePoint = me->pos();
-	}
-	else if (m_DoubleClick && e->type() == QMouseEvent::MouseButtonDblClick && isEnabled())
-	{
-		if (value() == 0)
-			setValue(m_DoubleClickZero);
-		else
-			setValue(m_DoubleClickNonZero);
+		if (!settings->ToggleType() &&//Ensure double click toggles, not right click.
+				me->type() == QMouseEvent::MouseButtonPress &&
+				me->button() == Qt::RightButton)
+		{
+			m_MouseDownPoint = m_MouseMovePoint = me->pos();
+			StartTimer();
+		}
+		else if (!settings->ToggleType() &&
+				 me->type() == QMouseEvent::MouseButtonRelease &&
+				 me->button() == Qt::RightButton)
+		{
+			StopTimer();
+			m_MouseDownPoint = m_MouseMovePoint = me->pos();
+		}
+		else if (!settings->ToggleType() &&
+				 me->type() == QMouseEvent::MouseMove &&
+				 QGuiApplication::mouseButtons() & Qt::RightButton)
+		{
+			m_MouseMovePoint = me->pos();
+		}
+		else if (m_DoubleClick &&
+				 ((!settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
+				  (settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
+		{
+			if (IsNearZero(value()))
+				setValue(m_DoubleClickZero);
+			else
+				setValue(m_DoubleClickNonZero);
+		}
 	}
 	else
 	{
@@ -172,9 +175,9 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 		{
 			//Take special action for shift to reduce the scroll amount. Control already
 			//increases it automatically.
-			if (QWheelEvent* wev = dynamic_cast<QWheelEvent*>(e))
+			if (QWheelEvent* we = dynamic_cast<QWheelEvent*>(e))
 			{
-				Qt::KeyboardModifiers mod = wev->modifiers();
+				Qt::KeyboardModifiers mod = we->modifiers();
 
 				if (mod.testFlag(Qt::ShiftModifier))
 					setSingleStep(m_SmallStep);

@@ -8,13 +8,13 @@
 /// <param name="settings">Pointer to the global settings object to use</param>
 /// <param name="p">The parent widget. Default: nullptr.</param>
 /// <param name="f">The window flags. Default: 0.</param>
-FractoriumVariationsDialog::FractoriumVariationsDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f)
+FractoriumVariationsDialog::FractoriumVariationsDialog(QWidget* p, Qt::WindowFlags f)
 	: QDialog(p, f),
-	  m_Settings(settings),
 	  m_VariationList(VariationList<float>::Instance())
 {
 	ui.setupUi(this);
 	auto table = ui.VariationsTable;
+	m_Settings = FractoriumSettings::DefInstance();
 	m_Vars = m_Settings->Variations();
 	Populate();
 	OnSelectAllButtonClicked(true);

@@ -27,9 +27,24 @@
 *.msi
 *.idb
 *.flam3
+*.flame
+*.bmp
+*.jpg
+*.png
+*.zip
+*.avi
+*.ini
+*.bin
+*.aps
+*.db
+*.opendb
 *moc_*
 *GeneratedFiles*
 *.unsuccessfulbuild
+*~*
+*-pre1
+Makefile.Debug
+Makefile.Release
 *\Obj\*
 Builds/MSVC/VS2013/Obj/x64/Debug/EmberCL_manifest.rc
 Builds/MSVC/VS2013/Obj/EmberTester/x64/Debug/EmberTester_manifest.rc
@@ -38,8 +53,12 @@ Builds/MSVC/VS2013/Obj/EmberGenome/x64/Debug/EmberGenome_manifest.rc
 Builds/MSVC/VS2013/Obj/EmberAnimate/x64/Debug/EmberAnimate_manifest.rc
 Builds/MSVC/VS2013/Obj/Ember/x64/Debug/Ember_manifest.rc
 Builds/MSVC/Installer/obj/
+Builds/MSVC/VS2015/GeneratedFiles
+Builds/MSVC/VS2015/ipch
+Builds/MSVC/VS2015/Obj
 Bin/x64/Release/testallvarsout.flame
-Data/~$Bench.xlsx
+fractorium.com/
+Site/
 *.ps1
 *.o
 ui_*.h
@@ -65,3 +84,4 @@ Builds/QtCreator/Fractorium/Makefile
 Builds/lib/libOpenCL.so
 Builds/include/CL
 Builds/include/GL
+/Data/Variations Bench.xlsx

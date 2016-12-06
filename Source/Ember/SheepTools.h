@@ -424,7 +424,6 @@ public:
 		size_t i;
 		T t;
 		ostringstream os;
-		char ministr[32];
 
 		if (crossMode == eCrossMode::CROSS_NOT_SPECIFIED)
 		{
@@ -463,8 +462,7 @@ public:
 			for (i = 0; i < emberOut.TotalXformCount(); i++)
 				emberOut.GetTotalXform(i)->DeleteMotionElements();
 
-			sprintf_s(ministr, 32, "%7.5g", t);
-			os << "cross interpolate " << ministr;
+			os << "cross interpolate " << std::to_string(t);
 		}
 		else//Alternate mode.
 		{
@@ -953,7 +951,8 @@ public:
 	/// <param name="ember">The ember to rotate</param>
 	/// <param name="rotated">The rotated xform</param>
 	/// <param name="blend">The time percentage value which dictates how much of a percentage of 360 degrees it should be rotated and the time position for the motion elements</param>
-	void Loop(Ember<T>& ember, Ember<T>& rotated, T blend)
+	/// <param name="cw">True to rotate clockwise, else rotate counter clockwise. Ignored if rotations is 0.</param>
+	void Loop(Ember<T>& ember, Ember<T>& rotated, T blend, bool cw)
 	{
 		rotated = ember;
 
@@ -970,7 +969,7 @@ public:
 		}
 
 		rotated.ApplyFlameMotion(blend);
-		rotated.RotateAffines(-blend * 360);//Rotate the affines.
+		rotated.RotateAffines((cw ? blend : -blend) * 360);//Rotate the affines.
 		rotated.DeleteMotionElements();//Delete all motion elements from the looped ember, at the xform level and at the parent ember level.
 	}
 
@@ -981,8 +980,10 @@ public:
 	/// <param name="embers">The embers to interpolate</param>
 	/// <param name="result">The result of the interpolation</param>
 	/// <param name="blend">The interpolation time</param>
+	/// <param name="rotations">The number of times to rotate within the interpolation</param>
+	/// <param name="cw">True to rotate clockwise, else rotate counter clockwise. Ignored if rotations is 0.</param>
 	/// <param name="seqFlag">True if embers points to the first or last ember in the entire sequence, else false.</param>
-	void Edge(Ember<T>* embers, Ember<T>& result, T blend, bool seqFlag)
+	void Edge(Ember<T>* embers, Ember<T>& result, T blend, size_t rotations, bool cw, bool seqFlag)
 	{
 		size_t i, si;
 
@@ -1016,9 +1017,15 @@ public:
 			m_EdgeSpun[1].m_Time = 1;
 			//Call this first to establish the asymmetric reference angles.
 			Interpolater<T>::AsymmetricRefAngles(m_EdgeSpun, 2);
+
 			//Rotate the aligned xforms.
-			m_EdgeSpun[0].RotateAffines(-blend * 360);
-			m_EdgeSpun[1].RotateAffines(-blend * 360);
+			if (rotations)
+			{
+				auto cwblend = cw ? blend : -blend;
+				m_EdgeSpun[0].RotateAffines(cwblend * (360 * rotations));
+				m_EdgeSpun[1].RotateAffines(cwblend * (360 * rotations));
+			}
+
 			m_Interpolater.Interpolate(m_EdgeSpun, 2, m_Smooth ? Interpolater<T>::Smoother(blend) : blend, m_Stagger, result);
 		}
 
@@ -1037,11 +1044,13 @@ public:
 	/// <param name="result">The result of the spin</param>
 	/// <param name="frame">The frame in the sequence to be stored in the m_Time member of result</param>
 	/// <param name="blend">The interpolation time</param>
-	void Spin(Ember<T>& parent, Ember<T>* templ, Ember<T>& result, size_t frame, T blend)
+	/// <param name="cw">True to rotate clockwise, else rotate counter clockwise. Ignored if rotations is 0.</param>
+	void Spin(Ember<T>& parent, Ember<T>* templ, Ember<T>& result, size_t frame, T blend, bool cw)
 	{
-		char temp[50];
+		auto cwblend = cw ? blend : -blend;
+		string temp = "rotate " + std::to_string(cwblend * 360.0);
 		//Spin the parent blend degrees.
-		Loop(parent, result, blend);
+		Loop(parent, result, blend, cw);
 
 		//Apply the template if necessary.
 		if (templ)
@@ -1052,14 +1061,12 @@ public:
 		result.m_Interp = eInterp::EMBER_INTERP_LINEAR;
 		result.m_PaletteInterp = ePaletteInterp::INTERP_HSV;
 		//Create the edit doc xml.
-		sprintf_s(temp, 50, "rotate %g", blend * 360.0);
 		result.ClearEdit();
 		result.m_Edits = m_EmberToXml.CreateNewEditdoc(&parent, nullptr, temp, m_Nick, m_Url, m_Id, m_Comment, m_SheepGen, m_SheepId);
 		//Subpixel jitter.
 		Offset(result, m_OffsetX, m_OffsetY);
 		//Make the name of the flame the time.
-		sprintf_s(temp, 50, "%f", result.m_Time);
-		result.m_Name = string(temp);
+		result.m_Name = std::to_string(result.m_Time);
 	}
 
 	/// <summary>
@@ -1074,11 +1081,14 @@ public:
 	/// <param name="frame">The frame in the sequence to be stored in the m_Time member of result</param>
 	/// <param name="seqFlag">True if embers points to the first or last ember in the entire sequence, else false.</param>
 	/// <param name="blend">The interpolation time</param>
-	void SpinInter(Ember<T>* parents, Ember<T>* templ, Ember<T>& result, size_t frame, bool seqFlag, T blend)
+	/// <param name="rotations">The number of times to rotate within the interpolation</param>
+	/// <param name="cw">True to rotate clockwise, else rotate counter clockwise. Ignored if rotations is 0.</param>
+	void SpinInter(Ember<T>* parents, Ember<T>* templ, Ember<T>& result, size_t frame, bool seqFlag, T blend, size_t rotations, bool cw)
 	{
-		char temp[50];
+		auto cwblend = cw ? blend : -blend;
+		string temp = "interpolate " + std::to_string(cwblend * 360.0);
 		//Interpolate between spun parents.
-		Edge(parents, result, blend, seqFlag);
+		Edge(parents, result, blend, rotations, cw, seqFlag);
 
 		//Original did an interpolated palette hack here for random palettes, but it was never used anywhere so ember omits it.//ORIG
 
@@ -1089,14 +1099,12 @@ public:
 		//Set ember parameters accordingly.
 		result.m_Time = T(frame);
 		//Create the edit doc xml.
-		sprintf_s(temp, 50, "interpolate %g", blend * 360.0);
 		result.ClearEdit();
 		result.m_Edits = m_EmberToXml.CreateNewEditdoc(&parents[0], &parents[1], temp, m_Nick, m_Url, m_Id, m_Comment, m_SheepGen, m_SheepId);
 		//Subpixel jitter.
 		Offset(result, m_OffsetX, m_OffsetY);
 		//Make the name of the flame the time.
-		sprintf_s(temp, 50, "%f", result.m_Time);
-		result.m_Name = string(temp);
+		result.m_Name = std::to_string(result.m_Time);
 	}
 
 	/// <summary>

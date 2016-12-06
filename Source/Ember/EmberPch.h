@@ -13,8 +13,6 @@
 #ifdef _WIN32
 	#pragma warning(disable : 4251; disable : 4661; disable : 4100)
 	#define basename(x) _strdup(x)
-	#define snprintf _snprintf
-	#define snprintf_s _snprintf_s
 	#define WIN32_LEAN_AND_MEAN
 	#define EMBER_OS "WIN"
 
@@ -69,11 +67,12 @@
 #endif
 
 //Intel's Threading Building Blocks is what's used for all threading.
-#include <tbb/task_group.h>
 #include <tbb/parallel_for.h>
 #include <tbb/task_scheduler_init.h>
 
 #define GLM_FORCE_RADIANS 1
+#define GLM_ENABLE_EXPERIMENTAL 1
+
 #ifndef __APPLE__
 	#define GLM_FORCE_INLINE 1
 #endif

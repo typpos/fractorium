@@ -19,7 +19,7 @@ class FractoriumVariationsDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	FractoriumVariationsDialog(FractoriumSettings* settings, QWidget* p = nullptr, Qt::WindowFlags f = nullptr);
+	FractoriumVariationsDialog(QWidget* p = nullptr, Qt::WindowFlags f = nullptr);
 	void ForEachCell(std::function<void(QTableWidgetItem* cb)> func);
 	void ForEachSelectedCell(std::function<void(QTableWidgetItem* cb)> func);
 	void SyncSettings();
@@ -46,6 +46,6 @@ private:
 	shared_ptr<VariationList<float>> m_VariationList;
 	vector<QCheckBox*> m_CheckBoxes;
 	QMap<QString, QVariant> m_Vars;
-	FractoriumSettings* m_Settings;
+	shared_ptr<FractoriumSettings> m_Settings;
 	Ui::VariationsDialog ui;
 };

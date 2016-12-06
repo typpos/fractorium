@@ -26,31 +26,33 @@ void Fractorium::InitLibraryUI()
 	connect(ui.SequenceRenderButton,        SIGNAL(clicked(bool)), this, SLOT(OnSequenceRenderButtonClicked(bool)),        Qt::QueuedConnection);
 	connect(ui.SequenceSaveButton,          SIGNAL(clicked(bool)), this, SLOT(OnSequenceSaveButtonClicked(bool)),          Qt::QueuedConnection);
 	connect(ui.SequenceOpenButton,          SIGNAL(clicked(bool)), this, SLOT(OnSequenceOpenButtonClicked(bool)),          Qt::QueuedConnection);
-	connect(ui.SequenceRandomizeStaggerCheckBox,      SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeStaggerCheckBoxStateChanged(int)),      Qt::QueuedConnection);
-	connect(ui.SequenceRandomizeFramesPerRotCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui.SequenceRandomizeRotationsCheckBox,    SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeRotationsCheckBoxStateChanged(int)),    Qt::QueuedConnection);
-	connect(ui.SequenceRandomizeBlendFramesCheckBox,  SIGNAL(stateChanged(int)), this, SLOT(OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int)),  Qt::QueuedConnection);
-	connect(ui.SequenceStaggerSpinBox,               SIGNAL(valueChanged(double)), this, SLOT(OnSequenceStaggerSpinBoxChanged(double)),            Qt::QueuedConnection);
-	connect(ui.SequenceRandomStaggerMaxSpinBox,      SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRandomStaggerMaxSpinBoxChanged(double)),   Qt::QueuedConnection);
-	connect(ui.SequenceStartFlameSpinBox,            SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceStartFlameSpinBoxChanged(int)),            Qt::QueuedConnection);
-	connect(ui.SequenceStopFlameSpinBox,             SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceStopFlameSpinBoxChanged(int)),             Qt::QueuedConnection);
-	connect(ui.SequenceFramesPerRotSpinBox,          SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceFramesPerRotSpinBoxChanged(int)),          Qt::QueuedConnection);
-	connect(ui.SequenceRandomFramesPerRotMaxSpinBox, SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int)), Qt::QueuedConnection);
-	connect(ui.SequenceRotationsSpinBox,             SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRotationsSpinBoxChanged(double)),          Qt::QueuedConnection);
-	connect(ui.SequenceRandomRotationsMaxSpinBox,    SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRandomRotationsMaxSpinBoxChanged(double)), Qt::QueuedConnection);
-	connect(ui.SequenceBlendFramesSpinBox,           SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceBlendFramesSpinBoxChanged(int)),           Qt::QueuedConnection);
-	connect(ui.SequenceRandomBlendMaxFramesSpinBox,  SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomBlendMaxFramesSpinBoxChanged(int)),  Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeStaggerCheckBox,           SIGNAL(stateChanged(int)),    this, SLOT(OnSequenceRandomizeStaggerCheckBoxStateChanged(int)),           Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeFramesPerRotCheckBox,      SIGNAL(stateChanged(int)),    this, SLOT(OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int)),      Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeRotationsCheckBox,         SIGNAL(stateChanged(int)),    this, SLOT(OnSequenceRandomizeRotationsCheckBoxStateChanged(int)),         Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeBlendFramesCheckBox,       SIGNAL(stateChanged(int)),    this, SLOT(OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int)),       Qt::QueuedConnection);
+	connect(ui.SequenceRandomizeRotationsPerBlendCheckBox, SIGNAL(stateChanged(int)),    this, SLOT(OnSequenceRandomizeRotationsPerBlendCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.SequenceStaggerSpinBox,                     SIGNAL(valueChanged(double)), this, SLOT(OnSequenceStaggerSpinBoxChanged(double)),                       Qt::QueuedConnection);
+	connect(ui.SequenceRandomStaggerMaxSpinBox,            SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRandomStaggerMaxSpinBoxChanged(double)),              Qt::QueuedConnection);
+	connect(ui.SequenceStartFlameSpinBox,                  SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceStartFlameSpinBoxChanged(int)),                       Qt::QueuedConnection);
+	connect(ui.SequenceStopFlameSpinBox,                   SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceStopFlameSpinBoxChanged(int)),                        Qt::QueuedConnection);
+	connect(ui.SequenceFramesPerRotSpinBox,                SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceFramesPerRotSpinBoxChanged(int)),                     Qt::QueuedConnection);
+	connect(ui.SequenceRandomFramesPerRotMaxSpinBox,       SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int)),            Qt::QueuedConnection);
+	connect(ui.SequenceRotationsSpinBox,                   SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRotationsSpinBoxChanged(double)),                     Qt::QueuedConnection);
+	connect(ui.SequenceRandomRotationsMaxSpinBox,          SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRandomRotationsMaxSpinBoxChanged(double)),            Qt::QueuedConnection);
+	connect(ui.SequenceBlendFramesSpinBox,                 SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceBlendFramesSpinBoxChanged(int)),                      Qt::QueuedConnection);
+	connect(ui.SequenceRandomBlendMaxFramesSpinBox,        SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomBlendMaxFramesSpinBoxChanged(int)),             Qt::QueuedConnection);
 }
 
 /// <summary>
 /// Get the index of the currently selected ember in the library tree.
 /// </summary>
 /// <returns>A pair containing the index of the item clicked and a pointer to the item</param>
-pair<size_t, QTreeWidgetItem*> Fractorium::GetCurrentEmberIndex()
+vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex()
 {
 	int index = 0;
 	QTreeWidgetItem* item = nullptr;
 	auto tree = ui.LibraryTree;
+	vector<pair<size_t, QTreeWidgetItem*>> v;
 
 	if (auto top = tree->topLevelItem(0))
 	{
@@ -58,14 +60,14 @@ pair<size_t, QTreeWidgetItem*> Fractorium::GetCurrentEmberIndex()
 		{
 			item = top->child(index);
 
-			if (item && !item->isSelected())
-				index++;
-			else
-				break;
+			if (item && item->isSelected())
+				v.push_back(make_pair(index, item));
+
+			index++;
 		}
 	}
 
-	return make_pair(index, item);
+	return v;
 }
 
 /// <summary>
@@ -218,6 +220,9 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 
 		if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item))
 		{
+			if (!emberItem->isSelected())//Checking/unchecking other items shouldn't perform the processing below.
+				return;
+
 			if (emberItem->text(0).isEmpty())//Prevent empty string.
 			{
 				emberItem->UpdateEditText();
@@ -225,11 +230,16 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 			}
 
 			string oldName = emberItem->GetEmber()->m_Name;//First preserve the previous name.
+			string newName = emberItem->text(0).toStdString();
+
+			if (oldName == newName)//If nothing changed, nothing to do.
+				return;
+
 			tree->blockSignals(true);
 			emberItem->UpdateEmberName();//Copy edit text to the ember's name variable.
 			m_EmberFile.MakeNamesUnique();//Ensure all names remain unique.
 			SyncLibrary(eLibraryUpdate::NAME);//Copy all ember names to the tree items since some might have changed to be made unique.
-			string newName = emberItem->GetEmber()->m_Name;//Get the new, final, unique name.
+			newName = emberItem->GetEmber()->m_Name;//Get the new, final, unique name.
 
 			if (m_EmberFilePointer == emberItem->GetEmber() && oldName != newName)//If the ember edited was the current one, and the name was indeed changed, update the name of the current one.
 			{
@@ -263,20 +273,15 @@ void Fractorium::OnEmberTreeItemChanged(QTreeWidgetItem* item, int col) { m_Cont
 /// Clears the undo state.
 /// Resets the rendering process.
 /// Called when the user double clicks on a library tree item.
-/// This will get called twice for some reason, and there's no way to prevent it.
-/// Doesn't seem to cause any problems.
+/// This will get called twice for some reason, so the check state is checked to prevent duplicate processing.
 /// </summary>
 /// <param name="item">The item double clicked on</param>
-/// <param name="col">The column clicked, ignored.</param>
+/// <param name="col">The column clicked</param>
 template <typename T>
 void FractoriumEmberController<T>::EmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col)
 {
-	if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item))
-	{
-		//qDebug() << "Setting current ember to: " << QString::fromStdString(emberItem->GetEmber()->m_Name);
-		ClearUndo();
-		SetEmber(*emberItem->GetEmber(), false, true);
-	}
+	if (item->checkState(col) == Qt::Unchecked)
+		SetEmber(m_Fractorium->ui.LibraryTree->currentIndex().row(), false);
 }
 
 void Fractorium::OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { m_Controller->EmberTreeItemDoubleClicked(item, col); }
@@ -287,32 +292,56 @@ void Fractorium::OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { 
 /// <param name="startRow">The index of the source item to move</param>
 /// <param name="destRow">The destination index to move the item to</param>
 template <typename T>
-void FractoriumEmberController<T>::MoveLibraryItems(int startRow, int destRow)
+void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items, int destRow)
 {
 	int i = 0;
+	auto startRow = items[0].row();
 	auto tree = m_Fractorium->ui.LibraryTree;
 	auto top = tree->topLevelItem(0);
+	list<QString> names;
+
+	for (auto& item : items)
+		if (auto temp = m_EmberFile.Get(item.row()))
+			names.push_back(QString::fromStdString(temp->m_Name));
+
 	auto b = m_EmberFile.m_Embers.begin();
-	auto s = Advance(b, startRow);
-	auto d = Advance(b, destRow);
-	m_EmberFile.m_Embers.splice(d, m_EmberFile.m_Embers, s);
-	SyncLibrary(eLibraryUpdate::INDEX);//Only indices need syncing.
+	auto result = Gather(b, m_EmberFile.m_Embers.end(), Advance(b, destRow), [&](const Ember<T>& ember)
+	{
+		auto qname = QString::fromStdString(ember.m_Name);
+		auto position = std::find(names.begin(), names.end(), qname);
+
+		if (position != names.end())
+		{
+			names.erase(position);
+			return true;
+		}
+
+		return false;
+	});
+	SyncLibrary(eLibraryUpdate(eLibraryUpdate::INDEX | eLibraryUpdate::POINTER));
 }
 
 /// <summary>
-/// Delete the currently selected item in the tree.
-/// Note this is not necessarilly the current ember, it's just the item
-/// in the tree that is selected.
+/// Delete the currently selected items in the tree.
+/// Note this is not necessarilly the current ember, it's just the items
+/// in the tree that are selected.
 /// </summary>
-/// <param name="p">A pair containing the index of the item clicked and a pointer to the item</param>
+/// <param name="v">A vector of pairs, each containing the index of the item selected and a pointer to the item</param>
 template <typename T>
-void FractoriumEmberController<T>::Delete(const pair<size_t, QTreeWidgetItem*>& p)
+void FractoriumEmberController<T>::Delete(const vector<pair<size_t, QTreeWidgetItem*>>& v)
 {
-	if (m_EmberFile.Delete(p.first))
+	size_t offset = 0;
+
+	for (auto& p : v)
 	{
-		delete p.second;
-		SyncLibrary(eLibraryUpdate::INDEX);
-		m_Fractorium->SyncFileCountToSequenceCount();
+		if (p.second && m_EmberFile.Delete(p.first - offset))
+		{
+			delete p.second;
+			SyncLibrary(eLibraryUpdate::INDEX);
+			m_Fractorium->SyncFileCountToSequenceCount();
+		}
+
+		offset++;
 	}
 
 	//If there is now only one item left and it wasn't selected, select it.
@@ -327,10 +356,10 @@ void FractoriumEmberController<T>::Delete(const pair<size_t, QTreeWidgetItem*>& 
 /// Called when the user presses and releases the delete key while the library tree has the focus,
 /// and an item is selected.
 /// </summary>
-/// <param name="p">A pair containing the index of the item clicked and a pointer to the item</param>
-void Fractorium::OnDelete(const pair<size_t, QTreeWidgetItem*>& p)
+/// <param name="v">A vector of pairs, each containing the index of the item selected and a pointer to the item</param>
+void Fractorium::OnDelete(const vector<pair<size_t, QTreeWidgetItem*>>& v)
 {
-	m_Controller->Delete(p);
+	m_Controller->Delete(v);
 }
 
 /// <summary>
@@ -506,18 +535,30 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	Ember<T> result;
 	auto& ui = m_Fractorium->ui;
 	auto s = m_Fractorium->m_Settings;
+	//Bools for determining whether to use hard coded vs. random values.
 	bool randStagger = ui.SequenceRandomizeStaggerCheckBox->isChecked();
 	bool randFramesRot = ui.SequenceRandomizeFramesPerRotCheckBox->isChecked();
 	bool randRot = ui.SequenceRandomizeRotationsCheckBox->isChecked();
 	bool randBlend = ui.SequenceRandomizeBlendFramesCheckBox->isChecked();
+	bool randBlendRot = ui.SequenceRandomizeRotationsPerBlendCheckBox->isChecked();
+	//The direction to rotate the loops.
+	bool loopsCw = ui.SequenceRotationsCWCheckBox->isChecked();
+	bool loopsBlendCw = ui.SequenceRotationsPerBlendCWCheckBox->isChecked();
+	//Whether to stagger, default is 1 which means no stagger.
 	double stagger = ui.SequenceStaggerSpinBox->value();
 	double staggerMax = ui.SequenceRandomStaggerMaxSpinBox->value();
+	//Rotations on keyframes.
 	double rots = ui.SequenceRotationsSpinBox->value();
 	double rotsMax = ui.SequenceRandomRotationsMaxSpinBox->value();
+	//Number of frames it takes to rotate a keyframe.
 	int framesPerRot = ui.SequenceFramesPerRotSpinBox->value();
 	int framesPerRotMax = ui.SequenceRandomFramesPerRotMaxSpinBox->value();
+	//Number of frames it takes to interpolate.
 	int framesBlend = ui.SequenceBlendFramesSpinBox->value();
 	int framesBlendMax = ui.SequenceRandomBlendMaxFramesSpinBox->value();
+	//Number of rotations performed during interpolation.
+	int rotsPerBlend = ui.SequenceRotationsPerBlendSpinBox->value();
+	int rotsPerBlendMax = ui.SequenceRotationsPerBlendMaxSpinBox->value();
 	size_t start = ui.SequenceStartFlameSpinBox->value();
 	size_t stop = ui.SequenceStopFlameSpinBox->value();
 	size_t startCount = ui.SequenceStartCountSpinBox->value();
@@ -533,6 +574,24 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 #else
 		"~/.config/fractorium";
 #endif
+
+	if (!randRot && !randBlend)
+	{
+		if ((!rots || !framesPerRot) && !framesBlend)
+		{
+			QMessageBox::critical(m_Fractorium, "Animation sequence parameters error",
+								  "Rotations and Frames per rot, or blend frames must be positive and non-zero");
+			return;
+		}
+
+		if (framesPerRot > 1 && !rots)//Because framesPerRot control has a min value of 1, check greater than 1. Also don't need to check the inverse like in EmberGenome.
+		{
+			QMessageBox::critical(m_Fractorium, "Animation sequence parameters error",
+								  "Frames per rot cannot be positive while Rotations is zero");
+			return;
+		}
+	}
+
 	SheepTools<T, float> tools(palettePath, EmberCommon::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	tools.SetSpinParams(true,
 						stagger,//Will be set again below if random is used.
@@ -584,7 +643,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 			for (frame = 0; frame < roundFrames; frame++)
 			{
 				blend = frame / rotFrames;
-				tools.Spin(embers[0], nullptr, result, startCount + frameCount++, blend);//Result is cleared and reassigned each time inside of Spin().
+				tools.Spin(embers[0], nullptr, result, startCount + frameCount++, blend, loopsCw);//Result is cleared and reassigned each time inside of Spin().
 				FormatName(result, os, padding);
 				m_SequenceFile.m_Embers.push_back(result);
 			}
@@ -594,7 +653,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 			//result will be the starting point for the interp phase below.
 			frame = roundFrames;
 			blend = frame / rotFrames;
-			tools.Spin(embers[0], nullptr, result, startCount + frameCount, blend);//Do not increment frameCount here.
+			tools.Spin(embers[0], nullptr, result, startCount + frameCount, blend, loopsCw);//Do not increment frameCount here.
 			FormatName(result, os, padding);
 		}
 
@@ -606,6 +665,8 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 			auto it2 = it;//Need a quick temporary to avoid modifying it which is used in the loop.
 			embers[1] = *(++it2);//Get the next ember to be used with blending below.
 			size_t blendFrames = randBlend ? m_Rand.Frand<double>(framesBlend, framesBlendMax) : framesBlend;
+			double d = randBlendRot ? m_Rand.Frand<double>(rotsPerBlend, rotsPerBlendMax) : double(rotsPerBlend);
+			size_t rpb = size_t(std::round(d));
 
 			if (randStagger)
 				tools.Stagger(m_Rand.Frand<double>(stagger, staggerMax));
@@ -615,7 +676,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 				bool seqFlag = frame == 0 || (frame == blendFrames - 1);
 				blend = frame / double(blendFrames);
 				result.Clear();
-				tools.SpinInter(&embers[0], nullptr, result, startCount + frameCount++, seqFlag, blend);
+				tools.SpinInter(&embers[0], nullptr, result, startCount + frameCount++, seqFlag, blend, rpb, loopsBlendCw);
 				FormatName(result, os, padding);
 				m_SequenceFile.m_Embers.push_back(result);
 			}
@@ -623,7 +684,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	}
 
 	it = Advance(m_EmberFile.m_Embers.begin(), stop);
-	tools.Spin(*it, nullptr, result, startCount + frameCount, 0);
+	tools.Spin(*it, nullptr, result, startCount + frameCount, 0, loopsBlendCw);
 	FormatName(result, os, padding);
 	m_SequenceFile.m_Embers.push_back(result);
 	FillSequenceTree();//The sequence has been generated, now create preview thumbnails.
@@ -730,6 +791,7 @@ void Fractorium::OnSequenceRandomizeStaggerCheckBoxStateChanged(int state) { ui.
 void Fractorium::OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state) { ui.SequenceRandomFramesPerRotMaxSpinBox->setEnabled(state); }
 void Fractorium::OnSequenceRandomizeRotationsCheckBoxStateChanged(int state) { ui.SequenceRandomRotationsMaxSpinBox->setEnabled(state); }
 void Fractorium::OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state) { ui.SequenceRandomBlendMaxFramesSpinBox->setEnabled(state); }
+void Fractorium::OnSequenceRandomizeRotationsPerBlendCheckBoxStateChanged(int state) { ui.SequenceRotationsPerBlendMaxSpinBox->setEnabled(state); }
 
 /// <summary>
 /// Constrain all min/max spinboxes.

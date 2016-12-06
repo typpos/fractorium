@@ -31,8 +31,8 @@ void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformChe
 /// <param name="checked">True if checked, else false.</param>
 bool Fractorium::IsXformSelected(size_t i)
 {
-	if (auto child = m_XformsSelectionLayout->itemAt(int(i)))
-		if (auto w = qobject_cast<QCheckBox*>(child->widget()))
+	if (i < m_XformSelections.size())
+		if (auto w = m_XformSelections[i])
 			return w->isChecked();
 
 	return false;
@@ -70,7 +70,7 @@ QString FractoriumEmberController<T>::MakeXformCaption(size_t i)
 	bool isFinal = m_Ember.FinalXform() == m_Ember.GetTotalXform(i);
 	QString caption = isFinal ? "Final" : QString::number(i + 1);
 
-	if (Xform<T>* xform = m_Ember.GetTotalXform(i))
+	if (auto xform = m_Ember.GetTotalXform(i))
 	{
 		if (!xform->m_Name.empty())
 			caption += " (" + QString::fromStdString(xform->m_Name) + ")";
@@ -87,13 +87,8 @@ void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*)> func)
 {
 	int i = 0;
 
-	while (QLayoutItem* child = m_XformsSelectionLayout->itemAt(i))
-	{
-		if (auto w = qobject_cast<QCheckBox*>(child->widget()))
-			func(i, w);
-
-		i++;
-	}
+	for (auto& cb : m_XformSelections)
+		func(i++, cb);
 }
 
 /// <summary>
@@ -105,9 +100,9 @@ void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*)> func)
 template <typename T>
 bool FractoriumEmberController<T>::XformCheckboxAt(int i, std::function<void(QCheckBox*)> func)
 {
-	if (auto child = m_Fractorium->m_XformsSelectionLayout->itemAt(i))
+	if (i < m_Fractorium->m_XformSelections.size())
 	{
-		if (auto w = qobject_cast<QCheckBox*>(child->widget()))
+		if (auto w = m_Fractorium->m_XformSelections[i])
 		{
 			func(w);
 			return true;

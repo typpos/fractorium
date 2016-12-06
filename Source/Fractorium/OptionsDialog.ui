@@ -414,6 +414,16 @@ in interactive mode for each mouse movement</string>
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="ToggleTypeCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: right clicking toggles spin boxes, right button dragging disabled.&lt;/p&gt;&lt;p&gt;Unchecked: double clicking toggles spin boxes, right button dragging enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Right Click Toggles Spinboxes</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="OptionsXmlSavingTab">

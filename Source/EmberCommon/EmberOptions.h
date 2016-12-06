@@ -65,6 +65,8 @@ enum class eOptionIDs : et
 	OPT_ENCLOSED,
 	OPT_NO_EDITS,
 	OPT_UNSMOOTH_EDGE,
+	OPT_CW_LOOPS,
+	OPT_CW_INTERP_LOOPS,
 	OPT_LOCK_ACCUM,
 	OPT_DUMP_KERNEL,
 
@@ -80,7 +82,9 @@ enum class eOptionIDs : et
 	OPT_END,
 	OPT_FRAME,
 	OPT_DTIME,
-	OPT_NFRAMES,
+	OPT_LOOP_FRAMES,
+	OPT_INTERP_FRAMES,
+	OPT_INTERP_LOOPS,
 	OPT_SYMMETRY,
 	OPT_SHEEP_GEN,
 	OPT_SHEEP_ID,
@@ -236,7 +240,7 @@ private:
 	{ \
 		if (member.m_Option.nArgType == SO_OPT) \
 		{ \
-			member(!strcmp(args.OptionArg(), "true")); \
+			member(!_stricmp(args.OptionArg(), "true")); \
 		} \
 		else \
 		{ \
@@ -245,16 +249,21 @@ private:
 	} \
 	break
 
+//Parsing is the same for all numerical option types.
+#define PARSEOPTION(e, member) \
+	case (e): \
+	{ \
+		ss.clear(); \
+		ss.str(args.OptionArg()); \
+		ss >> member.m_Val; \
+		break; \
+	}
+
 //Int.
 #define Eoi EmberOptionEntry<intmax_t>
 #define INITINTOPTION(member, option) \
 	member = option; \
 	m_IntArgs.push_back(&member)
-
-#define PARSEINTOPTION(e, member) \
-	case (e): \
-	sscanf_s(args.OptionArg(), "%ld", &member.m_Val); \
-	break
 
 //Uint.
 #define Eou EmberOptionEntry<size_t>
@@ -262,32 +271,17 @@ private:
 	member = option; \
 	m_UintArgs.push_back(&member)
 
-#define PARSEUINTOPTION(e, member) \
-	case (e): \
-	sscanf_s(args.OptionArg(), "%lu", &member.m_Val); \
-	break
-
 //Double.
 #define Eod EmberOptionEntry<double>
 #define INITDOUBLEOPTION(member, option) \
 	member = option; \
 	m_DoubleArgs.push_back(&member)
 
-#define PARSEDOUBLEOPTION(e, member) \
-	case (e): \
-	sscanf_s(args.OptionArg(), "%lf", &member.m_Val); \
-	break
-
 //String.
 #define Eos EmberOptionEntry<string>
 #define INITSTRINGOPTION(member, option) \
 	member = option; \
 	m_StringArgs.push_back(&member)
-
-#define PARSESTRINGOPTION(e, member) \
-	case (e): \
-	member.m_Val = args.OptionArg(); \
-	break
 
 /// <summary>
 /// Class for holding all available options across all command line programs.
@@ -345,6 +339,8 @@ public:
 		INITBOOLOPTION(Enclosed,	   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ENCLOSED,		  _T("--enclosed"),				true,				  SO_OPT,	   "   --enclosed                Use enclosing Xml tags [default: true].\n"));
 		INITBOOLOPTION(NoEdits,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NO_EDITS,         _T("--noedits"),              false,                SO_NONE,     "   --noedits                 Exclude edit tags when writing Xml [default: false].\n"));
 		INITBOOLOPTION(UnsmoothEdge,   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_UNSMOOTH_EDGE,    _T("--unsmoother"),           false,                SO_NONE,     "   --unsmoother              Do not use smooth blending for sheep edges [default: false].\n"));
+		INITBOOLOPTION(CwLoops,        Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_CW_LOOPS,         _T("--cwloops"),              false,                SO_NONE,     "   --cwloops                 Rotate loops clockwise [default: false].\n"));
+		INITBOOLOPTION(CwInterpLoops,  Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_CW_INTERP_LOOPS,  _T("--cwinterploops"),        false,                SO_NONE,     "   --cwinterploops           Rotate clockwise during interpolation, ignored if --interploops is 0 [default: false].\n"));
 		INITBOOLOPTION(LockAccum,	   Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_LOCK_ACCUM,       _T("--lock_accum"),           false,                SO_NONE,     "   --lock_accum              Lock threads when accumulating to the histogram using the CPU. This will drop performance to that of single threading [default: false].\n"));
 		INITBOOLOPTION(DumpKernel,	   Eob(eOptionUse::OPT_USE_RENDER,	eOptionIDs::OPT_DUMP_KERNEL,      _T("--dump_kernel"),          false,                SO_NONE,     "   --dump_kernel             Print the iteration kernel string when using OpenCL (ignored for CPU) [default: false].\n"));
 		//Int.
@@ -368,20 +364,22 @@ public:
 		INITUINTOPTION(LastFrame,       Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_END,              _T("--end"),	                 UINT_MAX,             SO_REQ_SEP, "   --end=<val>               Time of last frame to render [default: last time specified in the input file].\n"));
 		INITUINTOPTION(Frame,           Eou(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_FRAME,            _T("--frame"),                UINT_MAX,             SO_REQ_SEP, "   --frame=<val>             Time of first and last frame (ie do one frame).\n"));
 		INITUINTOPTION(Dtime,           Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_DTIME,            _T("--dtime"),                1,                    SO_REQ_SEP, "   --dtime=<val>             Time between frames [default: 1].\n"));
-		INITUINTOPTION(Frames,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_NFRAMES,          _T("--nframes"),              20,                   SO_REQ_SEP, "   --nframes=<val>           Number of frames per loop and per interpolation in the animation [default: 20].\n"));
+		INITUINTOPTION(LoopFrames,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_LOOP_FRAMES,      _T("--loopframes"),           20,                   SO_REQ_SEP, "   --loopframes=<val>        Number of frames per loop in the animation [default: 20].\n"));
+		INITUINTOPTION(InterpFrames,    Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_INTERP_FRAMES,    _T("--interpframes"),         20,                   SO_REQ_SEP, "   --interpframes=<val>      Number of frames per interpolation in the animation [default: 20].\n"));
+		INITUINTOPTION(InterpLoops,     Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_INTERP_LOOPS,     _T("--interploops"),          1,                    SO_REQ_SEP, "   --interploops=<val>       The number of 360 degree loops to rotate when interpolating between keyframes [default: 1].\n"));
 		INITUINTOPTION(Repeat,          Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_REPEAT,           _T("--repeat"),               1,                    SO_REQ_SEP, "   --repeat=<val>            Number of new flames to create. Ignored if sequence, inter or rotate were specified [default: 1].\n"));
 		INITUINTOPTION(Tries,           Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_TRIES,            _T("--tries"),                10,                   SO_REQ_SEP, "   --tries=<val>             Number times to try creating a flame that meets the specified constraints. Ignored if sequence, inter or rotate were specified [default: 10].\n"));
 		INITUINTOPTION(MaxXforms,       Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_MAX_XFORMS,       _T("--maxxforms"),            UINT_MAX,             SO_REQ_SEP, "   --maxxforms=<val>         The maximum number of xforms allowed in the final output.\n"));
 		INITUINTOPTION(StartCount,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_START_COUNT,      _T("--startcount"),           0,                    SO_REQ_SEP, "   --startcount=<val>        The number to add to each flame name when generating a sequence. Useful for programs like ffmpeg which require numerically increasing filenames [default: 0].\n"));
 		INITUINTOPTION(Padding,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PADDING,          _T("--padding"),              0,                    SO_REQ_SEP, "   --padding=<val>           Override the amount of zero padding added to each flame name when generating a sequence. Useful for programs like ffmpeg which require fixed width filenames [default: 0 (auto calculate padding)].\n"));
 		//Double.
-		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1,                    SO_REQ_SEP,  "   --ss=<val>                Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1,                    SO_REQ_SEP,  "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(Quality,	   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		  _T("--quality"),				0,					  SO_REQ_SEP,  "   --quality=<val>           Override the quality of the flame if not 0 [default: 0].\n"));
-		INITDOUBLEOPTION(DeMin,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,			  _T("--demin"),			   -1,					  SO_REQ_SEP,  "   --demin=<val>             Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
-		INITDOUBLEOPTION(DeMax,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MAX,			  _T("--demax"),			   -1,					  SO_REQ_SEP,  "   --demax=<val>             Override the maximum size of the density estimator filter radius if not -1 [default: -1].\n"));
-		INITDOUBLEOPTION(AspectRatio,  Eod(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PIXEL_ASPECT,     _T("--pixel_aspect"),         1,                    SO_REQ_SEP,  "   --pixel_aspect=<val>      Aspect ratio of pixels (width over height), eg. 0.90909 for NTSC [default: 1.0].\n"));
-		INITDOUBLEOPTION(Stagger,      Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STAGGER,          _T("--stagger"),              0,                    SO_REQ_SEP,  "   --stagger=<val>           Affects simultaneity of xform interpolation during flame interpolation.\n"
+		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1.0,                   SO_REQ_SEP,  "   --ss=<val>                Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1.0,                   SO_REQ_SEP,  "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(Quality,	   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		  _T("--quality"),				0.0,                   SO_REQ_SEP,  "   --quality=<val>           Override the quality of the flame if not 0 [default: 0].\n"));
+		INITDOUBLEOPTION(DeMin,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,			  _T("--demin"),			   -1.0,                   SO_REQ_SEP,  "   --demin=<val>             Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
+		INITDOUBLEOPTION(DeMax,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MAX,			  _T("--demax"),			   -1.0,                   SO_REQ_SEP,  "   --demax=<val>             Override the maximum size of the density estimator filter radius if not -1 [default: -1].\n"));
+		INITDOUBLEOPTION(AspectRatio,  Eod(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PIXEL_ASPECT,     _T("--pixel_aspect"),         1.0,                   SO_REQ_SEP,  "   --pixel_aspect=<val>      Aspect ratio of pixels (width over height), eg. 0.90909 for NTSC [default: 1.0].\n"));
+		INITDOUBLEOPTION(Stagger,      Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STAGGER,          _T("--stagger"),              0.0,                   SO_REQ_SEP,  "   --stagger=<val>           Affects simultaneity of xform interpolation during flame interpolation.\n"
 										   "\t                         Represents how 'separate' the xforms are interpolated. Set to 1 for each\n"
 										   "\t                         xform to be interpolated individually, fractions control interpolation overlap [default: 0].\n"));
 		INITDOUBLEOPTION(AvgThresh,    Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_AVG_THRESH,       _T("--avg"),                  20.0,                 SO_REQ_SEP,  "   --avg=<val>               Minimum average pixel channel sum (r + g + b) threshold from 0 - 765. Ignored if sequence, inter or rotate were specified [default: 20].\n"));
@@ -399,7 +397,7 @@ public:
 		INITSTRINGOPTION(Out,          Eos(eOptionUse::OPT_USE_RENDER,	eOptionIDs::OPT_OUT,              _T("--out"),                  "",                   SO_REQ_SEP,  "   --out=<val>               Name of a single output file. Not recommended when rendering more than one image.\n"));
 		INITSTRINGOPTION(Prefix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PREFIX,           _T("--prefix"),               "",                   SO_REQ_SEP,  "   --prefix=<val>            Prefix to prepend to all output files.\n"));
 		INITSTRINGOPTION(Suffix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUFFIX,           _T("--suffix"),               "",                   SO_REQ_SEP,  "   --suffix=<val>            Suffix to append to all output files.\n"));
-		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: bmp, jpg, png, ppm [default: png].\n"));
+		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: bmp, jpg, png [default: png].\n"));
 		INITSTRINGOPTION(PalettePath,  Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_FILE,     _T("--flam3_palettes"),       "flam3-palettes.xml", SO_REQ_SEP,  "   --flam3_palettes=<val>    Path and name of the palette file [default: flam3-palettes.xml].\n"));
 		INITSTRINGOPTION(Id,           Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_ID,               _T("--id"),                   "",                   SO_REQ_SEP,  "   --id=<val>                ID to use in <edit> tags / image comments.\n"));
 		INITSTRINGOPTION(Url,          Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_URL,              _T("--url"),                  "",                   SO_REQ_SEP,  "   --url=<val>               URL to use in <edit> tags / image comments.\n"));
@@ -436,6 +434,7 @@ public:
 		EmberOptions options;
 		vector<CSimpleOpt::SOption> sOptions = options.GetSimpleOptions();
 		CSimpleOpt args(argc, argv, sOptions.data());
+		stringstream ss;
 
 		//Process args.
 		while (args.Next())
@@ -492,72 +491,76 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_ENCLOSED, Enclosed);
 					PARSEBOOLOPTION(eOptionIDs::OPT_NO_EDITS, NoEdits);
 					PARSEBOOLOPTION(eOptionIDs::OPT_UNSMOOTH_EDGE, UnsmoothEdge);
+					PARSEBOOLOPTION(eOptionIDs::OPT_CW_LOOPS, CwLoops);
+					PARSEBOOLOPTION(eOptionIDs::OPT_CW_INTERP_LOOPS, CwInterpLoops);
 					PARSEBOOLOPTION(eOptionIDs::OPT_LOCK_ACCUM, LockAccum);
 					PARSEBOOLOPTION(eOptionIDs::OPT_DUMP_KERNEL, DumpKernel);
-					PARSEINTOPTION(eOptionIDs::OPT_SYMMETRY, Symmetry);//Int args
-					PARSEINTOPTION(eOptionIDs::OPT_SHEEP_GEN, SheepGen);
-					PARSEINTOPTION(eOptionIDs::OPT_SHEEP_ID, SheepId);
-					PARSEINTOPTION(eOptionIDs::OPT_PRIORITY, Priority);
-					PARSEUINTOPTION(eOptionIDs::OPT_NTHREADS, ThreadCount);//uint args.
-					PARSEUINTOPTION(eOptionIDs::OPT_STRIPS, Strips);
-					PARSEUINTOPTION(eOptionIDs::OPT_SUPERSAMPLE, Supersample);
-					PARSEUINTOPTION(eOptionIDs::OPT_TEMPSAMPLES, TemporalSamples);
-					PARSEUINTOPTION(eOptionIDs::OPT_BPC, BitsPerChannel);
-					PARSEUINTOPTION(eOptionIDs::OPT_PRINT_EDIT_DEPTH, PrintEditDepth);
-					PARSEUINTOPTION(eOptionIDs::OPT_JPEG, JpegQuality);
-					PARSEUINTOPTION(eOptionIDs::OPT_BEGIN, FirstFrame);
-					PARSEUINTOPTION(eOptionIDs::OPT_END, LastFrame);
-					PARSEUINTOPTION(eOptionIDs::OPT_FRAME, Frame);
-					PARSEUINTOPTION(eOptionIDs::OPT_DTIME, Dtime);
-					PARSEUINTOPTION(eOptionIDs::OPT_NFRAMES, Frames);
-					PARSEUINTOPTION(eOptionIDs::OPT_REPEAT, Repeat);
-					PARSEUINTOPTION(eOptionIDs::OPT_TRIES, Tries);
-					PARSEUINTOPTION(eOptionIDs::OPT_MAX_XFORMS, MaxXforms);
-					PARSEUINTOPTION(eOptionIDs::OPT_START_COUNT, StartCount);
-					PARSEUINTOPTION(eOptionIDs::OPT_PADDING, Padding);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_SS, SizeScale);//Float args.
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_QS, QualityScale);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_QUALITY, Quality);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_DE_MIN, DeMin);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_DE_MAX, DeMax);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_PIXEL_ASPECT, AspectRatio);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_STAGGER, Stagger);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_AVG_THRESH, AvgThresh);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_BLACK_THRESH, BlackThresh);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_WHITE_LIMIT, WhiteLimit);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_SPEED, Speed);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_OFFSETX, OffsetX);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_OFFSETY, OffsetY);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_USEMEM, UseMem);
-					PARSEDOUBLEOPTION(eOptionIDs::OPT_LOOPS, Loops);
-					PARSESTRINGOPTION(eOptionIDs::OPT_OPENCL_DEVICE, Device);//String args.
-					PARSESTRINGOPTION(eOptionIDs::OPT_ISAAC_SEED, IsaacSeed);
-					PARSESTRINGOPTION(eOptionIDs::OPT_IN, Input);
-					PARSESTRINGOPTION(eOptionIDs::OPT_OUT, Out);
-					PARSESTRINGOPTION(eOptionIDs::OPT_PREFIX, Prefix);
-					PARSESTRINGOPTION(eOptionIDs::OPT_SUFFIX, Suffix);
-					PARSESTRINGOPTION(eOptionIDs::OPT_FORMAT, Format);
-					PARSESTRINGOPTION(eOptionIDs::OPT_PALETTE_FILE, PalettePath);
+					PARSEOPTION(eOptionIDs::OPT_SYMMETRY, Symmetry);//Int args
+					PARSEOPTION(eOptionIDs::OPT_SHEEP_GEN, SheepGen);
+					PARSEOPTION(eOptionIDs::OPT_SHEEP_ID, SheepId);
+					PARSEOPTION(eOptionIDs::OPT_PRIORITY, Priority);
+					PARSEOPTION(eOptionIDs::OPT_NTHREADS, ThreadCount);//uint args.
+					PARSEOPTION(eOptionIDs::OPT_STRIPS, Strips);
+					PARSEOPTION(eOptionIDs::OPT_SUPERSAMPLE, Supersample);
+					PARSEOPTION(eOptionIDs::OPT_TEMPSAMPLES, TemporalSamples);
+					PARSEOPTION(eOptionIDs::OPT_BPC, BitsPerChannel);
+					PARSEOPTION(eOptionIDs::OPT_PRINT_EDIT_DEPTH, PrintEditDepth);
+					PARSEOPTION(eOptionIDs::OPT_JPEG, JpegQuality);
+					PARSEOPTION(eOptionIDs::OPT_BEGIN, FirstFrame);
+					PARSEOPTION(eOptionIDs::OPT_END, LastFrame);
+					PARSEOPTION(eOptionIDs::OPT_FRAME, Frame);
+					PARSEOPTION(eOptionIDs::OPT_DTIME, Dtime);
+					PARSEOPTION(eOptionIDs::OPT_LOOP_FRAMES, LoopFrames);
+					PARSEOPTION(eOptionIDs::OPT_INTERP_FRAMES, InterpFrames);
+					PARSEOPTION(eOptionIDs::OPT_INTERP_LOOPS, InterpLoops);
+					PARSEOPTION(eOptionIDs::OPT_REPEAT, Repeat);
+					PARSEOPTION(eOptionIDs::OPT_TRIES, Tries);
+					PARSEOPTION(eOptionIDs::OPT_MAX_XFORMS, MaxXforms);
+					PARSEOPTION(eOptionIDs::OPT_START_COUNT, StartCount);
+					PARSEOPTION(eOptionIDs::OPT_PADDING, Padding);
+					PARSEOPTION(eOptionIDs::OPT_SS, SizeScale);//Float args.
+					PARSEOPTION(eOptionIDs::OPT_QS, QualityScale);
+					PARSEOPTION(eOptionIDs::OPT_QUALITY, Quality);
+					PARSEOPTION(eOptionIDs::OPT_DE_MIN, DeMin);
+					PARSEOPTION(eOptionIDs::OPT_DE_MAX, DeMax);
+					PARSEOPTION(eOptionIDs::OPT_PIXEL_ASPECT, AspectRatio);
+					PARSEOPTION(eOptionIDs::OPT_STAGGER, Stagger);
+					PARSEOPTION(eOptionIDs::OPT_AVG_THRESH, AvgThresh);
+					PARSEOPTION(eOptionIDs::OPT_BLACK_THRESH, BlackThresh);
+					PARSEOPTION(eOptionIDs::OPT_WHITE_LIMIT, WhiteLimit);
+					PARSEOPTION(eOptionIDs::OPT_SPEED, Speed);
+					PARSEOPTION(eOptionIDs::OPT_OFFSETX, OffsetX);
+					PARSEOPTION(eOptionIDs::OPT_OFFSETY, OffsetY);
+					PARSEOPTION(eOptionIDs::OPT_USEMEM, UseMem);
+					PARSEOPTION(eOptionIDs::OPT_LOOPS, Loops);
+					PARSEOPTION(eOptionIDs::OPT_OPENCL_DEVICE, Device);//String args.
+					PARSEOPTION(eOptionIDs::OPT_ISAAC_SEED, IsaacSeed);
+					PARSEOPTION(eOptionIDs::OPT_IN, Input);
+					PARSEOPTION(eOptionIDs::OPT_OUT, Out);
+					PARSEOPTION(eOptionIDs::OPT_PREFIX, Prefix);
+					PARSEOPTION(eOptionIDs::OPT_SUFFIX, Suffix);
+					PARSEOPTION(eOptionIDs::OPT_FORMAT, Format);
+					PARSEOPTION(eOptionIDs::OPT_PALETTE_FILE, PalettePath);
 						//PARSESTRINGOPTION(eOptionIDs::OPT_PALETTE_IMAGE, PaletteImage);
-					PARSESTRINGOPTION(eOptionIDs::OPT_ID, Id);
-					PARSESTRINGOPTION(eOptionIDs::OPT_URL, Url);
-					PARSESTRINGOPTION(eOptionIDs::OPT_NICK, Nick);
-					PARSESTRINGOPTION(eOptionIDs::OPT_COMMENT, Comment);
-					PARSESTRINGOPTION(eOptionIDs::OPT_TEMPLATE, TemplateFile);
-					PARSESTRINGOPTION(eOptionIDs::OPT_CLONE, Clone);
-					PARSESTRINGOPTION(eOptionIDs::OPT_CLONE_ALL, CloneAll);
-					PARSESTRINGOPTION(eOptionIDs::OPT_CLONE_ACTION, CloneAction);
-					PARSESTRINGOPTION(eOptionIDs::OPT_ANIMATE, Animate);
-					PARSESTRINGOPTION(eOptionIDs::OPT_MUTATE, Mutate);
-					PARSESTRINGOPTION(eOptionIDs::OPT_CROSS0, Cross0);
-					PARSESTRINGOPTION(eOptionIDs::OPT_CROSS1, Cross1);
-					PARSESTRINGOPTION(eOptionIDs::OPT_METHOD, Method);
-					PARSESTRINGOPTION(eOptionIDs::OPT_INTER, Inter);
-					PARSESTRINGOPTION(eOptionIDs::OPT_ROTATE, Rotate);
-					PARSESTRINGOPTION(eOptionIDs::OPT_SEQUENCE, Sequence);
-					PARSESTRINGOPTION(eOptionIDs::OPT_USE_VARS, UseVars);
-					PARSESTRINGOPTION(eOptionIDs::OPT_DONT_USE_VARS, DontUseVars);
-					PARSESTRINGOPTION(eOptionIDs::OPT_EXTRAS, Extras);
+					PARSEOPTION(eOptionIDs::OPT_ID, Id);
+					PARSEOPTION(eOptionIDs::OPT_URL, Url);
+					PARSEOPTION(eOptionIDs::OPT_NICK, Nick);
+					PARSEOPTION(eOptionIDs::OPT_COMMENT, Comment);
+					PARSEOPTION(eOptionIDs::OPT_TEMPLATE, TemplateFile);
+					PARSEOPTION(eOptionIDs::OPT_CLONE, Clone);
+					PARSEOPTION(eOptionIDs::OPT_CLONE_ALL, CloneAll);
+					PARSEOPTION(eOptionIDs::OPT_CLONE_ACTION, CloneAction);
+					PARSEOPTION(eOptionIDs::OPT_ANIMATE, Animate);
+					PARSEOPTION(eOptionIDs::OPT_MUTATE, Mutate);
+					PARSEOPTION(eOptionIDs::OPT_CROSS0, Cross0);
+					PARSEOPTION(eOptionIDs::OPT_CROSS1, Cross1);
+					PARSEOPTION(eOptionIDs::OPT_METHOD, Method);
+					PARSEOPTION(eOptionIDs::OPT_INTER, Inter);
+					PARSEOPTION(eOptionIDs::OPT_ROTATE, Rotate);
+					PARSEOPTION(eOptionIDs::OPT_SEQUENCE, Sequence);
+					PARSEOPTION(eOptionIDs::OPT_USE_VARS, UseVars);
+					PARSEOPTION(eOptionIDs::OPT_DONT_USE_VARS, DontUseVars);
+					PARSEOPTION(eOptionIDs::OPT_EXTRAS, Extras);
 
 					default:
 					{
@@ -775,6 +778,8 @@ public:
 	Eob Enclosed;
 	Eob NoEdits;
 	Eob UnsmoothEdge;
+	Eob CwLoops;
+	Eob CwInterpLoops;
 	Eob LockAccum;
 	Eob DumpKernel;
 
@@ -794,7 +799,9 @@ public:
 	Eou LastFrame;
 	Eou Frame;
 	Eou Dtime;
-	Eou Frames;
+	Eou LoopFrames;
+	Eou InterpFrames;
+	Eou InterpLoops;
 	Eou Repeat;
 	Eou Tries;
 	Eou MaxXforms;

@@ -10,7 +10,7 @@
 /// <param name="settings">Pointer to the global settings object to use</param>
 /// <param name="p">The parent widget</param>
 /// <param name="f">The window flags. Default: 0.</param>
-FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f)
+FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowFlags f)
 	: QDialog(p, f)
 {
 	ui.setupUi(this);
@@ -19,7 +19,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(FractoriumSettings* set
 	QTableWidget* table = ui.FinalRenderParamsTable;
 	m_Info = OpenCLInfo::Instance();
 	m_Fractorium = qobject_cast<Fractorium*>(p);
-	m_Settings = settings;
+	m_Settings = FractoriumSettings::DefInstance();
 	ui.FinalRenderThreadCountSpin->setRange(1, Timing::ProcessorCount());
 	connect(ui.FinalRenderEarlyClipCheckBox,	   SIGNAL(stateChanged(int)),		 this, SLOT(OnEarlyClipCheckBoxStateChanged(int)),		 Qt::QueuedConnection);
 	connect(ui.FinalRenderYAxisUpCheckBox,	       SIGNAL(stateChanged(int)),		 this, SLOT(OnYAxisUpCheckBoxStateChanged(int)),		 Qt::QueuedConnection);

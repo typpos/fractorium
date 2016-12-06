@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FractoriumPch.h"
+#include "DoubleSpinBox.h"
 
 /// <summary>
 /// SpinBox class.
@@ -41,7 +42,6 @@ private:
 	void StartTimer();
 	void StopTimer();
 
-	bool m_Select;
 	bool m_DoubleClick;
 	int m_DoubleClickNonZero;
 	int m_DoubleClickZero;

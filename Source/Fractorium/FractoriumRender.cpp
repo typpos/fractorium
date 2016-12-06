@@ -642,6 +642,8 @@ bool Fractorium::CreateRendererFromOptions()
 		//If using OpenCL, will only get here if creating RendererCL failed, but creating a backup CPU Renderer succeeded.
 		ShowCritical("Renderer Creation Error", "Error creating renderer, most likely a GPU problem. Using CPU instead.");
 		m_Settings->OpenCL(false);
+		ui.ActionCpu->setChecked(true);
+		ui.ActionCL->setChecked(false);
 		m_OptionsDialog->ui.OpenCLCheckBox->setChecked(false);
 		m_FinalRenderDialog->ui.FinalRenderOpenCLCheckBox->setChecked(false);
 		ok = false;
@@ -674,11 +676,9 @@ bool Fractorium::CreateControllerFromOptions()
 		double scale;
 		uint current = 0;
 #ifdef DO_DOUBLE
-		Ember<double> ed;
 		EmberFile<double> efd;
 		Palette<double> tempPalette;
 #else
-		Ember<float> ed;
 		EmberFile<float> efd;
 		Palette<float> tempPalette;
 #endif
@@ -689,16 +689,13 @@ bool Fractorium::CreateControllerFromOptions()
 		{
 			scale = m_Controller->LockedScale();
 			m_Controller->StopAllPreviewRenderers();//Must stop any previews first, else changing controllers will crash the program and SaveCurrentToOpenedFile() will return 0.
-			current = m_Controller->SaveCurrentToOpenedFile(false);
 			m_Controller->CopyTempPalette(tempPalette);//Convert float to double or save double verbatim;
+			current = m_Controller->SaveCurrentToOpenedFile(false);
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
-			//m_Controller->CopyEmber(ed);
 			//m_Controller->CopyEmberFile(efd);
 #ifdef DO_DOUBLE
-			m_Controller->CopyEmber(ed, [&](Ember<double>& ember) { });
 			m_Controller->CopyEmberFile(efd, false, [&](Ember<double>& ember) { });
 #else
-			m_Controller->CopyEmber(ed, [&](Ember<float>& ember) { });
 			m_Controller->CopyEmberFile(efd, false, [&](Ember<float>& ember) { });
 #endif
 			m_Controller->Shutdown();
@@ -715,7 +712,9 @@ bool Fractorium::CreateControllerFromOptions()
 		//Restore the ember and ember file.
 		if (m_Controller.get())
 		{
-			ed.m_Palette = tempPalette;//Restore base temp palette. Adjustments will be then be applied and stored back in in m_Ember.m_Palette below.
+			if (auto prev = efd.Get(current))//Restore base temp palette. Adjustments will be then be applied and stored back in in m_Ember.m_Palette below.
+				prev->m_Palette = tempPalette;
+
 			m_Controller->SetEmberFile(efd, true);
 			m_Controller->SetEmber(current, true);
 			m_Controller->LockedScale(scale);

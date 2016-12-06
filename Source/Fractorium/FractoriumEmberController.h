@@ -127,8 +127,8 @@ public:
 	virtual void StopLibraryPreviewRender() { }
 	virtual void StopSequencePreviewRender() { }
 	virtual void StopAllPreviewRenderers() { }
-	virtual void MoveLibraryItems(int startRow, int destRow) { }
-	virtual void Delete(const pair<size_t, QTreeWidgetItem*>& p) { }
+	virtual void MoveLibraryItems(const QModelIndexList& items, int destRow) { }
+	virtual void Delete(const vector<pair<size_t, QTreeWidgetItem*>>& v) { }
 	virtual void FillSequenceTree() { }
 	virtual void SequenceGenerateButtonClicked() { }
 	virtual void SequenceSaveButtonClicked() { }
@@ -191,6 +191,8 @@ public:
 	virtual void RandomXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
 	double LockedScale() { return m_LockedScale; }
+	double LockedX() { return m_LockedX; }
+	double LockedY() { return m_LockedY; }
 	void LockedScale(double scale) { m_LockedScale = scale; }
 	virtual void LockAffineScaleCheckBoxStateChanged(int state) { }
 
@@ -265,6 +267,8 @@ protected:
 	uint m_FailedRenders = 0;
 	size_t m_UndoIndex = 0;
 	double m_LockedScale = 1;
+	double m_LockedX = 0;
+	double m_LockedY = 0;
 	eRendererType m_RenderType = eRendererType::CPU_RENDERER;
 	eEditUndoState m_EditState;
 	GLuint m_OutputTexID = 0;
@@ -372,8 +376,8 @@ public:
 	virtual void SyncLibrary(eLibraryUpdate update) override;
 	virtual void FillLibraryTree(int selectIndex = -1) override;
 	virtual void UpdateLibraryTree() override;
-	virtual void MoveLibraryItems(int startRow, int destRow) override;
-	virtual void Delete(const pair<size_t, QTreeWidgetItem*>& p) override;
+	virtual void MoveLibraryItems(const QModelIndexList& items, int destRow) override;
+	virtual void Delete(const vector<pair<size_t, QTreeWidgetItem*>>& v) override;
 	virtual void EmberTreeItemChanged(QTreeWidgetItem* item, int col) override;
 	virtual void EmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) override;
 	void RenderPreviews(QTreeWidget* tree, TreePreviewRenderer<T>* renderer, EmberFile<T>& file, uint start = UINT_MAX, uint end = UINT_MAX);
@@ -477,6 +481,10 @@ public:
 	virtual void ClearXaos() override;
 	virtual void RandomXaos() override;
 
+	//Xforms Selection.
+	bool XformCheckboxAt(int i, std::function<void(QCheckBox*)> func);
+	bool XformCheckboxAt(Xform<T>* xform, std::function<void(QCheckBox*)> func);
+
 	//Palette.
 	virtual size_t InitPaletteList(const string& s) override;
 	virtual bool FillPaletteTable(const string& s) override;
@@ -512,8 +520,6 @@ private:
 
 	//Xforms Selection.
 	QString MakeXformCaption(size_t i);
-	bool XformCheckboxAt(int i, std::function<void(QCheckBox*)> func);
-	bool XformCheckboxAt(Xform<T>* xform, std::function<void(QCheckBox*)> func);
 
 	//Palette.
 	void UpdateAdjustedPaletteGUI(Palette<T>& palette);
@@ -624,7 +630,7 @@ public:
 	using PreviewRenderer<T>::m_PreviewEmber;
 	using PreviewRenderer<T>::m_PreviewRenderer;
 	using PreviewRenderer<T>::m_PreviewFinalImage;
-	
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TreePreviewRenderer{T}"/> class.
 	/// </summary>

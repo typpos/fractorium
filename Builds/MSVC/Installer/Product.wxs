@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <?define ProductVersion="1.0.0.1" ?>
+  <?define ProductVersion="1.0.0.2" ?>
   <?define ProductName="Fractorium $(var.ProductVersion) ($(var.GpuType))" ?>
   <?define UpgradeCode="{4714cd15-bfba-44f6-8059-9e1466ebfa6e}"?>
   <?define Manufacturer="Fractorium"?>
@@ -13,7 +13,7 @@
   <!--
   Change this for every release.
   -->
-  <?define ProductCode="{93E17CD3-46AA-4AD6-8531-3DF61721B48D}"?>
+  <?define ProductCode="{08AE2B75-565F-4E0D-A1A0-C7A5ED1CA2C1}"?>
   
   <Product Id="$(var.ProductCode)" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
     <Package
@@ -146,14 +146,17 @@
       <Component Id="tbb.dll" Guid="ffa1b2ec-32d5-41aa-9380-fb04d8139103">
         <File Id="tbb.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\tbb.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64"/>
       </Component>
-      <Component Id="msvcp120.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
-        <File Id="msvcp120.dll" Source="$(env.VS120COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC120.CRT\msvcp120.dll" KeyPath="yes" Checksum="yes" />
+      <Component Id="msvcp140.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
+        <File Id="msvcp140.dll" Source="$(env.VS140COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC140.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" />
       </Component>
-      <Component Id="msvcr120.dll" Guid="50c9bc27-c547-4a03-9f6c-cd416f449dd8">
-        <File Id="msvcr120.dll" Source="$(env.VS120COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC120.CRT\msvcr120.dll" KeyPath="yes" Checksum="yes" />
+      <Component Id="vcruntime140.dll" Guid="50c9bc27-c547-4a03-9f6c-cd416f449dd8">
+        <File Id="vcruntime140.dll" Source="$(env.VS140COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC140.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" />
       </Component>
-      <Component Id="vccorlib120.dll" Guid="affe33e7-1e64-4bb0-a062-2b56f77459b4">
-        <File Id="vccorlib120.dll" Source="$(env.VS120COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC120.CRT\vccorlib120.dll" KeyPath="yes" Checksum="yes" />
+      <Component Id="vccorlib140.dll" Guid="affe33e7-1e64-4bb0-a062-2b56f77459b4">
+        <File Id="vccorlib140.dll" Source="$(env.VS140COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC140.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Id="concrt140.dll" Guid="7fb716a1-1b4f-42fb-89c7-4d216ebd6e2e">
+        <File Id="concrt140.dll" Source="$(env.VS140COMNTOOLS)..\..\VC\redist\x64\Microsoft.VC140.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" />
       </Component>
       <Component Id="flam3palettes.xml" Guid="d3adb0bb-14ef-4923-99d9-a5784b7ef04e">
         <File Id="flam3palettes.xml" Source="$(var.SolutionDir)..\..\..\Data\flam3-palettes.xml" KeyPath="yes" Checksum="yes" />

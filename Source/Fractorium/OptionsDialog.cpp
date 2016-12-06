@@ -8,12 +8,12 @@
 /// <param name="settings">A pointer to the settings object to use</param>
 /// <param name="p">The parent widget. Default: nullptr.</param>
 /// <param name="f">The window flags. Default: 0.</param>
-FractoriumOptionsDialog::FractoriumOptionsDialog(FractoriumSettings* settings, QWidget* p, Qt::WindowFlags f)
+FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 	: QDialog(p, f)
 {
 	int i, row = 0, spinHeight = 20;
 	ui.setupUi(this);
-	m_Settings = settings;
+	m_Settings = FractoriumSettings::DefInstance();
 	m_Info = OpenCLInfo::Instance();
 	QTableWidget* table = ui.OptionsXmlSavingTable;
 	ui.ThreadCountSpin->setRange(1, Timing::ProcessorCount());
@@ -66,6 +66,7 @@ bool FractoriumOptionsDialog::ContinuousUpdate() { return ui.ContinuousUpdateChe
 bool FractoriumOptionsDialog::OpenCL() { return ui.OpenCLCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::Double() { return ui.DoublePrecisionCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::ShowAllXforms() { return ui.ShowAllXformsCheckBox->isChecked(); }
+bool FractoriumOptionsDialog::ToggleType() { return ui.ToggleTypeCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::AutoUnique() { return ui.AutoUniqueCheckBox->isChecked(); }
 uint FractoriumOptionsDialog::ThreadCount() { return ui.ThreadCountSpin->value(); }
 uint FractoriumOptionsDialog::RandomCount() { return ui.RandomCountSpin->value(); }
@@ -172,6 +173,7 @@ void FractoriumOptionsDialog::GuiToData()
 	m_Settings->OpenCL(OpenCL());
 	m_Settings->Double(Double());
 	m_Settings->ShowAllXforms(ShowAllXforms());
+	m_Settings->ToggleType(ToggleType());
 	m_Settings->ThreadCount(ThreadCount());
 	m_Settings->RandomCount(RandomCount());
 	m_Settings->CpuSubBatch(ui.CpuSubBatchSpin->value());
@@ -204,6 +206,7 @@ void FractoriumOptionsDialog::DataToGui()
 	ui.OpenCLCheckBox->setChecked(m_Settings->OpenCL());
 	ui.DoublePrecisionCheckBox->setChecked(m_Settings->Double());
 	ui.ShowAllXformsCheckBox->setChecked(m_Settings->ShowAllXforms());
+	ui.ToggleTypeCheckBox->setChecked(m_Settings->ToggleType());
 	ui.ThreadCountSpin->setValue(m_Settings->ThreadCount());
 	ui.RandomCountSpin->setValue(m_Settings->RandomCount());
 	ui.CpuSubBatchSpin->setValue(m_Settings->CpuSubBatch());

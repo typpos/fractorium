@@ -6,6 +6,8 @@
 /// DoubleSpinBox and VariationTreeDoubleSpinBox classes.
 /// </summary>
 
+enum class eSpinToggle : et { NONE = 0, SPIN_DOUBLE_CLICK = 1, SPIN_RIGHT_CLICK = 2 };
+
 /// <summary>
 /// A derivation to prevent the spin box from selecting its own text
 /// when editing. Also to prevent multiple spin boxes from all having
@@ -43,7 +45,6 @@ private:
 	void StartTimer();
 	void StopTimer();
 
-	bool m_Select;
 	bool m_DoubleClick;
 	double m_DoubleClickNonZero;
 	double m_DoubleClickZero;

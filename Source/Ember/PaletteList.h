@@ -241,7 +241,6 @@ private:
 	/// <param name="palettes">The vector to store the paresed palettes associated with this file in.</param>
 	void ParsePalettes(xmlNode* node, const shared_ptr<string>& filename, vector<Palette<T>>& palettes)
 	{
-		bool hexError = false;
 		char* val;
 		const char* loc = __FUNCTION__;
 		xmlAttrPtr attr;
@@ -259,33 +258,31 @@ private:
 
 					if (!Compare(attr->name, "data"))
 					{
-						int colorIndex = 0;
-						uint r, g, b;
-						int colorCount = 0;
-						hexError = false;
+						string s1, s;
+						size_t tmp, colorCount = 0, colorIndex = 0;
+						stringstream ss, temp(val); ss >> std::hex;
+						s.reserve(2048);
 
-						do
+						while (temp >> s1)
+							s += s1;
+
+						auto length = s.size();
+
+						for (size_t strIndex = 0; strIndex < length;)
 						{
-							int ret = sscanf_s(static_cast<char*>(&(val[colorIndex])), "00%2x%2x%2x", &r, &g, &b);
+							strIndex += 2;//Skip past the 00 at the beginning of each RGB.
 
-							if (ret != 3)
+							for (glm::length_t i = 0; i < 3 && colorCount < palette.Size(); i++)
 							{
-								AddToReport(string(loc) + " : Problem reading hexadecimal color data " + string(&val[colorIndex]));
-								hexError = true;
-								break;
+								const char tmpStr[3] = { s[strIndex++], s[strIndex++], 0 };//Read out and convert the string two characters at a time.
+								ss.clear();//Reset and fill the string stream.
+								ss.str(tmpStr);
+								ss >> tmp;//Do the conversion.
+								palette.m_Entries[colorCount][i] = T(tmp) / T(255);//Hex palette is [0..255], convert to [0..1].
 							}
 
-							colorIndex += 8;
-
-							while (isspace(int(val[colorIndex])))
-								colorIndex++;
-
-							palette[colorCount].r = T(r) / T(255);//Store as normalized colors in the range of 0-1.
-							palette[colorCount].g = T(g) / T(255);
-							palette[colorCount].b = T(b) / T(255);
 							colorCount++;
 						}
-						while (colorCount < COLORMAP_LENGTH);
 					}
 					else if (!Compare(attr->name, "number"))
 					{
@@ -300,11 +297,8 @@ private:
 					attr = attr->next;
 				}
 
-				if (!hexError)
-				{
-					palette.m_Filename = filename;
-					palettes.push_back(palette);
-				}
+				palette.m_Filename = filename;
+				palettes.push_back(palette);
 			}
 			else
 			{

@@ -18,12 +18,9 @@ using namespace EmberCommon;
 template <typename T>
 void SaveFinalImage(Renderer<T, T>& renderer, vector<byte>& pixels, char* suffix)
 {
-	Timing t;
-	//renderer.AccumulatorToFinalImage(pixels);
-	//t.Toc("AccumulatorToFinalImage()");
 	long newSize;
-	char ch[50];
-	sprintf_s(ch, 50, ".\\BasicFlame_%d_%s.bmp", sizeof(T), suffix);
+	ostringstream os;
+	os << ".\\BasicFlame_" << sizeof(T) << "_"  << suffix ".bmp";
 	BYTE* bgrBuf = ConvertRGBToBMPBuffer(pixels.data(), renderer.FinalRasW(), renderer.FinalRasH(), newSize);
 	SaveBMP(ch, bgrBuf, renderer.FinalRasW(), renderer.FinalRasH(), newSize);
 	delete [] bgrBuf;
@@ -1870,7 +1867,7 @@ void DistribTester()
 					throw "Out of bounds xform index in selection distribution.";
 
 #endif
-				//printf("offset = %d, xform = %d, running sum = %f\n", j, i, tempDensity);
+				//cout << "offset = " << j << ", xform = " << i << ", running sum = " << tempDensity << "\n";
 				m_XformDistributions[(distrib * CHOOSE_XFORM_GRAIN) + j] = byte(i);
 				tempDensity += densityPerElement;
 				j++;

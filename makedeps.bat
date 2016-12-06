@@ -9,12 +9,13 @@ git clone https://github.com/GNOME/libxml2.git
 git clone https://github.com/g-truc/glm.git
 
 REM Set VC paths
-set INCLUDE=%INCLUDE%;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include;
+set INCLUDE=%INCLUDE%;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin;
 
 REM libjpeg
+copy fractorium\Builds\MSVC\WIN32.MAK libjpeg
 cd libjpeg
-nmake /f makefile.vc  setup-v10
-nmake nodebug=1 /f makefile.vc all
+nmake /f makefile.vc setup-v10 CPU=i386
+nmake nodebug=1 /f makefile.vc all CPU=i386
 copy libjpeg.lib ..\fractorium\Deps
 cd ..
 
@@ -44,7 +45,7 @@ copy libpng.lib ..\fractorium\Deps
 cd ..
 
 REM tbb
-cd tbb\build\vs2010
+cd tbb\build\vs2012
 devenv.exe tbb.vcxproj /upgrade
 msbuild tbb.vcxproj /p:Configuration=Release
 copy X64\Release\tbb.dll ..\..\..\fractorium\Deps

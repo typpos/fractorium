@@ -145,7 +145,7 @@ public:
 						throw "Out of bounds xform index in selection distribution.";
 
 #endif
-					//printf("offset = %d, xform = %d, running sum = %f\n", j, i, tempDensity);
+					//cout << "offset = " << j << ", xform = " << i << ", running sum = " << tempDensity << "\n";
 					m_XformDistributions[(distrib * CHOOSE_XFORM_GRAIN) + j] = byte(i);
 					tempDensity += densityPerElement;
 					j++;

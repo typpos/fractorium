@@ -45,13 +45,13 @@ Fractorium::Fractorium(QWidget* p)
 	m_VarSortMode = 1;//Sort by weight by default.
 	m_PaletteSortMode = 0;//Sort by palette ascending by default.
 	m_ColorDialog = new QColorDialog(this);
-	m_Settings = new FractoriumSettings(this);
+	m_Settings = FractoriumSettings::Instance();
 	m_QssDialog = new QssDialog(this);
 	m_FileDialog = nullptr;//Use lazy instantiation upon first use.
 	m_FolderDialog = nullptr;
-	m_FinalRenderDialog = new FractoriumFinalRenderDialog(m_Settings, this);
-	m_OptionsDialog = new FractoriumOptionsDialog(m_Settings, this);
-	m_VarDialog = new FractoriumVariationsDialog(m_Settings, this);
+	m_FinalRenderDialog = new FractoriumFinalRenderDialog(this);
+	m_OptionsDialog = new FractoriumOptionsDialog(this);
+	m_VarDialog = new FractoriumVariationsDialog(this);
 	m_AboutDialog = new FractoriumAboutDialog(this);
 	//Put the about dialog in the screen center.
 	const QRect screen = QApplication::desktop()->screenGeometry();
@@ -157,6 +157,7 @@ Fractorium::Fractorium(QWidget* p)
 	if (ifs.is_open())
 	{
 		string total, qs;
+		total.reserve(20 * 1024);
 
 		while (std::getline(ifs, qs))
 			total += qs + "\n";
@@ -213,9 +214,9 @@ Fractorium::~Fractorium()
 /// <param name="worldY">The cartesian world y coordinate</param>
 void Fractorium::SetCoordinateStatus(int rasX, int rasY, float worldX, float worldY)
 {
-	//Use sprintf rather than allocating and concatenating 6 QStrings for efficiency since this is called on every mouse move.
-	sprintf_s(m_CoordinateString, sizeof(m_CoordinateString), "Window: %4d, %4d World: %2.2f, %2.2f", rasX, rasY, worldX, worldY);
-	m_CoordinateStatusLabel->setText(QString(m_CoordinateString));
+	static QString coords;
+	coords.sprintf("Window: %4d, %4d World: %2.2f, %2.2f", rasX, rasY, worldX, worldY);
+	m_CoordinateStatusLabel->setText(coords);
 }
 
 /// <summary>
@@ -327,10 +328,10 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			//Require shift for deleting to prevent it from triggering when the user enters delete in the edit box.
 			if (ke->key() == Qt::Key_Delete && e->type() == QEvent::KeyRelease && shift)
 			{
-				auto p = GetCurrentEmberIndex();
+				auto v = GetCurrentEmberIndex();
 
-				if (ui.LibraryTree->topLevelItem(0)->childCount() > 1 && p.second)
-					OnDelete(p);
+				if (ui.LibraryTree->topLevelItem(0)->childCount() > 1)
+					OnDelete(v);
 			}
 		}
 	}

@@ -18,9 +18,6 @@
 	#define _stat stat
 	#define _fstat fstat
 	#define _stricmp strcmp
-	#define sscanf_s sscanf
-	#define sprintf_s snprintf
-	#define snprintf_s snprintf
 	typedef int errno_t;
 #endif
 
@@ -40,7 +37,7 @@ static void sincos(float x, float* s, float* c)
 
 namespace EmberNs
 {
-#define EMBER_VERSION "1.0.0.1"
+#define EMBER_VERSION "1.0.0.2"
 #define EPS6 T(1e-6)
 #define EPS std::numeric_limits<T>::epsilon()//Apoplugin.h uses -20, but it's more mathematically correct to do it this way.
 #define ISAAC_SIZE 4

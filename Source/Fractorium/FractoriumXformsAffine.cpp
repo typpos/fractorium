@@ -163,6 +163,8 @@ template <typename T>
 void FractoriumEmberController<T>::LockAffineScaleCheckBoxStateChanged(int state)
 {
 	m_LockedScale = m_Ember.m_PixelsPerUnit;
+	m_LockedX = m_Ember.m_CenterX;
+	m_LockedY = m_Ember.m_CenterY;
 	m_Fractorium->ui.GLDisplay->update();
 }
 

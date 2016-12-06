@@ -5,31 +5,6 @@
 #define PNG_COMMENT_MAX 8
 
 /// <summary>
-/// Write a PPM file.
-/// </summary>
-/// <param name="filename">The full path and name of the file</param>
-/// <param name="image">Pointer to the image data to write</param>
-/// <param name="width">Width of the image in pixels</param>
-/// <param name="height">Height of the image in pixels</param>
-/// <returns>True if success, else false</returns>
-static bool WritePpm(const char* filename, byte* image, size_t width, size_t height)
-{
-	bool b = false;
-	size_t size = width * height * 3;
-	FILE* file;
-
-	if (fopen_s(&file, filename, "wb") == 0)
-	{
-		fprintf_s(file, "P6\n");
-		fprintf_s(file, "%lu %lu\n255\n", width, height);
-		b = (size == fwrite(image, 1, size, file));
-		fclose(file);
-	}
-
-	return b;
-}
-
-/// <summary>
 /// Write a JPEG file.
 /// </summary>
 /// <param name="filename">The full path and name of the file</param>
@@ -53,15 +28,16 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		size_t i;
 		jpeg_error_mgr jerr;
 		jpeg_compress_struct info;
-		char nickString[64], urlString[128], idString[128];
-		char bvString[64], niString[64], rtString[64];
-		char genomeString[65536], verString[64];
+		string nickString, urlString, idString;
+		string bvString, niString, rtString;
+		string genomeString, verString;
 		//Create the mandatory comment strings.
-		snprintf_s(genomeString, 65536, "flam3_genome: %s", comments.m_Genome.c_str());
-		snprintf_s(bvString, 64, "flam3_error_rate: %s", comments.m_Badvals.c_str());
-		snprintf_s(niString, 64, "flam3_samples: %s", comments.m_NumIters.c_str());
-		snprintf_s(rtString, 64, "flam3_time: %s", comments.m_Runtime.c_str());
-		snprintf_s(verString, 64, "flam3_version: %s", EmberVersion());
+		ostringstream os;
+		os << "genome: " << comments.m_Genome; genomeString = os.str(); os.str("");
+		os << "error_rate: " << comments.m_Badvals; bvString = os.str(); os.str("");
+		os << "samples: " << comments.m_NumIters; niString = os.str(); os.str("");
+		os << "time: " << comments.m_Runtime; rtString = os.str(); os.str("");
+		os << "version: " << EmberVersion(); verString = os.str(); os.str("");
 		info.err = jpeg_std_error(&jerr);
 		jpeg_create_compress(&info);
 		jpeg_stdio_dest(&info, file);
@@ -83,36 +59,43 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		//Write comments to jpeg.
 		if (enableComments)
 		{
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(verString), uint(strlen(verString)));
+			string s;
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(verString.c_str()), uint(verString.size()));
 
 			if (nick != "")
 			{
-				snprintf_s(nickString, 64, "flam3_nickname: %s", nick.c_str());
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(nickString), uint(strlen(nickString)));
+				os.str("");
+				os << "nickname: " << nick;
+				s = os.str();
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), uint(s.size()));
 			}
 
 			if (url != "")
 			{
-				snprintf_s(urlString, 128, "flam3_url: %s", url.c_str());
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(urlString), uint(strlen(urlString)));
+				os.str("");
+				os << "url: " << url;
+				s = os.str();
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), uint(s.size()));
 			}
 
 			if (id != "")
 			{
-				snprintf_s(idString, 128, "flam3_id: %s", id.c_str());
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(idString), uint(strlen(idString)));
+				os.str("");
+				os << "id: " << id;
+				s = os.str();
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), uint(s.size()));
 			}
 
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(bvString), uint(strlen(bvString)));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(niString), uint(strlen(niString)));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(rtString), uint(strlen(rtString)));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<byte*>(genomeString), uint(strlen(genomeString)));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(bvString.c_str()), uint(bvString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(niString.c_str()), uint(niString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(rtString.c_str()), uint(rtString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(genomeString.c_str()), uint(genomeString.size()));
 		}
 
 		for (i = 0; i < height; i++)
 		{
 			JSAMPROW row_pointer[1];
-			row_pointer[0] = reinterpret_cast<byte*>(image) + (3 * width * i);
+			row_pointer[0] = image + (3 * width * i);
 			jpeg_write_scanlines(&info, row_pointer, 1);
 		}
 
@@ -209,7 +192,7 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 			png_set_swap(png_ptr);
 		}
 
-		png_write_image(png_ptr, const_cast<png_bytepp>(rows.data()));
+		png_write_image(png_ptr, rows.data());
 		png_write_end(png_ptr, info_ptr);
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(file);
@@ -227,10 +210,10 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 /// <param name="height">The height.</param>
 /// <param name="newSize">The size of the new buffer created</param>
 /// <returns>The converted buffer if successful, else NULL.</returns>
-static byte* ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, size_t& newSize)
+static vector<byte> ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, size_t& newSize)
 {
 	if (buffer == nullptr || width == 0 || height == 0)
-		return nullptr;
+		return vector<byte>();
 
 	size_t padding = 0;
 	size_t scanlinebytes = width * 3;
@@ -240,34 +223,27 @@ static byte* ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, si
 
 	size_t psw = scanlinebytes + padding;
 	newSize = height * psw;
-	byte* newBuf = new byte[newSize];
+	vector<byte> newBuf(newSize);
+	size_t bufpos = 0;
+	size_t newpos = 0;
 
-	if (newBuf)
+	for (size_t y = 0; y < height; y++)
 	{
-		memset (newBuf, 0, newSize);
-		size_t bufpos = 0;
-		size_t newpos = 0;
-
-		for (size_t y = 0; y < height; y++)
+		for (size_t x = 0; x < 3 * width; x += 3)
 		{
-			for (size_t x = 0; x < 3 * width; x += 3)
-			{
-				bufpos = y * 3 * width + x;     // position in original buffer
-				newpos = (height - y - 1) * psw + x; // position in padded buffer
-				newBuf[newpos] = buffer[bufpos + 2];     // swap r and b
-				newBuf[newpos + 1] = buffer[bufpos + 1]; // g stays
-				newBuf[newpos + 2] = buffer[bufpos];     // swap b and r
-				//No swap.
-				//newBuf[newpos] = buffer[bufpos];
-				//newBuf[newpos + 1] = buffer[bufpos + 1];
-				//newBuf[newpos + 2] = buffer[bufpos + 2];
-			}
+			bufpos = y * 3 * width + x;     // position in original buffer
+			newpos = (height - y - 1) * psw + x; // position in padded buffer
+			newBuf[newpos] = buffer[bufpos + 2];     // swap r and b
+			newBuf[newpos + 1] = buffer[bufpos + 1]; // g stays
+			newBuf[newpos + 2] = buffer[bufpos];     // swap b and r
+			//No swap.
+			//newBuf[newpos] = buffer[bufpos];
+			//newBuf[newpos + 1] = buffer[bufpos + 1];
+			//newBuf[newpos + 2] = buffer[bufpos + 2];
 		}
-
-		return newBuf;
 	}
 
-	return nullptr;
+	return newBuf;
 }
 
 /// <summary>
@@ -279,7 +255,7 @@ static byte* ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, si
 /// <param name="height">Height of the image in pixels</param>
 /// <param name="paddedSize">Padded size, greater than or equal to total image size.</param>
 /// <returns>True if success, else false</returns>
-static bool SaveBmp(const char* filename, byte* image, size_t width, size_t height, size_t paddedSize)
+static bool SaveBmp(const char* filename, const byte* image, size_t width, size_t height, size_t paddedSize)
 {
 #ifdef _WIN32
 	BITMAPFILEHEADER bmfh;
@@ -346,10 +322,7 @@ static bool WriteBmp(const char* filename, byte* image, size_t width, size_t hei
 {
 	bool b = false;
 	size_t newSize;
-	unique_ptr<byte> bgrBuf(ConvertRGBToBMPBuffer(image, width, height, newSize));
-
-	if (bgrBuf.get())
-		b = SaveBmp(filename, bgrBuf.get(), width, height, newSize);
-
+	auto bgrBuf = ConvertRGBToBMPBuffer(image, width, height, newSize);
+	b = SaveBmp(filename, bgrBuf.data(), width, height, newSize);
 	return b;
 }

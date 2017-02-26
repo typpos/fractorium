@@ -56,8 +56,6 @@ uint Timing::m_ProcessorCount;
 	template class Post##varName##Variation<T>;
 
 #define EXPORT_SINGLE_TYPE_EMBER(T) \
-	template<> const char* PaletteList<T>::m_DefaultFilename = "flam3-palettes.xml"; \
-	template<> map<string, vector<Palette<T>>> PaletteList<T>::s_Palettes = map<string, vector<Palette<T>>>(); \
 	template<> bool XmlToEmber<T>::m_Init = false; \
 	template<> vector<string> XmlToEmber<T>::m_FlattenNames = vector<string>(); \
 	template<> unordered_map<string, string> XmlToEmber<T>::m_BadParamNames = unordered_map<string, string>(); \

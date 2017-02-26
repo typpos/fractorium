@@ -62,10 +62,11 @@ public:
 	/// <param name="palettePath">The full path and filename of the palette file</param>
 	/// <param name="renderer">A pre-constructed renderer to use. The caller should not delete this.</param>
 	SheepTools(const string& palettePath, Renderer<T, bucketT>* renderer)
-		: m_VariationList(VariationList<T>::Instance())
+		: m_VariationList(VariationList<T>::Instance()),
+		  m_PaletteList(PaletteList<float>::Instance())
 	{
 		Timing t;
-		m_PaletteList.Add(palettePath);
+		m_PaletteList->Add(palettePath);
 		m_Renderer = unique_ptr<Renderer<T, bucketT>>(renderer);
 		m_Rand = QTIsaac<ISAAC_SIZE, ISAAC_INT>(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));
 	}
@@ -90,8 +91,8 @@ public:
 		ember.AddXform(xform2);
 		ember.AddXform(xform3);
 
-		if (m_PaletteList.Size())
-			ember.m_Palette = *m_PaletteList.GetRandomPalette();
+		if (m_PaletteList->Size())
+			ember.m_Palette = *m_PaletteList->GetRandomPalette();
 
 		return ember;
 	}
@@ -365,8 +366,8 @@ public:
 			}
 			else//Randomize palette only.
 			{
-				if (m_PaletteList.Size())
-					ember.m_Palette = *m_PaletteList.GetRandomPalette();
+				if (m_PaletteList->Size())
+					ember.m_Palette = *m_PaletteList->GetRandomPalette();
 
 				//If the palette retrieval fails, skip the mutation.
 				if (ember.m_Palette.m_Index >= 0)
@@ -607,8 +608,8 @@ public:
 		};
 		ember.Clear();
 
-		if (m_PaletteList.Size())
-			ember.m_Palette = *m_PaletteList.GetRandomPalette();
+		if (m_PaletteList->Size())
+			ember.m_Palette = *m_PaletteList->GetRandomPalette();
 
 		ember.m_Time = 0;
 		ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
@@ -883,9 +884,9 @@ public:
 	{
 		if (changePalette)
 		{
-			if (m_PaletteList.Size())
+			if (m_PaletteList->Size())
 			{
-				ember.m_Palette = *m_PaletteList.GetRandomPalette();
+				ember.m_Palette = *m_PaletteList->GetRandomPalette();
 			}
 			else
 			{
@@ -1365,7 +1366,7 @@ private:
 	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();
 	unique_ptr<Renderer<T, bucketT>> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
-	PaletteList<float> m_PaletteList;
+	shared_ptr<PaletteList<float>> m_PaletteList;
 	shared_ptr<VariationList<T>> m_VariationList;
 };
 }

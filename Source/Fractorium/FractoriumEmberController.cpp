@@ -9,6 +9,7 @@
 /// </summary>
 /// <param name="fractorium">Pointer to the main window.</param>
 FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractorium)
+	: m_PaletteList(PaletteList<float>::Instance())
 {
 	Timing t;
 	m_Fractorium = fractorium;
@@ -46,7 +47,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 	m_GLController = make_unique<GLEmberController<T>>(fractorium, fractorium->ui.GLDisplay, this);
 	m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile);
 	m_SequencePreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.SequenceTree, m_SequenceFile);
-	m_PaletteList.Clear();
+	m_PaletteList->Clear();
 	m_Fractorium->ui.PaletteFilenameCombo->clear();
 	//Initial combo change event to fill the palette table will be called automatically later.
 	//Look hard for a palette.
@@ -57,7 +58,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 
 	if (b)
 	{
-		m_SheepTools = make_unique<SheepTools<T, float>>(m_PaletteList.Name(0), new EmberNs::Renderer<T, float>());
+		m_SheepTools = make_unique<SheepTools<T, float>>(m_PaletteList->Name(0), new EmberNs::Renderer<T, float>());
 	}
 	else
 	{
@@ -71,8 +72,8 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 		throw ex;
 	}
 
-	if (m_PaletteList.Size() >= 1)//Only add the user palette if the folder already had a palette, which means we'll be using this folder.
-		if (m_PaletteList.AddEmptyPaletteFile((GetDefaultUserPath() + "/user-palettes.xml").toStdString()))
+	if (m_PaletteList->Size() >= 1)//Only add the user palette if the folder already had a palette, which means we'll be using this folder.
+		if (m_PaletteList->AddEmptyPaletteFile((GetDefaultUserPath() + "/user-palettes.xml").toStdString()))
 			m_Fractorium->ui.PaletteFilenameCombo->addItem("user-palettes.xml");
 
 	BackgroundChanged(QColor(0, 0, 0));//Default to black.
@@ -327,23 +328,13 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	}
 
 	static EmberToXml<T> writer;//Save parameters of last full render just in case there is a crash.
-#ifdef _WIN32
-	string filename = "last.flame";
-#elif defined(__APPLE__)
-	QDir dir(QDir::applicationDirPath());
+	auto path = GetDefaultUserPath();
+	QDir dir(path);
 
 	if (!dir.exists())
 		dir.mkpath(".");
 
-	string filename = QDir::applicationDirPath().toStdString() + "/last.flame";
-#else
-	QDir dir(QDir::homePath() + "/.config/fractorium");
-
-	if (!dir.exists())
-		dir.mkpath(".");
-
-	string filename = QDir::homePath().toStdString() + "/.config/fractorium/last.flame";
-#endif
+	string filename = path.toStdString() + "/last.flame";
 	writer.Save(filename.c_str(), m_Ember, 0, true, true, false, true, true);
 	m_GLController->ResetMouseState();
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.

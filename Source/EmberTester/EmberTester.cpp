@@ -88,9 +88,9 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 	uint index = 0;
 	ostringstream ss;
 	auto varList = VariationList<T>::Instance();
-	PaletteList<T> paletteList;
+	auto paletteList = PaletteList<float>::Instance();
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
-	paletteList.Add("flam3-palettes.xml");
+	paletteList->Add("flam3-palettes.xml");
 	Timing t;
 	Ember<T> emberNoVars;
 	emberNoVars.m_FinalRasW = 640;
@@ -113,7 +113,7 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 	ss << "NoVars";
 	emberNoVars.m_Name = ss.str();
 	ss.str("");
-	emberNoVars.m_Palette = *paletteList.GetPaletteByFilename(paletteList.m_DefaultFilename, 0);
+	emberNoVars.m_Palette = *paletteList->GetPaletteByFilename(paletteList->m_DefaultFilename, 0);
 	embers.push_back(emberNoVars);
 
 	while (index < varList->RegSize())
@@ -176,7 +176,7 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 		ss << index << "_" << regVar->Name();
 		ember1.m_Name = ss.str();
 		ss.str("");
-		ember1.m_Palette = *paletteList.GetRandomPalette();
+		ember1.m_Palette = *paletteList->GetRandomPalette();
 		index++;
 		embers.push_back(ember1);
 	}
@@ -1078,10 +1078,10 @@ void PrintAllVars()
 void TestXformsInOutPoints()
 {
 	uint index = 0;
-	auto varList(VariationList<float>::Instance());
-	PaletteList<float> paletteList;
+	auto varList = VariationList<float>::Instance();
+	auto paletteList = PaletteList<float>::Instance();
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
-	paletteList.Add("flam3-palettes.xml");
+	paletteList->Add("flam3-palettes.xml");
 
 	while (index < varList->RegSize())
 	{
@@ -1975,8 +1975,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	    TestThreadedKernel();
 
-	    PaletteList<float> palf;
-	    Palette<float>* pal = palf.GetRandomPalette();
+	    auto palf = PaletteList<float>::Instance();
+	    Palette<float>* pal = palf->GetRandomPalette();
 
 	    cout << pal->Size() << endl;
 

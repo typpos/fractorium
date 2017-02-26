@@ -66,7 +66,7 @@ size_t FractoriumEmberController<T>::InitPaletteList(const QString& s)
 
 		try
 		{
-			if (QFile::exists(path) && m_PaletteList.Add(path.toStdString()))
+			if (QFile::exists(path) && m_PaletteList->Add(path.toStdString()))
 				m_Fractorium->ui.PaletteFilenameCombo->addItem(qfilename);
 		}
 		catch (const std::exception& e)
@@ -79,7 +79,7 @@ size_t FractoriumEmberController<T>::InitPaletteList(const QString& s)
 		}
 	}
 
-	return m_PaletteList.Size();
+	return m_PaletteList->Size();
 }
 
 /// <summary>
@@ -103,10 +103,10 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 		}
 		else
 		{
-			vector<string> errors = m_PaletteList.ErrorReport();
+			vector<string> errors = m_PaletteList->ErrorReport();
 			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 			m_Fractorium->ShowCritical("Palette Read Error", "Could not load palette file, all images will be black. See info tab for details.");
-			m_PaletteList.ClearErrorReport();
+			m_PaletteList->ClearErrorReport();
 		}
 	}
 
@@ -122,7 +122,7 @@ void Fractorium::OnPaletteFilenameComboChanged(const QString& text)
 {
 	auto s = text.toStdString();
 	m_Controller->FillPaletteTable(s);
-	auto fullname = m_Controller->m_PaletteList.GetFullPathFromFilename(s);
+	auto fullname = m_Controller->m_PaletteList->GetFullPathFromFilename(s);
 	ui.PaletteFilenameCombo->setToolTip(QString::fromStdString(fullname));
 	ui.PaletteListTable->sortItems(0, m_PaletteSortMode == 0 ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
@@ -222,7 +222,7 @@ void FractoriumEmberController<T>::SetBasePaletteAndAdjust(const Palette<float>&
 template <typename T>
 void FractoriumEmberController<T>::PaletteCellClicked(int row, int col)
 {
-	if (auto palette = m_PaletteList.GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+	if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		SetBasePaletteAndAdjust(*palette);
 }
 
@@ -332,14 +332,14 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 	}
 
 	//If the palette was modifiable, and any palette was changed at least once
-	if (m_Fractorium->m_PaletteFileChanged && m_PaletteList.IsModifiable(m_CurrentPaletteFilePath))
+	if (m_Fractorium->m_PaletteFileChanged && m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
 	{
 		if (!::FillPaletteTable(m_CurrentPaletteFilePath, m_Fractorium->ui.PaletteListTable, m_PaletteList))
 		{
-			vector<string> errors = m_PaletteList.ErrorReport();
+			vector<string> errors = m_PaletteList->ErrorReport();
 			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 			m_Fractorium->ShowCritical("Palette Read Error", "Could not re-load modified palette file, all images will be black. See info tab for details.");
-			m_PaletteList.ClearErrorReport();
+			m_PaletteList->ClearErrorReport();
 		}
 	}
 }
@@ -362,7 +362,7 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 {
 	if (!m_PaletteEditor)
 	{
-		m_PaletteEditor = new PaletteEditor(m_Controller->m_PaletteList, this);
+		m_PaletteEditor = new PaletteEditor(this);
 		connect(m_PaletteEditor, SIGNAL(PaletteChanged()), this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()), this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
 	}

@@ -71,6 +71,6 @@ private:
 	static unordered_map<string, string> m_BadParamNames;
 	static vector<pair<pair<string, string>, vector<string>>> m_BadVariationNames;
 	shared_ptr<VariationList<T>> m_VariationList;//The variation list used to make copies of variations to populate the embers with.
-	PaletteList<T> m_PaletteList;
+	shared_ptr<PaletteList<float>> m_PaletteList;
 };
 }

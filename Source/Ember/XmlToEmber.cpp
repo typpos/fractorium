@@ -37,7 +37,8 @@ Locale::~Locale()
 /// </summary>
 template <typename T>
 XmlToEmber<T>::XmlToEmber()
-	: m_VariationList(VariationList<T>::Instance())
+	: m_VariationList(VariationList<T>::Instance()),
+	  m_PaletteList(PaletteList<float>::Instance())
 {
 	Timing t;
 
@@ -388,7 +389,7 @@ bool XmlToEmber<T>::Parse(const char* filename, C<Ember<T>, Alloc>& embers, bool
 	string buf;
 
 	//Ensure palette list is setup first.
-	if (!m_PaletteList.Size())
+	if (!m_PaletteList->Size())
 	{
 		AddToReport(string(loc) + " : Palette list must be initialized before parsing embers.");
 		return false;
@@ -468,7 +469,7 @@ void XmlToEmber<T>::ScanForEmberNodes(xmlNode* curNode, char* parentFile, C<Embe
 
 			if (currentEmber.PaletteIndex() != -1)
 			{
-				if (auto pal = m_PaletteList.GetPaletteByFilename(PaletteList<T>::m_DefaultFilename, currentEmber.PaletteIndex()))
+				if (auto pal = m_PaletteList->GetPaletteByFilename(m_PaletteList->m_DefaultFilename, currentEmber.PaletteIndex()))
 					currentEmber.m_Palette = *pal;
 				else
 					AddToReport(string(loc) + " : Error assigning palette with index " + std::to_string(currentEmber.PaletteIndex()));

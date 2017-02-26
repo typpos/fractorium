@@ -1,6 +1,9 @@
 TEMPLATE = app
 CONFIG += console
-CONFIG -= app_bundle
+
+# Uncomment this if you only want to build a binary instead of an app bundle.
+#macx:CONFIG -= app_bundle
+
 CONFIG -= qt
 
 TARGET = embergenome

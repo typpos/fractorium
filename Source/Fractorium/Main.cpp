@@ -22,6 +22,7 @@ int main(int argc, char* argv[])
 #endif
 	auto vf = VarFuncs<float>::Instance();//Create instances that will stay alive until the program exits.
 	auto vlf = VariationList<float>::Instance();
+	auto palf = PaletteList<float>::Instance();
 	auto settings = FractoriumSettings::Instance();
 #ifdef DO_DOUBLE
 	auto vd = VarFuncs<float>::Instance();

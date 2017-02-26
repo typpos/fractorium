@@ -10,10 +10,10 @@
 /// </summary>
 /// <param name="paletteList">A reference to an existing palette list, gotten from the main window.</param>
 /// <param name="p">The parent widget</param>
-PaletteEditor::PaletteEditor(PaletteList<float>& paletteList, QWidget* p) :
+PaletteEditor::PaletteEditor(QWidget* p) :
 	QDialog(p),
 	ui(make_unique<Ui::PaletteEditor>()),
-	m_PaletteList(paletteList)
+	m_PaletteList(PaletteList<float>::Instance())
 {
 	ui->setupUi(this);
 	m_ColorPicker = new ColorPickerWidget(this);
@@ -51,11 +51,11 @@ PaletteEditor::PaletteEditor(PaletteList<float>& paletteList, QWidget* p) :
 	layout->setSpacing(0);
 	layout->addWidget(m_GradientColorView);
 	ui->ColorViewGroupBox->setLayout(layout);
-	auto& pals = m_PaletteList.Palettes();
+	auto& pals = m_PaletteList->Palettes();
 
 	for (auto& pal : pals)
 	{
-		if (m_PaletteList.IsModifiable(pal.first))//Only add user created palettes.
+		if (m_PaletteList->IsModifiable(pal.first))//Only add user created palettes.
 		{
 			QFileInfo info(QString::fromStdString(pal.first));
 			ui->PaletteFilenameCombo->addItem(info.fileName());
@@ -265,7 +265,7 @@ void PaletteEditor::OnPaletteFilenameComboChanged(const QString& text)
 		auto paletteTable = ui->PaletteListTable;
 		m_CurrentPaletteFilePath = text.toStdString();
 		::FillPaletteTable(text.toStdString(), paletteTable, m_PaletteList);
-		auto fullname = m_PaletteList.GetFullPathFromFilename(m_CurrentPaletteFilePath);
+		auto fullname = m_PaletteList->GetFullPathFromFilename(m_CurrentPaletteFilePath);
 		ui->PaletteFilenameCombo->setToolTip(QString::fromStdString(fullname));
 		OnPaletteCellClicked(0, 1);
 	}
@@ -281,7 +281,7 @@ void PaletteEditor::OnPaletteCellClicked(int row, int col)
 {
 	if (col == 1)
 	{
-		if (auto palette = m_PaletteList.GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+		if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		{
 			SetPalette(*palette);
 			m_PaletteIndex = row;
@@ -299,7 +299,7 @@ void PaletteEditor::OnPaletteCellChanged(int row, int col)
 {
 	if (col == 0)
 	{
-		if (auto palette = m_PaletteList.GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+		if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		{
 			palette->m_Name = ui->PaletteListTable->item(row, col)->text().toStdString();
 			emit PaletteFileChanged();
@@ -316,7 +316,7 @@ void PaletteEditor::OnNewPaletteFileButtonClicked()
 {
 	auto filename = EmberFile<float>::UniqueFilename(GetDefaultUserPath() + "/user-palettes.xml");
 
-	if (m_PaletteList.AddEmptyPaletteFile(filename.toStdString()))
+	if (m_PaletteList->AddEmptyPaletteFile(filename.toStdString()))
 	{
 		QFileInfo info(filename);
 		ui->PaletteFilenameCombo->addItem(info.fileName());
@@ -331,17 +331,17 @@ void PaletteEditor::OnNewPaletteFileButtonClicked()
 /// </summary>
 void PaletteEditor::OnCopyPaletteFileButtonClicked()
 {
-	auto& paletteFiles = m_PaletteList.Palettes();
+	auto& paletteFiles = m_PaletteList->Palettes();
 	auto qscurr = QString::fromStdString(m_CurrentPaletteFilePath);
 	auto qfilename = EmberFile<float>::UniqueFilename(GetDefaultUserPath() + "/" + qscurr);
 	auto filename = qfilename.toStdString();
 
-	if (m_PaletteList.GetPaletteListByFullPath(filename) == nullptr)//Ensure the new filename does not exist in the map.
+	if (m_PaletteList->GetPaletteListByFullPath(filename) == nullptr)//Ensure the new filename does not exist in the map.
 	{
 		//Get the list of palettes for the current filename, this will be added as a copy below.
-		if (auto currentPaletteFile = m_PaletteList.GetPaletteListByFilename(m_CurrentPaletteFilePath))//Ensure the list of palettes was properly retrieved.
+		if (auto currentPaletteFile = m_PaletteList->GetPaletteListByFilename(m_CurrentPaletteFilePath))//Ensure the list of palettes was properly retrieved.
 		{
-			if (m_PaletteList.AddPaletteFile(filename, *currentPaletteFile))//Add the current vector of palettes to an entry with the new filename.
+			if (m_PaletteList->AddPaletteFile(filename, *currentPaletteFile))//Add the current vector of palettes to an entry with the new filename.
 			{
 				QFileInfo info(qfilename);
 				ui->PaletteFilenameCombo->addItem(info.fileName());
@@ -364,7 +364,7 @@ void PaletteEditor::OnCopyPaletteFileButtonClicked()
 void PaletteEditor::OnAppendPaletteButtonClicked()
 {
 	auto& pal = m_GradientColorView->GetPalette(256);
-	m_PaletteList.AddPaletteToFile(m_CurrentPaletteFilePath, pal);
+	m_PaletteList->AddPaletteToFile(m_CurrentPaletteFilePath, pal);
 	::FillPaletteTable(m_CurrentPaletteFilePath, ui->PaletteListTable, m_PaletteList);
 	m_PaletteIndex = ui->PaletteListTable->rowCount() - 1;
 	emit PaletteFileChanged();
@@ -377,7 +377,7 @@ void PaletteEditor::OnAppendPaletteButtonClicked()
 void PaletteEditor::OnOverwritePaletteButtonClicked()
 {
 	auto& pal = m_GradientColorView->GetPalette(256);
-	m_PaletteList.Replace(m_CurrentPaletteFilePath, pal, m_PaletteIndex);
+	m_PaletteList->Replace(m_CurrentPaletteFilePath, pal, m_PaletteIndex);
 	::FillPaletteTable(m_CurrentPaletteFilePath, ui->PaletteListTable, m_PaletteList);
 	emit PaletteFileChanged();
 }
@@ -393,7 +393,7 @@ void PaletteEditor::OnDeletePaletteButtonClicked()
 
 	if (table->rowCount() > 1)
 	{
-		m_PaletteList.Delete(m_CurrentPaletteFilePath, m_PaletteIndex);
+		m_PaletteList->Delete(m_CurrentPaletteFilePath, m_PaletteIndex);
 		::FillPaletteTable(m_CurrentPaletteFilePath, table, m_PaletteList);
 		emit PaletteFileChanged();
 		OnPaletteCellClicked(0, table->rowCount() - 1);

@@ -20,14 +20,11 @@ namespace EmberNs
 /// Template argument should always be float (which makes the templating of this class pointless).
 /// </summary>
 template <typename T>
-class EMBER_API PaletteList : public EmberReport
+class EMBER_API PaletteList : public EmberReport, public Singleton<PaletteList<T>>
 {
 public:
-	static const char* m_DefaultFilename;
+	const char* m_DefaultFilename = "flam3-palettes.xml";
 
-	PaletteList();
-	PaletteList(const PaletteList<T>& paletteList) = delete;
-	~PaletteList();
 	bool AddPaletteFile(const string& filename, const vector<Palette<T>>& palettes);
 	bool AddEmptyPaletteFile(const string& filename);
 	bool AddPaletteToFile(const string& filename, const Palette<T>& palette);
@@ -52,11 +49,12 @@ public:
 	bool IsModifiable(const string& filename);
 	const map<string, vector<Palette<T>>>& Palettes() const;
 
+	SINGLETON_DERIVED_DECL(PaletteList<T>);
 private:
+	PaletteList();
 	bool Save(const string& filename);
 	void ParsePalettes(xmlNode* node, const shared_ptr<string>& filename, vector<Palette<T>>& palettes);
 	bool ParsePalettes(const string& buf, const shared_ptr<string>& filename, vector<Palette<T>>& palettes);
-
-	static map<string, vector<Palette<T>>> s_Palettes;//The map of filenames to vectors that store the palettes.
+	map<string, vector<Palette<T>>> s_Palettes;//The map of filenames to vectors that store the palettes.
 };
 }

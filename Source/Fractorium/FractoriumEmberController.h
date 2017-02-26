@@ -294,9 +294,9 @@ protected:
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	Fractorium* m_Fractorium;
 	Palette<float> m_TempPalette;
-	PaletteList<float> m_PaletteList;
 	std::unique_ptr<QTimer> m_RenderTimer;
 	std::unique_ptr<QTimer> m_RenderRestartTimer;
+	shared_ptr<PaletteList<float>> m_PaletteList;
 	shared_ptr<OpenCLInfo> m_Info = OpenCLInfo::Instance();
 };
 

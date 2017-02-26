@@ -122,7 +122,7 @@ static bool ParseEmberFile(XmlToEmber<T>& parser, const string& filename, vector
 template <typename T>
 static bool InitPaletteList(const string& filename)
 {
-	PaletteList<T> paletteList;//Even though this is local, the members are static so they will remain.
+	auto paletteList = PaletteList<float>::Instance();
 	static vector<string> paths =
 	{
 		"./"
@@ -138,15 +138,15 @@ static bool InitPaletteList(const string& filename)
 	for (auto& p : paths)
 	{
 		if (!added)
-			added |= paletteList.Add(p + "/" + filename);
+			added |= paletteList->Add(p + "/" + filename);
 		else
 			break;
 	}
 
-	if (!added || !paletteList.Size())
+	if (!added || !paletteList->Size())
 	{
 		cout << "Error parsing palette file " << filename << ". Reason: \n"
-			 << paletteList.ErrorReportString() << "\nReturning without executing.\n";
+			 << paletteList->ErrorReportString() << "\nReturning without executing.\n";
 		return false;
 	}
 

@@ -45,9 +45,8 @@ CONFIG(debug, debug|release) {
 INCLUDEPATH += $$PRJ_SRC_DIR
 INCLUDEPATH += $$PRJ_SRC_DIR/PaletteEditor
 
-# TODO: Figure out how to build the app bundle correctly.
-# This will build a binary instead of an app bundle.
-macx:CONFIG -= app_bundle
+# Uncomment this if you only want to build a binary instead of an app bundle.
+#macx:CONFIG -= app_bundle
 
 target.path = $$BIN_INSTALL_DIR
 #message(TARGET INSTALL: $$target.path)

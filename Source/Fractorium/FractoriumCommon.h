@@ -397,12 +397,14 @@ static void AddPaletteToTable(QTableWidget* paletteTable, Palette<float>* palett
 /// Called upon initialization, palette combo index change, and controller type change.
 /// </summary>
 /// <param name="s">The name of the palette file without the path</param>
+/// <param name="paletteTable">The table to populate</param>
+/// <param name="paletteList">The global PaletteList shared_ptr to retrieve the specified palette file from to populate the table with</param>
 /// <returns>True if successful, else false.</returns>
-static bool FillPaletteTable(const string& s, QTableWidget* paletteTable, PaletteList<float>& paletteList)
+static bool FillPaletteTable(const string& s, QTableWidget* paletteTable, shared_ptr<PaletteList<float>> paletteList)
 {
 	if (!s.empty())//This occasionally seems to get called with an empty string for reasons unknown.
 	{
-		if (auto palettes = paletteList.GetPaletteListByFilename(s))
+		if (auto palettes = paletteList->GetPaletteListByFilename(s))
 		{
 			paletteTable->clear();
 			paletteTable->blockSignals(true);

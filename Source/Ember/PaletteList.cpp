@@ -9,7 +9,6 @@ namespace EmberNs
 template <typename T>
 PaletteList<T>::PaletteList()
 {
-	//Add(string(m_DefaultFilename));
 }
 
 /// <summary>

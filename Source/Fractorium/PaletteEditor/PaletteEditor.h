@@ -26,7 +26,7 @@ class PaletteEditor : public QDialog
 	Q_OBJECT
 
 public:
-	explicit PaletteEditor(PaletteList<float>& paletteList, QWidget* p = nullptr);
+	explicit PaletteEditor(QWidget* p = nullptr);
 
 public:
 	bool Sync();
@@ -73,6 +73,6 @@ private:
 	ColorPickerWidget* m_ColorPicker = nullptr;
 	GradientColorsView* m_GradientColorView = nullptr;
 	QFileDialog* m_FileDialog = nullptr;
-	PaletteList<float>& m_PaletteList;
+	shared_ptr<PaletteList<float>> m_PaletteList;
 	std::unique_ptr<Ui::PaletteEditor> ui;
 };

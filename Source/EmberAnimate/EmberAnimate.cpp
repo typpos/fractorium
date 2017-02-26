@@ -137,7 +137,7 @@ bool EmberAnimate(EmberOptions& opt)
 		renderers.push_back(std::move(tempRenderer));
 	}
 
-	if (!InitPaletteList<T>(opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
+	if (!InitPaletteList<float>(opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
 		return false;
 
 	cout << "Parsing ember file " << opt.Input() << "\n";
@@ -456,6 +456,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_ANIMATE))
 	{
+		auto palf = PaletteList<float>::Instance();
 #ifdef DO_DOUBLE
 
 		if (!opt.Sp())

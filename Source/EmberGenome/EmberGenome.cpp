@@ -203,7 +203,7 @@ bool EmberGenome(EmberOptions& opt)
 		return false;
 	}
 
-	if (!InitPaletteList<T>(opt.PalettePath()))
+	if (!InitPaletteList<float>(opt.PalettePath()))
 		return false;
 
 	if (!opt.EmberCL())
@@ -562,7 +562,7 @@ bool EmberGenome(EmberOptions& opt)
 				cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			}
 
-			tools.Spin(embers[0], pTemplate, result2, frame    , blend         , opt.CwLoops());
+			tools.Spin(embers[0], pTemplate, result2, frame, blend, opt.CwLoops());
 			tools.Spin(embers[0], pTemplate, result3, frame + 1, blend + spread, opt.CwLoops());
 			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
@@ -581,7 +581,7 @@ bool EmberGenome(EmberOptions& opt)
 				cout << emberToXml.ToString(result1, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			}
 
-			tools.SpinInter(embers.data(), pTemplate, result2, frame    , false, blend         , opt.InterpLoops(), opt.CwInterpLoops());
+			tools.SpinInter(embers.data(), pTemplate, result2, frame, false, blend, opt.InterpLoops(), opt.CwInterpLoops());
 			tools.SpinInter(embers.data(), pTemplate, result3, frame + 1, false, blend + spread, opt.InterpLoops(), opt.CwInterpLoops());
 			cout << emberToXml.ToString(result2, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
 			cout << emberToXml.ToString(result3, opt.Extras(), opt.PrintEditDepth(), !opt.NoEdits(), opt.HexPalette());
@@ -862,6 +862,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_GENOME))
 	{
+		auto palf = PaletteList<float>::Instance();
 #ifdef DO_DOUBLE
 
 		if (!opt.Sp())

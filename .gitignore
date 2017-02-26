@@ -28,7 +28,7 @@
 *.flame
 *.bmp
 *.jpg
-*.png
+Data/*.png
 *.zip
 *.avi
 *.ini

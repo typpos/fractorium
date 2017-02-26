@@ -10,6 +10,7 @@
 /// <returns>0 if successful, else 1.</returns>
 int main(int argc, char* argv[])
 {
+	int rv = -1;
 	QApplication a(argc, argv);
 #ifdef TEST_CL
 	QMessageBox::critical(QApplication::desktop(), "Error", "Fractorium cannot be run in test mode, undefine TEST_CL first.");
@@ -19,16 +20,9 @@ int main(int argc, char* argv[])
 	QMessageBox::critical(QApplication::desktop(), "Error", "Fractorium cannot be run in test mode, undefine ISAAC_FLAM3_DEBUG first.");
 	return 1;
 #endif
-	//Required for large allocs, else GPU memory usage will be severely limited to small sizes.
-	//This must be done in the application and not in the EmberCL DLL.
-#ifdef _WIN32
-	_putenv_s("GPU_MAX_ALLOC_PERCENT", "100");
-#else
-	putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
-#endif
-	int rv = -1;
 	auto vf = VarFuncs<float>::Instance();//Create instances that will stay alive until the program exits.
 	auto vlf = VariationList<float>::Instance();
+	auto settings = FractoriumSettings::Instance();
 #ifdef DO_DOUBLE
 	auto vd = VarFuncs<float>::Instance();
 	auto vld = VariationList<double>::Instance();//No further creations should occur after this.
@@ -36,6 +30,13 @@ int main(int argc, char* argv[])
 
 	try
 	{
+		//Required for large allocs, else GPU memory usage will be severely limited to small sizes.
+		//This must be done in the application and not in the EmberCL DLL.
+#ifdef _WIN32
+		_putenv_s("GPU_MAX_ALLOC_PERCENT", "100");
+#else
+		putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
+#endif
 		Fractorium w;
 		w.show();
 		a.installEventFilter(&w);
@@ -43,11 +44,11 @@ int main(int argc, char* argv[])
 	}
 	catch (const std::exception& e)
 	{
-		QMessageBox::critical(0, "Fatal Error", QString::fromStdString(e.what()));
+		QMessageBox::critical(nullptr, "Fatal Error", QString::fromStdString(e.what()));
 	}
 	catch (const char* e)
 	{
-		QMessageBox::critical(0, "Fatal Error", e);
+		QMessageBox::critical(nullptr, "Fatal Error", e);
 	}
 
 	return rv;

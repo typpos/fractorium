@@ -31,8 +31,8 @@ public:
 	/// The re-parenting is done so that the DoubleSpinBox appears directly on top of the cell.
 	/// </summary>
 	/// <param name="parent">The parent cell</param>
-	/// <param name="option">Unused</param>
-	/// <param name="index">unused</param>
+	/// <param name="option">Ignored</param>
+	/// <param name="index">Ignored</param>
 	/// <returns>The DoubleSpinBox member</returns>
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
 	{
@@ -44,8 +44,8 @@ public:
 	/// <summary>
 	/// Prevent DoubleSpinBox control from being destroyed when the cell loses focus.
 	/// </summary>
-	/// <param name="editor">Unused</param>
-	/// <param name="index">Unused</param>
+	/// <param name="editor">Ignored</param>
+	/// <param name="index">Ignored</param>
 	virtual void destroyEditor(QWidget* editor, const QModelIndex& index) const override
 	{
 	}
@@ -53,8 +53,8 @@ public:
 	/// <summary>
 	/// Set the value of the DoubleSpinBox as well as its tableindex property.
 	/// </summary>
-	/// <param name="editor">Unused</param>
-	/// <param name="index">Unused</param>
+	/// <param name="editor">Ignored</param>
+	/// <param name="index">Ignored</param>
 	virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override
 	{
 		QPoint p(index.row(), index.column());
@@ -67,7 +67,7 @@ public:
 	/// <summary>
 	/// Set the cell in the model to the value of the DoubleSpinBox.
 	/// </summary>
-	/// <param name="editor">Unused</param>
+	/// <param name="editor">Ignored</param>
 	/// <param name="model">The model whose value will be set</param>
 	/// <param name="index">The cell index of the model</param>
 	virtual void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
@@ -80,7 +80,7 @@ public:
 	/// </summary>
 	/// <param name="editor">The DoubleSpinBox member</param>
 	/// <param name="option">Contains the rectangle to be used for the geometry of the DoubleSpinBox</param>
-	/// <param name="index">Unused</param>
+	/// <param name="index">Ignored</param>
 	virtual void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
 	{
 		editor->setGeometry(option.rect);

@@ -22,11 +22,12 @@ void Fractorium::InitParamsUI()
 	SetFixedTableHeader(ui.IterationTableHeader->horizontalHeader());
 	SetFixedTableHeader(ui.AnimationTableHeader->horizontalHeader());
 	//Color.
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.05, 1000,    1,  SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	   true,  4.0,  4.0,  4.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1, 9999,  0.5,  SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0,  4.0,  4.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,   10, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)), true,  0.1,  0.1,  0.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,   30, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0,  1.0,  0.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_HighlightSpin,	   spinHeight,  -1.0,  10,  0.1,  SIGNAL(valueChanged(double)), SLOT(OnHighlightPowerChanged(double)), true,  1.0, -1.0, -1.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.05, 1000,    1,  SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	   true,  4.0, 4.0,  4.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1, 9999,  0.5,  SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0, 4.0,  4.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,   10, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)), true,  0.1, 0.1,  0.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,   30, 0.01,  SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0, 1.0,  0.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_HighlightSpin,	   spinHeight,  -1.0,  10,  0.1,  SIGNAL(valueChanged(double)), SLOT(OnHighlightPowerChanged(double)), true,  1.0, 1.0, -1.0);
+	m_HighlightSpin->DoubleClickLowVal(-1.0);
 	m_GammaThresholdSpin->setDecimals(4);
 	m_BackgroundColorButton = new QPushButton("...", table);
 	m_BackgroundColorButton->setMinimumWidth(21);
@@ -63,7 +64,8 @@ void Fractorium::InitParamsUI()
 	//Filter.
 	row = 0;
 	table = ui.FilterTable;
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight, 0.1, 2, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 1.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight, 0.1, 2, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 0.1);
+	m_SpatialFilterWidthSpin->DoubleClickLowVal(0.1);
 	comboVals = SpatialFilterCreator<float>::FilterTypes();
 	SetupCombo(table, this, row, 1, m_SpatialFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnSpatialFilterTypeComboCurrentIndexChanged(const QString&)));
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMinRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMinRadiusWidthChanged(double)), true,   0,   0,   0);
@@ -192,7 +194,7 @@ void Fractorium::OnHighlightPowerChanged(double d) { m_Controller->HighlightPowe
 /// <param name="checked">Ignored</param>
 void Fractorium::OnBackgroundColorButtonClicked(bool checked)
 {
-	m_ColorDialog->show();
+	m_ColorDialog->exec();
 }
 
 /// <summary>
@@ -725,6 +727,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	//Since the controls were cleared above, the adjusted palette will be identical to the base palette.
 	//Callers can set, apply and display palette adjustments after this function exits if needed.
 	UpdateAdjustedPaletteGUI(m_Ember.m_Palette);//Updating the palette GUI will trigger a full render.
+	InitLockedScale();
 }
 
 /// <summary>
@@ -803,5 +806,5 @@ void Fractorium::SetScale(double scale)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

@@ -69,6 +69,7 @@
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,9 +154,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Ember\EmberToXml.cpp" />
+    <ClCompile Include="..\..\..\Source\Ember\PaletteList.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\Renderer.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\RendererBase.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\VariationList.cpp" />
+    <ClCompile Include="..\..\..\Source\Ember\XmlToEmber.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Ember.rc" />

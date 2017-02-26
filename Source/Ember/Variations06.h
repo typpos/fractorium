@@ -4379,17 +4379,17 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power     , prefix + "smartcrop_power", 4)); //Original used a prefix of scrop_, which is incompatible with Ember's design.
-		m_Params.push_back(ParamWithName<T>(&m_Radius    , prefix + "smartcrop_radius", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Roundstr  , prefix + "smartcrop_roundstr"));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "smartcrop_power", 4));      //Original used a prefix of scrop_, which is incompatible with Ember's design.
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "smartcrop_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Roundstr, prefix + "smartcrop_roundstr"));
 		m_Params.push_back(ParamWithName<T>(&m_Roundwidth, prefix + "smartcrop_roundwidth", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Distortion, prefix + "smartcrop_distortion", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Edge      , prefix + "smartcrop_edge"));
-		m_Params.push_back(ParamWithName<T>(&m_Scatter   , prefix + "smartcrop_scatter"));
-		m_Params.push_back(ParamWithName<T>(&m_Offset    , prefix + "smartcrop_offset"));
-		m_Params.push_back(ParamWithName<T>(&m_Rotation  , prefix + "smartcrop_rotation"));
-		m_Params.push_back(ParamWithName<T>(&m_Cropmode  , prefix + "smartcrop_cropmode", 1, eParamType::INTEGER, -1, 2));
-		m_Params.push_back(ParamWithName<T>(&m_Static	 , prefix + "smartcrop_static", 1, eParamType::INTEGER, -1, 3));
+		m_Params.push_back(ParamWithName<T>(&m_Edge, prefix + "smartcrop_edge"));
+		m_Params.push_back(ParamWithName<T>(&m_Scatter, prefix + "smartcrop_scatter"));
+		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "smartcrop_offset"));
+		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix + "smartcrop_rotation"));
+		m_Params.push_back(ParamWithName<T>(&m_Cropmode, prefix + "smartcrop_cropmode", 1, eParamType::INTEGER, -1, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Static	, prefix + "smartcrop_static", 1, eParamType::INTEGER, -1, 3));
 		m_Params.push_back(ParamWithName<T>(true, &m_Mode,         prefix + "smartcrop_mode"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Radial,       prefix + "smartcrop_radial"));
 		m_Params.push_back(ParamWithName<T>(true, &m_WorkRadius,   prefix + "smartcrop_work_radius"));
@@ -4649,7 +4649,7 @@ public:
 		   << "\n"
 		   << "\t\tif (" << hypergon << " != 0)\n"
 		   << "\t\t{\n"
-		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t	temp1 = fmod(fabs(a), (real_t)M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
 		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
 		   << "\n"
 		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
@@ -4664,7 +4664,7 @@ public:
 		   << "\n"
 		   << "\t\tif (" << star << "!= 0)\n"
 		   << "\t\t{\n"
-		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), (real_t)M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
 		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t}\n"
 		   << "\n"
@@ -4684,7 +4684,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	if (" << hypergon << " != 0.0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		temp1 = fmod(fabs(a2), M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
+		   << "\t\t		temp1 = fmod(fabs(a2), (real_t)M_2PI / " << hypergonN << ") - M_PI / " << hypergonN << ";\n"
 		   << "\t\t		temp2 = Sqr(tan(temp1)) + 1;\n"
 		   << "\n"
 		   << "\t\t		if (temp2 >= Sqr(" << hypergonD << "))\n"
@@ -4699,7 +4699,7 @@ public:
 		   << "\n"
 		   << "\t\t	if (" << star << " != 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		temp1 = tan(fabs(fmod(fabs(a2), M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
+		   << "\t\t		temp1 = tan(fabs(fmod(fabs(a2), (real_t)M_2PI / " << starN << ") - M_PI / " << starN << "));\n"
 		   << "\t\t		total2 += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t	}\n"
 		   << "\n"

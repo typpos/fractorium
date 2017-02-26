@@ -948,6 +948,513 @@ private:
 	T m_FixPe;
 };
 
+/// <summary>
+/// circlesplit.
+/// By tatasz.
+/// http://fav.me/dapecsh
+/// </summary>
+template <typename T>
+class CircleSplitVariation : public ParametricVariation<T>
+{
+public:
+	CircleSplitVariation(T weight = 1.0) : ParametricVariation<T>("circlesplit", eVariationId::VAR_CIRCLESPLIT, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(CircleSplitVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T x1, y1;
+
+		if (helper.m_PrecalcSqrtSumSquares < (m_Radius - m_Split))
+		{
+			x1 = helper.In.x;
+			y1 = helper.In.y;
+		}
+		else
+		{
+			T a = std::atan2(helper.In.y, helper.In.x);
+			T len = helper.m_PrecalcSqrtSumSquares + m_Split;
+			x1 = std::cos(a) * len;
+			y1 = std::sin(a) * len;
+		}
+
+		helper.Out.x = m_Weight * x1;
+		helper.Out.y = m_Weight * y1;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string cs_radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cs_split  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t x1, y1;\n"
+		   << "\n"
+		   << "\t\tif (precalcSqrtSumSquares < (" << cs_radius << " - " << cs_split << "))\n"
+		   << "\t\t{\n"
+		   << "\t\t\tx1 = vIn.x;\n"
+		   << "\t\t\ty1 = vIn.y;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t\treal_t a = (real_t)atan2(vIn.y, vIn.x);\n"
+		   << "\t\t\treal_t len = precalcSqrtSumSquares + " << cs_split << ";\n"
+		   << "\t\t\tx1 = cos(a) * len;\n"
+		   << "\t\t\ty1 = sin(a) * len;\n"
+		   << "\t\t}"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * x1;\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * y1;\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "circlesplit_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Split,  prefix + "circlesplit_split",  T(0.5)));
+	}
+
+private:
+	T m_Radius;
+	T m_Split;
+};
+
+/// <summary>
+/// cylinder2.
+/// By tatasz.
+/// http://fav.me/dapecsh
+/// </summary>
+template <typename T>
+class Cylinder2Variation : public Variation<T>
+{
+public:
+	Cylinder2Variation(T weight = 1.0) : Variation<T>("cylinder2", eVariationId::VAR_CYLINDER2, weight) { }
+
+	VARCOPY(Cylinder2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.x = m_Weight * (helper.In.x / Zeps(std::sqrt(SQR(helper.In.x) + 1)));
+		helper.Out.y = m_Weight * helper.In.y;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x / Zeps(sqrt(SQR(vIn.x) + (real_t)1.0)));\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+};
+
+/// <summary>
+/// tile_log.
+/// By zy0rg.
+/// http://zy0rg.deviantart.com
+/// </summary>
+template <typename T>
+class TileLogVariation : public ParametricVariation<T>
+{
+public:
+	TileLogVariation(T weight = 1.0) : ParametricVariation<T>("tile_log", eVariationId::VAR_TILE_LOG, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(TileLogVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T temp = Round(std::log(rand.Frand01<T>()) * (rand.Rand() & 1 ? m_Spread : -m_Spread));
+		helper.Out.x = m_Weight * (helper.In.x + temp);
+		helper.Out.y = m_Weight * helper.In.y;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string spread = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t temp = (real_t) (Round(log(MwcNext01(mwc)) * (MwcNext(mwc) & 1 ? " << spread << " : -" << spread << ")));\n"
+		   << "\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x + temp);\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Round" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Spread, prefix + "tile_log_spread", 1));
+	}
+
+private:
+	T m_Spread;
+};
+
+/// <summary>
+/// Truchet_fill.
+/// By tatasz.
+/// http://fav.me/dapecsh
+/// </summary>
+template <typename T>
+class TruchetFillVariation : public ParametricVariation<T>
+{
+public:
+	TruchetFillVariation(T weight = 1.0) : ParametricVariation<T>("Truchet_fill", eVariationId::VAR_TRUCHET_FILL, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(TruchetFillVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T modbase = T(65535);
+		T multiplier = T(32747); //1103515245;
+		T offset = T(12345);
+		T x = helper.In.x * m_Scale;
+		T y = helper.In.y * m_Scale;
+		T intx = Round(x);
+		T inty = Round(y);
+		T r = x - intx;
+
+		if (r < 0)
+			x = 1 + r;
+		else
+			x = r;
+
+		r = y - inty;
+
+		if (r < 0)
+			y = 1 + r;
+		else
+			y = r;
+
+		T tiletype = 0;
+
+		if (m_Seed != 0)
+		{
+			if (m_Seed == 1)
+			{
+				tiletype = m_Seed;
+			}
+			else
+			{
+				T xrand = helper.In.x;
+				T yrand = helper.In.y;
+				xrand = Round(std::abs(xrand)) * m_Seed2;
+				yrand = Round(std::abs(yrand)) * m_Seed2;
+				T niter = xrand + yrand + (xrand * yrand);
+				T randint = (m_Seed + niter) * m_Seed2 * T(0.5);
+				randint = std::fmod((randint * multiplier + offset), modbase);
+				tiletype = std::fmod(randint, T(2.0));
+			}
+		}
+
+		T r0, r1;
+
+		if (tiletype < T(1))
+		{
+			//Slow drawmode
+			r0 = std::pow((std::pow(std::fabs(x), m_FinalExponent) + std::pow(std::fabs(y), m_FinalExponent)), m_OneOverEx);
+			r1 = std::pow((std::pow(std::fabs(x - T(1.0)), m_FinalExponent) + std::pow(std::fabs(y - 1), m_FinalExponent)), m_OneOverEx);
+		}
+		else
+		{
+			r0 = std::pow((std::pow(std::fabs(x - T(1.0)), m_FinalExponent) + std::pow(std::fabs(y), m_FinalExponent)), m_OneOverEx);
+			r1 = std::pow((std::pow(std::fabs(x), m_FinalExponent) + std::pow(std::fabs(y - T(1.0)), m_FinalExponent)), m_OneOverEx);
+		}
+
+		T x1, y1;
+		T r00 = fabs(r0 - T(0.5)) / m_Rmax;
+
+		if (r00 < 1)
+		{
+			x1 = 2 * (x + std::floor(helper.In.x));
+			y1 = 2 * (y + std::floor(helper.In.y));
+		}
+		else
+		{
+			x1 = 0;
+			y1 = 0;
+		}
+
+		T r11 = std::fabs(r1 - T(0.5)) / m_Rmax;
+
+		if (r11 < 1)
+		{
+			helper.Out.x = x1 + (2 * (x + std::floor(helper.In.x))) - helper.In.x;
+			helper.Out.y = y1 + (2 * (y + std::floor(helper.In.y))) - helper.In.y;
+		}
+		else
+		{
+			helper.Out.x = x1 - helper.In.x;
+			helper.Out.y = y1 - helper.In.y;
+		}
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0;
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string exponent      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string arcWidth      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string finalexponent = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverEx     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string width         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rmax          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss  << "\t{\n"
+			<< "\t\treal_t modbase = 65535;\n"
+			<< "\t\treal_t multiplier = 32747;\n"
+			<< "\t\treal_t offset = 12345;\n"
+			<< "\n"
+			<< "\t\treal_t x = vIn.x * " << scale << ";\n"
+			<< "\t\treal_t y = vIn.y * " << scale << ";\n"
+			<< "\t\treal_t intx = Round(x);\n"
+			<< "\t\treal_t inty = Round(y);\n"
+			<< "\n"
+			<< "\t\treal_t r = x - intx;\n"
+			<< "\n"
+			<< "\t\tif (r < 0)\n"
+			<< "\t\t\tx = r + 1;\n"
+			<< "\t\telse\n"
+			<< "\t\t\tx = r;\n"
+			<< "\n"
+			<< "\t\tr = y - inty;\n"
+			<< "\n"
+			<< "\t\tif (r < 0)\n"
+			<< "\t\t\ty = r + 1;\n"
+			<< "\t\telse\n"
+			<< "\t\t\ty = r;\n"
+			<< "\n"
+			<< "\t\treal_t tiletype = 0;\n"
+			<< "\n"
+			<< "\t\tif (" << seed << " != 0)\n"
+			<< "\t\t{\n"
+			<< "\t\t\tif (" << seed << " == 1)\n"
+			<< "\t\t\t{\n"
+			<< "\t\t\t\ttiletype = " << seed << ";\n"
+			<< "\t\t\t}\n"
+			<< "\t\t\telse\n"
+			<< "\t\t\t{\n"
+			<< "\t\t\t\treal_t xrand = vIn.x;\n"
+			<< "\t\t\t\treal_t yrand = vIn.y;\n"
+			<< "\n"
+			<< "\t\t\t\txrand = Round(fabs(xrand)) * " << seed2 << ";\n"
+			<< "\t\t\t\tyrand = Round(fabs(yrand)) * " << seed2 << ";\n"
+			<< "\n"
+			<< "\t\t\t\treal_t niter = xrand + yrand + (xrand * yrand);\n"
+			<< "\t\t\t\treal_t randint = (" << seed << " + niter) * " << seed2 << " * ((real_t) 0.5);\n"
+			<< "\n"
+			<< "\t\t\t\trandint = fmod((randint * multiplier + offset), modbase);\n"
+			<< "\t\t\t\ttiletype = fmod(randint, 2);\n"
+			<< "\t\t\t}\n"
+			<< "\t\t}\n"
+			<< "\n"
+			<< "\t\treal_t r0, r1;\n"
+			<< "\n"
+			<< "\t\tif (tiletype < 1)\n"
+			<< "\t\t{\n"
+			<< "\t\t\tr0 = pow((pow(fabs(x), " << finalexponent << ") + pow(fabs(y), " << finalexponent << ")), " << oneOverEx << ");\n"
+			<< "\t\t\tr1 = pow((pow(fabs(x-1), " << finalexponent << ") + pow(fabs(y-1), " << finalexponent << ")), " << oneOverEx << ");\n"
+			<< "\t\t}\n"
+			<< "\t\telse\n"
+			<< "\t\t{\n"
+			<< "\t\t\tr0 = pow((pow(fabs(x-1), " << finalexponent << ") + pow(fabs(y), " << finalexponent << ")), " << oneOverEx << ");\n"
+			<< "\t\t\tr1 = pow((pow(fabs(x), " << finalexponent << ") + pow(fabs(y-1), " << finalexponent << ")), " << oneOverEx << ");\n"
+			<< "\t\t}\n"
+			<< "\n"
+			<< "\t\treal_t x1, y1;\n"
+			<< "\t\treal_t r00 = fabs(r0 - (real_t) 0.5) / " << rmax << ";\n"
+			<< "\n"
+			<< "\t\tif (r00 < 1.0)\n"
+			<< "\t\t{\n"
+			<< "\t\t\tx1 = 2 * (x + floor(vIn.x));\n"
+			<< "\t\t\ty1 = 2 * (y + floor(vIn.y));\n"
+			<< "\t\t}\n"
+			<< "\t\telse\n"
+			<< "\t\t{\n"
+			<< "\t\t\tx1 = 0;\n"
+			<< "\t\t\ty1 = 0;\n"
+			<< "\t\t}\n"
+			<< "\n"
+			<< "\t\treal_t r11 = fabs(r1 - (real_t) 0.5) / " << rmax << ";\n"
+			<< "\n"
+			<< "\t\tif (r11 < 1)\n"
+			<< "\t\t{\n"
+			<< "\t\t\tvOut.x = x1 + (2 * (x + floor(vIn.x))) - vIn.x;\n"
+			<< "\t\t\tvOut.y = y1 + (2 * (y + floor(vIn.y))) - vIn.y;\n"
+			<< "\t\t}\n"
+			<< "\t\telse\n"
+			<< "\t\t{\n"
+			<< "\t\t\tvOut.x = x1 - vIn.x;\n"
+			<< "\t\t\tvOut.y = y1 - vIn.y;\n"
+			<< "\t\t}\n"
+			<< "\n"
+			<< "\t\tvOut.z = " << DefaultZCl()
+			<< "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Round" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_FinalExponent = m_Exponent > T(2) ? T(2) : (m_Exponent < T(0.001) ? T(0.001) : m_Exponent);
+		m_OneOverEx = T(1) / m_FinalExponent;
+		m_Width = m_ArcWidth > T(1) ? T(1) : (m_ArcWidth < T(0.001) ? T(0.001) : m_ArcWidth);
+		m_Seed2 = std::sqrt(m_Seed * T(1.5)) / (m_Seed * T(0.5)) * T(0.25);
+		m_Rmax = T(0.5) * (std::pow(T(2), m_OneOverEx) - T(1)) * m_Width;
+		m_Scale = T(1) / m_Weight;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Exponent, prefix + "Truchet_fill_exponent", 2, eParamType::REAL_CYCLIC, T(0.001), 2));
+		m_Params.push_back(ParamWithName<T>(&m_ArcWidth, prefix + "Truchet_fill_arc_width", T(0.5), eParamType::REAL_CYCLIC, T(0.001), 1));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,     prefix + "Truchet_fill_seed"));
+		m_Params.push_back(ParamWithName<T>(true, &m_FinalExponent, prefix + "Truchet_fill_final_exponent"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverEx,     prefix + "Truchet_fill_oneoverex"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Width,         prefix + "Truchet_fill_width"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Seed2,         prefix + "Truchet_fill_seed2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rmax,          prefix + "Truchet_fill_rmax"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale,         prefix + "Truchet_fill_scale"));
+	}
+
+private:
+	T m_Exponent;
+	T m_ArcWidth;
+	T m_Seed;
+	T m_FinalExponent;//Precalc.
+	T m_OneOverEx;
+	T m_Width;
+	T m_Seed2;
+	T m_Rmax;
+	T m_Scale;
+};
+
+/// <summary>
+/// waves2_radial.
+/// By tatasz.
+/// http://fav.me/dapecsh
+/// </summary>
+template <typename T>
+class Waves2RadialVariation : public ParametricVariation<T>
+{
+public:
+	Waves2RadialVariation(T weight = 1.0) : ParametricVariation<T>("waves2_radial", eVariationId::VAR_WAVES2_RADIAL, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Waves2RadialVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T x0 = helper.In.x;
+		T y0 = helper.In.y;
+		T dist = helper.m_PrecalcSqrtSumSquares;
+		T factor = (dist < m_Distance) ? (dist - m_Null) / Zeps(m_Distance - m_Null) : T(1);
+		factor = (dist < m_Null) ? T(0) : factor;
+		helper.Out.x = m_Weight * (x0 + factor * std::sin(y0 * m_Freqx) * m_Scalex);
+		helper.Out.y = m_Weight * (y0 + factor * std::sin(x0 * m_Freqy) * m_Scaley);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string freqX    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaleX   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqY    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaleY   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string nullVar  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string distance = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t x0 = vIn.x;\n"
+		   << "\t\treal_t y0 = vIn.y;\n"
+		   << "\n"
+		   << "\t\treal_t dist = precalcSqrtSumSquares;\n"
+		   << "\t\treal_t factor = (dist < " << distance << ") ? (dist - " << nullVar << ") / Zeps(" << distance << "-" << nullVar << ") : (real_t)(1.0);\n"
+		   << "\t\tfactor = (dist < " << nullVar << ") ? (real_t) 0.0 : factor;\n"
+		   << "\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (x0 + factor * sin(y0 * " << freqX << ") * " << scaleX << ");\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y0 + factor * sin(x0 * " << freqY << ") * " << scaleY << ");\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,    prefix + "waves2_radial_freqx",    7));
+		m_Params.push_back(ParamWithName<T>(&m_Scalex,   prefix + "waves2_radial_scalex",   T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,    prefix + "waves2_radial_freqy",    13));
+		m_Params.push_back(ParamWithName<T>(&m_Scaley,   prefix + "waves2_radial_scaley",   T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Null,     prefix + "waves2_radial_null",     2));
+		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "waves2_radial_distance", 10));
+	}
+
+private:
+	T m_Freqx;
+	T m_Scalex;
+	T m_Freqy;
+	T m_Scaley;
+	T m_Null;
+	T m_Distance;
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -957,4 +1464,9 @@ MAKEPREPOSTPARVAR(PressureWave, pressure_wave, PRESSURE_WAVE)
 MAKEPREPOSTVAR(Gamma, gamma, GAMMA)
 MAKEPREPOSTPARVAR(PRose3D, pRose3D, PROSE3D)
 MAKEPREPOSTPARVAR(LogDB, log_db, LOG_DB)
+MAKEPREPOSTPARVAR(CircleSplit, circlesplit, CIRCLESPLIT)
+MAKEPREPOSTVAR(Cylinder2, cylinder2, CYLINDER2)
+MAKEPREPOSTPARVAR(TileLog, tile_log, TILE_LOG)
+MAKEPREPOSTPARVAR(TruchetFill, Truchet_fill, TRUCHET_FILL)
+MAKEPREPOSTPARVAR(Waves2Radial, waves2_radial, WAVES2_RADIAL)
 }

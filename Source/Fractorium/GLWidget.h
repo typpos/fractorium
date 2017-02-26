@@ -11,8 +11,6 @@ class GLEmberControllerBase;
 template<typename T> class GLEmberController;
 template<typename T> class FractoriumEmberController;
 
-static const float GridStep = 1.0f / 8.0f;
-
 /// <summary>
 /// The main drawing area.
 /// This uses the Qt wrapper around OpenGL to draw the output of the render to a texture whose
@@ -68,7 +66,6 @@ private:
 	bool Allocate(bool force = false);
 	bool Deallocate();
 	void SetViewport();
-	void DrawGrid(double scale);
 	void DrawUnitSquare();
 	void DrawAffineHelper(int index, bool selected, bool pre, bool final, bool background);
 	GLEmberControllerBase* GLController();

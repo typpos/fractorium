@@ -13,6 +13,7 @@
 #include "AboutDialog.h"
 #include "CurvesGraphicsView.h"
 #include "DoubleSpinBoxTableItemDelegate.h"
+#include "PaletteEditor/PaletteEditor.h"
 
 /// <summary>
 /// Fractorium class.
@@ -90,6 +91,11 @@ public:
 	Fractorium(QWidget* p = nullptr);
 	~Fractorium();
 
+	//Toolbar.
+	bool DrawXforms();
+	bool DrawImage();
+	bool DrawGrid();
+
 	//Library.
 	void SyncFileCountToSequenceCount();
 
@@ -135,6 +141,8 @@ public slots:
 	void OnActionPasteSelectedXforms(bool checked);
 
 	void OnActionResetWorkspace(bool checked);//View
+	void OnActionAlternateEditorImage(bool checked);
+	void OnActionResetScale(bool checked);
 
 	void OnActionAddReflectiveSymmetry(bool checked);//Tools.
 	void OnActionAddRotationalSymmetry(bool checked);
@@ -158,6 +166,9 @@ public slots:
 	void OnActionDP(bool checked);
 	void OnActionStyle(bool checked);
 	void OnActionStartStopRenderer(bool checked);
+	void OnActionDrawXforms(bool checked);
+	void OnActionDrawImage(bool checked);
+	void OnActionDrawGrid(bool checked);
 
 	//Library.
 	void OnEmberTreeItemChanged(QTreeWidgetItem* item, int col);
@@ -237,7 +248,6 @@ public slots:
 	void OnXformAnimateCheckBoxStateChanged(int state);
 
 	//Xforms Affine.
-	void OnLockAffineScaleCheckBoxStateChanged(int state);
 	void OnPreAffineRowDoubleClicked(int logicalIndex);
 	void OnPreAffineColDoubleClicked(int logicalIndex);
 	void OnPostAffineRowDoubleClicked(int logicalIndex);
@@ -275,6 +285,9 @@ public slots:
 	void OnXformScrollColorIndexChanged(int d);
 	void OnRandomColorIndicesButtonClicked(bool b);
 	void OnToggleColorIndicesButtonClicked(bool b);
+	void OnRandomColorSpeedButtonClicked(bool b);
+	void OnToggleColorSpeedButtonClicked(bool b);
+
 	void OnXformColorSpeedChanged(double d);
 	void OnXformOpacityChanged(double d);
 	void OnXformDirectColorChanged(double d);
@@ -313,9 +326,12 @@ public slots:
 	void OnPaletteCellDoubleClicked(int row, int col);
 	void OnPaletteRandomSelectButtonClicked(bool checked);
 	void OnPaletteRandomAdjustButtonClicked(bool checked);
+	void OnPaletteEditorButtonClicked(bool checked);
 	void OnPaletteFilterLineEditTextChanged(const QString& text);
 	void OnPaletteFilterClearButtonClicked(bool checked);
 	void OnPaletteHeaderSectionClicked(int col);
+	void OnPaletteEditorColorChanged();
+	void OnPaletteEditorFileChanged();
 
 	//Info.
 	void OnSummaryTableHeaderResized(int logicalIndex, int oldSize, int newSize);
@@ -371,6 +387,7 @@ private:
 	void SyncOptionsToToolbar();
 
 	//Library.
+	void SelectLibraryItem(size_t index);
 	vector<pair<size_t, QTreeWidgetItem*>> GetCurrentEmberIndex();
 	void SyncSequenceSettings();
 
@@ -384,7 +401,6 @@ private:
 
 	//Xforms Variations.
 	void Filter();
-	void Filter(const QString& text);
 
 	//Xforms Selection.
 	void ClearXformsSelections();
@@ -397,6 +413,7 @@ private:
 	void ResetPaletteControls();
 	void SetPaletteFileComboIndex(const string& filename);
 	void SetPaletteTableItem(QPixmap* pixmap, QTableWidget* table, QTableWidgetItem* item, int row, int col);
+	bool PaletteChanged();
 
 	//Info.
 	void FillSummary();
@@ -415,11 +432,12 @@ private:
 	QString SetupSaveXmlDialog(const QString& defaultFilename);
 	QString SetupSaveImageDialog(const QString& defaultFilename);
 	QString SetupSaveFolderDialog();
-	QColorDialog* m_ColorDialog;
-	FractoriumFinalRenderDialog* m_FinalRenderDialog;
-	FractoriumOptionsDialog* m_OptionsDialog;
-	FractoriumVariationsDialog* m_VarDialog;
-	FractoriumAboutDialog* m_AboutDialog;
+	QColorDialog* m_ColorDialog = nullptr;
+	FractoriumFinalRenderDialog* m_FinalRenderDialog = nullptr;
+	FractoriumOptionsDialog* m_OptionsDialog = nullptr;
+	FractoriumVariationsDialog* m_VarDialog = nullptr;
+	FractoriumAboutDialog* m_AboutDialog = nullptr;
+	PaletteEditor*  m_PaletteEditor = nullptr;
 
 	//Params.
 	DoubleSpinBox* m_BrightnessSpin;//Color.
@@ -494,6 +512,8 @@ private:
 	DoubleSpinBoxTableItemDelegate* m_XaosTableItemDelegate;
 
 	//Palette.
+	bool m_PaletteChanged;
+	bool m_PaletteFileChanged;
 	SpinBox* m_PaletteHueSpin;
 	SpinBox* m_PaletteSaturationSpin;
 	SpinBox* m_PaletteBrightnessSpin;
@@ -510,9 +530,9 @@ private:
 	QTableWidgetItem* m_InfoFinalXformItem;
 
 	//Files.
-	QFileDialog* m_FileDialog;
-	QFileDialog* m_FolderDialog;
-	QssDialog* m_QssDialog;
+	QFileDialog* m_FileDialog = nullptr;
+	QFileDialog* m_FolderDialog = nullptr;
+	QssDialog* m_QssDialog = nullptr;
 	QString m_LastSaveAll;
 	QString m_LastSaveCurrent;
 	QString m_Style;

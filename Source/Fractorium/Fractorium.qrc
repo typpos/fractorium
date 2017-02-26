@@ -47,5 +47,8 @@
         <file>Icons/checkbox_unchecked.png</file>
         <file>Icons/control.png</file>
         <file>Icons/control-stop-square.png</file>
+        <file>Icons/Function-512.png</file>
+        <file>Icons/pic.png</file>
+        <file>Icons/grid.png</file>
     </qresource>
 </RCC>

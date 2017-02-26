@@ -118,7 +118,7 @@ public:
 	void ClearBuffers();
 
 	//Images.
-	bool AddAndWriteImage(const string& name, cl_mem_flags flags, const cl::ImageFormat& format, ::size_t width, ::size_t height, ::size_t row_pitch, void* data = NULL, bool shared = false, GLuint texName = 0);
+	bool AddAndWriteImage(const string& name, cl_mem_flags flags, const cl::ImageFormat& format, ::size_t width, ::size_t height, ::size_t row_pitch, void* data = nullptr, bool shared = false, GLuint texName = 0);
 	bool WriteImage2D(size_t index, bool shared, size_t width, size_t height, size_t row_pitch, void* data);
 	bool ReadImage(const string& name, ::size_t width, ::size_t height, ::size_t row_pitch, bool shared, void* data);
 	bool ReadImage(size_t imageIndex, ::size_t width, ::size_t height, ::size_t row_pitch, bool shared, void* data);
@@ -127,14 +127,14 @@ public:
 	size_t GetImageSize(size_t imageIndex, bool shared);
 	bool CompareImageParams(cl::Image& image, cl_mem_flags flags, const cl::ImageFormat& format, ::size_t width, ::size_t height, ::size_t row_pitch);
 	void ClearImages(bool shared);
-	bool CreateImage2D(cl::Image2D& image2D, cl_mem_flags flags, cl::ImageFormat format, ::size_t width, ::size_t height, ::size_t row_pitch = 0, void* data = NULL);
+	bool CreateImage2D(cl::Image2D& image2D, cl_mem_flags flags, cl::ImageFormat format, ::size_t width, ::size_t height, ::size_t row_pitch = 0, void* data = nullptr);
 	bool CreateImage2DGL(cl::ImageGL& image2DGL, cl_mem_flags flags, GLenum target, GLint miplevel, GLuint texobj);
 	bool EnqueueAcquireGLObjects(const string& name);
 	bool EnqueueAcquireGLObjects(cl::ImageGL& image);
 	bool EnqueueReleaseGLObjects(const string& name);
 	bool EnqueueReleaseGLObjects(cl::ImageGL& image);
-	bool EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = NULL);
-	bool EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = NULL);
+	bool EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = nullptr);
+	bool EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = nullptr);
 	bool CreateSampler(cl::Sampler& sampler, cl_bool normalizedCoords, cl_addressing_mode addressingMode, cl_filter_mode filterMode);
 
 	//Arguments.

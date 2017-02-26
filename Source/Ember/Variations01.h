@@ -3940,7 +3940,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T expx = std::exp(helper.In.x) * T(0.5);
-		T expnx = T(0.25) / expx;
+		T expnx = T(0.25) / Zeps(expx);
 		T sn, cn, tmp;
 		sincos(helper.In.y, &sn, &cn);
 		tmp = m_Weight / Zeps(expx + expnx - cn);
@@ -3955,7 +3955,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t expx = exp(vIn.x) * (real_t)(0.5);\n"
-		   << "\t\treal_t expnx = (real_t)(0.25) / expx;\n"
+		   << "\t\treal_t expnx = (real_t)(0.25) / Zeps(expx);\n"
 		   << "\t\treal_t sn = sin(vIn.y);\n"
 		   << "\t\treal_t cn = cos(vIn.y);\n"
 		   << "\t\treal_t tmp = Zeps(expx + expnx - cn);\n"

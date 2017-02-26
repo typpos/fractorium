@@ -1951,7 +1951,6 @@ class DeltaAVariation : public Variation<T>
 {
 public:
 	DeltaAVariation(T weight = 1.0) : Variation<T>("deltaa", eVariationId::VAR_DELTA_A, weight) { }
-
 	VARCOPY(DeltaAVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
@@ -4551,7 +4550,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(true, &m_S,    prefix + "ripple_s"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Is,   prefix + "ripple_is"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vxp,  prefix + "ripple_vxp"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Pxa , prefix + "ripple_pxa"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Pxa, prefix + "ripple_pxa"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pixa, prefix + "ripple_pixa"));
 	}
 
@@ -5420,14 +5419,14 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T a = helper.m_PrecalcAtanyx;
-		int n = rand.Rand(uint(m_Spread));
+		int n = rand.Rand(m_SpreadUint);
 
 		if (a < 0)
 			n++;
 
 		a += M_2PI * n;
 
-		if (std::cos(a * m_InvSpread) < rand.Rand() * 2 / 0xFFFFFFFF - 1)//Rand max.
+		if (std::cos(a * m_InvSpread) < rand.Rand() * T(2) / 0xFFFFFFFF - T(1))//Rand max.
 			a -= m_FullSpread;
 
 		T lnr2 = std::log(helper.m_PrecalcSumSquares);
@@ -5464,7 +5463,7 @@ public:
 		   << "\n"
 		   << "\t\ta += M_2PI * n;\n"
 		   << "\n"
-		   << "\t\tif (cos(a * " << invSpread << ") < MwcNext(mwc) * 2 / 0xFFFFFFFF - 1)\n"
+		   << "\t\tif (cos(a * " << invSpread << ") < MwcNext(mwc) * (real_t)2.0 / 0xFFFFFFFF - (real_t)1.0)\n"
 		   << "\t\t	a -= " << fullSpread << ";\n"
 		   << "\n"
 		   << "\t\treal_t lnr2 = log(precalcSumSquares);\n"
@@ -5487,6 +5486,7 @@ public:
 		m_HalfD = m_D / 2;
 		m_InvSpread = T(0.5) / m_Spread;
 		m_FullSpread = M_2PI * m_Spread;
+		m_SpreadUint = uint(m_Spread);
 	}
 
 protected:
@@ -5512,7 +5512,8 @@ private:
 	T m_A;
 	T m_Divisor;
 	T m_Spread;
-	T m_C;//Precalc.
+	uint m_SpreadUint;//Precalc.
+	T m_C;
 	T m_HalfC;
 	T m_D;
 	T m_HalfD;

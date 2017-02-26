@@ -51,6 +51,9 @@
     <Filter Include="Dialogs\Qss">
       <UniqueIdentifier>{5ba9fccd-8922-4037-956f-d57177a43700}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dialogs\PaletteEditor">
+      <UniqueIdentifier>{30bfa226-b712-471b-a4ff-cf01d10cf1f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Fractorium\main.cpp">
@@ -266,6 +269,51 @@
     <ClCompile Include="..\..\..\Source\Fractorium\LibraryTreeWidget.cpp">
       <Filter>Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\PaletteEditor\ColorPanel.cpp">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ColorPanel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ColorPanel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\PaletteEditor\ColorPickerWidget.cpp">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ColorPickerWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ColorPickerWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\PaletteEditor\ColorTriangle.cpp">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ColorTriangle.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ColorTriangle.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\PaletteEditor\GradientColorsView.cpp">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_GradientColorsView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_GradientColorsView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Fractorium\PaletteEditor\PaletteEditor.cpp">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PaletteEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PaletteEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_Fractorium.h">
@@ -321,6 +369,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\Fractorium\qfunctions.h">
       <Filter>Dialogs\Qss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\Fractorium\PaletteEditor\GradientArrow.h">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_paletteeditor.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -404,6 +458,24 @@
     </CustomBuild>
     <CustomBuild Include="..\..\..\Source\Fractorium\LibraryTreeWidget.h">
       <Filter>Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\PaletteEditor\ColorPanel.h">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\PaletteEditor\ColorPickerWidget.h">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\PaletteEditor\ColorTriangle.h">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\PaletteEditor\GradientColorsView.h">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\PaletteEditor\PaletteEditor.h">
+      <Filter>Dialogs\PaletteEditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\paletteeditor.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

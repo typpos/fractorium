@@ -14,13 +14,25 @@ void Fractorium::InitToolbarUI()
 	spGroup->addAction(ui.ActionSP);
 	spGroup->addAction(ui.ActionDP);
 	SyncOptionsToToolbar();
+	ui.ActionDrawImage->setChecked(true);
 	connect(ui.ActionCpu,	            SIGNAL(triggered(bool)), this, SLOT(OnActionCpu(bool)),	              Qt::QueuedConnection);
 	connect(ui.ActionCL,	            SIGNAL(triggered(bool)), this, SLOT(OnActionCL(bool)),	              Qt::QueuedConnection);
 	connect(ui.ActionSP,	            SIGNAL(triggered(bool)), this, SLOT(OnActionSP(bool)),	              Qt::QueuedConnection);
 	connect(ui.ActionDP,	            SIGNAL(triggered(bool)), this, SLOT(OnActionDP(bool)),	              Qt::QueuedConnection);
 	connect(ui.ActionStyle,             SIGNAL(triggered(bool)), this, SLOT(OnActionStyle(bool)),             Qt::QueuedConnection);
 	connect(ui.ActionStartStopRenderer, SIGNAL(triggered(bool)), this, SLOT(OnActionStartStopRenderer(bool)), Qt::QueuedConnection);
+	connect(ui.ActionDrawXforms,        SIGNAL(triggered(bool)), this, SLOT(OnActionDrawXforms(bool)),        Qt::QueuedConnection);
+	connect(ui.ActionDrawImage,         SIGNAL(triggered(bool)), this, SLOT(OnActionDrawImage(bool)),	      Qt::QueuedConnection);
+	connect(ui.ActionDrawGrid,          SIGNAL(triggered(bool)), this, SLOT(OnActionDrawGrid(bool)),          Qt::QueuedConnection);
 }
+
+/// <summary>
+/// GUI wrapper functions, getters only.
+/// </summary>
+
+bool Fractorium::DrawXforms() { return ui.ActionDrawXforms->isChecked(); }
+bool Fractorium::DrawImage()  { return ui.ActionDrawImage->isChecked();  }
+bool Fractorium::DrawGrid()   { return ui.ActionDrawGrid->isChecked();   }
 
 /// <summary>
 /// Called when the CPU render option on the toolbar is clicked.
@@ -80,7 +92,11 @@ void Fractorium::OnActionDP(bool checked)
 /// <param name="checked">Ignored</param>
 void Fractorium::OnActionStyle(bool checked)
 {
+#ifdef __APPLE__
+	m_QssDialog->exec();
+#else
 	m_QssDialog->show();
+#endif
 }
 
 /// <summary>
@@ -103,6 +119,42 @@ void Fractorium::OnActionStartStopRenderer(bool checked)
 		ui.ActionStartStopRenderer->setToolTip("Stop Renderer");
 		ui.ActionStartStopRenderer->setIcon(QIcon(":/Fractorium/Icons/control-stop-square.png"));
 	}
+}
+
+/// <summary>
+/// Toggle whether to show the affines.
+/// Called when the editor image button is clicked.
+/// </summary>
+/// <param name="checked">Check state, show editor if true, else hide.</param>
+void Fractorium::OnActionDrawXforms(bool checked)
+{
+	if (!ui.ActionDrawImage->isChecked() && !ui.ActionDrawXforms->isChecked())
+		ui.ActionDrawImage->setChecked(true);
+
+	ui.GLDisplay->update();
+}
+
+/// <summary>
+/// Toggle whether to show the image.
+/// Called when the image button is clicked.
+/// </summary>
+/// <param name="checked">Check state, show image if true, else hide.</param>
+void Fractorium::OnActionDrawImage(bool checked)
+{
+	if (!ui.ActionDrawImage->isChecked() && !ui.ActionDrawXforms->isChecked())
+		ui.ActionDrawXforms->setChecked(true);
+
+	ui.GLDisplay->update();
+}
+
+/// <summary>
+/// Toggle whether to show the grid.
+/// Called when the grid image button is clicked.
+/// </summary>
+/// <param name="checked">Check state, show grid if true, else hide.</param>
+void Fractorium::OnActionDrawGrid(bool checked)
+{
+	ui.GLDisplay->update();
 }
 
 /// <summary>
@@ -139,4 +191,7 @@ void Fractorium::SyncOptionsToToolbar()
 		ui.ActionSP->setChecked(true);
 		ui.ActionDP->setChecked(false);
 	}
+
+	ui.ActionDrawGrid->setChecked(m_Settings->ShowGrid());
+	ui.ActionDrawXforms->setChecked(m_Settings->ShowXforms());
 }

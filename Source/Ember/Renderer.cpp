@@ -60,25 +60,6 @@ bool Renderer<T, bucketT>::AssignIterator()
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::ComputeBounds()
 {
-	//size_t maxDEFilterWidth = 0;
-	//Use type T to account for negative numbers which will occur with a larger supersample and smaller filter width.
-	//The final value will be of type size_t.
-	//m_GutterWidth = size_t(ClampGte<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0));
-	//
-	////Check the size of the density estimation filter.
-	////If the radius of the density estimation filter is greater than the
-	////gutter width, have to pad with more.  Otherwise, use the same value.
-	//for (auto& ember : *m_EmbersP)
-	//	maxDEFilterWidth = std::max<size_t>(size_t(ceil(ember.m_MaxRadDE) * m_Ember.m_Supersample), maxDEFilterWidth);
-	//
-	////Need an extra ss = (int)floor(m_Supersample / 2.0) of pixels so that a local iteration count for DE can be determined.//SMOULDER
-	//if (maxDEFilterWidth > 0)
-	//	maxDEFilterWidth += size_t(Floor<T>(m_Ember.m_Supersample / T(2)));
-	//To have a fully present set of pixels for the spatial filter, must
-	//add the DE filter width to the spatial filter width.//SMOULDER
-	//m_DensityFilterOffset = maxDEFilterWidth;
-	//m_GutterWidth += m_DensityFilterOffset;
-	//
 	//Original did a lot of work to compute a gutter that changes size based on various parameters, which seems to be of no benefit.
 	//It also prevents the renderer from only performing filtering or final accum based on a filter parameter change, since that
 	//change may have changed the gutter.
@@ -720,7 +701,7 @@ EmberImageComments Renderer<T, bucketT>::ImageComments(const EmberStats& stats, 
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::MakeDmap(T colorScalar)
 {
-	m_Ember.m_Palette.template MakeDmap<bucketT>(m_Dmap, colorScalar);
+	m_Ember.m_Palette.template MakeDmap<bucketT>(m_Dmap, bucketT(colorScalar));
 }
 
 /// <summary>
@@ -863,48 +844,33 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 	size_t endRow = m_SuperRasH;
 	size_t endCol = m_SuperRasW;
 	//Timing t(4);
-	//if (forceOutput)//Assume interactive render, so speed up at the expense of slight quality.
-	//{
-	//	parallel_for(startRow, endRow, [&](size_t j)
-	//	{
-	//		if (!m_Abort)
-	//		{
-	//			size_t row = j * m_SuperRasW;
-	//			size_t rowEnd = row + endCol;
-	//			VectorizedLogScale(row, rowEnd);
-	//		}
-	//	});
-	//}
-	//else
+	//Original didn't parallelize this, doing so gives a 50-75% speedup.
+	//The value can be directly assigned, which is quicker than summing.
+	parallel_for(startRow, endRow, size_t(1), [&](size_t j)
 	{
-		//Original didn't parallelize this, doing so gives a 50-75% speedup.
-		//The value can be directly assigned, which is quicker than summing.
-		parallel_for(startRow, endRow, [&](size_t j)
+		size_t row = j * m_SuperRasW;
+		size_t rowEnd = row + endCol;
+
+		if (!m_Abort)
 		{
-			size_t row = j * m_SuperRasW;
-			size_t rowEnd = row + endCol;
-
-			if (!m_Abort)
+			for (size_t i = row; i < rowEnd; i++)
 			{
-				for (size_t i = row; i < rowEnd; i++)
+				//Check for visibility first before doing anything else to avoid all possible unnecessary calculations.
+				if (m_HistBuckets[i].a != 0)
 				{
-					//Check for visibility first before doing anything else to avoid all possible unnecessary calculations.
-					if (m_HistBuckets[i].a != 0)
-					{
-						bucketT logScale = (m_K1 * std::log(1 + m_HistBuckets[i].a * m_K2)) / m_HistBuckets[i].a;
-						//Original did a temporary assignment, then *= logScale, then passed the result to bump_no_overflow().
-						//Combine here into one operation for a slight speedup.
-						//Vectorized version:
-						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[i]);//Vectorizer can't tell these point to different locations.
-						bucketT* __restrict acc = glm::value_ptr(m_AccumulatorBuckets[i]);
+					bucketT logScale = (m_K1 * std::log(1 + m_HistBuckets[i].a * m_K2)) / m_HistBuckets[i].a;
+					//Original did a temporary assignment, then *= logScale, then passed the result to bump_no_overflow().
+					//Combine here into one operation for a slight speedup.
+					//Vectorized version:
+					bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[i]);//Vectorizer can't tell these point to different locations.
+					bucketT* __restrict acc = glm::value_ptr(m_AccumulatorBuckets[i]);
 
-						for (size_t v = 0; v < 4; v++)
-							acc[v] = hist[v] * logScale;
-					}
+					for (size_t v = 0; v < 4; v++)
+						acc[v] = hist[v] * logScale;
 				}
 			}
-		});
-	}
+		}
+	});
 	//t.Toc(__FUNCTION__);
 	return m_Abort ? eRenderStatus::RENDER_ABORT : eRenderStatus::RENDER_OK;
 }
@@ -930,7 +896,7 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 	intmax_t endCol = m_SuperRasW - (Supersample() - 1);
 	size_t chunkSize = size_t(ceil(double(endRow - startRow) / double(threads)));
 	//parallel_for scales very well, dividing the work almost perfectly among all processors.
-	parallel_for(size_t(0), threads, [&] (size_t threadIndex)
+	parallel_for(size_t(0), threads, size_t(1), [&] (size_t threadIndex)
 	{
 		size_t pixelNumber = 0;
 		int localStartRow = int(std::min<size_t>(startRow + (threadIndex * chunkSize), endRow - 1));
@@ -1115,7 +1081,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 	//The original does it this way as well and it's roughly 11 times faster to do it this way than inline below with each pixel.
 	if (EarlyClip())
 	{
-		parallel_for(size_t(0), m_SuperRasH, [&] (size_t j)
+		parallel_for(size_t(0), m_SuperRasH, size_t(1), [&] (size_t j)
 		{
 			auto rowStart = m_AccumulatorBuckets.data() + (j * m_SuperRasW);//Pull out of inner loop for optimization.
 			auto rowEnd = rowStart + m_SuperRasW;
@@ -1138,7 +1104,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 	//otherwise artifacts that resemble page tearing will occur in an interactive run. It's
 	//critical to never exit this loop prematurely.
 	//for (size_t j = 0; j < FinalRasH(); j++)//Keep around for debugging.
-	parallel_for(size_t(0), FinalRasH(), [&](size_t j)
+	parallel_for(size_t(0), FinalRasH(), size_t(1), [&](size_t j)
 	{
 		Color<bucketT> newBucket;
 		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRowSize();//Pull out of inner loop for optimization.
@@ -1300,13 +1266,13 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 		m_ThreadEmbers.insert(m_ThreadEmbers.begin(), m_ThreadsToUse, m_Ember);
 	}
 
-	parallel_for(size_t(0), m_ThreadsToUse, [&] (size_t threadIndex)
+	parallel_for(size_t(0), m_ThreadsToUse, size_t(1), [&] (size_t threadIndex)
 	{
 #if defined(_WIN32)
 		SetThreadPriority(GetCurrentThread(), int(m_Priority));
 #elif defined(__APPLE__)
 		sched_param sp = {0};
-		sp.sched_priority = m_Priority;
+		sp.sched_priority = int(m_Priority);
 		pthread_setschedparam(pthread_self(), SCHED_RR, &sp);
 #else
 		pthread_setschedprio(pthread_self(), int(m_Priority));
@@ -1441,31 +1407,31 @@ template <typename T, typename bucketT> DensityFilterBase* Renderer<T, bucketT>:
 /// Non-virtual ember wrappers, getters only.
 /// </summary>
 
-template <typename T, typename bucketT> bool              Renderer<T, bucketT>::XaosPresent()         const { return m_Ember.XaosPresent(); }
-template <typename T, typename bucketT> size_t			  Renderer<T, bucketT>::Supersample()         const { return m_Ember.m_Supersample; }
-template <typename T, typename bucketT> size_t			  Renderer<T, bucketT>::PaletteIndex()        const { return m_Ember.PaletteIndex(); }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::Time()                const { return m_Ember.m_Time; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::Quality()             const { return m_Ember.m_Quality; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::SpatialFilterRadius() const { return m_Ember.m_SpatialFilterRadius; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::PixelsPerUnit()       const { return m_Ember.m_PixelsPerUnit; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::Zoom()                const { return m_Ember.m_Zoom; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::CenterX()             const { return m_Ember.m_CenterX; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::CenterY()             const { return m_Ember.m_CenterY; }
-template <typename T, typename bucketT> T                 Renderer<T, bucketT>::Rotate()              const { return m_Ember.m_Rotate; }
-template <typename T, typename bucketT> bucketT           Renderer<T, bucketT>::Brightness()		  const { return bucketT(m_Ember.m_Brightness); }
-template <typename T, typename bucketT> bucketT           Renderer<T, bucketT>::Gamma()				  const { return bucketT(m_Ember.m_Gamma); }
-template <typename T, typename bucketT> bucketT           Renderer<T, bucketT>::Vibrancy()			  const { return bucketT(m_Ember.m_Vibrancy); }
-template <typename T, typename bucketT> bucketT           Renderer<T, bucketT>::GammaThresh()		  const { return bucketT(m_Ember.m_GammaThresh); }
-template <typename T, typename bucketT> bucketT           Renderer<T, bucketT>::HighlightPower()	  const { return bucketT(m_Ember.m_HighlightPower); }
-template <typename T, typename bucketT> Color<T>		  Renderer<T, bucketT>::Background()		  const { return m_Ember.m_Background; }
-template <typename T, typename bucketT> const Xform<T>*   Renderer<T, bucketT>::Xforms()			  const { return m_Ember.Xforms(); }
-template <typename T, typename bucketT> Xform<T>*         Renderer<T, bucketT>::NonConstXforms()			{ return m_Ember.NonConstXforms(); }
-template <typename T, typename bucketT> size_t			  Renderer<T, bucketT>::XformCount()          const { return m_Ember.XformCount(); }
-template <typename T, typename bucketT> const Xform<T>*   Renderer<T, bucketT>::FinalXform()          const { return m_Ember.FinalXform(); }
-template <typename T, typename bucketT> Xform<T>*         Renderer<T, bucketT>::NonConstFinalXform()        { return m_Ember.NonConstFinalXform(); }
-template <typename T, typename bucketT> bool              Renderer<T, bucketT>::UseFinalXform()       const { return m_Ember.UseFinalXform(); }
-template <typename T, typename bucketT> const Palette<T>* Renderer<T, bucketT>::GetPalette()          const { return &m_Ember.m_Palette; }
-template <typename T, typename bucketT> ePaletteMode      Renderer<T, bucketT>::PaletteMode()         const { return m_Ember.m_PaletteMode; }
+template <typename T, typename bucketT> bool                  Renderer<T, bucketT>::XaosPresent()         const { return m_Ember.XaosPresent(); }
+template <typename T, typename bucketT> size_t			      Renderer<T, bucketT>::Supersample()         const { return m_Ember.m_Supersample; }
+template <typename T, typename bucketT> size_t			      Renderer<T, bucketT>::PaletteIndex()        const { return m_Ember.PaletteIndex(); }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::Time()                const { return m_Ember.m_Time; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::Quality()             const { return m_Ember.m_Quality; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::SpatialFilterRadius() const { return m_Ember.m_SpatialFilterRadius; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::PixelsPerUnit()       const { return m_Ember.m_PixelsPerUnit; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::Zoom()                const { return m_Ember.m_Zoom; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::CenterX()             const { return m_Ember.m_CenterX; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::CenterY()             const { return m_Ember.m_CenterY; }
+template <typename T, typename bucketT> T                     Renderer<T, bucketT>::Rotate()              const { return m_Ember.m_Rotate; }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Brightness()		  const { return bucketT(m_Ember.m_Brightness); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Gamma()				  const { return bucketT(m_Ember.m_Gamma); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Vibrancy()			  const { return bucketT(m_Ember.m_Vibrancy); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::GammaThresh()		  const { return bucketT(m_Ember.m_GammaThresh); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::HighlightPower()	  const { return bucketT(m_Ember.m_HighlightPower); }
+template <typename T, typename bucketT> Color<T>		      Renderer<T, bucketT>::Background()		  const { return m_Ember.m_Background; }
+template <typename T, typename bucketT> const Xform<T>*       Renderer<T, bucketT>::Xforms()			  const { return m_Ember.Xforms(); }
+template <typename T, typename bucketT> Xform<T>*             Renderer<T, bucketT>::NonConstXforms()			{ return m_Ember.NonConstXforms(); }
+template <typename T, typename bucketT> size_t			      Renderer<T, bucketT>::XformCount()          const { return m_Ember.XformCount(); }
+template <typename T, typename bucketT> const Xform<T>*       Renderer<T, bucketT>::FinalXform()          const { return m_Ember.FinalXform(); }
+template <typename T, typename bucketT> Xform<T>*             Renderer<T, bucketT>::NonConstFinalXform()        { return m_Ember.NonConstFinalXform(); }
+template <typename T, typename bucketT> bool                  Renderer<T, bucketT>::UseFinalXform()       const { return m_Ember.UseFinalXform(); }
+template <typename T, typename bucketT> const Palette<float>* Renderer<T, bucketT>::GetPalette()          const { return &m_Ember.m_Palette; }
+template <typename T, typename bucketT> ePaletteMode          Renderer<T, bucketT>::PaletteMode()         const { return m_Ember.m_PaletteMode; }
 
 /// <summary>
 /// Virtual ember wrappers overridden from RendererBase, getters only.
@@ -1528,53 +1494,52 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 {
 	size_t histIndex, intColorIndex, histSize = m_HistBuckets.size();
 	bucketT colorIndex, colorIndexFrac;
-	auto dmap = palette->m_Entries.data();
 
-	//It's critical to understand what's going on here as it's one of the most important parts of the algorithm.
-	//A color value gets retrieved from the palette and
-	//its RGB values are added to the existing RGB values in the histogram bucket.
-	//Alpha is always 1 in the palettes, so that serves as the hit count.
-	//This differs from the original since redundantly adding both an alpha component and a hit count is omitted.
-	//This will eventually leave us with large values for pixels with many hits, which will be log scaled down later.
-	//Original used a function called bump_no_overflow(). Just do a straight add because the type will always be float or double.
-	//Doing so gives a 25% speed increase.
-	//Splitting these conditionals into separate loops makes no speed difference.
-	for (size_t i = 0; i < sampleCount && !m_Abort; i++)
+	//Linear is a linear scale for when the color index is not a whole number, which is most of the time.
+	//It uses a portion of the value of the index, and the remainder of the next index.
+	//Example: index = 25.7
+	//Fraction = 0.7
+	//Color = (dmap[25] * 0.3) + (dmap[26] * 0.7)
+	//Use overloaded addition and multiplication operators in vec4 to perform the accumulation.
+	if (PaletteMode() == ePaletteMode::PALETTE_LINEAR)
 	{
-		Point<T> p(samples[i]);//Slightly faster to cache this.
-
-		if (Rotate() != 0)
+		//It's critical to understand what's going on here as it's one of the most important parts of the algorithm.
+		//A color value gets retrieved from the palette and
+		//its RGB values are added to the existing RGB values in the histogram bucket.
+		//Alpha is always 1 in the palettes, so that serves as the hit count.
+		//This differs from the original since redundantly adding both an alpha component and a hit count is omitted.
+		//This will eventually leave us with large values for pixels with many hits, which will be log scaled down later.
+		//Original used a function called bump_no_overflow(). Just do a straight add because the type will always be float or double.
+		//Doing so gives a 25% speed increase.
+		//Splitting these conditionals into separate loops makes no speed difference.
+		for (size_t i = 0; i < sampleCount && !m_Abort; i++)
 		{
-			T p00 = p.m_X - CenterX();
-			T p11 = p.m_Y - m_Ember.m_RotCenterY;
-			p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
-			p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
-		}
+			Point<T> p(samples[i]);//Slightly faster to cache this.
 
-		//Checking this first before converting gives better performance than converting and checking a single value, which the original did.
-		//Second, an interesting optimization observation is that when keeping the bounds vars within m_CarToRas and calling its InBounds() member function,
-		//rather than here as members, about a 7% speedup is achieved. This is possibly due to the fact that data from m_CarToRas is accessed
-		//right after the call to Convert(), so some caching efficiencies get realized.
-		if (m_CarToRas.InBounds(p))
-		{
-			if (p.m_VizAdjusted != 0)
+			if (Rotate() != 0)
 			{
-				m_CarToRas.Convert(p, histIndex);
+				T p00 = p.m_X - CenterX();
+				T p11 = p.m_Y - m_Ember.m_RotCenterY;
+				p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
+				p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
+			}
 
-				//There is a very slim chance that a point will be right on the border and will technically be in bounds, passing the InBounds() test,
-				//but ends up being mapped to a histogram bucket that is out of bounds due to roundoff error. Perform one final check before proceeding.
-				//This will result in a few points at the very edges getting discarded, but prevents a crash and doesn't seem to make a speed difference.
-				if (histIndex < histSize)
+			//Checking this first before converting gives better performance than converting and checking a single value, which the original did.
+			//Second, an interesting optimization observation is that when keeping the bounds vars within m_CarToRas and calling its InBounds() member function,
+			//rather than here as members, about a 7% speedup is achieved. This is possibly due to the fact that data from m_CarToRas is accessed
+			//right after the call to Convert(), so some caching efficiencies get realized.
+			if (m_CarToRas.InBounds(p))
+			{
+				if (p.m_VizAdjusted != 0)
 				{
-					//Linear is a linear scale for when the color index is not a whole number, which is most of the time.
-					//It uses a portion of the value of the index, and the remainder of the next index.
-					//Example: index = 25.7
-					//Fraction = 0.7
-					//Color = (dmap[25] * 0.3) + (dmap[26] * 0.7)
-					//Use overloaded addition and multiplication operators in vec4 to perform the accumulation.
-					if (PaletteMode() == ePaletteMode::PALETTE_LINEAR)
+					m_CarToRas.Convert(p, histIndex);
+
+					//There is a very slim chance that a point will be right on the border and will technically be in bounds, passing the InBounds() test,
+					//but ends up being mapped to a histogram bucket that is out of bounds due to roundoff error. Perform one final check before proceeding.
+					//This will result in a few points at the very edges getting discarded, but prevents a crash and doesn't seem to make a speed difference.
+					if (histIndex < histSize)
 					{
-						colorIndex = bucketT(p.m_ColorX) * COLORMAP_LENGTH;
+						colorIndex = bucketT(p.m_ColorX) * COLORMAP_LENGTH_MINUS_1;
 						intColorIndex = size_t(colorIndex);
 
 						if (intColorIndex < 0)
@@ -1614,9 +1579,33 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 							hist[3] += ((pal[3] * cifm1) + (pal2[3] * colorIndexFrac)) * va;
 						}
 					}
-					else if (PaletteMode() == ePaletteMode::PALETTE_STEP)
+				}
+			}
+		}
+	}
+	else if (PaletteMode() == ePaletteMode::PALETTE_STEP)//Duplicate of above, but for step mode.
+	{
+		for (size_t i = 0; i < sampleCount && !m_Abort; i++)
+		{
+			Point<T> p(samples[i]);//Slightly faster to cache this.
+
+			if (Rotate() != 0)
+			{
+				T p00 = p.m_X - CenterX();
+				T p11 = p.m_Y - m_Ember.m_RotCenterY;
+				p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
+				p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
+			}
+
+			if (m_CarToRas.InBounds(p))
+			{
+				if (p.m_VizAdjusted != 0)
+				{
+					m_CarToRas.Convert(p, histIndex);
+
+					if (histIndex < histSize)
 					{
-						intColorIndex = Clamp<size_t>(size_t(p.m_ColorX * COLORMAP_LENGTH), 0, COLORMAP_LENGTH_MINUS_1);
+						intColorIndex = Clamp<size_t>(size_t(p.m_ColorX * COLORMAP_LENGTH_MINUS_1), 0, COLORMAP_LENGTH_MINUS_1);
 						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
 						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
 
@@ -1654,7 +1643,13 @@ template <typename T, typename bucketT>
 void Renderer<T, bucketT>::AddToAccum(const tvec4<bucketT, glm::defaultp>& bucket, intmax_t i, intmax_t ii, intmax_t j, intmax_t jj)
 {
 	if (j + jj >= 0 && j + jj < intmax_t(m_SuperRasH) && i + ii >= 0 && i + ii < intmax_t(m_SuperRasW))
-		m_AccumulatorBuckets[(i + ii) + ((j + jj) * m_SuperRasW)] += bucket;
+	{
+		auto* __restrict accum = m_AccumulatorBuckets.data() + ((i + ii) + ((j + jj) * m_SuperRasW));//For vectorizer, results in a 33% speedup.
+		accum->r += bucket.r;
+		accum->g += bucket.g;
+		accum->b += bucket.b;
+		accum->a += bucket.a;
+	}
 }
 
 /// <summary>

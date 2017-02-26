@@ -18,6 +18,8 @@ void Fractorium::InitXformsColorUI()
 	connect(ui.XformPaletteRefTable->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this, SLOT(OnXformRefPaletteResized(int, int, int)), Qt::QueuedConnection);
 	connect(ui.RandomColorIndicesButton, SIGNAL(clicked(bool)), this, SLOT(OnRandomColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.ToggleColorIndicesButton, SIGNAL(clicked(bool)), this, SLOT(OnToggleColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.RandomColorSpeedButton,   SIGNAL(clicked(bool)), this, SLOT(OnRandomColorSpeedButtonClicked(bool)),   Qt::QueuedConnection);
+	connect(ui.ToggleColorSpeedButton,   SIGNAL(clicked(bool)), this, SLOT(OnToggleColorSpeedButtonClicked(bool)),   Qt::QueuedConnection);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorIndexTable,  this, row, 1, m_XformColorIndexSpin,  spinHeight,  0, 1, 0.01, SIGNAL(valueChanged(double)), SLOT(OnXformColorIndexChanged(double)),  false,   0,   1,   0);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorValuesTable, this, row, 1, m_XformColorSpeedSpin,  spinHeight, -1, 1,  0.1, SIGNAL(valueChanged(double)), SLOT(OnXformColorSpeedChanged(double)),  true,  0.5, 0.5, 0.5);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorValuesTable, this, row, 1, m_XformOpacitySpin,	    spinHeight,  0, 1,  0.1, SIGNAL(valueChanged(double)), SLOT(OnXformOpacityChanged(double)),	    true,    1,   1,   0);
@@ -105,6 +107,33 @@ void FractoriumEmberController<T>::ToggleColorIndicesButtonClicked()
 void Fractorium::OnToggleColorIndicesButtonClicked(bool b) { m_Controller->ToggleColorIndicesButtonClicked(); }
 
 /// <summary>
+/// Set all xform color speeds to a random value between 0 and 1, inclusive.
+/// Called when the Random Color Speed button is clicked.
+/// Resets the rendering process.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::RandomColorSpeedButtonClicked()
+{
+	UpdateXform([&](Xform<T>* xform) { xform->m_ColorSpeed = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL);
+	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(CurrentXform()->m_ColorSpeed);
+}
+void Fractorium::OnRandomColorSpeedButtonClicked(bool b) { m_Controller->RandomColorSpeedButtonClicked(); }
+
+/// <summary>
+/// Set all xform color speeds to either 0 and 0.5, sequentially toggling.
+/// Called when the Toggle Color Speed button is clicked.
+/// Resets the rendering process.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::ToggleColorSpeedButtonClicked()
+{
+	char ch = 1;
+	UpdateXform([&](Xform<T>* xform) { xform->m_ColorSpeed = (T(ch ^= 1) ? 0.5 : 0.0); }, eXformUpdate::UPDATE_ALL);
+	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(CurrentXform()->m_ColorSpeed);
+}
+void Fractorium::OnToggleColorSpeedButtonClicked(bool b) { m_Controller->ToggleColorSpeedButtonClicked(); }
+
+/// <summary>
 /// Set the color speed of the selected xforms.
 /// Called when xform color speed spinner is changed.
 /// Resets the rendering process.
@@ -184,7 +213,7 @@ void Fractorium::OnXformRefPaletteResized(int logicalIndex, int oldSize, int new
 template <typename T>
 QColor FractoriumEmberController<T>::ColorIndexToQColor(double d)
 {
-	v4T entry = m_Ember.m_Palette[Clamp<size_t>(d * COLORMAP_LENGTH_MINUS_1, 0, m_Ember.m_Palette.Size())];
+	v4F entry = m_Ember.m_Palette[Clamp<size_t>(d * COLORMAP_LENGTH_MINUS_1, 0, m_Ember.m_Palette.Size())];
 	entry.r *= 255;
 	entry.g *= 255;
 	entry.b *= 255;
@@ -227,5 +256,5 @@ void Fractorium::SetPaletteTableItem(QPixmap* pixmap, QTableWidget* table, QTabl
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

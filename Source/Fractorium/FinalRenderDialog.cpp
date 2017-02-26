@@ -196,7 +196,11 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 void FractoriumFinalRenderDialog::Show(bool fromSequence)
 {
 	m_FromSequence = fromSequence;
+#ifdef __APPLE__
+	exec();
+#else
 	show();
+#endif
 }
 
 /// <summary>

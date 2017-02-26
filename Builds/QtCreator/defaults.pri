@@ -1,5 +1,6 @@
 VERSION = 1.0.0.2
 win32:CONFIG += skip_target_version_ext
+CONFIG += c++14
 #message(PWD: $$absolute_path($$PWD))
 
 #1) Declare the root of all files in this project, everything else will be
@@ -51,6 +52,7 @@ win32 {
 	INCLUDEPATH += /usr/include/glm
 	INCLUDEPATH += /usr/include/tbb
 	INCLUDEPATH += /usr/include/libxml2
+
 #libjpeg and libpng aren't in separate folders, so nothing to add here for them.
 }
 
@@ -90,7 +92,7 @@ macx {
 	LIBS += -L/usr/local/lib# homebrew installs into /usr/local
 }
 
-unix {
+unix:!macx {
 	LIBS += -lGL
 	LIBS += -lOpenCL
 }
@@ -150,6 +152,7 @@ win32 {
 	QMAKE_CXXFLAGS_DEBUG += /Od #Optimization disabled.
 	QMAKE_CXXFLAGS_DEBUG += /D "_DEBUG" #Debug mode.
 	QMAKE_CXXFLAGS_DEBUG += /RTC1 #Basic runtime checks: stack frames and uninitialized variables.
+        QMAKE_CXXFLAGS_DEBUG += /Ob2 #Inline function expansion: any suitable.
 }
 
 !win32 {

@@ -54,6 +54,18 @@ static inline bool Contains(c& container, const T& val)
 }
 
 /// <summary>
+/// Thin specialization for string because the compiler can't figure out the container template type
+/// when passing string to the function above.
+/// </summary>
+/// <param name="str1">The string to call find() on</param>
+/// <param name="str2">The string to search for</param>
+/// <returns>True if str2 was present at least once, else false.</returns>
+static bool Find(const string& str1, const string& str2)
+{
+	return str1.find(str2) != string::npos;
+}
+
+/// <summary>
 /// Thin wrapper around computing the total size of a vector.
 /// </summary>
 /// <param name="vec">The vector to compute the size of</param>
@@ -284,16 +296,21 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 {
 	try
 	{
-		ifstream ifs(filename, ios::binary | ios::ate);
-		auto pos = ifs.tellg();
-		buf.resize(pos + streampos(nullTerminate ? 1 : 0));
-		ifs.seekg(0, ios::beg);
-		ifs.read(&buf[0], pos);
+		ifstream ifs;
+		ifs.exceptions(ifstream::failbit);
+		ifs.open(filename, ios::binary | ios::ate);
 
-		if (nullTerminate)//Optionally NULL terminate if they want to treat it as a string.
-			buf[buf.size() - 1] = 0;
+		if (auto pos = ifs.tellg())//Ensure it exists and wasn't empty.
+		{
+			buf.resize(pos + streampos(nullTerminate ? 1 : 0));
+			ifs.seekg(0, ios::beg);
+			ifs.read(&buf[0], pos);
 
-		return true;
+			if (nullTerminate)//Optionally NULL terminate if they want to treat it as a string.
+				buf[buf.size() - 1] = 0;
+
+			return true;
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -813,6 +830,18 @@ static inline T NormalizeDeg180(T angle)
 }
 
 /// <summary>
+/// Determine whether the passed in string ends with the passed in suffix, case sensitive.
+/// </summary>
+/// <param name="str">The string to test</param>
+/// <param name="suffix">The string to test for</param>
+/// <returns>True if str ends with suffix, else false.</returns>
+static bool EndsWith(const std::string& str, const std::string& suffix)
+{
+	return str.size() >= suffix.size() &&
+		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+/// <summary>
 /// Return a lower case copy of a string.
 /// </summary>
 /// <param name="str">The string to copy and make lower case</param>
@@ -867,21 +896,61 @@ static string Trim(const string& str, char ch = ' ')
 }
 
 /// <summary>
-/// Return a copy of a file path string with the path portion removed.
+/// Split a string into tokens and place them in a vector.
+/// </summary>
+/// <param name="str">The string to split</param>
+/// <param name="del">The delimiter to split the string on. Note that only one character has to match, so this is a good way to use multiple delimiters</param>
+/// <param name="removeEmpty">True to omit empty strings, else false to keep them.</param>
+/// <returns>The vector containing the split tokens</returns>
+static vector<std::string> Split(const string& str, const string& del, bool removeEmpty = false)
+{
+	int current = 0;
+	int next = -1;
+	vector<string> vec;
+
+	do
+	{
+		current = next + 1;
+		next = int(str.find_first_of(del, current));
+		string ent(Trim(str.substr(current, next - current)));
+
+		if (!removeEmpty || ent.length() > 0)
+			vec.push_back(ent);
+	}
+	while (next != int(string::npos));
+
+	return vec;
+}
+
+/// <summary>
+/// Return a copy of a file path string with the file portion removed.
 /// </summary>
 /// <param name="filename">The string to retrieve the path from</param>
 /// <returns>The path portion of the string</returns>
 static string GetPath(const string& filename)
 {
+	const size_t lastSlash = filename.find_last_of("\\/");
+
+	if (std::string::npos != lastSlash)
+		return filename.substr(0, lastSlash + 1);
+	else
+		return filename;
+}
+
+/// <summary>
+/// Return a copy of a file path string with the path portion removed.
+/// </summary>
+/// <param name="filename">The string to retrieve the filename from</param>
+/// <returns>The filename portion of the string</returns>
+static string GetFilename(const string& filename)
+{
 	string s;
 	const size_t lastSlash = filename.find_last_of("\\/");
 
 	if (std::string::npos != lastSlash)
-		s = filename.substr(0, lastSlash + 1);
+		return filename.substr(lastSlash + 1, filename.size() - lastSlash);
 	else
-		s = "";
-
-	return s;
+		return filename;
 }
 
 /// <summary>

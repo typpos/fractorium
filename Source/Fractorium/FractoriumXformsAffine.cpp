@@ -9,7 +9,6 @@ void Fractorium::InitXformsAffineUI()
 	int affinePrec = 6, spinHeight = 20;
 	double affineStep = 0.01, affineMin = std::numeric_limits<double>::lowest(), affineMax = std::numeric_limits<double>::max();
 	auto table = ui.PreAffineTable;
-	connect(ui.LockAffineCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnLockAffineScaleCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	table->verticalHeader()->setVisible(true);//The designer continually clobbers these values, so must manually set them here.
 	table->horizontalHeader()->setVisible(true);
 	table->verticalHeader()->setSectionsClickable(true);
@@ -155,20 +154,29 @@ void Fractorium::InitXformsAffineUI()
 }
 
 /// <summary>
-/// Toggle whether to lock the visual scale of the affine spinners.
-/// Called when the user checks LockAffineCheckBox.
+/// Set the scale used for drawing the affines to a default value.
 /// </summary>
-/// <param name="state">True if checked, else false.</param>
 template <typename T>
-void FractoriumEmberController<T>::LockAffineScaleCheckBoxStateChanged(int state)
+void FractoriumEmberController<T>::InitLockedScale()
 {
-	m_LockedScale = m_Ember.m_PixelsPerUnit;
+	m_LockedScale = (T)std::min<size_t>(m_Ember.m_FinalRasW, m_Ember.m_FinalRasH) / 4.0;
 	m_LockedX = m_Ember.m_CenterX;
 	m_LockedY = m_Ember.m_CenterY;
-	m_Fractorium->ui.GLDisplay->update();
 }
 
-void Fractorium::OnLockAffineScaleCheckBoxStateChanged(int state) { m_Controller->LockAffineScaleCheckBoxStateChanged(state); }
+/// <summary>
+/// Multiply the scale used for drawing the affines by the passed in value.
+/// </summary>
+/// <param name="value">The value to scale by</param>
+template <typename T>
+void FractoriumEmberController<T>::ChangeLockedScale(T value)
+{
+	T min_size = 25.0;
+	m_LockedScale *= value;
+
+	if (m_LockedScale < min_size)
+		m_LockedScale = min_size;
+}
 
 /// <summary>
 /// Return the value needed to multiply the current scale by to get back to the locked scale.
@@ -177,10 +185,7 @@ void Fractorium::OnLockAffineScaleCheckBoxStateChanged(int state) { m_Controller
 template <typename T>
 T FractoriumEmberController<T>::AffineScaleCurrentToLocked()
 {
-	if (m_Fractorium->ui.LockAffineCheckBox->isChecked())
-		return LockedScale() / m_Ember.m_PixelsPerUnit;
-	else
-		return 1;
+	return LockedScale() / m_Ember.m_PixelsPerUnit;
 }
 
 /// <summary>
@@ -190,10 +195,7 @@ T FractoriumEmberController<T>::AffineScaleCurrentToLocked()
 template <typename T>
 T FractoriumEmberController<T>::AffineScaleLockedToCurrent()
 {
-	if (m_Fractorium->ui.LockAffineCheckBox->isChecked())
-		return m_Ember.m_PixelsPerUnit / LockedScale();
-	else
-		return 1;
+	return m_Ember.m_PixelsPerUnit / LockedScale();
 }
 
 /// <summary>
@@ -736,5 +738,5 @@ bool Fractorium::LocalPivot()  { return ui.LocalPivotRadio->isChecked();        
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

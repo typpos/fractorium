@@ -238,7 +238,6 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	uint histSize,\n"
 	   "	__read_only image2d_t palette,\n"
 	   "	__global Point* points\n"
-	   //"	uint startRender\n"
 	   "\t)\n"
 	   "{\n"
 	   "	bool fuse, ok;\n"
@@ -456,7 +455,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		{
 			os <<
 			   "				real_t colorIndexFrac;\n"
-			   "				real_t colorIndex = secondPoint.m_ColorX * COLORMAP_LENGTH;\n"
+			   "				real_t colorIndex = secondPoint.m_ColorX * COLORMAP_LENGTH_MINUS_1;\n"
 			   "				int intColorIndex = (int)colorIndex;\n"
 			   "				float4 palColor2;\n"
 			   "\n"
@@ -484,7 +483,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		else if (ember.m_PaletteMode == ePaletteMode::PALETTE_STEP)
 		{
 			os <<
-			   "				iPaletteCoord.x = (int)(secondPoint.m_ColorX * COLORMAP_LENGTH);\n"
+			   "				iPaletteCoord.x = (int)(secondPoint.m_ColorX * COLORMAP_LENGTH_MINUS_1);\n"
 			   "				palColor1 = read_imagef(palette, paletteSampler, iPaletteCoord);\n";
 		}
 
@@ -675,7 +674,7 @@ void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<
 /// <param name="doVals">True if the vector should be populated, else false. Default: true.</param>
 /// <param name="doString">True if the string should be populated, else false. Default: true.</param>
 template <typename T>
-void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals = true, bool doString = true)
+void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals, bool doString)
 {
 	size_t i, j, offset = 0, xformCount = ember.TotalXformCount();
 	string s;

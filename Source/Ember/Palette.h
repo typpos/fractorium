@@ -13,6 +13,9 @@ namespace EmberNs
 /// The palette stores a set of 256 colors which are what get accumulated to the histogram
 /// for each iteration. The colors come from either the main palette Xml file or directly
 /// from the ember parameter file. Either way, they come in as 0-255 and get normalized to 0-1.
+/// The palette may have also come from a palette editor where the user specifies key colors, then
+/// those are interpolated to make a smooth palette. In that case, the m_SourceColors map will
+/// be populated.
 /// In the future, 2D palette support might be added in which case this class will have to be modified.
 /// Template argument expected to be float or double.
 /// </summary>
@@ -90,11 +93,25 @@ public:
 			for (size_t i = 0; i < size; i++)
 			{
 				m_Entries[i].a = T(palette15[i * 4 + 0]);
-				m_Entries[i].r = T(palette15[i * 4 + 1]);
-				m_Entries[i].g = T(palette15[i * 4 + 2]);
-				m_Entries[i].b = T(palette15[i * 4 + 3]);
+				m_Entries[i].r = T(palette15[i * 4 + 1]) / T(255);
+				m_Entries[i].g = T(palette15[i * 4 + 2]) / T(255);
+				m_Entries[i].b = T(palette15[i * 4 + 3]) / T(255);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Constructor which takes the vector of colors as well as the source colors which were
+	/// used to create it in a palette editor. The burden is on the user to not let the two get out of sync.
+	/// </summary>
+	/// <param name="name">The name of the palette</param>
+	/// <param name="entries">A vector of color entries</param>
+	/// <param name="sourceColors">A map of colors which was used to create entries in a palette editor</param>
+	Palette(const string& name, vector<v4T>& entries, map<T, v4T>& sourceColors)
+	{
+		m_Name = name;
+		m_Entries = entries;
+		m_SourceColors = sourceColors;
 	}
 
 	/// <summary>
@@ -145,6 +162,11 @@ public:
 		m_Name = palette.m_Name;
 		m_Filename = palette.m_Filename;
 		CopyCont(m_Entries, palette.m_Entries);
+		m_SourceColors.clear();
+
+		for (auto& kv : palette.m_SourceColors)
+			m_SourceColors[T(kv.first)] = v4T(kv.second);
+
 		return *this;
 	}
 
@@ -182,6 +204,13 @@ public:
 	/// </summary>
 	/// <returns>The size of the color entries vector</returns>
 	size_t Size() { return m_Entries.size(); }
+
+	/// <summary>
+	/// The size of the source color entries vector which was used to create the palette.
+	/// Note this will only be non-zero if this palette was created in the palette editor.
+	/// </summary>
+	/// <returns>The size of the source colors map</returns>
+	size_t SourceColorSize() { return m_SourceColors.size(); }
 
 	/// <summary>
 	/// Set all colors to either black or white, including the alpha channel.
@@ -585,5 +614,6 @@ public:
 	string m_Name = "-";//Name of this palette.
 	shared_ptr<string> m_Filename;//Name of the parent file this palette came from, can be empty.
 	vector<v4T> m_Entries;
+	map<T, v4T> m_SourceColors;
 };
 }

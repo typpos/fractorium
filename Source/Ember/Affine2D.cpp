@@ -204,6 +204,19 @@ void Affine2D<T>::Scale(T amount)
 }
 
 /// <summary>
+/// Scales all values A,B,D,E by the specified amount.
+/// </summary>
+/// <param name="amount">The amount to scale by</param>
+template <typename T>
+void Affine2D<T>::ScaleXY(T amount)
+{
+	A(A() * amount);
+	B(B() * amount);
+	D(D() * amount);
+	E(E() * amount);
+}
+
+/// <summary>
 /// Rotate this affine transform around its origin by the specified angle in degrees.
 /// </summary>
 /// <param name="angle">The angle to rotate by</param>

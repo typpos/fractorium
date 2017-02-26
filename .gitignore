@@ -18,8 +18,6 @@
 *.ipch
 *.bsc
 *.exe
-*.xml
-!./Data/flam3-palettes.xml
 *.ilk
 *.wixobj
 *.pch
@@ -85,3 +83,8 @@ Builds/lib/libOpenCL.so
 Builds/include/CL
 Builds/include/GL
 /Data/Variations Bench.xlsx
+/Builds/QtCreator/EmberCL/EmberCL.pro.user.18
+/Builds/QtCreator/Ember/Ember.pro.user.18
+/Builds/QtCreator/Fractorium/Fractorium.pro.user.18
+/Builds/MSVC/VS2013/flam3-palettes.xml
+/Builds/MSVC/VS2015/flam3-palettes.xml

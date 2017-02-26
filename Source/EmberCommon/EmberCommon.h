@@ -125,19 +125,23 @@ static bool InitPaletteList(const string& filename)
 	PaletteList<T> paletteList;//Even though this is local, the members are static so they will remain.
 	static vector<string> paths =
 	{
-		"./",
+		"./"
 #ifndef _WIN32
-		"~"
+		, "~",
 		"~/.config/fractorium",
 		"/usr/share/fractorium",
 		"/usr/local/share/fractorium"
 #endif
 	};
-	bool added = paletteList.Add(filename);
+	bool added = false;
 
 	for (auto& p : paths)
+	{
 		if (!added)
 			added |= paletteList.Add(p + "/" + filename);
+		else
+			break;
+	}
 
 	if (!added || !paletteList.Size())
 	{

@@ -70,7 +70,7 @@ void FractoriumEmberController<T>::XaosChanged(int x, int y, double val)
 
 void Fractorium::OnXaosChanged(double d)
 {
-	if (auto senderSpinBox = qobject_cast<DoubleSpinBox*>(this->sender()))
+	if (auto senderSpinBox = qobject_cast<DoubleSpinBox*>(sender()))
 	{
 		auto p = senderSpinBox->property("tableindex").toPoint();
 		m_Controller->XaosChanged(p.x(), p.y(), d);

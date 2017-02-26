@@ -58,7 +58,7 @@
     <enum>QFrame::NoFrame</enum>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;Fractorium 1.0.0.2&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;A Qt-based fractal flame editor which uses a C++ re-write of the flam3 algorithm named Ember and a GPU capable version named EmberCL which implements a portion of the cuburn algorithm in OpenCL.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;http://fractorium.com&quot;&gt;fractorium.com&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&lt;br/&gt;Lead: Matt Feemster&lt;br/&gt;Contributors: Simon Detheridge&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Fractorium 1.0.0.2&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;A Qt-based fractal flame editor which uses a C++ re-write of the flam3 algorithm named Ember and a GPU capable version named EmberCL which implements a portion of the cuburn algorithm in OpenCL.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;http://fractorium.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;fractorium.com&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&lt;br/&gt;Lead: Matt Feemster&lt;br/&gt;Contributors: Simon Detheridge, Michel Mastriani&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::RichText</enum>
@@ -86,9 +86,9 @@
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>180</y>
+     <y>170</y>
      <width>585</width>
-     <height>483</height>
+     <height>500</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="AboutVerticalLayout">
@@ -128,7 +128,7 @@
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/scottdraves/flam3&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;flam3&lt;/span&gt;&lt;/a&gt;: Scott Draves, Erik Reckase (GPL v2)&lt;br/&gt;&lt;a href=&quot;http://github.com/stevenrobertson/cuburn&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cuburn&lt;/span&gt;&lt;/a&gt;: Steven Robertson, Michael Semeniuk, Matthew Znoj, Nicolas Mejia (GPL v3)&lt;br/&gt;&lt;a href=&quot;http://fractron9000.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Fractron 9000&lt;/span&gt;&lt;/a&gt;: Mike Thiesen (GPL)&lt;br/&gt;&lt;a href=&quot;http://sourceforge.net/projects/apophysis7x&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Apophysis&lt;/span&gt;&lt;/a&gt;: Mark Townsend, Ronald Hordijk, Peter Sdobnov, Piotr Borys, Georg Kiehne (GPL)&lt;br/&gt;&lt;a href=&quot;http://jwildfire.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;JWildfire&lt;/span&gt;&lt;/a&gt;: Andreas Maschke (LGPL)&lt;br/&gt;Numerous Apophysis plugin developers (GPL)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/scottdraves/flam3&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;flam3&lt;/span&gt;&lt;/a&gt;: Scott Draves, Erik Reckase (GPL v2)&lt;br/&gt;&lt;a href=&quot;http://github.com/stevenrobertson/cuburn&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cuburn&lt;/span&gt;&lt;/a&gt;: Steven Robertson, Michael Semeniuk, Matthew Znoj, Nicolas Mejia (GPL v3)&lt;br/&gt;&lt;a href=&quot;http://fractron9000.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Fractron 9000&lt;/span&gt;&lt;/a&gt;: Mike Thiesen (GPL)&lt;br/&gt;&lt;a href=&quot;http://sourceforge.net/projects/apophysis7x&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Apophysis&lt;/span&gt;&lt;/a&gt;: Mark Townsend, Ronald Hordijk, Peter Sdobnov, Piotr Borys, Georg Kiehne (GPL)&lt;br/&gt;&lt;a href=&quot;http://jwildfire.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;JWildfire&lt;/span&gt;&lt;/a&gt;: Andreas Maschke (LGPL)&lt;br/&gt;gradLib: Stian Broen&lt;br/&gt;ColorPickerWidget: Etienne Moutot&lt;br/&gt;Numerous Apophysis plugin developers (GPL)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="textFormat">
           <enum>Qt::RichText</enum>
@@ -211,7 +211,7 @@
        </sizepolicy>
       </property>
       <property name="title">
-       <string>Icons Used</string>
+       <string>Icons and Palettes Used</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="topMargin">
@@ -232,7 +232,7 @@
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://famfamfam.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Silk&lt;/span&gt;&lt;/a&gt;: Mark James (Creative Commons Attribution 2.5 License)&lt;br/&gt;&lt;a href=&quot;http://momentumdesignlab.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Momentum&lt;/span&gt;&lt;/a&gt;: Momentum Design Lab (Creative Commons Attribution-ShareAlike 3.5 License)&lt;br/&gt;&lt;a href=&quot;http://everaldo.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Crystal Clear&lt;/span&gt;&lt;/a&gt;: Everaldo Coelho (LGPL)&lt;br/&gt;&lt;a href=&quot;http://openiconlibrary.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Open Icon Library&lt;/span&gt;&lt;/a&gt;: Jeff Israel (GPL, LGPL, Creative Commons, Public Domain)&lt;br/&gt;&lt;a href=&quot;http://icons.mysitemyway.com/category/3d-transparent-glass-icons/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;3D Transparent Glass&lt;/span&gt;&lt;/a&gt;: iconsETC (Public Domain)&lt;br/&gt;&lt;a href=&quot;http://p.yusukekamiyamane.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Fugue&lt;/span&gt;&lt;/a&gt;: Yusuke Kamiyamane (Creative Commons Attribution 3.0 License)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Palettes&lt;/span&gt;: Boxtail, FarDareisMai, FractalDesire, Rce, Tatasz (Public Domain)&lt;br/&gt;&lt;a href=&quot;http://famfamfam.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Silk&lt;/span&gt;&lt;/a&gt;: Mark James (Creative Commons Attribution 2.5 License)&lt;br/&gt;&lt;a href=&quot;http://momentumdesignlab.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Momentum&lt;/span&gt;&lt;/a&gt;: Momentum Design Lab (Creative Commons Attribution-ShareAlike 3.5 License)&lt;br/&gt;&lt;a href=&quot;http://everaldo.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Crystal Clear&lt;/span&gt;&lt;/a&gt;: Everaldo Coelho (LGPL)&lt;br/&gt;&lt;a href=&quot;http://openiconlibrary.sourceforge.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Open Icon Library&lt;/span&gt;&lt;/a&gt;: Jeff Israel (GPL, LGPL, Creative Commons, Public Domain)&lt;br/&gt;&lt;a href=&quot;http://icons.mysitemyway.com/category/3d-transparent-glass-icons/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;3D Transparent Glass&lt;/span&gt;&lt;/a&gt;: iconsETC (Public Domain)&lt;br/&gt;&lt;a href=&quot;http://p.yusukekamiyamane.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Fugue&lt;/span&gt;&lt;/a&gt;: Yusuke Kamiyamane (Creative Commons Attribution 3.0 License)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="textFormat">
           <enum>Qt::RichText</enum>
@@ -253,7 +253,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>5</x>

@@ -113,7 +113,7 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 	ss << "NoVars";
 	emberNoVars.m_Name = ss.str();
 	ss.str("");
-	emberNoVars.m_Palette = *paletteList.GetPalette(paletteList.m_DefaultFilename, 0);
+	emberNoVars.m_Palette = *paletteList.GetPaletteByFilename(paletteList.m_DefaultFilename, 0);
 	embers.push_back(emberNoVars);
 
 	while (index < varList->RegSize())
@@ -1945,11 +1945,23 @@ int _tmain(int argc, _TCHAR* argv[])
 	vector<Ember<double>> dv;
 	list<Ember<float>> fl;
 	list<Ember<double>> dl;
-	EmberContainerTester<float>::TestEmberContainer(fv);
-	EmberContainerTester<double>::TestEmberContainer(dv);
-	EmberContainerTester<float>::TestEmberContainer(fl);
-	EmberContainerTester<double>::TestEmberContainer(dl);
-	CopyCont(fv, fl);
+	string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
+	auto vec = Split(line, delim, true);
+
+	for (auto& s : vec) cout << s << endl;
+
+	line = "index=0 color=2177354", delim = " =";
+	vec = Split(line, delim, true);
+
+	for (auto& s : vec) cout << s << endl;
+
+	/*
+	    EmberContainerTester<float>::TestEmberContainer(fv);
+	    EmberContainerTester<double>::TestEmberContainer(dv);
+	    EmberContainerTester<float>::TestEmberContainer(fl);
+	    EmberContainerTester<double>::TestEmberContainer(dl);
+	    CopyCont(fv, fl);
+	*/
 	//QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(1, 2, 3);
 	//mt19937 meow(1729);
 	/*  TestAffine<float>();

@@ -1038,7 +1038,7 @@ public:
 		T expx = std::exp(helper.In.x) * T(0.5);
 		T expnx = T(0.25) / expx;
 		T boot = helper.In.z == 0 ? helper.m_PrecalcAtanyx : helper.In.z;
-		T tmp = m_Weight / (expx + expnx - (std::cos(helper.In.y) * std::cos(boot)));
+		T tmp = m_Weight / Zeps(expx + expnx - (std::cos(helper.In.y) * std::cos(boot)));
 		helper.Out.x = (expx - expnx) * tmp;
 		helper.Out.y = std::sin(helper.In.y) * tmp;
 		helper.Out.z = std::sin(boot) * tmp;
@@ -1052,13 +1052,18 @@ public:
 		   << "\t\treal_t expx = exp(vIn.x) * (real_t)(0.5);\n"
 		   << "\t\treal_t expnx = (real_t)(0.25) / expx;\n"
 		   << "\t\treal_t boot = vIn.z == 0 ? precalcAtanyx : vIn.z;\n"
-		   << "\t\treal_t tmp = xform->m_VariationWeights[" << varIndex << "] / (expx + expnx - (cos(vIn.y) * cos(boot)));\n"
+		   << "\t\treal_t tmp = xform->m_VariationWeights[" << varIndex << "] / Zeps(expx + expnx - (cos(vIn.y) * cos(boot)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = (expx - expnx) * tmp;\n"
 		   << "\t\tvOut.y = sin(vIn.y) * tmp;\n"
 		   << "\t\tvOut.z = sin(boot) * tmp;\n"
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 };
 

@@ -112,9 +112,8 @@ public:
 	void CalcDragXAxis();
 	void CalcDragYAxis();
 	void CalcDragTranslation();
-
-	void SetEmber(Ember<T>* ember);
 	void SetSelectedXform(Xform<T>* xform);
+	void DrawGrid();
 	void DrawAffine(Xform<T>* xform, bool pre, bool selected);
 	int UpdateHover(v3T& glCoords);
 	bool CheckXformHover(Xform<T>* xform, v3T& glCoords, T& bestDist, bool pre, bool post);
@@ -136,7 +135,6 @@ private:
 	v3T m_MouseWorldPos;
 	v3T m_MouseDownWorldPos;
 	v3T m_DragHandlePos;
-	v3T m_DragHandleOffset;
 	v3T m_HoverHandlePos;
 
 	m4T m_Modelview;

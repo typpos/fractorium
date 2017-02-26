@@ -35,7 +35,7 @@ template <typename T>
 GLEmberController<T>::GLEmberController(Fractorium* fractorium, GLWidget* glWidget, FractoriumEmberController<T>* controller)
 	: GLEmberControllerBase(fractorium, glWidget)
 {
-	GridStep = T(1.0 / 8.0);
+	GridStep = T(1.0 / 4.0); // michel, needs to insert on GUI to be flexible//TODO
 	m_FractoriumEmberController = controller;
 	m_HoverXform = nullptr;
 	m_SelectedXform = nullptr;

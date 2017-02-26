@@ -137,7 +137,7 @@ bool EmberAnimate(EmberOptions& opt)
 		renderers.push_back(std::move(tempRenderer));
 	}
 
-	if (!InitPaletteList<T>(opt.PalettePath()))
+	if (!InitPaletteList<T>(opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
 		return false;
 
 	cout << "Parsing ember file " << opt.Input() << "\n";

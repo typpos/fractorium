@@ -1,6 +1,5 @@
 #include "FractoriumPch.h"
 #include "DoubleSpinBox.h"
-#include "FractoriumSettings.h"
 
 QTimer DoubleSpinBox::s_Timer;
 
@@ -17,10 +16,12 @@ DoubleSpinBox::DoubleSpinBox(QWidget* p, int h, double step)
 	: QDoubleSpinBox(p)
 {
 	m_DoubleClick = false;
+	m_DoubleClickLowVal = 0;
 	m_DoubleClickNonZero = 0;
 	m_DoubleClickZero = 1;
 	m_Step = step;
 	m_SmallStep = step / 10.0;
+	m_Settings = FractoriumSettings::DefInstance();
 	setSingleStep(step);
 	setFrame(false);
 	setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -51,6 +52,16 @@ void DoubleSpinBox::SetValueStealth(double d)
 void DoubleSpinBox::DoubleClick(bool b)
 {
 	m_DoubleClick = b;
+}
+
+/// <summary>
+/// Set the value to be used instead of zero to represent the lower value
+/// used when responding to a double click.
+/// </summary>
+/// <param name="val">The value to be used for the lower value instead of zero</param>
+void DoubleSpinBox::DoubleClickLowVal(double val)
+{
+	m_DoubleClickLowVal = val;
 }
 
 /// <summary>
@@ -120,7 +131,7 @@ QLineEdit* DoubleSpinBox::lineEdit()
 /// <summary>
 /// Another workaround for the persistent text selection bug in Qt.
 /// </summary>
-void DoubleSpinBox::OnSpinBoxValueChanged(double d)
+void DoubleSpinBox::OnSpinBoxValueChanged(double)
 {
 	lineEdit()->deselect();//Gets rid of nasty "feature" that always has text selected.
 }
@@ -159,35 +170,34 @@ void DoubleSpinBox::OnTimeout()
 bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 {
 	QMouseEvent* me = dynamic_cast<QMouseEvent*>(e);
-	auto settings = FractoriumSettings::DefInstance();
 
 	if (isEnabled() && me)
 	{
-		if (!settings->ToggleType() &&//Ensure double click toggles, not right click.
+		if (!m_Settings->ToggleType() &&//Ensure double click toggles, not right click.
 				me->type() == QMouseEvent::MouseButtonPress &&
 				me->button() == Qt::RightButton)
 		{
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 			StartTimer();
 		}
-		else if (!settings->ToggleType() &&
+		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseButtonRelease &&
 				 me->button() == Qt::RightButton)
 		{
 			StopTimer();
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		}
-		else if (!settings->ToggleType() &&
+		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseMove &&
 				 QGuiApplication::mouseButtons() & Qt::RightButton)
 		{
 			m_MouseMovePoint = me->pos();
 		}
 		else if (m_DoubleClick &&
-				 ((!settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
-				  (settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
+				 ((!m_Settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
+				  (m_Settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
 		{
-			if (IsNearZero(value()))
+			if (IsClose(m_DoubleClickLowVal, value()))
 				setValue(m_DoubleClickZero);
 			else
 				setValue(m_DoubleClickNonZero);

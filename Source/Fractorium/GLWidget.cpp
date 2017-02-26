@@ -135,8 +135,8 @@ void GLEmberController<T>::ClearWindow()
 {
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	m_GL->makeCurrent();
-	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_GL->glClearColor(ember->m_Background.r, ember->m_Background.g, ember->m_Background.b, 1.0);
+	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 /// <summary>
@@ -209,7 +209,17 @@ void GLWidget::paintGL()
 	{
 		auto renderer = controller->Renderer();
 		m_Drawing = true;
-		GLController()->DrawImage();
+
+		if (m_Fractorium->DrawImage())
+		{
+			GLController()->DrawImage();
+		}
+		else
+		{
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+
 		//Affine drawing.
 		bool pre = m_Fractorium->ui.PreAffineGroupBox->isChecked();
 		bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
@@ -249,8 +259,8 @@ void GLEmberController<T>::DrawImage()
 {
 	auto renderer = m_FractoriumEmberController->Renderer();
 	auto ember = m_FractoriumEmberController->CurrentEmber();
-	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_GL->glClearColor(ember->m_Background.r, ember->m_Background.g, ember->m_Background.b, 1.0);
+	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_GL->glDisable(GL_DEPTH_TEST);
 	renderer->EnterFinalAccum();//Lock, may not be necessary, but just in case.
 	renderer->EnterResize();
@@ -276,16 +286,16 @@ void GLEmberController<T>::DrawImage()
 template <typename T>
 void GLEmberController<T>::DrawAffines(bool pre, bool post)
 {
+	if (!m_Fractorium->DrawXforms() || (m_DragState == eDragState::DragRotateScale))
+		return;
+
 	QueryVMP();//Resolves to float or double specialization function depending on T.
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	bool dragging = m_DragState == eDragState::DragDragging;
 
 	//Draw grid if control key is pressed.
-	if (m_GL->hasFocus() && GetControl())
-	{
-		m_GL->glLineWidth(1.0f);
-		m_GL->DrawGrid(m_FractoriumEmberController->AffineScaleLockedToCurrent());
-	}
+	if ((m_GL->hasFocus() && GetControl()) || m_Fractorium->DrawGrid())
+		DrawGrid();
 
 	//When dragging, only draw the selected xform's affine and hide all others.
 	if (!m_Fractorium->m_Settings->ShowAllXforms() && dragging)
@@ -376,7 +386,7 @@ bool GLEmberControllerBase::KeyPress_(QKeyEvent* e)
 }
 
 /// <summary>
-/// Call controller KeyPress_().
+/// Call controller KeyPress().
 /// </summary>
 /// <param name="e">The event</param>
 void GLWidget::keyPressEvent(QKeyEvent* e)
@@ -466,15 +476,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 					m_DragSrcTransforms.push_back(m_AffineType == eAffineType::AffinePre ? xform->m_Affine : xform->m_Post);
 				}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Don't update renderer here.
 				m_DragHandlePos = m_HoverHandlePos;//The location in local coordinates of the point selected on the spinner, x, y or center.
-				m_DragHandleOffset = m_DragHandlePos - m_MouseWorldPos;//The distance in world coordinates from the point selected to the center of the spinner.
 				m_DragState = eDragState::DragDragging;
-				//Draw large yellow dot on select or drag.
-				m_GL->glPointSize(6.0f);
-				m_GL->glBegin(GL_POINTS);
-				m_GL->glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
-				m_GL->glVertex2f(m_DragHandlePos.x, m_DragHandlePos.y);
-				m_GL->glEnd();
-				m_GL->glPointSize(1.0f);//Restore point size.
 				m_GL->repaint();
 			}
 			else//Nothing was selected.
@@ -491,13 +493,16 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 		}
 		else if (e->button() == Qt::RightButton)//Right button does whole image rotation and scaling.
 		{
-			UpdateHover(mouseFlipped);
-			m_SelectedXform = m_HoverXform;
-			m_CenterDownX = ember->m_CenterX;//Capture these because they will change when rotating and scaling.
-			m_CenterDownY = ember->m_CenterY;
-			m_RotationDown = ember->m_Rotate;
-			m_ScaleDown = ember->m_PixelsPerUnit;
-			m_DragState = eDragState::DragRotateScale;
+			if (m_Fractorium->DrawImage())
+			{
+				UpdateHover(mouseFlipped);
+				m_SelectedXform = m_HoverXform;
+				m_CenterDownX = ember->m_CenterX;//Capture these because they will change when rotating and scaling.
+				m_CenterDownY = ember->m_CenterY;
+				m_RotationDown = ember->m_Rotate;
+				m_ScaleDown = ember->m_PixelsPerUnit;
+				m_DragState = eDragState::DragRotateScale;
+			}
 		}
 	}
 }
@@ -535,7 +540,7 @@ void GLEmberController<T>::MouseRelease(QMouseEvent* e)
 
 	m_DragState = eDragState::DragNone;
 	m_DragModifier = 0;
-	m_GL->repaint();//Force immediate redraw.
+	m_GL->update();
 }
 
 /// <summary>
@@ -670,15 +675,27 @@ void GLWidget::mouseMoveEvent(QMouseEvent* e)
 /// will zoom in the image in our out, while sacrificing quality.
 /// If the user needs to preserve quality, they can use the zoom spinner
 /// on the main window.
+/// If Alt is pressed, only the scale of the affines is changed, the scale of the image remains untouched.
 /// </summary>
 /// <param name="e">The event</param>
 template <typename T>
 void GLEmberController<T>::Wheel(QWheelEvent* e)
 {
-	auto ember = m_FractoriumEmberController->CurrentEmber();
+	if ((e->modifiers() & Qt::AltModifier) && m_Fractorium->DrawXforms())
+	{
+		m_FractoriumEmberController->ChangeLockedScale(e->angleDelta().x() >= 0 ? 1.0981 : 0.9);
+		m_GL->update();
+	}
+	else
+	{
+		if (m_Fractorium->DrawImage())
+		{
+			auto ember = m_FractoriumEmberController->CurrentEmber();
 
-	if (m_Fractorium && !(e->buttons() & Qt::MiddleButton))//Middle button does whole image translation, so ignore the mouse wheel while panning to avoid inadvertent zooming.
-		m_Fractorium->SetScale(ember->m_PixelsPerUnit + (e->angleDelta().y() >= 0 ? 50 : -50));
+			if (!(e->buttons() & Qt::MiddleButton))//Middle button does whole image translation, so ignore the mouse wheel while panning to avoid inadvertent zooming.
+				m_Fractorium->SetScale(ember->m_PixelsPerUnit + (e->angleDelta().y() >= 0 ? 50 : -50));
+		}
+	}
 }
 
 /// <summary>
@@ -800,76 +817,6 @@ bool GLEmberController<T>::SizesMatch()
 }
 
 /// <summary>
-/// Draw the grid in response to the control key being pressed.
-/// The frequency of the grid lines will change depending on the zoom.
-/// Calculated with the frame always centered, the renderer just moves the camera.
-/// </summary>
-/// <param name="scale">A value to scale by, used when locking the affine scale</param>
-void GLWidget::DrawGrid(double scale)
-{
-	auto renderer = m_Fractorium->m_Controller->Renderer();
-	float unitX = std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f;
-	float unitY = std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f;
-	float rad = std::max(unitX * scale, unitY * scale);
-	float xLow =  floor(-unitX);
-	float xHigh = ceil(unitX);
-	float yLow =  floor(-unitY);
-	float yHigh = ceil(unitY);
-	glBegin(GL_LINES);
-
-	if (rad <= 8.0f)
-	{
-		glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
-
-		for (float fx = xLow; fx <= xHigh; fx += GridStep)
-		{
-			glVertex2f(fx, yLow);
-			glVertex2f(fx, yHigh);
-		}
-
-		for (float fy = yLow; fy < yHigh; fy += GridStep)
-		{
-			glVertex2f(xLow,  fy);
-			glVertex2f(xHigh, fy);
-		}
-	}
-
-	unitX *= scale;
-	unitY *= scale;
-
-	if (unitX <= 64.0f)
-	{
-		glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
-
-		for (float fx = xLow; fx <= xHigh; fx += 1.0f)
-		{
-			glVertex2f(fx, yLow);
-			glVertex2f(fx, yHigh);
-		}
-
-		for (float fy = yLow; fy < yHigh; fy += 1.0f)
-		{
-			glVertex2f(xLow,  fy);
-			glVertex2f(xHigh, fy);
-		}
-	}
-
-	glColor4f(1.0f,   0.0f, 0.0f, 1.0f);
-	glVertex2f(0.0f,  0.0f);
-	glVertex2f(xHigh, 0.0f);
-	glColor4f(0.5f,   0.0f, 0.0f, 1.0f);
-	glVertex2f(0.0f,  0.0f);
-	glVertex2f(xLow,  0.0f);
-	glColor4f(0.0f,   1.0f, 0.0f, 1.0f);
-	glVertex2f(0.0f,  0.0f);
-	glVertex2f(0.0f,  yHigh);
-	glColor4f(0.0f,   0.5f, 0.0f, 1.0f);
-	glVertex2f(0.0f,  0.0f);
-	glVertex2f(0.0f,  yLow);
-	glEnd();
-}
-
-/// <summary>
 /// Draw the unit square.
 /// </summary>
 void GLWidget::DrawUnitSquare()
@@ -892,6 +839,60 @@ void GLWidget::DrawUnitSquare()
 	glVertex2f( 0, -1);
 	glVertex2f( 0, 1);
 	glEnd();
+}
+
+/// <summary>
+/// Draw the grid
+/// The frequency of the grid lines will change depending on the zoom (ALT+WHEEL).
+/// Calculated with the frame always centered, the renderer just moves the camera.
+/// </summary>
+template <typename T>
+void GLEmberController<T>::DrawGrid()
+{
+	auto renderer = m_Fractorium->m_Controller->Renderer();
+	double scale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	float unitX = (std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f) / scale;
+	float unitY = (std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f) / scale;
+	float xLow =  floor(-unitX);
+	float xHigh = ceil(unitX);
+	float yLow =  floor(-unitY);
+	float yHigh = ceil(unitY);
+	float alpha = 0.25f;
+	Affine2D<T> temp;
+	m4T mat = (temp * scale).ToMat4RowMajor();
+	m_GL->glPushMatrix();
+	m_GL->glLoadIdentity();
+	MultMatrix(mat);
+	m_GL->glLineWidth(1.0f);
+	m_GL->glBegin(GL_LINES);
+	m_GL->glColor4f(0.5f, 0.5f, 0.5f, alpha);
+
+	for (float fx = xLow; fx <= xHigh; fx += GridStep)
+	{
+		m_GL->glVertex2f(fx, yLow);
+		m_GL->glVertex2f(fx, yHigh);
+	}
+
+	for (float fy = yLow; fy < yHigh; fy += GridStep)
+	{
+		m_GL->glVertex2f(xLow,  fy);
+		m_GL->glVertex2f(xHigh, fy);
+	}
+
+	m_GL->glColor4f(1.0f,   0.0f, 0.0f, alpha);
+	m_GL->glVertex2f(0.0f,  0.0f);
+	m_GL->glVertex2f(xHigh, 0.0f);
+	m_GL->glColor4f(0.5f,   0.0f, 0.0f, alpha);
+	m_GL->glVertex2f(0.0f,  0.0f);
+	m_GL->glVertex2f(xLow,  0.0f);
+	m_GL->glColor4f(0.0f,   1.0f, 0.0f, alpha);
+	m_GL->glVertex2f(0.0f,  0.0f);
+	m_GL->glVertex2f(0.0f,  yHigh);
+	m_GL->glColor4f(0.0f,   0.5f, 0.0f, alpha);
+	m_GL->glVertex2f(0.0f,  0.0f);
+	m_GL->glVertex2f(0.0f,  yLow);
+	m_GL->glEnd();
+	m_GL->glPopMatrix();
 }
 
 /// <summary>
@@ -1028,42 +1029,45 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	m_HoverType = eHoverType::HoverNone;
 
-	//If there's a selected/current xform, check it first so it gets precedence over the others.
-	if (m_SelectedXform)
+	if (m_Fractorium->DrawXforms())//Don't bother checking anything if the user wants to see no xforms.
 	{
-		//These checks prevent highlighting the pre/post selected xform circle, when one is set to show all, and the other
-		//is set to show current, and the user hovers over another xform, but doesn't select it, then moves the mouse
-		//back over the hidden circle for the pre/post that was set to only show current.
-		bool checkSelPre = preAll || (pre && m_HoverXform == m_SelectedXform);
-		bool checkSelPost = postAll || (post && m_HoverXform == m_SelectedXform);
-
-		if (CheckXformHover(m_SelectedXform, glCoords, bestDist, checkSelPre, checkSelPost))
+		//If there's a selected/current xform, check it first so it gets precedence over the others.
+		if (m_SelectedXform)
 		{
-			m_HoverXform = m_SelectedXform;
-			bestIndex = int(ember->GetTotalXformIndex(m_SelectedXform));
-		}
-	}
+			//These checks prevent highlighting the pre/post selected xform circle, when one is set to show all, and the other
+			//is set to show current, and the user hovers over another xform, but doesn't select it, then moves the mouse
+			//back over the hidden circle for the pre/post that was set to only show current.
+			bool checkSelPre = preAll || (pre && m_HoverXform == m_SelectedXform);
+			bool checkSelPost = postAll || (post && m_HoverXform == m_SelectedXform);
 
-	//Check all xforms.
-	for (int i = 0; i < int(ember->TotalXformCount()); i++)
-	{
-		auto xform = ember->GetTotalXform(i);
-
-		if (preAll || (pre && m_HoverXform == xform))//Only check pre affine if they are shown.
-		{
-			if (CheckXformHover(xform, glCoords, bestDist, true, false))
+			if (CheckXformHover(m_SelectedXform, glCoords, bestDist, checkSelPre, checkSelPost))
 			{
-				m_HoverXform = xform;
-				bestIndex = i;
+				m_HoverXform = m_SelectedXform;
+				bestIndex = int(ember->GetTotalXformIndex(m_SelectedXform));
 			}
 		}
 
-		if (postAll || (post && m_HoverXform == xform))//Only check post affine if they are shown.
+		//Check all xforms.
+		for (int i = 0; i < int(ember->TotalXformCount()); i++)
 		{
-			if (CheckXformHover(xform, glCoords, bestDist, false, true))
+			auto xform = ember->GetTotalXform(i);
+
+			if (preAll || (pre && m_HoverXform == xform))//Only check pre affine if they are shown.
 			{
-				m_HoverXform = xform;
-				bestIndex = i;
+				if (CheckXformHover(xform, glCoords, bestDist, true, false))
+				{
+					m_HoverXform = xform;
+					bestIndex = i;
+				}
+			}
+
+			if (postAll || (post && m_HoverXform == xform))//Only check post affine if they are shown.
+			{
+				if (CheckXformHover(xform, glCoords, bestDist, false, true))
+				{
+					m_HoverXform = xform;
+					bestIndex = i;
+				}
 			}
 		}
 	}
@@ -1207,18 +1211,17 @@ template <typename T>
 void GLEmberController<T>::CalcDragXAxis()
 {
 	size_t index = 0;
-	auto scale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
-	auto scaleBack = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	auto affineToWorldScale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
+	auto worldToAffineScale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
 	bool pre = m_AffineType == eAffineType::AffinePre;
 	bool worldPivotShiftAlt = !m_Fractorium->LocalPivot() && GetShift() && GetAlt();
+	auto startDiff = (v2T(m_HoverHandlePos) * affineToWorldScale) - m_DragSrcTransform.O();
+	T startAngle = std::atan2(startDiff.y, startDiff.x);
 
 	if (GetShift())
 	{
-		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
-		v3T snapped = GetControl() ? SnapToNormalizedAngle(posOffset, 24u) : posOffset;
-		auto startDiff = (v2T(m_MouseDownWorldPos) * scale) - m_DragSrcTransform.O();
-		auto endDiff = (v2T(snapped) * scale) - m_DragSrcTransform.O();
-		T startAngle = std::atan2(startDiff.y, startDiff.x);
+		v3T snapped = GetControl() ? SnapToNormalizedAngle(m_MouseWorldPos, 24u) : m_MouseWorldPos;
+		auto endDiff = (v2T(snapped) * affineToWorldScale) - m_DragSrcTransform.O();
 		T endAngle = std::atan2(endDiff.y, endDiff.x);
 		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
@@ -1245,32 +1248,47 @@ void GLEmberController<T>::CalcDragXAxis()
 			}
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine.O() + affine.X()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.X()) * worldToAffineScale, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
 	}
 	else
 	{
-		v3T diff;
-		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
+		v3T diff = m_MouseWorldPos - m_MouseDownWorldPos;
+		auto diffscale = diff * affineToWorldScale;
+		auto origmag = Zeps(glm::length(m_DragSrcTransform.X()));
+		auto origXPlusOff = v3T(m_DragSrcTransform.X(), 0) + diffscale;
 
 		if (GetControl())
-			diff = SnapToGrid(posOffset) - m_MouseDownWorldPos;
-		else
-			diff = posOffset - m_MouseDownWorldPos;
+		{
+			auto o3 = v3T(m_DragSrcTransform.O(), 0);
+			auto o3x = origXPlusOff + o3;
+			origXPlusOff = SnapToGrid(o3x);
+			origXPlusOff -= o3;
+		}
 
-		auto origXPlusOff = v3T(m_DragSrcTransform.X(), 0) + (diff * scale);
+		auto newmag = glm::length(origXPlusOff);
+		auto newprc = newmag / origmag;
+		auto endDiff = (v2T(origXPlusOff) * affineToWorldScale);
+		T endAngle = std::atan2(endDiff.y, endDiff.x);
+		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
 			auto& affine = pre ? xform->m_Affine : xform->m_Post;
-			auto axis = v3T(m_DragSrcTransforms[index++].X(), 0) + (diff * scale);
+			auto src = m_DragSrcTransforms[index++];
 
 			if (GetAlt())
+			{
 				affine.X(v2T(origXPlusOff));//Absolute, not ratio.
+			}
 			else
-				affine.RotateScaleXTo(v2T(axis));
+			{
+				src.ScaleXY(newprc);
+				src.Rotate(angle);
+				affine = src;
+			}
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine.O() + affine.X()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.X()) * worldToAffineScale, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
 	}
 }
@@ -1297,18 +1315,17 @@ template <typename T>
 void GLEmberController<T>::CalcDragYAxis()
 {
 	size_t index = 0;
-	auto scale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
-	auto scaleBack = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	auto affineToWorldScale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
+	auto worldToAffineScale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
 	bool pre = m_AffineType == eAffineType::AffinePre;
 	bool worldPivotShiftAlt = !m_Fractorium->LocalPivot() && GetShift() && GetAlt();
+	auto startDiff = (v2T(m_HoverHandlePos) * affineToWorldScale) - m_DragSrcTransform.O();
+	T startAngle = std::atan2(startDiff.y, startDiff.x);
 
 	if (GetShift())
 	{
-		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
-		v3T snapped = GetControl() ? SnapToNormalizedAngle(posOffset, 24u) : posOffset;
-		auto startDiff = (v2T(m_MouseDownWorldPos) * scale) - m_DragSrcTransform.O();
-		auto endDiff = (v2T(snapped) * scale) - m_DragSrcTransform.O();
-		T startAngle = std::atan2(startDiff.y, startDiff.x);
+		v3T snapped = GetControl() ? SnapToNormalizedAngle(m_MouseWorldPos, 24u) : m_MouseWorldPos;
+		auto endDiff = (v2T(snapped) * affineToWorldScale) - m_DragSrcTransform.O();
 		T endAngle = std::atan2(endDiff.y, endDiff.x);
 		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
@@ -1335,32 +1352,47 @@ void GLEmberController<T>::CalcDragYAxis()
 			}
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine.O() + affine.Y()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.Y()) * worldToAffineScale, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
 	}
 	else
 	{
-		v3T diff;
-		auto posOffset = m_MouseWorldPos + m_DragHandleOffset;
+		v3T diff = m_MouseWorldPos - m_MouseDownWorldPos;
+		auto diffscale = diff * affineToWorldScale;
+		auto origmag = Zeps(glm::length(m_DragSrcTransform.Y()));
+		auto origYPlusOff = v3T(m_DragSrcTransform.Y(), 0) + diffscale;
 
 		if (GetControl())
-			diff = SnapToGrid(posOffset) - m_MouseDownWorldPos;
-		else
-			diff = posOffset - m_MouseDownWorldPos;
+		{
+			auto o3 = v3T(m_DragSrcTransform.O(), 0);
+			auto o3y = origYPlusOff + o3;
+			origYPlusOff = SnapToGrid(o3y);
+			origYPlusOff -= o3;
+		}
 
-		auto origXPlusOff = v3T(m_DragSrcTransform.Y(), 0) + (diff * scale);
+		auto newmag = glm::length(origYPlusOff);
+		auto newprc = newmag / origmag;
+		auto endDiff = (v2T(origYPlusOff) * affineToWorldScale);
+		T endAngle = std::atan2(endDiff.y, endDiff.x);
+		T angle = startAngle - endAngle;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 		{
 			auto& affine = pre ? xform->m_Affine : xform->m_Post;
-			auto axis = v3T(m_DragSrcTransforms[index++].Y(), 0) + (diff * scale);
+			auto src = m_DragSrcTransforms[index++];
 
 			if (GetAlt())
-				affine.Y(v2T(origXPlusOff));//Absolute, not ratio.
+			{
+				affine.Y(v2T(origYPlusOff));//Absolute, not ratio.
+			}
 			else
-				affine.RotateScaleYTo(v2T(axis));
+			{
+				src.ScaleXY(newprc);
+				src.Rotate(angle);
+				affine = src;
+			}
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T((affine.O() + affine.Y()) * scaleBack, 0);
+				m_DragHandlePos = v3T((affine.O() + affine.Y()) * worldToAffineScale, 0);
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
 	}
 }
@@ -1382,8 +1414,8 @@ template <typename T>
 void GLEmberController<T>::CalcDragTranslation()
 {
 	size_t index = 0;
-	auto scale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
-	auto scaleBack = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	auto affineToWorldScale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
+	auto worldToAffineScale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
 	bool worldPivotShift = !m_Fractorium->LocalPivot() && GetShift();
 	bool pre = m_AffineType == eAffineType::AffinePre;
 
@@ -1409,7 +1441,7 @@ void GLEmberController<T>::CalcDragTranslation()
 			affine.O(srcRotated.O());
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
-				m_DragHandlePos = v3T(srcRotated.O(), 0) * scaleBack;
+				m_DragHandlePos = v3T(srcRotated.O(), 0) * worldToAffineScale;
 		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
 	}
 	else
@@ -1421,20 +1453,24 @@ void GLEmberController<T>::CalcDragTranslation()
 			m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 			{
 				auto& affine = pre ? xform->m_Affine : xform->m_Post;
-				auto offset = m_DragSrcTransforms[index++].O() + (scale * v2T(diff));
+				auto offset = m_DragSrcTransforms[index++].O() + (affineToWorldScale * v2T(diff));
 				auto snapped = SnapToGrid(offset);
 				affine.O(v2T(snapped.x, snapped.y));
+
+				if (xform == m_FractoriumEmberController->CurrentXform())
+					m_DragHandlePos = v3T(affine.O(), 0) * worldToAffineScale;
 			}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
-			m_DragHandlePos = SnapToGrid(m_MouseWorldPos);
 		}
 		else
 		{
 			m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform)
 			{
 				auto& affine = pre ? xform->m_Affine : xform->m_Post;
-				affine.O(m_DragSrcTransforms[index++].O() + (scale * v2T(diff)));
+				affine.O(m_DragSrcTransforms[index++].O() + (affineToWorldScale * v2T(diff)));
+
+				if (xform == m_FractoriumEmberController->CurrentXform())
+					m_DragHandlePos = v3T(affine.O(), 0) * worldToAffineScale;
 			}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
-			m_DragHandlePos = m_MouseWorldPos;
 		}
 	}
 }
@@ -1454,5 +1490,5 @@ GLEmberControllerBase* GLWidget::GLController()
 template class GLEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class GLEmberController<double>;
+	template class GLEmberController<double>;
 #endif

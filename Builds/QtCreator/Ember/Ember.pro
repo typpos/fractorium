@@ -38,9 +38,12 @@ SOURCES += \
     $$PRJ_SRC_DIR/DllMain.cpp \
     $$PRJ_SRC_DIR/Ember.cpp \
     $$PRJ_SRC_DIR/EmberPch.cpp \
+    $$PRJ_SRC_DIR/EmberToXml.cpp \
+    $$PRJ_SRC_DIR/PaletteList.cpp \
     $$PRJ_SRC_DIR/RendererBase.cpp \
     $$PRJ_SRC_DIR/Renderer.cpp \
-    $$PRJ_SRC_DIR/VariationList.cpp
+    $$PRJ_SRC_DIR/VariationList.cpp \
+    $$PRJ_SRC_DIR/XmlToEmber.cpp
 
 include(deployment.pri)
 qtcAddDeployment()

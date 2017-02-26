@@ -63,7 +63,7 @@ bool EmberRender(EmberOptions& opt)
 	if (opt.EmberCL() && renderer->RendererType() != eRendererType::OPENCL_RENDERER)//OpenCL init failed, so fall back to CPU.
 		opt.EmberCL(false);
 
-	if (!InitPaletteList<T>(opt.PalettePath()))
+	if (!InitPaletteList<T>(opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
 		return false;
 
 	if (!ParseEmberFile(parser, opt.Input(), embers))

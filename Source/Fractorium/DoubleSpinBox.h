@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FractoriumPch.h"
+#include "FractoriumSettings.h"
 
 /// <summary>
 /// DoubleSpinBox and VariationTreeDoubleSpinBox classes.
@@ -22,6 +23,7 @@ public:
 	virtual ~DoubleSpinBox() { }
 	void SetValueStealth(double d);
 	void DoubleClick(bool b);
+	void DoubleClickLowVal(double val);
 	void DoubleClickZero(double val);
 	void DoubleClickNonZero(double val);
 	double Step();
@@ -46,12 +48,14 @@ private:
 	void StopTimer();
 
 	bool m_DoubleClick;
+	double m_DoubleClickLowVal;
 	double m_DoubleClickNonZero;
 	double m_DoubleClickZero;
 	double m_Step;
 	double m_SmallStep;
 	QPoint m_MouseDownPoint;
 	QPoint m_MouseMovePoint;
+	shared_ptr<FractoriumSettings> m_Settings;
 	static QTimer s_Timer;
 };
 

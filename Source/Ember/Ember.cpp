@@ -396,6 +396,11 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(Gamma, T) \
 	EXPORTPREPOSTREGVAR(PRose3D, T) \
 	EXPORTPREPOSTREGVAR(LogDB, T) \
+	EXPORTPREPOSTREGVAR(CircleSplit, T) \
+	EXPORTPREPOSTREGVAR(Cylinder2, T) \
+	EXPORTPREPOSTREGVAR(TileLog, T) \
+	EXPORTPREPOSTREGVAR(TruchetFill, T) \
+	EXPORTPREPOSTREGVAR(Waves2Radial, T) \
 	template EMBER_API class PostSmartcropVariation<T>; /*Only implemented as post.*/ \
 	EXPORTPREPOSTREGVAR(DCBubble, T) \
 	EXPORTPREPOSTREGVAR(DCCarpet, T) \
@@ -436,11 +441,10 @@ uint Timing::m_ProcessorCount;
 	template EMBER_API class XmlToEmber<T>; \
 	template EMBER_API class EmberToXml<T>;
 
-EXPORT_SINGLE_TYPE_EMBER(float)
-
 #define EXPORT_TWO_TYPE_EMBER(T, bucketT) \
 	template EMBER_API class SheepTools<T, bucketT>;
 
+EXPORT_SINGLE_TYPE_EMBER(float)
 EXPORT_TWO_TYPE_EMBER(float, float)
 
 #ifdef DO_DOUBLE

@@ -659,23 +659,23 @@ public:
 		{
 			for (glm::length_t i = 0; i < 256; i++)
 			{
-				T t[3], s[4] = { 0, 0, 0, 0 };
+				float t[3], s[4] = { 0, 0, 0, 0 };
 
 				for (glm::length_t k = 0; k < size; k++)
 				{
-					Palette<T>::RgbToHsv(glm::value_ptr(embers[k].m_Palette[i]), t);
+					Palette<float>::RgbToHsv(glm::value_ptr(embers[k].m_Palette[i]), t);
 
 					for (size_t j = 0; j < 3; j++)
-						s[j] += coefs[k] * t[j];
+						s[j] += float(coefs[k]) * t[j];
 
-					s[3] += coefs[k] * embers[k].m_Palette[i][3];
+					s[3] += float(coefs[k]) * embers[k].m_Palette[i][3];
 				}
 
-				Palette<T>::HsvToRgb(s, glm::value_ptr(m_Palette[i]));
+				Palette<float>::HsvToRgb(s, glm::value_ptr(m_Palette[i]));
 				m_Palette[i][3] = s[3];
 
 				for (glm::length_t j = 0; j < 4; j++)
-					Clamp<T>(m_Palette[i][j], 0, 1);
+					Clamp<float>(m_Palette[i][j], 0, 1);
 			}
 		}
 		else if (embers[0].m_PaletteInterp == ePaletteInterp::INTERP_SWEEP)
@@ -1100,8 +1100,8 @@ public:
 	/// <summary>
 	/// Placeholder to do nothing.
 	/// </summary>
-	/// <param name="point">Unused</param>
-	/// <param name="rand">Unused</param>
+	/// <param name="point">Ignored</param>
+	/// <param name="rand">Ignored</param>
 	void ProjectNone(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
 	{
 	}
@@ -1110,7 +1110,7 @@ public:
 	/// Project when only z is set, and not pitch, yaw, projection or depth blur.
 	/// </summary>
 	/// <param name="point">The point to project</param>
-	/// <param name="rand">Unused</param>
+	/// <param name="rand">Ignored</param>
 	void ProjectZPerspective(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
 	{
 		T zr = Zeps(1 - m_CamPerspective * (point.m_Z - m_CamZPos));
@@ -1123,7 +1123,7 @@ public:
 	/// Project when pitch, and optionally z and perspective are set, but not depth blur or yaw.
 	/// </summary>
 	/// <param name="point">The point to project</param>
-	/// <param name="rand">Unused</param>
+	/// <param name="rand">Ignored</param>
 	void ProjectPitch(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
 	{
 		T z  = point.m_Z - m_CamZPos;
@@ -1180,7 +1180,7 @@ public:
 	/// Project when yaw and optionally pitch, z, and perspective are set, but not depth blur.
 	/// </summary>
 	/// <param name="point">The point to project</param>
-	/// <param name="rand">Unused</param>
+	/// <param name="rand">Ignored</param>
 	void ProjectPitchYaw(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
 	{
 		T z = point.m_Z - m_CamZPos;
@@ -1653,7 +1653,7 @@ public:
 	//The color palette to use. Can be specified inline as Xml color fields, or as a hex buffer. Can also be specified
 	//as an index into the palette file with an optional hue rotation applied. Inserting as a hex buffer is the preferred method.
 	//Xml field: "color" or "colors" or "palette" .
-	Palette<T> m_Palette;//Final palette that is actually used is a copy of this inside of render, which will be of type bucketT (float).
+	Palette<float> m_Palette;//Final palette that is actually used is a copy of this inside of render, which will be of type bucketT (float).
 
 	//Curves used to adjust the color during final accumulation.
 	Curves<T> m_Curves;

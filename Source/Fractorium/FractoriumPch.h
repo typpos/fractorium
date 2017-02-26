@@ -26,41 +26,69 @@
 	#include <QtWidgets>
 #endif
 
+#include <math.h>
 #include <deque>
 #include "qfunctions.h"
+
 #include <QApplication>
 #include <QBrush>
+#include <QCheckBox>
+#include <QClipboard>
 #include <QColor>
 #include <QColorDialog>
 #include <QComboBox>
+#include <QConicalGradient>
 #include <QDebug>
+#include <QDesktopWidget>
+#include <QDial>
 #include <QDoubleSpinBox>
+#include <QEvent>
+#include <QFile>
 #include <QFileInfo>
 #include <QFont>
 #include <QFontDialog>
 #include <QFontMetrics>
+#include <QFrame>
 #include <QFuture>
 #include <QGraphicsView>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHash>
+#include <QHBoxLayout>
 #include <QIcon>
+#include <QImage>
 #include <QImageReader>
 #include <QItemDelegate>
+#include <QKeyEvent>
+#include <QLabel>
+#include <QLayout>
+#include <QLinearGradient>
 #include <QLineEdit>
+#include <QMap>
 #include <QMenu>
+#include <QMessageBox>
+#include <QMimeData>
 #include <QModelIndex>
+#include <QMouseEvent>
 #include <qopenglfunctions_2_0.h>
 #include <QOpenGLWidget>
+#include <QPainter>
 #include <QPainterPath>
+#include <QPaintEvent>
+#include <QPixmap>
+#include <QPoint>
+#include <QPolygon>
 #include <QPushButton>
+#include <QRect>
+#include <QResizeEvent>
 #include <QSettings>
 #include <QSignalMapper>
+#include <QSize>
+#include <QSizePolicy>
 #include <QSpinBox>
 #include <QStandardPaths>
-#include <QTextEdit>
-#include <QTimer>
-#include <QToolBar>
-#include <QTreeWidget>
-#include <QWheelEvent>
 #include <QtConcurrentRun>
+#include <QtCore/qglobal.h>
 #include <QtCore/QMultiHash>
 #include <QtCore/QPair>
 #include <QtCore/QSharedData>
@@ -68,11 +96,31 @@
 #include <QtCore/QStringList>
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
-#include <QtCore/qglobal.h>
+#include <QTextEdit>
+#include <QTextStream>
 #include <QtGui/QFont>
 #include <QtGui/QPalette>
 #include <QtGui/QSyntaxHighlighter>
+#include <QThread>
+#include <QTime>
+#include <QTimer>
+#include <QToolBar>
+#include <QToolTip>
+#include <QTreeWidget>
 #include <QtWidgets/QMainWindow>
+#include <QVarLengthArray>
+#include <QVBoxLayout>
+#include <QVector>
+#include <QWheelEvent>
+#include <QWidget>
+#include <QWidgetAction>
+
+#define GLM_FORCE_RADIANS 1
+#define GLM_ENABLE_EXPERIMENTAL 1
+
+#ifndef __APPLE__
+	#define GLM_FORCE_INLINE 1
+#endif
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"

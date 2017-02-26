@@ -2,10 +2,12 @@
 
 #include "FractoriumPch.h"
 #include "FractoriumSettings.h"
+#include "PaletteTableWidgetItem.h"
 
 /// <summary>
 /// Fractorium global utility functions.
 /// </summary>
+#define PALETTE_CELL_HEIGHT 16
 
 /// <summary>
 /// Setup a spinner to be placed in a table cell.
@@ -366,6 +368,116 @@ static void HandleDeviceTableCheckChanged(QTableWidget* table, int row, int col)
 	if (auto primaryItem = table->item(primaryRow, 0))
 		if (primaryItem->checkState() == Qt::Unchecked)
 			primaryItem->setCheckState(Qt::Checked);
+}
+
+/// <summary>
+/// Set a row in a table to represent a palette.
+/// This will place the palette name as a string value in the first column,
+/// and a QPixmap representing the palette in the second column.
+/// </summary>
+/// <param name="paletteTable">The table write to the row to</param>
+/// <param name="palette">A pointer to the palette to write to the row</param>
+/// <param name="row">The row to write the palette to</param>
+static void AddPaletteToTable(QTableWidget* paletteTable, Palette<float>* palette, int row)
+{
+	auto v = palette->MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);
+	auto nameCol = new QTableWidgetItem(palette->m_Name.c_str());
+	nameCol->setToolTip(palette->m_Name.c_str());
+	paletteTable->setItem(row, 0, nameCol);
+	QImage image(v.data(), int(palette->Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
+	auto paletteItem = new PaletteTableWidgetItem(palette);
+	paletteItem->setData(Qt::DecorationRole, QPixmap::fromImage(image));
+	paletteItem->setFlags(paletteItem->flags() & ~Qt::ItemIsEditable);
+	paletteTable->setItem(row, 1, paletteItem);
+}
+
+/// <summary>
+/// Read a palette Xml file and populate the palette table with the contents.
+/// This will clear any previous contents.
+/// Called upon initialization, palette combo index change, and controller type change.
+/// </summary>
+/// <param name="s">The name of the palette file without the path</param>
+/// <returns>True if successful, else false.</returns>
+static bool FillPaletteTable(const string& s, QTableWidget* paletteTable, PaletteList<float>& paletteList)
+{
+	if (!s.empty())//This occasionally seems to get called with an empty string for reasons unknown.
+	{
+		if (auto palettes = paletteList.GetPaletteListByFilename(s))
+		{
+			paletteTable->clear();
+			paletteTable->blockSignals(true);
+			paletteTable->setRowCount(int(palettes->size()));
+			//Headers get removed when clearing, so must re-create here.
+			auto nameHeader = new QTableWidgetItem("Name");
+			auto paletteHeader = new QTableWidgetItem("Palette");
+			nameHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+			paletteHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+			paletteTable->setHorizontalHeaderItem(0, nameHeader);
+			paletteTable->setHorizontalHeaderItem(1, paletteHeader);
+
+			//Palette list table.
+			for (auto i = 0; i < palettes->size(); i++)
+				if (auto palette = &(*palettes)[i])
+					AddPaletteToTable(paletteTable, palette, i);
+
+			paletteTable->blockSignals(false);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/// <summary>
+/// Get the default search paths for config and palette files.
+/// </summary>
+/// <returns>vector<QString> of paths</returns>
+static vector<QString> GetDefaultPaths()
+{
+	static vector<QString> paths =
+	{
+		(QDir::homePath() + "/AppData/Roaming/Fractorium").toLocal8Bit().data(),
+#ifndef _WIN32
+		QString("/usr/share/fractorium").toLocal8Bit().data(),
+		QString("/usr/local/share/fractorium").toLocal8Bit().data(),
+		(QDir::homePath() + "/.config/fractorium").toLocal8Bit().data(),
+#endif
+		QDir::currentPath().toLocal8Bit().data(),
+		QCoreApplication::applicationDirPath().toLocal8Bit().data()
+	};
+	return paths;
+}
+
+/// <summary>
+/// Get the default user path for config and palette files.
+/// </summary>
+/// <returns>vector<QString> of paths</returns>
+static QString GetDefaultUserPath()
+{
+#ifdef _WIN32
+	return (QDir::homePath() + "/AppData/Roaming/Fractorium").toLocal8Bit().data();
+#else
+	return (QDir::homePath() + "/.config/fractorium").toLocal8Bit().data();
+#endif
+}
+
+/// <summary>
+/// Get the first flam3-palettes.xml file in the default search paths.
+/// </summary>
+/// <returns>The full path and filename if found, else empty string.</returns>
+static QString FindFirstDefaultPalette()
+{
+	auto paths = GetDefaultPaths();
+
+	for (auto& path : paths)
+	{
+		auto full = path + "/flam3-palettes.xml";
+
+		if (QFile::exists(full))
+			return full;
+	}
+
+	return "";
 }
 
 /// <summary>

@@ -44,6 +44,25 @@ void Fractorium::InitLibraryUI()
 }
 
 /// <summary>
+/// Select the item in the library tree specified by the passed in index.
+/// </summary>
+/// <param name="index">The 0-based index of the item in the library tree to select</param>
+void Fractorium::SelectLibraryItem(size_t index)
+{
+	if (auto top = ui.LibraryTree->topLevelItem(0))
+	{
+		for (int i = 0; i < top->childCount(); i++)
+		{
+			if (auto emberItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(i)))
+			{
+				emberItem->setSelected(i == index);
+				emberItem->setCheckState(0, i == index ? Qt::Checked : Qt::Unchecked);
+			}
+		}
+	}
+}
+
+/// <summary>
 /// Get the index of the currently selected ember in the library tree.
 /// </summary>
 /// <returns>A pair containing the index of the item clicked and a pointer to the item</param>
@@ -153,9 +172,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 	tree->blockSignals(false);
 
 	if (selectIndex != -1)
-		if (auto top = tree->topLevelItem(0))
-			if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(selectIndex)))
-				emberItem->setSelected(true);
+		m_Fractorium->SelectLibraryItem(selectIndex);
 
 	m_Fractorium->SyncFileCountToSequenceCount();
 	QCoreApplication::flush();
@@ -568,12 +585,13 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	vector<pair<size_t, size_t>> devices;//Dummy.
 	EmberReport emberReport;
 	ostringstream os;
-	string palettePath =
-#ifdef _WIN32
-		"./flam3-palettes.xml";
-#else
-		"~/.config/fractorium";
-#endif
+	string palettePath = FindFirstDefaultPalette().toStdString();
+
+	if (palettePath.empty())//This should never happen because the program requires a palette file to run this far.
+	{
+		QMessageBox::warning(nullptr, "Sequence", "No flam3-palettes.xml file found, sequence will not be generated.");
+		return;
+	}
 
 	if (!randRot && !randBlend)
 	{
@@ -700,12 +718,15 @@ void Fractorium::OnSequenceGenerateButtonClicked(bool checked) { m_Controller->S
 /// <param name="checked">Ignored.</param>
 void Fractorium::OnSequenceRenderButtonClicked(bool checked)
 {
-	//First completely stop what the current rendering process is doing.
-	m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
-	m_Controller->StopAllPreviewRenderers();
-	m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
-	m_RenderStatusLabel->setText("Renderer stopped.");
-	m_FinalRenderDialog->Show(true);//Show with a bool specifying that it came from the sequence generator.
+	if (ui.SequenceTree->topLevelItemCount() > 0)
+	{
+		//First completely stop what the current rendering process is doing.
+		m_Controller->DeleteRenderer();//Delete the renderer, but not the controller.
+		m_Controller->StopAllPreviewRenderers();
+		m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
+		m_RenderStatusLabel->setText("Renderer stopped.");
+		m_FinalRenderDialog->Show(true);//Show with a bool specifying that it came from the sequence generator.
+	}
 }
 
 /// <summary>
@@ -825,5 +846,5 @@ void Fractorium::SyncSequenceSettings()
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

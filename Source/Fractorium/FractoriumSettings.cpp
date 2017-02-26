@@ -109,6 +109,12 @@ void FractoriumSettings::Double(bool b)							 { setValue(DOUBLEPRECISION, b);		
 bool FractoriumSettings::ShowAllXforms()						 { return value(SHOWALLXFORMS).toBool();   }
 void FractoriumSettings::ShowAllXforms(bool b)					 { setValue(SHOWALLXFORMS, b);			   }
 
+bool FractoriumSettings::ShowXforms()                            { return value(SHOWXFORMS, QVariant::fromValue(true)).toBool(); }
+void FractoriumSettings::ShowXforms(bool b)                      { setValue(SHOWXFORMS, b);                }
+
+bool FractoriumSettings::ShowGrid()                              { return value(SHOWGRID, QVariant::fromValue(true)).toBool();   }
+void FractoriumSettings::ShowGrid(bool b)                        { setValue(SHOWGRID, b);                  }
+
 bool FractoriumSettings::ToggleType()                            { return value(TOGGLETYPE).toBool();      }
 void FractoriumSettings::ToggleType(bool b)                      { setValue(TOGGLETYPE, b);                }
 

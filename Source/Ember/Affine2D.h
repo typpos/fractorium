@@ -76,6 +76,7 @@ public:
 	bool IsZero() const;
 	bool IsEmpty() const;
 	void Scale(T amount);
+	void ScaleXY(T amount);
 	Affine2D<T> ScaleCopy(T amount);
 	void Rotate(T rad);
 	void RotateTrans(T rad);

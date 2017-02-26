@@ -42,33 +42,38 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 	: FractoriumEmberControllerBase(fractorium),
 	  m_VariationList(VariationList<T>::Instance())
 {
-	bool b = false;
+	size_t b = 0;
 	m_GLController = make_unique<GLEmberController<T>>(fractorium, fractorium->ui.GLDisplay, this);
 	m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile);
 	m_SequencePreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.SequenceTree, m_SequenceFile);
+	m_PaletteList.Clear();
+	m_Fractorium->ui.PaletteFilenameCombo->clear();
 	//Initial combo change event to fill the palette table will be called automatically later.
 	//Look hard for a palette.
-	static vector<string> paths =
-	{
-		QDir::currentPath().toLocal8Bit().data(),
-		QDir::homePath().toLocal8Bit().data(),
-		QCoreApplication::applicationDirPath().toLocal8Bit().data(),
-		QString(QDir::homePath() + "/.config/fractorium").toLocal8Bit().data(),
-		QString("/usr/share/fractorium").toLocal8Bit().data(),
-		QString("/usr/local/share/fractorium").toLocal8Bit().data()
-	};
+	auto paths = GetDefaultPaths();
 
 	for (auto& path : paths)
+		b |= InitPaletteList(path);
+
+	if (b)
 	{
-		if (b = InitPaletteList(path))
-		{
-			m_SheepTools = make_unique<SheepTools<T, float>>(m_PaletteList.Name(0), new EmberNs::Renderer<T, float>());
-			break;
-		}
+		m_SheepTools = make_unique<SheepTools<T, float>>(m_PaletteList.Name(0), new EmberNs::Renderer<T, float>());
+	}
+	else
+	{
+		QString allPaths;
+
+		for (auto& path : paths)
+			allPaths += path + "\r\n";
+
+		allPaths = QString("No palettes found in paths:\r\n") + allPaths + "\r\nExiting.";
+		std::runtime_error ex(allPaths.toStdString());
+		throw ex;
 	}
 
-	if (!b)
-		throw "No palettes found, exiting.";
+	if (m_PaletteList.Size() >= 1)//Only add the user palette if the folder already had a palette, which means we'll be using this folder.
+		if (m_PaletteList.AddEmptyPaletteFile((GetDefaultUserPath() + "/user-palettes.xml").toStdString()))
+			m_Fractorium->ui.PaletteFilenameCombo->addItem("user-palettes.xml");
 
 	BackgroundChanged(QColor(0, 0, 0));//Default to black.
 	ClearUndo();
@@ -146,18 +151,7 @@ void FractoriumEmberController<T>::SetEmber(size_t index, bool verbatim)
 {
 	if (index < m_EmberFile.Size())
 	{
-		if (auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
-		{
-			for (int i = 0; i < top->childCount(); i++)
-			{
-				if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))
-				{
-					emberItem->setSelected(i == index);
-					emberItem->setCheckState(0, i == index ? Qt::Checked : Qt::Unchecked);
-				}
-			}
-		}
-
+		m_Fractorium->SelectLibraryItem(index);
 		ClearUndo();
 		SetEmber(*m_EmberFile.Get(index), verbatim, true);
 	}
@@ -335,6 +329,13 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	static EmberToXml<T> writer;//Save parameters of last full render just in case there is a crash.
 #ifdef _WIN32
 	string filename = "last.flame";
+#elif defined(__APPLE__)
+	QDir dir(QDir::applicationDirPath());
+
+	if (!dir.exists())
+		dir.mkpath(".");
+
+	string filename = QDir::applicationDirPath().toStdString() + "/last.flame";
 #else
 	QDir dir(QDir::homePath() + "/.config/fractorium");
 

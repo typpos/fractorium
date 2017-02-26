@@ -43,6 +43,7 @@ CONFIG(debug, debug|release) {
 
 #For some reason, a Qt project needs to be told to look at itself.
 INCLUDEPATH += $$PRJ_SRC_DIR
+INCLUDEPATH += $$PRJ_SRC_DIR/PaletteEditor
 
 # TODO: Figure out how to build the app bundle correctly.
 # This will build a binary instead of an app bundle.
@@ -53,7 +54,22 @@ target.path = $$BIN_INSTALL_DIR
 INSTALLS += target
 
 palettes.path = $$SHARE_INSTALL_DIR
-palettes.files = $$ASSETS_DIR/flam3-palettes.xml
+palettes.files = $$ASSETS_DIR/flam3-palettes.xml \
+$$ASSETS_DIR/boxtail_pack_02.gradient \
+$$ASSETS_DIR/boxtail_pack_03_triangle.gradient \
+$$ASSETS_DIR/boxtail_pack_04_mineshack.gradient \
+$$ASSETS_DIR/fardareismai_pack_01_variety_number_128.gradient \
+$$ASSETS_DIR/fardareismai_pack_02_b_sides.gradient \
+$$ASSETS_DIR/fardareismai_pack_03_old_and_new.gradient \
+$$ASSETS_DIR/fardareismai_pack_04_hoard.gradient \
+$$ASSETS_DIR/fractaldesire_pack_01.gradient \
+$$ASSETS_DIR/rce_ordinary_pack_01_colornation.gradient \
+$$ASSETS_DIR/tatasz_pack_01.gradient \
+$$ASSETS_DIR/tatasz_pack_02_colder.gradient \
+$$ASSETS_DIR/tatasz_pack_02_dark.gradient \
+$$ASSETS_DIR/tatasz_pack_02_warmer.gradient \
+$$ASSETS_DIR/tatasz_pack_03.gradient
+
 #message(PALETTE INSTALL SOURCE: $$palettes.files)
 INSTALLS += palettes
 
@@ -114,7 +130,12 @@ SOURCES += \
     $$PRJ_SRC_DIR/QssTextEdit.cpp \
     $$PRJ_SRC_DIR/SpinBox.cpp \
     $$PRJ_SRC_DIR/VariationsDialog.cpp \
-	$$PRJ_SRC_DIR/LibraryTreeWidget.cpp
+    $$PRJ_SRC_DIR/LibraryTreeWidget.cpp \
+    $$PRJ_SRC_DIR/PaletteEditor/ColorPanel.cpp \
+    $$PRJ_SRC_DIR/PaletteEditor/ColorPickerWidget.cpp \
+    $$PRJ_SRC_DIR/PaletteEditor/ColorTriangle.cpp \
+    $$PRJ_SRC_DIR/PaletteEditor/GradientColorsView.cpp \
+    $$PRJ_SRC_DIR/PaletteEditor/PaletteEditor.cpp
 
 HEADERS += \
     $$SRC_COMMON_DIR/EmberCommon.h \
@@ -150,7 +171,13 @@ HEADERS += \
     $$PRJ_SRC_DIR/TwoButtonComboWidget.h \
     $$PRJ_SRC_DIR/VariationsDialog.h \
     $$PRJ_SRC_DIR/VariationTreeWidgetItem.h \
-	$$PRJ_SRC_DIR/LibraryTreeWidget.h
+    $$PRJ_SRC_DIR/LibraryTreeWidget.h \
+    $$PRJ_SRC_DIR/PaletteEditor/ColorPanel.h \
+    $$PRJ_SRC_DIR/PaletteEditor/ColorPickerWidget.h \
+    $$PRJ_SRC_DIR/PaletteEditor/ColorTriangle.h \
+    $$PRJ_SRC_DIR/PaletteEditor/GradientArrow.h \
+    $$PRJ_SRC_DIR/PaletteEditor/GradientColorsView.h \
+    $$PRJ_SRC_DIR/PaletteEditor/PaletteEditor.h
 
 FORMS += \
     $$PRJ_SRC_DIR/AboutDialog.ui \
@@ -158,7 +185,8 @@ FORMS += \
     $$PRJ_SRC_DIR/Fractorium.ui \
     $$PRJ_SRC_DIR/OptionsDialog.ui \
     $$PRJ_SRC_DIR/QssDialog.ui \
-    $$PRJ_SRC_DIR/VariationsDialog.ui
+    $$PRJ_SRC_DIR/VariationsDialog.ui \
+    $$PRJ_SRC_DIR/PaletteEditor.ui
 
 OTHER_FILES += \
     $$PRJ_SRC_DIR/Fractorium.aps \

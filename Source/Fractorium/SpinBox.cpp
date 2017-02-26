@@ -17,10 +17,12 @@ SpinBox::SpinBox(QWidget* p, int h, int step)
 	: QSpinBox(p)
 {
 	m_DoubleClick = false;
+	m_DoubleClickLowVal = 0;
 	m_DoubleClickNonZero = 0;
 	m_DoubleClickZero = 1;
 	m_Step = step;
 	m_SmallStep = 1;
+	m_Settings = FractoriumSettings::DefInstance();
 	setSingleStep(step);
 	setFrame(false);
 	setButtonSymbols(QAbstractSpinBox::NoButtons);
@@ -52,6 +54,16 @@ void SpinBox::SetValueStealth(size_t d) { SetValueStealth(int(d)); }
 void SpinBox::DoubleClick(bool b)
 {
 	m_DoubleClick = b;
+}
+
+/// <summary>
+/// Set the value to be used instead of zero to represent the lower value
+/// used when responding to a double click.
+/// </summary>
+/// <param name="val">The value to be used for the lower value instead of zero</param>
+void SpinBox::DoubleClickLowVal(int val)
+{
+	m_DoubleClickLowVal = val;
 }
 
 /// <summary>
@@ -135,35 +147,34 @@ void SpinBox::OnTimeout()
 bool SpinBox::eventFilter(QObject* o, QEvent* e)
 {
 	QMouseEvent* me = dynamic_cast<QMouseEvent*>(e);
-	auto settings = FractoriumSettings::DefInstance();
 
 	if (isEnabled() && me)
 	{
-		if (!settings->ToggleType() &&//Ensure double click toggles, not right click.
+		if (!m_Settings->ToggleType() &&//Ensure double click toggles, not right click.
 				me->type() == QMouseEvent::MouseButtonPress &&
 				me->button() == Qt::RightButton)
 		{
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 			StartTimer();
 		}
-		else if (!settings->ToggleType() &&
+		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseButtonRelease &&
 				 me->button() == Qt::RightButton)
 		{
 			StopTimer();
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 		}
-		else if (!settings->ToggleType() &&
+		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseMove &&
 				 QGuiApplication::mouseButtons() & Qt::RightButton)
 		{
 			m_MouseMovePoint = me->pos();
 		}
 		else if (m_DoubleClick &&
-				 ((!settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
-				  (settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
+				 ((!m_Settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
+				  (m_Settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
 		{
-			if (IsNearZero(value()))
+			if (IsClose(m_DoubleClickLowVal, value()))
 				setValue(m_DoubleClickZero);
 			else
 				setValue(m_DoubleClickNonZero);

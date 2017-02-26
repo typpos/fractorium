@@ -27,7 +27,9 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionPasteSelectedXforms, SIGNAL(triggered(bool)), this, SLOT(OnActionPasteSelectedXforms(bool)), Qt::QueuedConnection);
 	ui.ActionPasteSelectedXforms->setEnabled(false);
 	//View menu.
-	connect(ui.ActionResetWorkspace, SIGNAL(triggered(bool)), this, SLOT(OnActionResetWorkspace(bool)), Qt::QueuedConnection);
+	connect(ui.ActionResetWorkspace,       SIGNAL(triggered(bool)), this, SLOT(OnActionResetWorkspace(bool)),       Qt::QueuedConnection);
+	connect(ui.ActionAlternateEditorImage, SIGNAL(triggered(bool)), this, SLOT(OnActionAlternateEditorImage(bool)), Qt::QueuedConnection);
+	connect(ui.ActionResetScale,           SIGNAL(triggered(bool)), this, SLOT(OnActionResetScale(bool)),           Qt::QueuedConnection);
 	//Tools menu.
 	connect(ui.ActionAddReflectiveSymmetry, SIGNAL(triggered(bool)), this, SLOT(OnActionAddReflectiveSymmetry(bool)), Qt::QueuedConnection);
 	connect(ui.ActionAddRotationalSymmetry, SIGNAL(triggered(bool)), this, SLOT(OnActionAddRotationalSymmetry(bool)), Qt::QueuedConnection);
@@ -699,6 +701,38 @@ void Fractorium::OnActionResetWorkspace(bool checked)
 }
 
 /// <summary>
+/// Alternate between Editor/Image.
+/// </summary>
+/// <param name="checked">Ignored</param>
+void Fractorium::OnActionAlternateEditorImage(bool checked)
+{
+	if (DrawImage())
+	{
+		ui.ActionDrawImage->setChecked(false);
+		ui.ActionDrawXforms->setChecked(true);
+		ui.ActionDrawGrid->setChecked(true);
+	}
+	else
+	{
+		ui.ActionDrawXforms->setChecked(false);
+		ui.ActionDrawGrid->setChecked(false);
+		ui.ActionDrawImage->setChecked(true);
+	}
+
+	ui.GLDisplay->update();
+}
+
+/// <summary>
+/// Reset the scale used to draw affines, which was adjusted by zooming with the Alt key pressed.
+/// </summary>
+/// <param name="checked">Ignored</param>
+void Fractorium::OnActionResetScale(bool checked)
+{
+	m_Controller->InitLockedScale();
+	ui.GLDisplay->update();
+}
+
+/// <summary>
 /// Add reflective symmetry to the current ember.
 /// Resets the rendering process.
 /// </summary>
@@ -877,5 +911,5 @@ void Fractorium::OnActionAbout(bool checked)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

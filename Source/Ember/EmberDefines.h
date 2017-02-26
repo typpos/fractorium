@@ -103,6 +103,8 @@ static inline size_t NowMs()
 	#define v2T  glm::tvec2<T, glm::defaultp>
 	#define v3T  glm::tvec3<T, glm::defaultp>
 	#define v4T  glm::tvec4<T, glm::defaultp>
+	#define v4F  glm::tvec4<float, glm::defaultp>
+	#define v4D  glm::tvec4<double, glm::defaultp>
 	#define v4bT glm::tvec4<bucketT, glm::defaultp>
 	#define m2T  glm::tmat2x2<T, glm::defaultp>
 	#define m3T  glm::tmat3x3<T, glm::defaultp>
@@ -112,6 +114,8 @@ static inline size_t NowMs()
 	#define v2T  glm::detail::tvec2<T, glm::defaultp>
 	#define v3T  glm::detail::tvec3<T, glm::defaultp>
 	#define v4T  glm::detail::tvec4<T, glm::defaultp>
+	#define v4F  glm::detail::tvec4<float, glm::defaultp>
+	#define v4D  glm::detail::tvec4<double, glm::defaultp>
 	#define v4bT glm::detail::tvec4<bucketT, glm::defaultp>
 	#define m2T  glm::detail::tmat2x2<T, glm::defaultp>
 	#define m3T  glm::detail::tmat3x3<T, glm::defaultp>

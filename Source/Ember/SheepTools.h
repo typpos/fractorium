@@ -597,7 +597,6 @@ public:
 		int var, samed, multid, samepost;
 		glm::length_t i, j, k, n;
 		size_t varCount = m_VariationList->Size();
-		Palette<T> palette;
 		static size_t xformDistrib[] =
 		{
 			2, 2, 2, 2,
@@ -863,8 +862,8 @@ public:
 		for (i = 0; i < m_Renderer->FinalDimensions(); i++)
 		{
 			m_Hist[(p[0] * res / 256) +
-				   (p[1] * res / 256) * res +
-				   (p[2] * res / 256) * res * res]++;//A specific histogram index representing the sum of R,G,B values.
+									  (p[1] * res / 256) * res +
+									  (p[2] * res / 256) * res * res]++;//A specific histogram index representing the sum of R,G,B values.
 			p += m_Renderer->PixelSize();//Advance the pointer by 1 pixel.
 		}
 
@@ -1366,7 +1365,7 @@ private:
 	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();
 	unique_ptr<Renderer<T, bucketT>> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
-	PaletteList<T> m_PaletteList;
+	PaletteList<float> m_PaletteList;
 	shared_ptr<VariationList<T>> m_VariationList;
 };
 }

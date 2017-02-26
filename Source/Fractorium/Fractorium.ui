@@ -74,7 +74,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1284</width>
+      <width>1269</width>
       <height>987</height>
      </rect>
     </property>
@@ -2007,13 +2007,13 @@
       <rect>
        <x>770</x>
        <y>0</y>
-       <width>255</width>
+       <width>294</width>
        <height>881</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>255</width>
+       <width>294</width>
        <height>617</height>
       </size>
      </property>
@@ -2420,7 +2420,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="PaletteRandomSelect">
+          <widget class="QPushButton" name="PaletteRandomSelectButton">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -2442,7 +2442,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="PaletteRandomAdjust">
+          <widget class="QPushButton" name="PaletteRandomAdjustButton">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -2463,6 +2463,16 @@
            </property>
            <property name="flat">
             <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="PaletteEditorButton">
+           <property name="toolTip">
+            <string>Open the palette editor to make a custom palette</string>
+           </property>
+           <property name="text">
+            <string>Palette Editor...</string>
            </property>
           </widget>
          </item>
@@ -3050,7 +3060,7 @@
           <enum>QTabWidget::Triangular</enum>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="XformColorTab">
           <property name="sizePolicy">
@@ -3370,6 +3380,53 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="0" colspan="2">
+            <layout class="QGridLayout" name="gridLayout_5">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="RandomColorIndicesButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Random Indices</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="ToggleColorIndicesButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Toggle Indices</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="RandomColorSpeedButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Random Color Speed</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="ToggleColorSpeedButton">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Toggle Color Speed</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
            <item row="4" column="0" colspan="2">
             <widget class="TableWidget" name="XformColorValuesTable">
              <property name="sizePolicy">
@@ -3565,36 +3622,6 @@
              </item>
             </widget>
            </item>
-           <item row="3" column="0" colspan="2">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="spacing">
-              <number>4</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="RandomColorIndicesButton">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Random Indices</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="ToggleColorIndicesButton">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Toggle Indices</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
            <item row="5" column="0">
             <widget class="QCheckBox" name="SoloXformCheckBox">
              <property name="toolTip">
@@ -3643,16 +3670,6 @@
             <number>5</number>
            </property>
            <item>
-            <widget class="QCheckBox" name="LockAffineCheckBox">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checking this box will lock the display size of the affines at their current level, allowing for easy manipulation no matter what zoom level is used.&lt;/p&gt;&lt;p&gt;Unchecking this resets the scale used to draw the affines to its native value.&lt;/p&gt;&lt;p&gt;Note this only affects the display and does not alter any internal values used for rendering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Lock Affine Scale</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QScrollArea" name="AffineTabScrollArea">
              <property name="autoFillBackground">
               <bool>false</bool>
@@ -3672,7 +3689,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>263</width>
-                <height>700</height>
+                <height>722</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -6843,6 +6860,8 @@
      <string>&amp;View</string>
     </property>
     <addaction name="ActionResetWorkspace"/>
+    <addaction name="ActionAlternateEditorImage"/>
+    <addaction name="ActionResetScale"/>
    </widget>
    <addaction name="MenuFile"/>
    <addaction name="MenuEdit"/>
@@ -6997,7 +7016,7 @@
            <x>0</x>
            <y>0</y>
            <width>432</width>
-           <height>572</height>
+           <height>589</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -7685,6 +7704,11 @@
    <addaction name="ActionOptions"/>
    <addaction name="separator"/>
    <addaction name="ActionStyle"/>
+   <addaction name="separator"/>
+   <addaction name="ActionDrawXforms"/>
+   <addaction name="ActionDrawImage"/>
+   <addaction name="ActionDrawGrid"/>
+   <addaction name="ActionResetScale"/>
   </widget>
   <action name="ActionNewFlock">
    <property name="icon">
@@ -7869,6 +7893,9 @@
    </property>
    <property name="toolTip">
     <string>Add a copy of the current flame to the end of the current file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
    </property>
   </action>
   <action name="ActionClearFlame">
@@ -8126,6 +8153,67 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="ActionDrawImage">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Fractorium.qrc">
+     <normaloff>:/Fractorium/Icons/pic.png</normaloff>:/Fractorium/Icons/pic.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show/Hide Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Show/Hide Image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="ActionDrawGrid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Fractorium.qrc">
+     <normaloff>:/Fractorium/Icons/grid.png</normaloff>:/Fractorium/Icons/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show/Hide Grid</string>
+   </property>
+   <property name="toolTip">
+    <string>Show/Hide Grid</string>
+   </property>
+  </action>
+  <action name="ActionDrawXforms">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Fractorium.qrc">
+     <normaloff>:/Fractorium/Icons/Function-512.png</normaloff>:/Fractorium/Icons/Function-512.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show/Hide Xforms</string>
+   </property>
+   <property name="toolTip">
+    <string>Show/Hide Xforms</string>
+   </property>
+  </action>
+  <action name="ActionAlternateEditorImage">
+   <property name="text">
+    <string>Alternate Editor/Image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="ActionResetScale">
+   <property name="text">
+    <string>Reset Scale</string>
    </property>
   </action>
  </widget>

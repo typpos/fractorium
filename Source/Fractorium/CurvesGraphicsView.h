@@ -32,7 +32,7 @@ class CurvesGraphicsView : public QGraphicsView
 	Q_OBJECT
 
 public:
-	CurvesGraphicsView(QWidget* parent = 0);
+	CurvesGraphicsView(QWidget* parent = nullptr);
 
 	void PointChanged(int curveIndex, int pointIndex, const QPointF& point);
 	QPointF Get(int curveIndex, int pointIndex);
@@ -82,7 +82,7 @@ public:
 	/// <param name="pointIndex">The point index within the curve</param>
 	/// <param name="viewParent">The graphics view this point is displayed on</param>
 	/// <param name="p">The parent widget of this item</param>
-	EllipseItem(const QRectF& rect, int curveIndex, int pointIndex, CurvesGraphicsView* viewParent, QGraphicsItem* parent = 0)
+	EllipseItem(const QRectF& rect, int curveIndex, int pointIndex, CurvesGraphicsView* viewParent, QGraphicsItem* parent = nullptr)
 		: QGraphicsEllipseItem(rect, parent)
 	{
 		setFlag(QGraphicsItem::ItemSendsScenePositionChanges);

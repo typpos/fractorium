@@ -22,6 +22,7 @@ public:
 	void SetValueStealth(int d);
 	void SetValueStealth(size_t d);
 	void DoubleClick(bool b);
+	void DoubleClickLowVal(int val);
 	void DoubleClickZero(int val);
 	void DoubleClickNonZero(int val);
 	void SmallStep(int step);
@@ -43,11 +44,13 @@ private:
 	void StopTimer();
 
 	bool m_DoubleClick;
+	int m_DoubleClickLowVal;
 	int m_DoubleClickNonZero;
 	int m_DoubleClickZero;
 	int m_Step;
 	int m_SmallStep;
 	QPoint m_MouseDownPoint;
 	QPoint m_MouseMovePoint;
+	shared_ptr<FractoriumSettings> m_Settings;
 	static QTimer s_Timer;
 };

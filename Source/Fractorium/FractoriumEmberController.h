@@ -49,6 +49,8 @@ template <typename T> class TreePreviewRenderer;
 /// </summary>
 class FractoriumEmberControllerBase : public RenderCallback
 {
+	friend Fractorium;
+
 public:
 	FractoriumEmberControllerBase(Fractorium* fractorium);
 	FractoriumEmberControllerBase(const FractoriumEmberControllerBase& controller) = delete;
@@ -194,13 +196,15 @@ public:
 	double LockedX() { return m_LockedX; }
 	double LockedY() { return m_LockedY; }
 	void LockedScale(double scale) { m_LockedScale = scale; }
-	virtual void LockAffineScaleCheckBoxStateChanged(int state) { }
+	virtual void InitLockedScale() { }
 
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender) { }
 	virtual void XformScrollColorIndexChanged(int d) { }
 	virtual void RandomColorIndicesButtonClicked() { }
 	virtual void ToggleColorIndicesButtonClicked() { }
+	virtual void RandomColorSpeedButtonClicked() { }
+	virtual void ToggleColorSpeedButtonClicked() { }
 	virtual void XformColorSpeedChanged(double d) { }
 	virtual void XformOpacityChanged(double d) { }
 	virtual void XformDirectColorChanged(double d) { }
@@ -222,11 +226,13 @@ public:
 	virtual void RandomXaos() { }
 
 	//Palette.
-	virtual size_t InitPaletteList(const string& s) { return 0; }
+	virtual size_t InitPaletteList(const QString& s) { return 0; }
 	virtual bool FillPaletteTable(const string& s) { return false; }
 	virtual void ApplyPaletteToEmber() { }
 	virtual void PaletteAdjust() { }
 	virtual void PaletteCellClicked(int row, int col) { }
+	virtual void SetBasePaletteAndAdjust(const Palette<float>& palette) { }
+	virtual void PaletteEditorButtonClicked() { }
 	QImage& FinalPaletteImage() { return m_FinalPaletteImage; }
 
 	//Info.
@@ -287,6 +293,8 @@ protected:
 	unique_ptr<EmberNs::RendererBase> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	Fractorium* m_Fractorium;
+	Palette<float> m_TempPalette;
+	PaletteList<float> m_PaletteList;
 	std::unique_ptr<QTimer> m_RenderTimer;
 	std::unique_ptr<QTimer> m_RenderRestartTimer;
 	shared_ptr<OpenCLInfo> m_Info = OpenCLInfo::Instance();
@@ -451,8 +459,9 @@ public:
 	virtual void ResetXformsAffine(bool pre) override;
 	virtual void RandomXformsAffine(bool pre) override;
 	virtual void FillBothAffines() override;
-	virtual void LockAffineScaleCheckBoxStateChanged(int state) override;
+	virtual void InitLockedScale() override;
 	void FillAffineWithXform(Xform<T>* xform, bool pre);
+	void ChangeLockedScale(T value);
 	T AffineScaleCurrentToLocked();
 	T AffineScaleLockedToCurrent();
 
@@ -461,6 +470,8 @@ public:
 	virtual void XformScrollColorIndexChanged(int d) override;
 	virtual void RandomColorIndicesButtonClicked() override;
 	virtual void ToggleColorIndicesButtonClicked() override;
+	virtual void RandomColorSpeedButtonClicked() override;
+	virtual void ToggleColorSpeedButtonClicked() override;
 	virtual void XformColorSpeedChanged(double d) override;
 	virtual void XformOpacityChanged(double d) override;
 	virtual void XformDirectColorChanged(double d) override;
@@ -486,11 +497,13 @@ public:
 	bool XformCheckboxAt(Xform<T>* xform, std::function<void(QCheckBox*)> func);
 
 	//Palette.
-	virtual size_t InitPaletteList(const string& s) override;
+	virtual size_t InitPaletteList(const QString& s) override;
 	virtual bool FillPaletteTable(const string& s) override;
 	virtual void ApplyPaletteToEmber() override;
 	virtual void PaletteAdjust() override;
 	virtual void PaletteCellClicked(int row, int col) override;
+	virtual void SetBasePaletteAndAdjust(const Palette<float>& palette) override;
+	virtual void PaletteEditorButtonClicked() override;
 
 	//Info.
 	virtual void FillSummary() override;
@@ -522,7 +535,7 @@ private:
 	QString MakeXformCaption(size_t i);
 
 	//Palette.
-	void UpdateAdjustedPaletteGUI(Palette<T>& palette);
+	void UpdateAdjustedPaletteGUI(Palette<float>& palette);
 
 	//Rendering/progress.
 	void Update(std::function<void (void)> func, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER);
@@ -540,8 +553,6 @@ private:
 	deque<Ember<T>> m_UndoList;
 	vector<Xform<T>> m_CopiedXforms;
 	Xform<T> m_CopiedFinalXform;
-	Palette<T> m_TempPalette;
-	PaletteList<T> m_PaletteList;
 	shared_ptr<VariationList<T>> m_VariationList;
 	unique_ptr<SheepTools<T, float>> m_SheepTools;
 	unique_ptr<GLEmberController<T>> m_GLController;

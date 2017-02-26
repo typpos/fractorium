@@ -13,6 +13,8 @@
 #define DOUBLEPRECISION		 "render/dp64"
 #define CONTUPDATE			 "render/continuousupdate"
 #define SHOWALLXFORMS	     "render/dragshowallxforms"
+#define SHOWXFORMS           "render/showxforms"
+#define SHOWGRID             "render/showgrid"
 #define TOGGLETYPE			 "render/toggletype"
 #define DEVICES				 "render/devices"
 #define THREADCOUNT          "render/threadcount"
@@ -111,6 +113,12 @@ public:
 
 	bool ShowAllXforms();
 	void ShowAllXforms(bool b);
+
+	bool ShowXforms();
+	void ShowXforms(bool b);
+
+	bool ShowGrid();
+	void ShowGrid(bool b);
 
 	bool ToggleType();
 	void ToggleType(bool b);

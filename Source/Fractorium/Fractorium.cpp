@@ -186,6 +186,19 @@ Fractorium::Fractorium(QWidget* p)
 		}
 	}
 
+#ifdef __APPLE__
+
+	for (auto dock : m_Docks)//Fixes focus problem on OSX.
+	{
+		if (!dock->isHidden())
+		{
+			dock->setFloating(!dock->isFloating());
+			dock->setFloating(!dock->isFloating());
+			break;
+		}
+	}
+
+#endif
 	//At this point, everything has been setup except the renderer. Shortly after
 	//this constructor exits, GLWidget::InitGL() will create the initial flock and start the rendering timer
 	//which executes whenever the program is idle. Upon starting the timer, the renderer
@@ -201,6 +214,8 @@ Fractorium::~Fractorium()
 {
 	SyncSequenceSettings();
 	m_VarDialog->SyncSettings();
+	m_Settings->ShowXforms(ui.ActionDrawXforms->isChecked());
+	m_Settings->ShowGrid(ui.ActionDrawGrid->isChecked());
 	m_Settings->setValue("windowState", saveState());
 	m_Settings->sync();
 }
@@ -497,16 +512,13 @@ QStringList Fractorium::SetupOpenXmlDialog()
 		m_FileDialog->setViewMode(QFileDialog::List);
 	}
 
-	if (!m_FileDialog)
-		return QStringList("");
-
 	QStringList filenames;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
 	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
 	m_FileDialog->setFileMode(QFileDialog::ExistingFiles);
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
 	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
-	m_FileDialog->setWindowTitle("Open flame");
+	m_FileDialog->setWindowTitle("Open Flame");
 	m_FileDialog->setDirectory(m_Settings->OpenFolder());
 	m_FileDialog->selectNameFilter(m_Settings->OpenXmlExt());
 
@@ -709,15 +721,20 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.SequenceRandomizeStaggerCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceStaggerSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomStaggerMaxSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomizeRotationsCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceRotationsSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRotationsCWCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomRotationsMaxSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomizeFramesPerRotCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceFramesPerRotSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomFramesPerRotMaxSpinBox);
-	w = SetTabOrder(this, w, ui.SequenceRandomizeRotationsCheckBox);
-	w = SetTabOrder(this, w, ui.SequenceRotationsSpinBox);
-	w = SetTabOrder(this, w, ui.SequenceRandomRotationsMaxSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomizeBlendFramesCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceBlendFramesSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRandomBlendMaxFramesSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRandomizeRotationsPerBlendCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendCWCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendMaxSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceGenerateButton);
 	w = SetTabOrder(this, w, ui.SequenceRenderButton);
 	w = SetTabOrder(this, w, ui.SequenceSaveButton);
@@ -738,7 +755,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_XformOpacitySpin);
 	w = SetTabOrder(this, w, m_XformDirectColorSpin);
 	w = SetTabOrder(this, w, ui.SoloXformCheckBox);
-	w = SetTabOrder(this, ui.LockAffineCheckBox, ui.PreAffineGroupBox);//Xforms affine.
 	w = SetTabOrder(this, w, m_PreX1Spin);
 	w = SetTabOrder(this, w, m_PreX2Spin);
 	w = SetTabOrder(this, w, m_PreY1Spin);
@@ -802,8 +818,9 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PaletteBlurSpin);
 	w = SetTabOrder(this, w, m_PaletteBrightnessSpin);
 	w = SetTabOrder(this, w, m_PaletteFrequencySpin);
-	w = SetTabOrder(this, w, ui.PaletteRandomSelect);
-	w = SetTabOrder(this, w, ui.PaletteRandomAdjust);
+	w = SetTabOrder(this, w, ui.PaletteRandomSelectButton);
+	w = SetTabOrder(this, w, ui.PaletteRandomAdjustButton);
+	w = SetTabOrder(this, w, ui.PaletteEditorButton);
 	w = SetTabOrder(this, w, ui.PaletteFilterLineEdit);
 	w = SetTabOrder(this, w, ui.PaletteFilterClearButton);
 	w = SetTabOrder(this, w, ui.PaletteListTable);

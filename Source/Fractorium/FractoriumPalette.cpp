@@ -2,8 +2,6 @@
 #include "Fractorium.h"
 #include "PaletteTableWidgetItem.h"
 
-#define PALETTE_CELL_HEIGHT 16
-
 /// <summary>
 /// Initialize the palette UI.
 /// </summary>
@@ -25,8 +23,10 @@ void Fractorium::InitPaletteUI()
 	SetupSpinner<SpinBox, int>(table, this, row, 3, m_PaletteContrastSpin,  spinHeight, -100, 100, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	SetupSpinner<SpinBox, int>(table, this, row, 3, m_PaletteBlurSpin,	    spinHeight,	   0, 127, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 0, 0, 0);
 	SetupSpinner<SpinBox, int>(table, this, row, 3, m_PaletteFrequencySpin, spinHeight,	   1,  10, 1, SIGNAL(valueChanged(int)), SLOT(OnPaletteAdjust(int)), true, 1, 1, 1);
-	connect(ui.PaletteRandomSelect, SIGNAL(clicked(bool)), this, SLOT(OnPaletteRandomSelectButtonClicked(bool)), Qt::QueuedConnection);
-	connect(ui.PaletteRandomAdjust, SIGNAL(clicked(bool)), this, SLOT(OnPaletteRandomAdjustButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.PaletteRandomSelectButton, SIGNAL(clicked(bool)), this, SLOT(OnPaletteRandomSelectButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.PaletteRandomAdjustButton, SIGNAL(clicked(bool)), this, SLOT(OnPaletteRandomAdjustButtonClicked(bool)), Qt::QueuedConnection);
+	//Palette editor.
+	connect(ui.PaletteEditorButton, SIGNAL(clicked(bool)), this, SLOT(OnPaletteEditorButtonClicked(bool)), Qt::QueuedConnection);
 	//Preview table.
 	palettePreviewTable->setRowCount(1);
 	palettePreviewTable->setColumnWidth(1, 260);//256 plus small margin on each side.
@@ -38,13 +38,13 @@ void Fractorium::InitPaletteUI()
 	connect(ui.PaletteFilterClearButton, SIGNAL(clicked(bool)),				  this, SLOT(OnPaletteFilterClearButtonClicked(bool)));
 	paletteTable->setColumnWidth(1, 260);//256 plus small margin on each side.
 	paletteTable->horizontalHeader()->setSectionsClickable(true);
-	connect(paletteTable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(OnPaletteHeaderSectionClicked(int)), Qt::QueuedConnection);
-	connect(ui.ResetCurvesButton, SIGNAL(clicked(bool)), this, SLOT(OnResetCurvesButtonClicked(bool)), Qt::QueuedConnection);
-	connect(ui.CurvesView, SIGNAL(PointChangedSignal(int, int, const QPointF&)), this, SLOT(OnCurvesPointChanged(int, int, const QPointF&)), Qt::QueuedConnection);
-	connect(ui.CurvesAllRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesAllRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.CurvesRedRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesRedRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.CurvesGreenRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesGreenRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.CurvesBlueRadio, SIGNAL(toggled(bool)), this, SLOT(OnCurvesBlueRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(paletteTable->horizontalHeader(), SIGNAL(sectionClicked(int)),                          this, SLOT(OnPaletteHeaderSectionClicked(int)),             Qt::QueuedConnection);
+	connect(ui.ResetCurvesButton,             SIGNAL(clicked(bool)),                                this, SLOT(OnResetCurvesButtonClicked(bool)),               Qt::QueuedConnection);
+	connect(ui.CurvesView,                    SIGNAL(PointChangedSignal(int, int, const QPointF&)), this, SLOT(OnCurvesPointChanged(int, int, const QPointF&)), Qt::QueuedConnection);
+	connect(ui.CurvesAllRadio,                SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesAllRadioButtonToggled(bool)),            Qt::QueuedConnection);
+	connect(ui.CurvesRedRadio,                SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesRedRadioButtonToggled(bool)),            Qt::QueuedConnection);
+	connect(ui.CurvesGreenRadio,              SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesGreenRadioButtonToggled(bool)),          Qt::QueuedConnection);
+	connect(ui.CurvesBlueRadio,               SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesBlueRadioButtonToggled(bool)),           Qt::QueuedConnection);
 }
 
 /// <summary>
@@ -55,20 +55,28 @@ void Fractorium::InitPaletteUI()
 /// <param name="s">The full path to the palette files folder</param>
 /// <returns>The number of palettes successfully added</returns>
 template <typename T>
-size_t FractoriumEmberController<T>::InitPaletteList(const string& s)
+size_t FractoriumEmberController<T>::InitPaletteList(const QString& s)
 {
-	QDirIterator it(s.c_str(), QStringList() << "*.xml", QDir::Files, QDirIterator::FollowSymlinks);
-	m_PaletteList.Clear();
-	m_Fractorium->ui.PaletteFilenameCombo->clear();
-	m_Fractorium->ui.PaletteFilenameCombo->setProperty("path", QString::fromStdString(s));
+	QDirIterator it(s, QStringList() << "*.xml" << "*.ugr" << "*.gradient" << "*.gradients", QDir::Files, QDirIterator::FollowSymlinks);
 
 	while (it.hasNext())
 	{
-		auto path = it.next().toStdString();
+		auto path = it.next();
 		auto qfilename = it.fileName();
 
-		if (m_PaletteList.Add(path))
-			m_Fractorium->ui.PaletteFilenameCombo->addItem(qfilename);
+		try
+		{
+			if (QFile::exists(path) && m_PaletteList.Add(path.toStdString()))
+				m_Fractorium->ui.PaletteFilenameCombo->addItem(qfilename);
+		}
+		catch (const std::exception& e)
+		{
+			QMessageBox::critical(nullptr, "Palette Parsing Error", QString::fromStdString(e.what()));
+		}
+		catch (const char* e)
+		{
+			QMessageBox::critical(nullptr, "Palette Parsing Error", e);
+		}
 	}
 
 	return m_PaletteList.Size();
@@ -79,7 +87,7 @@ size_t FractoriumEmberController<T>::InitPaletteList(const string& s)
 /// This will clear any previous contents.
 /// Called upon initialization, palette combo index change, and controller type change.
 /// </summary>
-/// <param name="s">The name to the palette file without the path</param>
+/// <param name="s">The name of the palette file without the path</param>
 /// <returns>True if successful, else false.</returns>
 template <typename T>
 bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
@@ -87,38 +95,10 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 	if (!s.empty())//This occasionally seems to get called with an empty string for reasons unknown.
 	{
 		auto paletteTable = m_Fractorium->ui.PaletteListTable;
-		m_CurrentPaletteFilePath = m_Fractorium->ui.PaletteFilenameCombo->property("path").toString().toStdString() + "/" + s;
+		m_CurrentPaletteFilePath = s;
 
-		if (int paletteSize = int(m_PaletteList.Size(m_CurrentPaletteFilePath)))
+		if (::FillPaletteTable(m_CurrentPaletteFilePath, paletteTable, m_PaletteList))
 		{
-			paletteTable->clear();
-			paletteTable->blockSignals(true);
-			paletteTable->setRowCount(paletteSize);
-			//Headers get removed when clearing, so must re-create here.
-			auto nameHeader = new QTableWidgetItem("Name");
-			auto paletteHeader = new QTableWidgetItem("Palette");
-			nameHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-			paletteHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-			paletteTable->setHorizontalHeaderItem(0, nameHeader);
-			paletteTable->setHorizontalHeaderItem(1, paletteHeader);
-
-			//Palette list table.
-			for (auto i = 0; i < paletteSize; i++)
-			{
-				if (auto p = m_PaletteList.GetPalette(m_CurrentPaletteFilePath, i))
-				{
-					auto v = p->MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);
-					auto nameCol = new QTableWidgetItem(p->m_Name.c_str());
-					nameCol->setToolTip(p->m_Name.c_str());
-					paletteTable->setItem(i, 0, nameCol);
-					QImage image(v.data(), int(p->Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
-					auto paletteItem = new PaletteTableWidgetItem<T>(p);
-					paletteItem->setData(Qt::DecorationRole, QPixmap::fromImage(image));
-					paletteTable->setItem(i, 1, paletteItem);
-				}
-			}
-
-			paletteTable->blockSignals(false);
 			return true;
 		}
 		else
@@ -126,15 +106,24 @@ bool FractoriumEmberController<T>::FillPaletteTable(const string& s)
 			vector<string> errors = m_PaletteList.ErrorReport();
 			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
 			m_Fractorium->ShowCritical("Palette Read Error", "Could not load palette file, all images will be black. See info tab for details.");
+			m_PaletteList.ClearErrorReport();
 		}
 	}
 
 	return false;
 }
 
+/// <summary>
+/// Fill the palette table with the passed in string.
+/// Called when the palette name combo box changes.
+/// </summary>
+/// <param name="text">The full path to the palette file</param>
 void Fractorium::OnPaletteFilenameComboChanged(const QString& text)
 {
-	m_Controller->FillPaletteTable(text.toStdString());
+	auto s = text.toStdString();
+	m_Controller->FillPaletteTable(s);
+	auto fullname = m_Controller->m_PaletteList.GetFullPathFromFilename(s);
+	ui.PaletteFilenameCombo->setToolTip(QString::fromStdString(fullname));
 	ui.PaletteListTable->sortItems(0, m_PaletteSortMode == 0 ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
@@ -161,7 +150,7 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 /// <param name="palette">The palette to use</param>
 /// <param name="paletteName">Name of the palette</param>
 template <typename T>
-void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<T>& palette)
+void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<float>& palette)
 {
 	auto xform = CurrentXform();
 	auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
@@ -206,6 +195,20 @@ void FractoriumEmberController<T>::PaletteAdjust()
 void Fractorium::OnPaletteAdjust(int d) { m_Controller->PaletteAdjust(); }
 
 /// <summary>
+/// Set the passed in palette as the current one,
+/// applying any adjustments previously specified.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="palette">The palette to assign to the temporary palette</param>
+template <typename T>
+void FractoriumEmberController<T>::SetBasePaletteAndAdjust(const Palette<float>& palette)
+{
+	m_TempPalette = palette;//Deep copy.
+	ApplyPaletteToEmber();//Copy temp palette to ember palette and apply adjustments.
+	UpdateAdjustedPaletteGUI(m_Ember.m_Palette);//Show the adjusted palette.
+}
+
+/// <summary>
 /// Set the selected palette as the current one,
 /// applying any adjustments previously specified.
 /// Called when a palette cell is clicked. Unfortunately,
@@ -219,12 +222,8 @@ void Fractorium::OnPaletteAdjust(int d) { m_Controller->PaletteAdjust(); }
 template <typename T>
 void FractoriumEmberController<T>::PaletteCellClicked(int row, int col)
 {
-	if (auto palette = m_PaletteList.GetPalette(m_CurrentPaletteFilePath, row))
-	{
-		m_TempPalette = *palette;//Deep copy.
-		ApplyPaletteToEmber();//Copy temp palette to ember palette and apply adjustments.
-		UpdateAdjustedPaletteGUI(m_Ember.m_Palette);//Show the adjusted palette.
-	}
+	if (auto palette = m_PaletteList.GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+		SetBasePaletteAndAdjust(*palette);
 }
 
 /// <summary>
@@ -237,7 +236,7 @@ void FractoriumEmberController<T>::PaletteCellClicked(int row, int col)
 /// <param name="col">The table column clicked, ignored</param>
 void Fractorium::OnPaletteCellClicked(int row, int col)
 {
-	if (auto item = dynamic_cast<PaletteTableWidgetItemBase*>(ui.PaletteListTable->item(row, 1)))
+	if (auto item = dynamic_cast<PaletteTableWidgetItem*>(ui.PaletteListTable->item(row, 1)))
 	{
 		auto index = int(item->Index());
 
@@ -309,6 +308,85 @@ void Fractorium::OnPaletteRandomAdjustButtonClicked(bool checked)
 	}
 
 	OnPaletteAdjust(0);
+}
+
+/// <summary>
+/// Open the palette editor dialog.
+/// Called when the palette editor button is clicked.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::PaletteEditorButtonClicked()
+{
+	auto ed = m_Fractorium->m_PaletteEditor;
+	Palette<float> prevPal = m_TempPalette;
+	ed->SetPalette(m_TempPalette);
+
+	if (ed->exec() == QDialog::Accepted)
+	{
+		if (!m_Fractorium->PaletteChanged())//If the clicked ok, but never synced, set the palette now.
+			SetBasePaletteAndAdjust(ed->GetPalette(int(256)));
+	}
+	else if (m_Fractorium->PaletteChanged())//They clicked cancel, but synced at least once, restore the previous palette.
+	{
+		SetBasePaletteAndAdjust(prevPal);
+	}
+
+	//If the palette was modifiable, and any palette was changed at least once
+	if (m_Fractorium->m_PaletteFileChanged && m_PaletteList.IsModifiable(m_CurrentPaletteFilePath))
+	{
+		if (!::FillPaletteTable(m_CurrentPaletteFilePath, m_Fractorium->ui.PaletteListTable, m_PaletteList))
+		{
+			vector<string> errors = m_PaletteList.ErrorReport();
+			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
+			m_Fractorium->ShowCritical("Palette Read Error", "Could not re-load modified palette file, all images will be black. See info tab for details.");
+			m_PaletteList.ClearErrorReport();
+		}
+	}
+}
+
+/// <summary>
+/// Slot called when the palette editor changes the palette and the Sync checkbox is checked.
+/// </summary>
+bool Fractorium::PaletteChanged()
+{
+	return m_PaletteChanged;
+}
+
+/// <summary>
+/// Open the palette editor dialog.
+/// This creates the palette editor dialog if it has not been created at least once.
+/// Called when the palette editor button is clicked.
+/// </summary>
+/// <param name="checked">Ignored</param>
+void Fractorium::OnPaletteEditorButtonClicked(bool checked)
+{
+	if (!m_PaletteEditor)
+	{
+		m_PaletteEditor = new PaletteEditor(m_Controller->m_PaletteList, this);
+		connect(m_PaletteEditor, SIGNAL(PaletteChanged()), this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
+		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()), this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
+	}
+
+	m_PaletteChanged = false;
+	m_PaletteFileChanged = false;
+	m_Controller->PaletteEditorButtonClicked();
+}
+
+/// <summary>
+/// Slot called every time a color is changed in the palette editor.
+/// </summary>
+void Fractorium::OnPaletteEditorColorChanged()
+{
+	m_PaletteChanged = true;
+	m_Controller->SetBasePaletteAndAdjust(m_PaletteEditor->GetPalette(int(256)));
+}
+
+/// <summary>
+/// Slot called every time a palette file is changed in the palette editor.
+/// </summary>
+void Fractorium::OnPaletteEditorFileChanged()
+{
+	m_PaletteFileChanged = true;
 }
 
 /// <summary>
@@ -427,7 +505,7 @@ void Fractorium::OnCurvesPointChanged(int curveIndex, int pointIndex, const QPoi
 /// select a point by putting it on top of all the others.
 /// Called when the any of the curve color radio buttons are toggled.
 /// </summary>
-/// <param name="curveIndex">The curve index, 0-1/</param>
+/// <param name="checked">Ignored</param>
 void Fractorium::OnCurvesAllRadioButtonToggled(bool checked)   { if (checked) ui.CurvesView->SetTop(CurveIndex::ALL); }
 void Fractorium::OnCurvesRedRadioButtonToggled(bool checked)   { if (checked) ui.CurvesView->SetTop(CurveIndex::RED); }
 void Fractorium::OnCurvesGreenRadioButtonToggled(bool checked) { if (checked) ui.CurvesView->SetTop(CurveIndex::GREEN); }
@@ -457,5 +535,5 @@ void FractoriumEmberController<T>::FillCurvesControl()
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

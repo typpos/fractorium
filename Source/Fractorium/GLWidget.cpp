@@ -683,7 +683,11 @@ void GLEmberController<T>::Wheel(QWheelEvent* e)
 {
 	if ((e->modifiers() & Qt::AltModifier) && m_Fractorium->DrawXforms())
 	{
+#ifdef __APPLE__
+		m_FractoriumEmberController->ChangeLockedScale(e->angleDelta().y() >= 0 ? 1.0981 : 0.9);
+#else
 		m_FractoriumEmberController->ChangeLockedScale(e->angleDelta().x() >= 0 ? 1.0981 : 0.9);
+#endif
 		m_GL->update();
 	}
 	else

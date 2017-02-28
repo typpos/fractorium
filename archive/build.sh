@@ -2,8 +2,8 @@
 
 OSX_BUILD_PATH=$PWD
 FRACTORIUM_RELEASE_ROOT=$PWD/../Bin/release
-QT_MACDEPLOY=/Users/mastriani/Qt/5.4/clang_64/bin/macdeployqt
-
+# replace 5.4 by your QT version, and check if the instation path is the same
+QT_MACDEPLOY=~/Qt/5.4/clang_64/bin/macdeployqt
 
 cd $FRACTORIUM_RELEASE_ROOT
 
@@ -39,14 +39,12 @@ cp ./emberrender.app/Contents/MacOS/emberrender $FRACTORIUM_FINAL_ROOT
 
 cd $OSX_BUILD_PATH
 
-#python macdeployqtfix.py $FRACTORIUM_FINAL_ROOT/fractorium /Users/mastriani/Qt/5.4/
-
 cd ../Data
 
 cp dark.qss $FRACTORIUM_FINAL_ROOT
 cp flam3-palettes.xml $FRACTORIUM_FINAL_ROOT
+cp *.gradient $FRACTORIUM_FINAL_ROOT
 cp Info.plist $FRACTORIUM_FINAL_ROOT/../
-#cp fractoriumcaller $FRACTORIUM_FINAL_ROOT
 
 cd $FRACTORIUM_RELEASE_ROOT
 

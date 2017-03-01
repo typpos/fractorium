@@ -244,6 +244,7 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 		}
 
 		os << ">\n";
+		os << std::uppercase;
 
 		for (i = 0; i < 32; i++)
 		{
@@ -260,6 +261,7 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 			os << "\n";
 		}
 
+		os << std::nouppercase;
 		os << "   </palette>\n";
 	}
 	else

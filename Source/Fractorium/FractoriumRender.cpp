@@ -683,6 +683,7 @@ bool Fractorium::CreateControllerFromOptions()
 		Palette<float> tempPalette;
 #endif
 		QModelIndex index = ui.LibraryTree->currentIndex();
+		ui.LibraryTree->clear();//This must be here before FillLibraryTree() is called below, else a spurious EmberTreeItemChanged event will be called on a deleted object.
 
 		//First check if a controller has already been created, and if so, save its embers and gracefully shut it down.
 		if (m_Controller.get())
@@ -716,6 +717,12 @@ bool Fractorium::CreateControllerFromOptions()
 				prev->m_Palette = tempPalette;
 
 			m_Controller->SetEmberFile(efd, true);
+			//Template specific palette table and variations tree setup in controller constructor, but
+			//must manually setup the library tree here because it's after the embers were assigned.
+			//Passing row re-selects the item that was previously selected.
+			//This will eventually call FillParamTablesAndPalette(), which in addition to filling in various fields,
+			//will apply the palette adjustments.
+			m_Controller->FillLibraryTree(index.row());
 			m_Controller->SetEmber(current, true);
 			m_Controller->LockedScale(scale);
 			//Setting these and updating the GUI overwrites the work of clearing them done in SetEmber() above.
@@ -727,12 +734,6 @@ bool Fractorium::CreateControllerFromOptions()
 			m_PaletteBlurSpin->SetValueStealth(blur);
 			m_PaletteFrequencySpin->SetValueStealth(freq);
 			m_Controller->PaletteAdjust();//Applies the adjustments to temp and saves in m_Ember.m_Palette, then fills in the palette preview widget.
-			//Template specific palette table and variations tree setup in controller constructor, but
-			//must manually setup the library tree here because it's after the embers were assigned.
-			//Passing row re-selects the item that was previously selected.
-			//This will eventually call FillParamTablesAndPalette(), which in addition to filling in various fields,
-			//will apply the palette adjustments.
-			m_Controller->FillLibraryTree(index.row());
 		}
 	}
 
@@ -773,5 +774,5 @@ bool Fractorium::ControllersOk() { return m_Controller.get() && m_Controller->GL
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

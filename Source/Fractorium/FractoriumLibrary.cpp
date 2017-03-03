@@ -283,7 +283,11 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 	}
 }
 
-void Fractorium::OnEmberTreeItemChanged(QTreeWidgetItem* item, int col) { m_Controller->EmberTreeItemChanged(item, col); }
+void Fractorium::OnEmberTreeItemChanged(QTreeWidgetItem* item, int col)
+{
+	if (ui.LibraryTree->topLevelItemCount())//This can sometimes be spurriously called even when the tree is empty.
+		m_Controller->EmberTreeItemChanged(item, col);
+}
 
 /// <summary>
 /// Set the current ember to the selected item.
@@ -301,12 +305,17 @@ void FractoriumEmberController<T>::EmberTreeItemDoubleClicked(QTreeWidgetItem* i
 		SetEmber(m_Fractorium->ui.LibraryTree->currentIndex().row(), false);
 }
 
-void Fractorium::OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col) { m_Controller->EmberTreeItemDoubleClicked(item, col); }
+void Fractorium::OnEmberTreeItemDoubleClicked(QTreeWidgetItem* item, int col)
+{
+	if (ui.LibraryTree->topLevelItemCount())//This can sometimes be spurriously called even when the tree is empty.
+		m_Controller->EmberTreeItemDoubleClicked(item, col);
+}
 
 /// <summary>
-/// Move a library item at one index to the next index.
+/// Move a possibly disjoint selection of library items from their indices,
+/// to another index.
 /// </summary>
-/// <param name="startRow">The index of the source item to move</param>
+/// <param name="items">The selected list of items to move</param>
 /// <param name="destRow">The destination index to move the item to</param>
 template <typename T>
 void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items, int destRow)
@@ -315,17 +324,16 @@ void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items
 	auto startRow = items[0].row();
 	auto tree = m_Fractorium->ui.LibraryTree;
 	auto top = tree->topLevelItem(0);
-	list<QString> names;
+	list<string> names;
 
 	for (auto& item : items)
 		if (auto temp = m_EmberFile.Get(item.row()))
-			names.push_back(QString::fromStdString(temp->m_Name));
+			names.push_back(temp->m_Name);
 
 	auto b = m_EmberFile.m_Embers.begin();
 	auto result = Gather(b, m_EmberFile.m_Embers.end(), Advance(b, destRow), [&](const Ember<T>& ember)
 	{
-		auto qname = QString::fromStdString(ember.m_Name);
-		auto position = std::find(names.begin(), names.end(), qname);
+		auto position = std::find(names.begin(), names.end(), ember.m_Name);
 
 		if (position != names.end())
 		{
@@ -335,7 +343,9 @@ void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items
 
 		return false;
 	});
+	tree->update();
 	SyncLibrary(eLibraryUpdate(eLibraryUpdate::INDEX | eLibraryUpdate::POINTER));
+	//SyncLibrary(eLibraryUpdate(eLibraryUpdate::INDEX | eLibraryUpdate::POINTER | eLibraryUpdate::NAME));
 }
 
 /// <summary>
@@ -496,7 +506,11 @@ void FractoriumEmberController<T>::SequenceTreeItemChanged(QTreeWidgetItem* item
 	}
 }
 
-void Fractorium::OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col) { m_Controller->SequenceTreeItemChanged(item, col); }
+void Fractorium::OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col)
+{
+	if (ui.SequenceTree->topLevelItemCount())
+		m_Controller->SequenceTreeItemChanged(item, col);
+}
 
 /// <summary>
 /// Wrapper around calling RenderPreviews with the appropriate values passed in for the previews in the sequence tree.

@@ -286,10 +286,11 @@ void GLEmberController<T>::DrawImage()
 template <typename T>
 void GLEmberController<T>::DrawAffines(bool pre, bool post)
 {
+	QueryVMP();//Resolves to float or double specialization function depending on T.
+
 	if (!m_Fractorium->DrawXforms() || (m_DragState == eDragState::DragRotateScale))
 		return;
 
-	QueryVMP();//Resolves to float or double specialization function depending on T.
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	bool dragging = m_DragState == eDragState::DragDragging;
 

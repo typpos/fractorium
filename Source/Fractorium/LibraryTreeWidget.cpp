@@ -72,7 +72,7 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 					auto itemrow = offsetitem.row();//Will be at least 1 if dropped above it.
 					auto offset = itemrow;
 
-					for (i = 0; i < dragItems.size(); i++)
+					for (i = 0; i < dragItems.size() && offset > 0; i++)
 					{
 						offset--;
 
@@ -91,6 +91,6 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 			}
 		}
 
-		QTimer::singleShot(500, [ = ]() { m_Fractorium->m_Controller->MoveLibraryItems(items, row); });//Need to fire this after this event has internally reshuffled the items.
+		m_Fractorium->m_Controller->MoveLibraryItems(items, row);
 	}
 }

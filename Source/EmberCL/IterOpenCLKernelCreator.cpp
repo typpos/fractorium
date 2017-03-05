@@ -280,7 +280,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "		firstPoint.m_Y = MwcNextNeg1Pos1(&mwc);\n"
 	   "		firstPoint.m_Z = 0.0;\n"
 	   "		firstPoint.m_ColorX = MwcNext01(&mwc);\n"
-	   "		firstPoint.m_LastXfUsed = 0;\n"
+	   "		firstPoint.m_LastXfUsed = 0 - 1;\n"//This ensures the first iteration chooses from the unweighted distribution array, all subsequent will choose from the weighted ones.
 	   "	}\n"
 	   "	else\n"
 	   "	{\n"

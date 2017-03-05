@@ -3060,7 +3060,7 @@
           <enum>QTabWidget::Triangular</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="XformColorTab">
           <property name="sizePolicy">
@@ -3398,7 +3398,7 @@
              <item row="0" column="1">
               <widget class="QPushButton" name="ToggleColorIndicesButton">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1, alternating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Toggle Indices</string>
@@ -3408,7 +3408,7 @@
              <item row="1" column="0">
               <widget class="QPushButton" name="RandomColorSpeedButton">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Random Color Speed</string>
@@ -3418,7 +3418,7 @@
              <item row="1" column="1">
               <widget class="QPushButton" name="ToggleColorSpeedButton">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to 0 or 1, alternating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Toggle Color Speed</string>

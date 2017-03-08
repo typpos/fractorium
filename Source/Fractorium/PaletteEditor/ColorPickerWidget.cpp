@@ -90,7 +90,8 @@ void ColorPickerWidget::OnColorViewerClicked()
 void ColorPickerWidget::OnTriangleColorChanged(const QColor& col)
 {
 	if (col.isValid())
+	{
 		m_ColorPanel->Color(col);
-
-	emit ColorChanged(col);
+		emit ColorChanged(col);
+	}
 }

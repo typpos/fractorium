@@ -240,7 +240,9 @@ void PaletteEditor::OnColorPickerColorChanged(const QColor& col)
 /// <param name="arrow">The arrow which was double clicked on</param>
 void PaletteEditor::OnArrowDoubleClicked(const GradientArrow& arrow)
 {
+	blockSignals(true);//Do not update main window when Sync is checked because selecting an arrow as the main color doesn't actually change anything.
 	m_ColorPicker->SetColorPanelColor(arrow.Color());
+	blockSignals(false);
 }
 
 /// <summary>

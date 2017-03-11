@@ -398,7 +398,7 @@ void PaletteEditor::OnDeletePaletteButtonClicked()
 		m_PaletteList->Delete(m_CurrentPaletteFilePath, m_PaletteIndex);
 		::FillPaletteTable(m_CurrentPaletteFilePath, table, m_PaletteList);
 		emit PaletteFileChanged();
-		OnPaletteCellClicked(0, table->rowCount() - 1);
+		OnPaletteCellClicked(table->rowCount() - 1, 1);
 	}
 }
 

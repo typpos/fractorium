@@ -38512,9 +38512,9 @@ gradient:
 
 }
  
-recherché {
+recherche {
 gradient:
- title="recherché" smooth=no
+ title="recherche" smooth=no
  index=0 color=12051958
  index=2 color=15659763
  index=3 color=15725302

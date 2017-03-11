@@ -26984,9 +26984,9 @@ gradient:
 
 }
  
-animé {
+anime {
 gradient:
- title="animé" smooth=no
+ title="anime" smooth=no
  index=0 color=9991992
  index=2 color=11769427
  index=3 color=11839083

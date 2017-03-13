@@ -51,7 +51,13 @@ win32 {
 	INCLUDEPATH += /usr/local/include/GL
 	INCLUDEPATH += /usr/include/glm
 	INCLUDEPATH += /usr/include/tbb
-	INCLUDEPATH += /usr/include/libxml2
+
+        unix:!macx {
+            INCLUDEPATH += /usr/include/libxml2
+        }
+        else {
+            INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
+        }
 
 #libjpeg and libpng aren't in separate folders, so nothing to add here for them.
 }
@@ -83,7 +89,13 @@ else {
 	LIBS += -lpng
 	LIBS += -ltbb
 	LIBS += -lpthread
-	LIBS += -lxml2
+
+        unix:!macx {
+            LIBS += -lxml2
+        }
+        else {
+            LIBS += -L/usr/local/opt/libxml2/lib -lxml2
+        }
 }
 
 macx {

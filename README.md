@@ -9,7 +9,11 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_Beta_1.0.0.1.msi](https://drive.google.com/open?id=0Bws5xPbHJph6aFQxTV9lQmc4WHc)
+Download: [Fractorium_1.0.0.2.msi](https://drive.google.com/file/d/0Bws5xPbHJph6Y2tlQ2tmdHFwNnc/view?usp=sharing)
+
+## Mac
+
+Download: [Fractorium_1.0.0.2.dmg](https://drive.google.com/file/d/0Bws5xPbHJph6MkpQZjVaV1dVMWM/view?usp=sharing)
 
 ## Linux
 

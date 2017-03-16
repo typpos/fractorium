@@ -101,6 +101,20 @@ tar --exclude='package-linux.sh' \
 	--exclude-backups \
 	-czf "$PPA_DIR/$TAR_NAME" \
 	./Data/flam3-palettes.xml \
+	./Data/boxtail_pack_02.gradient \
+	./Data/boxtail_pack_03_triangle.gradient \
+	./Data/boxtail_pack_04_mineshack.gradient \
+	./Data/fardareismai_pack_01_variety_number_128.gradient \
+	./Data/fardareismai_pack_02_b_sides.gradient \
+	./Data/fardareismai_pack_03_old_and_new.gradient \
+	./Data/fardareismai_pack_04_hoard.gradient \
+	./Data/fractaldesire_pack_01.gradient \
+	./Data/rce_ordinary_pack_01_colornation.gradient \
+	./Data/tatasz_pack_01.gradient \
+	./Data/tatasz_pack_02_colder.gradient \
+	./Data/tatasz_pack_02_dark.gradient \
+	./Data/tatasz_pack_02_warmer.gradient \
+	./Data/tatasz_pack_03.gradient \
 	./Data/dark.qss \
 	.
 

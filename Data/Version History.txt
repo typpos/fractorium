@@ -1,4 +1,4 @@
-1.0.0.2 12/05/2016
+1.0.0.2 03/15/2017
 --User changes
  -Add many tooltips to help clarify functionality.
  -Select multiple flames in library for del/move. Still only one allowed to be set as the current.
@@ -6,22 +6,51 @@
  -User can now drag a square to select xforms, which keeps in sync with checkboxes.
  -Remove --nframes from command line. Replace with new params: --loopframes, --interpframes, --interploops.
  -Add two new options to EmberGenome: --cwloops --cwinterploops to specify whether rotation should go clockwise instead of the default counter clockwise.
- -Add these to Fractorium as checkboxes.
+  --Add these to Fractorium as checkboxes.
  -Apply All now also works for toggling animate flag on xforms.
  -Options dialog now allows user to set whether double click toggles spinners, or right click does.
- 
+ -Allow toggling on spinners whose minimum value is not zero.
+ -Add a palette editor.
+ -Add support for reading .ugr/.gradient/.gradients palette files.
+ -Allow toggling display of image, affines and grid.
+ -Add new variations: cylinder2, circlesplit, tile_log, truchet_fill, waves2_radial.
+
 --Bug fixes
  -Selecting final and non-final xforms, and then dragging the non-final did not drag the final with it.
  -Selecting all xforms when a final was present, then deleting crashed the program.
- -Remove support for ppm files in the command line programs, it's an outdated format.
+ -Selecting multiple xforms and rotating them would produce the wrong rotation.
  -Switching between SP and DP kept reapplying the palette adjustments.
+ -cpow2 was wrong.
+ -Xaos has been wrong this entire time on the GPU because it was not selecting from the unweighted distributions on the very first iteration when fusing.
+ -Palettes with rapid changes in color would produce slightly different outputs from Apo/Chaotica. This was due to a long standing bug from flam3.
+ -Use exec() on Apple and show() on all other OSes for dialog boxes.
+ -Trying to render a sequence with no frames would crash.
+ -Remove support for ppm files in the command line programs, it's an outdated format.
+ -Better handling when parsing flames using different encoding, such as unicode and UTF-8.
+ -Save palettes values in flame files as uppercase.
+ -Query matrices when drawing affines even if they are set not to be drawn because the values are used elsewhere.
 
 --Code changes
- -Move build system to Visual Studio 2015 and Qt 5.6.
+ -Move build system to Visual Studio 2015 and Qt 5.8.
  -SSE used during addition of points to the histogram.
  -Remove last remnants of old flam3 C code and replace with C++.
  -Remove unused code involving tbb::task_group.
- -Make settings object a global shared_ptr singleton, so it doesn't have to be passed around.
+ -Make settings and PaletteList objects be global shared_ptr singletons, so they don't have to be passed around.
+ -Make all types concerning palettes be floats, including PaletteTableWidgetItem.
+ -PaletteTableWidgetItem is no longer templated because all palettes are float.
+ -Include the source colors for user created gradients.
+ -Change parallel_for() calls to work with very old versions of TBB which are lingering on some systems.
+ -Split conditional out of accumulation loop on the CPU for better performance.
+ -Vectorize summing when doing density filter for better performance.
+ -Allow palettes to reside in multiple folders, while ensuring only one of each name is added.
+ -Refactor some palette path searching code.
+ -Make ReadFile() throw and catch an exception if the file operation fails.
+ -A little extra safety in foci and foci3D with a call to Zeps().
+ -Cast to (real_t) in the OpenCL string for the w variation, which was having trouble compiling on Mac.
+ -Fixing missing comma between paths in InitPaletteList().
+ -Move Xml and PaletteList classes into cpp to shorten build times when working on them.
+ -Remove default param values for IterOpenCLKernelCreator<T>::SharedDataIndexDefines in cpp file.
+ -Change more NULL to nullptr.
 
 1.0.0.1 06/21/2016	
 --Bug fixes

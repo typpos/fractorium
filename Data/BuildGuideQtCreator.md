@@ -11,7 +11,7 @@ Install [Microsoft Visual Studio 2015 or later](https://www.visualstudio.com/en-
 
 ###Qt
 
-Install Qt for Windows 64-bit (VS 2015) 5.8 (http://www.qt.io/download/). 
+Install Qt for Windows 64-bit (VS 2015) 5.8 or later (http://www.qt.io/download/). 
 
 Add system environment variable named `QTPATH` and point it to the location of the Qt folder. On a default install, this will be something like:
 

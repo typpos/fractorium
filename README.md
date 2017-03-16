@@ -52,12 +52,12 @@ All builds are 64-bit.
 
 ## Windows
 
-[Build Guide for Visual Studio 2013 or Qt Creator](Data/BuildGuideQtCreator.md)
+[Build Guide for Visual Studio 2015 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 
 [Build Guide for Linux](./Data/BuildGuideLinux.md)
 
-## Mac OS/X 10.9+
+## Mac OS/X Sierra, El Capitan, Yosemite and Mavericks
 
 [Build Guide for Mac OS/X](./Data/BuildGuideMacOSX.md)

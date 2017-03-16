@@ -42,10 +42,6 @@ cd ~/Downloads
 sudo dpkg -i fractorium_1.0.0.1-0ubuntu1_amd64.deb
 ```
 
-## Mac OS/X (10.9+)
-
-TODO
-
 # Building from git
 
 All builds are 64-bit.

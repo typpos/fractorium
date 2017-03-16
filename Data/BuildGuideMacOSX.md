@@ -27,7 +27,7 @@ PATH=/usr/local/opt/qt5/bin:$PATH
 export PATH
 ```
 
-Compile the binary:
+Building:
 
 ```
 cd fractorium
@@ -43,7 +43,7 @@ cd archive
 ./build.sh
 ```
 
-Run the binary from the release folder:
+Running the binary from the release folder:
 
 ```
 cd ..

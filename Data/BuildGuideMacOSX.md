@@ -19,19 +19,12 @@ Install the dependencies:
 brew install qt5 tbb glm jpeg libpng glib libxml2
 ```
 
-TODO: Confirm if `glib` and `libxml2` are actually needed.
-
 Add the Qt `bin` folder to `PATH` to make `qmake` available. In
 `~/.bash_profile` or `~/.bashrc`:
 
 ```
 PATH=/usr/local/opt/qt5/bin:$PATH
 export PATH
-```
-Obtain the source:
-
-```
-git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 ```
 
 Compile the binary:

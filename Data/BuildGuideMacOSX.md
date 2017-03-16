@@ -34,6 +34,7 @@ cd fractorium
 qmake CONFIG+=release
 make
 ```
+Or open main.pro in Qt Creator, select release and build all.
 
 Creating the app bundle:
 

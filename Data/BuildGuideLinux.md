@@ -1,27 +1,40 @@
 # Build Guide for Linux
 
+The following has been tested on 16.04.2 (xenial).
+
+Make sure the package lists are up-to-date:
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+
 Install `git` and clone the repository:
 
 ```
 sudo apt-get install git
-git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
+git clone --depth=1 https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 ```
 
 Install the dependencies.
-
-Ubuntu 15.04 (vivid), 15.10 (wily), 16.04 (xenial):
 
 ```
 sudo apt-get install g++ libgl1-mesa-dev libgl-dev libglm-dev libjpeg-dev libpng12-dev libqt5opengl5-dev libtbb-dev libxml2-dev ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers qt5-default qt5-qmake qtbase5-dev
 ```
 
-Install the OpenCL drivers and opencl support for your hardware. For AMD get their drivers from their site, build and install .deb package. For Nvidia:
+Install the OpenCL drivers and opencl support for your hardware.
+
+For AMD get their drivers from their site, build and install the .deb package.
+
+For Nvidia:
 
 ```
-sudo apt-get install nvidia-352 nvidia-352-dev nvidia-libopencl1-352 nvidia-modprobe nvidia-opencl-dev nvidia-opencl-icd-352 nvidia-prime
+sudo apt-get install nvidia-modprobe nvidia-prime nvidia-367 nvidia-367-dev 
 ```
 
-Note: There may be a more recent release on their site.
+Optionally you can install the Nvidia-specific `nvidia-libopencl1-367` package,
+but keep in mind that this will remove the generic ones (`ocl-icd-opencl-dev`
+and `ocl-icd-libopencl1`).
 
 If you have both Qt 4 and 5 installed, select Qt 5 before compilation:
 
@@ -29,7 +42,7 @@ If you have both Qt 4 and 5 installed, select Qt 5 before compilation:
 export QT_SELECT=qt5
 ```
 
-Compile the binary:
+Compile the binaries, they will be created in the `Bin/release` folder.
 
 ```
 cd fractorium
@@ -39,13 +52,6 @@ make
 
 Or open main.pro in Qt Creator and build all.
 
-Run the binary from the release folder:
-
-```
-cd Bin/release
-./fractorium
-```
-
 `sudo make install` will install the files directly. `sudo make uninstall` is
 also available.
 
@@ -54,6 +60,12 @@ be necessary:
 
 ```
 sudo apt-get install bzr bzr-builddeb dh-make debhelper
+```
+
+Tell `bzr` about yourself:
+
+```
+bzr whoami "The Person <the.person@email.com>"
 ```
 
 A helper script is available, use `package-linux.sh` in the project root. It

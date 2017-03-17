@@ -35,11 +35,11 @@ sudo apt-get install fractorium
 
 ### Install from .deb
 
-Download: [fractorium_1.0.0.1-0ubuntu1_amd64.deb](https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_1.0.0.1-0ubuntu1_amd64.deb)
+Download: [fractorium_1.0.0.2b-0ubuntu1_amd64.deb](https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+build/12136710/+files/fractorium_1.0.0.2b-0ubuntu1_amd64.deb)
 
 ```
 cd ~/Downloads
-sudo dpkg -i fractorium_1.0.0.1-0ubuntu1_amd64.deb
+sudo dpkg -i fractorium_1.0.0.2b-0ubuntu1_amd64.deb
 ```
 
 # Building from git

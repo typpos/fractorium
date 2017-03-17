@@ -1,6 +1,5 @@
 #include "FractoriumPch.h"
 #include "PaletteEditor.h"
-#include "ui_paletteeditor.h"
 
 /// <summary>
 /// Constructor which passes parent widget to the base and sets up slots and other ui

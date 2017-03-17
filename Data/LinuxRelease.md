@@ -54,6 +54,7 @@ Starting with a fresh clone from bitbucket.org. It will not work unless it's tot
 ```
 $ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 $ cd fractorium
+$ qmake main.pro -r -spec linux-g++-64 CONFIG+=release
 ```
 
 Test that the package creator script:

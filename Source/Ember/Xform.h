@@ -1244,10 +1244,11 @@ private:
 	/// <returns>The adjusted opacity</returns>
 	static T AdjustOpacityPercentage(T in)
 	{
-		if (in == 0)
+		return in;
+		/*  if (in == 0)
 			return 0;
-		else
-			return std::pow(T(10.0), -std::log(T(1.0) / T(in)) / std::log(T(2)));
+		    else
+			return std::pow(T(10.0), -std::log(T(1.0) / T(in)) / std::log(T(2)));*/
 	}
 
 	vector<T> m_Xaos;//Xaos vector which affects the probability that this xform is chosen. Usually empty.

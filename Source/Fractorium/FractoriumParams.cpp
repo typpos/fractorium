@@ -479,8 +479,8 @@ void FractoriumEmberController<T>::DEFilterMinRadiusWidthChanged(double d)
 
 void Fractorium::OnDEFilterMinRadiusWidthChanged(double d)
 {
-	if (!ConstrainLow(m_DEFilterMinRadiusSpin, m_DEFilterMaxRadiusSpin))
-		m_Controller->DEFilterMinRadiusWidthChanged(d);
+	ConstrainLow(m_DEFilterMinRadiusSpin, m_DEFilterMaxRadiusSpin);
+	m_Controller->DEFilterMinRadiusWidthChanged(m_DEFilterMinRadiusSpin->value());
 }
 
 /// <summary>
@@ -499,8 +499,8 @@ void FractoriumEmberController<T>::DEFilterMaxRadiusWidthChanged(double d)
 
 void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d)
 {
-	if (!ConstrainHigh(m_DEFilterMinRadiusSpin, m_DEFilterMaxRadiusSpin))
-		m_Controller->DEFilterMaxRadiusWidthChanged(d);
+	ConstrainHigh(m_DEFilterMinRadiusSpin, m_DEFilterMaxRadiusSpin);
+	m_Controller->DEFilterMaxRadiusWidthChanged(m_DEFilterMaxRadiusSpin->value());
 }
 
 /// <summary>

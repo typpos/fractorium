@@ -474,7 +474,7 @@ public:
 		m_ParentEmber = nullptr;
 		m_ColorSpeedCache = 0;
 		m_OneMinusColorCache = 0;
-		m_VizAdjusted = 0;
+		m_Opacity = 0;
 		m_Animate = 0;
 		m_Wind[0] = 0;
 		m_Wind[1] = 0;
@@ -482,7 +482,7 @@ public:
 	}
 
 	/// <summary>
-	/// Compute color cache values: color speed, one minus color speed and adjusted visibility.
+	/// Compute color cache values: color speed and one minus color speed.
 	/// </summary>
 	void CacheColorVals()
 	{
@@ -491,7 +491,6 @@ public:
 		//m_OneMinusColorCache = (1 + m_ColorSpeed) / 2;
 		m_ColorSpeedCache = m_ColorSpeed * m_ColorX;//Flam3 style.
 		m_OneMinusColorCache = T(1.0) - m_ColorSpeed;
-		m_VizAdjusted = AdjustOpacityPercentage(m_Opacity);
 	}
 
 	/// <summary>
@@ -598,7 +597,7 @@ public:
 		//to the histogram. Calculate this value by interpolating between the index value of the
 		//last iteration with the one specified in this xform. Note that some cached values are used
 		//to reduce the amount of processing.
-		outPoint->m_VizAdjusted = m_VizAdjusted;
+		outPoint->m_Opacity = m_Opacity;
 		iterHelper.m_Color.x = outPoint->m_ColorX = m_ColorSpeedCache + (m_OneMinusColorCache * inPoint->m_ColorX);
 
 		if (m_HasPreOrRegularVars)
@@ -788,7 +787,6 @@ public:
 	size_t PostVariationCount()  const { return m_PostVariations.size(); }
 	size_t TotalVariationCount() const { return PreVariationCount() + VariationCount() + PostVariationCount(); }
 	bool Empty() const { return TotalVariationCount() == 0 && m_Affine.IsID(); }//Use this instead of padding like the original did.
-	T VizAdjusted() const { return m_VizAdjusted; }
 	T ColorSpeedCache() const { return m_ColorSpeedCache; }
 	T OneMinusColorCache() const { return m_OneMinusColorCache; }
 	const vector<T>& XaosVec() const { return m_Xaos; }
@@ -1133,7 +1131,6 @@ public:
 		ss << "\nColor Speed: " << m_ColorSpeed;
 		ss << "\nAnimate: " << m_Animate;
 		ss << "\nOpacity: " << m_Opacity;
-		ss << "\nViz Adjusted: " << m_VizAdjusted;
 		ss << "\nWind: " << m_Wind[0] << ", " << m_Wind[1];
 		ss << "\nMotion Frequency: " << m_MotionFreq;
 		ss << "\nMotion Func: " << m_MotionFunc;
@@ -1165,7 +1162,6 @@ public:
 
 private:
 	bool m_HasPreOrRegularVars;//Whethere there are any pre or regular variations present.
-	T m_VizAdjusted;//Adjusted visibility for better transitions.
 
 public:
 	//Color coordinates for this function. This is the index into the palette used to look up a color and add to the histogram for each iter.
@@ -1235,20 +1231,6 @@ private:
 
 		if (keepGoing)
 			func(m_PostVariations, keepGoing);
-	}
-
-	/// <summary>
-	/// Adjust opacity.
-	/// </summary>
-	/// <param name="in">The opacity to adjust, range 0-1.</param>
-	/// <returns>The adjusted opacity</returns>
-	static T AdjustOpacityPercentage(T in)
-	{
-		return in;
-		/*  if (in == 0)
-			return 0;
-		    else
-			return std::pow(T(10.0), -std::log(T(1.0) / T(in)) / std::log(T(2)));*/
 	}
 
 	vector<T> m_Xaos;//Xaos vector which affects the probability that this xform is chosen. Usually empty.

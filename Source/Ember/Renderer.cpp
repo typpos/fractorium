@@ -1516,21 +1516,21 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 		{
 			Point<T> p(samples[i]);//Slightly faster to cache this.
 
-			if (Rotate() != 0)
+			if (p.m_Opacity != 0)
 			{
-				T p00 = p.m_X - CenterX();
-				T p11 = p.m_Y - m_Ember.m_RotCenterY;
-				p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
-				p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
-			}
+				if (Rotate() != 0)
+				{
+					T p00 = p.m_X - CenterX();
+					T p11 = p.m_Y - m_Ember.m_RotCenterY;
+					p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
+					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
+				}
 
-			//Checking this first before converting gives better performance than converting and checking a single value, which the original did.
-			//Second, an interesting optimization observation is that when keeping the bounds vars within m_CarToRas and calling its InBounds() member function,
-			//rather than here as members, about a 7% speedup is achieved. This is possibly due to the fact that data from m_CarToRas is accessed
-			//right after the call to Convert(), so some caching efficiencies get realized.
-			if (m_CarToRas.InBounds(p))
-			{
-				if (p.m_VizAdjusted != 0)
+				//Checking this first before converting gives better performance than converting and checking a single value, which the original did.
+				//Second, an interesting optimization observation is that when keeping the bounds vars within m_CarToRas and calling its InBounds() member function,
+				//rather than here as members, about a 7% speedup is achieved. This is possibly due to the fact that data from m_CarToRas is accessed
+				//right after the call to Convert(), so some caching efficiencies get realized.
+				if (m_CarToRas.InBounds(p))
 				{
 					m_CarToRas.Convert(p, histIndex);
 
@@ -1563,7 +1563,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						auto cifm1 = bucketT(1) - colorIndexFrac;
 
 						//Loops are unrolled to allow auto vectorization.
-						if (p.m_VizAdjusted == 1)
+						if (p.m_Opacity == 1)
 						{
 							hist[0] += (pal[0] * cifm1) + (pal2[0] * colorIndexFrac);
 							hist[1] += (pal[1] * cifm1) + (pal2[1] * colorIndexFrac);
@@ -1572,7 +1572,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						}
 						else
 						{
-							auto va = bucketT(p.m_VizAdjusted);
+							auto va = bucketT(p.m_Opacity);
 							hist[0] += ((pal[0] * cifm1) + (pal2[0] * colorIndexFrac)) * va;
 							hist[1] += ((pal[1] * cifm1) + (pal2[1] * colorIndexFrac)) * va;
 							hist[2] += ((pal[2] * cifm1) + (pal2[2] * colorIndexFrac)) * va;
@@ -1589,17 +1589,17 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 		{
 			Point<T> p(samples[i]);//Slightly faster to cache this.
 
-			if (Rotate() != 0)
+			if (p.m_Opacity != 0)
 			{
-				T p00 = p.m_X - CenterX();
-				T p11 = p.m_Y - m_Ember.m_RotCenterY;
-				p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
-				p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
-			}
+				if (Rotate() != 0)
+				{
+					T p00 = p.m_X - CenterX();
+					T p11 = p.m_Y - m_Ember.m_RotCenterY;
+					p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + CenterX();
+					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
+				}
 
-			if (m_CarToRas.InBounds(p))
-			{
-				if (p.m_VizAdjusted != 0)
+				if (m_CarToRas.InBounds(p))
 				{
 					m_CarToRas.Convert(p, histIndex);
 
@@ -1609,7 +1609,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
 						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
 
-						if (p.m_VizAdjusted == 1)
+						if (p.m_Opacity == 1)
 						{
 							hist[0] += pal[0];
 							hist[1] += pal[1];
@@ -1618,7 +1618,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						}
 						else
 						{
-							auto va = bucketT(p.m_VizAdjusted);
+							auto va = bucketT(p.m_Opacity);
 							hist[0] += pal[0] * va;
 							hist[1] += pal[1] * va;
 							hist[2] += pal[2] * va;

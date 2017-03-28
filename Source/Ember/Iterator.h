@@ -213,7 +213,7 @@ protected:
 			firstBadPoint.m_Y = rand.Frand11<T>();
 			firstBadPoint.m_Z = 0;
 			firstBadPoint.m_ColorX = point->m_ColorX;
-			firstBadPoint.m_VizAdjusted = point->m_VizAdjusted;
+			firstBadPoint.m_Opacity = point->m_Opacity;
 			xformIndex = NextXformFromIndex(rand.Rand());
 
 			if (!xforms[xformIndex].Apply(&firstBadPoint, point, rand))
@@ -245,9 +245,9 @@ protected:
 	{
 		if (IsClose<T>(ember.FinalXform()->m_Opacity, 1) || rand.Frand01<T>() < ember.FinalXform()->m_Opacity)
 		{
-			T tempVizAdjusted = tempPoint.m_VizAdjusted;
+			T tempOpacity = tempPoint.m_Opacity;
 			ember.NonConstFinalXform()->Apply(&tempPoint, sample, rand);
-			sample->m_VizAdjusted = tempVizAdjusted;
+			sample->m_Opacity = tempOpacity;
 		}
 		else
 		{
@@ -433,7 +433,7 @@ public:
 			firstBadPoint.m_Y = rand.Frand11<T>();
 			firstBadPoint.m_Z = 0;
 			firstBadPoint.m_ColorX = point->m_ColorX;
-			firstBadPoint.m_VizAdjusted = point->m_VizAdjusted;
+			firstBadPoint.m_Opacity = point->m_Opacity;
 			xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
 			if (!xforms[xformIndex].Apply(&firstBadPoint, point, rand))

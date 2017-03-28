@@ -72,7 +72,7 @@ public:
 		m_Z = point.m_Z;
 		m_ColorX = point.m_ColorX;
 		//m_ColorY = point.m_ColorY;
-		m_VizAdjusted = point.m_VizAdjusted;
+		m_Opacity = point.m_Opacity;
 		return *this;
 	}
 
@@ -82,7 +82,7 @@ public:
 	T m_Z = 0;
 	T m_ColorX = 0;
 	//T m_ColorY;
-	T m_VizAdjusted = 1;
+	T m_Opacity = 1;
 };
 
 /// <summary>

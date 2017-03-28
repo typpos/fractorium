@@ -1140,7 +1140,7 @@ void TestXformsInOutPoints()
 				orig.m_Y = rand.Frand11<float>();
 				orig.m_Z = rand.Frand11<float>();
 				orig.m_ColorX = rand.Frand01<float>();
-				orig.m_VizAdjusted = rand.Frand01<float>();
+				orig.m_Opacity = rand.Frand01<float>();
 				Point<float> p1 = orig, p2 = orig, p3;
 				xforms[i].Apply(&p1, &p1, rand);
 				xforms[i].Apply(&p2, &p3, rand);
@@ -1148,12 +1148,12 @@ void TestXformsInOutPoints()
 				badVals |= (p1.m_Y != p1.m_Y);
 				badVals |= (p1.m_Z != p1.m_Z);
 				badVals |= (p1.m_ColorX != p1.m_ColorX);
-				badVals |= (p1.m_VizAdjusted != p1.m_VizAdjusted);
+				badVals |= (p1.m_Opacity != p1.m_Opacity);
 				badVals |= (p3.m_X != p3.m_X);
 				badVals |= (p3.m_Y != p3.m_Y);
 				badVals |= (p3.m_Z != p3.m_Z);
 				badVals |= (p3.m_ColorX != p3.m_ColorX);
-				badVals |= (p3.m_VizAdjusted != p3.m_VizAdjusted);
+				badVals |= (p3.m_Opacity != p3.m_Opacity);
 
 				if (badVals)
 					cout << "Variation " << regVar->Name() << ": Bad value detected" << endl;
@@ -1172,8 +1172,8 @@ void TestXformsInOutPoints()
 					if (p1.m_ColorX != p3.m_ColorX)
 						cout << "Variation " << regVar->Name() << ": p1.m_ColorX " << p1.m_ColorX << " != p3.m_ColorX " << p3.m_ColorX << endl;
 
-					if (p1.m_VizAdjusted != p3.m_VizAdjusted)
-						cout << "Variation " << regVar->Name() << ": p1.m_VizAdjusted " << p1.m_VizAdjusted << " != p3.m_VizAdjusted " << p3.m_VizAdjusted << endl;
+					if (p1.m_Opacity != p3.m_Opacity)
+						cout << "Variation " << regVar->Name() << ": p1.m_Opacity " << p1.m_Opacity << " != p3.m_Opacity " << p3.m_Opacity << endl;
 				}
 			}
 		}
@@ -1221,7 +1221,7 @@ void TestVarTime()
 			helper.In.y = helper.m_TransY = (xform.m_Affine.D() * p.m_X) + (xform.m_Affine.E() * p.m_Y) + xform.m_Affine.F();
 			helper.In.z = helper.m_TransZ = p.m_Z;
 			helper.m_Color.x = p.m_ColorX = rand.Frand01<T>();
-			p.m_VizAdjusted = rand.Frand01<T>();
+			p.m_Opacity = rand.Frand01<T>();
 			helper.m_PrecalcSumSquares = SQR(helper.m_TransX) + SQR(helper.m_TransY);
 			helper.m_PrecalcSqrtSumSquares = sqrt(helper.m_PrecalcSumSquares);
 			helper.m_PrecalcSina = helper.m_TransX / helper.m_PrecalcSqrtSumSquares;
@@ -1346,7 +1346,7 @@ void TestVarsSimilar()
 				helper.In.y = helper.m_TransY = (xform.m_Affine.D() * p.m_X) + (xform.m_Affine.E() * p.m_Y) + xform.m_Affine.F();
 				helper.In.z = helper.m_TransZ = p.m_Z;
 				helper.m_Color.x = p.m_ColorX = rand.Frand01<T>();
-				p.m_VizAdjusted = rand.Frand01<T>();
+				p.m_Opacity = rand.Frand01<T>();
 				pComp = p;
 				helper.m_PrecalcSumSquares = SQR(helper.m_TransX) + SQR(helper.m_TransY);
 				helper.m_PrecalcSqrtSumSquares = sqrt(helper.m_PrecalcSumSquares);
@@ -1501,7 +1501,7 @@ void TestCpuGpuResults(size_t platform, size_t device)
 			p.m_Y = rand.Frand<T>(-5, 5);
 			p.m_Z = rand.Frand<T>(-5, 5);
 			p.m_ColorX = rand.Frand01<T>();
-			p.m_VizAdjusted = rand.Frand01<T>();
+			p.m_Opacity = rand.Frand01<T>();
 			varCopy->Random(rand);
 			xform.AddVariation(varCopy);
 			ember.AddXform(xform);
@@ -1579,7 +1579,7 @@ void TestGpuVectorRead(size_t platform, size_t device)
 	p.m_Y = rand.Frand<T>(-5, 5);
 	p.m_Z = rand.Frand<T>(-5, 5);
 	p.m_ColorX = rand.Frand01<T>();
-	p.m_VizAdjusted = rand.Frand01<T>();
+	p.m_Opacity = rand.Frand01<T>();
 	varCopy->Random(rand);
 	xform.AddVariation(varCopy);
 	ember.AddXform(xform);

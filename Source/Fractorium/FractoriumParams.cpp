@@ -471,10 +471,13 @@ void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& tex
 template <typename T>
 void FractoriumEmberController<T>::DEFilterMinRadiusWidthChanged(double d)
 {
-	UpdateAll([&](Ember<T>& ember)
+	if (m_Ember.m_MinRadDE != d)
 	{
-		ember.m_MinRadDE = d;
-	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
+		UpdateAll([&](Ember<T>& ember)
+		{
+			ember.m_MinRadDE = d;
+		}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
+	}
 }
 
 void Fractorium::OnDEFilterMinRadiusWidthChanged(double d)
@@ -491,10 +494,13 @@ void Fractorium::OnDEFilterMinRadiusWidthChanged(double d)
 template <typename T>
 void FractoriumEmberController<T>::DEFilterMaxRadiusWidthChanged(double d)
 {
-	UpdateAll([&](Ember<T>& ember)
+	if (m_Ember.m_MaxRadDE != d)
 	{
-		ember.m_MaxRadDE = d;
-	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
+		UpdateAll([&](Ember<T>& ember)
+		{
+			ember.m_MaxRadDE = d;
+		}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
+	}
 }
 
 void Fractorium::OnDEFilterMaxRadiusWidthChanged(double d)

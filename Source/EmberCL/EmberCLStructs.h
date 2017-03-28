@@ -168,7 +168,6 @@ struct ALIGN XformCL
 	T m_ColorSpeedCache;//88 (176)
 	T m_OneMinusColorCache;//92 (184)
 	T m_Opacity;//96 (192)
-	T m_VizAdjusted;//100 (200)
 };
 
 /// <summary>
@@ -184,7 +183,6 @@ static const char* XformCLStructString =
 	"	real_t m_ColorSpeedCache;\n"
 	"	real_t m_OneMinusColorCache;\n"
 	"	real_t m_Opacity;\n"
-	"	real_t m_VizAdjusted;\n"
 	"} XformCL;\n"
 	"\n";
 

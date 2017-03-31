@@ -358,11 +358,13 @@ template <typename T>
 void FractoriumEmberController<T>::Delete(const vector<pair<size_t, QTreeWidgetItem*>>& v)
 {
 	size_t offset = 0;
+	uint last = 0;
 
 	for (auto& p : v)
 	{
 		if (p.second && m_EmberFile.Delete(p.first - offset))
 		{
+			last = uint(p.first - offset);
 			delete p.second;
 			SyncLibrary(eLibraryUpdate::INDEX);
 			m_Fractorium->SyncFileCountToSequenceCount();
@@ -371,12 +373,15 @@ void FractoriumEmberController<T>::Delete(const vector<pair<size_t, QTreeWidgetI
 		offset++;
 	}
 
-	//If there is now only one item left and it wasn't selected, select it.
+	//Select the next item in the tree closest to the last one that was deleted.
 	if (auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
-		if (top->childCount() == 1)
-			if (auto item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(0)))
-				if (item->GetEmber()->m_Name != m_Ember.m_Name)
-					EmberTreeItemDoubleClicked(top->child(0), 0);
+	{
+		last = std::min<uint>(top->childCount() - 1, last);
+
+		if (auto item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(last)))
+			if (item->GetEmber()->m_Name != m_Ember.m_Name)
+				EmberTreeItemDoubleClicked(item, 0);
+	}
 }
 
 /// <summary>

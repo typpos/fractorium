@@ -72,7 +72,9 @@ private:
 	string m_CurrentPaletteFilePath;
 	ColorPickerWidget* m_ColorPicker = nullptr;
 	GradientColorsView* m_GradientColorView = nullptr;
+#ifndef __APPLE__
 	QFileDialog* m_FileDialog = nullptr;
+#endif
 	shared_ptr<PaletteList<float>> m_PaletteList;
 	std::unique_ptr<Ui::PaletteEditor> ui;
 };

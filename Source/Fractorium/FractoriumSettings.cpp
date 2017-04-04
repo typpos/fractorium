@@ -75,7 +75,7 @@ void FractoriumSettings::EnsureDefaults()
 	if (FinalExt() != "jpg" && FinalExt() != "png")
 		FinalExt("png");
 
-	QString s = SaveFolder();
+	auto s = SaveFolder();
 	QDir dir(s);
 
 	if (s.isEmpty() || !dir.exists())
@@ -85,6 +85,9 @@ void FractoriumSettings::EnsureDefaults()
 		if (!paths.empty())
 			SaveFolder(paths[0]);
 	}
+
+	if (OpenPaletteImageFolder() == "")
+		OpenPaletteImageFolder(QCoreApplication::applicationDirPath());
 }
 
 /// <summary>
@@ -284,6 +287,9 @@ void FractoriumSettings::Nick(const QString& s)     { setValue(IDENTITYNICK, s);
 
 QString FractoriumSettings::OpenFolder()							  { return value(OPENFOLDER).toString();   }
 void FractoriumSettings::OpenFolder(const QString& s)				  { setValue(OPENFOLDER, s);			   }
+
+QString FractoriumSettings::OpenPaletteImageFolder()				  { return value(OPENPALETTEIMAGEFOLDER).toString();   }
+void FractoriumSettings::OpenPaletteImageFolder(const QString& s)	  { setValue(OPENPALETTEIMAGEFOLDER, s);			   }
 
 QString FractoriumSettings::SaveFolder()							  { return value(SAVEFOLDER).toString();   }
 void FractoriumSettings::SaveFolder(const QString& s)				  { setValue(SAVEFOLDER, s);			   }

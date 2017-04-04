@@ -530,8 +530,10 @@ private:
 	QTableWidgetItem* m_InfoFinalXformItem;
 
 	//Files.
+#ifndef __APPLE__
 	QFileDialog* m_FileDialog = nullptr;
 	QFileDialog* m_FolderDialog = nullptr;
+#endif
 	QssDialog* m_QssDialog = nullptr;
 	QString m_LastSaveAll;
 	QString m_LastSaveCurrent;

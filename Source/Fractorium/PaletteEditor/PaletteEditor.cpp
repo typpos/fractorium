@@ -425,6 +425,10 @@ void PaletteEditor::EmitPaletteChanged()
 /// </summary>
 QStringList PaletteEditor::SetupOpenImagesDialog()
 {
+	QStringList filenames;
+	auto settings = FractoriumSettings::Instance();
+#ifndef __APPLE__
+
 	if (!m_FileDialog)
 	{
 		m_FileDialog = new QFileDialog(this);
@@ -433,20 +437,33 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 		m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
 		m_FileDialog->setNameFilter("Image Files (*.png *.jpg *.bmp)");
 		m_FileDialog->setWindowTitle("Open Image");
-		m_FileDialog->setDirectory(QCoreApplication::applicationDirPath());
+		m_FileDialog->setDirectory(settings->OpenPaletteImageFolder());
 		m_FileDialog->selectNameFilter("*.jpg");
 	}
-
-	QStringList filenames;
 
 	if (m_FileDialog->exec() == QDialog::Accepted)
 	{
 		filenames = m_FileDialog->selectedFiles();
 
 		if (!filenames.empty())
-			m_FileDialog->setDirectory(QFileInfo(filenames[0]).canonicalPath());
+		{
+			auto path = QFileInfo(filenames[0]).canonicalPath();
+			m_FileDialog->setDirectory(path);
+			settings->OpenPaletteImageFolder(path);
+		}
 	}
 
+#else
+	auto filename = QFileDialog::getOpenFileName(this, tr("Open Image"), settings->OpenPaletteImageFolder(), tr("Image Files (*.png *.jpg *.bmp)"));
+
+	if (filename.size() > 0)
+	{
+		filenames.append(filename);
+		auto path = QFileInfo(filenames[0]).canonicalPath();
+		settings->OpenPaletteImageFolder(path);
+	}
+
+#endif
 	return filenames;
 }
 

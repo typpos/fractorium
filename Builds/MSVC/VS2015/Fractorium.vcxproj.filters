@@ -417,9 +417,6 @@
     <CustomBuild Include="..\..\..\Source\Fractorium\GLWidget.h">
       <Filter>MainWindows</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\Source\Fractorium\Fractorium.h">
-      <Filter>MainWindows</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\Source\Fractorium\EmberTreeWidgetItem.h">
       <Filter>Widgets</Filter>
     </CustomBuild>
@@ -476,6 +473,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\..\Source\Fractorium\paletteeditor.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\Source\Fractorium\Fractorium.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

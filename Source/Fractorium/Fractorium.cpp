@@ -51,8 +51,6 @@ Fractorium::Fractorium(QWidget* p)
 #endif
 	m_Settings = FractoriumSettings::Instance();
 	m_QssDialog = new QssDialog(this);
-	m_FileDialog = nullptr;//Use lazy instantiation upon first use.
-	m_FolderDialog = nullptr;
 	m_FinalRenderDialog = new FractoriumFinalRenderDialog(this);
 	m_OptionsDialog = new FractoriumOptionsDialog(this);
 	m_VarDialog = new FractoriumVariationsDialog(this);
@@ -509,6 +507,8 @@ void Fractorium::SetFixedTableHeader(QHeaderView* header, QHeaderView::ResizeMod
 /// <returns>The filename selected</returns>
 QStringList Fractorium::SetupOpenXmlDialog()
 {
+#ifndef __APPLE__
+
 	//Lazy instantiate since it takes a long time.
 	if (!m_FileDialog)
 	{
@@ -534,6 +534,15 @@ QStringList Fractorium::SetupOpenXmlDialog()
 			m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
 	}
 
+#else
+	auto defaultFilter(m_Settings->OpenXmlExt());
+	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("Flame Files (*.flam3 *.flame *.xml)"), &defaultFilter);
+	m_Settings->OpenXmlExt(defaultFilter);
+
+	if (!filenames.empty())
+		m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
+
+#endif
 	return filenames;
 }
 
@@ -545,6 +554,8 @@ QStringList Fractorium::SetupOpenXmlDialog()
 /// <returns>The filename selected</returns>
 QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 {
+#ifndef __APPLE__
+
 	//Lazy instantiate since it takes a long time.
 	//QS
 	if (!m_FileDialog)
@@ -552,9 +563,6 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 		m_FileDialog = new QFileDialog(this);
 		m_FileDialog->setViewMode(QFileDialog::List);
 	}
-
-	if (!m_FileDialog)
-		return "";
 
 	QString filename;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
@@ -583,6 +591,11 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 		}
 	}
 
+#else
+	auto defaultFilter(m_Settings->SaveXmlExt());
+	auto filename = QFileDialog::getSaveFileName(this, tr("Save flame as xml"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)"), &defaultFilter);
+	m_Settings->SaveXmlExt(defaultFilter);
+#endif
 	return filename;
 }
 
@@ -594,15 +607,14 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 /// <returns>The filename selected</returns>
 QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 {
+#ifndef __APPLE__
+
 	//Lazy instantiate since it takes a long time.
 	if (!m_FileDialog)
 	{
 		m_FileDialog = new QFileDialog(this);
 		m_FileDialog->setViewMode(QFileDialog::List);
 	}
-
-	if (!m_FileDialog)
-		return "";
 
 	QString filename;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
@@ -622,6 +634,11 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 	if (m_FileDialog->exec() == QDialog::Accepted)
 		filename = m_FileDialog->selectedFiles().value(0);
 
+#else
+	auto defaultFilter(m_Settings->SaveImageExt());
+	auto filename = QFileDialog::getSaveFileName(this, tr("Save image"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Jpeg (*.jpg);;Png (*.png);;Bmp (*.bmp)"));
+	m_Settings->SaveImageExt(defaultFilter);
+#endif
 	return filename;
 }
 
@@ -632,15 +649,14 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 /// <returns>The folder selected, with '/' appended to the end</returns>
 QString Fractorium::SetupSaveFolderDialog()
 {
+#ifndef __APPLE__
+
 	//Lazy instantiate since it takes a long time.
 	if (!m_FolderDialog)
 	{
 		m_FolderDialog = new QFileDialog(this);
 		m_FolderDialog->setViewMode(QFileDialog::List);
 	}
-
-	if (!m_FolderDialog)
-		return "";
 
 	QString filename;
 	//This must come first because it clears various internal states which allow the file text to be properly set.
@@ -658,6 +674,15 @@ QString Fractorium::SetupSaveFolderDialog()
 		filename = MakeEnd(m_FolderDialog->selectedFiles().value(0), '/');
 	}
 
+#else
+	auto filename = QFileDialog::getExistingDirectory(this, tr("Save to folder"),
+					m_Settings->SaveFolder(),
+					QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+	if (filename.size() > 0)
+		filename = MakeEnd(filename, '/');
+
+#endif
 	return filename;
 }
 

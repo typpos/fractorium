@@ -53,7 +53,7 @@
 
 namespace Ui
 {
-	class QssDialog;
+class QssDialog;
 }
 
 /// <summary>
@@ -113,12 +113,12 @@ private slots:
 
 private:
 	void SaveAsDefault();
-	void InsertCssProperty(const QString &name, const QString &value);
+	void InsertCssProperty(const QString& name, const QString& value);
 	void SetupFileDialog();
 	QString OpenFile();
 	QString SaveFile();
 
-	QStyle* m_Theme;
+	QStyle* m_Theme = nullptr;
 	QStyle* m_LastTheme;
 	QString m_LastStyle;
 	QAction* m_AddColorAction;
@@ -136,6 +136,8 @@ private:
 	QHash<QString, QString> m_StyleMap;
 	QTimer* m_ApplyTimer;
 	Fractorium* m_Parent;
-	QFileDialog* m_FileDialog;
-	Ui::QssDialog *ui;
+#ifndef __APPLE__
+	QFileDialog* m_FileDialog = nullptr;
+#endif
+	Ui::QssDialog* ui;
 };

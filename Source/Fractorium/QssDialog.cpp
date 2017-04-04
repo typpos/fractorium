@@ -44,9 +44,7 @@ bool CaseInsensitiveLessThanQ(const QString& s1, const QString& s2)
 QssDialog::QssDialog(Fractorium* parent) :
 	QDialog(parent),
 	ui(new Ui::QssDialog),
-	m_FileDialog(nullptr),
 	m_Parent(parent),
-	m_Theme(nullptr),
 	m_AddColorAction(new QAction(tr("Add Color"), this)),
 	m_AddGeomAction(new QAction(tr("Add Geometry"), this)),
 	m_AddBorderAction(new QAction(tr("Add Border"), this)),
@@ -631,13 +629,16 @@ void QssDialog::InsertCssProperty(const QString& name, const QString& value)
 /// </summary>
 void QssDialog::SetupFileDialog()
 {
+#ifndef __APPLE__
+
 	if (!m_FileDialog)
 	{
-		auto path = m_Parent->m_SettingsPath;
 		m_FileDialog = new QFileDialog(this);
-		m_FileDialog->setDirectory(path);
+		m_FileDialog->setDirectory(m_Parent->m_SettingsPath);
 		m_FileDialog->setViewMode(QFileDialog::List);
 	}
+
+#endif
 }
 
 /// <summary>
@@ -646,6 +647,7 @@ void QssDialog::SetupFileDialog()
 /// <returns>The file selected if any, else empty string.</returns>
 QString QssDialog::OpenFile()
 {
+#ifndef __APPLE__
 	QStringList filenames;
 	SetupFileDialog();
 	m_FileDialog->setFileMode(QFileDialog::ExistingFile);
@@ -658,6 +660,10 @@ QString QssDialog::OpenFile()
 		filenames = m_FileDialog->selectedFiles();
 
 	return !filenames.empty() ? filenames[0] : "";
+#else
+	auto filename = QFileDialog::getOpenFileName(this, tr("Open Stylesheet"), m_Parent->m_SettingsPath, tr("Qss (*.qss)"));
+	return filename.size() > 0 ? filename : "";
+#endif
 }
 
 /// <summary>
@@ -666,6 +672,7 @@ QString QssDialog::OpenFile()
 /// <returns>The file selected for saving if any, else empty string.</returns>
 QString QssDialog::SaveFile()
 {
+#ifndef __APPLE__
 	QStringList filenames;
 	SetupFileDialog();
 	m_FileDialog->setFileMode(QFileDialog::AnyFile);
@@ -678,4 +685,8 @@ QString QssDialog::SaveFile()
 		filenames = m_FileDialog->selectedFiles();
 
 	return !filenames.empty() ? filenames[0] : "";
+#else
+	auto filename = QFileDialog::getSaveFileName(this, tr("Save Stylesheet"), m_Parent->m_SettingsPath, tr("Qss (*.qss)"));
+	return filename.size() > 0 ? filename : "";
+#endif
 }

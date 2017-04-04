@@ -67,8 +67,9 @@
 #define XMLQUALITY			 "xml/quality"
 #define XMLSUPERSAMPLE		 "xml/supersample"
 
-#define OPENFOLDER			 "path/open"
-#define SAVEFOLDER			 "path/save"
+#define OPENFOLDER             "path/open"
+#define OPENPALETTEIMAGEFOLDER "path/openpaletteimage"
+#define SAVEFOLDER             "path/save"
 
 #define OPENXMLEXT			 "file/openxmlext"
 #define SAVEXMLEXT			 "file/savexmlext"
@@ -260,6 +261,9 @@ public:
 
 	QString OpenFolder();
 	void OpenFolder(const QString& s);
+
+	QString OpenPaletteImageFolder();
+	void OpenPaletteImageFolder(const QString& s);
 
 	QString SaveFolder();
 	void SaveFolder(const QString& s);

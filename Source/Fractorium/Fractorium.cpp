@@ -636,7 +636,7 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 
 #else
 	auto defaultFilter(m_Settings->SaveImageExt());
-	auto filename = QFileDialog::getSaveFileName(this, tr("Save image"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Jpeg (*.jpg);;Png (*.png);;Bmp (*.bmp)"));
+	auto filename = QFileDialog::getSaveFileName(this, tr("Save image"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Jpeg (*.jpg);;Png (*.png);;Bmp (*.bmp)"), &defaultFilter);
 	m_Settings->SaveImageExt(defaultFilter);
 #endif
 	return filename;

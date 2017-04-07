@@ -9,11 +9,11 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_1.0.0.2.msi](https://drive.google.com/file/d/0Bws5xPbHJph6Y2tlQ2tmdHFwNnc/view?usp=sharing)
+Download: [Fractorium_1.0.0.3.msi](https://drive.google.com/file/d/0Bws5xPbHJph6cFhON1FPYXpTVDQ/view?usp=sharing)
 
 ## Mac
 
-Download: [Fractorium_1.0.0.2.dmg](https://drive.google.com/file/d/0Bws5xPbHJph6MkpQZjVaV1dVMWM/view?usp=sharing)
+Download: [Fractorium_1.0.0.3.dmg](https://drive.google.com/file/d/0Bws5xPbHJph6Ym0tOUhaLUxtVGM/view?usp=sharing)
 
 ## Linux
 
@@ -35,11 +35,11 @@ sudo apt-get install fractorium
 
 ### Install from .deb
 
-Download: [fractorium_1.0.0.2b-0ubuntu1_amd64.deb](https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+build/12136710/+files/fractorium_1.0.0.2b-0ubuntu1_amd64.deb)
+Download: [fractorium_1.0.0.3-0ubuntu1_amd64.deb](https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_1.0.0.3-0ubuntu1_amd64.deb)
 
 ```
 cd ~/Downloads
-sudo dpkg -i fractorium_1.0.0.2b-0ubuntu1_amd64.deb
+sudo dpkg -i fractorium_1.0.0.3-0ubuntu1_amd64.deb
 ```
 
 # Building from git

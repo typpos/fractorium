@@ -474,7 +474,7 @@ public:
 		m_ParentEmber = nullptr;
 		m_ColorSpeedCache = 0;
 		m_OneMinusColorCache = 0;
-		m_Opacity = 0;
+		m_Opacity = 1;
 		m_Animate = 0;
 		m_Wind[0] = 0;
 		m_Wind[1] = 0;

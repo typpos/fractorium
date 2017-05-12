@@ -110,8 +110,8 @@ public:
 	//Virtual processing functions.
 	virtual bool Ok() const;
 	virtual size_t MemoryAvailable();
-	virtual void SetEmber(const Ember<float>& ember, eProcessAction action = eProcessAction::FULL_RENDER) { }
-	virtual void SetEmber(const Ember<double>& ember, eProcessAction action = eProcessAction::FULL_RENDER) { }
+	virtual void SetEmber(const Ember<float>& ember, eProcessAction action = eProcessAction::FULL_RENDER, bool prep = false) { }
+	virtual void SetEmber(const Ember<double>& ember, eProcessAction action = eProcessAction::FULL_RENDER, bool prep = false) { }
 	virtual bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec);
 
 	//Abstract processing functions.

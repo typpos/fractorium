@@ -843,7 +843,7 @@ double ColorTriangle::RadiusAt(const QPointF& pos, const QRect& rect) const
 {
 	double mousexdist = pos.x() - (double) rect.center().x();
 	double mouseydist = pos.y() - (double) rect.center().y();
-	return sqrt(mousexdist * mousexdist + mouseydist * mouseydist);
+	return std::sqrt(mousexdist * mousexdist + mouseydist * mouseydist);
 }
 
 /*!
@@ -857,7 +857,7 @@ double ColorTriangle::AngleAt(const QPointF& pos, const QRect& rect) const
 {
 	double mousexdist = pos.x() - (double) rect.center().x();
 	double mouseydist = pos.y() - (double) rect.center().y();
-	double mouserad = sqrt(mousexdist * mousexdist + mouseydist * mouseydist);
+	double mouserad = std::sqrt(mousexdist * mousexdist + mouseydist * mouseydist);
 
 	if (mouserad == 0.0)
 		return 0.0;
@@ -885,7 +885,7 @@ inline double qsqr(double a)
 */
 inline double vlen(double x, double y)
 {
-	return sqrt(qsqr(x) + qsqr(y));
+	return std::sqrt(qsqr(x) + qsqr(y));
 }
 
 /*! \internal
@@ -1162,7 +1162,7 @@ QPointF ColorTriangle::MovePointToTriangle(double x, double y, const Vertex& a,
 		// the a-b vector with this distance and the angle between a-b
 		// and a-(x,y) to determine the point of intersection of the
 		// perpendicular projection from (x,y) onto a-b.
-		double pdist = sqrt(qsqr(x - a.point.x()) + qsqr(y - a.point.y()));
+		double pdist = std::sqrt(qsqr(x - a.point.x()) + qsqr(y - a.point.y()));
 		// the length of all edges is always > 0
 		double p0x = a.point.x() + ((b.point.x() - a.point.x()) / vlen(v2xB, v2yB)) * cos(alphaA) * pdist;
 		double p0y = a.point.y() + ((b.point.y() - a.point.y()) / vlen(v2xB, v2yB)) * cos(alphaA) * pdist;
@@ -1186,7 +1186,7 @@ QPointF ColorTriangle::MovePointToTriangle(double x, double y, const Vertex& a,
 	else if (angleBetweenAngles(angleP, angleB, angleC))
 	{
 		// If (x,y) is in the b-c area, project onto the b-c vector.
-		double pdist = sqrt(qsqr(x - b.point.x()) + qsqr(y - b.point.y()));
+		double pdist = std::sqrt(qsqr(x - b.point.x()) + qsqr(y - b.point.y()));
 		// the length of all edges is always > 0
 		double p0x = b.point.x() + ((c.point.x() - b.point.x()) / vlen(v2xC, v2yC)) * cos(alphaB) * pdist;
 		double p0y = b.point.y() + ((c.point.y() - b.point.y()) / vlen(v2xC, v2yC)) * cos(alphaB) * pdist;
@@ -1206,7 +1206,7 @@ QPointF ColorTriangle::MovePointToTriangle(double x, double y, const Vertex& a,
 	else if (angleBetweenAngles(angleP, angleC, angleA))
 	{
 		// If (x,y) is in the c-a area, project onto the c-a vector.
-		double pdist = sqrt(qsqr(x - c.point.x()) + qsqr(y - c.point.y()));
+		double pdist = std::sqrt(qsqr(x - c.point.x()) + qsqr(y - c.point.y()));
 		// the length of all edges is always > 0
 		double p0x = c.point.x() + ((a.point.x() - c.point.x()) / vlen(v2xA, v2yA)) * cos(alphaC) * pdist;
 		double p0y = c.point.y() + ((a.point.y() - c.point.y()) / vlen(v2xA, v2yA)) * cos(alphaC) * pdist;

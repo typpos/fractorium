@@ -569,7 +569,9 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 		m_Renderer->Callback(this);
 		m_Renderer->NumChannels(4);//Always using 4 since the GL texture is RGBA.
 		m_Renderer->ReclaimOnResize(true);
-		m_Renderer->SetEmber(m_Ember);//Give it an initial ember, will be updated many times later.
+		//Give it an initial ember, will be updated many times later.
+		//Even though the bounds are computed when starting the next render. The OpenGL draw calls use these values, which might get called before the render starts.
+		m_Renderer->SetEmber(m_Ember, eProcessAction::FULL_RENDER, true);
 		m_Renderer->EarlyClip(s->EarlyClip());
 		m_Renderer->YAxisUp(s->YAxisUp());
 		m_Renderer->ThreadCount(s->ThreadCount());

@@ -634,7 +634,6 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 	size_t iterCount;
 	pair<size_t, size_t> p(0, 0);
 	size_t strips;
-	bool b = false;
 	uint channels = m_FinalRenderDialog->Ext() == "png" ? 4 : 3;//4 channels for Png, else 3.
 	SyncGuiToEmbers();
 
@@ -642,13 +641,8 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 	{
 		strips = VerifyStrips(m_Ember->m_FinalRasH, m_FinalRenderDialog->Strips(),
 		[&](const string & s) {}, [&](const string & s) {}, [&](const string & s) {});
-		m_Renderer->SetEmber(*m_Ember);
-		m_Renderer->CreateSpatialFilter(b);
-		m_Renderer->CreateTemporalFilter(b);
+		m_Renderer->SetEmber(*m_Ember, eProcessAction::FULL_RENDER, true);
 		m_Renderer->NumChannels(channels);
-		m_Renderer->ComputeBounds();
-		m_Renderer->ComputeQuality();
-		m_Renderer->ComputeCamera();
 		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);
 		p = m_Renderer->MemoryRequired(strips, true, m_FinalRenderDialog->DoSequence());
 		iterCount = m_Renderer->TotalIterCount(strips);
@@ -657,13 +651,8 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 	{
 		for (auto& renderer : m_Renderers)
 		{
-			renderer->SetEmber(*m_Ember);
-			renderer->CreateSpatialFilter(b);
-			renderer->CreateTemporalFilter(b);
+			renderer->SetEmber(*m_Ember, eProcessAction::FULL_RENDER, true);
 			renderer->NumChannels(channels);
-			renderer->ComputeBounds();
-			renderer->ComputeQuality();
-			renderer->ComputeCamera();
 		}
 
 		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);

@@ -1236,16 +1236,10 @@ public:
 	/// <returns>The number of iterations ran</returns>
 	size_t EstimateBoundingBox(Ember<T>& ember, T eps, size_t samples, T* bmin, T* bmax)
 	{
-		bool newAlloc = false;
 		size_t i, lowTarget, highTarget;
 		T min[2], max[2];
 		IterParams<T> params;
-		m_Renderer->SetEmber(ember);
-		m_Renderer->CreateSpatialFilter(newAlloc);
-		m_Renderer->CreateDEFilter(newAlloc);
-		m_Renderer->ComputeBounds();
-		m_Renderer->ComputeQuality();
-		m_Renderer->ComputeCamera();
+		m_Renderer->SetEmber(ember, eProcessAction::FULL_RENDER, true);
 
 		if (ember.XaosPresent())
 			m_Iterator = m_XaosIterator.get();

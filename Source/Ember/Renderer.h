@@ -58,7 +58,7 @@ public:
 	virtual void ComputeBounds() override;
 	virtual void ComputeQuality() override;
 	virtual void ComputeCamera() override;
-	virtual void SetEmber(const Ember<T>& ember, eProcessAction action = eProcessAction::FULL_RENDER) override;
+	virtual void SetEmber(const Ember<T>& ember, eProcessAction action = eProcessAction::FULL_RENDER, bool prep = false) override;
 	template <typename C>
 	void SetEmber(const C& embers);
 	void MoveEmbers(vector<Ember<T>>& embers);

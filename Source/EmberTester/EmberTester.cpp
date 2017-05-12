@@ -1492,7 +1492,6 @@ void TestCpuGpuResults(size_t platform, size_t device)
 
 		for (int iter = 0; iter < iters; iter++)
 		{
-			bool newAlloc = false;
 			Point<T> p, p2;
 			Ember<T> ember;
 			Xform<T> xform;
@@ -1506,12 +1505,7 @@ void TestCpuGpuResults(size_t platform, size_t device)
 			xform.AddVariation(varCopy);
 			ember.AddXform(xform);
 			ember.CacheXforms();
-			renderer.SetEmber(ember);
-			renderer.CreateSpatialFilter(newAlloc);
-			renderer.CreateDEFilter(newAlloc);
-			renderer.ComputeBounds();
-			renderer.ComputeQuality();
-			renderer.ComputeCamera();
+			renderer.SetEmber(ember, eProcessAction::FULL_RENDER, true);
 			renderer.AssignIterator();
 
 			if (!renderer.Alloc())
@@ -1570,7 +1564,6 @@ void TestGpuVectorRead(size_t platform, size_t device)
 	RendererCL<T, float> renderer(devices);
 	points.resize(renderer.TotalIterKernelCount());
 	Variation<T>* var = vlf->GetVariation(eVariationId::VAR_LINEAR);
-	bool newAlloc = false;
 	Point<T> p, p2;
 	Ember<T> ember;
 	Xform<T> xform;
@@ -1584,12 +1577,7 @@ void TestGpuVectorRead(size_t platform, size_t device)
 	xform.AddVariation(varCopy);
 	ember.AddXform(xform);
 	ember.CacheXforms();
-	renderer.SetEmber(ember);
-	renderer.CreateSpatialFilter(newAlloc);
-	renderer.CreateDEFilter(newAlloc);
-	renderer.ComputeBounds();
-	renderer.ComputeQuality();
-	renderer.ComputeCamera();
+	renderer.SetEmber(ember, eProcessAction::FULL_RENDER, true);
 	renderer.AssignIterator();
 
 	if (!renderer.Alloc())

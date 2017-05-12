@@ -119,9 +119,11 @@ void Renderer<T, bucketT>::ComputeCamera()
 /// <param name="action">The requested process action. Note that it's critical the user supply the proper value here.
 /// For example: Changing dimensions without setting action to eProcessAction::FULL_RENDER will crash the program.
 /// However, changing only the brightness and setting action to ACCUM_ONLY is perfectly fine.
+/// <param name="prep">Whether to also compute bounds, camera, filters etc. This is useful when other code outside of this needs these values
+/// before the render actually starts. Default: false.</param>
 /// </param>
 template <typename T, typename bucketT>
-void Renderer<T, bucketT>::SetEmber(const Ember<T>& ember, eProcessAction action)
+void Renderer<T, bucketT>::SetEmber(const Ember<T>& ember, eProcessAction action, bool prep)
 {
 	ChangeVal([&]
 	{
@@ -131,6 +133,16 @@ void Renderer<T, bucketT>::SetEmber(const Ember<T>& ember, eProcessAction action
 		m_Ember = m_Embers[0];
 		m_EmbersP = &m_Embers;
 	}, action);
+
+	if (prep)
+	{
+		bool b = false;
+		CreateSpatialFilter(b);
+		CreateTemporalFilter(b);
+		ComputeBounds();
+		ComputeQuality();
+		ComputeCamera();
+	}
 }
 
 /// <summary>

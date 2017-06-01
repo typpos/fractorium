@@ -308,10 +308,11 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 	{
 		if (pre && m_Fractorium->DrawAllPre())//Draw all pre affine if specified.
 		{
-			for (size_t i = 0; i < ember->TotalXformCount(); i++)
+			size_t i = 0;
+
+			while (auto xform = ember->GetTotalXform(i))
 			{
-				auto xform = ember->GetTotalXform(i);
-				bool selected = m_Fractorium->IsXformSelected(i) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
+				bool selected = m_Fractorium->IsXformSelected(i++) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
 				DrawAffine(xform, true, selected);
 			}
 		}
@@ -322,10 +323,11 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 
 		if (post && m_Fractorium->DrawAllPost())//Draw all post affine if specified.
 		{
-			for (size_t i = 0; i < ember->TotalXformCount(); i++)
+			size_t i = 0;
+
+			while (auto xform = ember->GetTotalXform(i))
 			{
-				auto xform = ember->GetTotalXform(i);
-				bool selected = m_Fractorium->IsXformSelected(i) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
+				bool selected = m_Fractorium->IsXformSelected(i++) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
 				DrawAffine(xform, false, selected);
 			}
 		}
@@ -1029,7 +1031,7 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 	bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
 	bool preAll = pre && m_Fractorium->DrawAllPre();
 	bool postAll = post && m_Fractorium->DrawAllPost();
-	int bestIndex = -1;
+	int i = 0, bestIndex = -1;
 	T bestDist = 10;
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	m_HoverType = eHoverType::HoverNone;
@@ -1053,10 +1055,8 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 		}
 
 		//Check all xforms.
-		for (int i = 0; i < int(ember->TotalXformCount()); i++)
+		while (auto xform = ember->GetTotalXform(i))
 		{
-			auto xform = ember->GetTotalXform(i);
-
 			if (preAll || (pre && m_HoverXform == xform))//Only check pre affine if they are shown.
 			{
 				if (CheckXformHover(xform, glCoords, bestDist, true, false))
@@ -1074,6 +1074,8 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 					bestIndex = i;
 				}
 			}
+
+			i++;
 		}
 	}
 

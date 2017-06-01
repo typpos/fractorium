@@ -772,7 +772,7 @@ template<typename T>
 void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberStats& stats, Timing& renderTimer)
 {
 	rlg l(m_ProgressCs);
-	string renderTimeString = renderTimer.Format(renderTimer.Toc()), totalTimeString;
+	string renderTimeString = renderTimer.Format(renderTimer.Toc());
 	QString status, filename = ComposePath(QString::fromStdString(ember.m_Name));
 	QString itersString = ToString<qulonglong>(stats.m_Iters);
 	QString itersPerSecString = ToString<qulonglong>(size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)));
@@ -789,10 +789,9 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 			xmlFreeDoc(tempEdit);
 	}
 
-	status = "Pure render time: " + QString::fromStdString(renderTimeString);
+	status = "Render time: " + QString::fromStdString(renderTimeString);
 	Output(status);
-	totalTimeString = renderTimer.Format(renderTimer.Toc());
-	status = "Total time: " + QString::fromStdString(totalTimeString) + "\nTotal iters: " + itersString + "\nIters/second: " + itersPerSecString + "\n";
+	status = "Total iters: " + itersString + "\nIters/second: " + itersPerSecString + "\n";
 	Output(status);
 	QMetaObject::invokeMethod(m_FinalRenderDialog, "MoveCursorToEnd", Qt::QueuedConnection);
 

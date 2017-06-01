@@ -96,6 +96,8 @@ enum class eOptionIDs : et
 	OPT_PRIORITY,
 
 	OPT_SS,//Float value args.
+	OPT_WS,
+	OPT_HS,
 	OPT_QS,
 	OPT_QUALITY,
 	OPT_DE_MIN,
@@ -111,7 +113,8 @@ enum class eOptionIDs : et
 	OPT_USEMEM,
 	OPT_LOOPS,
 
-	OPT_OPENCL_DEVICE,//String value args.
+	OPT_SCALE_TYPE,//String value args.
+	OPT_OPENCL_DEVICE,
 	OPT_ISAAC_SEED,
 	OPT_IN,
 	OPT_OUT,
@@ -119,7 +122,6 @@ enum class eOptionIDs : et
 	OPT_SUFFIX,
 	OPT_FORMAT,
 	OPT_PALETTE_FILE,
-	//OPT_PALETTE_IMAGE,
 	OPT_ID,
 	OPT_URL,
 	OPT_NICK,
@@ -225,6 +227,35 @@ private:
 	T m_Val;
 };
 
+
+/// <summary>
+/// Class to force a stringstream to not split on space and
+/// read to the end of the string.
+/// </summary>
+struct NoDelimiters : std::ctype<char>
+{
+	/// <summary>
+	/// Constructor that passes the table created in GetTable() to the base.
+	/// </summary>
+	NoDelimiters()
+		: std::ctype<char>(GetTable())
+	{
+	}
+
+	/// <summary>
+	/// Create and return a pointer to an empty table with no delimiters.
+	/// </summary>
+	/// <returns>A pointer to the empty delimiter table</returns>
+	static std::ctype_base::mask const* GetTable()
+	{
+		typedef std::ctype<char> cctype;
+		static const cctype::mask* const_rc = cctype::classic_table();
+		static cctype::mask rc[cctype::table_size];
+		std::memset(rc, 0, cctype::table_size * sizeof(cctype::mask));
+		return &rc[0];
+	}
+};
+
 /// <summary>
 /// Macros for setting up and parsing various option types.
 /// </summary>
@@ -296,7 +327,7 @@ public:
 	/// </summary>
 	EmberOptions()
 	{
-		const size_t size = 40;
+		const size_t size = (size_t)eOptionIDs::OPT_EXTRAS;
 		m_BoolArgs.reserve(size);
 		m_IntArgs.reserve(size);
 		m_UintArgs.reserve(size);
@@ -374,6 +405,8 @@ public:
 		INITUINTOPTION(Padding,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PADDING,          _T("--padding"),              0,                    SO_REQ_SEP, "   --padding=<val>           Override the amount of zero padding added to each flame name when generating a sequence. Useful for programs like ffmpeg which require fixed width filenames [default: 0 (auto calculate padding)].\n"));
 		//Double.
 		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1.0,                   SO_REQ_SEP,  "   --ss=<val>                Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(WidthScale,   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_WS,               _T("--ws"),                   1.0,                   SO_REQ_SEP,  "   --ws=<val>                Width scale. The width is scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(HeightScale,  Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_HS,               _T("--hs"),                   1.0,                   SO_REQ_SEP,  "   --hs=<val>                Height scale. The height is scaled by this amount [default: 1.0].\n"));
 		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1.0,                   SO_REQ_SEP,  "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
 		INITDOUBLEOPTION(Quality,	   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		  _T("--quality"),				0.0,                   SO_REQ_SEP,  "   --quality=<val>           Override the quality of the flame if not 0 [default: 0].\n"));
 		INITDOUBLEOPTION(DeMin,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,			  _T("--demin"),			   -1.0,                   SO_REQ_SEP,  "   --demin=<val>             Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
@@ -391,6 +424,7 @@ public:
 		INITDOUBLEOPTION(UseMem,       Eod(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_USEMEM,           _T("--use_mem"),              0.0,                  SO_REQ_SEP,  "   --use_mem=<val>           Number of bytes of memory to use [default: max system memory].\n"));
 		INITDOUBLEOPTION(Loops,        Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_LOOPS,            _T("--loops"),                1.0,                  SO_REQ_SEP,  "   --loops=<val>             Number of times to rotate each control point in sequence [default: 1].\n"));
 		//String.
+		INITSTRINGOPTION(ScaleType,    Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SCALE_TYPE, 	  _T("--scaletype"),			"none",				  SO_REQ_SEP,  "   --scaletype               The type of scaling to use with the --ws or --hs options. Valid values are --width --height [default: width].\n"));
 		INITSTRINGOPTION(Device,	   Eos(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_OPENCL_DEVICE,	  _T("--device"),				"0",				  SO_REQ_SEP,  "   --device                  The comma-separated OpenCL device indices to use. Single device: 0 Multi device: 0,1,3,4 [default: 0].\n"));
 		INITSTRINGOPTION(IsaacSeed,    Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_ISAAC_SEED,       _T("--isaac_seed"),           "",                   SO_REQ_SEP,  "   --isaac_seed=<val>        Character-based seed for the random number generator [default: random].\n"));
 		INITSTRINGOPTION(Input,        Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_IN,               _T("--in"),                   "",                   SO_REQ_SEP,  "   --in=<val>                Name of the input file.\n"));
@@ -435,6 +469,7 @@ public:
 		vector<CSimpleOpt::SOption> sOptions = options.GetSimpleOptions();
 		CSimpleOpt args(argc, argv, sOptions.data());
 		stringstream ss;
+		ss.imbue(std::locale(std::locale(), new NoDelimiters()));
 
 		//Process args.
 		while (args.Next())
@@ -518,7 +553,9 @@ public:
 					PARSEOPTION(eOptionIDs::OPT_MAX_XFORMS, MaxXforms);
 					PARSEOPTION(eOptionIDs::OPT_START_COUNT, StartCount);
 					PARSEOPTION(eOptionIDs::OPT_PADDING, Padding);
-					PARSEOPTION(eOptionIDs::OPT_SS, SizeScale);//Float args.
+					PARSEOPTION(eOptionIDs::OPT_SS, SizeScale);//Double args.
+					PARSEOPTION(eOptionIDs::OPT_WS, WidthScale);
+					PARSEOPTION(eOptionIDs::OPT_HS, HeightScale);
 					PARSEOPTION(eOptionIDs::OPT_QS, QualityScale);
 					PARSEOPTION(eOptionIDs::OPT_QUALITY, Quality);
 					PARSEOPTION(eOptionIDs::OPT_DE_MIN, DeMin);
@@ -533,7 +570,8 @@ public:
 					PARSEOPTION(eOptionIDs::OPT_OFFSETY, OffsetY);
 					PARSEOPTION(eOptionIDs::OPT_USEMEM, UseMem);
 					PARSEOPTION(eOptionIDs::OPT_LOOPS, Loops);
-					PARSEOPTION(eOptionIDs::OPT_OPENCL_DEVICE, Device);//String args.
+					PARSEOPTION(eOptionIDs::OPT_SCALE_TYPE, ScaleType);//String args.
+					PARSEOPTION(eOptionIDs::OPT_OPENCL_DEVICE, Device);
 					PARSEOPTION(eOptionIDs::OPT_ISAAC_SEED, IsaacSeed);
 					PARSEOPTION(eOptionIDs::OPT_IN, Input);
 					PARSEOPTION(eOptionIDs::OPT_OUT, Out);
@@ -541,7 +579,6 @@ public:
 					PARSEOPTION(eOptionIDs::OPT_SUFFIX, Suffix);
 					PARSEOPTION(eOptionIDs::OPT_FORMAT, Format);
 					PARSEOPTION(eOptionIDs::OPT_PALETTE_FILE, PalettePath);
-						//PARSESTRINGOPTION(eOptionIDs::OPT_PALETTE_IMAGE, PaletteImage);
 					PARSEOPTION(eOptionIDs::OPT_ID, Id);
 					PARSEOPTION(eOptionIDs::OPT_URL, Url);
 					PARSEOPTION(eOptionIDs::OPT_NICK, Nick);
@@ -809,6 +846,8 @@ public:
 	Eou Padding;
 
 	Eod SizeScale;//Value double.
+	Eod WidthScale;
+	Eod HeightScale;
 	Eod QualityScale;
 	Eod Quality;
 	Eod DeMin;
@@ -824,7 +863,8 @@ public:
 	Eod UseMem;
 	Eod Loops;
 
-	Eos Device;//Value string.
+	Eos ScaleType;//Value string.
+	Eos Device;
 	Eos IsaacSeed;
 	Eos Input;
 	Eos Out;
@@ -832,7 +872,6 @@ public:
 	Eos Suffix;
 	Eos Format;
 	Eos PalettePath;
-	//Eos PaletteImage;
 	Eos Id;
 	Eos Url;
 	Eos Nick;

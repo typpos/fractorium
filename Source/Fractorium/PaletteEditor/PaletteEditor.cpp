@@ -27,6 +27,7 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 	connect(m_ColorPicker,                         SIGNAL(ColorChanged(const QColor&)),              this, SLOT(OnColorPickerColorChanged(const QColor&)));
 	connect(m_GradientColorView,                   SIGNAL(ArrowMove(qreal, const GradientArrow&)),   this, SLOT(OnArrowMoved(qreal, const GradientArrow&)));
 	connect(m_GradientColorView,                   SIGNAL(ArrowDoubleClicked(const GradientArrow&)), this, SLOT(OnArrowDoubleClicked(const GradientArrow&)));
+	connect(m_GradientColorView,                   SIGNAL(ColorIndexMove(size_t, float)),            this, SLOT(OnColorIndexMove(size_t, float)));
 	connect(ui->CreatePaletteFromImageButton,      SIGNAL(clicked()),                                this, SLOT(OnCreatePaletteFromImageButtonClicked()));
 	connect(ui->CreatePaletteAgainFromImageButton, SIGNAL(clicked()),                                this, SLOT(OnCreatePaletteAgainFromImageButton()));
 	connect(ui->AddColorButton,                    SIGNAL(clicked()),                                this, SLOT(OnAddColorButtonClicked()));
@@ -54,11 +55,8 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 
 	for (auto& pal : pals)
 	{
-		if (m_PaletteList->IsModifiable(pal.first))//Only add user created palettes.
-		{
-			QFileInfo info(QString::fromStdString(pal.first));
-			ui->PaletteFilenameCombo->addItem(info.fileName());
-		}
+		QFileInfo info(QString::fromStdString(pal.first));
+		ui->PaletteFilenameCombo->addItem(info.fileName());
 	}
 
 	if (ui->PaletteFilenameCombo->count() > 0)
@@ -75,15 +73,6 @@ bool PaletteEditor::Sync()
 }
 
 /// <summary>
-/// Get a pointer to the palette pixmap from the underlying gradient color view.
-/// </summary>
-/// <returns>QPixmap*</returns>
-QPixmap* PaletteEditor::GetBackGround()
-{
-	return m_GradientColorView->GetBackGround();
-}
-
-/// <summary>
 /// Populate and retrieve a reference to the palette from the underlying gradient color view
 /// using the specified number of elements.
 /// </summary>
@@ -96,23 +85,43 @@ Palette<float>& PaletteEditor::GetPalette(int size)
 
 /// <summary>
 /// Set the palette of the underlying gradient color view.
-/// Note this assignment will only take place if
-/// the number of source colors is 2 or more.
-/// This will only be the case if it was a user created palette made here.
-/// All palettes gotten from elsewhere are not assignable.
+/// This can be a modifiable palette or a fixed one.
 /// </summary>
 /// <param name="palette">The palette to assign</param>
-void PaletteEditor::SetPalette(Palette<float>& palette)
+void PaletteEditor::SetPalette(const Palette<float>& palette)
 {
-	if (palette.m_SourceColors.size() > 1)
-	{
-		m_PaletteIndex = std::numeric_limits<int>::max();
-		m_GradientColorView->SetPalette(palette);
-		auto& arrows = m_GradientColorView->GetArrows();
+	auto combo = ui->PaletteFilenameCombo;
+	m_PaletteIndex = std::numeric_limits<int>::max();
+	m_GradientColorView->SetPalette(palette);
+	auto& arrows = m_GradientColorView->GetArrows();
 
-		if (!arrows.empty())
-			m_ColorPicker->SetColorPanelColor(arrows.begin()->second.Color());
-	}
+	if (!arrows.empty())
+		m_ColorPicker->SetColorPanelColor(arrows.begin()->second.Color());//Will emit PaletteChanged() if color changed...
+
+	QFileInfo info(QString::fromStdString(*palette.m_Filename.get()));
+	combo->setCurrentIndex(combo->findData(info.fileName(), Qt::DisplayRole));
+	EnablePaletteControls();
+	EmitPaletteChanged();//...So emit here just to be safe.
+}
+
+/// <summary>
+/// Return a temporary copy of the xform color indices as a map.
+/// The keys are the xform indices, and the values are the color indices.
+/// </summary>
+/// <param name="palette">The color indices</param>
+map<size_t, float> PaletteEditor::GetColorIndices() const
+{
+	return m_GradientColorView->GetColorIndices();
+}
+
+/// <summary>
+/// Assign the values of the xform color indices to the arrows.
+/// This will clear out any existing values first.
+/// </summary>
+/// <param name="palette">The color indices to assign</param>
+void PaletteEditor::SetColorIndices(const map<size_t, float>& indices)
+{
+	m_GradientColorView->SetColorIndices(indices);
 }
 
 /// <summary>
@@ -229,7 +238,9 @@ void PaletteEditor::OnCreatePaletteAgainFromImageButton()
 void PaletteEditor::OnColorPickerColorChanged(const QColor& col)
 {
 	m_GradientColorView->SetFocusColor(col);
-	EmitPaletteChanged();
+
+	if (m_GradientColorView->ArrowCount())
+		EmitPaletteChanged();
 }
 
 /// <summary>
@@ -252,6 +263,7 @@ void PaletteEditor::OnArrowDoubleClicked(const GradientArrow& arrow)
 void PaletteEditor::OnSyncCheckBoxStateChanged(int state)
 {
 	EmitPaletteChanged();
+	EmitColorIndexChanged(std::numeric_limits<size_t>::max(), 0);//Pass special value to update all.
 }
 
 /// <summary>
@@ -268,7 +280,7 @@ void PaletteEditor::OnPaletteFilenameComboChanged(const QString& text)
 		::FillPaletteTable(text.toStdString(), paletteTable, m_PaletteList);
 		auto fullname = m_PaletteList->GetFullPathFromFilename(m_CurrentPaletteFilePath);
 		ui->PaletteFilenameCombo->setToolTip(QString::fromStdString(fullname));
-		OnPaletteCellClicked(0, 1);
+		EnablePaletteFileControls();
 	}
 }
 
@@ -302,8 +314,11 @@ void PaletteEditor::OnPaletteCellChanged(int row, int col)
 	{
 		if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		{
-			palette->m_Name = ui->PaletteListTable->item(row, col)->text().toStdString();
-			emit PaletteFileChanged();
+			if (!palette->m_SourceColors.empty())
+			{
+				palette->m_Name = ui->PaletteListTable->item(row, col)->text().toStdString();
+				emit PaletteFileChanged();
+			}
 		}
 	}
 }
@@ -411,12 +426,34 @@ void PaletteEditor::OnArrowMoved(qreal, const GradientArrow&)
 }
 
 /// <summary>
+/// Emit an xform color index changed event.
+/// Called when one of the top arrows are moved.
+/// </summary>
+/// <param name="index">The index of the xform whose color index has been changed. Special value of size_t max to update all</param>
+/// <param name="value">The value of the color index</param>
+void PaletteEditor::OnColorIndexMove(size_t index, float value)
+{
+	EmitColorIndexChanged(index, value);
+}
+
+/// <summary>
 /// Emit a palette changed event if the sync checkbox is checked.
 /// </summary>
 void PaletteEditor::EmitPaletteChanged()
 {
 	if (ui->SyncCheckBox->isChecked())
 		emit PaletteChanged();
+}
+
+/// <summary>
+/// Emit an xform color index changed event if the sync checkbox is checked.
+/// </summary>
+/// <param name="index">The index of the xform whose color index has been changed. Special value of size_t max to update all</param>
+/// <param name="value">The value of the color index</param>
+void PaletteEditor::EmitColorIndexChanged(size_t index, float value)
+{
+	if (ui->SyncCheckBox->isChecked())
+		emit ColorIndexChanged(index, value);
 }
 
 /// <summary>
@@ -513,4 +550,32 @@ map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filena
 	}
 
 	return colors;
+}
+
+/// <summary>
+/// Enable/disable controls related to switching between modifiable and fixed palette files.
+/// </summary>
+void PaletteEditor::EnablePaletteFileControls()
+{
+	bool b = m_PaletteList->IsModifiable(m_CurrentPaletteFilePath);//At least one in the file is not fixed.
+	ui->DeletePaletteButton->setEnabled(b);
+	ui->CopyPaletteFileButton->setEnabled(b);
+	ui->AppendPaletteButton->setEnabled(b);
+}
+
+/// <summary>
+/// Enable/disable controls related to switching between modifiable and fixed palettes.
+/// </summary>
+void PaletteEditor::EnablePaletteControls()
+{
+	auto& palette = m_GradientColorView->GetPalette(256);
+	bool b = !palette.m_SourceColors.empty();
+	ui->OverwritePaletteButton->setEnabled(b);
+	ui->AddColorButton->setEnabled(b);
+	ui->DistributeColorsButton->setEnabled(b);
+	ui->AutoDistributeCheckBox->setEnabled(b);
+	ui->RandomColorsButton->setEnabled(b);
+	ui->RemoveColorButton->setEnabled(b);
+	ui->ResetColorsButton->setEnabled(b);
+	ui->ArrowsSpinBox->setEnabled(b);
 }

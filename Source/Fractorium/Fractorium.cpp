@@ -23,6 +23,7 @@ Fractorium::Fractorium(QWidget* p)
 	Timing t;
 	ui.setupUi(this);
 	m_Info = OpenCLInfo::Instance();
+	qRegisterMetaType<size_t>("size_t");
 	qRegisterMetaType<QVector<int>>("QVector<int>");//For previews.
 	qRegisterMetaType<vector<byte>>("vector<byte>");
 	qRegisterMetaType<EmberTreeWidgetItemBase*>("EmberTreeWidgetItemBase*");

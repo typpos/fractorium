@@ -38,7 +38,7 @@ template <typename T>
 string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember, const string& parVarDefines, const string& globalSharedDefines, bool lockAccum, bool doAccum)
 {
 	bool doublePrecision = typeid(T) == typeid(double);
-	size_t i, v, varIndex, varCount, totalXformCount = ember.TotalXformCount();
+	size_t i = 0, v, varIndex, varCount;
 	ostringstream kernelIterBody, xformFuncs, os;
 	vector<Variation<T>*> variations;
 	xformFuncs << VariationStateString(ember);
@@ -49,9 +49,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		if (var)
 			xformFuncs << var->OpenCLFuncsString();
 
-	for (i = 0; i < totalXformCount; i++)
+	while (auto xform = ember.GetTotalXform(i))
 	{
-		auto xform = ember.GetTotalXform(i);
 		bool needPrecalcSumSquares = false;
 		bool needPrecalcSqrtSumSquares = false;
 		bool needPrecalcAngles = false;
@@ -206,6 +205,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		xformFuncs << "\toutPoint->m_ColorX = tempColor + xform->m_DirectColor * (outPoint->m_ColorX - tempColor);\n";
 		xformFuncs << "}\n"
 				   << "\n";
+		i++;
 	}
 
 	os <<
@@ -536,31 +536,28 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 template <typename T>
 string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 {
-	size_t i, j, xformCount = ember.TotalXformCount();
+	size_t i = 0, j;
 	vector<string> funcNames;//Can't use a set here because they sort and we must preserve the insertion order due to nested function calls.
 	ostringstream os;
 	static string zeps = "Zeps";
 
-	for (i = 0; i < xformCount; i++)
+	while (auto xform = ember.GetTotalXform(i++))
 	{
-		if (auto xform = ember.GetTotalXform(i))
+		size_t varCount = xform->TotalVariationCount();
+
+		if (xform->NeedPrecalcAngles())
+			if (!Contains(funcNames, zeps))
+				funcNames.push_back(zeps);
+
+		for (j = 0; j < varCount; j++)
 		{
-			size_t varCount = xform->TotalVariationCount();
-
-			if (xform->NeedPrecalcAngles())
-				if (!Contains(funcNames, zeps))
-					funcNames.push_back(zeps);
-
-			for (j = 0; j < varCount; j++)
+			if (auto var = xform->GetVariation(j))
 			{
-				if (auto var = xform->GetVariation(j))
-				{
-					auto names = var->OpenCLGlobalFuncNames();
+				auto names = var->OpenCLGlobalFuncNames();
 
-					for (auto& name : names)
-						if (!Contains(funcNames, name))
-							funcNames.push_back(name);
-				}
+				for (auto& name : names)
+					if (!Contains(funcNames, name))
+						funcNames.push_back(name);
 			}
 		}
 	}
@@ -618,43 +615,42 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 template <typename T>
 void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals, bool doString)
 {
-	size_t i, j, k, size = 0, xformCount = ember.TotalXformCount();
+	size_t i = 0, j, k, size = 0;
 	ostringstream os;
 
 	if (doVals)
 		params.second.clear();
 
-	for (i = 0; i < xformCount; i++)
+	while (auto xform = ember.GetTotalXform(i))
 	{
-		if (auto xform = ember.GetTotalXform(i))
+		size_t varCount = xform->TotalVariationCount();
+
+		for (j = 0; j < varCount; j++)
 		{
-			size_t varCount = xform->TotalVariationCount();
-
-			for (j = 0; j < varCount; j++)
+			if (auto parVar = dynamic_cast<ParametricVariation<T>*>(xform->GetVariation(j)))
 			{
-				if (auto parVar = dynamic_cast<ParametricVariation<T>*>(xform->GetVariation(j)))
+				for (k = 0; k < parVar->ParamCount(); k++)
 				{
-					for (k = 0; k < parVar->ParamCount(); k++)
+					if (!parVar->Params()[k].IsState())
 					{
-						if (!parVar->Params()[k].IsState())
+						if (doString)
+							os << "#define " << ToUpper(parVar->Params()[k].Name()) << "_" << i << " " << size << "\n";//Uniquely identify this param in this variation in this xform.
+
+						auto elements = parVar->Params()[k].Size() / sizeof(T);
+
+						if (doVals)
 						{
-							if (doString)
-								os << "#define " << ToUpper(parVar->Params()[k].Name()) << "_" << i << " " << size << "\n";//Uniquely identify this param in this variation in this xform.
-
-							auto elements = parVar->Params()[k].Size() / sizeof(T);
-
-							if (doVals)
-							{
-								for (auto l = 0; l < elements; l++)
-									params.second.push_back(*(parVar->Params()[k].Param() + l));
-							}
-
-							size += elements;
+							for (auto l = 0; l < elements; l++)
+								params.second.push_back(*(parVar->Params()[k].Param() + l));
 						}
+
+						size += elements;
 					}
 				}
 			}
 		}
+
+		i++;
 	}
 
 	if (doString)
@@ -676,7 +672,7 @@ void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<
 template <typename T>
 void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals, bool doString)
 {
-	size_t i, j, offset = 0, xformCount = ember.TotalXformCount();
+	size_t i = 0, j, offset = 0;
 	string s;
 	vector<string> dataNames;//Can't use a set here because they sort and we must preserve the insertion order due to nested function calls.
 	ostringstream os;
@@ -685,35 +681,32 @@ void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, p
 	if (doVals)
 		params.second.clear();
 
-	for (i = 0; i < xformCount; i++)
+	while (auto xform = ember.GetTotalXform(i++))
 	{
-		if (auto xform = ember.GetTotalXform(i))
+		size_t varCount = xform->TotalVariationCount();
+
+		for (j = 0; j < varCount; j++)
 		{
-			size_t varCount = xform->TotalVariationCount();
-
-			for (j = 0; j < varCount; j++)
+			if (auto var = xform->GetVariation(j))
 			{
-				if (auto var = xform->GetVariation(j))
+				auto names = var->OpenCLGlobalDataNames();
+
+				for (auto& name : names)
 				{
-					auto names = var->OpenCLGlobalDataNames();
-
-					for (auto& name : names)
+					if (!Contains(dataNames, name))
 					{
-						if (!Contains(dataNames, name))
+						s = ToUpper(name);
+
+						if (auto dataInfo = varFuncs->GetSharedData(s))///Will contain a name, pointer to data, and size of the data in units of sizeof(T).
 						{
-							s = ToUpper(name);
+							if (doString)
+								os << "#define " << ToUpper(name) << " " << offset << "\n";
 
-							if (auto dataInfo = varFuncs->GetSharedData(s))///Will contain a name, pointer to data, and size of the data in units of sizeof(T).
-							{
-								if (doString)
-									os << "#define " << ToUpper(name) << " " << offset << "\n";
+							if (doVals)
+								params.second.insert(params.second.end(), dataInfo->first, dataInfo->first + dataInfo->second);
 
-								if (doVals)
-									params.second.insert(params.second.end(), dataInfo->first, dataInfo->first + dataInfo->second);
-
-								dataNames.push_back(name);
-								offset += dataInfo->second;
-							}
+							dataNames.push_back(name);
+							offset += dataInfo->second;
 						}
 					}
 				}
@@ -738,22 +731,14 @@ void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, p
 template <typename T>
 string IterOpenCLKernelCreator<T>::VariationStateString(const Ember<T>& ember)
 {
+	size_t i = 0;
 	ostringstream os;
 	os << "typedef struct __attribute__ " ALIGN_CL " _VariationState\n{";
 
-	for (size_t i = 0; i < ember.TotalXformCount(); i++)
-	{
-		if (auto xform = ember.GetTotalXform(i))
-		{
-			for (size_t j = 0; j < xform->TotalVariationCount(); j++)
-			{
-				if (auto var = xform->GetVariation(j))
-				{
-					os << var->StateOpenCLString();
-				}
-			}
-		}
-	}
+	while (auto xform = ember.GetTotalXform(i++))
+		for (size_t j = 0; j < xform->TotalVariationCount(); j++)
+			if (auto var = xform->GetVariation(j))
+				os << var->StateOpenCLString();
 
 	os << "\n} VariationState;\n\n";
 	return os.str();
@@ -770,21 +755,13 @@ string IterOpenCLKernelCreator<T>::VariationStateString(const Ember<T>& ember)
 template <typename T>
 string IterOpenCLKernelCreator<T>::VariationStateInitString(const Ember<T>& ember)
 {
+	size_t i = 0;
 	ostringstream os;
 
-	for (size_t i = 0; i < ember.TotalXformCount(); i++)
-	{
-		if (auto xform = ember.GetTotalXform(i))
-		{
-			for (size_t j = 0; j < xform->TotalVariationCount(); j++)
-			{
-				if (auto var = xform->GetVariation(j))
-				{
-					os << var->StateInitOpenCLString();
-				}
-			}
-		}
-	}
+	while (auto xform = ember.GetTotalXform(i++))
+		for (size_t j = 0; j < xform->TotalVariationCount(); j++)
+			if (auto var = xform->GetVariation(j))
+				os << var->StateInitOpenCLString();
 
 	return os.str();
 }

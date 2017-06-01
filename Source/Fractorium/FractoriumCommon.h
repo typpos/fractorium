@@ -383,6 +383,8 @@ static void AddPaletteToTable(QTableWidget* paletteTable, Palette<float>* palett
 	auto v = palette->MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);
 	auto nameCol = new QTableWidgetItem(palette->m_Name.c_str());
 	nameCol->setToolTip(palette->m_Name.c_str());
+	nameCol->setFlags(palette->m_SourceColors.empty() ? (Qt::ItemIsEnabled | Qt::ItemIsSelectable)
+					  : (Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable));
 	paletteTable->setItem(row, 0, nameCol);
 	QImage image(v.data(), int(palette->Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
 	auto paletteItem = new PaletteTableWidgetItem(palette);

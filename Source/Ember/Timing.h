@@ -86,7 +86,7 @@ public:
 	/// Days, hours and minutes are only included if 1 or more of them has elapsed. Seconds are always
 	/// included as a decimal value with the precision the user specified in the constructor.
 	/// </summary>
-	/// <param name="ms">The ms</param>
+	/// <param name="ms">The time in milliseconds to format</param>
 	/// <returns>The formatted string</returns>
 	string Format(double ms) const
 	{

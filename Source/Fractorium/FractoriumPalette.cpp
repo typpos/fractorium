@@ -317,9 +317,16 @@ void Fractorium::OnPaletteRandomAdjustButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 {
+	size_t i = 0;
 	auto ed = m_Fractorium->m_PaletteEditor;
 	Palette<float> prevPal = m_TempPalette;
 	ed->SetPalette(m_TempPalette);
+	map<size_t, float> colorIndices;
+
+	while (auto xform = m_Ember.GetTotalXform(i))
+		colorIndices[i++] = xform->m_ColorX;
+
+	ed->SetColorIndices(colorIndices);
 
 	if (ed->exec() == QDialog::Accepted)
 	{
@@ -363,8 +370,9 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 	if (!m_PaletteEditor)
 	{
 		m_PaletteEditor = new PaletteEditor(this);
-		connect(m_PaletteEditor, SIGNAL(PaletteChanged()), this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
-		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()), this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
+		connect(m_PaletteEditor, SIGNAL(PaletteChanged()),                 this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
+		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()),             this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
+		connect(m_PaletteEditor, SIGNAL(ColorIndexChanged(size_t, float)), this, SLOT(OnPaletteEditorColorIndexChanged(size_t, float)), Qt::QueuedConnection);
 	}
 
 	m_PaletteChanged = false;
@@ -387,6 +395,25 @@ void Fractorium::OnPaletteEditorColorChanged()
 void Fractorium::OnPaletteEditorFileChanged()
 {
 	m_PaletteFileChanged = true;
+}
+
+/// <summary>
+/// Slot called every time an xform color index is changed in the palette editor.
+/// If a special value of size_t max is passed for index, it means update all color indices.
+/// </summary>
+/// <param name="index">The index of the xform whose color index has been changed. Special value of size_t max to update all</param>
+/// <param name="value">The value of the color index</param>
+void Fractorium::OnPaletteEditorColorIndexChanged(size_t index, float value)
+{
+	if (index == std::numeric_limits<size_t>::max())
+	{
+		auto indices = m_PaletteEditor->GetColorIndices();
+
+		for (auto& it : indices)
+			OnXformColorIndexChanged(it.second, true, eXformUpdate::UPDATE_SPECIFIC, it.first);
+	}
+	else
+		OnXformColorIndexChanged(value, true, eXformUpdate::UPDATE_SPECIFIC, index);
 }
 
 /// <summary>

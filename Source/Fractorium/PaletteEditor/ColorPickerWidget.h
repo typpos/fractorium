@@ -43,7 +43,7 @@ Q_SIGNALS:
 protected:
 	void resizeEvent(QResizeEvent* event) override;
 
-private slots:
+private Q_SLOTS:
 	void OnColorViewerClicked();
 	void OnTriangleColorChanged(const QColor& col);
 

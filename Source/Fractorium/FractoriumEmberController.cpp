@@ -203,8 +203,9 @@ void FractoriumEmberController<T>::UpdateAll(std::function<void(Ember<T>& ember)
 /// <param name="updateType">Whether to apply this update operation on the current, all or selected xforms. Default: eXformUpdate::UPDATE_CURRENT.</param>
 /// <param name="updateRender">True to update renderer, else false. Default: true.</param>
 /// <param name="action">The action to add to the rendering queue. Default: eProcessAction::FULL_RENDER.</param>
+/// <param name="index">The xform index to use when action is eXformUpdate::UPDATE_SPECIFIC. Default: 0.</param>
 template <typename T>
-void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType, bool updateRender, eProcessAction action)
+void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType, bool updateRender, eProcessAction action, size_t index)
 {
 	int i = 0;
 	bool isCurrentFinal = m_Ember.IsFinalXform(CurrentXform());
@@ -212,6 +213,13 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 	switch (updateType)
 	{
+		case eXformUpdate::UPDATE_SPECIFIC:
+		{
+			if (auto xform = m_Ember.GetTotalXform(index))
+				func(xform);
+		}
+		break;
+
 		case eXformUpdate::UPDATE_CURRENT:
 		{
 			if (auto xform = CurrentXform())

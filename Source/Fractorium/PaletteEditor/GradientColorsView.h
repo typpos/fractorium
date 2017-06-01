@@ -50,14 +50,16 @@ public:
 	void SetArrows(map<float, GradientArrow>& newArrows);
 	int ArrowCount();
 	int GetFocusedIndex();
-	QPixmap* GetBackGround();
 	map<float, GradientArrow>& GetArrows();
 	Palette<float>& GetPalette(int size);
 	void SetPalette(const Palette<float>& palette);
+	map<size_t, float> GetColorIndices() const;
+	void SetColorIndices(const map<size_t, float>& indices);
 
-signals:
+Q_SIGNALS:
 	void ArrowMove(qreal lastPos, const GradientArrow& arrow);
 	void ArrowDoubleClicked(const GradientArrow& arrow);
+	void ColorIndexMove(size_t index, float value);
 
 protected:
 	virtual void paintEvent(QPaintEvent* e) override;
@@ -68,13 +70,17 @@ protected:
 	virtual void resizeEvent(QResizeEvent*) override;
 
 private:
-	void CreateBackground(int vertLineSpace = 5, int horLineSpace = 5);
+	int RectWidth();
+	int RectHeight();
 	bool m_ArrowMoving = false;
-	int m_BackgroundVerSpace = 5;
-	int m_BackgroundHorSpace = 5;
+	bool m_ColorIndexArrowMoving = false;
+	QPoint m_ViewRectSize;
+	QPoint m_ViewRectOffset = QPoint(5, 15);
+	QPoint m_ViewRectTranslate = QPoint(5, 5);
 	QRect m_ViewRect;
 	QPoint m_DragStart;
-	unique_ptr<QPixmap> m_Background;
 	map<float, GradientArrow> m_Arrows;
+	map<size_t, pair<float, TopArrow>> m_ColorIndicesArrows;
 	Palette<float> m_Palette;
+	QPixmap m_FinalFixedPixmap;
 };

@@ -40,27 +40,35 @@ void Fractorium::InitXformsColorUI()
 /// </summary>
 /// <param name="d">The color index, 0-1/</param>
 /// <param name="updateRender">True to reset the rendering process, else don't.</param>
+/// <param name="update">The type of updating to do, default: eXformUpdate::UPDATE_SELECTED.</param>
+/// <param name="index">The index of the xform to update. Ignored unless update is eXformUpdate::UPDATE_SPECIFIC. Default: 0.</param>
 template <typename T>
-void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateRender)
+void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateRender, eXformUpdate update, size_t index)
 {
-	auto scroll = m_Fractorium->ui.XformColorScroll;
-	int scrollVal = d * scroll->maximum();
-	scroll->blockSignals(true);
-	scroll->setValue(scrollVal);
-	scroll->blockSignals(false);
-	m_Fractorium->ui.XformColorIndexTable->item(0, 0)->setBackgroundColor(ColorIndexToQColor(d));//Grab the current color from the index and assign it to the first cell of the first table.
+	bool updateGUI = update != eXformUpdate::UPDATE_SPECIFIC || index == m_Fractorium->ui.CurrentXformCombo->currentIndex();
+
+	if (updateGUI)
+	{
+		auto scroll = m_Fractorium->ui.XformColorScroll;
+		int scrollVal = d * scroll->maximum();
+		scroll->blockSignals(true);
+		scroll->setValue(scrollVal);
+		scroll->blockSignals(false);
+		m_Fractorium->m_XformColorIndexSpin->SetValueStealth(CurrentXform()->m_ColorX);
+		m_Fractorium->ui.XformColorIndexTable->item(0, 0)->setBackgroundColor(ColorIndexToQColor(d));//Grab the current color from the index and assign it to the first cell of the first table.
+	}
 
 	if (updateRender)//False when just updating GUI, true when in response to a GUI change so update values and reset renderer.
 	{
 		UpdateXform([&](Xform<T>* xform)
 		{
 			xform->m_ColorX = Clamp<T>(d, 0, 1);
-		}, eXformUpdate::UPDATE_SELECTED, updateRender);
+		}, update, updateRender, eProcessAction::FULL_RENDER, index);
 	}
 }
 
-void Fractorium::OnXformColorIndexChanged(double d) { OnXformColorIndexChanged(d, true); }
-void Fractorium::OnXformColorIndexChanged(double d, bool updateRender) { m_Controller->XformColorIndexChanged(d, updateRender); }
+void Fractorium::OnXformColorIndexChanged(double d) { OnXformColorIndexChanged(d, true, eXformUpdate::UPDATE_SELECTED, 0); }
+void Fractorium::OnXformColorIndexChanged(double d, bool updateRender, eXformUpdate update, size_t index) { m_Controller->XformColorIndexChanged(d, updateRender, update, index); }
 
 /// <summary>
 /// Set the color index of the current xform.
@@ -86,7 +94,6 @@ template <typename T>
 void FractoriumEmberController<T>::RandomColorIndicesButtonClicked()
 {
 	UpdateXform([&](Xform<T>* xform) { xform->m_ColorX = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL);
-	m_Fractorium->m_XformColorIndexSpin->SetValueStealth(CurrentXform()->m_ColorX);
 	m_Fractorium->OnXformColorIndexChanged(CurrentXform()->m_ColorX, false);//Update GUI, no need to update renderer because UpdateXform() did it.
 }
 void Fractorium::OnRandomColorIndicesButtonClicked(bool b) { m_Controller->RandomColorIndicesButtonClicked(); }
@@ -101,7 +108,6 @@ void FractoriumEmberController<T>::ToggleColorIndicesButtonClicked()
 {
 	char ch = 1;
 	UpdateXform([&](Xform<T>* xform) { xform->m_ColorX = T(ch ^= 1); }, eXformUpdate::UPDATE_ALL);
-	m_Fractorium->m_XformColorIndexSpin->SetValueStealth(CurrentXform()->m_ColorX);
 	m_Fractorium->OnXformColorIndexChanged(CurrentXform()->m_ColorX, false);//Update GUI, no need to update renderer because UpdateXform() did it.
 }
 void Fractorium::OnToggleColorIndicesButtonClicked(bool b) { m_Controller->ToggleColorIndicesButtonClicked(); }

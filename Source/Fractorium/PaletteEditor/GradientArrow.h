@@ -76,3 +76,52 @@ private:
 	QPolygon m_Area;
 	QColor m_Color;
 };
+
+/// <summary>
+/// Thin derivation to handle drawing arrows at the top of the gradient area to
+/// represent the color indices of each xform.
+/// </summary>
+class TopArrow : public GradientArrow
+{
+public:
+	/// <summary>
+	/// Default constructor which is only present so this class can be used with containers.
+	/// This should never be used by a caller.
+	/// </summary>
+	TopArrow()
+		: TopArrow(10, 0)
+	{
+	}
+
+	/// <summary>
+	/// Constructor which takes the width used to draw the arrow and the xform index
+	/// this arrow represents.
+	/// </summary>
+	/// <param name="width">The width used to draw the arrow</param>
+	/// <param name="index">The xform index this arrow represents</param>
+	TopArrow(int width, size_t index)
+	{
+		QPolygon area;
+		int center = 10;
+		int mid = width / 2;
+		int left = center - mid;
+		int right = center + mid;
+		area << QPoint(left, 0) << QPoint(right, 0) << QPoint(right, 10) << QPoint(center, 15) << QPoint(left, 10) << QPoint(left, 0);
+		Area(area);
+		m_Index = index;
+		m_Width = width;
+		m_Text = QString::number(index + 1);
+	}
+
+	/// <summary>
+	/// Getters.
+	/// </summary>
+	int Width() { return m_Width; }
+	size_t Index() { return m_Index; }
+	QString Text() { return m_Text; }
+
+private:
+	int m_Width;
+	size_t m_Index;
+	QString m_Text;
+};

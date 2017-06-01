@@ -164,50 +164,71 @@ bool EmberRender(EmberOptions& opt)
 
 	for (i = 0; i < embers.size(); i++)
 	{
+		auto& ember = embers[i];
+
 		if (opt.Verbose() && embers.size() > 1)
 			cout << "\nFlame = " << i + 1 << "/" << embers.size() << "\n";
 		else if (embers.size() > 1)
 			VerbosePrint("\n");
 
 		if (opt.Supersample() > 0)
-			embers[i].m_Supersample = opt.Supersample();
+			ember.m_Supersample = opt.Supersample();
 
 		if (opt.Quality() > 0)
-			embers[i].m_Quality = T(opt.Quality());
+			ember.m_Quality = T(opt.Quality());
 
 		if (opt.DeMin() > -1)
-			embers[i].m_MinRadDE = T(opt.DeMin());
+			ember.m_MinRadDE = T(opt.DeMin());
 
 		if (opt.DeMax() > -1)
-			embers[i].m_MaxRadDE = T(opt.DeMax());
+			ember.m_MaxRadDE = T(opt.DeMax());
 
-		embers[i].m_TemporalSamples = 1;//Force temporal samples to 1 for render.
-		embers[i].m_Quality *= T(opt.QualityScale());
-		embers[i].m_FinalRasW = size_t(T(embers[i].m_FinalRasW) * opt.SizeScale());
-		embers[i].m_FinalRasH = size_t(T(embers[i].m_FinalRasH) * opt.SizeScale());
-		embers[i].m_PixelsPerUnit *= T(opt.SizeScale());
+		ember.m_TemporalSamples = 1;//Force temporal samples to 1 for render.
+		ember.m_Quality *= T(opt.QualityScale());
 
-		if (embers[i].m_FinalRasW == 0 || embers[i].m_FinalRasH == 0)
+		if (opt.SizeScale() != 1.0)
 		{
-			cout << "Output image " << i << " has dimension 0: " << embers[i].m_FinalRasW  << ", " << embers[i].m_FinalRasH << ". Setting to 1920 x 1080.\n";
-			embers[i].m_FinalRasW = 1920;
-			embers[i].m_FinalRasH = 1080;
+			ember.m_FinalRasW = size_t(T(ember.m_FinalRasW) * opt.SizeScale());
+			ember.m_FinalRasH = size_t(T(ember.m_FinalRasH) * opt.SizeScale());
+			ember.m_PixelsPerUnit *= T(opt.SizeScale());
+		}
+		else if (opt.WidthScale() != 1.0 || opt.HeightScale() != 1.0)
+		{
+			auto scaleType = eScaleType::SCALE_NONE;
+
+			if (ToLower(opt.ScaleType()) == "width")
+				scaleType = eScaleType::SCALE_WIDTH;
+			else if (ToLower(opt.ScaleType()) == "height")
+				scaleType = eScaleType::SCALE_HEIGHT;
+			else if (ToLower(opt.ScaleType()) != "none")
+				cout << "Scale type must be width height or none. Setting to none.\n";
+
+			auto w = std::max<size_t>(size_t(ember.m_OrigFinalRasW * opt.WidthScale()), 10);
+			auto h = std::max<size_t>(size_t(ember.m_OrigFinalRasH * opt.HeightScale()), 10);
+			ember.SetSizeAndAdjustScale(w, h, false, scaleType);
+		}
+
+		if (ember.m_FinalRasW == 0 || ember.m_FinalRasH == 0)
+		{
+			cout << "Output image " << i << " has dimension 0: " << ember.m_FinalRasW  << ", " << ember.m_FinalRasH << ". Setting to 1920 x 1080.\n";
+			ember.m_FinalRasW = 1920;
+			ember.m_FinalRasH = 1080;
 		}
 
 		//Cast to double in case the value exceeds 2^32.
-		double imageMem = double(renderer->NumChannels()) * double(embers[i].m_FinalRasW)
-						  * double(embers[i].m_FinalRasH) * double(renderer->BytesPerChannel());
+		double imageMem = double(renderer->NumChannels()) * double(ember.m_FinalRasW)
+						  * double(ember.m_FinalRasH) * double(renderer->BytesPerChannel());
 		double maxMem = pow(2.0, double((sizeof(void*) * 8) - 1));
 
 		if (imageMem > maxMem)//Ensure the max amount of memory for a process is not exceeded.
 		{
 			cout << "Image " << i << " size > " << maxMem << ". Setting to 1920 x 1080.\n";
-			embers[i].m_FinalRasW = 1920;
-			embers[i].m_FinalRasH = 1080;
+			ember.m_FinalRasW = 1920;
+			ember.m_FinalRasH = 1080;
 		}
 
 		stats.Clear();
-		renderer->SetEmber(embers[i]);
+		renderer->SetEmber(ember);
 		renderer->PrepFinalAccumVector(finalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 
 		if (opt.Strips() > 1)
@@ -223,7 +244,7 @@ bool EmberRender(EmberOptions& opt)
 				VerbosePrint("Setting strips to " << strips << " with specified memory usage of " << opt.UseMem());
 		}
 
-		strips = VerifyStrips(embers[i].m_FinalRasH, strips,
+		strips = VerifyStrips(ember.m_FinalRasH, strips,
 		[&](const string & s) { cout << s << "\n"; }, //Greater than height.
 		[&](const string & s) { cout << s << "\n"; }, //Mod height != 0.
 		[&](const string & s) { cout << s << "\n"; }); //Final strips value to be set.
@@ -237,7 +258,7 @@ bool EmberRender(EmberOptions& opt)
 		//	resume = true;
 		//}
 		//while (success && renderer->ProcessState() != ACCUM_DONE);
-		StripsRender<T>(renderer.get(), embers[i], finalImage, 0, strips, opt.YAxisUp(),
+		StripsRender<T>(renderer.get(), ember, finalImage, 0, strips, opt.YAxisUp(),
 						[&](size_t strip)//Pre strip.
 		{
 			if (opt.Verbose() && (strips > 1) && strip > 0)

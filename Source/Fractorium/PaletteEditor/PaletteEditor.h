@@ -30,15 +30,17 @@ public:
 
 public:
 	bool Sync();
-	QPixmap* GetBackGround();
 	Palette<float>& GetPalette(int size);
-	void SetPalette(Palette<float>& palette);
+	void SetPalette(const Palette<float>& palette);
+	map<size_t, float> GetColorIndices() const;
+	void SetColorIndices(const map<size_t, float>& indices);
 
-signals:
+Q_SIGNALS:
 	void PaletteChanged();
 	void PaletteFileChanged();
+	void ColorIndexChanged(size_t index, float value);
 
-private slots:
+private Q_SLOTS:
 	void OnAddColorButtonClicked();
 	void OnRemoveColorButtonClicked();
 	void OnInvertColorsButtonClicked();
@@ -51,6 +53,7 @@ private slots:
 	void OnArrowDoubleClicked(const GradientArrow& arrow);
 	void OnSyncCheckBoxStateChanged(int state);
 	void OnArrowMoved(qreal lastPos, const GradientArrow& arrow);
+	void OnColorIndexMove(size_t index, float value);
 	void OnPaletteFilenameComboChanged(const QString& text);
 	void OnPaletteCellClicked(int row, int col);
 	void OnPaletteCellChanged(int row, int col);
@@ -62,10 +65,12 @@ private slots:
 
 private:
 	void EmitPaletteChanged();
+	void EmitColorIndexChanged(size_t index, float value);
 	QStringList SetupOpenImagesDialog();
 	void AddArrow(const QColor& color);
 	map<float, GradientArrow> GetRandomColorsFromImage(QString filename, int numPoints);
-
+	void EnablePaletteFileControls();
+	void EnablePaletteControls();
 	bool m_PaletteFileChanged = false;
 	int m_PaletteIndex = 0;
 	QString m_Filename;

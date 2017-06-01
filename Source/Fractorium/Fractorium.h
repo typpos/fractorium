@@ -281,7 +281,7 @@ public slots:
 
 	//Xforms Color.
 	void OnXformColorIndexChanged(double d);
-	void OnXformColorIndexChanged(double d, bool updateRender);
+	void OnXformColorIndexChanged(double d, bool updateRender, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0);
 	void OnXformScrollColorIndexChanged(int d);
 	void OnRandomColorIndicesButtonClicked(bool b);
 	void OnToggleColorIndicesButtonClicked(bool b);
@@ -332,6 +332,7 @@ public slots:
 	void OnPaletteHeaderSectionClicked(int col);
 	void OnPaletteEditorColorChanged();
 	void OnPaletteEditorFileChanged();
+	void OnPaletteEditorColorIndexChanged(size_t index, float value);
 
 	//Info.
 	void OnSummaryTableHeaderResized(int logicalIndex, int oldSize, int newSize);
@@ -419,7 +420,6 @@ private:
 	void FillSummary();
 	void UpdateHistogramBounds();
 	void ErrorReportToQTextEdit(const vector<string>& errors, QTextEdit* textEdit, bool clear = true);
-	void SetTableWidgetBackgroundColor();
 
 	//Rendering/progress.
 	void ShutdownAndRecreateFromOptions();

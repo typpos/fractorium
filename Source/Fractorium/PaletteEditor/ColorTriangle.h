@@ -97,7 +97,7 @@ public:
 	virtual int heightForWidth(int w) const override;
 	virtual QSize sizeHint() const override;
 
-signals:
+Q_SIGNALS:
 	void ColorChanged(const QColor& col);
 
 protected:

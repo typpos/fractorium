@@ -16,7 +16,7 @@ enum class eEditUndoState : et { REGULAR_EDIT, UNDO_REDO, EDIT_UNDO };
 /// <summary>
 /// An enum representing which xforms an update should be applied to.
 /// </summary>
-enum class eXformUpdate : et { UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_CURRENT_AND_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
+enum class eXformUpdate : et { UPDATE_SPECIFIC, UPDATE_CURRENT, UPDATE_SELECTED, UPDATE_CURRENT_AND_SELECTED, UPDATE_SELECTED_EXCEPT_FINAL, UPDATE_ALL, UPDATE_ALL_EXCEPT_FINAL };
 
 /// <summary>
 /// An enum representing the type of synchronizing to do between the list of Embers kept in memory
@@ -199,7 +199,7 @@ public:
 	virtual void InitLockedScale() { }
 
 	//Xforms Color.
-	virtual void XformColorIndexChanged(double d, bool updateRender) { }
+	virtual void XformColorIndexChanged(double d, bool updateRender, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) { }
 	virtual void XformScrollColorIndexChanged(int d) { }
 	virtual void RandomColorIndicesButtonClicked() { }
 	virtual void ToggleColorIndicesButtonClicked() { }
@@ -448,7 +448,7 @@ public:
 	virtual void FillXforms(int index = 0) override;
 	void FillWithXform(Xform<T>* xform);
 	Xform<T>* CurrentXform();
-	void UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER);
+	void UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, size_t index = 0);
 
 	//Xforms Affine.
 	virtual void AffineSetHelper(double d, int index, bool pre) override;
@@ -466,7 +466,7 @@ public:
 	T AffineScaleLockedToCurrent();
 
 	//Xforms Color.
-	virtual void XformColorIndexChanged(double d, bool updateRender) override;
+	virtual void XformColorIndexChanged(double d, bool updateRender, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) override;
 	virtual void XformScrollColorIndexChanged(int d) override;
 	virtual void RandomColorIndicesButtonClicked() override;
 	virtual void ToggleColorIndicesButtonClicked() override;

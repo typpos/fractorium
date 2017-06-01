@@ -211,10 +211,14 @@ bool PaletteList<T>::Add(const string& filename, bool force)
 				if (doc)
 				{
 					auto rootNode = xmlDocGetRootElement(doc);
-					palettes.first->second.clear();
-					palettes.first->second.reserve(buf.size() / 2048);//Roughly what it takes per palette.
-					ParsePalettes(rootNode, pfilename, palettes.first->second);
-					xmlFreeDoc(doc);
+
+					if (!Compare(rootNode->name, "palettes"))
+					{
+						palettes.first->second.clear();
+						palettes.first->second.reserve(buf.size() / 2048);//Roughly the size in bytes it takes to store the xml text of palette.
+						ParsePalettes(rootNode, pfilename, palettes.first->second);
+						xmlFreeDoc(doc);
+					}
 
 					if (palettes.first->second.empty())
 					{

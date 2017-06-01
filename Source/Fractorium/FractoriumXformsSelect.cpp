@@ -71,10 +71,8 @@ QString FractoriumEmberController<T>::MakeXformCaption(size_t i)
 	QString caption = isFinal ? "Final" : QString::number(i + 1);
 
 	if (auto xform = m_Ember.GetTotalXform(i))
-	{
 		if (!xform->m_Name.empty())
 			caption += " (" + QString::fromStdString(xform->m_Name) + ")";
-	}
 
 	return caption;
 }
@@ -128,5 +126,5 @@ bool FractoriumEmberController<T>::XformCheckboxAt(Xform<T>* xform, std::functio
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

@@ -73,7 +73,7 @@ void GradientColorsView::SetFocus(size_t position)
 		it.second.Focus(b);
 	}
 
-	if (!focused)
+	if (!focused && !m_Arrows.empty())
 		m_Arrows.begin()->second.Focus(true);
 
 	update();
@@ -100,6 +100,7 @@ void GradientColorsView::SetFocusColor(const QColor& color)
 
 /// <summary>
 /// Add an arrow whose color will be assigned the passed in color.
+/// This should never be called on a fixed palette.
 /// </summary>
 /// <param name="color">The color to assign to the new arrow</param>
 void GradientColorsView::AddArrow(const QColor& color)
@@ -202,14 +203,28 @@ void GradientColorsView::DeleteFocusedArrow()
 /// </summary>
 void GradientColorsView::InvertColors()
 {
-	for (auto& it : m_Arrows)
+	if (!m_Arrows.empty())
 	{
-		auto& arrow = it.second;
-		auto col = arrow.Color();
-		arrow.Color(QColor(255 - col.red(), 255 - col.green(), 255 - col.blue()));
+		for (auto& it : m_Arrows)
+		{
+			auto& arrow = it.second;
+			auto col = arrow.Color();
+			arrow.Color(QColor(255 - col.red(), 255 - col.green(), 255 - col.blue()));
 
-		if (arrow.Focus())
-			emit ArrowDoubleClicked(arrow);
+			if (arrow.Focus())
+				emit ArrowDoubleClicked(arrow);
+		}
+	}
+	else
+	{
+		for (auto& col : m_Palette.m_Entries)
+		{
+			col.r = 1 - col.r;
+			col.g = 1 - col.g;
+			col.b = 1 - col.b;
+		}
+
+		SetPalette(m_Palette);//Reset associated pixmap etc...
 	}
 
 	update();
@@ -235,16 +250,20 @@ void GradientColorsView::RandomColors()
 /// </summary>
 void GradientColorsView::DistributeColors()
 {
-	map<float, GradientArrow> arrows;
-	float index = 0, inc = 1.0f / std::max<size_t>(size_t(1), m_Arrows.size() - 1);
-
-	for (auto it : m_Arrows)
+	if (!m_Arrows.empty())
 	{
-		arrows[index] = it.second;
-		index = std::min(1.0f, index + inc);
+		map<float, GradientArrow> arrows;
+		float index = 0, inc = 1.0f / std::max<size_t>(size_t(1), m_Arrows.size() - 1);
+
+		for (auto it : m_Arrows)
+		{
+			arrows[index] = it.second;
+			index = std::min(1.0f, index + inc);
+		}
+
+		m_Arrows = std::move(arrows);
 	}
 
-	m_Arrows = std::move(arrows);
 	update();
 }
 
@@ -265,6 +284,7 @@ void GradientColorsView::ResetToDefault()
 void GradientColorsView::ClearArrows()
 {
 	m_Arrows.clear();
+	update();
 }
 
 /// <summary>
@@ -335,20 +355,6 @@ int GradientColorsView::GetFocusedIndex()
 }
 
 /// <summary>
-/// Return a pixmap to be used to draw the palette.
-/// The pixmap is lazily instantiated on the first call, and all subsequent
-/// calls return a pointer to the same pixmap.
-/// </summary>
-/// <returns>The pixmap</returns>
-QPixmap* GradientColorsView::GetBackGround()
-{
-	if (!m_Background.get())
-		CreateBackground(m_BackgroundVerSpace, m_BackgroundHorSpace);
-
-	return m_Background.get();
-}
-
-/// <summary>
 /// Return a reference to the arrows map.
 /// Be very careful what you do with this.
 /// </summary>
@@ -366,34 +372,37 @@ map<float, GradientArrow>& GradientColorsView::GetArrows()
 /// <returns>A reference to the internal map containing the arrows</returns>
 Palette<float>& GradientColorsView::GetPalette(int size)
 {
-	QSize imageSize(size, 1);
-	QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
-	QPainter p;
-	QLinearGradient grad(QPoint(0, 0), QPoint(imageSize.width(), imageSize.height()));
-	m_Palette.m_SourceColors.clear();
-
-	for  (auto& it : m_Arrows)
+	if (!m_Arrows.empty())
 	{
-		auto pos = it.first;
-		auto col = it.second.Color();
-		m_Palette.m_SourceColors[pos] = v4F(col.red() / 255.0f, col.green() / 255.0f, col.blue() / 255.0f, 1.0f);
-		grad.setColorAt(pos, col);
+		QPainter p;
+		QSize imageSize(size, 1);
+		QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
+		QLinearGradient grad(QPoint(0, 0), QPoint(imageSize.width(), imageSize.height()));
+		m_Palette.m_SourceColors.clear();
+
+		for (auto& it : m_Arrows)
+		{
+			auto pos = it.first;
+			auto col = it.second.Color();
+			m_Palette.m_SourceColors[pos] = v4F(col.red() / 255.0f, col.green() / 255.0f, col.blue() / 255.0f, 1.0f);
+			grad.setColorAt(pos, col);
+		}
+
+		p.begin(&image);
+		p.fillRect(image.rect(), grad);
+		p.end();
+		m_Palette.m_Entries.reserve(image.width());
+
+		for (int i = 0; i < image.width(); i++)
+		{
+			QColor col(image.pixel(i, 0));
+			m_Palette[i].r = col.red() / 255.0f;
+			m_Palette[i].g = col.green() / 255.0f;
+			m_Palette[i].b = col.blue() / 255.0f;
+		}
 	}
 
-	p.begin(&image);
-	p.fillRect(image.rect(), grad);
-	p.end();
-	m_Palette.m_Entries.reserve(image.width());
-
-	for (int i = 0; i < image.width(); i++)
-	{
-		QColor col(image.pixel(i, 0));
-		m_Palette[i].r = col.red() / 255.0f;
-		m_Palette[i].g = col.green() / 255.0f;
-		m_Palette[i].b = col.blue() / 255.0f;
-	}
-
-	return m_Palette;
+	return m_Palette;//If fixed palette, just return verbatim.
 }
 
 /// <summary>
@@ -406,11 +415,11 @@ Palette<float>& GradientColorsView::GetPalette(int size)
 /// <param name="palette">The palette whose source colors will be assigned to the arrow map</param>
 void GradientColorsView::SetPalette(const Palette<float>& palette)
 {
+	m_Arrows.clear();
+	m_Palette = palette;
+
 	if (palette.m_SourceColors.size() > 1)
 	{
-		m_Palette = palette;
-		m_Arrows.clear();
-
 		for (auto& col : m_Palette.m_SourceColors)
 		{
 			auto& rgb = col.second;
@@ -418,7 +427,48 @@ void GradientColorsView::SetPalette(const Palette<float>& palette)
 		}
 
 		SetFocus(size_t(0));
-		update();
+	}
+	else
+	{
+		auto v = m_Palette.MakeRgbPaletteBlock(m_ViewRect.height());//Make the palette repeat for PALETTE_CELL_HEIGHT rows.
+		auto image = QImage(int(m_Palette.Size()), m_ViewRect.height(), QImage::Format_RGB888);//Create a QImage out of it.
+		memcpy(image.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
+		m_FinalFixedPixmap = QPixmap(QPixmap::fromImage(image));//Create a QPixmap out of the QImage.
+	}
+
+	update();
+}
+
+/// <summary>
+/// Return a temporary copy of the xform color indices as a map.
+/// The keys are the xform indices, and the values are the color indices.
+/// </summary>
+/// <param name="palette">The color indices</param>
+map<size_t, float> GradientColorsView::GetColorIndices() const
+{
+	map<size_t, float> indices;
+
+	for (auto& it : m_ColorIndicesArrows)
+		indices[it.first] = it.second.first;
+
+	return indices;
+}
+
+/// <summary>
+/// Assign the values of the xform color indices to the arrows.
+/// This will clear out any existing values first.
+/// </summary>
+/// <param name="palette">The color indices to assign</param>
+void GradientColorsView::SetColorIndices(const map<size_t, float>& indices)
+{
+	QPainter painter(this);
+	m_ColorIndicesArrows.clear();
+
+	for (auto& it : indices)
+	{
+		auto text = QString::number(it.first + 1);//Get text width, which is used to adjust the size of the arrow.
+		QFontMetrics fm = painter.fontMetrics();
+		m_ColorIndicesArrows[it.first] = make_pair(it.second, TopArrow(fm.width(text) + 5, it.first));
 	}
 }
 
@@ -431,44 +481,60 @@ void GradientColorsView::paintEvent(QPaintEvent*)
 			m_ViewRect.size().isEmpty() ||
 			m_ViewRect.topLeft() == m_ViewRect.bottomRight())
 	{
-		m_ViewRect = QRect(QPoint(5, 0), QPoint(width() - 15, height() / 3 * 2 - 10));
-		m_ViewRect.translate(5, 5);
-		CreateBackground();
+		resizeEvent(nullptr);//Setup rects.
 	}
 
 	QPainter painter(this);
-
-	if (m_Background.get())
-		painter.drawPixmap(m_ViewRect, *m_Background.get(), m_ViewRect);
-
 	painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 	painter.setRenderHint(QPainter::Antialiasing);
-	QPoint gradStart = QPoint(m_ViewRect.topLeft().x(), m_ViewRect.bottomLeft().y() / 2);
-	QPoint gradStop = QPoint(m_ViewRect.topRight().x(), m_ViewRect.bottomRight().y() / 2);
-	QLinearGradient grad(gradStart, gradStop);
 
-	for (auto& it : m_Arrows)
+	if (!m_Arrows.empty())
 	{
-		GradientArrow& arrow = it.second;
-		grad.setColorAt(it.first, arrow.Color());
-		QPolygon arrowPolygon = arrow.Area();
-		int iPosX = it.first * (width() - 20),
-			iPosY = height() / 3 * 2;
-		arrowPolygon.translate(iPosX, iPosY);
-		QPainterPath paintPath;
-		paintPath.addPolygon(arrowPolygon);
-		painter.setBrush(QBrush(arrow.Color()));
+		QPoint gradStart = QPoint(m_ViewRect.topLeft().x(), m_ViewRect.bottomLeft().y() / 2);
+		QPoint gradStop = QPoint(m_ViewRect.topRight().x(), m_ViewRect.bottomRight().y() / 2);
+		QLinearGradient grad(gradStart, gradStop);
 
-		if (arrow.Focus())
-			paintPath.addRect(iPosX + 5, iPosY + 20, 10, 5);
+		for (auto& it : m_Arrows)
+		{
+			GradientArrow& arrow = it.second;
+			grad.setColorAt(it.first, arrow.Color());
+			QPolygon arrowPolygon = arrow.Area();
+			int iPosX = it.first * RectWidth(),
+				iPosY = m_ViewRect.height() + m_ViewRect.top() + 3;
+			arrowPolygon.translate(iPosX, iPosY);
+			QPainterPath paintPath;
+			paintPath.addPolygon(arrowPolygon);
+			painter.setBrush(QBrush(arrow.Color()));
 
-		painter.drawPath(paintPath);
-		painter.setBrush(QBrush(Qt::NoBrush));
+			if (arrow.Focus())
+				paintPath.addRect(iPosX + 5, iPosY + 20, 10, 5);
+
+			painter.drawPath(paintPath);
+			painter.setBrush(QBrush(Qt::NoBrush));
+		}
+
+		QBrush brush(grad);
+		painter.fillRect(m_ViewRect, brush);
+		painter.drawRect(m_ViewRect);
+	}
+	else
+	{
+		painter.drawPixmap(m_ViewRect, m_FinalFixedPixmap);
 	}
 
-	QBrush brush(grad);
-	painter.fillRect(m_ViewRect, brush);
-	painter.drawRect(m_ViewRect);
+	for (auto& it : m_ColorIndicesArrows)
+	{
+		QPainterPath topArrowPaintPath;
+		auto& topArrow = it.second.second;
+		auto topArrowPolygon = topArrow.Area();
+		topArrowPolygon.translate(it.second.first * RectWidth(), 0);
+		auto topArrowRect = topArrowPolygon.boundingRect();
+		topArrowPaintPath.addPolygon(topArrowPolygon);
+		painter.drawPath(topArrowPaintPath);//When using a separate painter, the sides aren't as thick.
+		//Draw text inside of the arrow.
+		painter.drawText(topArrowRect.x() + (topArrowRect.width() - (topArrow.Width() - 5)) / 2.0, topArrowRect.y() + (topArrowRect.height() - 5), topArrow.Text());
+	}
+
 	painter.end();
 }
 
@@ -484,11 +550,26 @@ void GradientColorsView::mousePressEvent(QMouseEvent* e)
 	{
 		auto& arrow = it.second;
 		QPolygon poly = arrow.Area();
-		poly.translate(it.first * (width() - 20), height() / 3 * 2);
+		poly.translate(it.first * m_ViewRectSize.x(), m_ViewRectSize.y());
 
 		if (poly.containsPoint(m_DragStart, Qt::OddEvenFill))
 		{
 			m_ArrowMoving = true;
+			arrow.Focus(true);
+		}
+		else
+			arrow.Focus(false);
+	}
+
+	for (auto& it : m_ColorIndicesArrows)
+	{
+		auto& arrow = it.second.second;
+		QPolygon poly = arrow.Area();
+		poly.translate(it.second.first * m_ViewRectSize.x(), 0);
+
+		if (poly.containsPoint(m_DragStart, Qt::OddEvenFill))
+		{
+			m_ColorIndexArrowMoving = true;
 			arrow.Focus(true);
 		}
 		else
@@ -508,7 +589,7 @@ void GradientColorsView::mouseDoubleClickEvent(QMouseEvent* e)
 	{
 		auto& arrow = it.second;
 		QPolygon poly = arrow.Area();
-		poly.translate(it.first * (width() - 20), height() / 3 * 2);
+		poly.translate(it.first * m_ViewRectSize.x(), m_ViewRectSize.y());
 
 		if (poly.containsPoint(e->pos(), Qt::OddEvenFill))
 		{
@@ -526,50 +607,76 @@ void GradientColorsView::mouseDoubleClickEvent(QMouseEvent* e)
 /// <param name="event">The mouse event</param>
 void GradientColorsView::mouseMoveEvent(QMouseEvent* e)
 {
-	if (!m_ArrowMoving) return;
+	if (!m_ArrowMoving && !m_ColorIndexArrowMoving) return;
 
 	size_t index = 0;
-	qreal maxMove = 11.5 / (width() - 20);
+	qreal maxMove = 11.5 / RectWidth();
 
-	for (auto it = m_Arrows.begin(); it != m_Arrows.end(); ++it)
+	if (m_ArrowMoving)
 	{
-		auto& arrow = it->second;
-
-		if (arrow.Focus())
+		for (auto it = m_Arrows.begin(); it != m_Arrows.end(); ++it)
 		{
-			qreal lastPos = it->first;
-			qreal start = m_DragStart.x();
-			qreal end = width() - 20;
-			qreal dPos = ((qreal) e->pos().x() - start) / end;
-			qreal newPos = lastPos + dPos;
+			auto& arrow = it->second;
 
-			if ( (it->first + dPos > 1) || (it->first + dPos < 0) )
-				return;
-
-			if (dPos < 0 && index > 0)
+			if (arrow.Focus())
 			{
-				qreal posBefore = std::prev(it)->first;
+				qreal lastPos = it->first;
+				qreal start = m_DragStart.x();
+				qreal end = RectWidth();
+				qreal dPos = ((qreal)e->pos().x() - start) / end;
+				qreal newPos = lastPos + dPos;
 
-				if ( (lastPos - maxMove + dPos) <= posBefore )
+				if ((lastPos + dPos > 1) || (lastPos + dPos < 0))
 					return;
+
+				if (dPos < 0 && index > 0)
+				{
+					qreal posBefore = std::prev(it)->first;
+
+					if ((lastPos - maxMove + dPos) <= posBefore)
+						return;
+				}
+
+				if ((dPos > 0) && (index < (m_Arrows.size() - 1)))
+				{
+					qreal posAfter = std::next(it)->first;
+
+					if ((lastPos + maxMove + dPos) >= posAfter)
+						return;
+				}
+
+				GradientArrow arrowCopy(it->second);
+				m_Arrows.erase(lastPos);
+				m_Arrows[newPos] = arrowCopy;
+				emit ArrowMove(lastPos, arrow);
+				break;
 			}
 
-			if ((dPos > 0) && (index < (m_Arrows.size() - 1)))
-			{
-				qreal posAfter = std::next(it)->first;
-
-				if ((lastPos + maxMove + dPos) >= posAfter)
-					return;
-			}
-
-			GradientArrow arrowCopy(it->second);
-			m_Arrows.erase(lastPos);
-			m_Arrows[newPos] = arrowCopy;
-			emit ArrowMove(lastPos, arrow);
-			break;
+			index++;
 		}
+	}
+	else if (m_ColorIndexArrowMoving)
+	{
+		for (auto& it : m_ColorIndicesArrows)
+		{
+			auto& arrow = it.second.second;
 
-		index++;
+			if (arrow.Focus())
+			{
+				qreal lastPos = it.second.first;
+				qreal start = m_DragStart.x();
+				qreal end = RectWidth();
+				qreal dPos = ((qreal)e->pos().x() - start) / end;
+				qreal newPos = lastPos + dPos;
+
+				if ((lastPos + dPos > 1) || (lastPos + dPos < 0))
+					return;
+
+				it.second.first = newPos;
+				emit ColorIndexMove(it.first, it.second.first);
+				break;
+			}
+		}
 	}
 
 	m_DragStart = e->pos();
@@ -582,6 +689,7 @@ void GradientColorsView::mouseMoveEvent(QMouseEvent* e)
 void GradientColorsView::mouseReleaseEvent(QMouseEvent*)
 {
 	m_ArrowMoving = false;
+	m_ColorIndexArrowMoving = false;
 }
 
 /// <summary>
@@ -589,42 +697,25 @@ void GradientColorsView::mouseReleaseEvent(QMouseEvent*)
 /// </summary>
 void GradientColorsView::resizeEvent(QResizeEvent*)
 {
-	m_ViewRect = QRect(QPoint(5, 0), QPoint(width() - 15, height() / 3 * 2 - 10));
-	m_ViewRect.translate(5, 5);
+	m_ViewRectSize = QPoint(RectWidth(), RectHeight());
+	m_ViewRect = QRect(m_ViewRectOffset, QPoint(m_ViewRectSize.x() + 5, m_ViewRectSize.y() - 10));
+	m_ViewRect.translate(m_ViewRectTranslate);
 }
 
 /// <summary>
-/// Create the background to represent the palette.
+/// Return the width used to draw the gradient area.
 /// </summary>
-/// <param name="vertLineSpace">The space between vertical lines to use</param>
-/// <param name="horLineSpace">The space between horizontal lines to use</param>
-void GradientColorsView::CreateBackground(int vertLineSpace, int horLineSpace)
+/// <returns>The width</returns>
+int GradientColorsView::RectWidth()
 {
-	m_BackgroundVerSpace = vertLineSpace;
-	m_BackgroundHorSpace = horLineSpace;
-	m_Background = make_unique<QPixmap>(QSize(800, 800));
-	m_Background->fill(Qt::white);
-	QPainter painter(m_Background.get());
-	int x = 0;
+	return width() - 20;
+}
 
-	while (x < m_Background->width())//Veritcal lines.
-	{
-		const QPoint lineStart(x, 0);
-		const QPoint lineStop(x, m_Background->height());
-		painter.drawLine(lineStart, lineStop);
-		x += vertLineSpace;
-	}
-
-	int y = 0;
-
-	while (y < m_Background->height())//Horizontal lines.
-	{
-		const QPoint lineStart(0, y);
-		const QPoint lineStop(m_Background->width(), y);
-		painter.drawLine(lineStart, lineStop);
-		y += horLineSpace;
-	}
-
-	painter.end();
-	update();
+/// <summary>
+/// Return the height used to draw the gradient area.
+/// </summary>
+/// <returns>The height</returns>
+int GradientColorsView::RectHeight()
+{
+	return height() / 3 * 2;
 }

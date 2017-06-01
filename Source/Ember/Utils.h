@@ -924,6 +924,8 @@ static vector<std::string> Split(const string& str, const string& del, bool remo
 
 /// <summary>
 /// Return a copy of a file path string with the file portion removed.
+/// If no path is present, such as having only a filename present, then
+/// empty string is returned.
 /// </summary>
 /// <param name="filename">The string to retrieve the path from</param>
 /// <returns>The path portion of the string</returns>
@@ -931,10 +933,10 @@ static string GetPath(const string& filename)
 {
 	const size_t lastSlash = filename.find_last_of("\\/");
 
-	if (std::string::npos != lastSlash)
+	if (lastSlash != std::string::npos)
 		return filename.substr(0, lastSlash + 1);
 	else
-		return filename;
+		return "";
 }
 
 /// <summary>

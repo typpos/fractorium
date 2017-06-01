@@ -322,28 +322,26 @@ bool FractoriumEmberController<T>::Render()
 	//Take care of solo xforms and set the current ember and action.
 	if (action != eProcessAction::NOTHING)
 	{
-		int i, solo = m_Fractorium->ui.CurrentXformCombo->property("soloxform").toInt();
+		size_t i = 0;
+		int solo = m_Fractorium->ui.CurrentXformCombo->property("soloxform").toInt();
 
 		if (solo != -1)
 		{
 			m_TempOpacities.resize(m_Ember.TotalXformCount());
 
-			for (i = 0; i < m_Ember.TotalXformCount(); i++)
+			while (auto xform = m_Ember.GetTotalXform(i))
 			{
-				m_TempOpacities[i] = m_Ember.GetTotalXform(i)->m_Opacity;
-				m_Ember.GetTotalXform(i)->m_Opacity = i == solo ? 1 : 0;
+				m_TempOpacities[i] = xform->m_Opacity;
+				xform->m_Opacity = i++ == solo ? 1 : 0;
 			}
 		}
 
+		i = 0;
 		m_Renderer->SetEmber(m_Ember, action);
 
 		if (solo != -1)
-		{
-			for (i = 0; i < m_Ember.TotalXformCount(); i++)
-			{
-				m_Ember.GetTotalXform(i)->m_Opacity = m_TempOpacities[i];
-			}
-		}
+			while (auto xform = m_Ember.GetTotalXform(i))
+				xform->m_Opacity = m_TempOpacities[i++];
 	}
 
 	//Ensure sizes are equal and if not, update dimensions.

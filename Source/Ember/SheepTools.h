@@ -108,28 +108,30 @@ public:
 	string TruncateVariations(Ember<T>& ember, size_t maxVars)
 	{
 		intmax_t smallest;
-		size_t i, j, numVars;
+		size_t i = 0, j, numVars;
 		T sv = 0;
 		ostringstream os;
 
 		//First clear out any xforms that are not the final, and have a density of less than 0.001.
-		for (i = 0; i < ember.XformCount(); i++)
-		{
-			auto xform = ember.GetXform(i);
 
+		while (auto xform = ember.GetXform(i))
+		{
 			if (xform->m_Weight < T(0.001))
 			{
 				os << "trunc_density " << i;
 				ember.DeleteXform(i);
 				i = 0;//Size will have changed, so start over.
+				continue;
 			}
+
+			i++;
 		}
 
 		//Now consider all xforms, including final.
-		for (i = 0; i < ember.TotalXformCount(); i++)
-		{
-			auto xform = ember.GetTotalXform(i);
+		i = 0;
 
+		while (auto xform = ember.GetTotalXform(i))
+		{
 			do
 			{
 				Variation<T>* var = nullptr;
@@ -164,6 +166,8 @@ public:
 				}
 			}
 			while (numVars > maxVars);
+
+			i++;
 		}
 
 		return os.str();

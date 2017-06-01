@@ -316,17 +316,17 @@ public:
 	{
 		if (i < XformCount())
 			return const_cast<Xform<T>*>(&m_Xforms[i]);
-		else if (i == XformCount() || forceFinal)
+		else if (forceFinal || (i == XformCount() && UseFinalXform()))
 			return const_cast<Xform<T>*>(&m_FinalXform);
 		else
 			return nullptr;
 	}
 
-	/// <summary>
-	/// Search the xforms, excluding final, to find which one's address matches the address of the specified xform.
-	/// </summary>
-	/// <param name="xform">A pointer to the xform to find</param>
-	/// <returns>The index of the matched xform if found, else -1.</returns>
+/// <summary>
+/// Search the xforms, excluding final, to find which one's address matches the address of the specified xform.
+/// </summary>
+/// <param name="xform">A pointer to the xform to find</param>
+/// <returns>The index of the matched xform if found, else -1.</returns>
 	intmax_t GetXformIndex(Xform<T>* xform) const
 	{
 		intmax_t index = -1;
@@ -388,8 +388,10 @@ public:
 	/// </summary>
 	void DeleteMotionElements()
 	{
-		for (size_t i = 0; i < TotalXformCount(); i++)
-			GetTotalXform(i)->DeleteMotionElements();
+		size_t i = 0;
+
+		while (auto xform = GetTotalXform(i++))
+			xform->DeleteMotionElements();
 
 		m_EmberMotionElements.clear();
 	}
@@ -399,9 +401,10 @@ public:
 	/// </summary>
 	void CacheXforms()
 	{
-		for (size_t i = 0; i < TotalXformCount(); i++)
+		size_t i = 0;
+
+		while (auto xform = GetTotalXform(i++))
 		{
-			auto xform = GetTotalXform(i);
 			xform->CacheColorVals();
 			xform->SetPrecalcFlags();
 		}
@@ -594,12 +597,10 @@ public:
 	bool Flatten(vector<string>& names)
 	{
 		bool flattened = false;
+		size_t i = 0;
 
-		for (auto& xform : m_Xforms)
-			flattened |= xform.Flatten(names);
-
-		if (UseFinalXform())
-			flattened |= m_FinalXform.Flatten(names);
+		while (auto xform = GetTotalXform(i++))
+			flattened |= xform->Flatten(names);
 
 		return flattened;
 	}
@@ -743,12 +744,8 @@ public:
 		for (size_t i = 0; i < totalXformCount; i++)//For each xform to populate.
 		{
 			for (size_t j = 0; j < size; j++)//For each ember in the list.
-			{
 				if (i < embers[j].TotalXformCount())//Xform in this position in this ember.
-				{
 					xformVec.push_back(embers[j].GetTotalXform(i));//Temporary list to pass to MergeXforms().
-				}
-			}
 
 			if (i < maxXformCount)//Working with standard xforms?
 				AddXform(Interpolater<T>::MergeXforms(xformVec, true));//Merge, set weights to zero, and add to the xform list.

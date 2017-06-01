@@ -205,7 +205,10 @@ bool EmberAnimate(EmberOptions& opt)
 	//-Have equal dimensions.
 	for (i = 0; i < embers.size(); i++)
 	{
-		if (i > 0 && embers[i].m_Time <= embers[i - 1].m_Time)
+		auto& ember = embers[i];
+		auto& emberm1 = embers[i - 1];
+
+		if (i > 0 && ember.m_Time <= emberm1.m_Time)
 		{
 			if (!unsorted)
 				firstUnsortedIndex = i;
@@ -213,57 +216,77 @@ bool EmberAnimate(EmberOptions& opt)
 			unsorted = true;
 		}
 
-		if (i > 0 && embers[i].m_Time == embers[i - 1].m_Time)
+		if (i > 0 && ember.m_Time == emberm1.m_Time)
 		{
-			cout << "Image " << i << " time of " << embers[i].m_Time << " equaled previous image time of " << embers[i - 1].m_Time << ". Adjusting up by 1.\n";
-			embers[i].m_Time++;
+			cout << "Image " << i << " time of " << ember.m_Time << " equaled previous image time of " << emberm1.m_Time << ". Adjusting up by 1.\n";
+			ember.m_Time++;
 		}
 
 		if (opt.Supersample() > 0)
-			embers[i].m_Supersample = opt.Supersample();
+			ember.m_Supersample = opt.Supersample();
 
 		if (opt.TemporalSamples() > 0)
-			embers[i].m_TemporalSamples = opt.TemporalSamples();
+			ember.m_TemporalSamples = opt.TemporalSamples();
 
 		if (opt.Quality() > 0)
-			embers[i].m_Quality = T(opt.Quality());
+			ember.m_Quality = T(opt.Quality());
 
 		if (opt.DeMin() > -1)
-			embers[i].m_MinRadDE = T(opt.DeMin());
+			ember.m_MinRadDE = T(opt.DeMin());
 
 		if (opt.DeMax() > -1)
-			embers[i].m_MaxRadDE = T(opt.DeMax());
+			ember.m_MaxRadDE = T(opt.DeMax());
 
-		embers[i].m_Quality *= T(opt.QualityScale());
-		embers[i].m_FinalRasW = size_t(T(embers[i].m_FinalRasW) * opt.SizeScale());
-		embers[i].m_FinalRasH = size_t(T(embers[i].m_FinalRasH) * opt.SizeScale());
-		embers[i].m_PixelsPerUnit *= T(opt.SizeScale());
+		ember.m_Quality *= T(opt.QualityScale());
+
+		if (opt.SizeScale() != 1.0)
+		{
+			ember.m_FinalRasW = size_t(T(ember.m_FinalRasW) * opt.SizeScale());
+			ember.m_FinalRasH = size_t(T(ember.m_FinalRasH) * opt.SizeScale());
+			ember.m_PixelsPerUnit *= T(opt.SizeScale());
+		}
+		else if (opt.WidthScale() != 1.0 || opt.HeightScale() != 1.0)
+		{
+			auto scaleType = eScaleType::SCALE_NONE;
+
+			if (ToLower(opt.ScaleType()) == "width")
+				scaleType = eScaleType::SCALE_WIDTH;
+			else if (ToLower(opt.ScaleType()) == "height")
+				scaleType = eScaleType::SCALE_HEIGHT;
+			else if (ToLower(opt.ScaleType()) != "none")
+				cout << "Scale type must be width height or none. Setting to none.\n";
+
+			auto w = std::max<size_t>(size_t(ember.m_OrigFinalRasW * opt.WidthScale()), 10);
+			auto h = std::max<size_t>(size_t(ember.m_OrigFinalRasH * opt.HeightScale()), 10);
+			ember.SetSizeAndAdjustScale(w, h, false, scaleType);
+		}
+
 		//Cast to double in case the value exceeds 2^32.
-		double imageMem = double(channels) * double(embers[i].m_FinalRasW)
-						  * double(embers[i].m_FinalRasH) * double(renderers[0]->BytesPerChannel());
+		double imageMem = double(channels) * double(ember.m_FinalRasW)
+						  * double(ember.m_FinalRasH) * double(renderers[0]->BytesPerChannel());
 		double maxMem = pow(2.0, double((sizeof(void*) * 8) - 1));
 
 		if (imageMem > maxMem)//Ensure the max amount of memory for a process isn't exceeded.
 		{
 			cout << "Image " << i << " size > " << maxMem << ". Setting to 1920 x 1080.\n";
-			embers[i].m_FinalRasW = 1920;
-			embers[i].m_FinalRasH = 1080;
+			ember.m_FinalRasW = 1920;
+			ember.m_FinalRasH = 1080;
 		}
 
-		if (embers[i].m_FinalRasW == 0 || embers[i].m_FinalRasH == 0)
+		if (ember.m_FinalRasW == 0 || ember.m_FinalRasH == 0)
 		{
-			cout << "Warning: Output image " << i << " has dimension 0: " << embers[i].m_FinalRasW  << ", " << embers[i].m_FinalRasH << ". Setting to 1920 x 1080.\n";
-			embers[i].m_FinalRasW = 1920;
-			embers[i].m_FinalRasH = 1080;
+			cout << "Warning: Output image " << i << " has dimension 0: " << ember.m_FinalRasW  << ", " << ember.m_FinalRasH << ". Setting to 1920 x 1080.\n";
+			ember.m_FinalRasW = 1920;
+			ember.m_FinalRasH = 1080;
 		}
 
-		if ((embers[i].m_FinalRasW != embers[0].m_FinalRasW) ||
-				(embers[i].m_FinalRasH != embers[0].m_FinalRasH))
+		if ((ember.m_FinalRasW != embers[0].m_FinalRasW) ||
+				(ember.m_FinalRasH != embers[0].m_FinalRasH))
 		{
-			cout << "Warning: flame " << i << " at time " << embers[i].m_Time << " size mismatch. (" << embers[i].m_FinalRasW << ", " << embers[i].m_FinalRasH <<
+			cout << "Warning: flame " << i << " at time " << ember.m_Time << " size mismatch. (" << ember.m_FinalRasW << ", " << ember.m_FinalRasH <<
 				 ") should be (" << embers[0].m_FinalRasW << ", " << embers[0].m_FinalRasH << "). Setting to " << embers[0].m_FinalRasW << ", " << embers[0].m_FinalRasH << ".\n";
-			embers[i].m_FinalRasW = embers[0].m_FinalRasW;
-			embers[i].m_FinalRasH = embers[0].m_FinalRasH;
+			ember.m_FinalRasW = embers[0].m_FinalRasW;
+			ember.m_FinalRasH = embers[0].m_FinalRasH;
 		}
 	}
 
@@ -373,7 +396,7 @@ bool EmberAnimate(EmberOptions& opt)
 
 			if (opt.WriteGenome())
 			{
-				flameName = filename.substr(0, filename.find_last_of('.')) + ".flam3";
+				flameName = filename.substr(0, filename.find_last_of('.')) + ".flame";
 
 				if (opt.Verbose())
 				{

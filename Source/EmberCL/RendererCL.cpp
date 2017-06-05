@@ -977,7 +977,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	if (m_Devices.size() >= launches)
 	{
 		launches = m_Devices.size();
-		adjustedIterCountPerKernel = size_t(ceil(ceil(double(iterCount) / m_Devices.size()) / IterGridKernelCount()));
+		adjustedIterCountPerKernel = size_t(std::ceil(std::ceil(double(iterCount) / m_Devices.size()) / IterGridKernelCount()));
 	}
 
 	size_t fuseFreq = Renderer<T, bucketT>::SubBatchSize() / adjustedIterCountPerKernel;//Use the base sbs to determine when to fuse.

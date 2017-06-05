@@ -87,7 +87,7 @@ QDoubleSpinBox
 	padding-right: 0px;
 	color: darkgray;
 	selection-background-color: darkgray;
-	font: 9pt "Segoe UI";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QCheckBox

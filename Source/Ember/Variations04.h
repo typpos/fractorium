@@ -3126,7 +3126,7 @@ public:
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
 		T ch = std::cosh(absV);
-		T d = m_Weight * c * sh / absV;
+		T d = m_Weight * c * sh / Zeps(absV);
 		helper.Out.x = m_Weight * s * ch;
 		helper.Out.y = d * helper.In.y;
 		helper.Out.z = d * helper.In.z;
@@ -3142,7 +3142,7 @@ public:
 		   << "\t\treal_t c = cos(vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
 		   << "\t\treal_t ch = cosh(absV);\n"
-		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] * c * sh / absV;\n"
+		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] * c * sh / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * s * ch;\n"
 		   << "\t\tvOut.y = d * vIn.y;\n"
@@ -3153,7 +3153,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3175,7 +3175,7 @@ public:
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
 		T ch = std::cosh(helper.In.x);
-		T d = m_Weight * ch * s / absV;
+		T d = m_Weight * ch * s / Zeps(absV);
 		helper.Out.x = m_Weight * sh * c;
 		helper.Out.y = d * helper.In.y;
 		helper.Out.z = d * helper.In.z;
@@ -3191,7 +3191,7 @@ public:
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
 		   << "\t\treal_t ch = cosh(vIn.x);\n"
-		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] * ch * s / absV;\n"
+		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] * ch * s / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * sh * c;\n"
 		   << "\t\tvOut.y = d * vIn.y;\n"
@@ -3202,7 +3202,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3220,12 +3220,12 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
-		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
+		T ni = m_Weight / Zeps(helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(-helper.In.x);
 		T c = std::cos(-helper.In.x);
 		T sh = std::sinh(absV);
 		T ch = std::cosh(absV);
-		T d = ni * s * sh / absV;
+		T d = ni * s * sh / Zeps(absV);
 		helper.Out.x =   c * ch * ni;
 		helper.Out.y = -(d * helper.In.y);
 		helper.Out.z = -(d * helper.In.z);
@@ -3237,12 +3237,12 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (precalcSumSquares + SQR(vIn.z));\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares + SQR(vIn.z));\n"
 		   << "\t\treal_t s = sin(-vIn.x);\n"
 		   << "\t\treal_t c = cos(-vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
 		   << "\t\treal_t ch = cosh(absV);\n"
-		   << "\t\treal_t d = ni * s * sh / absV;\n"
+		   << "\t\treal_t d = ni * s * sh / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x =   c * ch * ni;\n"
 		   << "\t\tvOut.y = -(d * vIn.y);\n"
@@ -3253,7 +3253,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3271,12 +3271,12 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
-		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
+		T ni = m_Weight / Zeps(helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(absV);
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
 		T ch = std::cosh(helper.In.x);
-		T d = ni * sh * s / absV;
+		T d = ni * sh * s / Zeps(absV);
 		helper.Out.x =  ch * c * ni;
 		helper.Out.y = -(d * helper.In.y);
 		helper.Out.z = -(d * helper.In.z);
@@ -3288,7 +3288,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (precalcSumSquares + SQR(vIn.z));\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares + SQR(vIn.z));\n"
 		   << "\t\treal_t s = sin(absV);\n"
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
@@ -3304,7 +3304,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3323,13 +3323,13 @@ public:
 	{
 		T sysz = SQR(helper.In.y) + SQR(helper.In.z);
 		T absV = std::sqrt(sysz);
-		T ni = m_Weight / (SQR(helper.In.x) + sysz);
+		T ni = m_Weight / Zeps(SQR(helper.In.x) + sysz);
 		T s = std::sin(helper.In.x);
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
 		T ch = std::cosh(absV);
-		T d = c * sh / absV;
-		T b = -s * sh / absV;
+		T d = c * sh / Zeps(absV);
+		T b = -s * sh / Zeps(absV);
 		T stcv = s * ch;
 		T nstcv = -stcv;
 		T ctcv = c * ch;
@@ -3345,13 +3345,13 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = SQR(vIn.y) + SQR(vIn.z);\n"
 		   << "\t\treal_t absV = sqrt(sysz);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (SQR(vIn.x) + sysz);\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(SQR(vIn.x) + sysz);\n"
 		   << "\t\treal_t s = sin(vIn.x);\n"
 		   << "\t\treal_t c = cos(vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
 		   << "\t\treal_t ch = cosh(absV);\n"
-		   << "\t\treal_t d = c * sh / absV;\n"
-		   << "\t\treal_t b = -s * sh / absV;\n"
+		   << "\t\treal_t d = c * sh / Zeps(absV);\n"
+		   << "\t\treal_t b = -s * sh / Zeps(absV);\n"
 		   << "\t\treal_t stcv = s * ch;\n"
 		   << "\t\treal_t nstcv = -stcv;\n"
 		   << "\t\treal_t ctcv = c * ch;\n"
@@ -3361,6 +3361,11 @@ public:
 		   << "\t\tvOut.z = (nstcv * b * vIn.z + d * vIn.z * ctcv) * ni;\n"
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 };
 
@@ -3379,13 +3384,13 @@ public:
 	{
 		T sysz = SQR(helper.In.y) + SQR(helper.In.z);
 		T absV = std::sqrt(sysz);
-		T ni = m_Weight / (SQR(helper.In.x) + sysz);
+		T ni = m_Weight / Zeps(SQR(helper.In.x) + sysz);
 		T s = std::sin(absV);
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
 		T ch = std::cosh(helper.In.x);
-		T d = ch * s / absV;
-		T b = sh * s / absV;
+		T d = ch * s / Zeps(absV);
+		T b = sh * s / Zeps(absV);
 		T stcv = sh * c;
 		T nstcv = -stcv;
 		T ctcv = c * ch;
@@ -3401,13 +3406,13 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = SQR(vIn.y) + SQR(vIn.z);\n"
 		   << "\t\treal_t absV = sqrt(sysz);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (SQR(vIn.x) + sysz);\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(SQR(vIn.x) + sysz);\n"
 		   << "\t\treal_t s = sin(absV);\n"
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
 		   << "\t\treal_t ch = cosh(vIn.x);\n"
-		   << "\t\treal_t d = ch * s / absV;\n"
-		   << "\t\treal_t b = sh * s / absV;\n"
+		   << "\t\treal_t d = ch * s / Zeps(absV);\n"
+		   << "\t\treal_t b = sh * s / Zeps(absV);\n"
 		   << "\t\treal_t stcv = sh * c;\n"
 		   << "\t\treal_t nstcv = -stcv;\n"
 		   << "\t\treal_t ctcv = c * ch;\n"
@@ -3417,6 +3422,11 @@ public:
 		   << "\t\tvOut.z = (nstcv * b * vIn.z + d * vIn.z * ctcv) * ni;\n"
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 };
 
@@ -3438,7 +3448,7 @@ public:
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
 		T ch = std::cosh(absV);
-		T d = -m_Weight * s * sh / absV;
+		T d = -m_Weight * s * sh / Zeps(absV);
 		helper.Out.x = m_Weight * c * ch;
 		helper.Out.y = d * helper.In.y;
 		helper.Out.z = d * helper.In.z;
@@ -3454,7 +3464,7 @@ public:
 		   << "\t\treal_t c = cos(vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
 		   << "\t\treal_t ch = cosh(absV);\n"
-		   << "\t\treal_t d = -xform->m_VariationWeights[" << varIndex << "] * s * sh / absV;\n"
+		   << "\t\treal_t d = -xform->m_VariationWeights[" << varIndex << "] * s * sh / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * c * ch;\n"
 		   << "\t\tvOut.y = d * vIn.y;\n"
@@ -3465,7 +3475,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3487,7 +3497,7 @@ public:
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
 		T ch = std::cosh(helper.In.x);
-		T d = -m_Weight * sh * s / absV;
+		T d = m_Weight * sh * s / Zeps(absV);
 		helper.Out.x = m_Weight * c * ch;
 		helper.Out.y = d * helper.In.y;
 		helper.Out.z = d * helper.In.z;
@@ -3503,7 +3513,7 @@ public:
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
 		   << "\t\treal_t ch = cosh(vIn.x);\n"
-		   << "\t\treal_t d = -xform->m_VariationWeights[" << varIndex << "] * sh * s / absV;\n"
+		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] * sh * s / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * c * ch;\n"
 		   << "\t\tvOut.y = d * vIn.y;\n"
@@ -3514,7 +3524,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3533,13 +3543,13 @@ public:
 	{
 		T sysz = SQR(helper.In.y) + SQR(helper.In.z);
 		T absV = std::sqrt(sysz);
-		T ni = m_Weight / (SQR(helper.In.x) + sysz);
+		T ni = m_Weight / Zeps(SQR(helper.In.x) + sysz);
 		T s = std::sin(helper.In.x);
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
 		T ch = std::cosh(absV);
-		T d = c * sh / absV;
-		T b = -s * sh / absV;
+		T d = c * sh / Zeps(absV);
+		T b = -s * sh / Zeps(absV);
 		T stcv = s * ch;
 		T nstcv = -stcv;
 		T ctcv = c * ch;
@@ -3555,13 +3565,13 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = SQR(vIn.y) + SQR(vIn.z);\n"
 		   << "\t\treal_t absV = sqrt(sysz);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (SQR(vIn.x) + sysz);\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(SQR(vIn.x) + sysz);\n"
 		   << "\t\treal_t s = sin(vIn.x);\n"
 		   << "\t\treal_t c = cos(vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
 		   << "\t\treal_t ch = cosh(absV);\n"
-		   << "\t\treal_t d = c * sh / absV;\n"
-		   << "\t\treal_t b = -s * sh / absV;\n"
+		   << "\t\treal_t d = c * sh / Zeps(absV);\n"
+		   << "\t\treal_t b = -s * sh / Zeps(absV);\n"
 		   << "\t\treal_t stcv = s * ch;\n"
 		   << "\t\treal_t nstcv = -stcv;\n"
 		   << "\t\treal_t ctcv = c * ch;\n"
@@ -3571,6 +3581,11 @@ public:
 		   << "\t\tvOut.z = -(nstcv * b * vIn.z + d * vIn.z * ctcv) * ni;\n"
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 };
 
@@ -3589,19 +3604,19 @@ public:
 	{
 		T sysz = SQR(helper.In.y) + SQR(helper.In.z);
 		T absV = std::sqrt(sysz);
-		T ni = m_Weight / (SQR(helper.In.x) + sysz);
+		T ni = m_Weight / Zeps(Sqr(SQR(helper.In.x) + sysz));
 		T s = std::sin(absV);
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
 		T ch = std::cosh(helper.In.x);
-		T d = ch * s / absV;
-		T b = sh * s / absV;
+		T d = ch * s / Zeps(absV);
+		T b = sh * s / Zeps(absV);
 		T stcv = sh * c;
 		T nstcv = -stcv;
 		T ctcv = ch * c;
-		helper.Out.x =  (stcv * ctcv + d * b * sysz) * ni;
-		helper.Out.y = -(nstcv * b * helper.In.y + d * helper.In.y * ctcv) * ni;
-		helper.Out.z = -(nstcv * b * helper.In.z + d * helper.In.z * ctcv) * ni;
+		helper.Out.x = (stcv * ctcv + d * b * sysz) * ni;
+		helper.Out.y = (nstcv * b * helper.In.y + d * helper.In.y * ctcv) * ni;
+		helper.Out.z = (nstcv * b * helper.In.z + d * helper.In.z * ctcv) * ni;
 	}
 
 	virtual string OpenCLString() const override
@@ -3611,22 +3626,27 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = SQR(vIn.y) + SQR(vIn.z);\n"
 		   << "\t\treal_t absV = sqrt(sysz);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (SQR(vIn.x) + sysz);\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(Sqr(SQR(vIn.x) + sysz));\n"
 		   << "\t\treal_t s = sin(absV);\n"
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
 		   << "\t\treal_t ch = cosh(vIn.x);\n"
-		   << "\t\treal_t d = ch * s / absV;\n"
-		   << "\t\treal_t b = sh * s / absV;\n"
+		   << "\t\treal_t d = ch * s / Zeps(absV);\n"
+		   << "\t\treal_t b = sh * s / Zeps(absV);\n"
 		   << "\t\treal_t stcv = sh * c;\n"
 		   << "\t\treal_t nstcv = -stcv;\n"
 		   << "\t\treal_t ctcv = ch * c;\n"
 		   << "\n"
-		   << "\t\tvOut.x =  (stcv * ctcv + d * b * sysz) * ni;\n"
-		   << "\t\tvOut.y = -(nstcv * b * vIn.y + d * vIn.y * ctcv) * ni;\n"
-		   << "\t\tvOut.z = -(nstcv * b * vIn.z + d * vIn.z * ctcv) * ni;\n"
+		   << "\t\tvOut.x = (stcv * ctcv + d * b * sysz) * ni;\n"
+		   << "\t\tvOut.y = (nstcv * b * vIn.y + d * vIn.y * ctcv) * ni;\n"
+		   << "\t\tvOut.z = (nstcv * b * vIn.z + d * vIn.z * ctcv) * ni;\n"
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
 	}
 };
 
@@ -3649,7 +3669,7 @@ public:
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
 		T ch = std::cosh(absV);
-		T d = ni * c * sh / absV;
+		T d = ni * c * sh / Zeps(absV);
 		helper.Out.x =   s * ch * ni;
 		helper.Out.y = -(d * helper.In.y);
 		helper.Out.z = -(d * helper.In.z);
@@ -3666,7 +3686,7 @@ public:
 		   << "\t\treal_t c = cos(vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
 		   << "\t\treal_t ch = cosh(absV);\n"
-		   << "\t\treal_t d = ni * c * sh / absV;\n"
+		   << "\t\treal_t d = ni * c * sh / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x =   s * ch * ni;\n"
 		   << "\t\tvOut.y = -(d * vIn.y);\n"
@@ -3677,7 +3697,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3700,7 +3720,7 @@ public:
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
 		T ch = std::cosh(helper.In.x);
-		T d = ni * ch * s / absV;
+		T d = ni * ch * s / Zeps(absV);
 		helper.Out.x =  sh * c * ni;
 		helper.Out.y = -(d * helper.In.y);
 		helper.Out.z = -(d * helper.In.z);
@@ -3717,7 +3737,7 @@ public:
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
 		   << "\t\treal_t ch = cosh(vIn.x);\n"
-		   << "\t\treal_t d = ni * ch * s / absV;\n"
+		   << "\t\treal_t d = ni * ch * s / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x =  sh * c * ni;\n"
 		   << "\t\tvOut.y = -(d * vIn.y);\n"
@@ -3728,7 +3748,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3749,7 +3769,7 @@ public:
 		T e = std::exp(helper.In.x);
 		T s = std::sin(absV);
 		T c = std::cos(absV);
-		T a = e * s / absV;
+		T a = e * s / Zeps(absV);
 		helper.Out.x = m_Weight * e * c;
 		helper.Out.y = m_Weight * a * helper.In.y;
 		helper.Out.z = m_Weight * a * helper.In.z;
@@ -3764,7 +3784,7 @@ public:
 		   << "\t\treal_t e = exp(vIn.x);\n"
 		   << "\t\treal_t s = sin(absV);\n"
 		   << "\t\treal_t c = cos(absV);\n"
-		   << "\t\treal_t a = e * s / absV;\n"
+		   << "\t\treal_t a = e * s / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * e * c;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * a * vIn.y;\n"
@@ -3775,7 +3795,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 };
 
@@ -3796,7 +3816,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
-		T c = m_Weight * std::atan2(absV, helper.In.x) / absV;
+		T c = m_Weight * std::atan2(absV, helper.In.x) / Zeps(absV);
 		helper.Out.x = std::log(SQR(helper.In.x) + SQR(absV)) * m_Denom;
 		helper.Out.y = c * helper.In.y;
 		helper.Out.z = c * helper.In.z;
@@ -3812,7 +3832,7 @@ public:
 		string denom = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
-		   << "\t\treal_t c = xform->m_VariationWeights[" << varIndex << "] * atan2(absV, vIn.x) / absV;\n"
+		   << "\t\treal_t c = xform->m_VariationWeights[" << varIndex << "] * atan2(absV, vIn.x) / Zeps(absV);\n"
 		   << "\n"
 		   << "\t\tvOut.x = log(SQR(vIn.x) + SQR(absV)) * " << denom << ";\n"
 		   << "\t\tvOut.y = c * vIn.y;\n"
@@ -3823,7 +3843,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Hypot" };
+		return vector<string> { "Hypot", "Zeps" };
 	}
 
 	virtual void Precalc() override

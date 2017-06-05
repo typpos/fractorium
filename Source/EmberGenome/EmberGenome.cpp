@@ -859,6 +859,8 @@ int _tmain(int argc, _TCHAR* argv[])
 #else
 	putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
 #endif
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
 	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_GENOME))
 	{

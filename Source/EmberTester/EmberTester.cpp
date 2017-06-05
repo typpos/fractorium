@@ -93,23 +93,23 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 	paletteList->Add("flam3-palettes.xml");
 	Timing t;
 	Ember<T> emberNoVars;
-	emberNoVars.m_FinalRasW = 640;
-	emberNoVars.m_FinalRasH = 480;
+	emberNoVars.m_FinalRasW = 1024;
+	emberNoVars.m_FinalRasH = 1024;
 	emberNoVars.m_Quality = 100;
 	Xform<T> xform1(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 	Xform<T> xform2(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 	Xform<T> xform3(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-	Xform<T> xform4(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-	Xform<T> xform5(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-	Xform<T> xform6(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-	Xform<T> xform7(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+	//Xform<T> xform4(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+	//Xform<T> xform5(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+	//Xform<T> xform6(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+	//Xform<T> xform7(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 	emberNoVars.AddXform(xform1);
 	emberNoVars.AddXform(xform2);
 	emberNoVars.AddXform(xform3);
-	emberNoVars.AddXform(xform4);
-	emberNoVars.AddXform(xform5);
-	emberNoVars.AddXform(xform6);
-	emberNoVars.AddXform(xform7);
+	//emberNoVars.AddXform(xform4);
+	//emberNoVars.AddXform(xform5);
+	//emberNoVars.AddXform(xform6);
+	//emberNoVars.AddXform(xform7);
 	ss << "NoVars";
 	emberNoVars.m_Name = ss.str();
 	ss.str("");
@@ -126,53 +126,51 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 		*/
 		Ember<T> ember1;
 		unique_ptr<Variation<T>> regVar(varList->GetVariationCopy(index, eVariationType::VARTYPE_REG));
-		unique_ptr<Variation<T>> preVar(varList->GetVariationCopy("pre_" + regVar->Name()));
-		unique_ptr<Variation<T>> postVar(varList->GetVariationCopy("post_" + regVar->Name()));
-		ember1.m_FinalRasW = 640;
-		ember1.m_FinalRasH = 480;
-		ember1.m_Quality = 100;
+		//unique_ptr<Variation<T>> preVar(varList->GetVariationCopy("pre_" + regVar->Name()));
+		//unique_ptr<Variation<T>> postVar(varList->GetVariationCopy("post_" + regVar->Name()));
+		ember1.m_FinalRasW = 1024;
+		ember1.m_FinalRasH = 1024;
+		ember1.m_Quality = 500;
 		Xform<T> xform1(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 		Xform<T> xform2(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 		Xform<T> xform3(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-		Xform<T> xform4(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-		Xform<T> xform5(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-		Xform<T> xform6(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-		Xform<T> xform7(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
-
-		if (preVar.get() && postVar.get())
-		{
-			xform1.AddVariation(preVar->Copy());
-			xform2.AddVariation(regVar->Copy());
-			xform3.AddVariation(postVar->Copy());
-			xform4.AddVariation(preVar->Copy());
-			xform4.AddVariation(regVar->Copy());
-			xform5.AddVariation(preVar->Copy());
-			xform5.AddVariation(postVar->Copy());
-			xform6.AddVariation(regVar->Copy());
-			xform6.AddVariation(postVar->Copy());
-			xform7.AddVariation(preVar->Copy());
-			xform7.AddVariation(regVar->Copy());
-			xform7.AddVariation(postVar->Copy());
-			ember1.AddXform(xform1);
-			ember1.AddXform(xform2);
-			ember1.AddXform(xform3);
-			ember1.AddXform(xform4);
-			ember1.AddXform(xform5);
-			ember1.AddXform(xform6);
-			ember1.AddXform(xform7);
-		}
-		else
+		//Xform<T> xform4(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+		//Xform<T> xform5(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+		//Xform<T> xform6(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+		//Xform<T> xform7(0.25f, rand.Frand01<T>(), rand.Frand11<T>(), 1, rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
+		//if (preVar.get() && postVar.get())
+		//{
+		//xform1.AddVariation(preVar->Copy());
+		//xform2.AddVariation(regVar->Copy());
+		//xform3.AddVariation(postVar->Copy());
+		//xform4.AddVariation(preVar->Copy());
+		//xform4.AddVariation(regVar->Copy());
+		//xform5.AddVariation(preVar->Copy());
+		//xform5.AddVariation(postVar->Copy());
+		//xform6.AddVariation(regVar->Copy());
+		//xform6.AddVariation(postVar->Copy());
+		//xform7.AddVariation(preVar->Copy());
+		//xform7.AddVariation(regVar->Copy());
+		//xform7.AddVariation(postVar->Copy());
+		//ember1.AddXform(xform1);
+		//ember1.AddXform(xform2);
+		//ember1.AddXform(xform3);
+		//ember1.AddXform(xform4);
+		//ember1.AddXform(xform5);
+		//ember1.AddXform(xform6);
+		//ember1.AddXform(xform7);
+		//}
+		//else
 		{
 			xform1.AddVariation(regVar->Copy());
 			xform2.AddVariation(regVar->Copy());
 			xform3.AddVariation(regVar->Copy());
-			xform4.AddVariation(regVar->Copy());
+			//xform4.AddVariation(regVar->Copy());
 			ember1.AddXform(xform1);
 			ember1.AddXform(xform2);
 			ember1.AddXform(xform3);
-			ember1.AddXform(xform4);
+			//ember1.AddXform(xform4);
 		}
-
 		ss << index << "_" << regVar->Name();
 		ember1.m_Name = ss.str();
 		ss.str("");
@@ -189,7 +187,7 @@ void MakeTestAllVarsRegPrePostComboFile(const string& filename)
 	EmberToXml<float> writer;
 	vector<Ember<float>> embers;
 	MakeTestAllVarsRegPrePost(embers);
-	writer.Save(filename, embers, 0, true, false, true);
+	writer.Save(filename, embers, 0, true, true, false);
 }
 
 void TestAtomicAdd()
@@ -1933,17 +1931,19 @@ int _tmain(int argc, _TCHAR* argv[])
 	vector<Ember<double>> dv;
 	list<Ember<float>> fl;
 	list<Ember<double>> dl;
-	string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
-	auto vec = Split(line, delim, true);
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+	/*  string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
+	    auto vec = Split(line, delim, true);
 
-	for (auto& s : vec) cout << s << endl;
+	    for (auto& s : vec) cout << s << endl;
 
-	line = "index=0 color=2177354", delim = " =";
-	vec = Split(line, delim, true);
+	    line = "index=0 color=2177354", delim = " =";
+	    vec = Split(line, delim, true);
 
-	for (auto& s : vec) cout << s << endl;
+	    for (auto& s : vec) cout << s << endl;
 
-	/*
+
 	    EmberContainerTester<float>::TestEmberContainer(fv);
 	    EmberContainerTester<double>::TestEmberContainer(dv);
 	    EmberContainerTester<float>::TestEmberContainer(fl);
@@ -1957,9 +1957,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	/*  TestRotate<float>();
 	    TestRotate<double>();
 	    return 1;
-	    MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
-	    return 0;
-
+	*/
+	MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
+	return 0;
+	/*
 
 	    TestThreadedKernel();
 
@@ -1972,8 +1973,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	    for (int i = 0; i < 10; i++)
 	    {
-		cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
-		d *= 10;
+	    cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
+	    d *= 10;
 	    }
 
 	    return 0;*/

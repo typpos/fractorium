@@ -20,6 +20,8 @@ int main(int argc, char* argv[])
 	QMessageBox::critical(QApplication::desktop(), "Error", "Fractorium cannot be run in test mode, undefine ISAAC_FLAM3_DEBUG first.");
 	return 1;
 #endif
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 	auto vf = VarFuncs<float>::Instance();//Create instances that will stay alive until the program exits.
 	auto vlf = VariationList<float>::Instance();
 	auto palf = PaletteList<float>::Instance();

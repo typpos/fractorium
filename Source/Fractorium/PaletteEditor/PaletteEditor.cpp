@@ -1,4 +1,4 @@
-#include "FractoriumPch.h"
+﻿#include "FractoriumPch.h"
 #include "PaletteEditor.h"
 
 /// <summary>
@@ -578,4 +578,6 @@ void PaletteEditor::EnablePaletteControls()
 	ui->RemoveColorButton->setEnabled(b);
 	ui->ResetColorsButton->setEnabled(b);
 	ui->ArrowsSpinBox->setEnabled(b);
+	ui->CreatePaletteFromImageButton->setEnabled(b);
+	ui->CreatePaletteAgainFromImageButton->setEnabled(b);
 }

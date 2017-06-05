@@ -681,6 +681,10 @@ public:
 		}
 
 		outPoint->m_ColorX = iterHelper.m_Color.x + m_DirectColor * (outPoint->m_ColorX - iterHelper.m_Color.x);
+
+		if (std::isnan(outPoint->m_ColorX))
+			outPoint->m_ColorX = 0;
+
 		//Has the trajectory of x or y gone either to infinity, or too close to zero?
 		return BadVal(outPoint->m_X) || BadVal(outPoint->m_Y)/* || BadVal(outPoint->m_Z)*/;
 	}

@@ -98,8 +98,12 @@ void PaletteEditor::SetPalette(const Palette<float>& palette)
 	if (!arrows.empty())
 		m_ColorPicker->SetColorPanelColor(arrows.begin()->second.Color());//Will emit PaletteChanged() if color changed...
 
-	QFileInfo info(QString::fromStdString(*palette.m_Filename.get()));
-	combo->setCurrentIndex(combo->findData(info.fileName(), Qt::DisplayRole));
+	if (palette.m_Filename.get())
+	{
+		QFileInfo info(QString::fromStdString(*palette.m_Filename.get()));
+		combo->setCurrentIndex(combo->findData(info.fileName(), Qt::DisplayRole));
+	}
+
 	EnablePaletteControls();
 	EmitPaletteChanged();//...So emit here just to be safe.
 }

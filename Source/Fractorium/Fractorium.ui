@@ -206,12 +206,6 @@
                <height>88</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -413,12 +407,6 @@
                <height>22</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -500,12 +488,6 @@
                <height>22</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -586,12 +568,6 @@
                <width>16777215</width>
                <height>22</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
@@ -695,12 +671,6 @@
                <width>16777215</width>
                <height>22</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
@@ -811,12 +781,6 @@
                <width>16777215</width>
                <height>264</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
@@ -1150,12 +1114,6 @@
                <height>110</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -1355,12 +1313,6 @@
                <width>16777215</width>
                <height>154</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
@@ -1607,12 +1559,6 @@
                <height>22</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -1709,12 +1655,6 @@
                <width>16777215</width>
                <height>110</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
@@ -1967,8 +1907,6 @@
          </property>
          <property name="font">
           <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
            <kerning>true</kerning>
           </font>
          </property>
@@ -2122,12 +2060,6 @@
            <height>21</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
          </property>
@@ -2243,12 +2175,6 @@
        </item>
        <item row="8" column="0">
         <widget class="QTableWidget" name="PaletteListTable">
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
          <property name="focusPolicy">
           <enum>Qt::StrongFocus</enum>
          </property>
@@ -2350,12 +2276,6 @@
            <width>16777215</width>
            <height>67</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-          </font>
          </property>
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
@@ -3024,8 +2944,6 @@
          </property>
          <property name="font">
           <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
            <kerning>true</kerning>
           </font>
          </property>
@@ -3213,8 +3131,6 @@
              </property>
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
                <kerning>true</kerning>
               </font>
              </property>
@@ -3545,8 +3461,7 @@
              </property>
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
+               <kerning>true</kerning>
               </font>
              </property>
              <property name="focusPolicy">
@@ -3875,12 +3790,6 @@
                       <width>10000</width>
                       <height>90</height>
                      </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <family>MS Shell Dlg 2</family>
-                      <pointsize>8</pointsize>
-                     </font>
                     </property>
                     <property name="focusPolicy">
                      <enum>Qt::NoFocus</enum>
@@ -4678,12 +4587,6 @@
                       <width>10000</width>
                       <height>90</height>
                      </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <family>MS Shell Dlg 2</family>
-                      <pointsize>8</pointsize>
-                     </font>
                     </property>
                     <property name="focusPolicy">
                      <enum>Qt::NoFocus</enum>
@@ -5611,12 +5514,6 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="mouseTracking">
               <bool>true</bool>
              </property>
@@ -6114,12 +6011,6 @@
                    <height>126</height>
                   </size>
                  </property>
-                 <property name="font">
-                  <font>
-                   <family>MS Shell Dlg 2</family>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
                  <property name="focusPolicy">
                   <enum>Qt::NoFocus</enum>
                  </property>
@@ -6257,12 +6148,6 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <family>MS Shell Dlg 2</family>
-                   <pointsize>8</pointsize>
-                  </font>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Plain</enum>
@@ -6635,8 +6520,6 @@
                     </property>
                     <property name="font">
                      <font>
-                      <family>MS Shell Dlg 2</family>
-                      <pointsize>8</pointsize>
                       <kerning>true</kerning>
                      </font>
                     </property>
@@ -7078,12 +6961,6 @@
         <enum>Qt::Vertical</enum>
        </property>
        <widget class="LibraryTreeWidget" name="LibraryTree">
-        <property name="font">
-         <font>
-          <family>MS Shell Dlg 2</family>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
         <property name="focusPolicy">
          <enum>Qt::WheelFocus</enum>
         </property>
@@ -7739,12 +7616,6 @@
               <width>0</width>
               <height>0</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-             </font>
             </property>
             <property name="focusPolicy">
              <enum>Qt::WheelFocus</enum>

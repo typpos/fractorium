@@ -35,7 +35,7 @@ public:
 	/// <returns>The begin time cast to a double</returns>
 	double Tic()
 	{
-		m_BeginTime = Clock::now();
+		m_BeginTime = NowMsD();
 		return BeginTime();
 	}
 
@@ -47,7 +47,7 @@ public:
 	/// <returns>The elapsed time in milliseconds as a double</returns>
 	double Toc(const char* str = nullptr, bool fullString = false)
 	{
-		m_EndTime = Clock::now();
+		m_EndTime = NowMsD();
 		double ms = ElapsedTime();
 
 		if (str)
@@ -76,8 +76,7 @@ public:
 	/// <returns>The elapsed time in milliseconds as a double</returns>
 	double ElapsedTime() const
 	{
-		duration<double> elapsed = duration_cast<milliseconds, Clock::rep, Clock::period>(m_EndTime - m_BeginTime);
-		return elapsed.count() * 1000.0;
+		return (m_EndTime - m_BeginTime).count();
 	}
 
 	/// <summary>
@@ -139,8 +138,8 @@ private:
 	}
 
 	int m_Precision;//How many digits after the decimal place to print for seconds.
-	time_point<Clock> m_BeginTime;//The start of the timing, set with Tic().
-	time_point<Clock> m_EndTime;//The end of the timing, set with Toc().
+	DoubleMsTimePoint m_BeginTime;//The start of the timing, set with Tic().
+	DoubleMsTimePoint m_EndTime;//The end of the timing, set with Toc().
 	static bool m_TimingInit;//Whether the performance info has bee queried.
 	static uint m_ProcessorCount;//The number of cores on the system, set in Init().
 };

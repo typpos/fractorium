@@ -70,16 +70,16 @@ namespace EmberNs
 #define FLOAT_MIN_TAN -FLOAT_MAX_TAN
 #define EMPTYFIELD -9999
 typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::duration<double, std::ratio<1, 1000>> DoubleMs;
+typedef std::chrono::time_point<Clock, DoubleMs> DoubleMsTimePoint;
+static inline DoubleMsTimePoint NowMsD() { return time_point_cast<DoubleMs>(Clock::now()); }
+static inline size_t NowMs() { return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count(); }
 typedef uint et;
 typedef std::lock_guard <std::recursive_mutex> rlg;
 
 /// <summary>
 /// Thin wrapper around getting the current time in milliseconds.
 /// </summary>
-static inline size_t NowMs()
-{
-	return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count();
-}
 
 #ifndef byte
 	typedef unsigned char byte;

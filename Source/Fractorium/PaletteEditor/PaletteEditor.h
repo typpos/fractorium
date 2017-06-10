@@ -34,6 +34,8 @@ public:
 	void SetPalette(const Palette<float>& palette);
 	map<size_t, float> GetColorIndices() const;
 	void SetColorIndices(const map<size_t, float>& indices);
+	string GetPaletteFile() const;
+	void SetPaletteFile(const string& filename);
 
 Q_SIGNALS:
 	void PaletteChanged();

@@ -259,21 +259,21 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 			{
 				case 0:
 				case 3:
-					affine.A(cos(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
-					affine.D(sin(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
+					affine.A(std::cos(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
+					affine.D(std::sin(spinners[0]->value() * DEG_2_RAD) * spinners[3]->value());
 					break;
 
 				case 1:
 				case 4:
-					affine.B(cos(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
-					affine.E(sin(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
+					affine.B(std::cos(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
+					affine.E(std::sin(spinners[1]->value() * DEG_2_RAD) * spinners[4]->value());
 					break;
 
 				case 2:
 				case 5:
 				default:
-					affine.C(cos(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
-					affine.F(sin(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
+					affine.C(std::cos(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
+					affine.F(std::sin(spinners[2]->value() * DEG_2_RAD) * spinners[5]->value());
 					break;
 			}
 		}
@@ -623,9 +623,9 @@ void FractoriumEmberController<T>::FillAffineWithXform(Xform<T>* xform, bool pre
 
 	if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
 	{
-		spinners[0]->SetValueStealth(RAD_2_DEG * atan2(affine.D(), affine.A()));
-		spinners[1]->SetValueStealth(RAD_2_DEG * atan2(affine.E(), affine.B()));
-		spinners[2]->SetValueStealth(RAD_2_DEG * atan2(affine.F(), affine.C()));
+		spinners[0]->SetValueStealth(RAD_2_DEG * std::atan2(affine.D(), affine.A()));
+		spinners[1]->SetValueStealth(RAD_2_DEG * std::atan2(affine.E(), affine.B()));
+		spinners[2]->SetValueStealth(RAD_2_DEG * std::atan2(affine.F(), affine.C()));
 		spinners[3]->SetValueStealth(VarFuncs<T>::Hypot(affine.D(), affine.A()));
 		spinners[4]->SetValueStealth(VarFuncs<T>::Hypot(affine.E(), affine.B()));
 		spinners[5]->SetValueStealth(VarFuncs<T>::Hypot(affine.F(), affine.C()));

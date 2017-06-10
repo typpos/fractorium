@@ -481,8 +481,8 @@ int FinalRenderEmberController<T>::ProgressFunc(Ember<T>& ember, void* foo, doub
 {
 	static int count = 0;
 	size_t strip = *(reinterpret_cast<size_t*>(FirstOrDefaultRenderer()->m_ProgressParameter));
-	double fracPerStrip = ceil(100.0 / m_GuiState.m_Strips);
-	double stripsfrac = ceil(fracPerStrip * strip) + ceil(fraction / m_GuiState.m_Strips);
+	double fracPerStrip = std::ceil(100.0 / m_GuiState.m_Strips);
+	double stripsfrac = std::ceil(fracPerStrip * strip) + std::ceil(fraction / m_GuiState.m_Strips);
 	int intFract = int(stripsfrac);
 
 	if (stage == 0)

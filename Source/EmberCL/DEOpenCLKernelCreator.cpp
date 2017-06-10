@@ -128,7 +128,7 @@ double DEOpenCLKernelCreator::SolveMaxDERad(double desiredFilterSize, double ss)
 		return desiredFilterSize;
 
 	//The final size doesn't fit, so scale the original down until it fits.
-	return floor((MaxDEFilterSize() - (ss - 1.0)) / ss);
+	return std::floor((MaxDEFilterSize() - (ss - 1.0)) / ss);
 }
 
 /// <summary>
@@ -139,7 +139,7 @@ double DEOpenCLKernelCreator::SolveMaxDERad(double desiredFilterSize, double ss)
 /// <returns>The maximum filter box size allowed</returns>
 uint DEOpenCLKernelCreator::SolveMaxBoxSize(uint localMem)
 {
-	return uint(floor(std::sqrt(floor(localMem / 16.0))));//Divide by 16 because each element is float4.
+	return uint(std::floor(std::sqrt(Floor(localMem / 16.0))));//Divide by 16 because each element is float4.
 }
 
 /// <summary>

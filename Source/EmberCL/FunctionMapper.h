@@ -14,6 +14,7 @@ class EMBERCL_API FunctionMapper
 public:
 	FunctionMapper();
 	static const string* GetGlobalFunc(const string& func);
+	static const std::unordered_map<string, string> GetGlobalMapCopy();
 
 private:
 	static std::unordered_map<string, string> s_GlobalMap;

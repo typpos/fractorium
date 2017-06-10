@@ -112,7 +112,7 @@ void PaletteEditor::SetPalette(const Palette<float>& palette)
 /// Return a temporary copy of the xform color indices as a map.
 /// The keys are the xform indices, and the values are the color indices.
 /// </summary>
-/// <param name="palette">The color indices</param>
+/// <returns>The color indices</returns>
 map<size_t, float> PaletteEditor::GetColorIndices() const
 {
 	return m_GradientColorView->GetColorIndices();
@@ -122,10 +122,30 @@ map<size_t, float> PaletteEditor::GetColorIndices() const
 /// Assign the values of the xform color indices to the arrows.
 /// This will clear out any existing values first.
 /// </summary>
-/// <param name="palette">The color indices to assign</param>
+/// <param name="indices">The color indices to assign</param>
 void PaletteEditor::SetColorIndices(const map<size_t, float>& indices)
 {
 	m_GradientColorView->SetColorIndices(indices);
+}
+
+/// <summary>
+/// Return the filename of the currently selected palette.
+/// Note this will only be filled in if the user has clicked in the palette
+/// table at least once.
+/// </summary>
+/// <returns>The palette filename</returns>
+string PaletteEditor::GetPaletteFile() const
+{
+	return m_CurrentPaletteFilePath;
+}
+
+/// <summary>
+/// Set the selected palette file in the combo box.
+/// </summary>
+/// <param name="filename">The filename of the palette file to set to the current one</param>
+void PaletteEditor::SetPaletteFile(const string& filename)
+{
+	ui->PaletteFilenameCombo->setCurrentText(QString::fromStdString(GetFilename(filename)));
 }
 
 /// <summary>
@@ -574,7 +594,8 @@ void PaletteEditor::EnablePaletteControls()
 {
 	auto& palette = m_GradientColorView->GetPalette(256);
 	bool b = !palette.m_SourceColors.empty();
-	ui->OverwritePaletteButton->setEnabled(b);
+	bool any = m_PaletteList->IsModifiable(m_CurrentPaletteFilePath);//At least one in the file is not fixed.
+	ui->OverwritePaletteButton->setEnabled(b && any);
 	ui->AddColorButton->setEnabled(b);
 	ui->DistributeColorsButton->setEnabled(b);
 	ui->AutoDistributeCheckBox->setEnabled(b);

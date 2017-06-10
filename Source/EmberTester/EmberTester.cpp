@@ -1035,19 +1035,36 @@ bool TestConstants()
 	return success;
 }
 
+void TestFuncs()
+{
+	//auto vlf(VariationList<float>::Instance());
+	//vector<string> stringVec;
+	//stringVec.push_back("/ (");
+	////stringVec.push_back("log(");
+	//for (size_t i = 0; i < vlf->Size(); i++)
+	//{
+	//	auto var = vlf->GetVariation(i);
+	//	if (SearchVar(var, stringVec, false))
+	//	{
+	//		cout << var->Name() << endl;
+	//	}
+	//}
+}
+
 bool TestGlobalFuncs()
 {
 	bool success = true;
 	auto vlf(VariationList<float>::Instance());
 	vector<string> funcs;
 	FunctionMapper mapper;
+	auto funcmap = mapper.GetGlobalMapCopy();
 
 	for (size_t i = 0; i < vlf->Size(); i++)
 	{
 		auto var = vlf->GetVariation(i);
 		funcs = var->OpenCLGlobalFuncNames();
 
-		for (auto& func : funcs)
+		for (auto& func : funcs)//Test if the functions the variation says it requires actually exist.
 		{
 			if (!mapper.GetGlobalFunc(func))
 			{
@@ -1057,6 +1074,23 @@ bool TestGlobalFuncs()
 			else
 			{
 				//cout << "Variation " << var->Name() << " used valid global funcion " << func << endl;
+			}
+		}
+
+		auto str = var->OpenCLString();
+		auto vec = var->OpenCLGlobalFuncNames();
+
+		for (auto& func : funcmap)//Test if the functions the variation uses are actually included in those it says are required.
+		{
+			if (Find(str, func.first + "("))
+			{
+				if (!Contains(vec, func.first))
+				{
+					cout << "Variation " << var->Name() << " used global funcion " << func.first << ", but it's not found in its global func name vector: " << endl;
+
+					for (auto& v : vec)
+						cout << v << endl;
+				}
 			}
 		}
 	}
@@ -1221,11 +1255,11 @@ void TestVarTime()
 			helper.m_Color.x = p.m_ColorX = rand.Frand01<T>();
 			p.m_Opacity = rand.Frand01<T>();
 			helper.m_PrecalcSumSquares = SQR(helper.m_TransX) + SQR(helper.m_TransY);
-			helper.m_PrecalcSqrtSumSquares = sqrt(helper.m_PrecalcSumSquares);
+			helper.m_PrecalcSqrtSumSquares = std::sqrt(helper.m_PrecalcSumSquares);
 			helper.m_PrecalcSina = helper.m_TransX / helper.m_PrecalcSqrtSumSquares;
 			helper.m_PrecalcCosa = helper.m_TransY / helper.m_PrecalcSqrtSumSquares;
-			helper.m_PrecalcAtanxy = atan2(helper.m_TransX, helper.m_TransY);
-			helper.m_PrecalcAtanyx = atan2(helper.m_TransY, helper.m_TransX);
+			helper.m_PrecalcAtanxy = std::atan2(helper.m_TransX, helper.m_TransY);
+			helper.m_PrecalcAtanyx = std::atan2(helper.m_TransY, helper.m_TransX);
 			var->Random(rand);
 			t.Tic();
 			var->Func(helper, p, rand);
@@ -1288,8 +1322,6 @@ void TestOperations()
 	{
 		cout << "Variation " << varVec[i]->Name() << " contained MwcNext(mwc) %. Use MwcNextRange() instead." << endl;
 	}
-
-	stringVec.clear();
 }
 
 template <typename T>
@@ -1347,11 +1379,11 @@ void TestVarsSimilar()
 				p.m_Opacity = rand.Frand01<T>();
 				pComp = p;
 				helper.m_PrecalcSumSquares = SQR(helper.m_TransX) + SQR(helper.m_TransY);
-				helper.m_PrecalcSqrtSumSquares = sqrt(helper.m_PrecalcSumSquares);
+				helper.m_PrecalcSqrtSumSquares = std::sqrt(helper.m_PrecalcSumSquares);
 				helper.m_PrecalcSina = helper.m_TransX / helper.m_PrecalcSqrtSumSquares;
 				helper.m_PrecalcCosa = helper.m_TransY / helper.m_PrecalcSqrtSumSquares;
-				helper.m_PrecalcAtanxy = atan2(helper.m_TransX, helper.m_TransY);
-				helper.m_PrecalcAtanyx = atan2(helper.m_TransY, helper.m_TransX);
+				helper.m_PrecalcAtanxy = std::atan2(helper.m_TransX, helper.m_TransY);
+				helper.m_PrecalcAtanyx = std::atan2(helper.m_TransY, helper.m_TransX);
 
 				if (parVar)
 				{
@@ -1641,10 +1673,10 @@ void TestRandomAccess(size_t vsize, size_t ipp, bool cache)
 			v4T v4(rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 			int index = rand.Rand((ISAAC_INT)vsize);
 			v4T v42 = vdata[index];
-			v4.x = log(v4.x);
-			v4.y = sqrt(v4.y);
-			v4.z = sin(v4.z);
-			v4.w = cos(v4.w);
+			v4.x = std::log(v4.x);
+			v4.y = std::sqrt(v4.y);
+			v4.z = std::sin(v4.z);
+			v4.w = std::cos(v4.w);
 			v4 += T(1.234);
 			v4 *= T(55.55);
 			v4 /= T(0.0045);
@@ -1657,10 +1689,10 @@ void TestRandomAccess(size_t vsize, size_t ipp, bool cache)
 		{
 			v4T v4(rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>(), rand.Frand11<T>());
 			int index = rand.Rand((ISAAC_INT)vsize);
-			v4.x = log(v4.x);
-			v4.y = sqrt(v4.y);
-			v4.z = sin(v4.z);
-			v4.w = cos(v4.w);
+			v4.x = std::log(v4.x);
+			v4.y = std::sqrt(v4.y);
+			v4.z = std::sin(v4.z);
+			v4.w = std::cos(v4.w);
 			v4 += T(1.234);
 			v4 *= T(55.55);
 			v4 /= T(0.0045);
@@ -1673,7 +1705,7 @@ template <typename T>
 void TestCross(T x, T y, T weight)
 {
 	T s = x * x - y * y;
-	T r = weight * sqrt(1 / (s * s + EPS));
+	T r = weight * std::sqrt(1 / (s * s + EPS));
 	T outX = x * r;
 	T outY = y * r;
 	cout << "First way, outX, outY == " << outX << ", " << outY << endl;
@@ -1931,9 +1963,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	vector<Ember<double>> dv;
 	list<Ember<float>> fl;
 	list<Ember<double>> dl;
-	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
-	/*  string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
+	/*  TestFuncs();
+	    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
 	    auto vec = Split(line, delim, true);
 
 	    for (auto& s : vec) cout << s << endl;
@@ -1958,9 +1989,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	    TestRotate<double>();
 	    return 1;
 	*/
-	MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
-	return 0;
-	/*
+	//MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
+	/*  return 0;
+
 
 	    TestThreadedKernel();
 

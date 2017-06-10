@@ -20,9 +20,9 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T temp = 1 / Zeps(cos(helper.In.y)) + m_Effect * T(M_PI);
-		helper.Out.x = m_Weight * (tanh(helper.In.x) * temp);
-		helper.Out.y = m_Weight * (tanh(helper.In.y) * temp);
+		T temp = 1 / Zeps(std::cos(helper.In.y)) + m_Effect * T(M_PI);
+		helper.Out.x = m_Weight * (std::tanh(helper.In.x) * temp);
+		helper.Out.y = m_Weight * (std::tanh(helper.In.y) * temp);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -1111,7 +1111,7 @@ public:
 		T coeff = std::abs(helper.In.z);
 
 		if (coeff != 0 && m_Power != 1)
-			coeff = std::exp(log(coeff) * m_Power);
+			coeff = std::exp(std::log(coeff) * m_Power);
 
 		helper.Out.x = m_Weight * (helper.m_TransX + helper.In.x * coeff);
 		helper.Out.y = m_Weight * (helper.m_TransY + helper.In.y * coeff);
@@ -2258,7 +2258,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T dx, dy, r = m_Weight / (helper.m_PrecalcSumSquares + EPS);
+		T dx, dy, r = m_Weight / Zeps(helper.m_PrecalcSumSquares);
 		int isXY = int(VarFuncs<T>::LRint(helper.In.x * m_InvSize) + VarFuncs<T>::LRint(helper.In.y * m_InvSize));
 
 		if (isXY & 1)
@@ -2289,7 +2289,7 @@ public:
 		string rand    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string invSize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		ss << "\t{\n"
-		   << "\t\treal_t dx, dy, r = xform->m_VariationWeights[" << varIndex << "] / (precalcSumSquares + EPS);\n"
+		   << "\t\treal_t dx, dy, r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares);\n"
 		   << "\t\tint isXY = LRint(vIn.x * " << invSize << ") + LRint(vIn.y * " << invSize << ");\n"
 		   << "\n"
 		   << "\t\tif (isXY & 1)\n"
@@ -2312,12 +2312,12 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "LRint" };
+		return vector<string> { "LRint", "Zeps" };
 	}
 
 	virtual void Precalc() override
 	{
-		m_InvSize = 1 / (m_Size + EPS);
+		m_InvSize = 1 / Zeps(m_Size);
 	}
 
 protected:
@@ -3468,8 +3468,8 @@ public:
 			sigma = alt * m_PiCn + fmod(sigma - m_CaCn, m_PiCn);
 
 		T temp = std::cosh(tau) - std::cos(sigma);
-		helper.Out.x = m_Weight * sinh(tau) / temp;
-		helper.Out.y = m_Weight * sin(sigma) / temp;
+		helper.Out.x = m_Weight * std::sinh(tau) / temp;
+		helper.Out.y = m_Weight * std::sin(sigma) / temp;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -3791,7 +3791,7 @@ public:
 		}
 
 		helper.Out.x = m_Weight * xmax * std::cos(nu);
-		helper.Out.y = m_Weight * std::sqrt(xmax - 1) * std::sqrt(xmax + 1) * sin(nu);
+		helper.Out.y = m_Weight * std::sqrt(xmax - 1) * std::sqrt(xmax + 1) * std::sin(nu);
 		helper.Out.z = DefaultZ(helper);
 	}
 

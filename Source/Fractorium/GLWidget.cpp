@@ -860,10 +860,10 @@ void GLEmberController<T>::DrawGrid()
 	double scale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
 	float unitX = (std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f) / scale;
 	float unitY = (std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f) / scale;
-	float xLow =  floor(-unitX);
-	float xHigh = ceil(unitX);
-	float yLow =  floor(-unitY);
-	float yHigh = ceil(unitY);
+	float xLow = std::floor(-unitX);
+	float xHigh = std::ceil(unitX);
+	float yLow = std::floor(-unitY);
+	float yHigh = std::ceil(unitY);
 	float alpha = 0.25f;
 	Affine2D<T> temp;
 	m4T mat = (temp * scale).ToMat4RowMajor();

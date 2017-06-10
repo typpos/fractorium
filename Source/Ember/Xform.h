@@ -866,10 +866,10 @@ public:
 		}
 
 		if (m_NeedPrecalcAtanXY)
-			helper.m_PrecalcAtanxy = atan2(helper.m_TransX, helper.m_TransY);
+			helper.m_PrecalcAtanxy = std::atan2(helper.m_TransX, helper.m_TransY);
 
 		if (m_NeedPrecalcAtanYX)
-			helper.m_PrecalcAtanyx = atan2(helper.m_TransY, helper.m_TransX);
+			helper.m_PrecalcAtanyx = std::atan2(helper.m_TransY, helper.m_TransX);
 	}
 
 	/// <summary>

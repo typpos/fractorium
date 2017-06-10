@@ -1226,10 +1226,10 @@ public:
 		}
 
 		if (m_NeedPrecalcAtanXY)
-			iteratorHelper.m_PrecalcAtanxy = atan2(iteratorHelper.In.x, iteratorHelper.In.y);
+			iteratorHelper.m_PrecalcAtanxy = std::atan2(iteratorHelper.In.x, iteratorHelper.In.y);
 
 		if (m_NeedPrecalcAtanYX)
-			iteratorHelper.m_PrecalcAtanyx = atan2(iteratorHelper.In.y, iteratorHelper.In.x);
+			iteratorHelper.m_PrecalcAtanyx = std::atan2(iteratorHelper.In.y, iteratorHelper.In.x);
 	}
 
 	/// <summary>
@@ -2328,4 +2328,4 @@ protected:
 		\
 		PREPOSTPARVARCOPY(Post##varName##Variation, varName##Variation) \
 	};
-	}
+}

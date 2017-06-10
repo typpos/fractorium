@@ -592,8 +592,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T d = Zeps(helper.m_PrecalcSumSquares);
-		helper.Out.x = (m_Weight / d) * (tanh(d) * (2 * helper.In.x));
-		helper.Out.y = (m_Weight / d) * (cos(d)  * (2 * helper.In.y));
+		helper.Out.x = (m_Weight / d) * (std::tanh(d) * (2 * helper.In.x));
+		helper.Out.y = (m_Weight / d) * (std::cos(d)  * (2 * helper.In.y));
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -631,8 +631,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T d = Zeps(helper.m_PrecalcSumSquares);
-		helper.Out.x = (m_Weight / 2) * (tanh(d) * (2 * helper.In.x));
-		helper.Out.y = (m_Weight / 2) * (cos(d)  * (2 * helper.In.y));
+		helper.Out.x = (m_Weight / 2) * (std::tanh(d) * (2 * helper.In.x));
+		helper.Out.y = (m_Weight / 2) * (std::cos(d)  * (2 * helper.In.y));
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -3664,7 +3664,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
-		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
+		T ni = m_Weight / Zeps(helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(helper.In.x);
 		T c = std::cos(helper.In.x);
 		T sh = std::sinh(absV);
@@ -3681,7 +3681,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (precalcSumSquares + SQR(vIn.z));\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares + SQR(vIn.z));\n"
 		   << "\t\treal_t s = sin(vIn.x);\n"
 		   << "\t\treal_t c = cos(vIn.x);\n"
 		   << "\t\treal_t sh = sinh(absV);\n"
@@ -3715,7 +3715,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T absV = VarFuncs<T>::Hypot(helper.In.y, helper.In.z);
-		T ni = m_Weight / (helper.m_PrecalcSumSquares + SQR(helper.In.z));
+		T ni = m_Weight / Zeps(helper.m_PrecalcSumSquares + SQR(helper.In.z));
 		T s = std::sin(absV);
 		T c = std::cos(absV);
 		T sh = std::sinh(helper.In.x);
@@ -3732,7 +3732,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
-		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / (precalcSumSquares + SQR(vIn.z));\n"
+		   << "\t\treal_t ni = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares + SQR(vIn.z));\n"
 		   << "\t\treal_t s = sin(absV);\n"
 		   << "\t\treal_t c = cos(absV);\n"
 		   << "\t\treal_t sh = sinh(vIn.x);\n"
@@ -4731,7 +4731,7 @@ public:
 			if (r <= m_R1)
 			{
 				r *= m_R2 / m_R1;
-				temp = atan2(helper.In.y, c1mx);
+				temp = std::atan2(helper.In.y, c1mx);
 				helper.Out.x = m_Weight * (r * std::cos(temp) - m_C2);
 				helper.Out.y = m_Weight *  r * std::sin(temp);
 			}
@@ -4749,7 +4749,7 @@ public:
 			if (r <= m_R2)
 			{
 				r *= m_R1 / m_R2;
-				temp = atan2(helper.In.y, c1mx);
+				temp = std::atan2(helper.In.y, c1mx);
 				helper.Out.x = m_Weight * (r * std::cos(temp) + m_C1);
 				helper.Out.y = m_Weight *  r * std::sin(temp);
 			}
@@ -5060,10 +5060,10 @@ public:
 		T ymax = T(0.5) * (std::sqrt(tmp + y2) + std::sqrt(tmp - y2));
 		T a = helper.In.x / Zeps(xmax);
 		T b = VarFuncs<T>::SafeSqrt(1 - SQR(a));
-		helper.Out.x = m_Vx * atan2(a, b) * r;
+		helper.Out.x = m_Vx * std::atan2(a, b) * r;
 		a = helper.In.y / Zeps(ymax);
 		b = VarFuncs<T>::SafeSqrt(1 - SQR(a));
-		helper.Out.y = m_Vy * atan2(a, b) * r;
+		helper.Out.y = m_Vy * std::atan2(a, b) * r;
 		helper.Out.z = DefaultZ(helper);
 	}
 

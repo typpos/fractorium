@@ -70,8 +70,11 @@
          <height>16777215</height>
         </size>
        </property>
-       <property name="font">
-       </property>
+			 <property name="font">
+			 	<font>
+			 		<kerning>true</kerning>
+			 	</font>
+			 </property>
        <property name="frameShape">
         <enum>QFrame::Panel</enum>
        </property>

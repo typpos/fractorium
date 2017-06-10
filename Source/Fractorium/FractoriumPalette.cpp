@@ -319,6 +319,7 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 {
 	size_t i = 0;
 	auto ed = m_Fractorium->m_PaletteEditor;
+	Palette<float> edPal;
 	Palette<float> prevPal = m_TempPalette;
 	ed->SetPalette(m_TempPalette);
 	map<size_t, float> colorIndices;
@@ -327,28 +328,27 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 		colorIndices[i++] = xform->m_ColorX;
 
 	ed->SetColorIndices(colorIndices);
+	ed->SetPaletteFile(m_CurrentPaletteFilePath);
 
 	if (ed->exec() == QDialog::Accepted)
 	{
 		if (!m_Fractorium->PaletteChanged())//If the clicked ok, but never synced, set the palette now.
-			SetBasePaletteAndAdjust(ed->GetPalette(int(256)));
+		{
+			edPal = ed->GetPalette(int(256));
+			SetBasePaletteAndAdjust(edPal);
+
+			if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
+				m_Fractorium->SetPaletteFileComboIndex(*edPal.m_Filename);
+		}
 	}
 	else if (m_Fractorium->PaletteChanged())//They clicked cancel, but synced at least once, restore the previous palette.
 	{
 		SetBasePaletteAndAdjust(prevPal);
 	}
 
-	//If the palette was modifiable, and any palette was changed at least once
-	if (m_Fractorium->m_PaletteFileChanged && m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
-	{
-		if (!::FillPaletteTable(m_CurrentPaletteFilePath, m_Fractorium->ui.PaletteListTable, m_PaletteList))
-		{
-			vector<string> errors = m_PaletteList->ErrorReport();
-			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoFileOpeningTextEdit);
-			m_Fractorium->ShowCritical("Palette Read Error", "Could not re-load modified palette file, all images will be black. See info tab for details.");
-			m_PaletteList->ClearErrorReport();
-		}
-	}
+	//Whether the current palette file was changed or not, if it's modifiable then reload it just to be safe.
+	if (m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
+		m_Fractorium->OnPaletteFilenameComboChanged(QString::fromStdString(m_CurrentPaletteFilePath));
 }
 
 /// <summary>

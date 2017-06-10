@@ -155,7 +155,7 @@ public:
 			{
 				lx *= m_G2;
 				ly *= m_G2;
-				T r = m_Rfactor / ((SQR(lx) + SQR(ly)) / 4 + 1);
+				T r = m_Rfactor / Zeps((SQR(lx) + SQR(ly)) / 4 + 1);
 				lx *= r;
 				ly *= r;
 				r = (SQR(lx) + SQR(ly)) / m_R2;
@@ -211,7 +211,7 @@ public:
 		   << "\t\t		lx *= " << g2 << ";\n"
 		   << "\t\t		ly *= " << g2 << ";\n"
 		   << "\n"
-		   << "\t\t		real_t r = " << rfactor << " / ((SQR(lx) + SQR(ly)) / 4 + 1);\n"
+		   << "\t\t		real_t r = " << rfactor << " / Zeps((SQR(lx) + SQR(ly)) / 4 + 1);\n"
 		   << "\n"
 		   << "\t\t		lx *= r;\n"
 		   << "\t\t		ly *= r;\n"
@@ -245,8 +245,13 @@ public:
 		else
 			maxBubble *= (1 / (SQR(maxBubble) / 4 + 1));
 
-		m_R2 = SQR(radius);
+		m_R2 = Zeps(SQR(radius));
 		m_Rfactor = radius / maxBubble;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -1957,7 +1962,7 @@ public:
 	{
 		T s, c;
 		T avgr = m_Weight * (std::sqrt(SQR(helper.In.y) + SQR(helper.In.x + 1)) / std::sqrt(SQR(helper.In.y) + SQR(helper.In.x - 1)));
-		T avga = (atan2(helper.In.y, helper.In.x - 1) - atan2(helper.In.y, helper.In.x + 1)) / 2;
+		T avga = (atan2(helper.In.y, helper.In.x - 1) - std::atan2(helper.In.y, helper.In.x + 1)) / 2;
 		sincos(avga, &s, &c);
 		helper.Out.x = avgr * c;
 		helper.Out.y = avgr * s;
@@ -2033,7 +2038,7 @@ public:
 	virtual void Precalc() override
 	{
 		m_K = T(0.5) * std::log(Zeps(SQR(m_Real) + SQR(m_Imag)));//Original used 1e-300, which isn't representable with a float.
-		m_T = atan2(m_Imag, m_Real);
+		m_T = std::atan2(m_Imag, m_Real);
 	}
 
 protected:
@@ -2958,7 +2963,7 @@ public:
 		T r2 = helper.m_PrecalcSumSquares + helper.In.z;
 		T x2cx = m_C2x * helper.In.x;
 		T y2cy = m_C2y * helper.In.y;
-		T d = m_Weight / (m_C2 * r2 + x2cx - y2cy + 1);
+		T d = m_Weight / Zeps(m_C2 * r2 + x2cx - y2cy + 1);
 		helper.Out.x = d * (helper.In.x * m_S2x - m_Cx * ( y2cy - r2 - 1));
 		helper.Out.y = d * (helper.In.y * m_S2y + m_Cy * (-x2cx - r2 - 1));
 		helper.Out.z = d * (helper.In.z * m_S2z);
@@ -2987,7 +2992,7 @@ public:
 		   << "\t\treal_t r2 = precalcSumSquares + vIn.z;\n"
 		   << "\t\treal_t x2cx = " << c2x << " * vIn.x;\n"
 		   << "\t\treal_t y2cy = " << c2y << " * vIn.y;\n"
-		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] / (" << c2 << " * r2 + x2cx - y2cy + 1);\n"
+		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] / Zeps(" << c2 << " * r2 + x2cx - y2cy + 1);\n"
 		   << "\n"
 		   << "\t\tvOut.x = d * (vIn.x * " << s2x << " - " << cx << "* ( y2cy - r2 - 1));\n"
 		   << "\t\tvOut.y = d * (vIn.y * " << s2y << " + " << cy << "* (-x2cx - r2 - 1));\n"
@@ -3016,6 +3021,11 @@ public:
 		m_S2x = 1 + SQR(m_Cx) - SQR(m_Cy);
 		m_S2y = 1 + SQR(m_Cy) - SQR(m_Cx);
 		m_S2z = 1 - SQR(m_Cy) - SQR(m_Cx);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -3078,7 +3088,7 @@ public:
 		T r2 = helper.m_PrecalcSumSquares + SQR(helper.In.z);
 		T x2cx = 2 * cx * helper.In.x;
 		T y2cy = 2 * cy * helper.In.x;
-		T d = m_Weight / (m_C2 * r2 + x2cx - y2cy + 1);
+		T d = m_Weight / Zeps(m_C2 * r2 + x2cx - y2cy + 1);
 		helper.Out.x = d * (helper.In.x * s2x - cx * ( y2cy - r2 - 1));
 		helper.Out.y = d * (helper.In.y * s2y + cy * (-x2cx - r2 - 1));
 		helper.Out.z = d * (helper.In.z * m_S2z);
@@ -3105,7 +3115,7 @@ public:
 		   << "\t\treal_t r2 = precalcSumSquares + SQR(vIn.z);\n"
 		   << "\t\treal_t x2cx = 2 * cx * vIn.x;\n"
 		   << "\t\treal_t y2cy = 2 * cy * vIn.x;\n"
-		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] / (" << c2 << " * r2 + x2cx - y2cy + 1);\n"
+		   << "\t\treal_t d = xform->m_VariationWeights[" << varIndex << "] / Zeps(" << c2 << " * r2 + x2cx - y2cy + 1);\n"
 		   << "\n"
 		   << "\t\tvOut.x = d * (vIn.x * s2x - cx * ( y2cy - r2 - 1));\n"
 		   << "\t\tvOut.y = d * (vIn.y * s2y + cy * (-x2cx - r2 - 1));\n"
@@ -3129,6 +3139,11 @@ public:
 		m_R = r;
 		m_C2 = SQR(r);
 		m_S2z = 1 - m_C2;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -3811,10 +3826,10 @@ public:
 		{
 			if (helper.In.x >= 0)
 			{
-				xo = (r + 1) / (2 * helper.In.x);
+				xo = (r + 1) / Zeps(2 * helper.In.x);
 				ro = std::sqrt(SQR(helper.In.x - xo) + SQR(helper.In.y));
-				theta = atan2(T(1), ro);
-				a = fmod(m_In * theta + atan2(helper.In.y, xo - helper.In.x) + theta, 2 * theta) - theta;
+				theta = std::atan2(T(1), ro);
+				a = fmod(m_In * theta + std::atan2(helper.In.y, xo - helper.In.x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
 				helper.Out.x = m_Weight * (xo - c * ro);
 				helper.Out.y = m_Weight * s * ro;
@@ -3823,8 +3838,8 @@ public:
 			{
 				xo = - (r + 1) / (2 * helper.In.x);
 				ro = std::sqrt(SQR(-helper.In.x - xo) + SQR(helper.In.y));
-				theta = atan2(T(1), ro);
-				a = fmod(m_In * theta + atan2(helper.In.y, xo + helper.In.x) + theta, 2 * theta) - theta;
+				theta = std::atan2(T(1), ro);
+				a = fmod(m_In * theta + std::atan2(helper.In.y, xo + helper.In.x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
 				helper.Out.x = -(m_Weight * (xo - c * ro));
 				helper.Out.y = m_Weight * s * ro;
@@ -3840,10 +3855,10 @@ public:
 
 			if (x >= 0)
 			{
-				xo = (SQR(x) + SQR(y) + 1) / (2 * x);
+				xo = (SQR(x) + SQR(y) + 1) / Zeps(2 * x);
 				ro = std::sqrt(SQR(x - xo) + SQR(y));
 				theta = std::atan2(T(1), ro);
-				a = fmod(m_Out * theta + atan2(y, xo - x) + theta, 2 * theta) - theta;
+				a = fmod(m_Out * theta + std::atan2(y, xo - x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
 				x = (xo - c * ro);
 				y =  s * ro;
@@ -3895,7 +3910,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	if (vIn.x >= 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		xo = (r + 1) / (2 * vIn.x);\n"
+		   << "\t\t		xo = (r + 1) / Zeps(2 * vIn.x);\n"
 		   << "\t\t		ro = sqrt(SQR(vIn.x - xo) + SQR(vIn.y));\n"
 		   << "\t\t		theta = atan2(1, ro);\n"
 		   << "\t\t		a = fmod(" << in << " * theta + atan2(vIn.y, xo - vIn.x) + theta, 2 * theta) - theta;\n"
@@ -3928,7 +3943,7 @@ public:
 		   << "\n"
 		   << "\t\t	if (x >= 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		xo = (SQR(x) + SQR(y) + 1) / (2 * x);\n"
+		   << "\t\t		xo = (SQR(x) + SQR(y) + 1) / Zeps(2 * x);\n"
 		   << "\t\t		ro = sqrt(SQR(x - xo) + SQR(y));\n"
 		   << "\t\t		theta = atan2(1 , ro);\n"
 		   << "\t\t		a = fmod(" << out << " * theta + atan2(y, xo - x) + theta, 2 * theta) - theta;\n"
@@ -3971,6 +3986,11 @@ public:
 		return ss.str();
 	}
 
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
 protected:
 	void Init()
 	{
@@ -4001,10 +4021,10 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x = m_C1x + (SQR(m_C1r) * (helper.In.x - m_C1x)) / (SQR(helper.In.x - m_C1x) + SQR(helper.In.y - m_C1y));
-		T y = m_C1y + (SQR(m_C1r) * (helper.In.y - m_C1y)) / (SQR(helper.In.x - m_C1x) + SQR(helper.In.y - m_C1y));
-		helper.Out.x = m_C2x + (SQR(m_C2r) * (x - m_C2x)) / (SQR(x - m_C2x) + SQR(y - m_C2y));
-		helper.Out.y = m_C2y + (SQR(m_C2r) * (y - m_C2y)) / (SQR(x - m_C2x) + SQR(y - m_C2y));
+		T x = m_C1x + (SQR(m_C1r) * (helper.In.x - m_C1x)) / Zeps(Sqr(helper.In.x - m_C1x) + Sqr(helper.In.y - m_C1y));
+		T y = m_C1y + (SQR(m_C1r) * (helper.In.y - m_C1y)) / Zeps(Sqr(helper.In.x - m_C1x) + Sqr(helper.In.y - m_C1y));
+		helper.Out.x = m_C2x + (SQR(m_C2r) * (x - m_C2x))  / Zeps(Sqr(x - m_C2x) + Sqr(y - m_C2y));
+		helper.Out.y = m_C2y + (SQR(m_C2r) * (y - m_C2y))  / Zeps(Sqr(x - m_C2x) + Sqr(y - m_C2y));
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -4025,11 +4045,11 @@ public:
 		string c1d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x = " << c1x << " + (SQR(" << c1r << ") * (vIn.x - " << c1x << ")) / (SQR(vIn.x - " << c1x << ") + SQR(vIn.y - " << c1y << "));\n"
-		   << "\t\treal_t y = " << c1y << " + (SQR(" << c1r << ") * (vIn.y - " << c1y << ")) / (SQR(vIn.x - " << c1x << ") + SQR(vIn.y - " << c1y << "));\n"
+		   << "\t\treal_t x = " << c1x << " + (SQR(" << c1r << ") * (vIn.x - " << c1x << ")) / Zeps(Sqr(vIn.x - " << c1x << ") + Sqr(vIn.y - " << c1y << "));\n"
+		   << "\t\treal_t y = " << c1y << " + (SQR(" << c1r << ") * (vIn.y - " << c1y << ")) / Zeps(Sqr(vIn.x - " << c1x << ") + Sqr(vIn.y - " << c1y << "));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << c2x << " + (SQR(" << c2r << ") * (x - " << c2x << ")) / (SQR(x - " << c2x << ") + SQR(y - " << c2y << "));\n"
-		   << "\t\tvOut.y = " << c2y << " + (SQR(" << c2r << ") * (y - " << c2y << ")) / (SQR(x - " << c2x << ") + SQR(y - " << c2y << "));\n"
+		   << "\t\tvOut.x = " << c2x << " + (SQR(" << c2r << ") * (x - " << c2x << ")) / Zeps(Sqr(x - " << c2x << ") + Sqr(y - " << c2y << "));\n"
+		   << "\t\tvOut.y = " << c2y << " + (SQR(" << c2r << ") * (y - " << c2y << ")) / Zeps(Sqr(x - " << c2x << ") + Sqr(y - " << c2y << "));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4043,6 +4063,11 @@ public:
 		m_C1y = m_C1d * std::sin(fmod(m_C1a, T(M_PI)));
 		m_C2x = m_C2d * std::cos(fmod(m_C2a, T(M_PI)));
 		m_C2y = m_C2d * std::sin(fmod(m_C2a, T(M_PI)));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sqr", "Zeps" };
 	}
 
 protected:
@@ -4358,7 +4383,7 @@ public:
 		T ti = m_T3 * (3 * xsqr * helper.In.y - ycb) + m_T2 * 2 * helper.In.x * helper.In.y + m_T1 * helper.In.y;
 		T br = m_B3 * (xcb - 3 * helper.In.x * ysqr) + m_B2 * (xsqr - ysqr) + m_B1 * helper.In.x + m_Bc;
 		T bi = m_B3 * (3 * xsqr * helper.In.y - ycb) + m_B2 * 2 * helper.In.x * helper.In.y + m_B1 * helper.In.y;
-		T r3den = 1 / (br * br + bi * bi);
+		T r3den = 1 / Zeps(br * br + bi * bi);
 		helper.Out.x = m_Weight * (tr * br + ti * bi) * r3den;
 		helper.Out.y = m_Weight * (ti * br - tr * bi) * r3den;
 		helper.Out.z = DefaultZ(helper);
@@ -4390,13 +4415,18 @@ public:
 		   << "\t\treal_t br = " << b3 << " * (xcb - 3 * vIn.x * ysqr) + " << b2 << " * (xsqr - ysqr) + " << b1 << " * vIn.x + " << bc << ";\n"
 		   << "\t\treal_t bi = " << b3 << " * (3 * xsqr * vIn.y - ycb) + " << b2 << " * 2 * vIn.x * vIn.y + " << b1 << " * vIn.y;\n"
 		   << "\n"
-		   << "\t\treal_t r3den = 1 / (br * br + bi * bi);\n"
+		   << "\t\treal_t r3den = 1 / Zeps(br * br + bi * bi);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (tr * br + ti * bi) * r3den;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (ti * br - tr * bi) * r3den;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -4661,6 +4691,11 @@ public:
 		m_Sx *= -5;
 		m_Sy *= -5;
 		m_Vv = std::abs(m_Weight);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -5192,7 +5227,7 @@ public:
 		T dot11 = SQR(m_C) + SQR(m_D);//v1 * v1.
 		T dot12 = m_C * helper.In.x + m_D * helper.In.y;//v1 * v2.
 		//Compute inverse denomiator.
-		T invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+		T invDenom = 1 / Zeps(dot00 * dot11 - dot01 * dot01);
 		//Now we can pull [u,v] as the barycentric coordinates of the point
 		//P in the triangle [A, B, C].
 		T u = (dot11 * dot02 - dot01 * dot12) * invDenom;
@@ -5221,7 +5256,7 @@ public:
 		   << "\t\treal_t dot02 = " << a << " * vIn.x + " << b << " * vIn.y;\n"
 		   << "\t\treal_t dot11 = SQR(" << c << ") + SQR(" << d << ");\n"
 		   << "\t\treal_t dot12 = " << c << " * vIn.x + " << d << " * vIn.y;\n"
-		   << "\t\treal_t invDenom = (real_t)(1.0) / (dot00 * dot11 - dot01 * dot01);\n"
+		   << "\t\treal_t invDenom = (real_t)(1.0) / Zeps(dot00 * dot11 - dot01 * dot01);\n"
 		   << "\t\treal_t u = (dot11 * dot02 - dot01 * dot12) * invDenom;\n"
 		   << "\t\treal_t v = (dot00 * dot12 - dot01 * dot02) * invDenom;\n"
 		   << "\t\treal_t um = sqrt(SQR(u) + SQR(vIn.x)) * Sign(u);\n"
@@ -5236,7 +5271,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sign" };
+		return vector<string> { "Sign", "Zeps" };
 	}
 
 protected:

@@ -684,7 +684,7 @@ static inline void ClampGte0Ref(T& val)
 template <typename T>
 static inline T Round(T r)
 {
-	return (r > 0) ? static_cast<T>(Floor<T>(r + T(0.5))) : ceil(r - T(0.5));
+	return (r > 0) ? static_cast<T>(Floor<T>(r + T(0.5))) : std::ceil(r - T(0.5));
 }
 
 /// <summary>

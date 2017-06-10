@@ -919,18 +919,17 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 
 		for (intmax_t j = localStartRow; (j < localEndRow) && !m_Abort; j++)
 		{
-			size_t bucketRowStart = j * m_SuperRasW;//Pull out of inner loop for optimization.
-			const tvec4<bucketT, glm::defaultp>* bucket;
-			const tvec4<bucketT, glm::defaultp>* buckets = m_HistBuckets.data();
-			const bucketT* filterCoefs = m_DensityFilter->Coefs();
-			const bucketT* filterWidths = m_DensityFilter->Widths();
+			auto buckets = m_HistBuckets.data();
+			auto bucketRowStart = buckets + (j * m_SuperRasW);//Pull out of inner loop for optimization.
+			auto filterCoefs = m_DensityFilter->Coefs();
+			auto filterWidths = m_DensityFilter->Widths();
 
 			for (intmax_t i = startCol; i < endCol; i++)
 			{
 				intmax_t ii, jj, arrFilterWidth;
 				size_t filterSelectInt, filterCoefIndex;
 				T filterSelect = 0;
-				bucket = buckets + bucketRowStart + i;
+				auto bucket = bucketRowStart + i;
 
 				//Don't do anything if there's no hits here. Must also put this first to avoid dividing by zero below.
 				if (bucket->a == 0)

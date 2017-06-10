@@ -1086,8 +1086,8 @@ public:
 		T uu = SQR(helper.In.x);
 		T vv = SQR(helper.In.y);
 		T ww = SQR(helper.In.z);
-		T atOmegaX = atan2(vv, ww);
-		T atOmegaY = atan2(uu, ww);
+		T atOmegaX = std::atan2(vv, ww);
+		T atOmegaY = std::atan2(uu, ww);
 		T su = std::sin(helper.In.x);
 		T cu = std::cos(helper.In.x);
 		T sv = std::sin(helper.In.y);
@@ -1994,7 +1994,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T t = helper.m_PrecalcSumSquares + SQR(helper.In.z);
-		T r = 1 / (std::sqrt(t) * (t + m_InvWeight));
+		T r = 1 / Zeps(std::sqrt(t) * (t + m_InvWeight));
 		T z = helper.In.z == 0 ? helper.m_PrecalcAtanyx : helper.In.z;
 		helper.Out.x = helper.In.x * r;
 		helper.Out.y = helper.In.y * r;
@@ -2010,7 +2010,7 @@ public:
 		string invWeight = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t t = precalcSumSquares + SQR(vIn.z);\n"
-		   << "\t\treal_t r = 1 / (sqrt(t) * (t + " << invWeight << "));\n"
+		   << "\t\treal_t r = 1 / Zeps(sqrt(t) * (t + " << invWeight << "));\n"
 		   << "\t\treal_t z = vIn.z == 0 ? precalcAtanyx : vIn.z;\n"
 		   << "\n"
 		   << "\t\tvOut.x = vIn.x * r;\n"
@@ -2023,6 +2023,11 @@ public:
 	virtual void Precalc() override
 	{
 		m_InvWeight = 1 / Zeps(m_Weight);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -2159,12 +2164,12 @@ public:
 				if (offsetX >= 0)
 				{
 					helper.Out.x += m_Weight * (offsetX * T(0.5) + roundX + m_X);
-					helper.Out.y += m_Weight * (offsetY * T(0.5) + roundY + m_Y * offsetY / offsetX);
+					helper.Out.y += m_Weight * (offsetY * T(0.5) + roundY + m_Y * offsetY / Zeps(offsetX));
 				}
 				else
 				{
 					helper.Out.x += m_Weight * (offsetX * T(0.5) + roundX - m_Y);
-					helper.Out.y += m_Weight * (offsetY * T(0.5) + roundY - m_Y * offsetY / offsetX);
+					helper.Out.y += m_Weight * (offsetY * T(0.5) + roundY - m_Y * offsetY / Zeps(offsetX));
 				}
 			}
 			else
@@ -2172,12 +2177,12 @@ public:
 				if (offsetY >= 0)
 				{
 					helper.Out.y += m_Weight * (offsetY * T(0.5) + roundY + m_Y);
-					helper.Out.x += m_Weight * (offsetX * T(0.5) + roundX + offsetX / offsetY * m_Y);
+					helper.Out.x += m_Weight * (offsetX * T(0.5) + roundX + offsetX / Zeps(offsetY) * m_Y);
 				}
 				else
 				{
 					helper.Out.y += m_Weight * (offsetY * T(0.5) + roundY - m_Y);
-					helper.Out.x += m_Weight * (offsetX * T(0.5) + roundX - offsetX / offsetY * m_X);
+					helper.Out.x += m_Weight * (offsetX * T(0.5) + roundX - offsetX / Zeps(offsetY) * m_X);
 				}
 			}
 		}
@@ -2219,12 +2224,12 @@ public:
 		   << "\t\t		if (offsetX >= 0)\n"
 		   << "\t\t		{\n"
 		   << "\t\t			vOut.x += xform->m_VariationWeights[" << varIndex << "] * (offsetX * (real_t)(0.5) + roundX + " << x << ");\n"
-		   << "\t\t			vOut.y += xform->m_VariationWeights[" << varIndex << "] * (offsetY * (real_t)(0.5) + roundY + " << y << " * offsetY / offsetX);\n"
+		   << "\t\t			vOut.y += xform->m_VariationWeights[" << varIndex << "] * (offsetY * (real_t)(0.5) + roundY + " << y << " * offsetY / Zeps(offsetX));\n"
 		   << "\t\t		}\n"
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
 		   << "\t\t			vOut.x += xform->m_VariationWeights[" << varIndex << "] * (offsetX * (real_t)(0.5) + roundX - " << y << ");\n"
-		   << "\t\t			vOut.y += xform->m_VariationWeights[" << varIndex << "] * (offsetY * (real_t)(0.5) + roundY - " << y << " * offsetY / offsetX);\n"
+		   << "\t\t			vOut.y += xform->m_VariationWeights[" << varIndex << "] * (offsetY * (real_t)(0.5) + roundY - " << y << " * offsetY / Zeps(offsetX));\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
@@ -2232,12 +2237,12 @@ public:
 		   << "\t\t		if (offsetY >= 0)\n"
 		   << "\t\t		{\n"
 		   << "\t\t			vOut.y += xform->m_VariationWeights[" << varIndex << "] * (offsetY * (real_t)(0.5) + roundY + " << y << ");\n"
-		   << "\t\t			vOut.x += xform->m_VariationWeights[" << varIndex << "] * (offsetX * (real_t)(0.5) + roundX + offsetX / offsetY * " << y << ");\n"
+		   << "\t\t			vOut.x += xform->m_VariationWeights[" << varIndex << "] * (offsetX * (real_t)(0.5) + roundX + offsetX / Zeps(offsetY) * " << y << ");\n"
 		   << "\t\t		}\n"
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
 		   << "\t\t			vOut.y += xform->m_VariationWeights[" << varIndex << "] * (offsetY * (real_t)(0.5) + roundY - " << y << ");\n"
-		   << "\t\t			vOut.x += xform->m_VariationWeights[" << varIndex << "] * (offsetX * (real_t)(0.5) + roundX - offsetX / offsetY * " << x << ");\n"
+		   << "\t\t			vOut.x += xform->m_VariationWeights[" << varIndex << "] * (offsetX * (real_t)(0.5) + roundX - offsetX / Zeps(offsetY) * " << x << ");\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -2247,6 +2252,11 @@ public:
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -2360,9 +2370,9 @@ public:
 			default:
 				scale = Clamp<T>(rs, 0, T(0.9)) + T(0.1);
 				denom = 1 / scale;
-				helper.Out.x = m_Weight * Lerp<T>(helper.In.x, floor(helper.In.x * denom) + scale * ax, m_MulX * rs) + m_MulX * std::pow(ax, m_BoxPow) * rs * denom;//m_BoxPow should be an integer value held in T,
-				helper.Out.y = m_Weight * Lerp<T>(helper.In.y, floor(helper.In.y * denom) + scale * ay, m_MulY * rs) + m_MulY * std::pow(ay, m_BoxPow) * rs * denom;//so std::abs() shouldn't be necessary.
-				helper.Out.z = m_Weight * Lerp<T>(helper.In.z, floor(helper.In.z * denom) + scale * az, m_MulZ * rs) + m_MulZ * std::pow(az, m_BoxPow) * rs * denom;
+				helper.Out.x = m_Weight * Lerp<T>(helper.In.x, std::floor(helper.In.x * denom) + scale * ax, m_MulX * rs) + m_MulX * std::pow(ax, m_BoxPow) * rs * denom;//m_BoxPow should be an integer value held in T,
+				helper.Out.y = m_Weight * Lerp<T>(helper.In.y, std::floor(helper.In.y * denom) + scale * ay, m_MulY * rs) + m_MulY * std::pow(ay, m_BoxPow) * rs * denom;//so std::abs() shouldn't be necessary.
+				helper.Out.z = m_Weight * Lerp<T>(helper.In.z, std::floor(helper.In.z * denom) + scale * az, m_MulZ * rs) + m_MulZ * std::pow(az, m_BoxPow) * rs * denom;
 				break;
 		}
 	}
@@ -4131,7 +4141,7 @@ public:
 		while (++n < 6)
 		{
 			if ((m_P[n].y <= i.y && i.y < m_P[j].y) || (m_P[j].y <= i.y && i.y < m_P[n].y))
-				if (i.x < (m_P[j].x - m_P[n].x) * (i.y - m_P[n].y) / (m_P[j].y - m_P[n].y) + m_P[n].x)
+				if (i.x < (m_P[j].x - m_P[n].x) * (i.y - m_P[n].y) / Zeps(m_P[j].y - m_P[n].y) + m_P[n].x)
 					c ^= 1;
 
 			j = n;
@@ -4182,7 +4192,7 @@ public:
 		   << "\t\t	int ynoff = " << pyStartIndex << " + n;\n"
 		   << "\n"
 		   << "\t\t	if ((parVars[ynoff] <= i.y && i.y < parVars[yjoff]) || (parVars[yjoff] <= i.y && i.y < parVars[ynoff]))\n"
-		   << "\t\t		if (i.x < (parVars[xjoff] - parVars[xnoff]) * (i.y - parVars[ynoff]) / (parVars[yjoff] - parVars[ynoff]) + parVars[xnoff])\n"
+		   << "\t\t		if (i.x < (parVars[xjoff] - parVars[xnoff]) * (i.y - parVars[ynoff]) / Zeps(parVars[yjoff] - parVars[ynoff]) + parVars[xnoff])\n"
 		   << "\t\t			c ^= 1;\n"
 		   << "\n"
 		   << "\t\t	j = n;\n"
@@ -4224,6 +4234,11 @@ public:
 		m_P[4].y = T(-1.0606601717798212866012665431573) * m_ScaleY;
 		m_P[5].x = T(-1.4142135623730950488016887242097) * m_ScaleX;
 		m_P[5].y = T(0.0000000000000000000000000000000)  * m_ScaleY;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:

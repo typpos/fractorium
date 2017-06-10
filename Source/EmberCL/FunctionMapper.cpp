@@ -389,4 +389,14 @@ const string* FunctionMapper::GetGlobalFunc(const string& func)
 	else
 		return nullptr;
 }
+
+/// <summary>
+/// Get a copy of the function map.
+/// This is useful only for debugging/testing.
+/// </summary>
+/// <returns>A copy of the function map</returns>
+const std::unordered_map<string, string> FunctionMapper::GetGlobalMapCopy()
+{
+	return s_GlobalMap;
+}
 }

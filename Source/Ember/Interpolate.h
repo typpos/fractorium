@@ -634,7 +634,7 @@ public:
 							t = xform->m_Post.m_Mat[col][2];
 						}
 
-						cxAng[k][col] = atan2(c1[1], c1[0]);
+						cxAng[k][col] = std::atan2(c1[1], c1[0]);
 						cxMag[k][col] = std::sqrt(c1[0] * c1[0] + c1[1] * c1[1]);
 
 						if (cxMag[k][col] == 0)
@@ -722,7 +722,7 @@ public:
 				{
 					c1[0] = embers[k].GetXform(xfi)->m_Affine.m_Mat[0][col];//A,D then B,E.
 					c1[1] = embers[k].GetXform(xfi)->m_Affine.m_Mat[1][col];
-					cxang[k][col] = atan2(c1[1], c1[0]);
+					cxang[k][col] = std::atan2(c1[1], c1[0]);
 				}
 			}
 
@@ -774,7 +774,7 @@ public:
 		{
 			for (i = 0; i < size; i++)
 			{
-				if (log(cxMag[i][col]) < -10)
+				if (std::log(cxMag[i][col]) < -10)
 					accmode[col] = 1;//Mode set to linear interp.
 			}
 		}
@@ -926,8 +926,8 @@ public:
 
 			if (bd < 0) return true;
 
-			ad = atan2(a.m_Affine.A(), a.m_Affine.D());
-			bd = atan2(b.m_Affine.A(), b.m_Affine.D());
+			ad = std::atan2(a.m_Affine.A(), a.m_Affine.D());
+			bd = std::atan2(b.m_Affine.A(), b.m_Affine.D());
 		}
 
 		return ad > bd;

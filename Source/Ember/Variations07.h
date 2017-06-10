@@ -957,7 +957,7 @@ template <typename T>
 class CircleSplitVariation : public ParametricVariation<T>
 {
 public:
-	CircleSplitVariation(T weight = 1.0) : ParametricVariation<T>("circlesplit", eVariationId::VAR_CIRCLESPLIT, weight, true, true)
+	CircleSplitVariation(T weight = 1.0) : ParametricVariation<T>("circlesplit", eVariationId::VAR_CIRCLESPLIT, weight, true, true, false, false, true)
 	{
 		Init();
 	}
@@ -975,7 +975,7 @@ public:
 		}
 		else
 		{
-			T a = std::atan2(helper.In.y, helper.In.x);
+			T a = helper.m_PrecalcAtanyx;
 			T len = helper.m_PrecalcSqrtSumSquares + m_Split;
 			x1 = std::cos(a) * len;
 			y1 = std::sin(a) * len;
@@ -983,6 +983,7 @@ public:
 
 		helper.Out.x = m_Weight * x1;
 		helper.Out.y = m_Weight * y1;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1003,13 +1004,14 @@ public:
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t\treal_t a = (real_t)atan2(vIn.y, vIn.x);\n"
+		   << "\t\t\treal_t a = precalcAtanyx;\n"
 		   << "\t\t\treal_t len = precalcSqrtSumSquares + " << cs_split << ";\n"
 		   << "\t\t\tx1 = cos(a) * len;\n"
 		   << "\t\t\ty1 = sin(a) * len;\n"
 		   << "\t\t}"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * x1;\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * y1;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1045,6 +1047,7 @@ public:
 	{
 		helper.Out.x = m_Weight * (helper.In.x / Zeps(std::sqrt(SQR(helper.In.x) + 1)));
 		helper.Out.y = m_Weight * helper.In.y;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1055,6 +1058,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x / Zeps(sqrt(SQR(vIn.x) + (real_t)1.0)));\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1086,6 +1090,7 @@ public:
 		T temp = Round(std::log(rand.Frand01<T>()) * (rand.Rand() & 1 ? m_Spread : -m_Spread));
 		helper.Out.x = m_Weight * (helper.In.x + temp);
 		helper.Out.y = m_Weight * helper.In.y;
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1100,6 +1105,7 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x + temp);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1341,7 +1347,7 @@ public:
 		m_FinalExponent = m_Exponent > T(2) ? T(2) : (m_Exponent < T(0.001) ? T(0.001) : m_Exponent);
 		m_OneOverEx = T(1) / m_FinalExponent;
 		m_Width = m_ArcWidth > T(1) ? T(1) : (m_ArcWidth < T(0.001) ? T(0.001) : m_ArcWidth);
-		m_Seed2 = std::sqrt(m_Seed * T(1.5)) / (m_Seed * T(0.5)) * T(0.25);
+		m_Seed2 = std::sqrt(m_Seed * T(1.5)) / Zeps(m_Seed * T(0.5)) * T(0.25);
 		m_Rmax = T(0.5) * (std::pow(T(2), m_OneOverEx) - T(1)) * m_Width;
 		m_Scale = T(1) / m_Weight;
 	}

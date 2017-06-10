@@ -141,7 +141,7 @@ public:
 		}
 
 		//Allocate the memory for these filters and the hit/width lookup array.
-		rowSize = static_cast<int>(2 * ceil(finalMaxRad) - 1);
+		rowSize = static_cast<int>(2 * std::ceil(finalMaxRad) - 1);
 		m_FilterWidth = (rowSize - 1) / 2;
 		m_KernelSize = (m_FilterWidth + 1) * (2 + m_FilterWidth) / 2;
 		m_Coefs.resize(maxIndex * m_KernelSize);

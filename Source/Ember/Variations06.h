@@ -783,9 +783,9 @@ public:
 		if (m_AdjustToLinear == 1)
 		{
 			if (int(m_NumEdges) % 4 == 0)
-				m_AdjustedWeight = m_Weight / (std::sqrt(2 - 2 * std::cos(m_MidAngle * (m_NumEdges / 2 - 1))) / 2);
+				m_AdjustedWeight = m_Weight / Zeps(std::sqrt(2 - 2 * std::cos(m_MidAngle * (m_NumEdges / 2 - 1))) / 2);
 			else
-				m_AdjustedWeight = m_Weight / (std::sqrt(2 - 2 * std::cos(m_MidAngle * std::floor((m_NumEdges / 2)))) / 2);
+				m_AdjustedWeight = m_Weight / Zeps(std::sqrt(2 - 2 * std::cos(m_MidAngle * std::floor((m_NumEdges / 2)))) / 2);
 		}
 		else
 			m_AdjustedWeight = m_Weight;
@@ -1515,7 +1515,7 @@ public:
 						yTmp = m_Top + rand.Frand01<T>() * m_YInt2;
 						xTmp = m_Right - pow(rand.Frand01<T>(), m_DirectBlur) * m_RatioBlur * m_MinInt2;
 					}
-					while ((yTmp - m_Y0c) / (xTmp - m_X0c) < -1);
+					while ((yTmp - m_Y0c) / Zeps(xTmp - m_X0c) < -1);
 
 					if (secTmp < m_SetProbH)
 						xTmp = m_Left + m_Right - xTmp;
@@ -1529,7 +1529,7 @@ public:
 					{
 						xTmp = m_Right - rand.Frand01<T>() * m_XInt2;
 						yTmp = m_Top + std::pow(rand.Frand01<T>(), m_DirectBlur) * m_RatioBlur * m_MinInt2;
-						gradTmp = (yTmp - m_Y0c) / (xTmp - m_X0c);
+						gradTmp = (yTmp - m_Y0c) / Zeps(xTmp - m_X0c);
 					}
 					while ((gradTmp <= 0) && (gradTmp > -1));
 
@@ -1614,7 +1614,7 @@ public:
 				<< "\t\t			{\n"
 				<< "\t\t				yTmp = " << top << " + MwcNext01(mwc) * " << yInt2 << ";\n"
 				<< "\t\t				xTmp = " << right << " - pow(MwcNext01(mwc), " << directBlur << ") * " << ratioBlur << " * " << minInt2 << ";\n"
-				<< "\t\t			} while ((yTmp - " << y0c << ") / (xTmp - " << x0c << ") < -1);\n"
+				<< "\t\t			} while ((yTmp - " << y0c << ") / Zeps(xTmp - " << x0c << ") < -1);\n"
 				<< "\n"
 				<< "\t\t			if (secTmp < " << setProbH << ")\n"
 				<< "\t\t				xTmp = " << left << " + " << right << " - xTmp;\n"
@@ -1628,7 +1628,7 @@ public:
 				<< "\t\t			{\n"
 				<< "\t\t				xTmp = " << right << " - MwcNext01(mwc) * " << xInt2 << ";\n"
 				<< "\t\t				yTmp = " << top << " + pow(MwcNext01(mwc), " << directBlur << ") * " << ratioBlur << " * " << minInt2 << ";\n"
-				<< "\t\t				gradTmp = (yTmp - " << y0c << ") / (xTmp - " << x0c << ");\n"
+				<< "\t\t				gradTmp = (yTmp - " << y0c << ") / Zeps(xTmp - " << x0c << ");\n"
 				<< "\t\t			} while ((gradTmp <= 0) && (gradTmp > -1));\n"
 				<< "\n"
 				<< "\t\t			if (secTmp > " << setProbH << ")\n"
@@ -1735,6 +1735,11 @@ public:
 			m_LeftBorder = m_Left  + m_MinInt2 * m_RatioBlur;
 			m_RightBorder = m_Right   - m_MinInt2 * m_RatioBlur;
 		}
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:

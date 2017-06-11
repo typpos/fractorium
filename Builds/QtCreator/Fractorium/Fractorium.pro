@@ -73,7 +73,18 @@ $$ASSETS_DIR/tatasz_pack_03.gradient
 INSTALLS += palettes
 
 themes.path = $$SHARE_INSTALL_DIR
-themes.files = $$ASSETS_DIR/dark.qss
+win32 {
+themes.files = $$ASSETS_DIR/dark_windows.qss
+}
+
+macx {
+themes.files = $$ASSETS_DIR/dark_mac.qss
+}
+
+unix:!macx {
+themes.files = $$ASSETS_DIR/dark_linux.qss
+}
+
 #message(THEMES INSTALL SOURCE: $$themes.files)
 INSTALLS += themes
 

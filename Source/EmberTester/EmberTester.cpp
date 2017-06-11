@@ -15,6 +15,8 @@
 using namespace EmberNs;
 using namespace EmberCommon;
 
+//#define DO_NVIDIA 1
+
 template <typename T>
 void SaveFinalImage(Renderer<T, T>& renderer, vector<byte>& pixels, char* suffix)
 {
@@ -1463,14 +1465,14 @@ bool TestAllVarsCLBuild(size_t platform, size_t device, bool printSuccess = true
 	{
 		renderer.SetEmber(it);
 
-		if (platform != 0 &&
-				((it.GetXform(0)->GetVariationById(eVariationId::VAR_SYNTH) != nullptr) ||//Nvidia OpenCL driver crashes when building too many synths.
-				 (it.GetXform(0)->GetVariationById(eVariationId::VAR_PRE_SYNTH) != nullptr) ||
-				 (it.GetXform(0)->GetVariationById(eVariationId::VAR_POST_SYNTH) != nullptr)))
-		{
-			cout << "Skipping synth.\n";
-			continue;
-		}
+		//if (platform != 0 &&
+		//		((it.GetXform(0)->GetVariationById(eVariationId::VAR_SYNTH) != nullptr) ||//Nvidia OpenCL driver crashes when building too many synths.
+		//		 (it.GetXform(0)->GetVariationById(eVariationId::VAR_PRE_SYNTH) != nullptr) ||
+		//		 (it.GetXform(0)->GetVariationById(eVariationId::VAR_POST_SYNTH) != nullptr)))
+		//{
+		//	cout << "Skipping synth.\n";
+		//	continue;
+		//}
 
 		if (renderer.BuildIterProgramForEmber())
 		{
@@ -1952,8 +1954,6 @@ public:
 	}
 };
 
-#define DO_NVIDIA 1
-
 int _tmain(int argc, _TCHAR* argv[])
 {
 	//int i;
@@ -2193,28 +2193,28 @@ int _tmain(int argc, _TCHAR* argv[])
 #endif
 	}
 
-//#ifdef DO_DOUBLE
-//
-//	//t.Tic();
-//	//TestCpuGpuResults<double>();
-//	//t.Toc("TestCpuGpuResults<double>()");
-//	if (b)
-//	{
-//		t.Tic();
-//		TestAllVarsCLBuild<double>(0, 0, true);
-//		t.Toc("TestAllVarsCLBuild<double>()");
-//
-//		if (b)
-//		{
-//#ifdef DO_NVIDIA
-//			t.Tic();
-//			TestAllVarsCLBuild<double>(1, 0, true);
-//			t.Toc("TestAllVarsCLBuild<double>()");
-//#endif
-//		}
-//	}
-//
-//#endif
+#ifdef DO_DOUBLE
+
+	//t.Tic();
+	//TestCpuGpuResults<double>();
+	//t.Toc("TestCpuGpuResults<double>()");
+	if (b)
+	{
+		t.Tic();
+		b = TestAllVarsCLBuild<double>(0, 0, true);
+		t.Toc("TestAllVarsCLBuild<double>()");
+
+		if (b)
+		{
+#ifdef DO_NVIDIA
+			t.Tic();
+			TestAllVarsCLBuild<double>(1, 0, true);
+			t.Toc("TestAllVarsCLBuild<double>()");
+#endif
+		}
+	}
+
+#endif
 #endif
 	//PrintAllVars();
 	//_CrtDumpMemoryLeaks();

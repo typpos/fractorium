@@ -1029,7 +1029,7 @@ bool OpenCLWrapper::CreateSPK(const string& name, const string& program, const s
 		if (doublePrecision)
 			err = spk.m_Program.build(m_DeviceVec, "-cl-mad-enable -cl-no-signed-zeros -cl-denorms-are-zero");//Tinker with other options later.
 		else
-			err = spk.m_Program.build(m_DeviceVec, "-cl-mad-enable -cl-no-signed-zeros -cl-single-precision-constant -cl-denorms-are-zero");
+			err = spk.m_Program.build(m_DeviceVec, "-cl-mad-enable -cl-no-signed-zeros -cl-denorms-are-zero -cl-single-precision-constant");
 
 		//err = spk.m_Program.build(m_DeviceVec, "-cl-single-precision-constant");
 		//err = spk.m_Program.build(m_DeviceVec, "-cl-mad-enable -cl-single-precision-constant");

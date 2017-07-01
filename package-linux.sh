@@ -115,7 +115,7 @@ tar --exclude='package-linux.sh' \
 	./Data/tatasz_pack_02_dark.gradient \
 	./Data/tatasz_pack_02_warmer.gradient \
 	./Data/tatasz_pack_03.gradient \
-	./Data/dark.qss \
+	./Data/dark_linux.qss \
 	.
 
 [ $? -ne 0 ] && echo "Tar command failed." && exit 2

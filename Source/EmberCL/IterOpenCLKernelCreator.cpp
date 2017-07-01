@@ -203,6 +203,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		}
 
 		xformFuncs << "\toutPoint->m_ColorX = tempColor + xform->m_DirectColor * (outPoint->m_ColorX - tempColor);\n";
+		xformFuncs << "\n";
 		xformFuncs << "\tif (isnan(outPoint->m_ColorX))\n";
 		xformFuncs << "\t	outPoint->m_ColorX = 0.0; \n";
 		xformFuncs << "}\n"

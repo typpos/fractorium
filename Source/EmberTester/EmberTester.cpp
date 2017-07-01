@@ -1039,18 +1039,20 @@ bool TestConstants()
 
 void TestFuncs()
 {
-	//auto vlf(VariationList<float>::Instance());
-	//vector<string> stringVec;
-	//stringVec.push_back("/ (");
-	////stringVec.push_back("log(");
-	//for (size_t i = 0; i < vlf->Size(); i++)
-	//{
-	//	auto var = vlf->GetVariation(i);
-	//	if (SearchVar(var, stringVec, false))
-	//	{
-	//		cout << var->Name() << endl;
-	//	}
-	//}
+	auto vlf(VariationList<float>::Instance());
+	vector<string> stringVec;
+	stringVec.push_back("M_PI");
+
+	//stringVec.push_back("log(");
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << var->Name() << endl;
+		}
+	}
 }
 
 bool TestGlobalFuncs()
@@ -1963,8 +1965,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	vector<Ember<double>> dv;
 	list<Ember<float>> fl;
 	list<Ember<double>> dl;
-	/*  TestFuncs();
-	    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
+	TestFuncs();
+	/*   string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
 	    auto vec = Split(line, delim, true);
 
 	    for (auto& s : vec) cout << s << endl;
@@ -1990,25 +1992,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	    return 1;
 	*/
 	//MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
-	/*  return 0;
+	return 0;
+	/*
 
+		    TestThreadedKernel();
 
-	    TestThreadedKernel();
+		    auto palf = PaletteList<float>::Instance();
+		    Palette<float>* pal = palf->GetRandomPalette();
 
-	    auto palf = PaletteList<float>::Instance();
-	    Palette<float>* pal = palf->GetRandomPalette();
+		    cout << pal->Size() << endl;
 
-	    cout << pal->Size() << endl;
+		    double d = 1;
 
-	    double d = 1;
+		    for (int i = 0; i < 10; i++)
+		    {
+		    cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
+		    d *= 10;
+		    }
 
-	    for (int i = 0; i < 10; i++)
-	    {
-	    cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
-	    d *= 10;
-	    }
-
-	    return 0;*/
+		    return 0;*/
 	/*
 	    uint i, iters = (uint)10e7;
 	    size_t total = 0;

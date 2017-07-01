@@ -1,3 +1,38 @@
+1.0.0.4 07/01/2017
+--User changes
+ -Add support for adjusting xform color indices in the palette editor. Fixed palettes can now be displayed there, but they will have no color arrows as they are not editable.
+ -Add support for independent dimension scaling in the EmberRender and EmberAnimate programs to bring them in line with the final render dialog Fractorium. The options are -ws, -hs and -scaletype.
+ -Limit size of the left side of the palette editor.
+ -dark.qss is now per-OS.
+ 
+--Bug fixes
+ -Opacity was accidentally being set to zero sometimes which could cause flickering when animating.
+ -Fractorium would occasionally freeze after dismissing the final render dialog because some values were not properly re-initialized.
+ -File paths with a space in them did not work in the command line programs.
+ -Any Xml file in the search paths would erroneously be treated as a palette file.
+ -The following variations were wrong: coshq, cothq.
+ -During iteration, the color index could become nan if all xform color speeds were negative. This could lead to bad results on the GPU. Fix to check for nan. Minimal speed difference.
+ -Fix crash when opening palette editor with a flame whose palette specifies no originating file.
+ -Any measurement of time which was sub-millisecond was wrong.
+  
+--Code changes
+ -Remove VS 2013 build files.
+ -Qualify many calls with std:: to avoid colliding with glm::
+ -Change some for loops to while loops when iterating through xforms.
+ -Allow FractoriumEmberController<T>::UpdateXform() to be able to apply the action to an xform at a specific index.
+ -Remove old code blocks build files that were never used.
+ -Make GetPath() return empty string if no path is present in the passed in file path.
+ -GetTotalXform() was always counting the final xform, even if it was unused.
+ -Make the following variations safer by using Zeps(): sinq, sinhq, secq, sechq, tanq, tanhq, cosq, coshq, cotq, cothq, cscq, cschq, estiq.
+ -Always pass -cl-no-signed-zeros -cl-denorms-are-zero to kernel compiles for both single and double.
+ -Flush all denormals to zero for all executable programs. This will likely lead to a speedup for badly behaving flames.
+ -Make the following variations safer by using Zeps(): conic, bipolar, edisc, whorl, tan, csc, cot, tanh, sech, csch, coth, auger, bwraps, hypertile3d, hypertile3d1, ortho, poincare, rational3, barycentroid, sschecks, cscq, cschq, scry_3D, splitbrdr, hexcrop, nblur, crob.
+ -Small optimization for gdoffs, use precalcAtanYX.
+ -Properly propagate z through circlesplit, cylinder2 and tile_log variations.
+ -Some values in truchet_fill could've been NaN.
+ -Make most installation files read only.
+ -Use auto in more places.
+  
 1.0.0.3 04/06/2017
 --User changes
  -Remove opacity adjustment from legacy flam3 code base, it can lead to erroneous results.

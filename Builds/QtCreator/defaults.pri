@@ -1,4 +1,4 @@
-VERSION = 1.0.0.2
+VERSION = 1.0.0.4
 win32:CONFIG += skip_target_version_ext
 CONFIG += c++14
 #message(PWD: $$absolute_path($$PWD))

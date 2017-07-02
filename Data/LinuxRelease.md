@@ -4,6 +4,15 @@ These are instructions for publishing a Linux deb package. It can be built local
 
 ## Summary
 
+
+Starting with a fresh clone from bitbucket.org. It will not work unless it's totally fresh:
+
+```
+$ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
+$ cd fractorium
+$ qmake main.pro -r -spec linux-g++-64 CONFIG+=release
+```
+
 ### Building a `.deb` locally
 
 Update `debian/changelog` with a new log message. Update version number. Use the time from `date -R`.
@@ -48,14 +57,6 @@ Wait for the autobuild to complete, and when the package is published, copy the
 link to the `.deb` from "Package Details".
 
 ## Narrative
-
-Starting with a fresh clone from bitbucket.org. It will not work unless it's totally fresh:
-
-```
-$ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
-$ cd fractorium
-$ qmake main.pro -r -spec linux-g++-64 CONFIG+=release
-```
 
 Test that the package creator script:
 

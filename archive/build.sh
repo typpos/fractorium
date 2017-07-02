@@ -41,7 +41,7 @@ cd $OSX_BUILD_PATH
 
 cd ../Data
 
-cp dark.qss $FRACTORIUM_FINAL_ROOT
+cp dark_mac.qss $FRACTORIUM_FINAL_ROOT
 cp flam3-palettes.xml $FRACTORIUM_FINAL_ROOT
 cp *.gradient $FRACTORIUM_FINAL_ROOT
 cp Info.plist $FRACTORIUM_FINAL_ROOT/../

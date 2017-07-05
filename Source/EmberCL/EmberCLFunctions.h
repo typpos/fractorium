@@ -12,7 +12,7 @@ namespace EmberCLns
 /// <summary>
 /// OpenCL equivalent of Palette::RgbToHsv().
 /// </summary>
-static const char* RgbToHsvFunctionString = 
+static const char* RgbToHsvFunctionString =
 	//rgb 0 - 1,
 	//h 0 - 6, s 0 - 1, v 0 - 1
 	"static inline void RgbToHsv(real4_bucket* rgb, real4_bucket* hsv)\n"
@@ -82,9 +82,9 @@ static const char* RgbToHsvFunctionString =
 /// <summary>
 /// OpenCL equivalent of Palette::HsvToRgb().
 /// </summary>
-static const char* HsvToRgbFunctionString = 
+static const char* HsvToRgbFunctionString =
 	//h 0 - 6, s 0 - 1, v 0 - 1
-	//rgb 0 - 1 
+	//rgb 0 - 1
 	"static inline void HsvToRgb(real4_bucket* hsv, real4_bucket* rgb)\n"
 	"{\n"
 	"	int j;\n"
@@ -118,11 +118,11 @@ static const char* HsvToRgbFunctionString =
 /// <summary>
 /// OpenCL equivalent of Palette::CalcAlpha().
 /// </summary>
-static const char* CalcAlphaFunctionString = 
+static const char* CalcAlphaFunctionString =
 	"static inline real_t CalcAlpha(real_bucket_t density, real_bucket_t gamma, real_bucket_t linrange)\n"//Not the slightest clue what this is doing.//DOC
 	"{\n"
 	"	real_bucket_t frac, alpha, funcval = pow(linrange, gamma);\n"
-		"\n"
+	"\n"
 	"	if (density > 0)\n"
 	"	{\n"
 	"		if (density < linrange)\n"
@@ -147,13 +147,13 @@ static const char* CalcAlphaFunctionString =
 /// during final accumulation, which only takes floats.
 /// </summary>
 static const char* CurveAdjustFunctionString =
-"static inline void CurveAdjust(__constant real4reals_bucket* csa, float* a, uint index)\n"
-"{\n"
-"	uint tempIndex = (uint)clamp(*a, (float)0.0, (float)COLORMAP_LENGTH_MINUS_1);\n"
-"	uint tempIndex2 = (uint)clamp((float)csa[tempIndex].m_Real4.x, (float)0.0, (float)COLORMAP_LENGTH_MINUS_1);\n"
-"\n"
-"	*a = (float)round(csa[tempIndex2].m_Reals[index]);\n"
-"}\n";
+	"static inline void CurveAdjust(__constant real4reals_bucket* csa, float* a, uint index)\n"
+	"{\n"
+	"	uint tempIndex = (uint)clamp(*a * (float)COLORMAP_LENGTH_MINUS_1, (float)0.0, (float)COLORMAP_LENGTH_MINUS_1);\n"
+	"	uint tempIndex2 = (uint)clamp((float)csa[tempIndex].m_Real4.x * (float)COLORMAP_LENGTH_MINUS_1, (float)0.0, (float)COLORMAP_LENGTH_MINUS_1);\n"
+	"\n"
+	"	*a = (float)csa[tempIndex2].m_Reals[index];\n"
+	"}\n";
 
 /// <summary>
 /// Use MWC 64 from David Thomas at the Imperial College of London for
@@ -197,7 +197,7 @@ static const char* RandFunctionString =
 /// <summary>
 /// OpenCL equivalent Renderer::AddToAccum().
 /// </summary>
-static const char* AddToAccumWithCheckFunctionString = 
+static const char* AddToAccumWithCheckFunctionString =
 	"inline bool AccumCheck(int superRasW, int superRasH, int i, int ii, int j, int jj)\n"
 	"{\n"
 	"	return (j + jj >= 0 && j + jj < superRasH && i + ii >= 0 && i + ii < superRasW);\n"
@@ -207,7 +207,7 @@ static const char* AddToAccumWithCheckFunctionString =
 /// <summary>
 /// OpenCL equivalent various CarToRas member functions.
 /// </summary>
-static const char* CarToRasFunctionString = 
+static const char* CarToRasFunctionString =
 	"inline void CarToRasConvertPointToSingle(__constant CarToRasCL* carToRas, Point* point, uint* singleBufferIndex)\n"
 	"{\n"
 	"	*singleBufferIndex = (uint)(carToRas->m_PixPerImageUnitW * point->m_X - carToRas->m_RasLlX) + (carToRas->m_RasWidth * (uint)(carToRas->m_PixPerImageUnitH * point->m_Y - carToRas->m_RasLlY));\n"
@@ -225,29 +225,27 @@ static const char* CarToRasFunctionString =
 static string AtomicString()
 {
 	ostringstream os;
-
 	os <<
-		"void AtomicAdd(volatile __global real_bucket_t* source, const real_bucket_t operand)\n"
-		"{\n"
-		"	union\n"
-		"	{\n"
-		"		atomi intVal;\n"
-		"		real_bucket_t realVal;\n"
-		"	} newVal;\n"
-		"\n"
-		"	union\n"
-		"	{\n"
-		"		atomi intVal;\n"
-		"		real_bucket_t realVal;\n"
-		"	} prevVal;\n"
-		"\n"
-		"	do\n"
-		"	{\n"
-		"		prevVal.realVal = *source;\n"
-		"		newVal.realVal = prevVal.realVal + operand;\n"
-		"	} while (atomic_cmpxchg((volatile __global atomi*)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);\n"
-		"}\n";
-
+	   "void AtomicAdd(volatile __global real_bucket_t* source, const real_bucket_t operand)\n"
+	   "{\n"
+	   "	union\n"
+	   "	{\n"
+	   "		atomi intVal;\n"
+	   "		real_bucket_t realVal;\n"
+	   "	} newVal;\n"
+	   "\n"
+	   "	union\n"
+	   "	{\n"
+	   "		atomi intVal;\n"
+	   "		real_bucket_t realVal;\n"
+	   "	} prevVal;\n"
+	   "\n"
+	   "	do\n"
+	   "	{\n"
+	   "		prevVal.realVal = *source;\n"
+	   "		newVal.realVal = prevVal.realVal + operand;\n"
+	   "	} while (atomic_cmpxchg((volatile __global atomi*)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);\n"
+	   "}\n";
 	return os.str();
 }
 }

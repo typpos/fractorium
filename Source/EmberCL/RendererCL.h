@@ -168,6 +168,7 @@ protected:
 	virtual eRenderStatus GaussianDensityFilter() override;
 	virtual eRenderStatus AccumulatorToFinalImage(byte* pixels, size_t finalOffset) override;
 	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample) override;
+	virtual void ComputeCurves(bool scale) override;
 
 #ifndef TEST_CL
 private:

@@ -557,9 +557,9 @@ public:
 	static void CalcNewRgb(bucketT* cBuf, T ls, T highPow, bucketT* newRgb)
 	{
 		size_t rgbi;
-		T newls, lsratio;
+		T lsratio;
 		bucketT newhsv[3];
-		T maxa, maxc;
+		T maxa, maxc, newls;
 		T adjustedHighlight;
 
 		if (ls == 0 || (cBuf[0] == 0 && cBuf[1] == 0 && cBuf[2] == 0))
@@ -573,35 +573,31 @@ public:
 		//Identify the most saturated channel.
 		maxc = std::max(std::max(cBuf[0], cBuf[1]), cBuf[2]);
 		maxa = ls * maxc;
+		newls = 1 / maxc;
 
 		//If a channel is saturated and highlight power is non-negative
 		//modify the color to prevent hue shift.
-		if (maxa > 255 && highPow >= 0)
+		if (maxa > 1 && highPow >= 0)
 		{
-			newls = T(255.0) / maxc;
 			lsratio = std::pow(newls / ls, highPow);
 
 			//Calculate the max-value color (ranged 0 - 1).
 			for (rgbi = 0; rgbi < 3; rgbi++)
-				newRgb[rgbi] = bucketT(newls) * cBuf[rgbi] / bucketT(255.0);
+				newRgb[rgbi] = bucketT(newls) * cBuf[rgbi];
 
 			//Reduce saturation by the lsratio.
 			Palette<bucketT>::RgbToHsv(newRgb, newhsv);
 			newhsv[1] *= bucketT(lsratio);
 			Palette<bucketT>::HsvToRgb(newhsv, newRgb);
-
-			for (rgbi = 0; rgbi < 3; rgbi++)
-				newRgb[rgbi] *= T(255.0);
 		}
 		else
 		{
-			newls = T(255.0) / maxc;
 			adjustedHighlight = -highPow;
 
 			if (adjustedHighlight > 1)
 				adjustedHighlight = 1;
 
-			if (maxa <= 255)
+			if (maxa <= 1)
 				adjustedHighlight = 1;
 
 			//Calculate the max-value color (ranged 0 - 1) interpolated with the old behavior.

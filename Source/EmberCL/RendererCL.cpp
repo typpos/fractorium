@@ -669,7 +669,7 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 
 	if (b && !(b = wrapper.AddBuffer(m_SpatialFilterParamsBufferName, sizeof(m_SpatialFilterCL))))	 { AddToReport(loc); }
 
-	if (b && !(b = wrapper.AddBuffer(m_CurvesCsaName, SizeOf(m_Csa.m_Entries))))					 { AddToReport(loc); }
+	if (b && !(b = wrapper.AddBuffer(m_CurvesCsaName, SizeOf(m_Csa))))					             { AddToReport(loc); }
 
 	if (b && !(b = wrapper.AddBuffer(m_AccumBufferName, size)))										 { AddToReport(loc); }//Accum buffer.
 
@@ -875,6 +875,17 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 	}
 
 	return stats;
+}
+
+/// <summary>
+/// Override which just passes false to the base.
+/// This is because curves are scaled from 0-1 to 0-255 or 0-65535 on the CPU, but need to be kept as 0-1 for OpenCL because the texture expects normalized values.
+/// </summary>
+/// <param name="scale">Ignored</param>
+template <typename T, typename bucketT>
+void RendererCL<T, bucketT>::ComputeCurves(bool scale)
+{
+	Renderer<T, bucketT>::ComputeCurves(false);
 }
 
 /// <summary>
@@ -1312,7 +1323,7 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 
 		if (b && !(b = wrapper.AddAndWriteBuffer(m_SpatialFilterParamsBufferName, reinterpret_cast<void*>(&m_SpatialFilterCL), sizeof(m_SpatialFilterCL)))) { AddToReport(loc); }
 
-		if (b && !(b = wrapper.AddAndWriteBuffer(m_CurvesCsaName,				  m_Csa.m_Entries.data(),					   SizeOf(m_Csa.m_Entries))))   { AddToReport(loc); }
+		if (b && !(b = wrapper.AddAndWriteBuffer(m_CurvesCsaName,				  m_Csa.data(),					   SizeOf(m_Csa))))   { AddToReport(loc); }
 
 		//Since early clip requires gamma correcting the entire accumulator first,
 		//it can't be done inside of the normal final accumulation kernel, so

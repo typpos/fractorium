@@ -4,6 +4,15 @@
 namespace EmberNs
 {
 /// <summary>
+/// Constructor that allocates various pieces of memory.
+/// </summary>
+template <typename T, typename bucketT>
+Renderer<T, bucketT>::Renderer()
+{
+	m_Csa.resize(size_t(std::pow(size_t(256), BytesPerChannel())));//Need to at least have something here so the derived RendererCL can do the initial buffer allocation.
+}
+
+/// <summary>
 /// Non-virtual processing functions.
 /// </summary>
 
@@ -344,7 +353,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, s
 	bool accumOnly = m_ProcessAction == eProcessAction::ACCUM_ONLY;
 	bool resume = m_ProcessState != eProcessState::NONE;
 	bool newFilterAlloc;
-	size_t i, temporalSample = 0;
+	size_t temporalSample = 0;
 	T deTime;
 	auto success = eRenderStatus::RENDER_OK;
 
@@ -636,11 +645,7 @@ AccumOnly:
 		CreateSpatialFilter(newFilterAlloc);
 		m_DensityFilterOffset = m_GutterWidth - size_t(Clamp<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0, T(m_GutterWidth)));
 		m_CurvesSet = m_Ember.m_Curves.CurvesSet();
-
-		//Color curves must be re-calculated as well.
-		if (m_CurvesSet)
-			for (i = 0; i < COLORMAP_LENGTH; i++)
-				m_Csa[i] = m_Ember.m_Curves.BezierFunc(i / T(COLORMAP_LENGTH_MINUS_1)) * T(COLORMAP_LENGTH_MINUS_1);
+		ComputeCurves(true);//Color curves must be re-calculated as well.
 
 		if (AccumulatorToFinalImage(finalImage, finalOffset) == eRenderStatus::RENDER_OK)
 		{
@@ -1086,13 +1091,13 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 	bucketT g, linRange, vibrancy;
 	Color<bucketT> background;
 	pixels += finalOffset;
-	PrepFinalAccumVals(background, g, linRange, vibrancy);
+	PrepFinalAccumVals(background, g, linRange, vibrancy);//After this, background has been scaled from 0-1 to 0-255.
 
 	//If early clip, go through the entire accumulator and perform gamma correction first.
 	//The original does it this way as well and it's roughly 11 times faster to do it this way than inline below with each pixel.
 	if (EarlyClip())
 	{
-		parallel_for(size_t(0), m_SuperRasH, size_t(1), [&] (size_t j)
+		parallel_for(size_t(0), m_SuperRasH, size_t(1), [&](size_t j)
 		{
 			auto rowStart = m_AccumulatorBuckets.data() + (j * m_SuperRasW);//Pull out of inner loop for optimization.
 			auto rowEnd = rowStart + m_SuperRasW;
@@ -1150,6 +1155,8 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 
 				if (EarlyClip())
 				{
+					newBucket *= bucketT(65535);
+
 					if (m_CurvesSet)
 					{
 						CurveAdjust(newBucket.r, 1);
@@ -1157,14 +1164,14 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 						CurveAdjust(newBucket.b, 3);
 					}
 
-					p16[0] = glm::uint16(Clamp<bucketT>(newBucket.r, 0, 255) * bucketT(256));
-					p16[1] = glm::uint16(Clamp<bucketT>(newBucket.g, 0, 255) * bucketT(256));
-					p16[2] = glm::uint16(Clamp<bucketT>(newBucket.b, 0, 255) * bucketT(256));
+					p16[0] = glm::uint16(Clamp<bucketT>(newBucket.r, 0, 65535));
+					p16[1] = glm::uint16(Clamp<bucketT>(newBucket.g, 0, 65535));
+					p16[2] = glm::uint16(Clamp<bucketT>(newBucket.b, 0, 65535));
 
 					if (doAlpha)
 					{
 						if (Transparency())
-							p16[3] = byte(Clamp<bucketT>(newBucket.a, 0, 1) * bucketT(65535.0));
+							p16[3] = byte(Clamp<bucketT>(newBucket.a, 0, 65535));
 						else
 							p16[3] = 65535;
 					}
@@ -1178,6 +1185,8 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 			{
 				if (EarlyClip())
 				{
+					newBucket *= bucketT(255);
+
 					if (m_CurvesSet)
 					{
 						CurveAdjust(newBucket.r, 1);
@@ -1185,14 +1194,14 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 						CurveAdjust(newBucket.b, 3);
 					}
 
-					pixels[pixelsRowStart]     = byte(Clamp<bucketT>(newBucket.r, 0, 255));
+					pixels[pixelsRowStart] = byte(Clamp<bucketT>(newBucket.r, 0, 255));
 					pixels[pixelsRowStart + 1] = byte(Clamp<bucketT>(newBucket.g, 0, 255));
 					pixels[pixelsRowStart + 2] = byte(Clamp<bucketT>(newBucket.b, 0, 255));
 
 					if (doAlpha)
 					{
 						if (Transparency())
-							pixels[pixelsRowStart + 3] = byte(Clamp<bucketT>(newBucket.a, 0, 1) * bucketT(255.0));
+							pixels[pixelsRowStart + 3] = byte(Clamp<bucketT>(newBucket.a, 0, 255));
 						else
 							pixels[pixelsRowStart + 3] = 255;
 					}
@@ -1484,9 +1493,9 @@ void Renderer<T, bucketT>::PrepFinalAccumVals(Color<bucketT>& background, bucket
 	g = 1 / ClampGte<bucketT>(gamma / vibGamCount, bucketT(0.01));//Ensure a divide by zero doesn't occur.
 	linRange = GammaThresh();
 	vibrancy /= vibGamCount;
-	background.x = (IsNearZero(m_Background.r) ? bucketT(m_Ember.m_Background.r) : m_Background.r) / (vibGamCount / bucketT(256.0));//Background is [0, 1].
-	background.y = (IsNearZero(m_Background.g) ? bucketT(m_Ember.m_Background.g) : m_Background.g) / (vibGamCount / bucketT(256.0));
-	background.z = (IsNearZero(m_Background.b) ? bucketT(m_Ember.m_Background.b) : m_Background.b) / (vibGamCount / bucketT(256.0));
+	background.x = (IsNearZero(m_Background.r) ? bucketT(m_Ember.m_Background.r) : m_Background.r) / vibGamCount;
+	background.y = (IsNearZero(m_Background.g) ? bucketT(m_Ember.m_Background.g) : m_Background.g) / vibGamCount;
+	background.z = (IsNearZero(m_Background.b) ? bucketT(m_Ember.m_Background.b) : m_Background.b) / vibGamCount;
 }
 
 /// <summary>
@@ -1684,7 +1693,7 @@ template <typename accumT>
 void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket, Color<bucketT>& background, bucketT g, bucketT linRange, bucketT vibrancy, bool doAlpha, bool scale, accumT* correctedChannels)
 {
 	bucketT alpha, ls, a, newRgb[3];//Would normally use a Color<bucketT>, but don't want to call a needless constructor every time this function is called, which is once per pixel.
-	static bucketT scaleVal = (numeric_limits<accumT>::max() + 1) / bucketT(256.0);
+	static bucketT scaleVal = numeric_limits<accumT>::max();
 
 	if (bucket.a <= 0)
 	{
@@ -1694,7 +1703,7 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 	else
 	{
 		alpha = Palette<bucketT>::CalcAlpha(bucket.a, g, linRange);
-		ls = vibrancy * 255 * alpha / bucket.a;
+		ls = vibrancy * alpha / bucket.a;
 		ClampRef<bucketT>(alpha, 0, 1);
 	}
 
@@ -1702,7 +1711,7 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 
 	for (glm::length_t rgbi = 0; rgbi < 3; rgbi++)
 	{
-		a = newRgb[rgbi] + ((1 - vibrancy) * 255 * std::pow(std::abs(bucket[rgbi]), g));//Must use abs(), else it it could be a negative value and return NAN.
+		a = newRgb[rgbi] + ((1 - vibrancy) * std::pow(std::abs(bucket[rgbi]), g));//Must use abs(), else it it could be a negative value and return NAN.
 
 		if (NumChannels() <= 3 || !Transparency())
 		{
@@ -1718,14 +1727,16 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 
 		if (!scale)
 		{
-			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, 255));//Early clip, just assign directly.
+			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, 1.0));//Early clip, just assign directly.
 		}
 		else
 		{
+			a *= scaleVal;
+
 			if (m_CurvesSet)
 				CurveAdjust(a, rgbi + 1);
 
-			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, 255) * scaleVal);//Final accum, multiply by 1 for 8 bpc, or 256 for 16 bpc.
+			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, scaleVal));//Final accum, multiply by 255 for 8 bpc (0-255), or 65535 for 16 bpc (0-65535).
 		}
 	}
 
@@ -1734,18 +1745,44 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 		if (!scale)
 			correctedChannels[3] = accumT(alpha);//Early clip, just assign alpha directly.
 		else if (Transparency())
-			correctedChannels[3] = accumT(alpha * numeric_limits<accumT>::max());//Final accum, 4 channels, using transparency. Scale alpha from 0-1 to 0-255 for 8 bpc or 0-65535 for 16 bpc.
+			correctedChannels[3] = accumT(alpha * scaleVal);//Final accum, 4 channels, using transparency. Scale alpha from 0-1 to 0-255 for 8 bpc or 0-65535 for 16 bpc.
 		else
-			correctedChannels[3] = numeric_limits<accumT>::max();//Final accum, 4 channels, but not using transparency. 255 for 8 bpc, 65535 for 16 bpc.
+			correctedChannels[3] = accumT(scaleVal);//Final accum, 4 channels, but not using transparency. 255 for 8 bpc, 65535 for 16 bpc.
 	}
 }
 
+/// <summary>
+/// Setup the curve values when they are being used.
+/// This will be either 255 values for bpc=8, or 65535 values for bpc=16.
+/// </summary>
+/// <param name="scale">Whether to scale from 0-1 to 0-255 or 0-65535</param>
 template <typename T, typename bucketT>
-void Renderer<T, bucketT>::CurveAdjust(bucketT& a, const glm::length_t& index)
+void Renderer<T, bucketT>::ComputeCurves(bool scale)
 {
-	size_t tempIndex = size_t(Clamp<bucketT>(a, 0, COLORMAP_LENGTH_MINUS_1));
-	size_t tempIndex2 = size_t(Clamp<bucketT>(m_Csa[tempIndex].x, 0, COLORMAP_LENGTH_MINUS_1));
-	a = std::round(m_Csa[tempIndex2][index]);
+	if (m_CurvesSet)
+	{
+		m_Csa.resize(size_t(std::pow(size_t(256), BytesPerChannel())));
+		auto st = m_Csa.size();
+		auto stm1 = st - 1;
+		T tscale = scale ? T(stm1) : T(1);
+
+		for (size_t i = 0; i < st; i++)
+			m_Csa[i] = m_Ember.m_Curves.BezierFunc(i / T(stm1)) * tscale;
+	}
+}
+
+/// <summary>
+/// Apply the curve adjustment to a single channel.
+/// </summary>
+/// <param name="aScaled">The value of the channel to apply curve adjustment to, scaled to either 255 or 65535, depending on bpc.</param>
+/// <param name="index">The index of the channel to apply curve adjustment to</param>
+template <typename T, typename bucketT>
+void Renderer<T, bucketT>::CurveAdjust(bucketT& aScaled, const glm::length_t& index)
+{
+	bucketT stm1 = bucketT(m_Csa.size() - 1);
+	size_t tempIndex = size_t(Clamp<bucketT>(aScaled, 0, stm1));
+	size_t tempIndex2 = size_t(Clamp<bucketT>(m_Csa[tempIndex].x, 0, stm1));
+	aScaled = m_Csa[tempIndex2][index];
 }
 
 //This class had to be implemented in a cpp file because the compiler was breaking.

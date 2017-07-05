@@ -44,8 +44,7 @@ template <typename T, typename bucketT>
 class EMBER_API Renderer : public RendererBase
 {
 public:
-
-	Renderer() = default;
+	Renderer();
 	Renderer(const Renderer<T, bucketT>& renderer) = delete;
 	Renderer<T, bucketT>& operator = (const Renderer<T, bucketT>& renderer) = delete;
 	virtual ~Renderer() = default;
@@ -80,6 +79,7 @@ protected:
 	virtual eRenderStatus AccumulatorToFinalImage(vector<byte>& pixels, size_t finalOffset);
 	virtual eRenderStatus AccumulatorToFinalImage(byte* pixels, size_t finalOffset);
 	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample);
+	virtual void ComputeCurves(bool scale);
 
 public:
 	//Non-virtual render properties, getters and setters.
@@ -189,7 +189,8 @@ protected:
 	unique_ptr<StandardIterator<T>> m_StandardIterator = make_unique<StandardIterator<T>>();
 	unique_ptr<XaosIterator<T>> m_XaosIterator = make_unique<XaosIterator<T>>();
 	Iterator<T>* m_Iterator = m_StandardIterator.get();
-	Palette<bucketT> m_Dmap, m_Csa;
+	Palette<bucketT> m_Dmap;
+	vector<tvec4<bucketT, glm::defaultp>> m_Csa;
 	vector<tvec4<bucketT, glm::defaultp>> m_HistBuckets;
 	vector<tvec4<bucketT, glm::defaultp>> m_AccumulatorBuckets;
 	unique_ptr<SpatialFilter<bucketT>> m_SpatialFilter;

@@ -237,7 +237,7 @@ public:
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (precalcAtanxy * M_1_PI);\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (precalcAtanxy * M1PI);\n"
 		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (precalcSqrtSumSquares - (real_t)(1.0));\n"
 		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
 		   << "\t}\n";
@@ -358,7 +358,7 @@ public:
 		string index = ss2.str();
 		string weightByPI = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalcs only, no params.
 		ss << "\t{\n"
-		   << "\t\treal_t val = M_PI * precalcSqrtSumSquares;\n"
+		   << "\t\treal_t val = MPI * precalcSqrtSumSquares;\n"
 		   << "\t\treal_t r = " << weightByPI << " * precalcAtanxy;\n"
 		   << "\n"
 		   << "\t\tvOut.x = sin(val) * r;\n"
@@ -600,7 +600,7 @@ public:
 		   << "\t\treal_t a = (real_t)(0.5) * precalcAtanxy;\n"
 		   << "\n"
 		   << "\t\tif (MwcNext(mwc) & 1)\n"
-		   << "\t\t	a += M_PI;\n"
+		   << "\t\t	a += MPI;\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(a);\n"
 		   << "\t\tvOut.y = r * sin(a);\n"
@@ -849,7 +849,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t dx = xform->m_VariationWeights[" << varIndex << "] * exp(vIn.x - (real_t)(1.0));\n"
-		   << "\t\treal_t dy = M_PI * vIn.y;\n"
+		   << "\t\treal_t dy = MPI * vIn.y;\n"
 		   << "\n"
 		   << "\t\tvOut.x = dx * cos(dy);\n"
 		   << "\t\tvOut.y = dx * sin(dy);\n"
@@ -931,7 +931,7 @@ public:
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t a = vIn.x * M_PI;\n"
+		   << "\t\treal_t a = vIn.x * MPI;\n"
 		   << "\t\treal_t nx = cos(a) * cosh(vIn.y);\n"
 		   << "\t\treal_t ny = -sin(a) * sinh(vIn.y);\n"
 		   << "\n"
@@ -1035,7 +1035,7 @@ public:
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t dx = M_PI * Zeps(xform->m_C * xform->m_C);\n"
+		   << "\t\treal_t dx = MPI * Zeps(xform->m_C * xform->m_C);\n"
 		   << "\t\treal_t dy = xform->m_F;\n"
 		   << "\t\treal_t dx2 = (real_t)(0.5) * dx;\n"
 		   << "\t\treal_t a = precalcAtanxy + ((fmod(precalcAtanxy + dy, dx) > dx2) ? -dx2 : dx2);\n"
@@ -2320,7 +2320,7 @@ public:
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t angle = MwcNext01(mwc) * xform->m_VariationWeights[" << varIndex << "] * M_PI;\n"
+		   << "\t\treal_t angle = MwcNext01(mwc) * xform->m_VariationWeights[" << varIndex << "] * MPI;\n"
 		   << "\t\treal_t sinr = sin(angle);\n"
 		   << "\t\treal_t cosr = cos(angle);\n"
 		   << "\n"
@@ -2420,7 +2420,7 @@ public:
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t ang = xform->m_VariationWeights[" << varIndex << "] * MwcNext01(mwc) * M_PI;\n"
+		   << "\t\treal_t ang = xform->m_VariationWeights[" << varIndex << "] * MwcNext01(mwc) * MPI;\n"
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares);\n"
 		   << "\t\treal_t tanr = xform->m_VariationWeights[" << varIndex << "] * tan(ang) * r;\n"
 		   << "\n"
@@ -2563,7 +2563,7 @@ public:
 		   << "\t\t	diff = -(real_t)(30.0);\n"
 		   << "\n"
 		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x * diff;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.x * (diff - sinr * M_PI);\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.x * (diff - sinr * MPI);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2649,7 +2649,7 @@ public:
 		   << "\t\treal_t t = " << rotTimesPi << " * (vIn.x + vIn.y);\n"
 		   << "\t\treal_t sinr = sin(t);\n"
 		   << "\t\treal_t cosr = cos(t);\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * precalcAtanxy / M_PI;\n"
+		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * precalcAtanxy / MPI;\n"
 		   << "\n"
 		   << "\t\tvOut.x = (sinr + " << cosAdd << ") * r;\n"
 		   << "\t\tvOut.y = (cosr + " << sinAdd << ") * r;\n"
@@ -2749,7 +2749,7 @@ public:
 		string pm4     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string pNeg1N1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t theta = " << pm4 << " * precalcAtanyx + M_PI_4;\n"
+		   << "\t\treal_t theta = " << pm4 << " * precalcAtanyx + MPI4;\n"
 		   << "\t\treal_t t1 = fabs(cos(theta));\n"
 		   << "\t\tt1 = pow(t1, " << n2 << ");\n"
 		   << "\t\treal_t t2 = fabs(sin(theta));\n"
@@ -3153,10 +3153,10 @@ public:
 		   << "\t\treal_t ps = " << s << ";\n"
 		   << "\t\treal_t y = (real_t)(0.5) * atan2((real_t)(2.0) * vIn.y, x2y2 - (real_t)(1.0)) + ps;\n"
 		   << "\n"
-		   << "\t\tif (y > M_PI_2)\n"
-		   << "\t\t	y = -M_PI_2 + fmod(y + M_PI_2, M_PI);\n"
-		   << "\t\telse if (y < -M_PI_2)\n"
-		   << "\t\t	y = M_PI_2 - fmod(M_PI_2 - y, M_PI);\n"
+		   << "\t\tif (y > MPI2)\n"
+		   << "\t\t	y = -MPI2 + fmod(y + MPI2, MPI);\n"
+		   << "\t\telse if (y < -MPI2)\n"
+		   << "\t\t	y = MPI2 - fmod(MPI2 - y, MPI);\n"
 		   << "\n"
 		   << "\t\treal_t f = t + x2;\n"
 		   << "\t\treal_t g = t - x2;\n"
@@ -4918,7 +4918,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t r = precalcSqrtSumSquares;\n"
 		   << "\t\treal_t a = precalcAtanyx + " << swirl << " * r;\n"
-		   << "\t\treal_t c = floor((" << count << " * a + M_PI) * M_1_PI * (real_t)(0.5));\n"
+		   << "\t\treal_t c = floor((" << count << " * a + MPI) * M1PI * (real_t)(0.5));\n"
 		   << "\n"
 		   << "\t\ta = a * " << compFac << " + c * " << angle << ";\n"
 		   << "\t\tr = xform->m_VariationWeights[" << varIndex << "] * (r + " << hole << ");\n"
@@ -5005,7 +5005,7 @@ public:
 		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * pow(precalcSumSquares, " << cn << ");\n"
 		   << "\t\tint tRand = (int)(" << rn << " * MwcNext01(mwc));\n"
 		   << "\t\treal_t a = (precalcAtanyx + M_2PI * tRand) / " << power << ";\n"
-		   << "\t\treal_t c = floor((" << count << " * a + M_PI) * M_1_PI * (real_t)(0.5));\n"
+		   << "\t\treal_t c = floor((" << count << " * a + MPI) * M1PI * (real_t)(0.5));\n"
 		   << "\n"
 		   << "\t\ta = a * " << cf << " + c * " << angle << ";\n"
 		   << "\t\tvOut.x = r * cos(a);\n"
@@ -5095,7 +5095,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t r = (real_t)(1.0) / Zeps(precalcSqrtSumSquares);\n"
 		   << "\t\treal_t a = precalcAtanyx + " << swirl << " * r;\n"
-		   << "\t\treal_t c = floor((" << count << " * a + M_PI) * " << c12pi << "); \n"
+		   << "\t\treal_t c = floor((" << count << " * a + MPI) * " << c12pi << "); \n"
 		   << "\n"
 		   << "\t\ta = a * " << compfac << " + c * " << angle << ";\n"
 		   << "\t\treal_t temp = xform->m_VariationWeights[" << varIndex << "] * (r + " << hole << ");\n"

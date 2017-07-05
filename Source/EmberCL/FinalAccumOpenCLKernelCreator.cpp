@@ -83,8 +83,8 @@ const string& FinalAccumOpenCLKernelCreator::FinalAccumEntryPoint(bool earlyClip
 
 	if (alphaAccum)
 	{
-		alphaBase = transparency ? 0 : 255;//See the table below.
-		alphaScale = transparency ? 255 : 0;
+		alphaBase = transparency ? 0 : 1;//See the table below.
+		alphaScale = transparency ? 1 : 0;
 	}
 
 	if (earlyClip)
@@ -260,9 +260,9 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 		if (alphaAccum)
 		{
 			if (alphaCalc)
-				os << "	finalColor.m_Float4.w = (float)newBucket.m_Real4.w * 255.0f;\n";
+				os << "	finalColor.m_Float4.w = (float)newBucket.m_Real4.w;\n";
 			else
-				os << "	finalColor.m_Float4.w = 255.0f;\n";
+				os << "	finalColor.m_Float4.w = 1.0f;\n";
 		}
 	}
 	else
@@ -296,7 +296,6 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	   "		CurveAdjust(csa, &(finalColor.m_Floats[2]), 3);\n"
 	   "	}\n"
 	   "\n"
-	   "	finalColor.m_Float4 /= 255.0f;\n"
 	   "	write_imagef(pixels, finalCoord, finalColor.m_Float4);\n"//Use write_imagef instead of write_imageui because only the former works when sharing with an OpenGL texture.
 	   "	barrier(CLK_GLOBAL_MEM_FENCE);\n"//Required, or else page tearing will occur during interactive rendering.
 	   "}\n"
@@ -335,7 +334,7 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool g
 			<< "	{\n"
 			<< "		tmp = bucket->m_Reals[3];\n"
 			<< "		alpha = CalcAlpha(tmp, g, linRange);\n"
-			<< "		ls = vibrancy * 256.0 * alpha / tmp;\n"
+			<< "		ls = vibrancy * alpha / tmp;\n"
 			<< "		alpha = clamp(alpha, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
 			<< "	}\n"
 			<< "\n"
@@ -343,7 +342,7 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool g
 			<< "\n"
 			<< "	for (uint rgbi = 0; rgbi < 3; rgbi++)\n"
 			<< "	{\n"
-			<< "		a = newRgb.m_Reals[rgbi] + ((1.0 - vibrancy) * 256.0 * pow(fabs(bucket->m_Reals[rgbi]), g));\n"
+			<< "		a = newRgb.m_Reals[rgbi] + ((1.0 - vibrancy) * pow(fabs(bucket->m_Reals[rgbi]), g));\n"
 			<< "\n";
 
 	if (!alphaCalc)
@@ -362,7 +361,7 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool g
 
 	os <<
 	   "\n"
-	   "			correctedChannels[rgbi] = (" << dataType << ")clamp(a, (real_bucket_t)0.0, (real_bucket_t)255.0);\n"
+	   "			correctedChannels[rgbi] = (" << dataType << ")clamp(a, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
 	   "		}\n"
 	   "\n";
 
@@ -399,9 +398,9 @@ string FinalAccumOpenCLKernelCreator::CreateCalcNewRgbFunctionString(bool global
 	   "static void CalcNewRgb(" << (globalBucket ? "__global " : "") << "real4reals_bucket* oldRgb, real_bucket_t ls, real_bucket_t highPow, real4reals_bucket* newRgb)\n"
 	   "{\n"
 	   "	int rgbi;\n"
-	   "	real_bucket_t newls, lsratio;\n"
+	   "	real_bucket_t lsratio;\n"
 	   "	real4reals_bucket newHsv;\n"
-	   "	real_bucket_t maxa, maxc;\n"
+	   "	real_bucket_t maxa, maxc, newls;\n"
 	   "	real_bucket_t adjhlp;\n"
 	   "\n"
 	   "	if (ls == 0 || (oldRgb->m_Real4.x == 0 && oldRgb->m_Real4.y == 0 && oldRgb->m_Real4.z == 0))\n"//Can't do a vector compare to zero.
@@ -413,35 +412,31 @@ string FinalAccumOpenCLKernelCreator::CreateCalcNewRgbFunctionString(bool global
 	   //Identify the most saturated channel.
 	   "	maxc = max(max(oldRgb->m_Reals[0], oldRgb->m_Reals[1]), oldRgb->m_Reals[2]);\n"
 	   "	maxa = ls * maxc;\n"
+	   "	newls = 1 / maxc;\n"
 	   "\n"
 	   //If a channel is saturated and highlight power is non-negative
 	   //modify the color to prevent hue shift.
-	   "	if (maxa > 255 && highPow >= 0)\n"
+	   "	if (maxa > 1 && highPow >= 0)\n"
 	   "	{\n"
-	   "		newls = 255.0 / maxc;\n"
 	   "		lsratio = pow(newls / ls, highPow);\n"
 	   "\n"
 	   //Calculate the max-value color (ranged 0 - 1).
 	   "		for (rgbi = 0; rgbi < 3; rgbi++)\n"
-	   "			newRgb->m_Reals[rgbi] = newls * oldRgb->m_Reals[rgbi] / 255.0;\n"
+	   "			newRgb->m_Reals[rgbi] = newls * oldRgb->m_Reals[rgbi];\n"
 	   "\n"
 	   //Reduce saturation by the lsratio.
 	   "		RgbToHsv(&(newRgb->m_Real4), &(newHsv.m_Real4));\n"
 	   "		newHsv.m_Real4.y *= lsratio;\n"
 	   "		HsvToRgb(&(newHsv.m_Real4), &(newRgb->m_Real4));\n"
-	   "\n"
-	   "		for (rgbi = 0; rgbi < 3; rgbi++)\n"//Unrolling and vectorizing makes no difference.
-	   "			newRgb->m_Reals[rgbi] *= 255.0;\n"
 	   "	}\n"
 	   "	else\n"
 	   "	{\n"
-	   "		newls = 255.0 / maxc;\n"
 	   "		adjhlp = -highPow;\n"
 	   "\n"
 	   "		if (adjhlp > 1)\n"
 	   "			adjhlp = 1;\n"
 	   "\n"
-	   "		if (maxa <= 255)\n"
+	   "		if (maxa <= 1)\n"
 	   "			adjhlp = 1;\n"
 	   "\n"
 	   //Calculate the max-value color (ranged 0 - 1) interpolated with the old behavior.

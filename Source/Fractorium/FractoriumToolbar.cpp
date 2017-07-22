@@ -43,7 +43,7 @@ void Fractorium::OnActionCpu(bool checked)
 	if (checked && m_Settings->OpenCL())
 	{
 		m_Settings->OpenCL(false);
-		ShutdownAndRecreateFromOptions();
+		ShutdownAndRecreateFromOptions(false);
 	}
 }
 
@@ -56,7 +56,7 @@ void Fractorium::OnActionCL(bool checked)
 	if (checked && !m_Settings->OpenCL())
 	{
 		m_Settings->OpenCL(true);
-		ShutdownAndRecreateFromOptions();
+		ShutdownAndRecreateFromOptions(false);
 	}
 }
 
@@ -69,7 +69,7 @@ void Fractorium::OnActionSP(bool checked)
 	if (checked && m_Settings->Double())
 	{
 		m_Settings->Double(false);
-		ShutdownAndRecreateFromOptions();
+		ShutdownAndRecreateFromOptions(true);//Pass true, but it's not needed because creating a new controller will force a library tree re-render.
 	}
 }
 
@@ -82,7 +82,7 @@ void Fractorium::OnActionDP(bool checked)
 	if (checked && !m_Settings->Double())
 	{
 		m_Settings->Double(true);
-		ShutdownAndRecreateFromOptions();
+		ShutdownAndRecreateFromOptions(true);//Pass true, but it's not needed because creating a new controller will force a library tree re-render.
 	}
 }
 

@@ -60,6 +60,7 @@ public:
 	bool SaveXml();
 	bool DoAll();
 	bool DoSequence();
+	bool Png16Bit();
 	bool KeepAspect();
 	bool ApplyToAll();
 	eScaleType Scale();

@@ -16,6 +16,7 @@
 #define SHOWXFORMS           "render/showxforms"
 #define SHOWGRID             "render/showgrid"
 #define TOGGLETYPE			 "render/toggletype"
+#define PNG16BIT			 "render/png16bit"
 #define DEVICES				 "render/devices"
 #define THREADCOUNT          "render/threadcount"
 #define CPUDEFILTER			 "render/cpudefilter"
@@ -50,6 +51,7 @@
 #define FINALSAVEXML		 "finalrender/savexml"
 #define FINALDOALL		     "finalrender/doall"
 #define FINALDOSEQUENCE	     "finalrender/dosequence"
+#define FINALPNG16BIT        "finalrender/png16bit"
 #define FINALKEEPASPECT		 "finalrender/keepaspect"
 #define FINALSCALE			 "finalrender/scale"
 #define FINALEXT			 "finalrender/ext"
@@ -123,6 +125,9 @@ public:
 
 	bool ToggleType();
 	void ToggleType(bool b);
+
+	bool Png16Bit();
+	void Png16Bit(bool b);
 
 	bool ContinuousUpdate();
 	void ContinuousUpdate(bool b);
@@ -219,6 +224,9 @@ public:
 
 	bool FinalDoSequence();
 	void FinalDoSequence(bool b);
+
+	bool FinalPng16Bit();
+	void FinalPng16Bit(bool b);
 
 	bool FinalKeepAspect();
 	void FinalKeepAspect(bool b);

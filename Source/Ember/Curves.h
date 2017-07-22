@@ -85,7 +85,8 @@ public:
 	/// </summary>
 	/// <param name="curves">The Curves object to add</param>
 	/// <returns>Reference to updated self</returns>
-	Curves<T>& operator += (const Curves<T>& curves)
+	template <typename U>
+	Curves<T>& operator += (const Curves<U>& curves)
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
@@ -93,8 +94,7 @@ public:
 			m_Points[i][1] += curves.m_Points[i][1];
 			m_Points[i][2] += curves.m_Points[i][2];
 			m_Points[i][3] += curves.m_Points[i][3];
-
-			m_Weights[i] += curves.m_Weights[i];
+			m_Weights[i]   += curves.m_Weights[i];
 		}
 
 		return *this;
@@ -105,7 +105,8 @@ public:
 	/// </summary>
 	/// <param name="curves">The Curves object to multiply this one by</param>
 	/// <returns>Reference to updated self</returns>
-	Curves<T>& operator *= (const Curves<T>& curves)
+	template <typename U>
+	Curves<T>& operator *= (const Curves<U>& curves)
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
@@ -113,8 +114,7 @@ public:
 			m_Points[i][1] *= curves.m_Points[i][1];
 			m_Points[i][2] *= curves.m_Points[i][2];
 			m_Points[i][3] *= curves.m_Points[i][3];
-
-			m_Weights[i] *= curves.m_Weights[i];
+			m_Weights[i]   *= curves.m_Weights[i];
 		}
 
 		return *this;
@@ -125,16 +125,16 @@ public:
 	/// </summary>
 	/// <param name="t">The scalar to multiply this object by</param>
 	/// <returns>Reference to updated self</returns>
-	Curves<T>& operator *= (const T& t)
+	template <typename U>
+	Curves<T>& operator *= (const U& t)
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
-			m_Points[i][0] *= t;
-			m_Points[i][1] *= t;
-			m_Points[i][2] *= t;
-			m_Points[i][3] *= t;
-
-			m_Weights[i] *= t;
+			m_Points[i][0] *= T(t);
+			m_Points[i][1] *= T(t);
+			m_Points[i][2] *= T(t);
+			m_Points[i][3] *= T(t);
+			m_Weights[i]   *= T(t);
 		}
 
 		return *this;
@@ -151,7 +151,21 @@ public:
 			m_Points[i][1] = v2T(0);
 			m_Points[i][2] = v2T(1);
 			m_Points[i][3] = v2T(1);
+			m_Weights[i] = v4T(1);
+		}
+	}
 
+	/// <summary>
+	/// Set the a specific curve and its weight value to their default state.
+	/// </summary>
+	void Init(size_t i)
+	{
+		if (i < 4)
+		{
+			m_Points[i][0] = v2T(0);//0,0 -> 0,0 -> 1,1 -> 1,1.
+			m_Points[i][1] = v2T(0);
+			m_Points[i][2] = v2T(1);
+			m_Points[i][3] = v2T(1);
 			m_Weights[i] = v4T(1);
 		}
 	}
@@ -176,9 +190,9 @@ public:
 		for (size_t i = 0; i < 4; i++)
 		{
 			if ((m_Points[i][0] != v2T(0)) ||
-				(m_Points[i][1] != v2T(0)) ||
-				(m_Points[i][2] != v2T(1)) ||
-				(m_Points[i][3] != v2T(1)))
+					(m_Points[i][1] != v2T(0)) ||
+					(m_Points[i][2] != v2T(1)) ||
+					(m_Points[i][3] != v2T(1)))
 			{
 				set = true;
 				break;
@@ -197,12 +211,10 @@ public:
 	{
 		v4T result;
 		v2T solution(0, 0);
-
 		BezierSolve(t, m_Points[0], &m_Weights[0], solution); result.x = solution.y;
 		BezierSolve(t, m_Points[1], &m_Weights[1], solution); result.y = solution.y;
 		BezierSolve(t, m_Points[2], &m_Weights[2], solution); result.z = solution.y;
 		BezierSolve(t, m_Points[3], &m_Weights[3], solution); result.w = solution.y;
-
 		return result;
 	}
 
@@ -217,20 +229,14 @@ private:
 	/// <param name="solution">The vec2 to store the solution in</param>
 	void BezierSolve(const T& t, v2T* src, v4T* w, v2T& solution)
 	{
-		T s, s2, s3, t2, t3, nom_x, nom_y, denom;
-
-		s = 1 - t;
-		s2 = s * s;
-		s3 = s * s * s;
-		t2 = t * t;
-		t3 = t * t * t;
-
-		nom_x = (w->x * s3 * src->x) + (w->y * s2 * 3 * t * src[1].x) + (w->z * s * 3 * t2 * src[2].x) + (w->w * t3 * src[3].x);
-
-		nom_y = (w->x * s3 * src->y) + (w->y * s2 * 3 * t * src[1].y) + (w->z * s * 3 * t2 * src[2].y) + (w->w * t3 * src[3].y);
-
-		denom = (w->x * s3) + (w->y * s2 * 3 * t) + (w->z * s * 3 * t2) + (w->w * t3);
-
+		T s = 1 - t;
+		T s2 = s * s;
+		T s3 = s * s * s;
+		T t2 = t * t;
+		T t3 = t * t * t;
+		T nom_x = (w->x * s3 * src->x) + (w->y * s2 * 3 * t * src[1].x) + (w->z * s * 3 * t2 * src[2].x) + (w->w * t3 * src[3].x);
+		T nom_y = (w->x * s3 * src->y) + (w->y * s2 * 3 * t * src[1].y) + (w->z * s * 3 * t2 * src[2].y) + (w->w * t3 * src[3].y);
+		T denom = (w->x * s3) + (w->y * s2 * 3 * t) + (w->z * s * 3 * t2) + (w->w * t3);
 
 		if (std::isnan(nom_x) || std::isnan(nom_y) || std::isnan(denom) || denom == 0)
 			return;
@@ -247,24 +253,24 @@ public:
 //Must declare this outside of the class to provide for both orders of parameters.
 
 /// <summary>
-/// Multiplication operator to multiply a Curves<T> object by a scalar of type T.
+/// Multiplication operator to multiply a Curves<T> object by a scalar of type U.
 /// </summary>
 /// <param name="curves">The curves object to multiply</param>
 /// <param name="t">The scalar to multiply curves by by</param>
 /// <returns>Copy of new Curves<T></returns>
-template<typename T>
-Curves<T> operator * (const Curves<T>& curves, const T& t)
+template <typename T, typename U>
+Curves<T> operator * (const Curves<T>& curves, const U& t)
 {
+	T tt = T(t);
 	Curves<T> c(curves);
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		c.m_Points[i][0] *= t;
-		c.m_Points[i][1] *= t;
-		c.m_Points[i][2] *= t;
-		c.m_Points[i][3] *= t;
-
-		c.m_Weights[i] *= t;
+		c.m_Points[i][0] *= tt;
+		c.m_Points[i][1] *= tt;
+		c.m_Points[i][2] *= tt;
+		c.m_Points[i][3] *= tt;
+		c.m_Weights[i] *= tt;
 	}
 
 	return c;
@@ -276,8 +282,8 @@ Curves<T> operator * (const Curves<T>& curves, const T& t)
 /// <param name="t">The scalar to multiply curves by by</param>
 /// <param name="curves">The curves object to multiply</param>
 /// <returns>Copy of new Curves<T></returns>
-template<typename T>
-Curves<T> operator * (const T& t, const Curves<T>& curves)
+template <typename T, typename U>
+Curves<T> operator * (const U& t, const Curves<T>& curves)
 {
 	return curves * t;
 }

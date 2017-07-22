@@ -5,6 +5,25 @@
 #include <list>
 #include <deque>
 
+#include <ImfRgbaFile.h>
+//#include <ImfStringAttribute.h>
+//#include <ImfMatrixAttribute.h>
+//#include <ImfArray.h>
+//#include <ImfChannelList.h>
+
+//#include "drawImage.h"
+//
+//#include <iostream>
+//#include <algorithm>
+//
+//
+//#include <ImfNamespace.h>
+//
+//namespace IMF = Imf;
+//
+using namespace Imf;
+using namespace Imath;
+
 /// <summary>
 /// EmberTester is a scratch area used for on the fly testing.
 /// It may become a more formalized automated testing system
@@ -16,6 +35,43 @@ using namespace EmberNs;
 using namespace EmberCommon;
 
 //#define DO_NVIDIA 1
+
+void writeRgba1(const char filename[],
+				const Rgba* pixels,
+				int width,
+				int height)
+{
+	//
+	// Write an RGBA image using class RgbaOutputFile.
+	//
+	//	- open the file
+	//	- describe the memory layout of the pixels
+	//	- store the pixels in the file
+	//
+	//auto& chl = file.header().channels();
+	//chl.findChannel("R")->type = PixelType::FLOAT;
+	//Header header(width, height);
+	//header.channels().insert("R", Channel(IMF::FLOAT));
+	//header.channels().insert("G", Channel(IMF::FLOAT));
+	//header.channels().insert("B", Channel(IMF::FLOAT));
+	////header.channels().insert("A", Channel(IMF::FLOAT));
+	//FrameBuffer frameBuffer;
+	//frameBuffer.insert("Z",					// name
+	//	Slice(IMF::FLOAT,			// type
+	//	(char *)zPixels,		// base
+	//		sizeof(*zPixels) * 1,		// xStride
+	//		sizeof(*zPixels) * width));	// yStride
+	try
+	{
+		RgbaOutputFile file(filename, width, height, WRITE_RGBA);
+		file.setFrameBuffer(pixels, 1, width);
+		file.writePixels(height);
+	}
+	catch (std::exception e)
+	{
+		cout << e.what() << endl;
+	}
+}
 
 template <typename T>
 void SaveFinalImage(Renderer<T, T>& renderer, vector<byte>& pixels, char* suffix)
@@ -1981,6 +2037,20 @@ int _tmain(int argc, _TCHAR* argv[])
 	vector<Ember<double>> dv;
 	list<Ember<float>> fl;
 	list<Ember<double>> dl;
+	int w = 1000, h = 1000;
+	string filename = ".\\testexr.exr";
+	vector<Rgba> pixels;
+	pixels.resize(w * h);
+
+	for (auto& pix : pixels)
+	{
+		pix.r = 1.0;
+		pix.b = 0.0;
+		pix.a = 1.0;
+		//pix.r = std::numeric_limits<float>::max();
+	}
+
+	writeRgba1(filename.c_str(), pixels.data(), w, h);
 	/*  TestFuncs();
 	    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
 	    auto vec = Split(line, delim, true);
@@ -2008,25 +2078,24 @@ int _tmain(int argc, _TCHAR* argv[])
 	    return 1;
 	*/
 	//MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
-	/*  return 0;
+	return 0;
+	/*
+			    TestThreadedKernel();
 
+			    auto palf = PaletteList<float>::Instance();
+			    Palette<float>* pal = palf->GetRandomPalette();
 
-		    TestThreadedKernel();
+			    cout << pal->Size() << endl;
 
-		    auto palf = PaletteList<float>::Instance();
-		    Palette<float>* pal = palf->GetRandomPalette();
+			    double d = 1;
 
-		    cout << pal->Size() << endl;
+			    for (int i = 0; i < 10; i++)
+			    {
+			    cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
+			    d *= 10;
+			    }
 
-		    double d = 1;
-
-		    for (int i = 0; i < 10; i++)
-		    {
-		    cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
-		    d *= 10;
-		    }
-
-		    return 0;*/
+			    return 0;*/
 	/*
 	    uint i, iters = (uint)10e7;
 	    size_t total = 0;

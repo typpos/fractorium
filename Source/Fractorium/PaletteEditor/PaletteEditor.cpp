@@ -496,7 +496,11 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 		m_FileDialog->setViewMode(QFileDialog::List);
 		m_FileDialog->setFileMode(QFileDialog::ExistingFile);
 		m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
+#ifdef _WIN32
 		m_FileDialog->setNameFilter("Image Files (*.png *.jpg *.bmp)");
+#else
+		m_FileDialog->setNameFilter("Image Files ( *.jpg *.png)");
+#endif
 		m_FileDialog->setWindowTitle("Open Image");
 		m_FileDialog->setDirectory(settings->OpenPaletteImageFolder());
 		m_FileDialog->selectNameFilter("*.jpg");
@@ -515,7 +519,7 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 	}
 
 #else
-	auto filename = QFileDialog::getOpenFileName(this, tr("Open Image"), settings->OpenPaletteImageFolder(), tr("Image Files (*.png *.jpg *.bmp)"));
+	auto filename = QFileDialog::getOpenFileName(this, tr("Open Image"), settings->OpenPaletteImageFolder(), tr("Image Files (*.jpg *.png)"));
 
 	if (filename.size() > 0)
 	{

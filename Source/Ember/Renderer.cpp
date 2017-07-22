@@ -9,7 +9,9 @@ namespace EmberNs
 template <typename T, typename bucketT>
 Renderer<T, bucketT>::Renderer()
 {
-	m_Csa.resize(size_t(std::pow(size_t(256), BytesPerChannel())));//Need to at least have something here so the derived RendererCL can do the initial buffer allocation.
+	//Use a very large number regardless of the size of the output pixels. This should be sufficient granularity, even though
+	//it's technically less than the number of distinct values representable by a 32-bit float.
+	m_Csa.resize(size_t(CURVES_LENGTH));
 }
 
 /// <summary>
@@ -344,7 +346,7 @@ bool Renderer<T, bucketT>::CreateTemporalFilter(bool& newAlloc)
 /// <param name="finalOffset">Offset in finalImage to store the pixels to. Default: 0.</param>
 /// <returns>True if nothing went wrong, else false.</returns>
 template <typename T, typename bucketT>
-eRenderStatus Renderer<T, bucketT>::Run(vector<byte>& finalImage, double time, size_t subBatchCountOverride, bool forceOutput, size_t finalOffset)
+eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, size_t subBatchCountOverride, bool forceOutput, size_t finalOffset)
 {
 	m_InRender = true;
 	EnterRender();
@@ -645,7 +647,7 @@ AccumOnly:
 		CreateSpatialFilter(newFilterAlloc);
 		m_DensityFilterOffset = m_GutterWidth - size_t(Clamp<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0, T(m_GutterWidth)));
 		m_CurvesSet = m_Ember.m_Curves.CurvesSet();
-		ComputeCurves(true);//Color curves must be re-calculated as well.
+		ComputeCurves();//Color curves must be re-calculated as well.
 
 		if (AccumulatorToFinalImage(finalImage, finalOffset) == eRenderStatus::RENDER_OK)
 		{
@@ -822,6 +824,7 @@ bool Renderer<T, bucketT>::ResetBuckets(bool resetHist, bool resetAccum)
 }
 
 /// <summary>
+/// THIS IS UNUSED.
 /// Log scales a single row with a specially structured loop that will be vectorized by the compiler.
 /// Note this adds an epsilon to the denomiator used to compute the logScale
 /// value because the conditional check for zero would have prevented the loop from
@@ -882,7 +885,7 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 					bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[i]);//Vectorizer can't tell these point to different locations.
 					bucketT* __restrict acc = glm::value_ptr(m_AccumulatorBuckets[i]);
 
-					for (size_t v = 0; v < 4; v++)
+					for (size_t v = 0; v < 4; v++)//Vectorized by compiler.
 						acc[v] = hist[v] * logScale;
 				}
 			}
@@ -1063,7 +1066,7 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 /// <param name="finalOffset">Offset in the buffer to store the pixels to</param>
 /// <returns>True if not prematurely aborted, else false.</returns>
 template <typename T, typename bucketT>
-eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<byte>& pixels, size_t finalOffset)
+eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset)
 {
 	if (PrepFinalAccumVector(pixels))
 		return AccumulatorToFinalImage(pixels.data(), finalOffset);
@@ -1079,14 +1082,13 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<byte>& pixels
 /// <param name="finalOffset">Offset in the buffer to store the pixels to. Default: 0.</param>
 /// <returns>True if not prematurely aborted, else false.</returns>
 template <typename T, typename bucketT>
-eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t finalOffset)
+eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t finalOffset)
 {
 	if (!pixels)
 		return eRenderStatus::RENDER_ERROR;
 
 	EnterFinalAccum();
 	//Timing t(4);
-	bool doAlpha = NumChannels() > 3;
 	size_t filterWidth = m_SpatialFilter->FinalFilterWidth();
 	bucketT g, linRange, vibrancy;
 	Color<bucketT> background;
@@ -1104,7 +1106,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 
 			while (rowStart < rowEnd && !m_Abort)//Use the pointer itself as the offset to save an extra addition per iter.
 			{
-				GammaCorrection(*rowStart, background, g, linRange, vibrancy, true, false, glm::value_ptr(*rowStart));//Write back in place.
+				GammaCorrection(*rowStart, background, g, linRange, vibrancy, false, glm::value_ptr(*rowStart));//Write back in place.
 				rowStart++;
 			}
 		});
@@ -1123,11 +1125,12 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 	parallel_for(size_t(0), FinalRasH(), size_t(1), [&](size_t j)
 	{
 		Color<bucketT> newBucket;
-		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRowSize();//Pull out of inner loop for optimization.
+		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRasW();//Pull out of inner loop for optimization.
 		size_t y = m_DensityFilterOffset + (j * Supersample());//Start at the beginning row of each super sample block.
 		size_t clampedFilterH = std::min(filterWidth, m_SuperRasH - y);//Make sure the filter doesn't go past the bottom of the gutter.
+		auto pv4T = pixels + pixelsRowStart;
 
-		for (size_t i = 0; i < FinalRasW(); i++, pixelsRowStart += PixelSize())
+		for (size_t i = 0; i < FinalRasW(); i++, pv4T++)
 		{
 			size_t ii, jj;
 			size_t x = m_DensityFilterOffset + (i * Supersample());//Start at the beginning column of each super sample block.
@@ -1149,68 +1152,8 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 				}
 			}
 
-			if (BytesPerChannel() == 2)
-			{
-				auto p16 = reinterpret_cast<glm::uint16*>(pixels + pixelsRowStart);
-
-				if (EarlyClip())
-				{
-					newBucket *= bucketT(65535);
-
-					if (m_CurvesSet)
-					{
-						CurveAdjust(newBucket.r, 1);
-						CurveAdjust(newBucket.g, 2);
-						CurveAdjust(newBucket.b, 3);
-					}
-
-					p16[0] = glm::uint16(Clamp<bucketT>(newBucket.r, 0, 65535));
-					p16[1] = glm::uint16(Clamp<bucketT>(newBucket.g, 0, 65535));
-					p16[2] = glm::uint16(Clamp<bucketT>(newBucket.b, 0, 65535));
-
-					if (doAlpha)
-					{
-						if (Transparency())
-							p16[3] = byte(Clamp<bucketT>(newBucket.a, 0, 65535));
-						else
-							p16[3] = 65535;
-					}
-				}
-				else
-				{
-					GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, doAlpha, true, p16);
-				}
-			}
-			else
-			{
-				if (EarlyClip())
-				{
-					newBucket *= bucketT(255);
-
-					if (m_CurvesSet)
-					{
-						CurveAdjust(newBucket.r, 1);
-						CurveAdjust(newBucket.g, 2);
-						CurveAdjust(newBucket.b, 3);
-					}
-
-					pixels[pixelsRowStart] = byte(Clamp<bucketT>(newBucket.r, 0, 255));
-					pixels[pixelsRowStart + 1] = byte(Clamp<bucketT>(newBucket.g, 0, 255));
-					pixels[pixelsRowStart + 2] = byte(Clamp<bucketT>(newBucket.b, 0, 255));
-
-					if (doAlpha)
-					{
-						if (Transparency())
-							pixels[pixelsRowStart + 3] = byte(Clamp<bucketT>(newBucket.a, 0, 255));
-						else
-							pixels[pixelsRowStart + 3] = 255;
-					}
-				}
-				else
-				{
-					GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, doAlpha, true, pixels + pixelsRowStart);
-				}
-			}
+			auto pf = reinterpret_cast<float*>(pv4T);
+			GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, true, pf);
 		}
 	});
 
@@ -1222,30 +1165,15 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t
 		if (ph >= FinalRasH())
 			ph = FinalRasH();
 
-		if (BytesPerChannel() == 1)
+		for (j = 0; j < ph; j++)
 		{
-			for (j = 0; j < ph; j++)
+			for (i = 0; i < FinalRasW(); i++)
 			{
-				for (i = 0; i < FinalRasW(); i++)
-				{
-					auto p = pixels + (NumChannels() * (i + j * FinalRasW()));
-					p[0] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][0] * WHITE);//The palette is [0..1], output image is [0..255].
-					p[1] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][1] * WHITE);
-					p[2] = byte(m_TempEmber.m_Palette[i * 256 / FinalRasW()][2] * WHITE);
-				}
-			}
-		}
-		else//BPC == 2.
-		{
-			for (j = 0; j < ph; j++)
-			{
-				for (i = 0; i < FinalRasW(); i++)
-				{
-					auto p16 = reinterpret_cast<glm::uint16*>(pixels + (PixelSize() * (i + j * FinalRasW())));
-					p16[0] = glm::uint16(m_TempEmber.m_Palette[i * 256 / FinalRasW()][0] * WHITE * bucketT(256)); //The palette is [0..1], output image is [0..65535].
-					p16[1] = glm::uint16(m_TempEmber.m_Palette[i * 256 / FinalRasW()][1] * WHITE * bucketT(256));
-					p16[2] = glm::uint16(m_TempEmber.m_Palette[i * 256 / FinalRasW()][2] * WHITE * bucketT(256));
-				}
+				auto p = pixels + (i + j * FinalRasW());
+				p->r = m_TempEmber.m_Palette[i * 256 / FinalRasW()][0];
+				p->g = m_TempEmber.m_Palette[i * 256 / FinalRasW()][1];
+				p->b = m_TempEmber.m_Palette[i * 256 / FinalRasW()][2];
+				p->a = 1;
 			}
 		}
 	}
@@ -1322,7 +1250,6 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 			//t.Tic();
 			//Iterating, loop 3.
 			m_BadVals[threadIndex] += m_Iterator->Iterate(m_ThreadEmbers[threadIndex], params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
-			//m_BadVals[threadIndex] += m_Iterator->Iterate(m_Ember, params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
 			//iterationTime += t.Toc();
 
 			if (m_LockAccum)
@@ -1677,112 +1604,97 @@ void Renderer<T, bucketT>::AddToAccum(const tvec4<bucketT, glm::defaultp>& bucke
 /// Because this code is used in both early and late clipping, a few extra arguments are passed
 /// to specify what actions to take. Coupled with an additional template argument, this allows
 /// using one function to perform all color clipping, gamma correction and final accumulation.
-/// Template argument accumT is expected to match bucketT for the case of early clipping, byte for late clip for
-/// images with one byte per channel and unsigned short for images with two bytes per channel.
+/// Template argument accumT is expected to always be float4.
 /// </summary>
 /// <param name="bucket">The pixel to correct</param>
 /// <param name="background">The background color</param>
 /// <param name="g">The gamma to use</param>
 /// <param name="linRange">The linear range to use</param>
 /// <param name="vibrancy">The vibrancy to use</param>
-/// <param name="doAlpha">True if either early clip, or late clip with 4 channel output, else false.</param>
 /// <param name="scale">True if late clip, else false.</param>
 /// <param name="correctedChannels">The storage space for the corrected values to be written to</param>
 template <typename T, typename bucketT>
 template <typename accumT>
-void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket, Color<bucketT>& background, bucketT g, bucketT linRange, bucketT vibrancy, bool doAlpha, bool scale, accumT* correctedChannels)
+void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket, Color<bucketT>& background, bucketT g, bucketT linRange, bucketT vibrancy, bool scale, accumT* correctedChannels)
 {
-	bucketT alpha, ls, a, newRgb[3];//Would normally use a Color<bucketT>, but don't want to call a needless constructor every time this function is called, which is once per pixel.
-	static bucketT scaleVal = numeric_limits<accumT>::max();
+	auto bt1 = bucketT(1);
 
-	if (bucket.a <= 0)
+	if (scale && EarlyClip())
 	{
-		alpha = 0;
-		ls = 0;
+		if (m_CurvesSet)
+		{
+			CurveAdjust(bucket.r, 1);
+			CurveAdjust(bucket.g, 2);
+			CurveAdjust(bucket.b, 3);
+		}
+
+		correctedChannels[0] = accumT(Clamp<bucketT>(bucket.r, 0, bt1));
+		correctedChannels[1] = accumT(Clamp<bucketT>(bucket.g, 0, bt1));
+		correctedChannels[2] = accumT(Clamp<bucketT>(bucket.b, 0, bt1));
+		correctedChannels[3] = accumT(Clamp<bucketT>(bucket.a, 0, bt1));
 	}
 	else
 	{
-		alpha = Palette<bucketT>::CalcAlpha(bucket.a, g, linRange);
-		ls = vibrancy * alpha / bucket.a;
-		ClampRef<bucketT>(alpha, 0, 1);
-	}
+		bucketT alpha, ls, a, newRgb[3];//Would normally use a Color<bucketT>, but don't want to call a needless constructor every time this function is called, which is once per pixel.
 
-	Palette<bucketT>::template CalcNewRgb<bucketT>(glm::value_ptr(bucket), ls, HighlightPower(), newRgb);
-
-	for (glm::length_t rgbi = 0; rgbi < 3; rgbi++)
-	{
-		a = newRgb[rgbi] + ((1 - vibrancy) * std::pow(std::abs(bucket[rgbi]), g));//Must use abs(), else it it could be a negative value and return NAN.
-
-		if (NumChannels() <= 3 || !Transparency())
+		if (bucket.a <= 0)
 		{
+			alpha = 0;
+			ls = 0;
+		}
+		else
+		{
+			alpha = Palette<bucketT>::CalcAlpha(bucket.a, g, linRange);
+			ls = vibrancy * alpha / bucket.a;
+			ClampRef<bucketT>(alpha, 0, 1);
+		}
+
+		Palette<bucketT>::template CalcNewRgb<bucketT>(glm::value_ptr(bucket), ls, HighlightPower(), newRgb);
+
+		for (glm::length_t rgbi = 0; rgbi < 3; rgbi++)
+		{
+			a = newRgb[rgbi] + ((1 - vibrancy) * std::pow(std::abs(bucket[rgbi]), g));//Must use abs(), else it it could be a negative value and return NAN.
 			a += (1 - alpha) * background[rgbi];
-		}
-		else
-		{
-			if (alpha > 0)
-				a /= alpha;
-			else
-				a = 0;
-		}
 
-		if (!scale)
-		{
-			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, 1.0));//Early clip, just assign directly.
-		}
-		else
-		{
-			a *= scaleVal;
-
-			if (m_CurvesSet)
+			if (scale && m_CurvesSet)
 				CurveAdjust(a, rgbi + 1);
 
-			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, scaleVal));//Final accum, multiply by 255 for 8 bpc (0-255), or 65535 for 16 bpc (0-65535).
+			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, bt1));//Early clip, just assign directly.
 		}
-	}
 
-	if (doAlpha)
-	{
-		if (!scale)
-			correctedChannels[3] = accumT(alpha);//Early clip, just assign alpha directly.
-		else if (Transparency())
-			correctedChannels[3] = accumT(alpha * scaleVal);//Final accum, 4 channels, using transparency. Scale alpha from 0-1 to 0-255 for 8 bpc or 0-65535 for 16 bpc.
-		else
-			correctedChannels[3] = accumT(scaleVal);//Final accum, 4 channels, but not using transparency. 255 for 8 bpc, 65535 for 16 bpc.
+		correctedChannels[3] = accumT(alpha);
 	}
 }
 
 /// <summary>
 /// Setup the curve values when they are being used.
-/// This will be either 255 values for bpc=8, or 65535 values for bpc=16.
 /// </summary>
-/// <param name="scale">Whether to scale from 0-1 to 0-255 or 0-65535</param>
 template <typename T, typename bucketT>
-void Renderer<T, bucketT>::ComputeCurves(bool scale)
+void Renderer<T, bucketT>::ComputeCurves()
 {
 	if (m_CurvesSet)
 	{
-		m_Csa.resize(size_t(std::pow(size_t(256), BytesPerChannel())));
+		Timing t;
 		auto st = m_Csa.size();
-		auto stm1 = st - 1;
-		T tscale = scale ? T(stm1) : T(1);
 
 		for (size_t i = 0; i < st; i++)
-			m_Csa[i] = m_Ember.m_Curves.BezierFunc(i / T(stm1)) * tscale;
+			m_Csa[i] = m_Ember.m_Curves.BezierFunc(i * ONE_OVER_CURVES_LENGTH_M1);
+
+		t.Toc("ComputeCurves");
 	}
 }
 
 /// <summary>
 /// Apply the curve adjustment to a single channel.
 /// </summary>
-/// <param name="aScaled">The value of the channel to apply curve adjustment to, scaled to either 255 or 65535, depending on bpc.</param>
+/// <param name="aScaled">The value of the channel to apply curve adjustment to.</param>
 /// <param name="index">The index of the channel to apply curve adjustment to</param>
 template <typename T, typename bucketT>
-void Renderer<T, bucketT>::CurveAdjust(bucketT& aScaled, const glm::length_t& index)
+void Renderer<T, bucketT>::CurveAdjust(bucketT& a, const glm::length_t& index)
 {
-	bucketT stm1 = bucketT(m_Csa.size() - 1);
-	size_t tempIndex = size_t(Clamp<bucketT>(aScaled, 0, stm1));
-	size_t tempIndex2 = size_t(Clamp<bucketT>(m_Csa[tempIndex].x, 0, stm1));
-	aScaled = m_Csa[tempIndex2][index];
+	size_t tempIndex = size_t(Clamp<bucketT>(a * CURVES_LENGTH_M1, 0, CURVES_LENGTH_M1));
+	size_t tempIndex2 = size_t(Clamp<bucketT>(m_Csa[tempIndex].x * CURVES_LENGTH_M1, 0, CURVES_LENGTH_M1));
+	a = m_Csa[tempIndex2][index];
 }
 
 //This class had to be implemented in a cpp file because the compiler was breaking.

@@ -111,49 +111,66 @@ void FractoriumEmberControllerBase::DeleteRenderer()
 /// This will embed the id, url and nick fields from the options in the image comments.
 /// </summary>
 /// <param name="filename">The full path and filename</param>
-/// <param name="comments">The comments to save in the png or jpg</param>
+/// <param name="comments">The comments to save in the png, jpg or exr</param>
 /// <param name="pixels">The buffer containing the pixels</param>
 /// <param name="width">The width in pixels of the image</param>
 /// <param name="height">The height in pixels of the image</param>
-/// <param name="channels">The number of channels, 3 or 4.</param>
-/// <param name="bpc">The bytes per channel, almost always 1.</param>
-void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<byte>& pixels, size_t width, size_t height, size_t channels, size_t bpc)
+/// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png.</param>
+/// <param name="transparency">Whether to use alpha when saving as Png or Exr.</param>
+void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
 {
 	if (filename != "")
 	{
 		bool b = false;
-		byte* data = nullptr;
-		vector<byte> vecRgb;
+		auto size = width * height;
+		auto settings = m_Fractorium->m_Settings;
 		QFileInfo fileInfo(filename);
 		QString suffix = fileInfo.suffix();
-		auto settings = m_Fractorium->m_Settings;
-
-		//Ensure dimensions are valid.
-		if (pixels.size() < (width * height * channels * bpc))
-		{
-			m_Fractorium->ShowCritical("Save Failed", "Dimensions didn't match, not saving.", true);
-			return;
-		}
-
-		data = pixels.data();//Png and channels == 4.
-
-		if ((suffix == "jpg" || suffix == "bmp") && channels)
-		{
-			RgbaToRgb(pixels, vecRgb, width, height);
-			data = vecRgb.data();
-		}
-
 		string s = filename.toStdString();
 		string id = settings->Id().toStdString();
 		string url = settings->Url().toStdString();
 		string nick = settings->Nick().toStdString();
 
-		if (suffix == "png")
-			b = WritePng(s.c_str(), data, width, height, 1, true, comments, id, url, nick);
-		else if (suffix == "jpg")
-			b = WriteJpeg(s.c_str(), data, width, height, 100, true, comments, id, url, nick);
-		else if (suffix == "bmp")
-			b = WriteBmp(s.c_str(), data, width, height);
+		//Ensure dimensions are valid.
+		if (pixels.size() < size)
+		{
+			m_Fractorium->ShowCritical("Save Failed", "Dimensions didn't match, not saving.", true);
+			return;
+		}
+
+		auto data = pixels.data();
+
+		if (suffix.endsWith("bmp", Qt::CaseInsensitive) || suffix.endsWith("jpg", Qt::CaseInsensitive))
+		{
+			vector<byte> rgb8Image(size * 3);
+			Rgba32ToRgb8(data, rgb8Image.data(), width, height);
+
+			if (suffix.endsWith("bmp", Qt::CaseInsensitive))
+				b = WriteBmp(s.c_str(), rgb8Image.data(), width, height);
+			else if (suffix.endsWith("jpg", Qt::CaseInsensitive))
+				b = WriteJpeg(s.c_str(), rgb8Image.data(), width, height, 100, true, comments, id, url, nick);
+		}
+		else if (suffix.endsWith("png", Qt::CaseInsensitive))
+		{
+			if (!png16Bit)
+			{
+				vector<byte> rgba8Image(size * 4);
+				Rgba32ToRgba8(data, rgba8Image.data(), width, height, transparency);
+				b = WritePng(s.c_str(), rgba8Image.data(), width, height, 1, true, comments, id, url, nick);//Put an opt here for 1 or 2 bytes.//TODO
+			}
+			else
+			{
+				vector<glm::uint16> rgba16Image(size * 4);
+				Rgba32ToRgba16(data, rgba16Image.data(), width, height, transparency);
+				b = WritePng(s.c_str(), (byte*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);//Put an opt here for 1 or 2 bytes.//TODO
+			}
+		}
+		else if (suffix.endsWith("exr", Qt::CaseInsensitive))
+		{
+			vector<Rgba> rgba32Image(size);
+			Rgba32ToRgbaExr(data, rgba32Image.data(), width, height, transparency);
+			b = WriteExr(s.c_str(), rgba32Image.data(), width, height, true, comments, id, url, nick);
+		}
 		else
 		{
 			m_Fractorium->ShowCritical("Save Failed", "Unrecognized format " + suffix + ", not saving.", true);
@@ -452,7 +469,7 @@ bool FractoriumEmberController<T>::Render()
 			//Update it on finish because the rendering process is completely done.
 			if (update || ProcessState() == eProcessState::ACCUM_DONE)
 			{
-				if (m_FinalImage.size() == m_Renderer->FinalBufferSize())//Make absolutely sure the correct amount of data is passed.
+				if (m_FinalImage.size() == m_Renderer->FinalDimensions())//Make absolutely sure the correct amount of data is passed.
 					gl->update();
 
 				if (ProcessState() == eProcessState::ACCUM_DONE)
@@ -509,10 +526,11 @@ bool FractoriumEmberController<T>::Render()
 /// </summary>
 /// <param name="renderType">The type of render to create</param>
 /// <param name="devices">The platform,device index pairs of the devices to use</param>
+/// <param name="updatePreviews">True to re-render the library previews, else false.</param>
 /// <param name="shared">True if shared with OpenGL, else false. Default: true.</param>
 /// <returns>True if nothing went wrong, else false.</returns>
 template <typename T>
-bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared)
+bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared)
 {
 	bool ok = true;
 	auto s = m_Fractorium->m_Settings;
@@ -565,7 +583,6 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 		}
 
 		m_Renderer->Callback(this);
-		m_Renderer->NumChannels(4);//Always using 4 since the GL texture is RGBA.
 		m_Renderer->ReclaimOnResize(true);
 		//Give it an initial ember, will be updated many times later.
 		//Even though the bounds are computed when starting the next render. The OpenGL draw calls use these values, which might get called before the render starts.
@@ -573,17 +590,15 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 		m_Renderer->EarlyClip(s->EarlyClip());
 		m_Renderer->YAxisUp(s->YAxisUp());
 		m_Renderer->ThreadCount(s->ThreadCount());
-		m_Renderer->Transparency(s->Transparency());
 
 		if (m_Renderer->RendererType() == eRendererType::CPU_RENDERER)
 			m_Renderer->InteractiveFilter(s->CpuDEFilter() ? eInteractiveFilter::FILTER_DE : eInteractiveFilter::FILTER_LOG);
 		else
 			m_Renderer->InteractiveFilter(s->OpenCLDEFilter() ? eInteractiveFilter::FILTER_DE : eInteractiveFilter::FILTER_LOG);
 
-		if ((m_Renderer->EarlyClip() != m_LibraryPreviewRenderer->EarlyClip()) ||
-				(m_Renderer->YAxisUp() != m_LibraryPreviewRenderer->YAxisUp()) ||
-				(m_Renderer->Transparency() != m_LibraryPreviewRenderer->Transparency()))
+		if (updatePreviews)
 		{
+			m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile);//Will take the same settings as the main renderer.
 			RenderLibraryPreviews();
 		}
 
@@ -618,26 +633,28 @@ void Fractorium::EnableRenderControls(bool enable)
 /// <summary>
 /// Wrapper to stop the timer, shutdown the controller and recreate, then restart the controller and renderer from the options.
 /// </summary>
-void Fractorium::ShutdownAndRecreateFromOptions()
+/// <param name="updatePreviews">True to re-render the library previews, else false.</param>
+void Fractorium::ShutdownAndRecreateFromOptions(bool updatePreviews)
 {
 	//First completely stop what the current rendering process is doing.
 	m_Controller->Shutdown();
-	StartRenderTimer();//This will recreate the controller and/or the renderer from the options if necessary, then start the render timer.
+	StartRenderTimer(updatePreviews);//This will recreate the controller and/or the renderer from the options if necessary, then start the render timer.
 	m_Settings->sync();
 }
 
 /// <summary>
 /// Create a new renderer from the options.
 /// </summary>
+/// <param name="updatePreviews">True to re-render the library previews, else false.</param>
 /// <returns>True if nothing went wrong, else false.</returns>
-bool Fractorium::CreateRendererFromOptions()
+bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 {
 	bool ok = true;
 	bool useOpenCL = m_Info->Ok() && m_Settings->OpenCL();
 	auto v = Devices(m_Settings->Devices());
 
 	//The most important option to process is what kind of renderer is desired, so do it first.
-	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v))
+	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v, updatePreviews))
 	{
 		//If using OpenCL, will only get here if creating RendererCL failed, but creating a backup CPU Renderer succeeded.
 		ShowCritical("Renderer Creation Error", "Error creating renderer, most likely a GPU problem. Using CPU instead.");
@@ -735,25 +752,30 @@ bool Fractorium::CreateControllerFromOptions()
 			m_PaletteFrequencySpin->SetValueStealth(freq);
 			m_Controller->PaletteAdjust();//Applies the adjustments to temp and saves in m_Ember.m_Palette, then fills in the palette preview widget.
 		}
+
+		return m_Controller.get();
 	}
 
-	return m_Controller.get();
+	return false;
 }
 
 /// <summary>
 /// Start the render timer.
 /// If a renderer has not been created yet, or differs form the options, it will first be created from the options.
 /// </summary>
-void Fractorium::StartRenderTimer()
+/// <param name="updatePreviews">True to re-render the library previews, else false.</param>
+void Fractorium::StartRenderTimer(bool updatePreviews)
 {
 	//Starting the render timer, either for the first time
 	//or from a paused state, such as resizing or applying new options.
-	CreateControllerFromOptions();
+	bool newController = CreateControllerFromOptions();
 
 	if (m_Controller.get())
 	{
 		//On program startup, the renderer does not get initialized until now.
-		CreateRendererFromOptions();
+		//If a new controller was created, then previews will have started, so only start the previews if a new controller
+		//was *not* created and updatePreviews is true.
+		CreateRendererFromOptions(updatePreviews && !newController);
 
 		if (m_Controller->Renderer())
 			m_Controller->StartRenderTimer();

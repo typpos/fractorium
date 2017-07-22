@@ -58,8 +58,7 @@ enum class eOptionIDs : et
 	OPT_INT_PALETTE,
 	OPT_HEX_PALETTE,
 	OPT_INSERT_PALETTE,
-	OPT_JPEG_COMMENTS,
-	OPT_PNG_COMMENTS,
+	OPT_ENABLE_COMMENTS,
 	OPT_WRITE_GENOME,
 	OPT_THREADED_WRITE,
 	OPT_ENCLOSED,
@@ -75,7 +74,6 @@ enum class eOptionIDs : et
 	OPT_STRIPS,
 	OPT_SUPERSAMPLE,
 	OPT_TEMPSAMPLES,
-	OPT_BPC,
 	OPT_PRINT_EDIT_DEPTH,
 	OPT_JPEG,
 	OPT_BEGIN,
@@ -363,8 +361,7 @@ public:
 		INITBOOLOPTION(NameEnable,     Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_NAME_ENABLE,      _T("--name_enable"),          false,                SO_NONE,     "   --name_enable             Use the name attribute contained in the Xml as the output filename [default: false].\n"));
 		INITBOOLOPTION(HexPalette,     Eob(eOptionUse::OPT_ANIM_GENOME, eOptionIDs::OPT_HEX_PALETTE,      _T("--hex_palette"),          true,                 SO_OPT,      "   --hex_palette             Force palette RGB values to be hex when saving to Xml [default: true].\n"));
 		INITBOOLOPTION(InsertPalette,  Eob(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_INSERT_PALETTE,   _T("--insert_palette"),       false,                SO_NONE,     "   --insert_palette          Insert the palette into the image for debugging purposes. Disabled when running with OpenCL [default: false].\n"));
-		INITBOOLOPTION(JpegComments,   Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG_COMMENTS,	  _T("--enable_jpg_comments"),  false,				  SO_NONE,	   "   --enable_jpg_comments     Enables embedding the flame parameters and user identifying information in the jpeg header [default: false].\n"));
-		INITBOOLOPTION(PngComments,    Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PNG_COMMENTS,	  _T("--enable_png_comments"),  false,				  SO_NONE,	   "   --enable_png_comments     Enables embedding the flame parameters and user identifying information in the png header [default: false].\n"));
+		INITBOOLOPTION(EnableComments, Eob(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_ENABLE_COMMENTS,  _T("--enable_comments"),      false,				  SO_NONE,	   "   --enable_comments         Enables embedding the flame parameters and user identifying information in the header of a jpg, png or exr [default: false].\n"));
 		INITBOOLOPTION(WriteGenome,    Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_WRITE_GENOME,     _T("--write_genome"),         false,                SO_NONE,     "   --write_genome            Write out flame associated with center of motion blur window [default: false].\n"));
 		INITBOOLOPTION(ThreadedWrite,  Eob(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_THREADED_WRITE,   _T("--threaded_write"),       true,                 SO_OPT,      "   --threaded_write          Use a separate thread to write images to disk. This gives better performance, but doubles the memory required for the final output buffer. [default: true].\n"));
 		INITBOOLOPTION(Enclosed,	   Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_ENCLOSED,		  _T("--enclosed"),				true,				  SO_OPT,	   "   --enclosed                Use enclosing Xml tags [default: true].\n"));
@@ -388,7 +385,6 @@ public:
 		INITUINTOPTION(Strips,		    Eou(eOptionUse::OPT_USE_RENDER,  eOptionIDs::OPT_STRIPS,           _T("--nstrips"),              1,                    SO_REQ_SEP, "   --nstrips=<val>           The number of fractions to split a single render frame into. Useful for print size renders or low memory systems [default: 1].\n"));
 		INITUINTOPTION(Supersample,     Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUPERSAMPLE,      _T("--supersample"),          0,                    SO_REQ_SEP, "   --supersample=<val>       The supersample value used to override the one specified in the file [default: 0 (use value from file), Range: 0 - 4].\n"));
 		INITUINTOPTION(TemporalSamples, Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_TEMPSAMPLES,      _T("--ts"),                   0,                    SO_REQ_SEP, "   --ts=<val>                The temporal samples value used to override all of the temporal sample values specified in the file when animating [default: 0 (use value from file)].\n"));
-		INITUINTOPTION(BitsPerChannel,  Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_BPC,              _T("--bpc"),                  8,                    SO_REQ_SEP, "   --bpc=<val>               Bits per channel. 8 or 16 for PNG, 8 for all others, always 8 with OpenCL [default: 8].\n"));
 		INITUINTOPTION(PrintEditDepth,  Eou(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PRINT_EDIT_DEPTH, _T("--print_edit_depth"),     0,                    SO_REQ_SEP, "   --print_edit_depth=<val>  Depth to truncate <edit> tag structure when converting a flame to Xml. 0 prints all <edit> tags [default: 0].\n"));
 		INITUINTOPTION(JpegQuality,     Eou(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_JPEG,             _T("--jpeg"),                 95,                   SO_REQ_SEP, "   --jpeg=<val>              Jpeg quality 0-100 for compression [default: 95].\n"));
 		INITUINTOPTION(FirstFrame,      Eou(eOptionUse::OPT_USE_ANIMATE, eOptionIDs::OPT_BEGIN,            _T("--begin"),                UINT_MAX,             SO_REQ_SEP, "   --begin=<val>             Time of first frame to render [default: first time specified in file].\n"));
@@ -431,7 +427,11 @@ public:
 		INITSTRINGOPTION(Out,          Eos(eOptionUse::OPT_USE_RENDER,	eOptionIDs::OPT_OUT,              _T("--out"),                  "",                   SO_REQ_SEP,  "   --out=<val>               Name of a single output file. Not recommended when rendering more than one image.\n"));
 		INITSTRINGOPTION(Prefix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PREFIX,           _T("--prefix"),               "",                   SO_REQ_SEP,  "   --prefix=<val>            Prefix to prepend to all output files.\n"));
 		INITSTRINGOPTION(Suffix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUFFIX,           _T("--suffix"),               "",                   SO_REQ_SEP,  "   --suffix=<val>            Suffix to append to all output files.\n"));
-		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: bmp, jpg, png [default: png].\n"));
+#ifdef _WIN32
+		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: bmp, jpg, png or exr [default: png].\n"));
+#else
+		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: jpg, png or exr [default: png].\n"));
+#endif
 		INITSTRINGOPTION(PalettePath,  Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_FILE,     _T("--flam3_palettes"),       "flam3-palettes.xml", SO_REQ_SEP,  "   --flam3_palettes=<val>    Path and name of the palette file [default: flam3-palettes.xml].\n"));
 		INITSTRINGOPTION(Id,           Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_ID,               _T("--id"),                   "",                   SO_REQ_SEP,  "   --id=<val>                ID to use in <edit> tags / image comments.\n"));
 		INITSTRINGOPTION(Url,          Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_URL,              _T("--url"),                  "",                   SO_REQ_SEP,  "   --url=<val>               URL to use in <edit> tags / image comments.\n"));
@@ -519,8 +519,7 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_NAME_ENABLE, NameEnable);
 					PARSEBOOLOPTION(eOptionIDs::OPT_HEX_PALETTE, HexPalette);
 					PARSEBOOLOPTION(eOptionIDs::OPT_INSERT_PALETTE, InsertPalette);
-					PARSEBOOLOPTION(eOptionIDs::OPT_JPEG_COMMENTS, JpegComments);
-					PARSEBOOLOPTION(eOptionIDs::OPT_PNG_COMMENTS, PngComments);
+					PARSEBOOLOPTION(eOptionIDs::OPT_ENABLE_COMMENTS, EnableComments);
 					PARSEBOOLOPTION(eOptionIDs::OPT_WRITE_GENOME, WriteGenome);
 					PARSEBOOLOPTION(eOptionIDs::OPT_THREADED_WRITE, ThreadedWrite);
 					PARSEBOOLOPTION(eOptionIDs::OPT_ENCLOSED, Enclosed);
@@ -538,7 +537,6 @@ public:
 					PARSEOPTION(eOptionIDs::OPT_STRIPS, Strips);
 					PARSEOPTION(eOptionIDs::OPT_SUPERSAMPLE, Supersample);
 					PARSEOPTION(eOptionIDs::OPT_TEMPSAMPLES, TemporalSamples);
-					PARSEOPTION(eOptionIDs::OPT_BPC, BitsPerChannel);
 					PARSEOPTION(eOptionIDs::OPT_PRINT_EDIT_DEPTH, PrintEditDepth);
 					PARSEOPTION(eOptionIDs::OPT_JPEG, JpegQuality);
 					PARSEOPTION(eOptionIDs::OPT_BEGIN, FirstFrame);
@@ -723,18 +721,18 @@ public:
 		{
 			cout << "Usage:\n"
 #ifdef _WIN32
-				 "\tEmberRender.exe --in=test.flame [--out=outfile --format=png --verbose --progress --opencl]\n\n";
+				 "\tEmberRender.exe --in=test.flame [--out=outfile --verbose --progress --opencl]\n\n";
 #else
-				 "\temberrender --in=test.flame [--out=outfile --format=png --verbose --progress --opencl]\n\n";
+				 "\temberrender --in=test.flame [--out=outfile --verbose --progress --opencl]\n\n";
 #endif
 		}
 		else if (optUsage == eOptionUse::OPT_USE_ANIMATE)
 		{
 			cout << "Usage:\n"
 #ifdef _WIN32
-				 "\tEmberAnimate.exe --in=sequence.flame [--format=png --verbose --progress --opencl]\n\n";
+				 "\tEmberAnimate.exe --in=sequence.flame [--verbose --progress --opencl]\n\n";
 #else
-				 "\temberanimate --in=sequence.flame [--format=png --verbose --progress --opencl]\n\n";
+				 "\temberanimate --in=sequence.flame [--verbose --progress --opencl]\n\n";
 #endif
 		}
 		else if (optUsage == eOptionUse::OPT_USE_GENOME)
@@ -808,8 +806,7 @@ public:
 	Eob NameEnable;
 	Eob HexPalette;
 	Eob InsertPalette;
-	Eob JpegComments;
-	Eob PngComments;
+	Eob EnableComments;
 	Eob WriteGenome;
 	Eob ThreadedWrite;
 	Eob Enclosed;
@@ -828,7 +825,6 @@ public:
 	Eou Strips;
 	Eou Supersample;
 	Eou TemporalSamples;
-	Eou BitsPerChannel;
 	Eou Bits;
 	Eou PrintEditDepth;
 	Eou JpegQuality;

@@ -836,7 +836,6 @@ public:
 	/// <returns>The percentage possible color values that were present in the final output image</returns>
 	T TryColors(Ember<T>& ember, size_t colorResolution)
 	{
-		byte* p;
 		size_t i, hits = 0, res = colorResolution;
 		size_t pixTotal, res3 = res * res * res;
 		T scalar;
@@ -862,14 +861,12 @@ public:
 
 		m_Hist.resize(res3);
 		Memset(m_Hist);
-		p = m_FinalImage.data();
+		auto p = m_FinalImage.data();
 
 		for (i = 0; i < m_Renderer->FinalDimensions(); i++)
 		{
-			m_Hist[(p[0] * res / 256) +
-									  (p[1] * res / 256) * res +
-									  (p[2] * res / 256) * res * res]++;//A specific histogram index representing the sum of R,G,B values.
-			p += m_Renderer->PixelSize();//Advance the pointer by 1 pixel.
+			m_Hist[size_t((p->r * res) + (p->g * res) * res + (p->b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
+			p++;
 		}
 
 		for (i = 0; i < res3; i++)
@@ -1352,7 +1349,7 @@ private:
 	string m_Comment;
 
 	vector<Point<T>> m_Samples;
-	vector<byte> m_FinalImage;
+	vector<v4F> m_FinalImage;
 	vector<uint> m_Hist;
 	EmberToXml<T> m_EmberToXml;
 	Iterator<T>* m_Iterator;

@@ -1,6 +1,7 @@
-VERSION = 1.0.0.4
+VERSION = 1.0.0.5
 win32:CONFIG += skip_target_version_ext
 CONFIG += c++14
+
 #message(PWD: $$absolute_path($$PWD))
 
 #1) Declare the root of all files in this project, everything else will be
@@ -26,7 +27,7 @@ SRC_DIR = $$EMBER_ROOT/Source
 SRC_COMMON_DIR = $$absolute_path($$EMBER_ROOT/Source/EmberCommon)
 ASSETS_DIR = $$absolute_path($$EMBER_ROOT/Data)
 QTCREATOR_DIR = $$absolute_path($$EMBER_ROOT/Builds/QtCreator)
-win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2013)
+win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2015)
 
 #4) Add up all include paths.
 INCLUDEPATH += $$LOCAL_INCLUDE_DIR
@@ -41,6 +42,7 @@ win32 {
 	INCLUDEPATH += $$EXTERNAL_DIR/libxml2/include
 	INCLUDEPATH += $$EXTERNAL_DIR/tbb/include
 	INCLUDEPATH += $$EXTERNAL_DIR/zlib
+    INCLUDEPATH += $$absolute_path($$EXTERNAL_LIB)/include/OpenEXR
 }
 
 !win32 {
@@ -51,6 +53,7 @@ win32 {
 	INCLUDEPATH += /usr/local/include/GL
 	INCLUDEPATH += /usr/include/glm
 	INCLUDEPATH += /usr/include/tbb
+    INCLUDEPATH += /usr/include/OpenEXR
 
         unix:!macx {
             INCLUDEPATH += /usr/include/libxml2
@@ -82,6 +85,9 @@ else {
         LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/tbb.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/Half.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmImf.lib
 }
 
 !win32 {
@@ -89,6 +95,9 @@ else {
 	LIBS += -lpng
 	LIBS += -ltbb
 	LIBS += -lpthread
+    LIBS += -lHalf
+    LIBS += -lIex
+    LIBS += -lIlmImf
 
         unix:!macx {
             LIBS += -lxml2
@@ -242,6 +251,26 @@ win32 {
 	tbb.path = $$BIN_INSTALL_DIR
 	tbb.files = $$absolute_path($$EMBER_ROOT/Deps/tbb.dll)
 	INSTALLS += tbb
+
+    half.path = $$BIN_INSTALL_DIR
+    half.files = $$absolute_path($$EMBER_ROOT/Deps/Half.dll)
+    INSTALLS += half
+
+    iex.path = $$BIN_INSTALL_DIR
+    iex.files = $$absolute_path($$EMBER_ROOT/Deps/Iex-2_2.dll)
+    INSTALLS += iex
+
+    imath.path = $$BIN_INSTALL_DIR
+    imath.files = $$absolute_path($$EMBER_ROOT/Deps/Imath-2_2.dll)
+    INSTALLS += imath
+
+    ilmthread.path = $$BIN_INSTALL_DIR
+    ilmthread.files = $$absolute_path($$EMBER_ROOT/Deps/IlmThread-2_2.dll)
+    INSTALLS += ilmthread
+
+    ilmimf.path = $$BIN_INSTALL_DIR
+    ilmimf.files = $$absolute_path($$EMBER_ROOT/Deps/IlmImf-2_2.dll)
+    INSTALLS += ilmimf
 }
 
 #11) Print values of relevant variables for debugging.

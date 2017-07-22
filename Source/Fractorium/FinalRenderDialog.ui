@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>941</height>
+    <width>573</width>
+    <height>751</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -63,8 +63,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>507</width>
-        <height>929</height>
+        <width>561</width>
+        <height>739</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -84,95 +84,11 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QGridLayout" name="FinalRenderGridLayout" columnstretch="0,0">
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="FinalRenderEarlyClipCheckBox">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: clip colors and gamma correct after density filtering.&lt;/p&gt;&lt;p&gt;Unchecked: do it after spatial filtering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Early Clip</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="FinalRenderYAxisUpCheckBox">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: Positive Y direction is up.&lt;/p&gt;&lt;p&gt;Unchecked: Positive Y direction is down.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Positive Y Up</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QCheckBox" name="FinalRenderOpenCLCheckBox">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use OpenCL to render if your video card supports it.&lt;/p&gt;&lt;p&gt;This is highly recommended as it will dramatically speed up render time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Use OpenCL</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="FinalRenderTransparencyCheckBox">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use transparency in the final image.&lt;/p&gt;&lt;p&gt;Only supported for Png format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Transparency</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="FinalRenderDoublePrecisionCheckBox">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: use 64-bit double precision numbers (slower, but better image quality).&lt;/p&gt;&lt;p&gt;Unchecked: use 32-bit single precision numbers (faster, but worse image quality).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Use Double Precision</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="FinalRenderSaveXmlCheckBox">
-           <property name="toolTip">
-            <string>Save an Xml parameter file for each flame rendered</string>
-           </property>
-           <property name="text">
-            <string>Save Xml</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QCheckBox" name="FinalRenderDoAllCheckBox">
-           <property name="toolTip">
-            <string>Render all open flames instead of just the current one</string>
-           </property>
-           <property name="text">
-            <string>Render All</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="FinalRenderDoSequenceCheckBox">
-           <property name="toolTip">
-            <string>Use temporal samples value to achieve motion blur effect between flames</string>
-           </property>
-           <property name="text">
-            <string>Render as Animation Sequence</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
         <layout class="QGridLayout" name="FinalRenderGridLayout2">
          <property name="sizeConstraint">
           <enum>QLayout::SetNoConstraint</enum>
          </property>
-         <item row="0" column="0">
+         <item row="0" column="1">
           <widget class="QLabel" name="FinalRenderPreviewLabel">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -215,7 +131,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="0" column="2">
           <widget class="QSpinBox" name="FinalRenderCurrentSpin">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -236,6 +152,100 @@
             <number>1</number>
            </property>
           </widget>
+         </item>
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="FinalRenderGridLayout" columnstretch="0,0">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="FinalRenderEarlyClipCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: clip colors and gamma correct after density filtering.&lt;/p&gt;&lt;p&gt;Unchecked: do it after spatial filtering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Early Clip</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="FinalRenderYAxisUpCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: Positive Y direction is up.&lt;/p&gt;&lt;p&gt;Unchecked: Positive Y direction is down.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Positive Y Up</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QCheckBox" name="FinalRenderOpenCLCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use OpenCL to render if your video card supports it.&lt;/p&gt;&lt;p&gt;This is highly recommended as it will dramatically speed up render time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Use OpenCL</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="FinalRenderTransparencyCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use transparency in the final image.&lt;/p&gt;&lt;p&gt;Only supported for Png format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Transparency</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="FinalRenderDoublePrecisionCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: use 64-bit double precision numbers (slower, but better image quality).&lt;/p&gt;&lt;p&gt;Unchecked: use 32-bit single precision numbers (faster, but worse image quality).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Use Double Precision</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="FinalRenderSaveXmlCheckBox">
+             <property name="toolTip">
+              <string>Save an Xml parameter file for each flame rendered</string>
+             </property>
+             <property name="text">
+              <string>Save Xml</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="FinalRenderDoAllCheckBox">
+             <property name="toolTip">
+              <string>Render all open flames instead of just the current one</string>
+             </property>
+             <property name="text">
+              <string>Render All</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="FinalRenderDoSequenceCheckBox">
+             <property name="toolTip">
+              <string>Use temporal samples value to achieve motion blur effect between flames</string>
+             </property>
+             <property name="text">
+              <string>Render as Animation Sequence</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QCheckBox" name="FinalRenderPng16BitCheckBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Save 16-bit Png</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
@@ -328,7 +338,10 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="FinalRenderThreadHorizontalLayout" stretch="0,0,0">
+        <layout class="QHBoxLayout" name="FinalRenderThreadHorizontalLayout">
+         <property name="spacing">
+          <number>6</number>
+         </property>
          <item>
           <widget class="QSpinBox" name="FinalRenderThreadCountSpin">
            <property name="sizePolicy">
@@ -404,6 +417,19 @@
             </property>
            </item>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>
@@ -929,148 +955,152 @@
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QTextEdit" name="FinalRenderTextOutput">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="FinalRenderGridLayout3" rowstretch="0,0,0,0" columnstretch="1,4">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
+           <item row="2" column="1">
+            <widget class="QProgressBar" name="FinalRenderFilteringProgress">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="FinalRenderIterationProgressLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Iteration:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="FinalRenderAccumProgressLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Final Accumulation:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QProgressBar" name="FinalRenderIterationProgress">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QProgressBar" name="FinalRenderAccumProgress">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="FinalRenderFilteringProgressLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Density Filtering:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="FinalRenderTotalProgressLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Total Progress:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QProgressBar" name="FinalRenderTotalProgress">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QLabel" name="FinalRenderImageCountLabel">
          <property name="text">
           <string>0 / 0</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QGridLayout" name="FinalRenderGridLayout3" rowstretch="0,0,0,0" columnstretch="1,4">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
-         </property>
-         <item row="2" column="1">
-          <widget class="QProgressBar" name="FinalRenderFilteringProgress">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="FinalRenderIterationProgressLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Iteration:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="FinalRenderAccumProgressLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Final Accumulation:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QProgressBar" name="FinalRenderIterationProgress">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QProgressBar" name="FinalRenderAccumProgress">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="FinalRenderFilteringProgressLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Density Filtering:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="FinalRenderTotalProgressLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Total Progress:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QProgressBar" name="FinalRenderTotalProgress">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QTextEdit" name="FinalRenderTextOutput">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -1160,13 +1190,22 @@
  </customwidgets>
  <tabstops>
   <tabstop>FinalRenderEarlyClipCheckBox</tabstop>
+  <tabstop>FinalRenderDoublePrecisionCheckBox</tabstop>
   <tabstop>FinalRenderYAxisUpCheckBox</tabstop>
+  <tabstop>FinalRenderSaveXmlCheckBox</tabstop>
   <tabstop>FinalRenderTransparencyCheckBox</tabstop>
+  <tabstop>FinalRenderDoAllCheckBox</tabstop>
   <tabstop>FinalRenderOpenCLCheckBox</tabstop>
-  <tabstop>FinalRenderParamsTable</tabstop>
-  <tabstop>FinalRenderTextOutput</tabstop>
-  <tabstop>FinalRenderStartButton</tabstop>
+  <tabstop>FinalRenderDoSequenceCheckBox</tabstop>
+  <tabstop>FinalRenderPng16BitCheckBox</tabstop>
+  <tabstop>FinalRenderCurrentSpin</tabstop>
   <tabstop>FinalRenderStopButton</tabstop>
+  <tabstop>FinalRenderStartButton</tabstop>
+  <tabstop>FinalRenderScaleWidthRadioButton</tabstop>
+  <tabstop>FinalRenderScaleHeightRadioButton</tabstop>
+  <tabstop>FinalRenderScaleNoneRadioButton</tabstop>
+  <tabstop>FinalRenderKeepAspectCheckBox</tabstop>
+  <tabstop>FinalRenderTextOutput</tabstop>
   <tabstop>FinalRenderCloseButton</tabstop>
  </tabstops>
  <resources/>

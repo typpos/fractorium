@@ -171,10 +171,10 @@ bool RendererBase::RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec)
 /// </summary>
 /// <param name="pixels">The vector to allocate</param>
 /// <returns>True if the vector contains enough space to hold the output image</returns>
-bool RendererBase::PrepFinalAccumVector(vector<byte>& pixels)
+bool RendererBase::PrepFinalAccumVector(vector<v4F>& pixels)
 {
 	EnterResize();
-	size_t size = FinalBufferSize();
+	size_t size = FinalDimensions();
 
 	if (m_ReclaimOnResize)
 	{
@@ -375,27 +375,6 @@ void RendererBase::ReclaimOnResize(bool reclaimOnResize)
 }
 
 /// <summary>
-/// Get whether to use transparency in the alpha channel.
-/// This only applies when the number of channels is 4 and the output
-/// image is Png.
-/// Default: false.
-/// </summary>
-/// <returns>True if using transparency, else false.</returns>
-bool RendererBase::Transparency() const { return m_Transparency; }
-
-/// <summary>
-/// Set whether to use transparency in the alpha channel.
-/// This only applies when the number of channels is 4 and the output
-/// image is Png.
-/// Set the render state to ACCUM_ONLY.
-/// </summary>
-/// <param name="transparency">True if using transparency, else false.</param>
-void RendererBase::Transparency(bool transparency)
-{
-	ChangeVal([&] { m_Transparency = transparency; }, eProcessAction::ACCUM_ONLY);
-}
-
-/// <summary>
 /// Set the callback object.
 /// </summary>
 /// <param name="callback">The callback object to set</param>
@@ -474,39 +453,17 @@ void RendererBase::ThreadCount(size_t threads, const char* seedString)
 
 /// <summary>
 /// Get the bytes per channel of the output image.
-/// The only acceptable values are 1 and 2, and 2 is only
-/// used when the output is Png.
-/// Default: 1.
+/// This will always be 4 since each channel is a 32-bit float.
 /// </summary>
-/// <returns></returns>
+/// <returns>The number of bytes per channel</returns>
 size_t RendererBase::BytesPerChannel() const { return m_BytesPerChannel; }
 
 /// <summary>
-/// Set the bytes per channel of the output image.
-/// The only acceptable values are 1 and 2, and 2 is only
-/// used when the output is Png.
-/// Set the render state to ACCUM_ONLY.
-/// </summary>
-/// <param name="bytesPerChannel">The bytes per channel.</param>
-void RendererBase::BytesPerChannel(size_t bytesPerChannel)
-{
-	ChangeVal([&]
-	{
-		if (bytesPerChannel == 0 || bytesPerChannel > 2)
-			m_BytesPerChannel = 1;
-		else
-			m_BytesPerChannel = bytesPerChannel;
-	}, eProcessAction::ACCUM_ONLY);
-}
-
-/// <summary>
-/// Get the number of channels per pixel in the output image. 3 for RGB images
-/// like Bitmap and Jpeg, 4 for Png.
-/// Default is 3.
+/// Get the number of channels per pixel in the output image.
+/// This will always be 4 since each pixel is always RGBA.
 /// </summary>
 /// <returns>The number of channels per pixel in the output image</returns>
 size_t RendererBase::NumChannels() const { return m_NumChannels; }
-
 
 /// <summary>
 /// Get/set the priority used for the CPU rendering threads.
@@ -542,18 +499,6 @@ void RendererBase::InteractiveFilter(eInteractiveFilter filter)
 /// <summary>
 /// Virtual render properties, getters and setters.
 /// </summary>
-
-/// <summary>
-/// Set the number of channels per pixel in the output image. 3 for RGB images
-/// like Bitmap and Jpeg, 4 for Png.
-/// Default is 3.
-/// Set the render state to ACCUM_ONLY.
-/// </summary>
-/// <param name="numChannels">The number of channels per pixel in the output image</param>
-void RendererBase::NumChannels(size_t numChannels)
-{
-	ChangeVal([&] { m_NumChannels = numChannels; }, eProcessAction::ACCUM_ONLY);
-}
 
 /// <summary>
 /// Get the number of threads used when rendering.

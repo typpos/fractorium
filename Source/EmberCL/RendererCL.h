@@ -19,7 +19,7 @@ class EMBERCL_API RendererCLBase
 {
 public:
 	virtual ~RendererCLBase() { }
-	virtual bool ReadFinal(byte* pixels) = 0;
+	virtual bool ReadFinal(v4F* pixels) = 0;
 	virtual bool ClearFinal() = 0;
 };
 
@@ -43,7 +43,6 @@ class EMBERCL_API RendererCL : public Renderer<T, bucketT>, public RendererCLBas
 {
 	using EmberNs::Renderer<T, bucketT>::RendererBase::Abort;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::EarlyClip;
-	using EmberNs::Renderer<T, bucketT>::RendererBase::Transparency;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::EnterResize;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::LeaveResize;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::FinalRasW;
@@ -60,7 +59,6 @@ class EMBERCL_API RendererCL : public Renderer<T, bucketT>, public RendererCLBas
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_YAxisUp;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_LockAccum;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_Abort;
-	using EmberNs::Renderer<T, bucketT>::RendererBase::m_NumChannels;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_LastIter;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_LastIterPercent;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_Stats;
@@ -141,13 +139,12 @@ public:
 	const vector<unique_ptr<RendererClDevice>>& Devices() const;
 
 	//Virtual functions overridden from RendererCLBase.
-	virtual bool ReadFinal(byte* pixels);
+	virtual bool ReadFinal(v4F* pixels);
 	virtual bool ClearFinal();
 
 	//Public virtual functions overridden from Renderer or RendererBase.
 	virtual size_t MemoryAvailable() override;
 	virtual bool Ok() const override;
-	virtual void NumChannels(size_t numChannels) override;
 	virtual void ClearErrorReport() override;
 	virtual size_t SubBatchSize() const override;
 	virtual size_t ThreadCount() const override;
@@ -166,9 +163,8 @@ protected:
 	virtual bool ResetBuckets(bool resetHist = true, bool resetAccum = true) override;
 	virtual eRenderStatus LogScaleDensityFilter(bool forceOutput = false) override;
 	virtual eRenderStatus GaussianDensityFilter() override;
-	virtual eRenderStatus AccumulatorToFinalImage(byte* pixels, size_t finalOffset) override;
+	virtual eRenderStatus AccumulatorToFinalImage(v4F* pixels, size_t finalOffset) override;
 	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample) override;
-	virtual void ComputeCurves(bool scale) override;
 
 #ifndef TEST_CL
 private:
@@ -183,7 +179,7 @@ private:
 	bool ClearBuffer(size_t device, const string& bufferName, uint width, uint height, uint elementSize);
 	bool RunDensityFilterPrivate(size_t kernelIndex, size_t gridW, size_t gridH, size_t blockW, size_t blockH, uint chunkSizeW, uint chunkSizeH, uint colChunkPass, uint rowChunkPass);
 	int MakeAndGetDensityFilterProgram(size_t ss, uint filterWidth);
-	int MakeAndGetFinalAccumProgram(double& alphaBase, double& alphaScale);
+	int MakeAndGetFinalAccumProgram();
 	int MakeAndGetGammaCorrectionProgram();
 	bool CreateHostBuffer();
 	bool SumDeviceHist();

@@ -57,7 +57,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_HELP_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_XML_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\tbb\include;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\tbb\include;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\Deps\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -81,7 +81,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(QTDIR)\lib;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Half.lib;Iex.lib;IlmImf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
@@ -102,7 +102,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_dark.gradient" "$(
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_warmer.gradient" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_03.gradient" "$(OutDir)"
 
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark.qss" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark_windows.qss" "$(OutDir)"
 
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Cored.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Guid.dll" "$(OutDir)"
@@ -115,7 +115,7 @@ xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)\platform
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_HELP_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_XML_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\tbb\include;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\tbb\include;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\Deps\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -138,7 +138,7 @@ xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)\platform
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(QTDIR)\lib;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgets.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgets.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Half.lib;Iex.lib;IlmImf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Version>0.1</Version>
     </Link>
     <PostBuildEvent>
@@ -160,7 +160,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_dark.gradient" "$(
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_warmer.gradient" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_03.gradient" "$(OutDir)"
 
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark.qss" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark_windows.qss" "$(OutDir)"
 
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Core.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Gui.dll" "$(OutDir)"

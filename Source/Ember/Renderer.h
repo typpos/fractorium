@@ -66,7 +66,7 @@ public:
 	virtual bool CreateSpatialFilter(bool& newAlloc) override;
 	virtual bool CreateTemporalFilter(bool& newAlloc) override;
 	virtual size_t HistBucketSize() const override { return sizeof(tvec4<bucketT, glm::defaultp>); }
-	virtual eRenderStatus Run(vector<byte>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) override;
+	virtual eRenderStatus Run(vector<v4F>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) override;
 	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool hexPalette = true) override;
 
 protected:
@@ -76,10 +76,10 @@ protected:
 	virtual bool ResetBuckets(bool resetHist = true, bool resetAccum = true);
 	virtual eRenderStatus LogScaleDensityFilter(bool forceOutput = false);
 	virtual eRenderStatus GaussianDensityFilter();
-	virtual eRenderStatus AccumulatorToFinalImage(vector<byte>& pixels, size_t finalOffset);
-	virtual eRenderStatus AccumulatorToFinalImage(byte* pixels, size_t finalOffset);
+	virtual eRenderStatus AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset);
+	virtual eRenderStatus AccumulatorToFinalImage(v4F* pixels, size_t finalOffset);
 	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample);
-	virtual void ComputeCurves(bool scale);
+	virtual void ComputeCurves();
 
 public:
 	//Non-virtual render properties, getters and setters.
@@ -118,9 +118,7 @@ public:
 	inline T                     CenterX()             const;
 	inline T                     CenterY()             const;
 	inline T                     Rotate()              const;
-	inline T                     Hue()                 const;
 	inline bucketT               Brightness()          const;
-	inline bucketT               Contrast()            const;
 	inline bucketT               Gamma()               const;
 	inline bucketT               Vibrancy()            const;
 	inline bucketT               GammaThresh()         const;
@@ -154,8 +152,8 @@ protected:
 private:
 	//Miscellaneous non-virtual functions used only in this class.
 	void Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Point<T>* samples, size_t sampleCount, const Palette<bucketT>* palette);
-	/*inline*/ void AddToAccum(const tvec4<bucketT, glm::defaultp>& bucket, intmax_t i, intmax_t ii, intmax_t j, intmax_t jj);
-	template <typename accumT> void GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket, Color<bucketT>& background, bucketT g, bucketT linRange, bucketT vibrancy, bool doAlpha, bool scale, accumT* correctedChannels);
+	void AddToAccum(const tvec4<bucketT, glm::defaultp>& bucket, intmax_t i, intmax_t ii, intmax_t j, intmax_t jj);
+	template <typename accumT> void GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket, Color<bucketT>& background, bucketT g, bucketT linRange, bucketT vibrancy, bool scale, accumT* correctedChannels);
 	void CurveAdjust(bucketT& a, const glm::length_t& index);
 	void VectorizedLogScale(size_t row, size_t rowEnd);
 

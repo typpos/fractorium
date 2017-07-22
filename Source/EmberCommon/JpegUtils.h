@@ -136,28 +136,28 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 		glm::uint16 testbe = 1;
 		vector<byte*> rows(height);
 		text[0].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[0].key = const_cast<png_charp>("flam3_version");
+		text[0].key = const_cast<png_charp>("ember_version");
 		text[0].text = const_cast<png_charp>(EmberVersion());
 		text[1].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[1].key = const_cast<png_charp>("flam3_nickname");
+		text[1].key = const_cast<png_charp>("ember_nickname");
 		text[1].text = const_cast<png_charp>(nick.c_str());
 		text[2].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[2].key = const_cast<png_charp>("flam3_url");
+		text[2].key = const_cast<png_charp>("ember_url");
 		text[2].text = const_cast<png_charp>(url.c_str());
 		text[3].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[3].key = const_cast<png_charp>("flam3_id");
+		text[3].key = const_cast<png_charp>("ember_id");
 		text[3].text = const_cast<png_charp>(id.c_str());
 		text[4].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[4].key = const_cast<png_charp>("flam3_error_rate");
+		text[4].key = const_cast<png_charp>("ember_error_rate");
 		text[4].text = const_cast<png_charp>(comments.m_Badvals.c_str());
 		text[5].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[5].key = const_cast<png_charp>("flam3_samples");
+		text[5].key = const_cast<png_charp>("ember_samples");
 		text[5].text = const_cast<png_charp>(comments.m_NumIters.c_str());
 		text[6].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[6].key = const_cast<png_charp>("flam3_time");
+		text[6].key = const_cast<png_charp>("ember_time");
 		text[6].text = const_cast<png_charp>(comments.m_Runtime.c_str());
 		text[7].compression = PNG_TEXT_COMPRESSION_zTXt;
-		text[7].key = const_cast<png_charp>("flam3_genome");
+		text[7].key = const_cast<png_charp>("ember_genome");
 		text[7].text = const_cast<png_charp>(comments.m_Genome.c_str());
 
 		for (i = 0; i < height; i++)
@@ -325,4 +325,51 @@ static bool WriteBmp(const char* filename, byte* image, size_t width, size_t hei
 	auto bgrBuf = ConvertRGBToBMPBuffer(image, width, height, newSize);
 	b = SaveBmp(filename, bgrBuf.data(), width, height, newSize);
 	return b;
+}
+
+/// <summary>
+/// Write an EXR file.
+/// This is used for extreme color precision because it uses
+/// floats for each color channel.
+/// </summary>
+/// <param name="filename">The full path and name of the file</param>
+/// <param name="image">Pointer to the image data to write</param>
+/// <param name="width">Width of the image in pixels</param>
+/// <param name="height">Height of the image in pixels</param>
+/// <param name="enableComments">True to embed comments, else false</param>
+/// <param name="comments">The comment string to embed</param>
+/// <param name="id">Id of the author</param>
+/// <param name="url">Url of the author</param>
+/// <param name="nick">Nickname of the author</param>
+/// <returns>True if success, else false</returns>
+static bool WriteExr(const char* filename, Rgba* image, size_t width, size_t height, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
+{
+	try
+	{
+		int iw = int(width);
+		int ih = int(height);
+		RgbaOutputFile file(filename, iw, ih, WRITE_RGBA);
+
+		if (enableComments)
+		{
+			auto& header = const_cast<Imf::Header&>(file.header());
+			header.insert("ember_version", StringAttribute(EmberVersion()));
+			header.insert("ember_nickname", StringAttribute(nick));
+			header.insert("ember_url", StringAttribute(url));
+			header.insert("ember_id", StringAttribute(id));
+			header.insert("ember_error_rate", StringAttribute(comments.m_Badvals));
+			header.insert("ember_samples", StringAttribute(comments.m_NumIters));
+			header.insert("ember_time", StringAttribute(comments.m_Runtime));
+			header.insert("ember_genome", StringAttribute(comments.m_Genome));
+		}
+
+		file.setFrameBuffer(image, 1, iw);
+		file.writePixels(ih);
+		return true;
+	}
+	catch (std::exception e)
+	{
+		cout << e.what() << endl;
+		return false;
+	}
 }

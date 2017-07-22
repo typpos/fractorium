@@ -105,7 +105,7 @@ public:
 	size_t HistMemoryRequired(size_t strips);
 	pair<size_t, size_t> MemoryRequired(size_t strips, bool includeFinal, bool threadedWrite);
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> RandVec();
-	bool PrepFinalAccumVector(vector<byte>& pixels);
+	bool PrepFinalAccumVector(vector<v4F>& pixels);
 
 	//Virtual processing functions.
 	virtual bool Ok() const;
@@ -121,7 +121,7 @@ public:
 	virtual void ComputeBounds() = 0;
 	virtual void ComputeQuality() = 0;
 	virtual void ComputeCamera() = 0;
-	virtual eRenderStatus Run(vector<byte>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) = 0;
+	virtual eRenderStatus Run(vector<v4F>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) = 0;
 	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool hexPalette = true) = 0;
 	virtual DensityFilterBase* GetDensityFilter() = 0;
 
@@ -152,12 +152,9 @@ public:
 	void InsertPalette(bool insertPalette);
 	bool ReclaimOnResize() const;
 	void ReclaimOnResize(bool reclaimOnResize);
-	bool Transparency() const;
-	void Transparency(bool transparency);
 	void Callback(RenderCallback* callback);
 	void ThreadCount(size_t threads, const char* seedString = nullptr);
 	size_t BytesPerChannel() const;
-	void BytesPerChannel(size_t bytesPerChannel);
 	size_t NumChannels() const;
 	eThreadPriority Priority() const;
 	void Priority(eThreadPriority priority);
@@ -165,7 +162,6 @@ public:
 	void InteractiveFilter(eInteractiveFilter filter);
 
 	//Virtual render properties, getters and setters.
-	virtual void NumChannels(size_t numChannels);
 	virtual size_t ThreadCount()   const;
 	virtual eRendererType RendererType() const;
 
@@ -200,7 +196,6 @@ public:
 protected:
 	bool m_EarlyClip = false;
 	bool m_YAxisUp = false;
-	bool m_Transparency = false;
 	bool m_LockAccum = false;
 	bool m_InRender = false;
 	bool m_InFinalAccum = false;
@@ -213,8 +208,8 @@ protected:
 	size_t m_SuperSize = 0;
 	size_t m_GutterWidth;
 	size_t m_DensityFilterOffset;
-	size_t m_NumChannels = 3;
-	size_t m_BytesPerChannel = 1;
+	size_t m_NumChannels = 4;
+	size_t m_BytesPerChannel = 4;
 	size_t m_ThreadsToUse;
 	size_t m_VibGamCount;
 	size_t m_LastTemporalSample = 0;

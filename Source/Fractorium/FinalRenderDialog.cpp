@@ -52,8 +52,12 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_ItersCellIndex = row++;//Iters.
 	m_PathCellIndex = row;
 	QStringList comboList;
+#ifndef _WIN32
+	comboList.append("bmp");
+#endif
 	comboList.append("jpg");
 	comboList.append("png");
+	comboList.append("exr");
 	m_Tbcw = new TwoButtonComboWidget("...", "Open", comboList, 22, 40, 22, table);
 	table->setCellWidget(row, 1, m_Tbcw);
 	table->item(row++, 1)->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -116,6 +120,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	ui.FinalRenderSaveXmlCheckBox->setChecked(			  m_Settings->FinalSaveXml());
 	ui.FinalRenderDoAllCheckBox->setChecked(			  m_Settings->FinalDoAll());
 	ui.FinalRenderDoSequenceCheckBox->setChecked(		  m_Settings->FinalDoSequence());
+	ui.FinalRenderPng16BitCheckBox->setChecked(		      m_Settings->FinalPng16Bit());
 	ui.FinalRenderKeepAspectCheckBox->setChecked(		  m_Settings->FinalKeepAspect());
 	ui.FinalRenderThreadCountSpin->setValue(			  m_Settings->FinalThreadCount());
 #ifdef _WIN32
@@ -136,11 +141,27 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_SupersampleSpin->setValue(m_Settings->FinalSupersample());
 	m_StripsSpin->setValue(int(m_Settings->FinalStrips()));
 	Scale(eScaleType(m_Settings->FinalScale()));
+	int index = 0;
+#ifdef _WIN32
 
-	if (m_Settings->FinalExt() == "jpg")
-		m_Tbcw->m_Combo->setCurrentIndex(0);
-	else
-		m_Tbcw->m_Combo->setCurrentIndex(1);
+	if (m_Settings->FinalExt().endsWith("bmp", Qt::CaseInsensitive))
+		m_Tbcw->m_Combo->setCurrentIndex(index);
+
+	index++;
+#endif
+
+	if (m_Settings->FinalExt().endsWith("jpg", Qt::CaseInsensitive))
+		m_Tbcw->m_Combo->setCurrentIndex(index);
+
+	index++;
+
+	if (m_Settings->FinalExt().endsWith("png", Qt::CaseInsensitive))
+		m_Tbcw->m_Combo->setCurrentIndex(index);
+
+	index++;
+
+	if (m_Settings->FinalExt().endsWith("exr", Qt::CaseInsensitive))
+		m_Tbcw->m_Combo->setCurrentIndex(index);
 
 	//Explicitly call these to enable/disable the appropriate controls.
 	OnOpenCLCheckBoxStateChanged(ui.FinalRenderOpenCLCheckBox->isChecked());
@@ -150,23 +171,20 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	int desktopHeight = qApp->desktop()->availableGeometry().height();
 	s.setHeight(std::min(s.height(), int(double(desktopHeight * 0.90))));
 	setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, s, qApp->desktop()->availableGeometry()));
-	ui.FinalRenderThreadHorizontalLayout->setAlignment(Qt::AlignLeft);
-	ui.FinalRenderThreadHorizontalLayout->setAlignment(ui.FinalRenderThreadCountSpin, Qt::AlignLeft);
-	ui.FinalRenderThreadHorizontalLayout->setAlignment(ui.FinalRenderThreadPriorityLabel, Qt::AlignLeft);
-	ui.FinalRenderThreadHorizontalLayout->setAlignment(ui.FinalRenderThreadPriorityComboBox, Qt::AlignLeft);
-	QWidget* w = SetTabOrder(this, ui.FinalRenderEarlyClipCheckBox, ui.FinalRenderYAxisUpCheckBox);
 	//Update these with new controls.
+	QWidget* w = SetTabOrder(this, ui.FinalRenderEarlyClipCheckBox, ui.FinalRenderYAxisUpCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderTransparencyCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderOpenCLCheckBox);
+	w = SetTabOrder(this, w, ui.FinalRenderPng16BitCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderDoublePrecisionCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderSaveXmlCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderDoAllCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderDoSequenceCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderCurrentSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderDeviceTable);
+	w = SetTabOrder(this, w, ui.FinalRenderApplyToAllCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderThreadCountSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderThreadPriorityComboBox);
-	w = SetTabOrder(this, w, ui.FinalRenderApplyToAllCheckBox);
 	w = SetTabOrder(this, w, m_WidthScaleSpin);
 	w = SetTabOrder(this, w, m_HeightScaleSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderScaleNoneRadioButton);
@@ -215,9 +233,10 @@ bool FractoriumFinalRenderDialog::Double() { return ui.FinalRenderDoublePrecisio
 bool FractoriumFinalRenderDialog::SaveXml() { return ui.FinalRenderSaveXmlCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::DoAll() { return ui.FinalRenderDoAllCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::DoSequence() { return ui.FinalRenderDoSequenceCheckBox->isChecked(); }
+bool FractoriumFinalRenderDialog::Png16Bit() { return ui.FinalRenderPng16BitCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::KeepAspect() { return ui.FinalRenderKeepAspectCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::ApplyToAll() { return ui.FinalRenderApplyToAllCheckBox->isChecked(); }
-QString FractoriumFinalRenderDialog::Ext() { return m_Tbcw->m_Combo->currentIndex() == 0 ? "jpg" : "png"; }
+QString FractoriumFinalRenderDialog::Ext() { return m_Tbcw->m_Combo->currentText(); }
 QString FractoriumFinalRenderDialog::Path() { return ui.FinalRenderParamsTable->item(m_PathCellIndex, 1)->text(); }
 void FractoriumFinalRenderDialog::Path(const QString& s) { ui.FinalRenderParamsTable->item(m_PathCellIndex, 1)->setText(s); }
 QString FractoriumFinalRenderDialog::Prefix() { return m_PrefixEdit->text(); }
@@ -261,6 +280,7 @@ FinalRenderGuiState FractoriumFinalRenderDialog::State()
 	state.m_SaveXml = SaveXml();
 	state.m_DoAll = DoAll();
 	state.m_DoSequence = DoSequence();
+	state.m_Png16Bit = Png16Bit();
 	state.m_KeepAspect = KeepAspect();
 	state.m_Scale = Scale();
 	state.m_Path = Path();

@@ -727,7 +727,7 @@ public:
 		InterpT<&Ember<T>::m_MinRadDE>(embers, coefs, size);
 		InterpT<&Ember<T>::m_CurveDE>(embers, coefs, size);
 		InterpT<&Ember<T>::m_SpatialFilterRadius>(embers, coefs, size);
-		InterpX<Curves<T>, &Ember<T>::m_Curves>(embers, coefs, size);
+		InterpX<Curves<float>, &Ember<T>::m_Curves>(embers, coefs, size);
 		//Normally done in assignment, must manually do here.
 		SetProjFunc();
 		//An extra step needed here due to the OOD that was not needed in the original.
@@ -1653,7 +1653,7 @@ public:
 	Palette<float> m_Palette;//Final palette that is actually used is a copy of this inside of render, which will be of type bucketT (float).
 
 	//Curves used to adjust the color during final accumulation.
-	Curves<T> m_Curves;
+	Curves<float> m_Curves;
 
 	//Strings.
 

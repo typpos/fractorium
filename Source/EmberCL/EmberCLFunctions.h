@@ -147,13 +147,14 @@ static const char* CalcAlphaFunctionString =
 /// during final accumulation, which only takes floats.
 /// </summary>
 static const char* CurveAdjustFunctionString =
-	"static inline void CurveAdjust(__constant real4reals_bucket* csa, float* a, uint index)\n"
+	"static inline void CurveAdjust(__global real4reals_bucket* csa, float* a, uint index)\n"
 	"{\n"
-	"	uint tempIndex = (uint)clamp(*a * (float)COLORMAP_LENGTH_MINUS_1, (float)0.0, (float)COLORMAP_LENGTH_MINUS_1);\n"
-	"	uint tempIndex2 = (uint)clamp((float)csa[tempIndex].m_Real4.x * (float)COLORMAP_LENGTH_MINUS_1, (float)0.0, (float)COLORMAP_LENGTH_MINUS_1);\n"
+	"	uint tempIndex = (uint)clamp(*a * CURVES_LENGTH_M1, 0.0f, CURVES_LENGTH_M1);\n"
+	"	uint tempIndex2 = (uint)clamp(csa[tempIndex].m_Real4.x * CURVES_LENGTH_M1, 0.0f, CURVES_LENGTH_M1);\n"
 	"\n"
 	"	*a = (float)csa[tempIndex2].m_Reals[index];\n"
-	"}\n";
+	"}\n"
+	"\n";
 
 /// <summary>
 /// Use MWC 64 from David Thomas at the Imperial College of London for

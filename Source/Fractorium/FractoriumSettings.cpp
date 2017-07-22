@@ -61,16 +61,16 @@ void FractoriumSettings::EnsureDefaults()
 		FinalScale(0);
 
 	if (OpenXmlExt() == "")
-		OpenXmlExt("Flame (*.flame)");
+		OpenXmlExt("*.flame");
 
 	if (SaveXmlExt() == "")
-		SaveXmlExt("Flame (*.flame)");
+		SaveXmlExt(".flame");
 
 	if (OpenImageExt() == "")
-		OpenImageExt("Png (*.png)");
+		OpenImageExt("*.png");
 
 	if (SaveImageExt() == "")
-		SaveImageExt("Png (*.png)");
+		SaveImageExt(".png");
 
 	if (FinalExt() != "jpg" && FinalExt() != "png")
 		FinalExt("png");
@@ -120,6 +120,9 @@ void FractoriumSettings::ShowGrid(bool b)                        { setValue(SHOW
 
 bool FractoriumSettings::ToggleType()                            { return value(TOGGLETYPE).toBool();      }
 void FractoriumSettings::ToggleType(bool b)                      { setValue(TOGGLETYPE, b);                }
+
+bool FractoriumSettings::Png16Bit()                              { return value(PNG16BIT).toBool();        }
+void FractoriumSettings::Png16Bit(bool b)                        { setValue(PNG16BIT, b);                  }
 
 bool FractoriumSettings::ContinuousUpdate()						 { return value(CONTUPDATE).toBool();	   }
 void FractoriumSettings::ContinuousUpdate(bool b)				 { setValue(CONTUPDATE, b);				   }
@@ -228,6 +231,9 @@ void FractoriumSettings::FinalDoAll(bool b)							  { setValue(FINALDOALL, b);		
 
 bool FractoriumSettings::FinalDoSequence()							  { return value(FINALDOSEQUENCE).toBool();	     }
 void FractoriumSettings::FinalDoSequence(bool b)					  { setValue(FINALDOSEQUENCE, b);				 }
+
+bool FractoriumSettings::FinalPng16Bit()							  { return value(FINALPNG16BIT).toBool();	     }
+void FractoriumSettings::FinalPng16Bit(bool b)			    		  { setValue(FINALPNG16BIT, b);			    	 }
 
 bool FractoriumSettings::FinalKeepAspect()							  { return value(FINALKEEPASPECT).toBool();		 }
 void FractoriumSettings::FinalKeepAspect(bool b)					  { setValue(FINALKEEPASPECT, b);				 }

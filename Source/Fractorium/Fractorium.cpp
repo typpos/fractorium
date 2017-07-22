@@ -26,6 +26,7 @@ Fractorium::Fractorium(QWidget* p)
 	qRegisterMetaType<size_t>("size_t");
 	qRegisterMetaType<QVector<int>>("QVector<int>");//For previews.
 	qRegisterMetaType<vector<byte>>("vector<byte>");
+	qRegisterMetaType<vv4F>("vv4F");
 	qRegisterMetaType<EmberTreeWidgetItemBase*>("EmberTreeWidgetItemBase*");
 	setDockOptions(DockOption::AllowNestedDocks | DockOption::AllowTabbedDocks);
 	setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::TabPosition::North);
@@ -505,7 +506,7 @@ void Fractorium::SetFixedTableHeader(QHeaderView* header, QHeaderView::ResizeMod
 /// Setup and show the open XML dialog.
 /// This will perform lazy instantiation.
 /// </summary>
-/// <returns>The filename selected</returns>
+/// <returns>The list of filenames selected</returns>
 QStringList Fractorium::SetupOpenXmlDialog()
 {
 #ifndef __APPLE__
@@ -522,7 +523,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
 	m_FileDialog->setFileMode(QFileDialog::ExistingFiles);
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
-	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
+	m_FileDialog->setNameFilter("*.flam3;;*.flame;;*.xml");
 	m_FileDialog->setWindowTitle("Open Flame");
 	m_FileDialog->setDirectory(m_Settings->OpenFolder());
 	m_FileDialog->selectNameFilter(m_Settings->OpenXmlExt());
@@ -567,30 +568,23 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 
 	QString filename;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->SaveXmlExt(filter); });
+	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter)
+	{
+		m_Settings->SaveXmlExt(filter);
+		m_FileDialog->setDefaultSuffix(filter);
+	});
 	//This must come first because it clears various internal states which allow the file text to be properly set.
 	//This is most likely a bug in QFileDialog.
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
 	m_FileDialog->selectFile(defaultFilename);
-	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
+	m_FileDialog->setNameFilter(".flam3;;.flame;;.xml");
 	m_FileDialog->setWindowTitle("Save flame as xml");
 	m_FileDialog->setDirectory(m_Settings->SaveFolder());
 	m_FileDialog->selectNameFilter(m_Settings->SaveXmlExt());
+	m_FileDialog->setDefaultSuffix(m_Settings->SaveXmlExt());
 
 	if (m_FileDialog->exec() == QDialog::Accepted)
-	{
 		filename = m_FileDialog->selectedFiles().value(0);
-		//For some reason, linux doesn't automatically append this, but Windows does. Force it to be safe.
-		auto filt = m_FileDialog->selectedNameFilter().split('*');//Qt makes it very hard to get the actual extension used.
-
-		if (filt.size() > 1)//Should always be true.
-		{
-			auto s = filt[1].replace(")", "");
-
-			if (!filename.endsWith(s))
-				filename.append(s);
-		}
-	}
 
 #else
 	auto defaultFilter(m_Settings->SaveXmlExt());
@@ -619,7 +613,11 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 
 	QString filename;
 	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->SaveImageExt(filter); });
+	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter)
+	{
+		m_Settings->SaveImageExt(filter);
+		m_FileDialog->setDefaultSuffix(filter);
+	});
 	//This must come first because it clears various internal states which allow the file text to be properly set.
 	//This is most likely a bug in QFileDialog.
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
@@ -627,17 +625,22 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 	m_FileDialog->setFileMode(QFileDialog::AnyFile);
 	m_FileDialog->setOption(QFileDialog::ShowDirsOnly, false);
 	m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, false);
-	m_FileDialog->setNameFilter("Jpeg (*.jpg);;Png (*.png);;Bmp (*.bmp)");
+#ifdef _WIN32
+	m_FileDialog->setNameFilter(".bmp;;.jpg;;.png;;.exr");
+#else
+	m_FileDialog->setNameFilter(".jpg;;.png;;.exr");
+#endif
 	m_FileDialog->setWindowTitle("Save image");
 	m_FileDialog->setDirectory(m_Settings->SaveFolder());
 	m_FileDialog->selectNameFilter(m_Settings->SaveImageExt());
+	m_FileDialog->setDefaultSuffix(m_Settings->SaveImageExt());
 
 	if (m_FileDialog->exec() == QDialog::Accepted)
 		filename = m_FileDialog->selectedFiles().value(0);
 
 #else
 	auto defaultFilter(m_Settings->SaveImageExt());
-	auto filename = QFileDialog::getSaveFileName(this, tr("Save image"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Jpeg (*.jpg);;Png (*.png);;Bmp (*.bmp)"), &defaultFilter);
+	auto filename = QFileDialog::getSaveFileName(this, tr("Save image"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Jpg (*.jpg);;Png (*.png);;Exr (*.exr)"), &defaultFilter);
 	m_Settings->SaveImageExt(defaultFilter);
 #endif
 	return filename;

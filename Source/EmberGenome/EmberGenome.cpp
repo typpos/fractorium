@@ -171,13 +171,15 @@ bool EmberGenome(EmberOptions& opt)
 	bool exactTimeMatch, randomMode, didColor, seqFlag, random = false;
 	size_t i, i0, i1, rep, val, frame, frameCount, count = 0;
 	size_t ftime, firstFrame, lastFrame;
-	size_t n, tot, totb, totw;
-	T avgPix, fractionBlack, fractionWhite, blend, spread, mix0, mix1;
+	double tot;
+	size_t n, totb, totw;
+	double avgPix;
+	T fractionBlack, fractionWhite, blend, spread, mix0, mix1;
 	string token, filename;
 	ostringstream os, os2;
 	vector<Ember<T>> embers, embers2, templateEmbers;
 	vector<eVariationId> vars, noVars;
-	vector<byte> finalImage;
+	vector<v4F> finalImage;
 	eCrossMode crossMeth;
 	eMutateMode mutMeth;
 	Ember<T> orig, save, selp0, selp1, parent0, parent1;
@@ -598,7 +600,6 @@ bool EmberGenome(EmberOptions& opt)
 	renderer->YAxisUp(opt.YAxisUp());
 	renderer->LockAccum(opt.LockAccum());
 	renderer->PixelAspectRatio(T(opt.AspectRatio()));
-	renderer->Transparency(opt.Transparency());
 
 	if (opt.Repeat() == 0)
 	{
@@ -786,19 +787,20 @@ bool EmberGenome(EmberOptions& opt)
 					return false;
 				}
 
-				tot = totb = totw = 0;
+				tot = 0;
+				totb = totw = 0;
 				n = orig.m_FinalRasW * orig.m_FinalRasH;
 
-				for (i = 0; i < 3 * n; i += 3)
+				for (i = 0; i < n; i++)
 				{
-					tot += (finalImage[i] + finalImage[i + 1] + finalImage[i + 2]);
+					tot += (finalImage[i].r + finalImage[i].g + finalImage[i].b);
 
-					if (0   == finalImage[i] && 0   == finalImage[i + 1] && 0   == finalImage[i + 2]) totb++;
+					if (0   == finalImage[i].r && 0   == finalImage[i].g && 0   == finalImage[i].b) totb++;
 
-					if (255 == finalImage[i] && 255 == finalImage[i + 1] && 255 == finalImage[i + 2]) totw++;
+					if (1 == finalImage[i].r && 1 == finalImage[i].g && 1 == finalImage[i].g) totw++;
 				}
 
-				avgPix = (tot / T(3 * n));
+				avgPix = (tot / (3 * n));
 				fractionBlack = totb / T(n);
 				fractionWhite = totw / T(n);
 

@@ -18,7 +18,7 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_RenderTimer->setInterval(0);
 	m_Fractorium->connect(m_RenderTimer.get(), SIGNAL(timeout()), SLOT(IdleTimer()));
 	m_RenderRestartTimer = make_unique<QTimer>(m_Fractorium);
-	m_Fractorium->connect(m_RenderRestartTimer.get(), SIGNAL(timeout()), SLOT(StartRenderTimer()));
+	m_Fractorium->connect(m_RenderRestartTimer.get(), &QTimer::timeout, [&]() { m_Fractorium->StartRenderTimer(false); });//It's ok to pass false for the first shot because creating the controller will start the preview renders.
 }
 
 /// <summary>
@@ -368,7 +368,6 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	auto f = m_Controller->m_Fractorium;
 	m_PreviewRenderer.EarlyClip(f->m_Settings->EarlyClip());
 	m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());
-	m_PreviewRenderer.Transparency(f->m_Settings->Transparency());
 	m_PreviewRenderer.ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Leave one processor free so the GUI can breathe.
 
 	if (auto top = m_Tree->topLevelItem(0))
@@ -394,7 +393,7 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 					//until the update is complete.
 					QMetaObject::invokeMethod(f, "SetLibraryTreeItemData", Qt::BlockingQueuedConnection,
 											  Q_ARG(EmberTreeWidgetItemBase*, treeItem),
-											  Q_ARG(vector<byte>&, m_PreviewFinalImage),
+											  Q_ARG(vv4F&, m_PreviewFinalImage),
 											  Q_ARG(uint, PREVIEW_SIZE),
 											  Q_ARG(uint, PREVIEW_SIZE));
 				}

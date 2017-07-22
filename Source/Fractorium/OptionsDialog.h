@@ -39,13 +39,13 @@ protected:
 private:
 	bool EarlyClip();
 	bool YAxisUp();
-	bool AlphaChannel();
 	bool Transparency();
 	bool ContinuousUpdate();
 	bool OpenCL();
 	bool Double();
 	bool ShowAllXforms();
 	bool ToggleType();
+	bool Png16Bit();
 	bool AutoUnique();
 	uint ThreadCount();
 	uint RandomCount();

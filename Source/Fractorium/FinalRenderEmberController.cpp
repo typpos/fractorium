@@ -80,7 +80,7 @@ bool FinalRenderEmberControllerBase::CreateRendererFromGUI()
 	bool useOpenCL = m_Info->Ok() && m_FinalRenderDialog->OpenCL();
 	auto v = Devices(m_FinalRenderDialog->Devices());
 	return CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER,
-						  v, false); //Not shared.
+						  v, false, false); //Not shared.
 }
 
 /// <summary>
@@ -178,7 +178,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 					size_t ftime;
 					size_t finalImageIndex = 0;
 					std::thread writeThread;
-					vector<byte> finalImages[2];
+					vector<v4F> finalImages[2];
 					EmberStats stats;
 					EmberImageComments comments;
 					Timing renderTimer;
@@ -225,8 +225,8 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 												  finalImages[threadFinalImageIndex],
 												  renderer->FinalRasW(),
 												  renderer->FinalRasH(),
-												  renderer->NumChannels(),
-												  renderer->BytesPerChannel());
+												  m_FinalRenderDialog->Png16Bit(),
+												  m_FinalRenderDialog->Transparency());
 							}, ftime, finalImageIndex);
 							m_FinishedImageCount.fetch_add(1);
 							RenderComplete(*m_EmberFile.Get(ftime), stats, renderTimer);
@@ -422,10 +422,9 @@ bool FinalRenderEmberController<T>::Render()
 /// <param name="shared">True if shared with OpenGL, else false. Always false in this case.</param>
 /// <returns>True if nothing went wrong, else false.</returns>
 template <typename T>
-bool FinalRenderEmberController<T>::CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared)
+bool FinalRenderEmberController<T>::CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared)
 {
 	bool ok = true;
-	//uint channels = m_FinalRenderDialog->Ext().endsWith("png", Qt::CaseInsensitive) ? 4 : 3;
 	bool renderTypeMismatch = (m_Renderer.get() && (m_Renderer->RendererType() != renderType)) ||
 							  (!m_Renderers.empty() && (m_Renderers[0]->RendererType() != renderType));
 	CancelRender();
@@ -542,35 +541,24 @@ template <typename T>
 bool FinalRenderEmberController<T>::SyncGuiToRenderer()
 {
 	bool ok = true;
-	uint channels = m_FinalRenderDialog->Ext().endsWith("png", Qt::CaseInsensitive) ? 4 : 3;
 
 	if (m_Renderer.get())
 	{
-		if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
-			channels = 4;//Always using 4 since the GL texture is RGBA.
-
 		m_Renderer->Callback(this);
-		m_Renderer->NumChannels(channels);
 		m_Renderer->EarlyClip(m_FinalRenderDialog->EarlyClip());
 		m_Renderer->YAxisUp(m_FinalRenderDialog->YAxisUp());
 		m_Renderer->ThreadCount(m_FinalRenderDialog->ThreadCount());
 		m_Renderer->Priority((eThreadPriority)m_FinalRenderDialog->ThreadPriority());
-		m_Renderer->Transparency(m_FinalRenderDialog->Transparency());
 	}
 	else if (!m_Renderers.empty())
 	{
 		for (size_t i = 0; i < m_Renderers.size(); i++)
 		{
-			if (m_Renderers[i]->RendererType() == eRendererType::OPENCL_RENDERER)
-				channels = 4;//Always using 4 since the GL texture is RGBA.
-
 			m_Renderers[i]->Callback(!i ? this : nullptr);
-			m_Renderers[i]->NumChannels(channels);
 			m_Renderers[i]->EarlyClip(m_FinalRenderDialog->EarlyClip());
 			m_Renderers[i]->YAxisUp(m_FinalRenderDialog->YAxisUp());
 			m_Renderers[i]->ThreadCount(m_FinalRenderDialog->ThreadCount());
 			m_Renderers[i]->Priority((eThreadPriority)m_FinalRenderDialog->ThreadPriority());
-			m_Renderers[i]->Transparency(m_FinalRenderDialog->Transparency());
 		}
 	}
 	else
@@ -627,11 +615,11 @@ void FinalRenderEmberController<T>::ResetProgress(bool total)
 /// specified in the widgets and compute the amount of memory required to render.
 /// This includes the memory needed for the final output image.
 /// </summary>
-/// <returns>If successful, memory required in bytes, else zero.</returns>
+/// <returns>If successful, a tuple specifying the memory required in bytes for the histogram int he first element, the total memory in the second, and the iter count in the last, else zero.</returns>
 template <typename T>
 tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemory()
 {
-	size_t iterCount;
+	size_t iterCount = 0;
 	pair<size_t, size_t> p(0, 0);
 	size_t strips;
 	uint channels = m_FinalRenderDialog->Ext() == "png" ? 4 : 3;//4 channels for Png, else 3.
@@ -642,7 +630,6 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 		strips = VerifyStrips(m_Ember->m_FinalRasH, m_FinalRenderDialog->Strips(),
 		[&](const string & s) {}, [&](const string & s) {}, [&](const string & s) {});
 		m_Renderer->SetEmber(*m_Ember, eProcessAction::FULL_RENDER, true);
-		m_Renderer->NumChannels(channels);
 		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);
 		p = m_Renderer->MemoryRequired(strips, true, m_FinalRenderDialog->DoSequence());
 		iterCount = m_Renderer->TotalIterCount(strips);
@@ -652,7 +639,6 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 		for (auto& renderer : m_Renderers)
 		{
 			renderer->SetEmber(*m_Ember, eProcessAction::FULL_RENDER, true);
-			renderer->NumChannels(channels);
 		}
 
 		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);
@@ -711,24 +697,24 @@ template<typename T>
 void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember)
 {
 	auto comments = m_Renderer->ImageComments(m_Stats, 0, true);
-	SaveCurrentRender(ember, comments, m_FinalImage, m_Renderer->FinalRasW(), m_Renderer->FinalRasH(), m_Renderer->NumChannels(), m_Renderer->BytesPerChannel());
+	SaveCurrentRender(ember, comments, m_FinalImage, m_Renderer->FinalRasW(), m_Renderer->FinalRasH(), m_FinalRenderDialog->Png16Bit(), m_FinalRenderDialog->Transparency());
 }
 
 /// <summary>
 /// Save the output of the render.
 /// </summary>
 /// <param name="ember">The ember whose rendered output will be saved</param>
-/// <param name="comments">The comments to save in the png or jpg</param>
+/// <param name="comments">The comments to save in the png, jpg or exr</param>
 /// <param name="pixels">The buffer containing the pixels</param>
 /// <param name="width">The width in pixels of the image</param>
 /// <param name="height">The height in pixels of the image</param>
-/// <param name="channels">The number of channels, 3 or 4.</param>
-/// <param name="bpc">The bytes per channel, almost always 1.</param>
+/// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png.</param>
+/// <param name="transparency">Whether to use alpha when saving as Png or Exr.</param>
 template<typename T>
-void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<byte>& pixels, size_t width, size_t height, size_t channels, size_t bpc)
+void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
 {
 	QString filename = ComposePath(QString::fromStdString(ember.m_Name));
-	FractoriumEmberControllerBase::SaveCurrentRender(filename, comments, pixels, width, height, channels, bpc);
+	FractoriumEmberControllerBase::SaveCurrentRender(filename, comments, pixels, width, height, png16Bit, transparency);
 }
 
 /// <summary>
@@ -806,6 +792,7 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 		m_Settings->FinalSaveXml(m_GuiState.m_SaveXml);
 		m_Settings->FinalDoAll(m_GuiState.m_DoAll);
 		m_Settings->FinalDoSequence(m_GuiState.m_DoSequence);
+		m_Settings->FinalPng16Bit(m_GuiState.m_Png16Bit);
 		m_Settings->FinalKeepAspect(m_GuiState.m_KeepAspect);
 		m_Settings->FinalScale(uint(m_GuiState.m_Scale));
 		m_Settings->FinalExt(m_GuiState.m_Ext);
@@ -960,6 +947,7 @@ void FinalRenderPreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	QLabel* widget = d->ui.FinalRenderPreviewLabel;
 	//Determine how to scale the scaled ember to fit in the label with a max of 100x100.
 	auto e = m_Controller->m_Ember;
+	auto settings = FractoriumSettings::Instance();
 
 	if (e->m_FinalRasW >= e->m_FinalRasH)
 		scalePercentage = T(maxDim) / e->m_FinalRasW;
@@ -974,9 +962,7 @@ void FinalRenderPreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	m_PreviewEmber.m_PixelsPerUnit = scalePercentage * e->m_PixelsPerUnit;
 	m_PreviewRenderer.EarlyClip(d->EarlyClip());
 	m_PreviewRenderer.YAxisUp(d->YAxisUp());
-	m_PreviewRenderer.Transparency(d->Transparency());
 	m_PreviewRenderer.Callback(nullptr);
-	m_PreviewRenderer.NumChannels(4);
 	m_PreviewRenderer.SetEmber(m_PreviewEmber);
 	m_PreviewRenderer.PrepFinalAccumVector(m_PreviewFinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 	auto strips = VerifyStrips(m_PreviewEmber.m_FinalRasH, d->Strips(),
@@ -987,8 +973,10 @@ void FinalRenderPreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	[&](size_t strip) {},//Error.
 	[&](Ember<T>& finalEmber)//Final strip.
 	{
+		m_PreviewVec.resize(finalEmber.m_FinalRasW * finalEmber.m_FinalRasH * 4);
+		Rgba32ToRgba8(m_PreviewFinalImage.data(), m_PreviewVec.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, d->Transparency());
 		QImage image(int(finalEmber.m_FinalRasW), int(finalEmber.m_FinalRasH), QImage::Format_RGBA8888);//The label wants RGBA.
-		memcpy(image.scanLine(0), m_PreviewFinalImage.data(), finalEmber.m_FinalRasW * finalEmber.m_FinalRasH * 4);//Memcpy the data in.
+		memcpy(image.scanLine(0), m_PreviewVec.data(), SizeOf(m_PreviewVec));//Memcpy the data in.
 		QPixmap pixmap(QPixmap::fromImage(image));
 		QMetaObject::invokeMethod(widget, "setPixmap", Qt::QueuedConnection, Q_ARG(QPixmap, pixmap));
 	});

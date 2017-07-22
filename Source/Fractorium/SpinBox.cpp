@@ -146,7 +146,7 @@ void SpinBox::OnTimeout()
 /// <returns>false</returns>
 bool SpinBox::eventFilter(QObject* o, QEvent* e)
 {
-	QMouseEvent* me = dynamic_cast<QMouseEvent*>(e);
+	auto me = dynamic_cast<QMouseEvent*>(e);
 
 	if (isEnabled() && me)
 	{

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EmberCommonPch.h"
+#include "EmberOptions.h"
 
 /// <summary>
 /// Global utility classes and functions that are common to all programs that use
@@ -168,24 +169,131 @@ void FormatName(Ember<T>& result, ostringstream& os, streamsize padding)
 }
 
 /// <summary>
-/// Convert an RGBA buffer to an RGB buffer.
+/// Convert an RGBA 32-bit float buffer to an RGB 8-bit buffer.
 /// The two buffers can point to the same memory location if needed.
 /// </summary>
-/// <param name="rgba">The RGBA buffer</param>
-/// <param name="rgb">The RGB buffer</param>
+/// <param name="rgba">The RGBA 32-bit float buffer</param>
+/// <param name="rgb">The RGB 8-bit buffer</param>
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
-static void RgbaToRgb(vector<byte>& rgba, vector<byte>& rgb, size_t width, size_t height)
+static void Rgba32ToRgb8(v4F* rgba, byte* rgb, size_t width, size_t height)
 {
-	if (rgba.data() != rgb.data())//Only resize the destination buffer if they are different.
-		rgb.resize(width * height * 3);
-
-	for (size_t i = 0, j = 0; i < (width * height * 4); i += 4, j += 3)
+	for (size_t i = 0, j = 0; i < (width * height); i++)
 	{
-		rgb[j] = rgba[i];
-		rgb[j + 1] = rgba[i + 1];
-		rgb[j + 2] = rgba[i + 2];
+		rgb[j++] = byte(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = byte(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = byte(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
 	}
+}
+
+/// <summary>
+/// Convert an RGBA 32-bit float buffer to an RGBA 8-bit buffer.
+/// The two buffers can point to the same memory location if needed.
+/// </summary>
+/// <param name="rgba">The RGBA 32-bit float buffer</param>
+/// <param name="rgb">The RGBA 8-bit buffer</param>
+/// <param name="width">The width of the image in pixels</param>
+/// <param name="height">The height of the image in pixels</param>
+/// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
+static void Rgba32ToRgba8(v4F* rgba, byte* rgb, size_t width, size_t height, bool doAlpha)
+{
+	for (size_t i = 0, j = 0; i < (width * height); i++)
+	{
+		rgb[j++] = byte(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = byte(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = byte(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = doAlpha ? byte(Clamp<float>(rgba[i].a * 255.0f, 0.0f, 255.0f)) : 255;
+	}
+}
+
+/// <summary>
+/// Convert an RGBA 32-bit float buffer to an RGBA 16-bit buffer.
+/// The two buffers can point to the same memory location if needed.
+/// </summary>
+/// <param name="rgba">The RGBA 32-bit float buffer</param>
+/// <param name="rgb">The RGBA 16-bit buffer</param>
+/// <param name="width">The width of the image in pixels</param>
+/// <param name="height">The height of the image in pixels</param>
+/// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
+static void Rgba32ToRgba16(v4F* rgba, glm::uint16* rgb, size_t width, size_t height, bool doAlpha)
+{
+	for (size_t i = 0, j = 0; i < (width * height); i++)
+	{
+		rgb[j++] = glm::uint16(Clamp<float>(rgba[i].r * 65535.0f, 0.0f, 65535.0f));
+		rgb[j++] = glm::uint16(Clamp<float>(rgba[i].g * 65535.0f, 0.0f, 65535.0f));
+		rgb[j++] = glm::uint16(Clamp<float>(rgba[i].b * 65535.0f, 0.0f, 65535.0f));
+		rgb[j++] = doAlpha ? glm::uint16(Clamp<float>(rgba[i].a * 65535.0f, 0.0f, 65535.0f)) : glm::uint16(65535);
+	}
+}
+
+/// <summary>
+/// Convert an RGBA 32-bit float buffer to an EXR RGBA 32-bit float buffer.
+/// The two buffers can point to the same memory location if needed.
+/// </summary>
+/// <param name="rgba">The RGBA 32-bit float buffer</param>
+/// <param name="rgb">The EXR RGBA 32-bit float buffer</param>
+/// <param name="width">The width of the image in pixels</param>
+/// <param name="height">The height of the image in pixels</param>
+/// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
+static void Rgba32ToRgbaExr(v4F* rgba, Rgba* ilmfRgba, size_t width, size_t height, bool doAlpha)
+{
+	for (size_t i = 0; i < (width * height); i++)
+	{
+		ilmfRgba[i].r = Clamp<float>(rgba[i].r, 0.0f, 1.0f);
+		ilmfRgba[i].g = Clamp<float>(rgba[i].g, 0.0f, 1.0f);
+		ilmfRgba[i].b = Clamp<float>(rgba[i].b, 0.0f, 1.0f);
+		ilmfRgba[i].a = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
+	}
+}
+
+/// <summary>
+/// Make a filename for a single render. This is used in EmberRender.
+/// </summary>
+/// <param name="path">The path portion of where to save the file</param>
+/// <param name="out">The full name and path to override everything else</param>
+/// <param name="finalName">The name to use when useFinalName is true</param>
+/// <param name="prefix">The prefix to prepend to the filename</param>
+/// <param name="suffix">True suffix to append to the filename</param>
+/// <param name="format">The format extention. This must not contain a period.</param>
+/// <param name="padding">The width padding to use, which will be zero filled.</param>
+/// <param name="i">The numerical value to use for the filename when useFinalName is false and out is empty</param>
+/// <param name="useFinalName">Whether to use the name included in the flame. The i parameter is ignored in this case.</param>
+static string MakeSingleFilename(const string& path, const string& out, const string& finalName, const string& prefix, const string& suffix, const string& format, glm::uint padding, size_t i, bool useFinalName)
+{
+	string filename;
+
+	if (!out.empty())
+	{
+		filename = out;
+	}
+	else if (useFinalName)
+	{
+		filename = path + prefix + finalName + suffix + "." + format;
+	}
+	else
+	{
+		ostringstream fnstream;
+		fnstream << path << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << i << suffix << "." << format;
+		filename = fnstream.str();
+	}
+
+	return filename;
+}
+
+/// <summary>
+/// Make a filename for a frame of an animation render. This is used in EmberAnimate.
+/// </summary>
+/// <param name="path">The path portion of where to save the file</param>
+/// <param name="prefix">The prefix to prepend to the filename</param>
+/// <param name="suffix">True suffix to append to the filename</param>
+/// <param name="format">The format extention. This must contain a period.</param>
+/// <param name="padding">The width padding to use, which will be zero filled.</param>
+/// <param name="ftime">The numerical value to use for the filename</param>
+static string MakeAnimFilename(const string& path, const string& prefix, const string& suffix, const string& format, glm::uint padding, size_t ftime)
+{
+	ostringstream fnstream;
+	fnstream << path << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << suffix << format;
+	return fnstream.str();
 }
 
 /// <summary>
@@ -439,7 +547,7 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 /// <param name="allStripsFinished">Function called when all strips successfully finish rendering</param>
 /// <returns>True if all rendering was successful, else false.</returns>
 template <typename T>
-static bool StripsRender(RendererBase* renderer, Ember<T>& ember, vector<byte>& finalImage, double time, size_t strips, bool yAxisUp,
+static bool StripsRender(RendererBase* renderer, Ember<T>& ember, vector<v4F>& finalImage, double time, size_t strips, bool yAxisUp,
 						 std::function<void(size_t strip)> perStripStart,
 						 std::function<void(size_t strip)> perStripFinish,
 						 std::function<void(size_t strip)> perStripError,

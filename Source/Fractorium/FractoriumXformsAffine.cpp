@@ -251,7 +251,7 @@ void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre
 	UpdateXform([&] (Xform<T>* xform)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
-		DoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
+		AffineDoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
 
 		if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
 		{
@@ -618,7 +618,7 @@ void FractoriumEmberController<T>::FillBothAffines()
 template <typename T>
 void FractoriumEmberController<T>::FillAffineWithXform(Xform<T>* xform, bool pre)
 {
-	DoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
+	AffineDoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
 	auto& affine = pre ? xform->m_Affine : xform->m_Post;
 
 	if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
@@ -715,9 +715,9 @@ void Fractorium::OnPolarAffineCheckBoxStateChanged(int state)
 /// <param name="prec">The precision of the spinner</param>
 /// <param name="signal">The signal the spinner emits</param>
 /// <param name="slot">The slot to receive the signal</param>
-void Fractorium::SetupAffineSpinner(QTableWidget* table, const QObject* receiver, int row, int col, DoubleSpinBox*& spinBox, int height, double min, double max, double step, double prec, const char* signal, const char* slot)
+void Fractorium::SetupAffineSpinner(QTableWidget* table, const QObject* receiver, int row, int col, AffineDoubleSpinBox*& spinBox, int height, double min, double max, double step, double prec, const char* signal, const char* slot)
 {
-	spinBox = new DoubleSpinBox(table, height, step);
+	spinBox = new AffineDoubleSpinBox(table, height, step);
 	spinBox->setRange(min, max);
 	spinBox->setDecimals(prec);
 	table->setCellWidget(row, col, spinBox);

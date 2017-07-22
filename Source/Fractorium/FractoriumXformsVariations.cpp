@@ -375,5 +375,5 @@ void Fractorium::OnVariationsFilterClearButtonClicked(bool checked)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

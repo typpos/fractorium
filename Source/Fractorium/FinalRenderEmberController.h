@@ -28,6 +28,7 @@ struct FinalRenderGuiState
 	bool m_Double;
 	bool m_SaveXml;
 	bool m_DoAll;
+	bool m_Png16Bit;
 	bool m_DoSequence;
 	bool m_KeepAspect;
 	eScaleType m_Scale;
@@ -111,7 +112,7 @@ public:
 #endif
 	virtual void SetEmber(size_t index, bool verbatim) override;
 	virtual bool Render() override;
-	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared = true) override;
+	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
 	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
 	virtual size_t Index() const override { return m_Ember->m_Index; }
 	virtual uint SizeOfT() const override { return sizeof(T); }
@@ -134,7 +135,7 @@ public:
 protected:
 	void HandleFinishedProgress();
 	void SaveCurrentRender(Ember<T>& ember);
-	void SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<byte>& pixels, size_t width, size_t height, size_t channels, size_t bpc);
+	void SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
 	void RenderComplete(Ember<T>& ember);
 	void RenderComplete(Ember<T>& ember, const EmberStats& stats, Timing& renderTimer);
 	void SyncGuiToEmber(Ember<T>& ember, size_t widthOverride = 0, size_t heightOverride = 0);
@@ -158,6 +159,7 @@ class FinalRenderPreviewRenderer : public PreviewRenderer<T>
 {
 public:
 	using PreviewRenderer<T>::m_PreviewRun;
+	using PreviewRenderer<T>::m_PreviewVec;
 	using PreviewRenderer<T>::m_PreviewEmber;
 	using PreviewRenderer<T>::m_PreviewRenderer;
 	using PreviewRenderer<T>::m_PreviewFinalImage;

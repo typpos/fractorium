@@ -57,5 +57,17 @@
 #include "SimpleGlob.h"
 #include "SimpleOpt.h"
 
+//Exr
+#ifdef _WIN32
+#define OPENEXR_DLL 1
+#endif
+
+#include <ImfRgbaFile.h>
+#include <ImfStringAttribute.h>
+#include <half.h>
+
+using namespace Imf;
+using namespace Imath;
+
 using namespace EmberNs;
 using namespace EmberCLns;

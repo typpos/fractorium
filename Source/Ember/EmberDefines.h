@@ -37,7 +37,7 @@ static void sincos(float x, float* s, float* c)
 
 namespace EmberNs
 {
-#define EMBER_VERSION "1.0.0.4"
+#define EMBER_VERSION "1.0.0.5"
 #define EPS6 T(1e-6)
 #define EPS std::numeric_limits<T>::epsilon()//Apoplugin.h uses -20, but it's more mathematically correct to do it this way.
 #define ISAAC_SIZE 4
@@ -68,6 +68,9 @@ namespace EmberNs
 #define TMAX std::numeric_limits<T>::max()
 #define FLOAT_MAX_TAN 8388607.0f
 #define FLOAT_MIN_TAN -FLOAT_MAX_TAN
+#define CURVES_LENGTH 131072
+#define CURVES_LENGTH_M1 131071.0f
+#define ONE_OVER_CURVES_LENGTH_M1 7.62945273935e-6f
 #define EMPTYFIELD -9999
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::duration<double, std::ratio<1, 1000>> DoubleMs;
@@ -110,6 +113,7 @@ typedef std::lock_guard <std::recursive_mutex> rlg;
 	#define m3T  glm::tmat3x3<T, glm::defaultp>
 	#define m4T  glm::tmat4x4<T, glm::defaultp>
 	#define m23T glm::tmat2x3<T, glm::defaultp>
+	typedef vector<glm::tvec4<float, glm::defaultp>> vv4F;
 #else
 	#define v2T  glm::detail::tvec2<T, glm::defaultp>
 	#define v3T  glm::detail::tvec3<T, glm::defaultp>
@@ -121,6 +125,7 @@ typedef std::lock_guard <std::recursive_mutex> rlg;
 	#define m3T  glm::detail::tmat3x3<T, glm::defaultp>
 	#define m4T  glm::detail::tmat4x4<T, glm::defaultp>
 	#define m23T glm::detail::tmat2x3<T, glm::defaultp>
+	typedef vector<glm::detail::tvec4<float, glm::defaultp>> vv4F;
 #endif
 
 enum class eInterp : et { EMBER_INTERP_LINEAR = 0, EMBER_INTERP_SMOOTH = 1 };

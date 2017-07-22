@@ -67,6 +67,7 @@ bool FractoriumOptionsDialog::OpenCL() { return ui.OpenCLCheckBox->isChecked(); 
 bool FractoriumOptionsDialog::Double() { return ui.DoublePrecisionCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::ShowAllXforms() { return ui.ShowAllXformsCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::ToggleType() { return ui.ToggleTypeCheckBox->isChecked(); }
+bool FractoriumOptionsDialog::Png16Bit() { return ui.Png16BitCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::AutoUnique() { return ui.AutoUniqueCheckBox->isChecked(); }
 uint FractoriumOptionsDialog::ThreadCount() { return ui.ThreadCountSpin->value(); }
 uint FractoriumOptionsDialog::RandomCount() { return ui.RandomCountSpin->value(); }
@@ -174,6 +175,7 @@ void FractoriumOptionsDialog::GuiToData()
 	m_Settings->Double(Double());
 	m_Settings->ShowAllXforms(ShowAllXforms());
 	m_Settings->ToggleType(ToggleType());
+	m_Settings->Png16Bit(Png16Bit());
 	m_Settings->ThreadCount(ThreadCount());
 	m_Settings->RandomCount(RandomCount());
 	m_Settings->CpuSubBatch(ui.CpuSubBatchSpin->value());
@@ -207,6 +209,7 @@ void FractoriumOptionsDialog::DataToGui()
 	ui.DoublePrecisionCheckBox->setChecked(m_Settings->Double());
 	ui.ShowAllXformsCheckBox->setChecked(m_Settings->ShowAllXforms());
 	ui.ToggleTypeCheckBox->setChecked(m_Settings->ToggleType());
+	ui.Png16BitCheckBox->setChecked(m_Settings->Png16Bit());
 	ui.ThreadCountSpin->setValue(m_Settings->ThreadCount());
 	ui.RandomCountSpin->setValue(m_Settings->RandomCount());
 	ui.CpuSubBatchSpin->setValue(m_Settings->CpuSubBatch());

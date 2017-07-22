@@ -52,4 +52,5 @@ copy X64\Release\tbb.dll ..\..\..\fractorium\Deps
 copy X64\Release\tbb.lib ..\..\..\fractorium\Deps
 cd ..\..\..
 
-cd fractorium
+openexr.cmd
+

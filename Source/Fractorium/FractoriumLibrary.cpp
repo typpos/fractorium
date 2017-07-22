@@ -96,15 +96,18 @@ vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex()
 /// <param name="v">The vector holding the RGBA bitmap</param>
 /// <param name="w">The width of the bitmap</param>
 /// <param name="h">The height of the bitmap</param>
-void Fractorium::SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vector<byte>& v, uint w, uint h)
+void Fractorium::SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h)
 {
-	item->SetImage(v, w, h);
+	m_PreviewVec.resize(w * h * 4);
+	Rgba32ToRgba8(v.data(), m_PreviewVec.data(), w, h, m_Settings->Transparency());
+	item->SetImage(m_PreviewVec, w, h);
 }
 
 /// <summary>
 /// Set all libary tree entries to the name of the corresponding ember they represent.
 /// Set all libary tree entries to point to the underlying ember they represent.
 /// </summary>
+/// <param name="update">A bitfield representing the type of synchronizing to do. Update one or more of index, name or pointer.</param>
 template <typename T>
 void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 {

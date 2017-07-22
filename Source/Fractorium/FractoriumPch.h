@@ -115,16 +115,16 @@
 #include <QWidget>
 #include <QWidgetAction>
 
-#define GLM_FORCE_RADIANS 1
-#define GLM_ENABLE_EXPERIMENTAL 1
+//#define GLM_FORCE_RADIANS 1
+//#define GLM_ENABLE_EXPERIMENTAL 1
 
-#ifndef __APPLE__
-	#define GLM_FORCE_INLINE 1
-#endif
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+//#ifndef __APPLE__
+//	#define GLM_FORCE_INLINE 1
+//#endif
+//
+//#include "glm/glm.hpp"
+//#include "glm/gtc/matrix_transform.hpp"
+//#include "glm/gtc/type_ptr.hpp"
 
 #ifndef _WIN32
 	#undef Bool

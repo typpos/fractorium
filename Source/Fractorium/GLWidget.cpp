@@ -54,8 +54,6 @@ void GLWidget::InitGL()
 void GLWidget::DrawQuad()
 {
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	auto renderer = m_Fractorium->m_Controller->Renderer();
 	auto finalImage = m_Fractorium->m_Controller->FinalImage();
 
@@ -65,7 +63,7 @@ void GLWidget::DrawQuad()
 		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);//The texture to draw to.
 
 		//Only draw if the dimensions match exactly.
-		if (m_TexWidth == width() && m_TexHeight == height() && ((m_TexWidth * m_TexHeight * 4) == GLint(finalImage->size())))
+		if (m_TexWidth == width() && m_TexHeight == height() && ((m_TexWidth * m_TexHeight) == GLint(finalImage->size())))
 		{
 			glMatrixMode(GL_PROJECTION);
 			glPushMatrix();
@@ -77,7 +75,7 @@ void GLWidget::DrawQuad()
 
 			//Copy data from CPU to OpenGL if using a CPU renderer. This is not needed when using OpenCL.
 			if (renderer->RendererType() == eRendererType::CPU_RENDERER)
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_UNSIGNED_BYTE, finalImage->data());
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_FLOAT, finalImage->data());
 
 			glBegin(GL_QUADS);//This will need to be converted to a shader at some point in the future.
 			glTexCoord2f(0.0, 0.0); glVertex2f(0.0, 0.0);
@@ -94,7 +92,6 @@ void GLWidget::DrawQuad()
 		glBindTexture(GL_TEXTURE_2D, 0);//Stop using this texture.
 	}
 
-	glDisable(GL_BLEND);
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -267,10 +264,10 @@ void GLEmberController<T>::DrawImage()
 
 	if (SizesMatch())//Ensure all sizes are correct. If not, do nothing.
 	{
-		vector<byte>* finalImage = m_FractoriumEmberController->FinalImage();
+		auto finalImage = m_FractoriumEmberController->FinalImage();
 
 		if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage)//Final image only matters for CPU renderer.
-			if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage->size() == renderer->FinalBufferSize())
+			if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage->size() == renderer->FinalDimensions())
 				m_GL->DrawQuad();//Output image is drawn here.
 	}
 
@@ -757,7 +754,7 @@ bool GLWidget::Allocate(bool force)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
 		alloc = true;
 	}
 

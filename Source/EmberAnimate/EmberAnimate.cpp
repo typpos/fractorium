@@ -30,8 +30,7 @@ bool EmberAnimate(EmberOptions& opt)
 	//Regular variables.
 	Timing t;
 	bool unsorted = false;
-	uint channels;
-	streamsize padding;
+	uint padding;
 	size_t i, firstUnsortedIndex = 0;
 	string inputPath = GetPath(opt.Input());
 	vector<Ember<T>> embers;
@@ -99,12 +98,6 @@ bool EmberAnimate(EmberOptions& opt)
 				renderers[i]->ThreadCount(opt.ThreadCount(), ns.c_str());
 			}
 		}
-
-		if (opt.BitsPerChannel() != 8)
-		{
-			cout << "Bits per channel cannot be anything other than 8 with OpenCL, setting to 8.\n";
-			opt.BitsPerChannel(8);
-		}
 	}
 	else
 	{
@@ -153,24 +146,19 @@ bool EmberAnimate(EmberOptions& opt)
 		return false;
 	}
 
-	if (opt.Format() != "jpg" &&
-			opt.Format() != "png" &&
-			opt.Format() != "bmp")
+	if (!Find(opt.Format(), "jpg") &&
+			!Find(opt.Format(), "png") &&
+#ifdef _WIN32
+			!Find(opt.Format(), "bmp") &&
+#endif
+			!Find(opt.Format(), "exr"))
 	{
-		cout << "Format must be jpg, png, or bmp not " << opt.Format() << ". Setting to jpg.\n";
-	}
-
-	channels = opt.Format() == "png" ? 4 : 3;
-
-	if (opt.BitsPerChannel() == 16 && opt.Format() != "png")
-	{
-		cout << "Support for 16 bits per channel images is only present for the png format. Setting to 8.\n";
-		opt.BitsPerChannel(8);
-	}
-	else if (opt.BitsPerChannel() != 8 && opt.BitsPerChannel() != 16)
-	{
-		cout << "Unexpected bits per channel specified " << opt.BitsPerChannel() << ". Setting to 8.\n";
-		opt.BitsPerChannel(8);
+#ifdef _WIN32
+		cout << "Format must be bmp, jpg, png, png16 or exr, not " << opt.Format() << ". Setting to png.\n";
+#else
+		cout << "Format must be jpg, png, png16 or exr, not " << opt.Format() << ". Setting to png.\n";
+#endif
+		opt.Format("png");
 	}
 
 	if (opt.AspectRatio() < 0)
@@ -262,7 +250,7 @@ bool EmberAnimate(EmberOptions& opt)
 		}
 
 		//Cast to double in case the value exceeds 2^32.
-		double imageMem = double(channels) * double(ember.m_FinalRasW)
+		double imageMem = 4 * double(ember.m_FinalRasW)
 						  * double(ember.m_FinalRasH) * double(renderers[0]->BytesPerChannel());
 		double maxMem = pow(2.0, double((sizeof(void*) * 8) - 1));
 
@@ -316,46 +304,131 @@ bool EmberAnimate(EmberOptions& opt)
 		r->YAxisUp(opt.YAxisUp());
 		r->LockAccum(opt.LockAccum());
 		r->PixelAspectRatio(T(opt.AspectRatio()));
-		r->Transparency(opt.Transparency());
-		r->NumChannels(channels);
-		r->BytesPerChannel(opt.BitsPerChannel() / 8);
 		r->Priority(eThreadPriority(Clamp<intmax_t>(intmax_t(opt.Priority()), intmax_t(eThreadPriority::LOWEST), intmax_t(eThreadPriority::HIGHEST))));
 	}
 
-	std::function<void (vector<byte>&, string, EmberImageComments, size_t, size_t, size_t)> saveFunc = [&](vector<byte>& finalImage,
-			string filename,//These are copies because this will be launched in a thread.
+	std::function<void (vector<v4F>&, string, EmberImageComments, size_t, size_t, size_t)> saveFunc = [&](vector<v4F>& finalImage,
+			string baseFilename,//These are copies because this will be launched in a thread.
 			EmberImageComments comments,
 			size_t w,
 			size_t h,
 			size_t chan)
 	{
-		bool writeSuccess = false;
-		byte* finalImagep = finalImage.data();
+		auto finalImagep = finalImage.data();
+		auto size = w * h;
+		bool doBmp = Find(opt.Format(), "bmp");
+		bool doJpg = Find(opt.Format(), "jpg");
+		bool doExr = Find(opt.Format(), "exr");
+		bool doPng8 = Find(opt.Format(), "png");
+		bool doPng16 = Find(opt.Format(), "png16");
+		bool doOnlyPng8 = doPng8 && !doPng16;
+		vector<byte> rgb8Image;
+		vector<std::thread> writeFileThreads;
+		writeFileThreads.reserve(5);
 
-		if ((opt.Format() == "jpg" || opt.Format() == "bmp") && chan == 4)
-			RgbaToRgb(finalImage, finalImage, w, h);
+		if (doBmp || doJpg)
+		{
+			rgb8Image.resize(size * 3);
+			Rgba32ToRgb8(finalImagep, rgb8Image.data(), w, h);
 
-		if (opt.Format() == "png")
-			writeSuccess = WritePng(filename.c_str(), finalImagep, w, h, opt.BitsPerChannel() / 8, opt.PngComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-		else if (opt.Format() == "jpg")
-			writeSuccess = WriteJpeg(filename.c_str(), finalImagep, w, h, int(opt.JpegQuality()), opt.JpegComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-		else if (opt.Format() == "bmp")
-			writeSuccess = WriteBmp(filename.c_str(), finalImagep, w, h);
+			if (doBmp)
+			{
+				writeFileThreads.push_back(std::thread([&]()
+				{
+					auto fn = baseFilename + ".bmp";
+					VerbosePrint("Writing " + fn);
+					auto writeSuccess = WriteBmp(fn.c_str(), rgb8Image.data(), w, h);
 
-		if (!writeSuccess)
-			cout << "Error writing " << filename << "\n";
+					if (!writeSuccess)
+						cout << "Error writing " << fn << "\n";
+				}));
+			}
+
+			if (doJpg)
+			{
+				writeFileThreads.push_back(std::thread([&]()
+				{
+					auto fn = baseFilename + ".jpg";
+					VerbosePrint("Writing " + fn);
+					auto writeSuccess = WriteJpeg(fn.c_str(), rgb8Image.data(), w, h, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+					if (!writeSuccess)
+						cout << "Error writing " << fn << "\n";
+				}));
+			}
+		}
+
+		if (doPng8)
+		{
+			bool doBothPng = doPng16 && (opt.Format().find("png") != opt.Format().rfind("png"));
+
+			if (doBothPng || doOnlyPng8)//8-bit PNG
+			{
+				writeFileThreads.push_back(std::thread([&]()
+				{
+					auto fn = baseFilename + ".png";
+					VerbosePrint("Writing " + fn);
+					vector<byte> rgba8Image(size * 4);
+					Rgba32ToRgba8(finalImagep, rgba8Image.data(), w, h, opt.Transparency());
+					auto writeSuccess = WritePng(fn.c_str(), rgba8Image.data(), w, h, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+					if (!writeSuccess)
+						cout << "Error writing " << fn << "\n";
+				}));
+			}
+
+			if (doPng16)
+			{
+				writeFileThreads.push_back(std::thread([&]()
+				{
+					auto suffix = opt.Suffix();
+					auto fn = baseFilename;
+
+					if (doBothPng)//Add suffix if they specified both PNG.
+					{
+						VerbosePrint("Doing both PNG formats, so adding suffix _p16 to avoid overwriting the same file.");
+						fn += "_p16";
+					}
+
+					fn += ".png";
+					VerbosePrint("Writing " + fn);
+					vector<glm::uint16> rgba16Image(size * 4);
+					Rgba32ToRgba16(finalImagep, rgba16Image.data(), w, h, opt.Transparency());
+					auto writeSuccess = WritePng(fn.c_str(), (byte*)rgba16Image.data(), w, h, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+					if (!writeSuccess)
+						cout << "Error writing " << fn << "\n";
+				}));
+			}
+		}
+
+		if (doExr)
+		{
+			writeFileThreads.push_back(std::thread([&]()
+			{
+				auto fn = baseFilename + ".exr";
+				VerbosePrint("Writing " + fn);
+				vector<Rgba> rgba32Image(size);
+				Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), w, h, opt.Transparency());
+				auto writeSuccess = WriteExr(fn.c_str(), rgba32Image.data(), w, h, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+				if (!writeSuccess)
+					cout << "Error writing " << fn << "\n";
+			}));
+		}
+
+		Join(writeFileThreads);
 	};
 	atomfTime.store(opt.FirstFrame());
 	std::function<void(size_t)> iterFunc = [&](size_t index)
 	{
 		size_t ftime, finalImageIndex = 0;
-		string filename, flameName;
 		RendererBase* renderer = renderers[index].get();
-		ostringstream fnstream, os;
+		ostringstream os;
 		EmberStats stats;
 		EmberImageComments comments;
 		Ember<T> centerEmber;
-		vector<byte> finalImages[2];
+		vector<v4F> finalImages[2];
 		std::thread writeThread;
 		os.imbue(std::locale(""));
 
@@ -390,13 +463,9 @@ bool EmberAnimate(EmberOptions& opt)
 				break;
 			}
 
-			fnstream << inputPath << opt.Prefix() << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << opt.Suffix() << "." << opt.Format();
-			filename = fnstream.str();
-			fnstream.str("");
-
 			if (opt.WriteGenome())
 			{
-				flameName = filename.substr(0, filename.find_last_of('.')) + ".flame";
+				auto flameName = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), ".flame", padding, ftime);
 
 				if (opt.Verbose())
 				{
@@ -425,21 +494,21 @@ bool EmberAnimate(EmberOptions& opt)
 				cout << "Render time: " << t.Format(stats.m_RenderMs) << "\n";
 				cout << "Pure iter time: " << t.Format(stats.m_IterMs) << "\n";
 				cout << "Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << "\n";
-				cout << "Writing " << filename << "\n\n";
 			}
 
 			//Run image writing in a thread. Although doing it this way duplicates the final output memory, it saves a lot of time
 			//when running with OpenCL. Call join() to ensure the previous thread call has completed.
 			Join(writeThread);
 			auto threadVecIndex = finalImageIndex;//Cache before launching thread.
+			auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, ftime);
 
-			if (opt.ThreadedWrite())//Copies are passed of all but the first parameter to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
+			if (opt.ThreadedWrite())//Copies of all but the first parameter are passed to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
 			{
-				writeThread = std::thread(saveFunc, std::ref(finalImages[threadVecIndex]), filename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());
+				writeThread = std::thread(saveFunc, std::ref(finalImages[threadVecIndex]), baseFilename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());
 				finalImageIndex ^= 1;//Toggle the index.
 			}
 			else
-				saveFunc(finalImages[threadVecIndex], filename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());//Will always use the first index, thereby not requiring more memory.
+				saveFunc(finalImages[threadVecIndex], baseFilename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());//Will always use the first index, thereby not requiring more memory.
 		}
 
 		Join(writeThread);//One final check to make sure all writing is done before exiting this thread.

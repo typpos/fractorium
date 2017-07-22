@@ -10,166 +10,58 @@ namespace EmberCLns
 FinalAccumOpenCLKernelCreator::FinalAccumOpenCLKernelCreator(bool doublePrecision)
 {
 	m_DoublePrecision = doublePrecision;
-	m_GammaCorrectionWithAlphaCalcKernel                      = CreateGammaCorrectionKernelString(true);
-	m_GammaCorrectionWithoutAlphaCalcKernel                   = CreateGammaCorrectionKernelString(false);
-	m_FinalAccumEarlyClipKernel                               = CreateFinalAccumKernelString(true, false, false);
-	m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel    = CreateFinalAccumKernelString(true, true,  true);
-	m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel = CreateFinalAccumKernelString(true, false, true);
-	m_FinalAccumLateClipKernel                                = CreateFinalAccumKernelString(false, false, false);
-	m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel     = CreateFinalAccumKernelString(false, true,  true);
-	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel  = CreateFinalAccumKernelString(false, false, true);
+	m_GammaCorrectionWithoutAlphaCalcKernel                   = CreateGammaCorrectionKernelString();
+	m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel = CreateFinalAccumKernelString(true);
+	m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel  = CreateFinalAccumKernelString(false);
 }
 
 /// <summary>
 /// Kernel source and entry point properties, getters only.
 /// </summary>
 
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithAlphaCalcKernel()        const { return m_GammaCorrectionWithAlphaCalcKernel;	     }
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithAlphaCalcEntryPoint()    const { return m_GammaCorrectionWithAlphaCalcEntryPoint;    }
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithoutAlphaCalcKernel()     const { return m_GammaCorrectionWithoutAlphaCalcKernel;     }
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionWithoutAlphaCalcEntryPoint() const { return m_GammaCorrectionWithoutAlphaCalcEntryPoint; }
-
-const string& FinalAccumOpenCLKernelCreator::FinalAccumEarlyClipKernel()                                   const { return m_FinalAccumEarlyClipKernel;                                   }
-const string& FinalAccumOpenCLKernelCreator::FinalAccumEarlyClipEntryPoint()                               const { return m_FinalAccumEarlyClipEntryPoint;                               }
-const string& FinalAccumOpenCLKernelCreator::FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel()        const { return m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel;        }
-const string& FinalAccumOpenCLKernelCreator::FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint()    const { return m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint;    }
 const string& FinalAccumOpenCLKernelCreator::FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel()     const { return m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel;     }
 const string& FinalAccumOpenCLKernelCreator::FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint() const { return m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint; }
 
-const string& FinalAccumOpenCLKernelCreator::FinalAccumLateClipKernel()                                   const { return m_FinalAccumLateClipKernel;                                   }
-const string& FinalAccumOpenCLKernelCreator::FinalAccumLateClipEntryPoint()                               const { return m_FinalAccumLateClipEntryPoint;                               }
-const string& FinalAccumOpenCLKernelCreator::FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel()        const { return m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel;        }
-const string& FinalAccumOpenCLKernelCreator::FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint()    const { return m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint;    }
 const string& FinalAccumOpenCLKernelCreator::FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel()     const { return m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel;     }
 const string& FinalAccumOpenCLKernelCreator::FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint() const { return m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint; }
 
-/// <summary>
-/// Get the gamma correction entry point.
-/// </summary>
-/// <param name="channels">The number of channels used, 3 or 4.</param>
-/// <param name="transparency">True if channels equals 4 and using transparency, else false.</param>
-/// <returns>The name of the gamma correction entry point kernel function</returns>
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionEntryPoint(size_t channels, bool transparency) const
-{
-	bool alphaCalc = ((channels > 3) && transparency);
-	return alphaCalc ? m_GammaCorrectionWithAlphaCalcEntryPoint : m_GammaCorrectionWithoutAlphaCalcEntryPoint;
-}
-
-/// <summary>
-/// Get the gamma correction kernel string.
-/// </summary>
-/// <param name="channels">The number of channels used, 3 or 4.</param>
-/// <param name="transparency">True if channels equals 4 and using transparency, else false.</param>
-/// <returns>The gamma correction kernel string</returns>
-const string& FinalAccumOpenCLKernelCreator::GammaCorrectionKernel(size_t channels, bool transparency) const
-{
-	bool alphaCalc = ((channels > 3) && transparency);
-	return alphaCalc ? m_GammaCorrectionWithAlphaCalcKernel : m_GammaCorrectionWithoutAlphaCalcKernel;
-}
+const string& FinalAccumOpenCLKernelCreator::GammaCorrectionEntryPoint() const { return m_GammaCorrectionWithoutAlphaCalcEntryPoint; }
+const string& FinalAccumOpenCLKernelCreator::GammaCorrectionKernel() const { return m_GammaCorrectionWithoutAlphaCalcKernel; }
 
 /// <summary>
 /// Get the final accumulation entry point.
 /// </summary>
 /// <param name="earlyClip">True if early clip is desired, else false.</param>
-/// <param name="channels">The number of channels used, 3 or 4.</param>
-/// <param name="transparency">True if channels equals 4 and using transparency, else false.</param>
-/// <param name="alphaBase">Storage for the alpha base value used in the kernel. 0 if transparency is true, else 255.</param>
-/// <param name="alphaScale">Storage for the alpha scale value used in the kernel. 255 if transparency is true, else 0.</param>
 /// <returns>The name of the final accumulation entry point kernel function</returns>
-const string& FinalAccumOpenCLKernelCreator::FinalAccumEntryPoint(bool earlyClip, size_t channels, bool transparency, double& alphaBase, double& alphaScale) const
+const string& FinalAccumOpenCLKernelCreator::FinalAccumEntryPoint(bool earlyClip) const
 {
-	bool alphaCalc = ((channels > 3) && transparency);
-	bool alphaAccum = channels > 3;
-
-	if (alphaAccum)
-	{
-		alphaBase = transparency ? 0 : 1;//See the table below.
-		alphaScale = transparency ? 1 : 0;
-	}
-
 	if (earlyClip)
-	{
-		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
-			return FinalAccumEarlyClipEntryPoint();
-		else if (alphaCalc && alphaAccum)//Rgba output and Transparency.
-			return FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint();
-		else if (!alphaCalc && alphaAccum)//Rgba output and !Transparency.
-			return FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint();
-		else
-			return m_Empty;//Cannot have alphaCalc and !alphaAccum, it makes no sense.
-	}
+		return FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint();
 	else
-	{
-		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
-			return FinalAccumLateClipEntryPoint();
-		else if (alphaCalc && alphaAccum)//Rgba output and Transparency.
-			return FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint();
-		else if (!alphaCalc && alphaAccum)//Rgba output and !Transparency.
-			return FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint();
-		else
-			return m_Empty;//Cannot have alphaCalc and !alphaAccum, it makes no sense.
-	}
+		return FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint();
 }
 
 /// <summary>
 /// Get the final accumulation kernel string.
 /// </summary>
 /// <param name="earlyClip">True if early clip is desired, else false.</param>
-/// <param name="channels">The number of channels used, 3 or 4.</param>
-/// <param name="transparency">True if channels equals 4 and using transparency, else false.</param>
 /// <returns>The final accumulation kernel string</returns>
-const string& FinalAccumOpenCLKernelCreator::FinalAccumKernel(bool earlyClip, size_t channels, bool transparency) const
+const string& FinalAccumOpenCLKernelCreator::FinalAccumKernel(bool earlyClip) const
 {
-	bool alphaCalc = (channels > 3 && transparency);
-	bool alphaAccum = channels > 3;
-
 	if (earlyClip)
-	{
-		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
-			return FinalAccumEarlyClipKernel();
-		else if (alphaCalc && alphaAccum)//Rgba output and Transparency.
-			return FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumKernel();
-		else if (!alphaCalc && alphaAccum)//Rgba output and !Transparency.
-			return FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel();
-		else
-			return m_Empty;//Cannot have alphaCalc and !alphaAccum, it makes no sense.
-	}
+		return FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumKernel();
 	else
-	{
-		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
-			return FinalAccumLateClipKernel();
-		else if (alphaCalc && alphaAccum)//Rgba output and Transparency.
-			return FinalAccumLateClipWithAlphaCalcWithAlphaAccumKernel();
-		else if (!alphaCalc && alphaAccum)//Rgba output and !Transparency.
-			return FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel();
-		else
-			return m_Empty;//Cannot have alphaCalc and !alphaAccum, it makes no sense.
-	}
-}
-
-/// <summary>
-/// Wrapper around CreateFinalAccumKernelString().
-/// </summary>
-/// <param name="earlyClip">True if early clip is desired, else false.</param>
-/// <param name="channels">The number of channels used, 3 or 4.</param>
-/// <param name="transparency">True if channels equals 4 and using transparency, else false.</param>
-/// <returns>The final accumulation kernel string</returns>
-string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyClip, size_t channels, bool transparency)
-{
-	return CreateFinalAccumKernelString(earlyClip, (channels > 3 && transparency), channels > 3);
+		return FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumKernel();
 }
 
 /// <summary>
 /// Create the final accumulation kernel string
 /// </summary>
 /// <param name="earlyClip">True if early clip is desired, else false.</param>
-/// <param name="alphaCalc">True if channels equals 4 and transparency is desired, else false.</param>
-/// <param name="alphaAccum">True if channels equals 4</param>
 /// <returns>The final accumulation kernel string</returns>
-string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyClip, bool alphaCalc, bool alphaAccum)
+string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyClip)
 {
 	ostringstream os;
-	string channels = alphaAccum ? "4" : "3";
 	os <<
 	   ConstantDefinesString(m_DoublePrecision) <<
 	   UnionCLStructString <<
@@ -181,29 +73,14 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 
 	if (earlyClip)
 	{
-		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
-			os << "__kernel void " << m_FinalAccumEarlyClipEntryPoint << "(\n";
-		else if (alphaCalc && alphaAccum)//Rgba output and Transparency.
-			os << "__kernel void " << m_FinalAccumEarlyClipWithAlphaCalcWithAlphaAccumEntryPoint << "(\n";
-		else if (!alphaCalc && alphaAccum)//Rgba output and !Transparency.
-			os << "__kernel void " << m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint << "(\n";
-		else
-			return "";//Cannot have alphaCalc and !alphaAccum, it makes no sense.
+		os << "__kernel void " << m_FinalAccumEarlyClipWithoutAlphaCalcWithAlphaAccumEntryPoint << "(\n";
 	}
 	else
 	{
 		os <<
 		   CreateCalcNewRgbFunctionString(false) <<
-		   CreateGammaCorrectionFunctionString(false, alphaCalc, alphaAccum, true);
-
-		if (!alphaCalc && !alphaAccum)//Rgb output, the most common case.
-			os << "__kernel void " << m_FinalAccumLateClipEntryPoint << "(\n";
-		else if (alphaCalc && alphaAccum)//Rgba output and Transparency.
-			os << "__kernel void " << m_FinalAccumLateClipWithAlphaCalcWithAlphaAccumEntryPoint << "(\n";
-		else if (!alphaCalc && alphaAccum)//Rgba output and !Transparency.
-			os << "__kernel void " << m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint << "(\n";
-		else
-			return "";//Cannot have alphaCalc and !alphaAccum, it makes no sense.
+		   CreateGammaCorrectionFunctionString(false, true) <<
+		   "__kernel void " << m_FinalAccumLateClipWithoutAlphaCalcWithAlphaAccumEntryPoint << "(\n";
 	}
 
 	os <<
@@ -211,10 +88,8 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	   "	__write_only image2d_t pixels,\n"
 	   "	__constant SpatialFilterCL* spatialFilter,\n"
 	   "	__constant real_bucket_t* filterCoefs,\n"
-	   "	__constant real4reals_bucket* csa,\n"
-	   "	const uint doCurves,\n"
-	   "	const real_bucket_t alphaBase,\n"
-	   "	const real_bucket_t alphaScale\n"
+	   "	__global real4reals_bucket* csa,\n"
+	   "	const uint doCurves\n"
 	   "\t)\n"
 	   "{\n"
 	   "\n"
@@ -249,21 +124,13 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 	   "	}\n"
 	   "\n";
 
-	//Not supporting 2 bytes per channel on the GPU. If the user wants it, run on the CPU.
 	if (earlyClip)//If early clip, simply assign values directly to the temp float4 since they've been gamma corrected already, then write it straight to the output image below.
 	{
 		os <<
 		   "	finalColor.m_Float4.x = (float)newBucket.m_Real4.x;\n"//CPU side clamps, skip here because write_imagef() does the clamping for us.
 		   "	finalColor.m_Float4.y = (float)newBucket.m_Real4.y;\n"
-		   "	finalColor.m_Float4.z = (float)newBucket.m_Real4.z;\n";
-
-		if (alphaAccum)
-		{
-			if (alphaCalc)
-				os << "	finalColor.m_Float4.w = (float)newBucket.m_Real4.w;\n";
-			else
-				os << "	finalColor.m_Float4.w = 1.0f;\n";
-		}
+		   "	finalColor.m_Float4.z = (float)newBucket.m_Real4.z;\n"
+		   "	finalColor.m_Float4.w = (float)newBucket.m_Real4.w;\n";
 	}
 	else
 	{
@@ -273,7 +140,7 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 			os <<
 			   "	real4reals_bucket realFinal;\n"
 			   "\n"
-			   "	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, alphaBase, alphaScale, &(realFinal.m_Reals[0]));\n"
+			   "	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, &(realFinal.m_Reals[0]));\n"
 			   "	finalColor.m_Float4.x = (float)realFinal.m_Real4.x;\n"
 			   "	finalColor.m_Float4.y = (float)realFinal.m_Real4.y;\n"
 			   "	finalColor.m_Float4.z = (float)realFinal.m_Real4.z;\n"
@@ -283,7 +150,7 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 		else
 		{
 			os <<
-			   "	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, alphaBase, alphaScale, &(finalColor.m_Floats[0]));\n";
+			   "	GammaCorrectionFloats(&newBucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, &(finalColor.m_Floats[0]));\n";
 		}
 	}
 
@@ -308,81 +175,45 @@ string FinalAccumOpenCLKernelCreator::CreateFinalAccumKernelString(bool earlyCli
 /// This is not a full kernel, just a function that is used in the kernels.
 /// </summary>
 /// <param name="globalBucket">True if writing to a global buffer (early clip), else false (late clip).</param>
-/// <param name="alphaCalc">True if channels equals 4 and transparency is desired, else false.</param>
-/// <param name="alphaAccum">True if channels equals 4</param>
 /// <param name="finalOut">True if writing to global buffer (late clip), else false (early clip).</param>
 /// <returns>The gamma correction function string</returns>
-string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool globalBucket, bool alphaCalc, bool alphaAccum, bool finalOut)
+string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionFunctionString(bool globalBucket, bool finalOut)
 {
 	ostringstream os;
 	string dataType;
 	string unionMember;
 	dataType = "real_bucket_t";
 	//Use real_t for all cases, early clip and final accum.
-	os << "void GammaCorrectionFloats(" << (globalBucket ? "__global " : "") << "real4reals_bucket* bucket, __constant real_bucket_t* background, real_bucket_t g, real_bucket_t linRange, real_bucket_t vibrancy, real_bucket_t highlightPower, real_bucket_t alphaBase, real_bucket_t alphaScale, " << (finalOut ? "" : "__global") << " real_bucket_t* correctedChannels)\n";
-	os
-			<< "{\n"
-			<< "	real_bucket_t alpha, ls, tmp, a;\n"
-			<< "	real4reals_bucket newRgb;\n"
-			<< "\n"
-			<< "	if (bucket->m_Reals[3] <= 0)\n"
-			<< "	{\n"
-			<< "		alpha = 0;\n"
-			<< "		ls = 0;\n"
-			<< "	}\n"
-			<< "	else\n"
-			<< "	{\n"
-			<< "		tmp = bucket->m_Reals[3];\n"
-			<< "		alpha = CalcAlpha(tmp, g, linRange);\n"
-			<< "		ls = vibrancy * alpha / tmp;\n"
-			<< "		alpha = clamp(alpha, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
-			<< "	}\n"
-			<< "\n"
-			<< "	CalcNewRgb(bucket, ls, highlightPower, &newRgb);\n"
-			<< "\n"
-			<< "	for (uint rgbi = 0; rgbi < 3; rgbi++)\n"
-			<< "	{\n"
-			<< "		a = newRgb.m_Reals[rgbi] + ((1.0 - vibrancy) * pow(fabs(bucket->m_Reals[rgbi]), g));\n"
-			<< "\n";
-
-	if (!alphaCalc)
-	{
-		os <<
-		   "		a += ((1.0 - alpha) * background[rgbi]);\n";
-	}
-	else
-	{
-		os
-				<< "		if (alpha > 0)\n"
-				<< "			a /= alpha;\n"
-				<< "		else\n"
-				<< "			a = 0;\n";
-	}
-
-	os <<
-	   "\n"
-	   "			correctedChannels[rgbi] = (" << dataType << ")clamp(a, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
-	   "		}\n"
-	   "\n";
-
-	//The CPU code has 3 cases for assigning alpha:
-	//[3] = alpha.//Early clip.
-	//[3] = alpha * 255.//Final Rgba with transparency.
-	//[3] = 255.//Final Rgba without transparency.
-	//Putting conditionals in GPU code is to be avoided. So do base + alpha * scale which will
-	//work for all 3 cases without using a conditional, which should be faster on a GPU. This gives:
-	//Base = 0,   scale = 1.   [3] = (0 +   (alpha * 1)).   [3] = alpha.
-	//Base = 0,   scale = 255. [3] = (0 +   (alpha * 255)). [3] = alpha * 255.
-	//Base = 255, scale = 0.   [3] = (255 + (alpha * 0)).   [3] = 255.
-	if (alphaAccum)
-	{
-		os
-				<< "	correctedChannels[3] = (" << dataType << ")(alphaBase + (alpha * alphaScale));\n";
-	}
-
-	os <<
-	   "}\n"
-	   "\n";
+	os << "void GammaCorrectionFloats(" << (globalBucket ? "__global " : "") << "real4reals_bucket* bucket, __constant real_bucket_t* background, real_bucket_t g, real_bucket_t linRange, real_bucket_t vibrancy, real_bucket_t highlightPower, " << (finalOut ? "" : "__global") << " real_bucket_t* correctedChannels)\n";
+	os << "{\n"
+	   << "	real_bucket_t alpha, ls, tmp, a;\n"
+	   << "	real4reals_bucket newRgb;\n"
+	   << "\n"
+	   << "	if (bucket->m_Reals[3] <= 0)\n"
+	   << "	{\n"
+	   << "		alpha = 0;\n"
+	   << "		ls = 0;\n"
+	   << "	}\n"
+	   << "	else\n"
+	   << "	{\n"
+	   << "		tmp = bucket->m_Reals[3];\n"
+	   << "		alpha = CalcAlpha(tmp, g, linRange);\n"
+	   << "		ls = vibrancy * alpha / tmp;\n"
+	   << "		alpha = clamp(alpha, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
+	   << "	}\n"
+	   << "\n"
+	   << "	CalcNewRgb(bucket, ls, highlightPower, &newRgb);\n"
+	   << "\n"
+	   << "	for (uint rgbi = 0; rgbi < 3; rgbi++)\n"
+	   << "	{\n"
+	   << "		a = newRgb.m_Reals[rgbi] + ((1.0 - vibrancy) * pow(fabs(bucket->m_Reals[rgbi]), g));\n"
+	   << "		a += ((1.0 - alpha) * background[rgbi]);\n"
+	   << "		correctedChannels[rgbi] = (" << dataType << ")clamp(a, (real_bucket_t)0.0, (real_bucket_t)1.0);\n"
+	   << "	}\n"
+	   << "\n"
+	   << "	correctedChannels[3] = (" << dataType << ")alpha;\n"
+	   << "}\n"
+	   << "\n";
 	return os.str();
 }
 
@@ -451,9 +282,8 @@ string FinalAccumOpenCLKernelCreator::CreateCalcNewRgbFunctionString(bool global
 /// <summary>
 /// Create the gamma correction kernel string used for early clipping.
 /// </summary>
-/// <param name="alphaCalc">True if channels equals 4 and transparency is desired, else false.</param>
 /// <returns>The gamma correction kernel string used for early clipping</returns>
-string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionKernelString(bool alphaCalc)
+string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionKernelString()
 {
 	ostringstream os;
 	string dataType;
@@ -465,8 +295,8 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionKernelString(bool alp
 	   CalcAlphaFunctionString <<
 	   CreateCalcNewRgbFunctionString(true) <<
 	   SpatialFilterCLStructString <<
-	   CreateGammaCorrectionFunctionString(true, alphaCalc, true, false);//Will only be used with float in this case, early clip. Will always alpha accum.
-	os << "__kernel void " << (alphaCalc ? m_GammaCorrectionWithAlphaCalcEntryPoint : m_GammaCorrectionWithoutAlphaCalcEntryPoint) << "(\n" <<
+	   CreateGammaCorrectionFunctionString(true, false);//Will only be used with float in this case, early clip. Will always alpha accum.
+	os << "__kernel void " << m_GammaCorrectionWithoutAlphaCalcEntryPoint << "(\n" <<
 	   "	__global real4reals_bucket* accumulator,\n"
 	   "	__constant SpatialFilterCL* spatialFilter\n"
 	   ")\n"
@@ -478,8 +308,7 @@ string FinalAccumOpenCLKernelCreator::CreateGammaCorrectionKernelString(bool alp
 	   "\n"
 	   "	uint superIndex = (GLOBAL_ID_Y * spatialFilter->m_SuperRasW) + GLOBAL_ID_X;\n"
 	   "	__global real4reals_bucket* bucket = accumulator + superIndex;\n"
-	   //Pass in an alphaBase and alphaScale of 0, 1 which means to just directly assign the computed alpha value.
-	   "	GammaCorrectionFloats(bucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, 0.0, 1.0, &(bucket->m_Reals[0]));\n"
+	   "	GammaCorrectionFloats(bucket, &(spatialFilter->m_Background[0]), spatialFilter->m_Gamma, spatialFilter->m_LinRange, spatialFilter->m_Vibrancy, spatialFilter->m_HighlightPower, &(bucket->m_Reals[0]));\n"
 	   "}\n"
 	   ;
 	return os.str();

@@ -40,7 +40,6 @@ void RendererCL<T, bucketT>::Init()
 {
 	m_Init = false;
 	m_DoublePrecision = typeid(T) == typeid(double);
-	m_NumChannels = 4;
 	//Buffer names.
 	m_EmberBufferName = "Ember";
 	m_XformsBufferName = "Xforms";
@@ -73,7 +72,7 @@ void RendererCL<T, bucketT>::Init()
 	m_PaletteFormat.image_channel_order = CL_RGBA;
 	m_PaletteFormat.image_channel_data_type = CL_FLOAT;
 	m_FinalFormat.image_channel_order = CL_RGBA;
-	m_FinalFormat.image_channel_data_type = CL_UNORM_INT8;//Change if this ever supports 2BPC outputs for PNG.
+	m_FinalFormat.image_channel_data_type = CL_FLOAT;
 }
 
 /// <summary>
@@ -386,7 +385,7 @@ const string& RendererCL<T, bucketT>::DEKernel() const { return m_DEOpenCLKernel
 /// </summary>
 /// <returns>The string representation of the kernel for the last built final accumulation program.</returns>
 template <typename T, typename bucketT>
-const string& RendererCL<T, bucketT>::FinalAccumKernel() const { return m_FinalAccumOpenCLKernelCreator.FinalAccumKernel(EarlyClip(), Renderer<T, bucketT>::NumChannels(), Transparency()); }
+const string& RendererCL<T, bucketT>::FinalAccumKernel() const { return m_FinalAccumOpenCLKernelCreator.FinalAccumKernel(EarlyClip()); }
 
 /// <summary>
 /// Get the a const referece to the devices this renderer will use.
@@ -407,7 +406,7 @@ const vector<unique_ptr<RendererClDevice>>& RendererCL<T, bucketT>::Devices() co
 /// <param name="pixels">The host side buffer to read into</param>
 /// <returns>True if success, else false.</returns>
 template <typename T, typename bucketT>
-bool RendererCL<T, bucketT>::ReadFinal(byte* pixels)
+bool RendererCL<T, bucketT>::ReadFinal(v4F* pixels)
 {
 	if (pixels && !m_Devices.empty())
 		return m_Devices[0]->m_Wrapper.ReadImage(m_FinalImageName, FinalRasW(), FinalRasH(), 0, m_Devices[0]->m_Wrapper.Shared(), pixels);
@@ -423,7 +422,7 @@ bool RendererCL<T, bucketT>::ReadFinal(byte* pixels)
 template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::ClearFinal()
 {
-	vector<byte> v;
+	vector<v4F> v;
 
 	if (!m_Devices.empty())
 	{
@@ -468,17 +467,6 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::Ok() const
 {
 	return !m_Devices.empty() && m_Init;
-}
-
-/// <summary>
-/// Override to force num channels to be 4 because RGBA is always used for OpenCL
-/// since the output is actually an image rather than just a buffer.
-/// </summary>
-/// <param name="numChannels">The number of channels, ignored.</param>
-template <typename T, typename bucketT>
-void RendererCL<T, bucketT>::NumChannels(size_t numChannels)
-{
-	m_NumChannels = 4;
 }
 
 /// <summary>
@@ -771,7 +759,7 @@ eRenderStatus RendererCL<T, bucketT>::GaussianDensityFilter()
 /// <param name="finalOffset">Offset in the buffer to store the pixels to</param>
 /// <returns>True if success and not aborted, else false.</returns>
 template <typename T, typename bucketT>
-eRenderStatus RendererCL<T, bucketT>::AccumulatorToFinalImage(byte* pixels, size_t finalOffset)
+eRenderStatus RendererCL<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t finalOffset)
 {
 	auto status = RunFinalAccum();
 
@@ -875,17 +863,6 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 	}
 
 	return stats;
-}
-
-/// <summary>
-/// Override which just passes false to the base.
-/// This is because curves are scaled from 0-1 to 0-255 or 0-65535 on the CPU, but need to be kept as 0-1 for OpenCL because the texture expects normalized values.
-/// </summary>
-/// <param name="scale">Ignored</param>
-template <typename T, typename bucketT>
-void RendererCL<T, bucketT>::ComputeCurves(bool scale)
-{
-	Renderer<T, bucketT>::ComputeCurves(false);
 }
 
 /// <summary>
@@ -1304,9 +1281,7 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 {
 	//Timing t(4);
 	bool b = true;
-	double alphaBase;
-	double alphaScale;
-	int accumKernelIndex = MakeAndGetFinalAccumProgram(alphaBase, alphaScale);
+	int accumKernelIndex = MakeAndGetFinalAccumProgram();
 	cl_uint argIndex;
 	size_t gridW;
 	size_t gridH;
@@ -1323,7 +1298,7 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 
 		if (b && !(b = wrapper.AddAndWriteBuffer(m_SpatialFilterParamsBufferName, reinterpret_cast<void*>(&m_SpatialFilterCL), sizeof(m_SpatialFilterCL)))) { AddToReport(loc); }
 
-		if (b && !(b = wrapper.AddAndWriteBuffer(m_CurvesCsaName,				  m_Csa.data(),					   SizeOf(m_Csa))))   { AddToReport(loc); }
+		if (b && !(b = wrapper.AddAndWriteBuffer(m_CurvesCsaName,                 m_Csa.data(),                                SizeOf(m_Csa))))             { AddToReport(loc); }
 
 		//Since early clip requires gamma correcting the entire accumulator first,
 		//it can't be done inside of the normal final accumulation kernel, so
@@ -1372,10 +1347,6 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_CurvesCsaName)))					{ AddToReport(loc); }//Curve points.
 
 		if (b && !(b = wrapper.SetArg	   (accumKernelIndex, argIndex++, curvesSet)))                          { AddToReport(loc); }//Do curves.
-
-		if (b && !(b = wrapper.SetArg	   (accumKernelIndex, argIndex++, bucketT(alphaBase))))                 { AddToReport(loc); }//Alpha base.
-
-		if (b && !(b = wrapper.SetArg	   (accumKernelIndex, argIndex++, bucketT(alphaScale))))                { AddToReport(loc); }//Alpha scale.
 
 		if (b && wrapper.Shared())
 			if (b && !(b = wrapper.EnqueueAcquireGLObjects(m_FinalImageName))) { AddToReport(loc); }
@@ -1534,26 +1505,22 @@ int RendererCL<T, bucketT>::MakeAndGetDensityFilterProgram(size_t ss, uint filte
 
 /// <summary>
 /// Make the final accumulation on the primary device program and return its index.
-/// There are many different kernels for final accum, depending on early clip, alpha channel, and transparency.
-/// Loading all of these in the beginning is too much, so only load the one for the current case being worked with.
 /// </summary>
-/// <param name="alphaBase">Storage for the alpha base value used in the kernel. 0 if transparency is true, else 255.</param>
-/// <param name="alphaScale">Storage for the alpha scale value used in the kernel. 255 if transparency is true, else 0.</param>
 /// <returns>The kernel index if successful, else -1.</returns>
 template <typename T, typename bucketT>
-int RendererCL<T, bucketT>::MakeAndGetFinalAccumProgram(double& alphaBase, double& alphaScale)
+int RendererCL<T, bucketT>::MakeAndGetFinalAccumProgram()
 {
 	int kernelIndex = -1;
 
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		auto& finalAccumEntryPoint = m_FinalAccumOpenCLKernelCreator.FinalAccumEntryPoint(EarlyClip(), Renderer<T, bucketT>::NumChannels(), Transparency(), alphaBase, alphaScale);
+		auto& finalAccumEntryPoint = m_FinalAccumOpenCLKernelCreator.FinalAccumEntryPoint(EarlyClip());
 		const char* loc = __FUNCTION__;
 
 		if ((kernelIndex = wrapper.FindKernelIndex(finalAccumEntryPoint)) == -1)//Has not been built yet.
 		{
-			auto& kernel = m_FinalAccumOpenCLKernelCreator.FinalAccumKernel(EarlyClip(), Renderer<T, bucketT>::NumChannels(), Transparency());
+			auto& kernel = m_FinalAccumOpenCLKernelCreator.FinalAccumKernel(EarlyClip());
 
 			if (wrapper.AddProgram(finalAccumEntryPoint, kernel, finalAccumEntryPoint, m_DoublePrecision))
 				kernelIndex = wrapper.FindKernelIndex(finalAccumEntryPoint);//Try to find it again, it will be present if successfully built.
@@ -1575,13 +1542,13 @@ int RendererCL<T, bucketT>::MakeAndGetGammaCorrectionProgram()
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		auto& gammaEntryPoint = m_FinalAccumOpenCLKernelCreator.GammaCorrectionEntryPoint(Renderer<T, bucketT>::NumChannels(), Transparency());
+		auto& gammaEntryPoint = m_FinalAccumOpenCLKernelCreator.GammaCorrectionEntryPoint();
 		int kernelIndex = wrapper.FindKernelIndex(gammaEntryPoint);
 		const char* loc = __FUNCTION__;
 
 		if (kernelIndex == -1)//Has not been built yet.
 		{
-			auto& kernel = m_FinalAccumOpenCLKernelCreator.GammaCorrectionKernel(Renderer<T, bucketT>::NumChannels(), Transparency());
+			auto& kernel = m_FinalAccumOpenCLKernelCreator.GammaCorrectionKernel();
 			bool b = wrapper.AddProgram(gammaEntryPoint, kernel, gammaEntryPoint, m_DoublePrecision);
 
 			if (b)
@@ -1735,10 +1702,7 @@ void RendererCL<T, bucketT>::ConvertSpatialFilter()
 		m_SpatialFilterCL.m_FinalRasH = uint(FinalRasH());
 		m_SpatialFilterCL.m_Supersample = uint(Supersample());
 		m_SpatialFilterCL.m_FilterWidth = uint(m_SpatialFilter->FinalFilterWidth());
-		m_SpatialFilterCL.m_NumChannels = uint(Renderer<T, bucketT>::NumChannels());
-		m_SpatialFilterCL.m_BytesPerChannel = uint(BytesPerChannel());
 		m_SpatialFilterCL.m_DensityFilterOffset = uint(DensityFilterOffset());
-		m_SpatialFilterCL.m_Transparency = Transparency();
 		m_SpatialFilterCL.m_YAxisUp = uint(m_YAxisUp);
 		m_SpatialFilterCL.m_Vibrancy = vibrancy;
 		m_SpatialFilterCL.m_HighlightPower = HighlightPower();

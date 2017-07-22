@@ -71,33 +71,52 @@ class VariationTreeWidgetItem;
 /// </summary>
 class VariationTreeDoubleSpinBox : public DoubleSpinBox
 {
-public:
-	/// <summary>
-	/// Constructor that passes agruments to the base and assigns the m_Param and m_Variation members.
-	/// </summary>
-	/// <param name="p">The parent widget</param>
-	/// <param name="widgetItem">The widget item this spinner is contained in</param>
-	/// <param name="id">The variation this spinner is for</param>
-	/// <param name="param">The name of the parameter this is for</param>
-	/// <param name="h">The height of the spin box. Default: 16.</param>
-	/// <param name="step">The step used to increment/decrement the spin box when using the mouse wheel. Default: 0.05.</param>
-	explicit VariationTreeDoubleSpinBox(QWidget* p, VariationTreeWidgetItem* widgetItem, eVariationId id, const string& param, int h = 16, double step = 0.05)
-		: DoubleSpinBox(p, h, step)
-	{
-		m_WidgetItem = widgetItem;
-		m_Param = param;
-		m_Id = id;
-		setDecimals(3);
-	}
+	Q_OBJECT
 
+public:
+	explicit VariationTreeDoubleSpinBox(QWidget* p, VariationTreeWidgetItem* widgetItem, eVariationId id, const string& param, int h = 16, double step = 0.05);
 	virtual ~VariationTreeDoubleSpinBox() { }
 	bool IsParam() { return !m_Param.empty(); }
 	string ParamName() { return m_Param; }
 	eVariationId GetVariationId() { return m_Id; }
 	VariationTreeWidgetItem* WidgetItem() { return m_WidgetItem; }
 
+public slots:
+	void PiActionTriggered(bool checked = false);
+	void TwoPiActionTriggered(bool checked = false);
+	void PiOver2ActionTriggered(bool checked = false);
+	void PiOver3ActionTriggered(bool checked = false);
+	void PiOver4ActionTriggered(bool checked = false);
+	void PiOver6ActionTriggered(bool checked = false);
+	void OneOverPiActionTriggered(bool checked = false);
+	void TwoOverPiActionTriggered(bool checked = false);
+	void ThreeOverPiActionTriggered(bool checked = false);
+	void FourOverPiActionTriggered(bool checked = false);
+	void SqrtTwoActionTriggered(bool checked = false);
+	void SqrtThreeActionTriggered(bool checked = false);
+
 private:
 	string m_Param;
 	eVariationId m_Id;
 	VariationTreeWidgetItem* m_WidgetItem;
+};
+
+/// <summary>
+/// Derivation for the double spin boxes that are in the
+/// affine controls.
+/// </summary>
+class AffineDoubleSpinBox : public DoubleSpinBox
+{
+	Q_OBJECT
+
+public:
+	explicit AffineDoubleSpinBox(QWidget* p, int h = 20, double step = 0.01);
+	virtual ~AffineDoubleSpinBox() { }
+
+public slots:
+	void NegOneActionTriggered(bool checked = false);
+	void ZeroActionTriggered(bool checked = false);
+	void OneActionTriggered(bool checked = false);
+	void FortyFiveActionTriggered(bool checked = false);
+	void NegFortyFiveActionTriggered(bool checked = false);
 };

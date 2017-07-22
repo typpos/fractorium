@@ -34,10 +34,10 @@ public:
 	{
 	}
 
-	//~EmberTreeWidgetItemBase()
-	//{
-	//	qDebug() << "~EmberTreeWidgetItemBase()";
-	//}
+	~EmberTreeWidgetItemBase()
+	{
+		//qDebug() << "~EmberTreeWidgetItemBase()";
+	}
 
 	/// <summary>
 	/// Set the preview image for the tree widget item.

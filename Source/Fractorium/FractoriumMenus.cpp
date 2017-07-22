@@ -349,9 +349,10 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 	auto filename = SetupSaveImageDialog(m_Controller->Name());
 	auto renderer = m_Controller->Renderer();
 	auto& pixels = *m_Controller->FinalImage();
-	auto rendererCL = dynamic_cast<RendererCLBase*>(m_Controller->Renderer());
+	auto rendererCL = dynamic_cast<RendererCLBase*>(renderer);
 	auto stats = m_Controller->Stats();
 	auto comments = renderer->ImageComments(stats, 0, true);
+	auto settings = FractoriumSettings::Instance();
 
 	if (rendererCL && renderer->PrepFinalAccumVector(pixels))
 	{
@@ -362,7 +363,7 @@ void Fractorium::OnActionSaveCurrentScreen(bool checked)
 		}
 	}
 
-	m_Controller->SaveCurrentRender(filename, comments, pixels, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels(), renderer->BytesPerChannel());
+	m_Controller->SaveCurrentRender(filename, comments, pixels, renderer->FinalRasW(), renderer->FinalRasH(), settings->Png16Bit(), settings->Transparency());
 }
 
 /// <summary>
@@ -879,7 +880,7 @@ void Fractorium::OnActionFinalRender(bool checked)
 void Fractorium::OnFinalRenderClose(int result)
 {
 	m_RenderStatusLabel->setText("Renderer starting...");
-	StartRenderTimer();//Re-create the renderer and start rendering again.
+	StartRenderTimer(false);//Re-create the renderer and start rendering again.
 	ui.ActionStartStopRenderer->setChecked(false);//Re-enable any controls that might have been disabled.
 	OnActionStartStopRenderer(false);
 }
@@ -892,10 +893,17 @@ void Fractorium::OnFinalRenderClose(int result)
 /// <param name="checked">Ignored</param>
 void Fractorium::OnActionOptions(bool checked)
 {
+	bool ec = m_Settings->EarlyClip();
+	bool yup = m_Settings->YAxisUp();
+	bool trans = m_Settings->Transparency();
+
 	if (m_OptionsDialog->exec())
 	{
+		bool updatePreviews = ec != m_Settings->EarlyClip() ||
+							  yup != m_Settings->YAxisUp() ||
+							  trans != m_Settings->Transparency();
 		SyncOptionsToToolbar();//This won't trigger a recreate, the call below handles it.
-		ShutdownAndRecreateFromOptions();//This will recreate the controller and/or the renderer from the options if necessary, then start the render timer.
+		ShutdownAndRecreateFromOptions(updatePreviews);//This will recreate the controller and/or the renderer from the options if necessary, then start the render timer.
 	}
 }
 

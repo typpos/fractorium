@@ -339,18 +339,18 @@ public slots:
 	void OnSummaryTreeHeaderSectionClicked(int logicalIndex);
 
 	//Rendering/progress.
-	void StartRenderTimer();
+	void StartRenderTimer(bool updatePreviews);
 	void IdleTimer();
 	bool ControllersOk();
 	void ShowCritical(const QString& title, const QString& text, bool invokeRequired = false);
 
 	//Can't have a template function be a slot.
-	void SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vector<byte>& v, uint w, uint h);
+	void SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h);
 
 public:
 	//template<typename spinType, typename valType>//See below.
 	//static void SetupSpinner(QTableWidget* table, const QObject* receiver, int& row, int col, spinType*& spinBox, int height, valType min, valType max, valType step, const char* signal, const char* slot, bool incRow = true, valType val = 0, valType doubleClickZero = -999, valType doubleClickNonZero = -999);
-	static void SetupAffineSpinner(QTableWidget* table, const QObject* receiver, int row, int col, DoubleSpinBox*& spinBox, int height, double min, double max, double step, double prec, const char* signal, const char* slot);
+	static void SetupAffineSpinner(QTableWidget* table, const QObject* receiver, int row, int col, AffineDoubleSpinBox*& spinBox, int height, double min, double max, double step, double prec, const char* signal, const char* slot);
 	static void SetupCombo(QTableWidget* table, const QObject* receiver, int& row, int col, StealthComboBox*& comboBox, const vector<string>& vals, const char* signal, const char* slot, Qt::ConnectionType connectionType = Qt::QueuedConnection);
 	static void SetFixedTableHeader(QHeaderView* header, QHeaderView::ResizeMode mode = QHeaderView::Fixed);
 
@@ -422,8 +422,8 @@ private:
 	void ErrorReportToQTextEdit(const vector<string>& errors, QTextEdit* textEdit, bool clear = true);
 
 	//Rendering/progress.
-	void ShutdownAndRecreateFromOptions();
-	bool CreateRendererFromOptions();
+	void ShutdownAndRecreateFromOptions(bool updatePreviews);
+	bool CreateRendererFromOptions(bool updatePreviews);
 	bool CreateControllerFromOptions();
 	void EnableRenderControls(bool enable);
 
@@ -489,22 +489,22 @@ private:
 	DoubleSpinBox* m_XformDirectColorSpin;
 
 	//Xforms Affine.
-	DoubleSpinBox* m_PreX1Spin;//Pre.
-	DoubleSpinBox* m_PreX2Spin;
-	DoubleSpinBox* m_PreY1Spin;
-	DoubleSpinBox* m_PreY2Spin;
-	DoubleSpinBox* m_PreO1Spin;
-	DoubleSpinBox* m_PreO2Spin;
+	AffineDoubleSpinBox* m_PreX1Spin;//Pre.
+	AffineDoubleSpinBox* m_PreX2Spin;
+	AffineDoubleSpinBox* m_PreY1Spin;
+	AffineDoubleSpinBox* m_PreY2Spin;
+	AffineDoubleSpinBox* m_PreO1Spin;
+	AffineDoubleSpinBox* m_PreO2Spin;
 
-	DoubleSpinBox* m_PostX1Spin;//Post.
-	DoubleSpinBox* m_PostX2Spin;
-	DoubleSpinBox* m_PostY1Spin;
-	DoubleSpinBox* m_PostY2Spin;
-	DoubleSpinBox* m_PostO1Spin;
-	DoubleSpinBox* m_PostO2Spin;
+	AffineDoubleSpinBox* m_PostX1Spin;//Post.
+	AffineDoubleSpinBox* m_PostX2Spin;
+	AffineDoubleSpinBox* m_PostY1Spin;
+	AffineDoubleSpinBox* m_PostY2Spin;
+	AffineDoubleSpinBox* m_PostO1Spin;
+	AffineDoubleSpinBox* m_PostO2Spin;
 
-	DoubleSpinBox* m_PreSpins[6];
-	DoubleSpinBox* m_PostSpins[6];
+	AffineDoubleSpinBox* m_PreSpins[6];
+	AffineDoubleSpinBox* m_PostSpins[6];
 
 	//Xaos.
 	DoubleSpinBox* m_XaosSpinBox;
@@ -555,6 +555,7 @@ private:
 	int m_VarSortMode;
 	int m_PaletteSortMode;
 	int m_PreviousPaletteRow;
+	vector<byte> m_PreviewVec;
 	shared_ptr<OpenCLInfo> m_Info;
 	unique_ptr<FractoriumEmberControllerBase> m_Controller;
 	Ui::FractoriumClass ui;

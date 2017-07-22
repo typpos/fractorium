@@ -172,7 +172,7 @@ public:
 	virtual void AffineInterpTypeChanged(int i) { }
 	virtual void InterpTypeChanged(int i) { }
 	virtual void BackgroundChanged(const QColor& color) { }
-	virtual void ClearColorCurves() { }
+	virtual void ClearColorCurves(int i) { }
 	virtual void ColorCurveChanged(int curveIndex, int pointInxed, const QPointF& point) { }
 
 	//Xforms.
@@ -240,7 +240,7 @@ public:
 
 	//Rendering/progress.
 	virtual bool Render() { return false; }
-	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared = true) { return false; }
+	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) { return false; }
 	virtual uint SizeOfT() const { return 0; }
 	virtual void ClearUndo() { }
 	virtual GLEmberControllerBase* GLController() { return nullptr; }
@@ -252,10 +252,10 @@ public:
 	void Shutdown();
 	void UpdateRender(eProcessAction action = eProcessAction::FULL_RENDER);
 	void DeleteRenderer();
-	void SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<byte>& pixels, size_t width, size_t height, size_t channels, size_t bpc);
+	void SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
 	RendererBase* Renderer() { return m_Renderer.get(); }
-	vector<byte>* FinalImage() { return &(m_FinalImage); }
-	vector<byte>* PreviewFinalImage() { return &m_PreviewFinalImage; }
+	vector<v4F>* FinalImage() { return &(m_FinalImage); }
+	vector<v4F>* PreviewFinalImage() { return &m_PreviewFinalImage; }
 	EmberStats Stats() { return m_Stats; }
 
 protected:
@@ -286,8 +286,8 @@ protected:
 	string m_CurrentPaletteFilePath;
 	std::recursive_mutex m_Cs;
 	std::thread m_WriteThread;
-	vector<byte> m_FinalImage;
-	vector<byte> m_PreviewFinalImage;
+	vector<v4F> m_FinalImage;
+	vector<v4F> m_PreviewFinalImage;
 	vector<eProcessAction> m_ProcessActions;
 	vector<eVariationId> m_FilteredVariations;
 	unique_ptr<EmberNs::RendererBase> m_Renderer;
@@ -436,7 +436,7 @@ public:
 	virtual void AffineInterpTypeChanged(int index) override;
 	virtual void InterpTypeChanged(int index) override;
 	virtual void BackgroundChanged(const QColor& col) override;
-	virtual void ClearColorCurves() override;
+	virtual void ClearColorCurves(int i) override;
 	virtual void ColorCurveChanged(int curveIndex, int pointInxed, const QPointF& point) override;
 
 	//Xforms.
@@ -510,7 +510,7 @@ public:
 
 	//Rendering/progress.
 	virtual bool Render() override;
-	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool shared = true) override;
+	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
 	virtual uint SizeOfT() const override { return sizeof(T); }
 	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
 	virtual void ClearUndo() override;
@@ -607,11 +607,6 @@ public:
 		return m_PreviewRenderer.YAxisUp();
 	}
 
-	bool Transparency()
-	{
-		return m_PreviewRenderer.Transparency();
-	}
-
 	bool Running()
 	{
 		return m_PreviewRun || m_PreviewResult.isRunning();
@@ -622,7 +617,8 @@ public:
 protected:
 	volatile bool m_PreviewRun = false;
 	Ember<T> m_PreviewEmber;
-	vector<byte> m_PreviewFinalImage;
+	vector<byte> m_PreviewVec;
+	vv4F m_PreviewFinalImage;
 	EmberNs::Renderer<T, float> m_PreviewRenderer;
 
 private:
@@ -639,6 +635,7 @@ class TreePreviewRenderer : public PreviewRenderer<T>
 public:
 	using PreviewRenderer<T>::m_PreviewRun;
 	using PreviewRenderer<T>::m_PreviewEmber;
+	using PreviewRenderer<T>::m_PreviewVec;
 	using PreviewRenderer<T>::m_PreviewRenderer;
 	using PreviewRenderer<T>::m_PreviewFinalImage;
 
@@ -655,10 +652,8 @@ public:
 	{
 		auto f = m_Controller->m_Fractorium;
 		m_PreviewRenderer.Callback(nullptr);
-		m_PreviewRenderer.NumChannels(4);
 		m_PreviewRenderer.EarlyClip(f->m_Settings->EarlyClip());
 		m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());
-		m_PreviewRenderer.Transparency(f->m_Settings->Transparency());
 	}
 
 	virtual void PreviewRenderFunc(uint start, uint end) override;

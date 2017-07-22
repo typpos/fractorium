@@ -424,6 +424,16 @@ in interactive mode for each mouse movement</string>
          </property>
         </widget>
        </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="Png16BitCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Save 16-bit Png</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="OptionsXmlSavingTab">
@@ -846,6 +856,8 @@ in interactive mode for each mouse movement</string>
   <tabstop>TransparencyCheckBox</tabstop>
   <tabstop>ShowAllXformsCheckBox</tabstop>
   <tabstop>ContinuousUpdateCheckBox</tabstop>
+  <tabstop>ToggleTypeCheckBox</tabstop>
+  <tabstop>Png16BitCheckBox</tabstop>
   <tabstop>RandomCountSpin</tabstop>
   <tabstop>ThreadCountSpin</tabstop>
   <tabstop>CpuSubBatchSpin</tabstop>

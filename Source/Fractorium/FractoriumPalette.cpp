@@ -491,21 +491,38 @@ void Fractorium::SetPaletteFileComboIndex(const string& filename)
 }
 
 /// <summary>
-/// Reset the color curve values in the current ember to their default state and also update the curves control.
+/// Reset the color curve values for the selected curve in the current ember to their default state and also update the curves control.
 /// Called when ResetCurvesButton is clicked.
+/// Note if they click Reset Curves when the "All" radio button is selected, then it clears all curves.
 /// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
 /// </summary>
+/// <param name="i">The index of the curve to be cleared, 0 to clear all.</param>
 template <typename T>
-void FractoriumEmberController<T>::ClearColorCurves()
+void FractoriumEmberController<T>::ClearColorCurves(int i)
 {
 	Update([&]
 	{
-		m_Ember.m_Curves.Init();
+		if (i)
+			m_Ember.m_Curves.Init(i);
+		else
+			m_Ember.m_Curves.Init(0);
 	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
 	FillCurvesControl();
 }
 
-void Fractorium::OnResetCurvesButtonClicked(bool checked) { m_Controller->ClearColorCurves(); }
+void Fractorium::OnResetCurvesButtonClicked(bool checked)
+{
+	if (ui.CurvesAllRadio->isChecked())
+		m_Controller->ClearColorCurves(0);
+	else if (ui.CurvesRedRadio->isChecked())
+		m_Controller->ClearColorCurves(1);
+	else if (ui.CurvesGreenRadio->isChecked())
+		m_Controller->ClearColorCurves(2);
+	else if (ui.CurvesBlueRadio->isChecked())
+		m_Controller->ClearColorCurves(3);
+	else
+		m_Controller->ClearColorCurves(0);
+}
 
 /// <summary>
 /// Set the coordinate of the curve point.

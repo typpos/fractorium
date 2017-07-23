@@ -1674,13 +1674,13 @@ void Renderer<T, bucketT>::ComputeCurves()
 {
 	if (m_CurvesSet)
 	{
-		Timing t;
+		//Timing t;
 		auto st = m_Csa.size();
 
 		for (size_t i = 0; i < st; i++)
 			m_Csa[i] = m_Ember.m_Curves.BezierFunc(i * ONE_OVER_CURVES_LENGTH_M1);
 
-		t.Toc("ComputeCurves");
+		//t.Toc("ComputeCurves");
 	}
 }
 

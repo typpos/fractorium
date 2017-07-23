@@ -140,6 +140,21 @@
 			<Component Id="EmberCL.dll" Guid="21c0e372-c605-4e0d-9ba8-94e38949833b">
 				<File Id="EmberCL.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\$(var.Configuration)\EmberCL.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
+			<Component Id="Half.dll" Guid="695cda02-1d6a-4e2a-8ccd-3a9600be2b96">
+				<File Id="Half.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Half.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
+			<Component Id="Iex22.dll" Guid="e485e9d1-c883-46f9-a898-5fdbbe6a83f8">
+				<File Id="Iex22.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Iex-2_2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
+			<Component Id="IlmImf22.dll" Guid="911ec3b1-c2e2-439c-af3b-cd16a9280c7f">
+				<File Id="IlmImf22.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\IlmImf-2_2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
+			<Component Id="IlmThread22.dll" Guid="89d0f2d4-7619-4bd2-8c22-6ae677d666b8">
+				<File Id="IlmThread22.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\IlmThread-2_2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
+			<Component Id="Imath22.dll" Guid="16c3c309-18b7-4232-b19b-59e56d4b75bf">
+				<File Id="Imath22.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Imath-2_2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
 			<Component Id="libxml2.dll" Guid="bb3aa687-7a3d-4d16-a27c-28529b472754">
 				<File Id="libxml2.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\libxml2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>

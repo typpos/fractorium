@@ -58,7 +58,7 @@ Go into the fractorium folder and run this script which will get the rest of the
 
 `makedeps.bat`
 
-This will download and build `glm libpng libxml zlib`. You will have a folder structure like this:
+This will download and build `glm libopenexr libpng libxml zlib`. You will have a folder structure like this:
 
 ```
 [fractorium]
@@ -67,6 +67,7 @@ This will download and build `glm libpng libxml zlib`. You will have a folder st
 ├─libjpeg
 ├─libpng
 ├─libxml2
+├─openexr
 ├─tbb
 └─fractorium
     │
@@ -79,6 +80,20 @@ This will download and build `glm libpng libxml zlib`. You will have a folder st
         ├─tbb.dll
         ├─tbb.lib
         ├─zlib.lib
+        ├─Half.lib
+        ├─Iex.lib
+        ├─IexMath.lib
+        ├─IlmImf.lib
+        ├─IlmImfUtil.lib
+        ├─IlmThread.lib
+        ├─Imath.lib
+        ├─Half.dll
+        ├─Iex-2_2.dll
+        ├─IexMath-2_2.dll
+        ├─IlmImf-2_2.dll
+        ├─IlmImfUtil-2_2.dll
+        ├─IlmThread-2_2.dll
+        ├─Imath-2_2.dll
 ```
 
 ##Building with Qt Creator or Visual Studio
@@ -153,6 +168,12 @@ fardareismai_pack_04_hoard.gradient
 flam3-palettes.xml
 fractaldesire_pack_01.gradient
 fractorium.exe
+half.dll
+iex-2_2.dll
+iexmath-2_2.dll
+ilmimf-2_2.dll
+ilmthread-2_2.dll
+imath-2_2.dll
 libxml2.dll
 Qt5Core.dll
 Qt5Gui.dll
@@ -201,6 +222,12 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2015 (
  ├─ flam3-palettes.xml
  ├─ fractaldesire_pack_01.gradient
  ├─ fractorium.exe
+ ├─ half.dll
+ ├─ iex-2_2.dll
+ ├─ iexmath-2_2.dll
+ ├─ ilmimf-2_2.dll
+ ├─ ilmthread-2_2.dll
+ ├─ imath-2_2.dll
  ├─ libxml2.dll
  ├─ Qt5Core.dll
  ├─ Qt5Gui.dll

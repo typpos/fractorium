@@ -43,11 +43,13 @@ protected:
 	virtual void enterEvent(QEvent* e);
 	virtual void leaveEvent(QEvent* e);
 
+	bool m_DoubleClick;
+	shared_ptr<FractoriumSettings> m_Settings;
+
 private:
 	void StartTimer();
 	void StopTimer();
 
-	bool m_DoubleClick;
 	double m_DoubleClickLowVal;
 	double m_DoubleClickNonZero;
 	double m_DoubleClickZero;
@@ -55,8 +57,24 @@ private:
 	double m_SmallStep;
 	QPoint m_MouseDownPoint;
 	QPoint m_MouseMovePoint;
-	shared_ptr<FractoriumSettings> m_Settings;
 	static QTimer s_Timer;
+};
+
+/// <summary>
+/// Thin derivation to implement the eventFilter() override which subsequently derived
+/// classes will use to suppress showing the context menu when right clicking is used for toggling,
+/// unless shift is pressed.
+/// </summary>
+class SpecialDoubleSpinBox : public DoubleSpinBox
+{
+	Q_OBJECT
+
+public:
+	explicit SpecialDoubleSpinBox(QWidget* p = nullptr, int h = 16, double step = 0.05);
+	virtual ~SpecialDoubleSpinBox() { }
+
+protected:
+	virtual bool eventFilter(QObject* o, QEvent* e) override;
 };
 
 /// <summary>
@@ -69,7 +87,7 @@ class VariationTreeWidgetItem;
 /// Derivation for the double spin boxes that are in the
 /// variations tree.
 /// </summary>
-class VariationTreeDoubleSpinBox : public DoubleSpinBox
+class VariationTreeDoubleSpinBox : public SpecialDoubleSpinBox
 {
 	Q_OBJECT
 
@@ -105,7 +123,7 @@ private:
 /// Derivation for the double spin boxes that are in the
 /// affine controls.
 /// </summary>
-class AffineDoubleSpinBox : public DoubleSpinBox
+class AffineDoubleSpinBox : public SpecialDoubleSpinBox
 {
 	Q_OBJECT
 

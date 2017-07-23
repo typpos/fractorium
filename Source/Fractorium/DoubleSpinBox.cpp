@@ -173,16 +173,18 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 
 	if (isEnabled() && me)
 	{
+		bool isRight = me->button() == Qt::RightButton;
+
 		if (!m_Settings->ToggleType() &&//Ensure double click toggles, not right click.
 				me->type() == QMouseEvent::MouseButtonPress &&
-				me->button() == Qt::RightButton)
+				isRight)
 		{
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 			StartTimer();
 		}
 		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseButtonRelease &&
-				 me->button() == Qt::RightButton)
+				 isRight)
 		{
 			StopTimer();
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
@@ -195,12 +197,14 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 		}
 		else if (m_DoubleClick &&
 				 ((!m_Settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
-				  (m_Settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
+				  (m_Settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && isRight)))
 		{
 			if (IsClose(m_DoubleClickLowVal, value()))
 				setValue(m_DoubleClickZero);
 			else
 				setValue(m_DoubleClickNonZero);
+
+			return true;
 		}
 	}
 	else
@@ -289,6 +293,54 @@ void DoubleSpinBox::StopTimer()
 }
 
 /// <summary>
+/// Constructor that does nothing but pass arguments to the base.
+/// </summary>
+/// <param name="p">The parent widget</param>
+/// <param name="h">The height of the spin box. Default: 16.</param>
+/// <param name="step">The step used to increment/decrement the spin box when using the mouse wheel. Default: 0.05.</param>
+SpecialDoubleSpinBox::SpecialDoubleSpinBox(QWidget* p, int h, double step)
+	: DoubleSpinBox(p, h, step)
+{
+}
+
+/// <summary>
+/// Event filter for taking special action on right click events.
+/// </summary>
+/// <param name="o">The object</param>
+/// <param name="e">The eevent</param>
+/// <returns>True to stop processing the event, else false./</returns>
+bool SpecialDoubleSpinBox::eventFilter(QObject* o, QEvent* e)
+{
+	if (isEnabled())
+	{
+		auto me = dynamic_cast<QMouseEvent*>(e);
+		auto cme = dynamic_cast<QContextMenuEvent*>(e);
+
+		if (m_DoubleClick && m_Settings->ToggleType())//If they use right click to toggle...
+		{
+			if (me)
+			{
+				if (me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)
+				{
+					if (me->modifiers().testFlag(Qt::ShiftModifier))//...then do not take the action if shift was pressed.
+						return false;//Shift was pressed, so continue normal event processing to show the menu, but do not call the base to toggle the value.
+				}
+			}
+			else if (cme)//Context menu.
+			{
+				if (!cme->modifiers().testFlag(Qt::ShiftModifier))//If they are not holding shift, call the base to toggle, and do not process further which suppresses showing the menu.
+				{
+					DoubleSpinBox::eventFilter(o, e);
+					return true;
+				}
+			}
+		}
+	}
+
+	return DoubleSpinBox::eventFilter(o, e);
+}
+
+/// <summary>
 /// Constructor that passes agruments to the base and assigns the m_Param and m_Variation members.
 /// It also sets up the context menu for special numerical values.
 /// </summary>
@@ -299,7 +351,7 @@ void DoubleSpinBox::StopTimer()
 /// <param name="h">The height of the spin box. Default: 16.</param>
 /// <param name="step">The step used to increment/decrement the spin box when using the mouse wheel. Default: 0.05.</param>
 VariationTreeDoubleSpinBox::VariationTreeDoubleSpinBox(QWidget* p, VariationTreeWidgetItem* widgetItem, eVariationId id, const string& param, int h, double step)
-	: DoubleSpinBox(p, h, step)
+	: SpecialDoubleSpinBox(p, h, step)
 {
 	m_WidgetItem = widgetItem;
 	m_Param = param;
@@ -377,7 +429,7 @@ void VariationTreeDoubleSpinBox::SqrtThreeActionTriggered(bool checked) { setVal
 /// <param name="h">The height of the spin box. Default: 20.</param>
 /// <param name="step">The step used to increment/decrement the spin box when using the mouse wheel. Default: 0.01.</param>
 AffineDoubleSpinBox::AffineDoubleSpinBox(QWidget* p, int h, double step)
-	: DoubleSpinBox(p, h, step)
+	: SpecialDoubleSpinBox(p, h, step)
 {
 	//-1
 	auto neg1Action = new QAction("-1", this);

@@ -215,7 +215,7 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 			if (isParam)
 			{
 				//Do not take action if the xform doesn't contain the variation which this param is part of.
-				if (ParametricVariation<T>* xformParVar = dynamic_cast<ParametricVariation<T>*>(xformVar))//The parametric cast of the xform's variation.
+				if (auto xformParVar = dynamic_cast<ParametricVariation<T>*>(xformVar))//The parametric cast of the xform's variation.
 					if (xformParVar->SetParamVal(sender->ParamName().c_str(), d))
 						update = true;
 			}

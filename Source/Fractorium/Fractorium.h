@@ -405,7 +405,7 @@ private:
 
 	//Xforms Selection.
 	void ClearXformsSelections();
-	void ForEachXformCheckbox(std::function<void(int, QCheckBox*)> func);
+	void ForEachXformCheckbox(std::function<void(int, QCheckBox*, bool)> func);
 
 	//Xaos.
 	void FillXaosTable();

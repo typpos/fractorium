@@ -216,6 +216,27 @@ public:
 	}
 
 	/// <summary>
+	/// Replace the xforms vector with the one passed in.
+	/// </summary>
+	/// <param name="xforms">The xforms to replace with</param>
+	/// <param name="xformPad">True to move, false to copy. Default: true.</param>
+	/// <returns>True if replaced, else false.</returns>
+	bool ReplaceXforms(vector<Xform<T>>& xforms, bool move = true)
+	{
+		if (!xforms.empty())
+		{
+			if (move)
+				m_Xforms = std::move(xforms);
+			else
+				m_Xforms = xforms;
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	/// <summary>
 	/// Copy this ember with optional padding xforms added.
 	/// </summary>
 	/// <param name="xformPad">The total number of xforms if additional padding xforms are desired. Default: 0.</param>
@@ -280,12 +301,13 @@ public:
 	/// Delete the xform at the specified index, including the final one.
 	/// </summary>
 	/// <param name="i">The index to delete</param>
+	/// <param name="forceFinal">If true, delete the final xform when its index is passed in even if one is not present. Default: false.</param>
 	/// <returns>True if success, else false.</returns>
-	bool DeleteTotalXform(size_t i)
+	bool DeleteTotalXform(size_t i, bool forceFinal = false)
 	{
 		if (DeleteXform(i))
 		{ }
-		else if (i == XformCount() && UseFinalXform())
+		else if (i == XformCount() && (forceFinal || UseFinalXform()))
 			m_FinalXform.Clear();
 		else
 			return false;
@@ -310,13 +332,13 @@ public:
 	/// Get a pointer to the xform at the specified index, including the final one.
 	/// </summary>
 	/// <param name="i">The index to get</param>
-	/// <param name="forceFinal">If true, return the final xform when its index is requested even if one is not present</param>
+	/// <param name="forceFinal">If true, return the final xform when its index is requested even if one is not present. Default: false.</param>
 	/// <returns>A pointer to the xform at the index if successful, else nullptr.</returns>
 	Xform<T>* GetTotalXform(size_t i, bool forceFinal = false) const
 	{
 		if (i < XformCount())
 			return const_cast<Xform<T>*>(&m_Xforms[i]);
-		else if (forceFinal || (i == XformCount() && UseFinalXform()))
+		else if (i == XformCount() && (forceFinal || UseFinalXform()))
 			return const_cast<Xform<T>*>(&m_FinalXform);
 		else
 			return nullptr;
@@ -342,13 +364,14 @@ public:
 	/// Search the xforms, including final, to find which one's address matches the address of the specified xform.
 	/// </summary>
 	/// <param name="xform">A pointer to the xform to find</param>
+	/// <param name="forceFinal">If true, return the index of the final xform when its pointer is passed, even if a final is not present. Default: false.</param>
 	/// <returns>The index of the matched xform if found, else -1.</returns>
-	intmax_t GetTotalXformIndex(Xform<T>* xform) const
+	intmax_t GetTotalXformIndex(Xform<T>* xform, bool forceFinal = false) const
 	{
-		size_t totalXformCount = TotalXformCount();
+		size_t totalXformCount = TotalXformCount(forceFinal);
 
 		for (size_t i = 0; i < totalXformCount; i++)
-			if (GetTotalXform(i) == xform)
+			if (GetTotalXform(i, forceFinal) == xform)
 				return intmax_t(i);
 
 		return -1;
@@ -1468,7 +1491,7 @@ public:
 	inline const Xform<T>* FinalXform() const { return &m_FinalXform; }
 	inline Xform<T>* NonConstFinalXform() { return &m_FinalXform; }
 	inline bool UseFinalXform() const { return !m_FinalXform.Empty(); }
-	inline size_t TotalXformCount() const { return XformCount() + (UseFinalXform() ? 1 : 0); }
+	inline size_t TotalXformCount(bool forceFinal = false) const { return XformCount() + ((forceFinal || UseFinalXform()) ? 1 : 0); }
 	inline int PaletteIndex() const { return m_Palette.m_Index; }
 	inline T BlurCoef() { return m_BlurCoef; }
 	inline eScaleType ScaleType() const { return m_ScaleType; }

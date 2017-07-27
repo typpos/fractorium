@@ -428,7 +428,9 @@ void FractoriumEmberController<T>::Undo()
 {
 	if (m_UndoList.size() > 1 && m_UndoIndex > 0)
 	{
-		int index = m_Ember.GetTotalXformIndex(CurrentXform());
+		bool forceFinal = m_Fractorium->HaveFinal();
+		auto current = CurrentXform();
+		int index = m_Ember.GetTotalXformIndex(current, forceFinal);
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::max<size_t>(0u, m_UndoIndex - 1u);
 		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list...
@@ -452,7 +454,9 @@ void FractoriumEmberController<T>::Redo()
 {
 	if (m_UndoList.size() > 1 && m_UndoIndex < m_UndoList.size() - 1)
 	{
-		int index = m_Ember.GetTotalXformIndex(CurrentXform());
+		bool forceFinal = m_Fractorium->HaveFinal();
+		auto current = CurrentXform();
+		int index = m_Ember.GetTotalXformIndex(current, forceFinal);
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::min<size_t>(m_UndoIndex + 1, m_UndoList.size() - 1);
 		SetEmber(m_UndoList[m_UndoIndex], true, false);
@@ -740,10 +744,11 @@ void Fractorium::OnActionResetScale(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::AddReflectiveSymmetry()
 {
+	bool forceFinal = m_Fractorium->HaveFinal();
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-1, m_Rand);
-		auto index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		auto index = m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1);//Set index to the last item before final.
 		FillXforms(int(index));
 	});
 }
@@ -757,10 +762,11 @@ void Fractorium::OnActionAddReflectiveSymmetry(bool checked) { m_Controller->Add
 template <typename T>
 void FractoriumEmberController<T>::AddRotationalSymmetry()
 {
+	bool forceFinal = m_Fractorium->HaveFinal();
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(2, m_Rand);
-		auto index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		auto index = m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1);//Set index to the last item before final.
 		FillXforms(int(index));
 	});
 }
@@ -774,10 +780,11 @@ void Fractorium::OnActionAddRotationalSymmetry(bool checked) { m_Controller->Add
 template <typename T>
 void FractoriumEmberController<T>::AddBothSymmetry()
 {
+	bool forceFinal = m_Fractorium->HaveFinal();
 	Update([&]()
 	{
 		m_Ember.AddSymmetry(-2, m_Rand);
-		auto index = m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1);//Set index to the last item before final.
+		auto index = m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1);//Set index to the last item before final.
 		FillXforms(int(index));
 	});
 }

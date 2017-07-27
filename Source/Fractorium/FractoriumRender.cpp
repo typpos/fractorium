@@ -341,10 +341,11 @@ bool FractoriumEmberController<T>::Render()
 	{
 		size_t i = 0;
 		int solo = m_Fractorium->ui.CurrentXformCombo->property("soloxform").toInt();
+		bool forceFinal = m_Fractorium->HaveFinal();
 
 		if (solo != -1)
 		{
-			m_TempOpacities.resize(m_Ember.TotalXformCount());
+			m_TempOpacities.resize(m_Ember.TotalXformCount(forceFinal));
 
 			while (auto xform = m_Ember.GetTotalXform(i))
 			{
@@ -357,7 +358,7 @@ bool FractoriumEmberController<T>::Render()
 		m_Renderer->SetEmber(m_Ember, action);
 
 		if (solo != -1)
-			while (auto xform = m_Ember.GetTotalXform(i))
+			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 				xform->m_Opacity = m_TempOpacities[i++];
 	}
 

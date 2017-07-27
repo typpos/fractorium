@@ -208,31 +208,32 @@ template <typename T>
 void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType, bool updateRender, eProcessAction action, size_t index)
 {
 	int i = 0;
-	bool isCurrentFinal = m_Ember.IsFinalXform(CurrentXform());
+	auto current = CurrentXform();
+	bool forceFinal = m_Fractorium->HaveFinal();
+	bool isCurrentFinal = m_Ember.IsFinalXform(current);
 	bool doFinal = updateType != eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL && updateType != eXformUpdate::UPDATE_ALL_EXCEPT_FINAL;
 
 	switch (updateType)
 	{
 		case eXformUpdate::UPDATE_SPECIFIC:
 		{
-			if (auto xform = m_Ember.GetTotalXform(index))
+			if (auto xform = m_Ember.GetTotalXform(index, forceFinal))
 				func(xform);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_CURRENT:
 		{
-			if (auto xform = CurrentXform())
-				func(xform);
+			if (current)
+				func(current);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_CURRENT_AND_SELECTED:
 		{
 			bool currentDone = false;
-			auto current = CurrentXform();
 
-			while (auto xform = m_Ember.GetTotalXform(i))
+			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 			{
 				if (i < m_Fractorium->m_XformSelections.size())
 				{
@@ -261,7 +262,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 		{
 			bool anyUpdated = false;
 
-			while (auto xform = (doFinal ? m_Ember.GetTotalXform(i) : m_Ember.GetXform(i)))
+			while (auto xform = (doFinal ? m_Ember.GetTotalXform(i, forceFinal) : m_Ember.GetXform(i)))
 			{
 				if (i < m_Fractorium->m_XformSelections.size())
 				{
@@ -280,14 +281,14 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 			if (!anyUpdated)//None were selected, so just apply to the current.
 				if (doFinal || !isCurrentFinal)//If do final, call func regardless. If not, only call if current is not final.
-					if (auto xform = CurrentXform())
-						func(xform);
+					if (current)
+						func(current);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_ALL:
 		{
-			while (auto xform = m_Ember.GetTotalXform(i++))
+			while (auto xform = m_Ember.GetTotalXform(i++, forceFinal))
 				func(xform);
 		}
 		break;

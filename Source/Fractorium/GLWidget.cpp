@@ -290,6 +290,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	bool dragging = m_DragState == eDragState::DragDragging;
+	bool forceFinal = m_Fractorium->HaveFinal();
 
 	//Draw grid if control key is pressed.
 	if ((m_GL->hasFocus() && GetControl()) || m_Fractorium->DrawGrid())
@@ -307,7 +308,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		{
 			size_t i = 0;
 
-			while (auto xform = ember->GetTotalXform(i))
+			while (auto xform = ember->GetTotalXform(i, forceFinal))
 			{
 				bool selected = m_Fractorium->IsXformSelected(i++) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
 				DrawAffine(xform, true, selected);
@@ -322,7 +323,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		{
 			size_t i = 0;
 
-			while (auto xform = ember->GetTotalXform(i))
+			while (auto xform = ember->GetTotalXform(i, forceFinal))
 			{
 				bool selected = m_Fractorium->IsXformSelected(i++) || (dragging ? (m_SelectedXform == xform) : (m_HoverXform == xform));
 				DrawAffine(xform, false, selected);
@@ -1035,6 +1036,8 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 
 	if (m_Fractorium->DrawXforms())//Don't bother checking anything if the user wants to see no xforms.
 	{
+		bool forceFinal = m_Fractorium->HaveFinal();
+
 		//If there's a selected/current xform, check it first so it gets precedence over the others.
 		if (m_SelectedXform)
 		{
@@ -1047,12 +1050,13 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 			if (CheckXformHover(m_SelectedXform, glCoords, bestDist, checkSelPre, checkSelPost))
 			{
 				m_HoverXform = m_SelectedXform;
-				bestIndex = int(ember->GetTotalXformIndex(m_SelectedXform));
+				bestIndex = int(ember->GetTotalXformIndex(m_SelectedXform, forceFinal));
 			}
 		}
 
 		//Check all xforms.
-		while (auto xform = ember->GetTotalXform(i))
+
+		while (auto xform = ember->GetTotalXform(i, forceFinal))
 		{
 			if (preAll || (pre && m_HoverXform == xform))//Only check pre affine if they are shown.
 			{

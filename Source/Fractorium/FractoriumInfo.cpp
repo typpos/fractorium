@@ -69,7 +69,8 @@ void FractoriumEmberController<T>::FillSummary()
 	int vp = 4;
 	int vlen = 7;
 	char pc = 'f';
-	size_t x = 0, total = m_Ember.TotalXformCount();
+	bool forceFinal = m_Fractorium->HaveFinal();
+	size_t x = 0, total = m_Ember.TotalXformCount(forceFinal);
 	Xform<T>* xform = nullptr;
 	QColor color;
 	auto table = m_Fractorium->ui.SummaryTable;
@@ -85,7 +86,7 @@ void FractoriumEmberController<T>::FillSummary()
 	QSize size(table->columnWidth(0), table->rowHeight(1) + 1);
 	m_Fractorium->m_InfoPaletteItem->setData(Qt::DecorationRole, pixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
-	for (x = 0; x < total && (xform = m_Ember.GetTotalXform(x)); x++)
+	for (x = 0; x < total && (xform = m_Ember.GetTotalXform(x, forceFinal)); x++)
 	{
 		size_t i = 0;
 		QString as = "Pre";
@@ -233,5 +234,5 @@ void Fractorium::ErrorReportToQTextEdit(const vector<string>& errors, QTextEdit*
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

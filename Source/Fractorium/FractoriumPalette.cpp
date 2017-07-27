@@ -323,8 +323,9 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 	Palette<float> prevPal = m_TempPalette;
 	ed->SetPalette(m_TempPalette);
 	map<size_t, float> colorIndices;
+	bool forceFinal = m_Fractorium->HaveFinal();
 
-	while (auto xform = m_Ember.GetTotalXform(i))
+	while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 		colorIndices[i++] = xform->m_ColorX;
 
 	ed->SetColorIndices(colorIndices);

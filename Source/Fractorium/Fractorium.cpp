@@ -264,6 +264,8 @@ void FractoriumEmberController<T>::ApplyXmlSavingTemplate(Ember<T>& ember)
 
 /// <summary>
 /// Return whether the current ember contains a final xform and the GUI is aware of it.
+/// Note this can be true even if the final is empty, as long as they've added one and have
+/// not explicitly deleted it.
 /// </summary>
 /// <returns>True if the current ember contains a final xform, else false.</returns>
 bool Fractorium::HaveFinal()

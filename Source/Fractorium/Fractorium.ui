@@ -3423,7 +3423,7 @@
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>Random Color Speed</string>
+                <string>Random Color Speeds</string>
                </property>
               </widget>
              </item>

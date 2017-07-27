@@ -16,13 +16,13 @@ void Fractorium::InitXformsSelectUI()
 /// Check all of the xform selection checkboxes.
 /// </summary>
 /// <param name="checked">Ignored</param>
-void Fractorium::OnXformsSelectAllButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w) { w->setChecked(true); }); }
+void Fractorium::OnXformsSelectAllButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w, bool isFinal) { w->setChecked(true); }); }
 
 /// <summary>
 /// Uncheck all of the xform selection checkboxes.
 /// </summary>
 /// <param name="checked">Ignored</param>
-void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w) { w->setChecked(false); }); }
+void Fractorium::OnXformsSelectNoneButtonClicked(bool checked) { ForEachXformCheckbox([&](int i, QCheckBox * w, bool isFinal) { w->setChecked(false); }); }
 
 /// <summary>
 /// Return whether the checkbox at the specified index is checked.
@@ -67,10 +67,11 @@ void Fractorium::ClearXformsSelections()
 template <typename T>
 QString FractoriumEmberController<T>::MakeXformCaption(size_t i)
 {
-	bool isFinal = m_Ember.FinalXform() == m_Ember.GetTotalXform(i);
+	bool forceFinal = m_Fractorium->HaveFinal();
+	bool isFinal = m_Ember.FinalXform() == m_Ember.GetTotalXform(i, forceFinal);
 	QString caption = isFinal ? "Final" : QString::number(i + 1);
 
-	if (auto xform = m_Ember.GetTotalXform(i))
+	if (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 		if (!xform->m_Name.empty())
 			caption += " (" + QString::fromStdString(xform->m_Name) + ")";
 
@@ -81,12 +82,13 @@ QString FractoriumEmberController<T>::MakeXformCaption(size_t i)
 /// Function to perform the specified operation on every dynamically created xform selection checkbox.
 /// </summary>
 /// <param name="func">The operation to perform</param>
-void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*)> func)
+void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*, bool)> func)
 {
 	int i = 0;
+	bool haveFinal = HaveFinal();
 
 	for (auto& cb : m_XformSelections)
-		func(i++, cb);
+		func(i++, cb, haveFinal && cb == m_XformSelections.back());
 }
 
 /// <summary>
@@ -120,7 +122,8 @@ bool FractoriumEmberController<T>::XformCheckboxAt(int i, std::function<void(QCh
 template <typename T>
 bool FractoriumEmberController<T>::XformCheckboxAt(Xform<T>* xform, std::function<void(QCheckBox*)> func)
 {
-	return XformCheckboxAt(m_Ember.GetTotalXformIndex(xform), func);
+	bool forceFinal = m_Fractorium->HaveFinal();
+	return XformCheckboxAt(m_Ember.GetTotalXformIndex(xform, forceFinal), func);
 }
 
 template class FractoriumEmberController<float>;

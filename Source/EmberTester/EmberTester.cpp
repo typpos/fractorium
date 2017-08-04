@@ -5,7 +5,15 @@
 #include <list>
 #include <deque>
 
-#include <ImfRgbaFile.h>
+#ifdef __APPLE__
+	#include <OpenEXR/ImfRgbaFile.h>
+	#include <OpenEXR/ImfStringAttribute.h>
+	#include <OpenEXR/half.h>
+#else
+	#include <ImfRgbaFile.h>
+	#include <ImfStringAttribute.h>
+	#include <half.h>
+#endif
 //#include <ImfStringAttribute.h>
 //#include <ImfMatrixAttribute.h>
 //#include <ImfArray.h>

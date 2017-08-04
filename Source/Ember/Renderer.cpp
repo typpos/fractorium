@@ -890,7 +890,7 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 				}
 			}
 		}
-	});
+	}, static_partitioner());
 	//t.Toc(__FUNCTION__);
 	return m_Abort ? eRenderStatus::RENDER_ABORT : eRenderStatus::RENDER_OK;
 }
@@ -1050,7 +1050,7 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 				}
 			}
 		}
-	});
+	}, static_partitioner());
 
 	if (m_Callback && !m_Abort)
 		m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0);
@@ -1109,7 +1109,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t 
 				GammaCorrection(*rowStart, background, g, linRange, vibrancy, false, glm::value_ptr(*rowStart));//Write back in place.
 				rowStart++;
 			}
-		});
+		}, static_partitioner());
 	}
 
 	if (m_Abort)
@@ -1155,7 +1155,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t 
 			auto pf = reinterpret_cast<float*>(pv4T);
 			GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, true, pf);
 		}
-	});
+	}, static_partitioner());
 
 	//Insert the palette into the image for debugging purposes. Not implemented on the GPU.
 	if (m_InsertPalette)
@@ -1293,7 +1293,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 				}
 			}
 		}
-	});
+	}, static_partitioner());
 	stats.m_Iters = std::accumulate(m_SubBatch.begin(), m_SubBatch.end(), 0ULL);//Sum of iter count of all threads.
 	stats.m_Badvals = std::accumulate(m_BadVals.begin(), m_BadVals.end(), 0ULL);
 	stats.m_IterMs = m_IterTimer.Toc();

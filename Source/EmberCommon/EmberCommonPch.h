@@ -59,12 +59,18 @@
 
 //Exr
 #ifdef _WIN32
-#define OPENEXR_DLL 1
+	#define OPENEXR_DLL 1
 #endif
 
-#include <ImfRgbaFile.h>
-#include <ImfStringAttribute.h>
-#include <half.h>
+#ifdef __APPLE__
+	#include <OpenEXR/ImfRgbaFile.h>
+	#include <OpenEXR/ImfStringAttribute.h>
+	#include <OpenEXR/half.h>
+#else
+	#include <ImfRgbaFile.h>
+	#include <ImfStringAttribute.h>
+	#include <half.h>
+#endif
 
 using namespace Imf;
 using namespace Imath;

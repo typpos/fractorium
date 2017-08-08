@@ -16,7 +16,7 @@ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 Install the dependencies:
 
 ```
-brew install qt5 tbb glm jpeg libpng glib libxml2
+brew install qt5 tbb glm jpeg libpng glib libxml2 openexr
 ```
 
 Add the Qt `bin` folder to `PATH` to make `qmake` available. In

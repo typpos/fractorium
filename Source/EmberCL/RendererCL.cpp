@@ -631,6 +631,20 @@ bool RendererCL<T, bucketT>::RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& ran
 }
 
 /// <summary>
+/// Get whether any devices are from Nvidia.
+/// </summary>
+/// <returns>True if an devices are from Nvidia, else false.</returns>
+template <typename T, typename bucketT>
+bool RendererCL<T, bucketT>::AnyNvidia() const
+{
+	for (auto& dev : m_Devices)
+		if (dev->Nvidia())
+			return true;
+
+	return false;
+}
+
+/// <summary>
 /// Protected virtual functions overridden from Renderer.
 /// </summary>
 

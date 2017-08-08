@@ -53,14 +53,31 @@ void Fractorium::InitMenusUI()
 template <typename T>
 void FractoriumEmberController<T>::NewFlock(size_t count)
 {
+	bool nv = false;
 	Ember<T> ember;
 	StopAllPreviewRenderers();
 	m_EmberFile.Clear();
 	m_EmberFile.m_Filename = EmberFile<T>::DefaultFilename();
+	vector<eVariationId> filteredVariations;
+	vector<eVariationId>& filteredVariationsRef = m_FilteredVariations;
+	auto& deviceNames = OpenCLInfo::Instance()->AllDeviceNames();
+
+	for (auto& dev : deviceNames)
+		if (Find(ToLower(dev), "nvidia"))
+			nv = true;
+
+	if (nv)//Nvidia cannot handle synth. It takes over a minute to compile and uses about 4GB of memory.
+	{
+		filteredVariations = m_FilteredVariations;
+		filteredVariationsRef = filteredVariations;
+		std::remove(filteredVariations.begin(), filteredVariations.end(), eVariationId::VAR_SYNTH);
+		std::remove(filteredVariations.begin(), filteredVariations.end(), eVariationId::VAR_PRE_SYNTH);
+		std::remove(filteredVariations.begin(), filteredVariations.end(), eVariationId::VAR_POST_SYNTH);
+	}
 
 	for (size_t i = 0; i < count; i++)
 	{
-		m_SheepTools->Random(ember, m_FilteredVariations, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
+		m_SheepTools->Random(ember, filteredVariationsRef, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
 		ParamsToEmber(ember);
 		ember.m_Index = i;
 		ember.m_Name = m_EmberFile.m_Filename.toStdString() + "_" + ToString(i + 1ULL).toStdString();

@@ -68,9 +68,9 @@ namespace EmberNs
 #define TMAX std::numeric_limits<T>::max()
 #define FLOAT_MAX_TAN 8388607.0f
 #define FLOAT_MIN_TAN -FLOAT_MAX_TAN
-#define CURVES_LENGTH 131072
-#define CURVES_LENGTH_M1 131071.0f
-#define ONE_OVER_CURVES_LENGTH_M1 7.62945273935e-6f
+#define CURVES_LENGTH 65536
+#define CURVES_LENGTH_M1 65535.0f
+#define ONE_OVER_CURVES_LENGTH_M1 1.525902189669e-5f
 #define EMPTYFIELD -9999
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::duration<double, std::ratio<1, 1000>> DoubleMs;

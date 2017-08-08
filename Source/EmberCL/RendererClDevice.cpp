@@ -40,7 +40,7 @@ bool RendererClDevice::Init()
 
 	if (b && m_Wrapper.Ok() && !m_Init)
 	{
-		m_NVidia = ToLower(m_Info->PlatformName(m_PlatformIndex)).find_first_of("nvidia") != string::npos && m_Wrapper.LocalMemSize() > (32 * 1024);
+		m_NVidia = Find(ToLower(m_Info->PlatformName(m_PlatformIndex)), "nvidia") && m_Wrapper.LocalMemSize() > (32 * 1024);
 		m_WarpSize = m_NVidia ? 32 : 64;
 		m_Init = true;
 	}

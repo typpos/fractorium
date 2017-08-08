@@ -21,6 +21,7 @@ public:
 	virtual ~RendererCLBase() { }
 	virtual bool ReadFinal(v4F* pixels) = 0;
 	virtual bool ClearFinal() = 0;
+	virtual bool AnyNvidia() const = 0;
 };
 
 /// <summary>
@@ -154,6 +155,7 @@ public:
 	virtual string ErrorReportString() override;
 	virtual vector<string> ErrorReport() override;
 	virtual bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec) override;
+	virtual bool AnyNvidia() const override;
 
 #ifndef TEST_CL
 protected:

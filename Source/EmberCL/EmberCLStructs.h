@@ -85,8 +85,8 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define SQRT5 2.2360679774997896964091736687313\n"
 	   "#define M_PHI 1.61803398874989484820458683436563\n"
 	   "#define DEG_2_RAD (MPI / 180)\n"
-	   "#define CURVES_LENGTH_M1 131071.0f\n"
-	   "#define ONE_OVER_CURVES_LENGTH_M1 7.62945273935e-6f\n"
+	   "#define CURVES_LENGTH_M1 ((real_bucket_t)" << CURVES_LENGTH_M1 << ")\n" <<
+	   "#define ONE_OVER_CURVES_LENGTH_M1 ((real_bucket_t)" << ONE_OVER_CURVES_LENGTH_M1 << ")\n" <<
 	   "\n"
 	   "//Index in each dimension of a thread within a block.\n"
 	   "#define THREAD_ID_X   (get_local_id(0))\n"

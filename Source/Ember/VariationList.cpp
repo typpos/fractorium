@@ -349,6 +349,8 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(TileLog)
 	ADDPREPOSTREGVAR(TruchetFill)
 	ADDPREPOSTREGVAR(Waves2Radial)
+	ADDPREPOSTREGVAR(Panorama1)
+	ADDPREPOSTREGVAR(Panorama2)
 	//ADDPREPOSTREGVAR(LinearXZ)
 	//ADDPREPOSTREGVAR(LinearYZ)
 	//DC are special.

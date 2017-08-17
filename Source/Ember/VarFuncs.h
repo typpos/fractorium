@@ -259,14 +259,13 @@ public:
 		v3T c[4]; // Co-ordinates of four simplex shape corners in (x,y,z)
 		T n = 0; // Noise total value
 		int gi[4];      // Hashed grid index for each corner, used to determine gradient
-		T t;       // Temp double
 		// Convert input co-ordinates ( x, y, z ) to
 		// integer-based simplex grid ( i, j, k )
 		T skewIn = (v.x + v.y + v.z) * T(0.333333);
 		intmax_t i = Floor<T>(v.x + skewIn);
 		intmax_t j = Floor<T>(v.y + skewIn);
 		intmax_t k = Floor<T>(v.z + skewIn);
-		t = (i + j + k) * T(0.1666666);
+		T t = (i + j + k) * T(0.1666666);
 		// Cell origin co-ordinates in input space (x,y,z)
 		T x0 = i - t;
 		T y0 = j - t;
@@ -552,8 +551,10 @@ private:
 	{
 		m_P = InitInts();
 		m_Grad = InitGrad();
+		m_Offsets = InitOffsets();
 		m_GlobalMap["NOISE_INDEX"] = make_pair(m_PFloats.data(), m_PFloats.size());
 		m_GlobalMap["NOISE_POINTS"] = make_pair(static_cast<T*>(&(m_Grad[0].x)), SizeOf(m_Grad) / sizeof(T));
+		m_GlobalMap["OFFSETS"] = make_pair(static_cast<T*>(&(m_Offsets[0].x)), SizeOf(m_Offsets) / sizeof(T));
 	}
 
 	/// <summary>
@@ -962,8 +963,24 @@ private:
 		return g;
 	}
 
+	/// <summary>
+	/// Initializes the offsets used in the crackle variation.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<v2T> InitOffsets()
+	{
+		std::vector<v2T> g =
+		{
+			{ -1, -1 }, { -1, 0 }, { -1, 1 },
+			{ 0, -1 }, { 0, 0 }, { 0, 1 },
+			{ 1, -1 }, { 1, 0 }, { 1, 1 }
+		};
+		return g;
+	}
+
 	std::vector<int> m_P;
 	std::vector<T> m_PFloats;
+	std::vector<v2T> m_Offsets;
 	std::vector<v3T> m_Grad;
 	std::unordered_map<string, pair<const T*, size_t>> m_GlobalMap;
 };

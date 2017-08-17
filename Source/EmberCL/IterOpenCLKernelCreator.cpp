@@ -703,7 +703,7 @@ void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, p
 						if (auto dataInfo = varFuncs->GetSharedData(s))///Will contain a name, pointer to data, and size of the data in units of sizeof(T).
 						{
 							if (doString)
-								os << "#define " << ToUpper(name) << " " << offset << "\n";
+								os << "#define " << ToUpper(name) << " " << offset << '\n';
 
 							if (doVals)
 								params.second.insert(params.second.end(), dataInfo->first, dataInfo->first + dataInfo->second);
@@ -719,7 +719,7 @@ void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, p
 
 	if (doString)
 	{
-		os << "\n";
+		os << "#define TOTAL_GLOBAL_SIZE_END " << offset << "\n\n";
 		params.first = os.str();
 	}
 }

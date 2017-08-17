@@ -1461,6 +1461,92 @@ private:
 	T m_Distance;
 };
 
+/// <summary>
+/// panorama1.
+/// </summary>
+template <typename T>
+class Panorama1Variation : public Variation<T>
+{
+public:
+	Panorama1Variation(T weight = 1.0) : Variation<T>("panorama1", eVariationId::VAR_PANORAMA1, weight, true, false, false, false, false)
+	{
+	}
+
+	VARCOPY(Panorama1Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T aux = 1 / std::sqrt(helper.m_PrecalcSumSquares + 1);
+		T x1 = helper.m_TransX * aux;
+		T y1 = helper.m_TransY * aux;
+		aux = std::sqrt(x1 * x1 + y1 * y1);
+		helper.Out.x = m_Weight * std::atan2(x1, y1) * T(M_1_PI);
+		helper.Out.y = m_Weight * (aux - T(0.5));
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		ss << "\t{\n"
+		   << "\t\treal_t aux = 1.0 / sqrt(precalcSumSquares + 1);\n"
+		   << "\t\treal_t x1 = transX * aux;\n"
+		   << "\t\treal_t y1 = transY * aux;\n"
+		   << "\t\taux = sqrt(x1 * x1 + y1 * y1);\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * atan2(x1, y1) * M1PI;\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (aux - 0.5);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
+/// <summary>
+/// panorama2.
+/// </summary>
+template <typename T>
+class Panorama2Variation : public Variation<T>
+{
+public:
+	Panorama2Variation(T weight = 1.0) : Variation<T>("panorama2", eVariationId::VAR_PANORAMA2, weight, true, true, false, false, false)
+	{
+	}
+
+	VARCOPY(Panorama2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T aux = 1 / (helper.m_PrecalcSqrtSumSquares + 1);
+		T x1 = helper.m_TransX * aux;
+		T y1 = helper.m_TransY * aux;
+		aux = std::sqrt(x1 * x1 + y1 * y1);
+		helper.Out.x = m_Weight * std::atan2(x1, y1) * T(M_1_PI);
+		helper.Out.y = m_Weight * (aux - T(0.5));
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		ss << "\t{\n"
+		   << "\t\treal_t aux = 1.0 / (precalcSqrtSumSquares + 1);\n"
+		   << "\t\treal_t x1 = transX * aux;\n"
+		   << "\t\treal_t y1 = transY * aux;\n"
+		   << "\t\taux = sqrt(x1 * x1 + y1 * y1);\n"
+		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * atan2(x1, y1) * M1PI;\n"
+		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (aux - 0.5);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -1475,4 +1561,6 @@ MAKEPREPOSTVAR(Cylinder2, cylinder2, CYLINDER2)
 MAKEPREPOSTPARVAR(TileLog, tile_log, TILE_LOG)
 MAKEPREPOSTPARVAR(TruchetFill, Truchet_fill, TRUCHET_FILL)
 MAKEPREPOSTPARVAR(Waves2Radial, waves2_radial, WAVES2_RADIAL)
+MAKEPREPOSTVAR(Panorama1, panorama1, PANORAMA1)
+MAKEPREPOSTVAR(Panorama2, panorama2, PANORAMA2)
 }

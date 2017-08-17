@@ -1279,7 +1279,7 @@ public:
 		string notchBottom   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string notchTop      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal3 v;\n"
+		   << "\t\treal4 v;\n"
 		   << "\t\treal_t vx, vy, col, r, theta, s, c, p, e;\n"
 		   << "\t\tint t = 0, iShape = (int)" << shape << ", iMap = (int)" << map << ", iOctaves = (int)" << octaves << ", iBailout = (int)" << selectBailout << ";\n"
 		   << "\n"

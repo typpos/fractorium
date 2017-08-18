@@ -281,7 +281,7 @@ public slots:
 
 	//Xforms Color.
 	void OnXformColorIndexChanged(double d);
-	void OnXformColorIndexChanged(double d, bool updateRender, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0);
+	void OnXformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0);
 	void OnXformScrollColorIndexChanged(int d);
 	void OnRandomColorIndicesButtonClicked(bool b);
 	void OnToggleColorIndicesButtonClicked(bool b);

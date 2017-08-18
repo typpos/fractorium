@@ -172,8 +172,9 @@ void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<float>& pale
 	}
 
 	//Update the current xform's color and reset the rendering process.
+	//Update all controls to be safe.
 	if (xform)
-		XformColorIndexChanged(xform->m_ColorX, true);
+		XformColorIndexChanged(xform->m_ColorX, true, true, true);
 }
 
 /// <summary>
@@ -321,9 +322,9 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 	auto ed = m_Fractorium->m_PaletteEditor;
 	Palette<float> edPal;
 	Palette<float> prevPal = m_TempPalette;
-	ed->SetPalette(m_TempPalette);
 	map<size_t, float> colorIndices;
 	bool forceFinal = m_Fractorium->HaveFinal();
+	ed->SetPalette(m_TempPalette);
 
 	while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 		colorIndices[i++] = xform->m_ColorX;
@@ -333,21 +334,29 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 
 	if (ed->exec() == QDialog::Accepted)
 	{
-		if (!m_Fractorium->PaletteChanged())//If the clicked ok, but never synced, set the palette now.
-		{
-			edPal = ed->GetPalette(int(256));
-			SetBasePaletteAndAdjust(edPal);
+		//Copy all just to be safe, because they may or may not have synced.
+		colorIndices = ed->GetColorIndices();
 
-			if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
-				m_Fractorium->SetPaletteFileComboIndex(*edPal.m_Filename);
-		}
+		for (auto& index : colorIndices)
+			if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
+				xform->m_ColorX = index.second;
+
+		edPal = ed->GetPalette(int(256));
+		SetBasePaletteAndAdjust(edPal);//This will take care of updating the color index controls.
+
+		if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
+			m_Fractorium->SetPaletteFileComboIndex(*edPal.m_Filename);
 	}
 	else if (m_Fractorium->PaletteChanged())//They clicked cancel, but synced at least once, restore the previous palette.
 	{
-		SetBasePaletteAndAdjust(prevPal);
+		for (auto& index : colorIndices)
+			if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
+				xform->m_ColorX = index.second;
+
+		SetBasePaletteAndAdjust(prevPal);//This will take care of updating the color index controls.
 	}
 
-	//Whether the current palette file was changed or not, if it's modifiable then reload it just to be safe.
+	//Whether the current palette file was changed or not, if it's modifiable then reload it just to be safe (even though it might be overkill).
 	if (m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
 		m_Fractorium->OnPaletteFilenameComboChanged(QString::fromStdString(m_CurrentPaletteFilePath));
 }
@@ -406,15 +415,15 @@ void Fractorium::OnPaletteEditorFileChanged()
 /// <param name="value">The value of the color index</param>
 void Fractorium::OnPaletteEditorColorIndexChanged(size_t index, float value)
 {
-	if (index == std::numeric_limits<size_t>::max())
+	if (index == std::numeric_limits<size_t>::max())//Update all in this case.
 	{
 		auto indices = m_PaletteEditor->GetColorIndices();
 
 		for (auto& it : indices)
-			OnXformColorIndexChanged(it.second, true, eXformUpdate::UPDATE_SPECIFIC, it.first);
+			OnXformColorIndexChanged(it.second, true, true, true, eXformUpdate::UPDATE_SPECIFIC, it.first);
 	}
-	else
-		OnXformColorIndexChanged(value, true, eXformUpdate::UPDATE_SPECIFIC, index);
+	else//Only update the xform index that was selected and dragged inside of the palette editor.
+		OnXformColorIndexChanged(value, true, true, true, eXformUpdate::UPDATE_SPECIFIC, index);
 }
 
 /// <summary>

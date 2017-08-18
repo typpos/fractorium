@@ -199,8 +199,7 @@ public:
 	virtual void InitLockedScale() { }
 
 	//Xforms Color.
-	virtual void XformColorIndexChanged(double d, bool updateRender, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) { }
-	virtual void XformScrollColorIndexChanged(int d) { }
+	virtual void XformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) { }
 	virtual void RandomColorIndicesButtonClicked() { }
 	virtual void ToggleColorIndicesButtonClicked() { }
 	virtual void RandomColorSpeedButtonClicked() { }
@@ -466,8 +465,7 @@ public:
 	T AffineScaleLockedToCurrent();
 
 	//Xforms Color.
-	virtual void XformColorIndexChanged(double d, bool updateRender, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) override;
-	virtual void XformScrollColorIndexChanged(int d) override;
+	virtual void XformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) override;
 	virtual void RandomColorIndicesButtonClicked() override;
 	virtual void ToggleColorIndicesButtonClicked() override;
 	virtual void RandomColorSpeedButtonClicked() override;

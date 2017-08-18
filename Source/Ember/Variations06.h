@@ -3870,7 +3870,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_HalfCellSize = Zeps<T>(m_CellSize / 2);
+		m_HalfCellSize = Zeps<T>(std::abs(m_CellSize) / 2);
 
 		for (int x = -CACHE_NUM; x <= CACHE_NUM; x++)
 			for (int y = -CACHE_NUM; y <= CACHE_NUM; y++)
@@ -3883,7 +3883,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.reserve(8);
-		m_Params.push_back(ParamWithName<T>(&m_CellSize, prefix + "crackle_cellsize", 1));
+		m_Params.push_back(ParamWithName<T>(&m_CellSize, prefix + "crackle_cellsize", 1, eParamType::REAL, T(0.0001)));
 		m_Params.push_back(ParamWithName<T>(&m_Power,	 prefix + "crackle_power", T(0.2)));
 		m_Params.push_back(ParamWithName<T>(&m_Distort,  prefix + "crackle_distort"));
 		m_Params.push_back(ParamWithName<T>(&m_Scale,	 prefix + "crackle_scale", 1));

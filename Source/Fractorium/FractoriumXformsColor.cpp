@@ -241,7 +241,7 @@ QColor FractoriumEmberController<T>::ColorIndexToQColor(double d)
 template <typename T>
 void FractoriumEmberController<T>::FillColorWithXform(Xform<T>* xform)
 {
-	m_Fractorium->m_XformColorIndexSpin->SetValueStealth(xform->m_ColorX);
+	m_Fractorium->m_XformColorIndexSpin->SetValueStealth(xform->m_ColorX);//Probably ought to put scroll bar update here too.
 	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(xform->m_ColorSpeed);
 	m_Fractorium->m_XformOpacitySpin->SetValueStealth(xform->m_Opacity);
 	m_Fractorium->m_XformDirectColorSpin->SetValueStealth(xform->m_DirectColor);

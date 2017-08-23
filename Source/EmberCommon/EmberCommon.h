@@ -229,6 +229,7 @@ static void Rgba32ToRgba16(v4F* rgba, glm::uint16* rgb, size_t width, size_t hei
 /// <summary>
 /// Convert an RGBA 32-bit float buffer to an EXR RGBA 32-bit float buffer.
 /// The two buffers can point to the same memory location if needed.
+/// Note that this squares the values coming in, for some reason EXR expects that.
 /// </summary>
 /// <param name="rgba">The RGBA 32-bit float buffer</param>
 /// <param name="rgb">The EXR RGBA 32-bit float buffer</param>
@@ -239,9 +240,9 @@ static void Rgba32ToRgbaExr(v4F* rgba, Rgba* ilmfRgba, size_t width, size_t heig
 {
 	for (size_t i = 0; i < (width * height); i++)
 	{
-		ilmfRgba[i].r = Clamp<float>(rgba[i].r, 0.0f, 1.0f);
-		ilmfRgba[i].g = Clamp<float>(rgba[i].g, 0.0f, 1.0f);
-		ilmfRgba[i].b = Clamp<float>(rgba[i].b, 0.0f, 1.0f);
+		ilmfRgba[i].r = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
+		ilmfRgba[i].g = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
+		ilmfRgba[i].b = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
 		ilmfRgba[i].a = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
 	}
 }

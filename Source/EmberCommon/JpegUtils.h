@@ -3,6 +3,7 @@
 #include "EmberCommonPch.h"
 
 #define PNG_COMMENT_MAX 8
+static std::recursive_mutex fileCs;
 
 /// <summary>
 /// Write a JPEG file.
@@ -22,8 +23,20 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 {
 	bool b = false;
 	FILE* file;
+	errno_t fileResult;
 
-	if (fopen_s(&file, filename, "wb") == 0)
+	//Just to be extra safe.
+	try
+	{
+		rlg l(fileCs);
+		fileResult = fopen_s(&file, filename, "wb");
+	}
+	catch (std::exception)
+	{
+		return false;
+	}
+
+	if (fileResult == 0)
 	{
 		size_t i;
 		jpeg_error_mgr jerr;
@@ -126,8 +139,20 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 {
 	bool b = false;
 	FILE* file;
+	errno_t fileResult;
 
-	if (fopen_s(&file, filename, "wb") == 0)
+	//Just to be extra safe.
+	try
+	{
+		rlg l(fileCs);
+		fileResult = fopen_s(&file, filename, "wb");
+	}
+	catch (std::exception)
+	{
+		return false;
+	}
+
+	if (fileResult == 0)
 	{
 		png_structp  png_ptr;
 		png_infop    info_ptr;
@@ -261,7 +286,7 @@ static bool SaveBmp(const char* filename, const byte* image, size_t width, size_
 	BITMAPFILEHEADER bmfh;
 	BITMAPINFOHEADER info;
 	DWORD bwritten;
-	HANDLE file;
+	HANDLE file = nullptr;
 	memset (&bmfh, 0, sizeof (BITMAPFILEHEADER));
 	memset (&info, 0, sizeof (BITMAPINFOHEADER));
 	bmfh.bfType = 0x4d42;       // 0x4d42 = 'BM'
@@ -281,7 +306,18 @@ static bool SaveBmp(const char* filename, const byte* image, size_t width, size_
 	info.biClrUsed = 0;
 	info.biClrImportant = 0;
 
-	if ((file = CreateFileA(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) == NULL)
+	//Just to be extra safe.
+	try
+	{
+		rlg l(fileCs);
+
+		if ((file = CreateFileA(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) == NULL)
+		{
+			CloseHandle(file);
+			return false;
+		}
+	}
+	catch (std::exception)
 	{
 		CloseHandle(file);
 		return false;
@@ -348,11 +384,21 @@ static bool WriteExr(const char* filename, Rgba* image, size_t width, size_t hei
 	{
 		int iw = int(width);
 		int ih = int(height);
-		RgbaOutputFile file(filename, iw, ih, WRITE_RGBA);
+		std::unique_ptr<RgbaOutputFile> file;
+
+		try
+		{
+			rlg l(fileCs);
+			file = std::make_unique<RgbaOutputFile>(filename, iw, ih, WRITE_RGBA);
+		}
+		catch (std::exception)
+		{
+			return false;
+		}
 
 		if (enableComments)
 		{
-			auto& header = const_cast<Imf::Header&>(file.header());
+			auto& header = const_cast<Imf::Header&>(file->header());
 			header.insert("ember_version", StringAttribute(EmberVersion()));
 			header.insert("ember_nickname", StringAttribute(nick));
 			header.insert("ember_url", StringAttribute(url));
@@ -363,8 +409,8 @@ static bool WriteExr(const char* filename, Rgba* image, size_t width, size_t hei
 			header.insert("ember_genome", StringAttribute(comments.m_Genome));
 		}
 
-		file.setFrameBuffer(image, 1, iw);
-		file.writePixels(ih);
+		file->setFrameBuffer(image, 1, iw);
+		file->writePixels(ih);
 		return true;
 	}
 	catch (std::exception e)

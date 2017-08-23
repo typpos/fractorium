@@ -28,7 +28,6 @@ bool EmberRender(EmberOptions& opt)
 
 	VerbosePrint("Using " << (sizeof(T) == sizeof(float) ? "single" : "double") << " precision.");
 	Timing t;
-	bool writeSuccess = false;
 	uint padding;
 	size_t i;
 	size_t strips;
@@ -304,7 +303,7 @@ bool EmberRender(EmberOptions& opt)
 					{
 						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "bmp", padding, i, useName);
 						VerbosePrint("Writing " + filename);
-						writeSuccess = WriteBmp(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
+						auto writeSuccess = WriteBmp(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -317,7 +316,7 @@ bool EmberRender(EmberOptions& opt)
 					{
 						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "jpg", padding, i, useName);
 						VerbosePrint("Writing " + filename);
-						writeSuccess = WriteJpeg(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						auto writeSuccess = WriteJpeg(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -337,7 +336,7 @@ bool EmberRender(EmberOptions& opt)
 						VerbosePrint("Writing " + filename);
 						vector<byte> rgba8Image(size * 4);
 						Rgba32ToRgba8(finalImagep, rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						writeSuccess = WritePng(filename.c_str(), rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						auto writeSuccess = WritePng(filename.c_str(), rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -360,7 +359,7 @@ bool EmberRender(EmberOptions& opt)
 						VerbosePrint("Writing " + filename);
 						vector<glm::uint16> rgba16Image(size * 4);
 						Rgba32ToRgba16(finalImagep, rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						writeSuccess = WritePng(filename.c_str(), (byte*)rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						auto writeSuccess = WritePng(filename.c_str(), (byte*)rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -376,7 +375,7 @@ bool EmberRender(EmberOptions& opt)
 					VerbosePrint("Writing " + filename);
 					vector<Rgba> rgba32Image(size);
 					Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-					writeSuccess = WriteExr(filename.c_str(), rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					auto writeSuccess = WriteExr(filename.c_str(), rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << filename << "\n";

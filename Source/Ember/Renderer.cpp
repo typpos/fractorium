@@ -446,7 +446,13 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 	}
 
 	if (!resume)
-		ResetBuckets(true, false);//Only reset hist here and do accum when needed later on.
+	{
+		if (!ResetBuckets(true, false))//Only reset hist here and do accum when needed later on.
+		{
+			success = eRenderStatus::RENDER_ERROR;
+			goto Finish;
+		}
+	}
 
 	deTime = T(time) + *m_TemporalFilter->Deltas();
 
@@ -587,7 +593,12 @@ FilterAndAccum:
 		else
 			m_K2 = bucketT((Supersample() * Supersample()) / (area * m_ScaledQuality * m_TemporalFilter->SumFilt()));
 
-		ResetBuckets(false, true);//Only the histogram was reset above, now reset the density filtering buffer.
+		if (!ResetBuckets(false, true))//Only the histogram was reset above, now reset the density filtering buffer.
+		{
+			success = eRenderStatus::RENDER_ERROR;
+			goto Finish;
+		}
+
 		//t.Tic();
 		//Make sure a density filter was created with the latest values.
 		ClampGteRef<T>(m_Ember.m_MinRadDE, 0);
@@ -616,8 +627,11 @@ FilterAndAccum:
 		//Take special action if filtering exited prematurely.
 		if (fullRun != eRenderStatus::RENDER_OK)
 		{
-			ResetBuckets(false, true);//Reset the accumulator, come back and try again on the next call.
-			success = fullRun;
+			if (!ResetBuckets(false, true))//Reset the accumulator, come back and try again on the next call.
+				success = eRenderStatus::RENDER_ERROR;
+			else
+				success = fullRun;
+
 			goto Finish;
 		}
 

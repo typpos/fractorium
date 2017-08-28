@@ -986,6 +986,39 @@ size_t OpenCLWrapper::GlobalMemSize() const { return m_GlobalMemSize; }
 size_t OpenCLWrapper::MaxAllocSize() const { return m_MaxAllocSize; }
 
 /// <summary>
+/// Clear the error report for this class as well as the global OpenCLInfo instance.
+/// </summary>
+void OpenCLWrapper::ClearErrorReport()
+{
+	EmberReport::ClearErrorReport();
+	m_Info->ClearErrorReport();
+}
+
+/// <summary>
+/// Concatenate and return the error report for this class and the
+/// global OpenCLInfo instance as a single string.
+/// </summary>
+/// <returns>The concatenated error report string</returns>
+string OpenCLWrapper::ErrorReportString()
+{
+	auto s = EmberReport::ErrorReportString();
+	return s + m_Info->ErrorReportString();
+}
+
+/// <summary>
+/// Concatenate and return the error report for this class and the
+/// global OpenCLInfo instance as a vector of strings.
+/// </summary>
+/// <returns>The concatenated error report vector of strings</returns>
+vector<string> OpenCLWrapper::ErrorReport()
+{
+	auto ours = EmberReport::ErrorReport();
+	auto s = m_Info->ErrorReport();
+	ours.insert(ours.end(), s.begin(), s.end());
+	return ours;
+}
+
+/// <summary>
 /// Make even grid dimensions.
 /// The size of the blocks in terms of threads must divide evenly into the total number of threads in the grid.
 /// In the case of a remainder, expand the width and height of the grid to the next highest evenly divisible value.

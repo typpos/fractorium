@@ -179,6 +179,11 @@ public:
 	size_t GlobalMemSize() const;
 	size_t MaxAllocSize() const;
 
+	//Public virtual functions overridden from base classes.
+	virtual void ClearErrorReport() override;
+	virtual string ErrorReportString() override;
+	virtual vector<string> ErrorReport() override;
+
 	static void MakeEvenGridDims(size_t blockW, size_t blockH, size_t& gridW, size_t& gridH);
 
 private:

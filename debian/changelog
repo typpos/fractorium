@@ -1,8 +1,8 @@
-fractorium (1.0.0.5a-0ubuntu1) xenial; urgency=low
+fractorium (1.0.0.5b-0ubuntu1) xenial; urgency=low
 
   * release 1.0.0.5
 
- -- Matt Feemster <matt.feemster@gmail.com>  Mon, 28 Aug 2017 22:14:02 -0700
+ -- Matt Feemster <matt.feemster@gmail.com>  Tue, 29 Aug 2017 16:55:16 -0700
 
 fractorium (1.0.0.4-0ubuntu1) xenial; urgency=low
 

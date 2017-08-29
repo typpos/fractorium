@@ -13,7 +13,7 @@
 	<!--
 	Change this for every release.
 	-->
-	<?define ProductCode="{290BBFDC-BD1C-45F7-80AC-DE59BA4378F0}"?>
+	<?define ProductCode="{5A168AAA-9B7A-4803-9DA7-B7B053D27924}"?>
 	
 	<Product Id="$(var.ProductCode)" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package

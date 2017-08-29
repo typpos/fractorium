@@ -1,3 +1,47 @@
+1.0.0.5 08/28/2017
+--User changes
+ -Add support for Exr files which use 32-bit floats for each RGBA channel.
+ -Allow for clearing an individual color curve.
+ -Allow for saving multiple image types in EmberRender and EmberAnimate. All writes are threaded.
+ -Remove --bpc command line argument. Add format png16 as a replacement.
+ -Remove --enable_jpg_comments and --enable_png_comments command line arguments, and replace them with --enable_comments which applies to jpg, png and exr.
+ -Add menu items to variations and affine spinners which allow for easy entry of specific numeric values like pi.
+ -Make final render dialog be wider rather than being so tall.
+ -Added panorama1 and panorama2 variations.
+
+--Bug fixes
+ -Fix several OpenCL build errors that were occurring on Mac. Some still remain.
+ -Remove ability to save bitmap files on all platforms but Windows.
+ -Fix bug where clearing the final xform, but leaving it present, then editing it would crash the program.
+ -Disallow the use of synth when randomly generating xforms if the user has an Nvidia device present on their system.
+ -crackle had a bug with Nvidia GPUs.
+ -Only allow crackle_cellsize to be greater than 0.
+ -Typing in the xform color index spinner produced strange results.
+ -Returning from palette editor did not always update xform color indices.
+ -Cleaner exit on some failures.
+ -Better reporting of OpenCL errors.
+
+--Code changes
+ -Improve the coloring code during final accum by getting rid of the last remnants of unnecessary scaling to 255 from flam3.
+ -New dependency on OpenEXR.
+ -Allow Curves class to interact with objects of a different template type.
+ -Make m_Curves member of Ember always use float as template type.
+ -Set the length of the curves array to always be 2^16 which should offer enough precision with new 32-bit float pixel types.
+ -Set pixel types to always be 32-bit float. This results in a major reduction of code in the final accumulation part of Renderer.h/cpp.
+ -Remove corresponding code from RendererCL and FinalAccumOpenCLKernelCreator.
+ -Remove Transparency, NumChannels and BytesPerPixel setters from Renderer.h/cpp.
+ -Add new global functions to format final image buffers and place all alpha calculation and scaling code in them.
+ -Blending is no longer needed in OpenGLWidget because of the new pixel type.
+ -Make new class, AffineDoubleSpinBox.
+ -Use static_partitioner in all parallel_for() calls.
+ -Use some CPU defines in CL code.
+ -Code in RendererClDevice::Init() to detect Nvidia was wrong even thought it technically worked.
+ -crackle now uses real_t* for cache rather than real2. This is what was causing the bug.
+ -Make the local offsets array used in crackle a precalc since it's the same for all. This reduces register pressure.
+ -Get rid of all usages of real3, just to be safe since Nvidia doesn't like them.
+ -#define TOTAL_GLOBAL_SIZE_END in the OpenCL iteration kernel just for debugging purposes to see how large the parvars buffer is.
+ -Remove some unused functions.
+
 1.0.0.4 07/01/2017
 --User changes
  -Add support for adjusting xform color indices in the palette editor. Fixed palettes can now be displayed there, but they will have no color arrows as they are not editable.

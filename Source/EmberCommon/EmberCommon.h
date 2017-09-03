@@ -572,9 +572,9 @@ static bool StripsRender(RendererBase* renderer, Ember<T>& ember, vector<v4F>& f
 		size_t stripOffset;
 
 		if (yAxisUp)
-			stripOffset = ember.m_FinalRasH * ((strips - strip) - 1) * renderer->FinalRowSize();
+			stripOffset = ember.m_FinalRasH * ((strips - strip) - 1) * ember.m_FinalRasW;
 		else
-			stripOffset = ember.m_FinalRasH * strip * renderer->FinalRowSize();
+			stripOffset = ember.m_FinalRasH * strip * ember.m_FinalRasW;
 
 		ember.m_CenterY = centerBase + ember.m_FinalRasH * T(strip) / (ember.m_PixelsPerUnit * zoomScale);
 

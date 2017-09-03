@@ -139,7 +139,12 @@ bool OpenCLWrapper::AddBuffer(const string& name, size_t size, cl_mem_flags flag
 		}
 		else if (GetBufferSize(bufferIndex) != size)//If it did exist, only create and add if the sizes were different.
 		{
-			m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, flags, size_t(0), nullptr, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
+			m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, flags, size_t(1), nullptr, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
+			char ch = 0;
+
+			if (!WriteBuffer("emptybuffer", &ch, 1))//Write the dummy buffer at least once because OpenCL seems to do a lazy instantiation of buffers.
+				return false;
+
 			cl::Buffer buff(m_Context, flags, size, nullptr, &err);//Create the new buffer.
 
 			if (!m_Info->CheckCL(err, "cl::Buffer()"))
@@ -190,7 +195,12 @@ bool OpenCLWrapper::AddHostBuffer(const string& name, size_t size, void* data)
 			if (GetBufferSize(bufferIndex) != size ||//If it did exist, only create and add if the sizes...
 					data != m_Buffers[bufferIndex].m_Buffer.getInfo<CL_MEM_HOST_PTR>(nullptr))//...or addresses were different.
 			{
-				m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, CL_MEM_USE_HOST_PTR, size_t(0), data, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
+				m_Buffers[bufferIndex] = NamedBuffer(cl::Buffer(m_Context, CL_MEM_USE_HOST_PTR, size_t(1), data, &err), "emptybuffer");//First clear out the original so the two don't exist in memory at once.
+				char ch = 0;
+
+				if (!WriteBuffer("emptybuffer", &ch, 1))//Write the dummy buffer at least once because OpenCL seems to do a lazy instantiation of buffers.
+					return false;
+
 				cl::Buffer buff(m_Context, CL_MEM_USE_HOST_PTR, size, data, &err);//Create the new buffer.
 
 				if (!m_Info->CheckCL(err, "cl::Buffer()"))

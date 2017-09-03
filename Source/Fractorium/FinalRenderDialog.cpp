@@ -52,7 +52,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_ItersCellIndex = row++;//Iters.
 	m_PathCellIndex = row;
 	QStringList comboList;
-#ifndef _WIN32
+#ifdef _WIN32
 	comboList.append("bmp");
 #endif
 	comboList.append("jpg");

@@ -909,6 +909,11 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 	, tbb::static_partitioner()
 #endif
 				);
+
+	if (m_Callback && !m_Abort)
+		if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0))
+			Abort();
+
 	//t.Toc(__FUNCTION__);
 	return m_Abort ? eRenderStatus::RENDER_ABORT : eRenderStatus::RENDER_OK;
 }

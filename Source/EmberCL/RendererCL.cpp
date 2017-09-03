@@ -1154,18 +1154,19 @@ eRenderStatus RendererCL<T, bucketT>::RunLogScaleFilter()
 			if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { AddToReport(loc); }
 
 			//t.Toc(loc);
+
+			if (b && m_Callback)
+				if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0.0))
+					Abort();
 		}
 		else
 		{
 			b = false;
 			AddToReport(loc);
 		}
-
-		if (b && m_Callback && m_LastIterPercent >= 99.0)//Only update progress if we've really reached the end, not via forced output.
-			m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0.0);
 	}
 
-	return b ? eRenderStatus::RENDER_OK : eRenderStatus::RENDER_ERROR;
+	return  m_Abort ? eRenderStatus::RENDER_ABORT : (b ? eRenderStatus::RENDER_OK : eRenderStatus::RENDER_ERROR);
 }
 
 /// <summary>
@@ -1273,7 +1274,8 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 #endif
 
 		if (b && m_Callback)
-			m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0.0);
+			if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0.0))
+				Abort();
 
 		//t2.Toc(__FUNCTION__ " all passes");
 	}

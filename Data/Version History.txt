@@ -1,3 +1,10 @@
+1.0.0.6 09/02/2017
+--Bug fixes
+ -Strips renders crashed.
+ -Better handling of large memory allocations by forcing a free of previous allocations.
+ -Final render dialog did not properly save last used extension setting.
+ -Density filtering progress bar in final render dialog did not update if only log scaling was being used.
+
 1.0.0.5 08/28/2017
 --User changes
  -Add support for Exr files which use 32-bit floats for each RGBA channel.

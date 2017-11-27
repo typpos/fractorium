@@ -19,7 +19,6 @@
  -Change bad vals from +- 1e10 to +-1e20.
  -Reintroduce the symmetry tag in xforms for legacy support in programs that do not use color_speed.
  -Compiler will not let us use default values in templated member functions anymore.
- -Add a benchmarking suite.
 
 1.0.0.6 09/02/2017
 --Bug fixes

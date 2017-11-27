@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
-    <height>751</height>
+    <width>588</width>
+    <height>838</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -63,8 +63,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>561</width>
-        <height>739</height>
+        <width>576</width>
+        <height>826</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -445,10 +445,16 @@
        </item>
        <item>
         <widget class="QGroupBox" name="FinalRenderSizeGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>95</height>
+           <height>106</height>
           </size>
          </property>
          <property name="title">
@@ -603,7 +609,20 @@
             </item>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="FinalRenderKeepAspectCheckBox">
+            <property name="toolTip">
+             <string>Maintain the aspect ratio between width and height to be equal to base width and base height</string>
+            </property>
+            <property name="text">
+             <string>Keep Aspect Ratio</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" rowspan="2">
            <widget class="QGroupBox" name="FinalRenderScaleGroupBox">
             <property name="minimumSize">
              <size>
@@ -614,7 +633,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>45</height>
+              <height>16777215</height>
              </size>
             </property>
             <property name="toolTip">
@@ -667,19 +686,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="FinalRenderKeepAspectCheckBox">
-            <property name="toolTip">
-             <string>Maintain the aspect ratio between width and height to be equal to base width and base height</string>
-            </property>
-            <property name="text">
-             <string>Keep Aspect Ratio</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
            </widget>
           </item>
          </layout>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>487</height>
+    <height>475</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -169,6 +169,26 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="ToggleTypeCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: right clicking toggles spin boxes, right button dragging disabled.&lt;/p&gt;&lt;p&gt;Unchecked: double clicking toggles spin boxes, right button dragging enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Right Click Toggles Spinboxes</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="Png16BitCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Save 16-bit Png</string>
+         </property>
+        </widget>
+       </item>
        <item row="6" column="0" colspan="2">
         <widget class="QTableWidget" name="DeviceTable">
          <property name="sizePolicy">
@@ -257,180 +277,212 @@
          </column>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QSpinBox" name="ThreadCountSpin">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of threads to use with CPU rendering.&lt;/p&gt;&lt;p&gt;Decrease for more responsive editing, increase for better performance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="prefix">
-          <string>Threads </string>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>64</number>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QSpinBox" name="CpuSubBatchSpin">
-         <property name="toolTip">
-          <string>The number of 10,000 iteration chunks ran per thread on the CPU
+       <item row="15" column="0" colspan="2">
+        <layout class="QGridLayout" name="InteractiveRenderingTabGridLayout">
+         <item row="3" column="1">
+          <widget class="QGroupBox" name="InteraciveGpuFilteringGroupBox">
+           <property name="title">
+            <string>OpenCL Filtering</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>4</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="OpenCLFilteringLogRadioButton">
+              <property name="toolTip">
+               <string>Use log scale filtering for interactive editing using OpenCL.</string>
+              </property>
+              <property name="text">
+               <string>Log Scale</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="OpenCLFilteringDERadioButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use full density estimation filtering for interactive editing using OpenCL.&lt;/p&gt;&lt;p&gt;This is slower, but gives better feedback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Full DE</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QGroupBox" name="InteraciveCpuFilteringGroupBox">
+           <property name="title">
+            <string>CPU Filtering</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>4</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="CpuFilteringLogRadioButton">
+              <property name="toolTip">
+               <string>Use log scale filtering for interactive editing on the CPU.</string>
+              </property>
+              <property name="text">
+               <string>Log Scale</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="CpuFilteringDERadioButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use full density estimation filtering for interactive editing on the CPU.&lt;/p&gt;&lt;p&gt;This is slower, but gives better feedback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Full DE</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QSpinBox" name="OpenCLSubBatchSpin">
+           <property name="toolTip">
+            <string>The number of ~8M iteration chunks ran using OpenCL
 in interactive mode for each mouse movement</string>
-         </property>
-         <property name="prefix">
-          <string>CPU Sub Batch </string>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QSpinBox" name="OpenCLSubBatchSpin">
-         <property name="toolTip">
-          <string>The number of ~8M iteration chunks ran using OpenCL
+           </property>
+           <property name="prefix">
+            <string>OpenCL Sub Batch </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="OpenCLQualitySpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default quality to use for the interactive renderer when using OpenCL.&lt;/p&gt;&lt;p&gt;30 is a good number for this, but you can use a larger value if you have a faster GPU.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>OpenCL Quality </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>30</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="CpuQualitySpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default quality to use for the interactive renderer when using the CPU.&lt;/p&gt;&lt;p&gt;10 is a good number for this, but you can use a larger value if you have a faster system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>CPU Quality </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="CpuSubBatchSpin">
+           <property name="toolTip">
+            <string>The number of 10,000 iteration chunks ran per thread on the CPU
 in interactive mode for each mouse movement</string>
-         </property>
-         <property name="prefix">
-          <string>OpenCL Sub Batch </string>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>100</number>
-         </property>
-        </widget>
+           </property>
+           <property name="prefix">
+            <string>CPU Sub Batch </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QSpinBox" name="RandomCountSpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of random flames to generate on startup.&lt;/p&gt;&lt;p&gt;These are usually of low quality, so leave the count as 1 unless you are searching for good randoms.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>Randoms </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="ThreadCountSpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of threads to use with CPU rendering.&lt;/p&gt;&lt;p&gt;Decrease for more responsive editing, increase for better performance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>Threads </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>64</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="11" column="0">
-        <widget class="QGroupBox" name="InteraciveCpuFilteringGroupBox">
-         <property name="title">
-          <string>CPU Filtering</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <property name="leftMargin">
-           <number>6</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="CpuFilteringLogRadioButton">
-            <property name="toolTip">
-             <string>Use log scale filtering for interactive editing on the CPU.</string>
-            </property>
-            <property name="text">
-             <string>Log Scale</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="CpuFilteringDERadioButton">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use full density estimation filtering for interactive editing on the CPU.&lt;/p&gt;&lt;p&gt;This is slower, but gives better feedback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Full DE</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <widget class="QGroupBox" name="InteraciveGpuFilteringGroupBox">
-         <property name="title">
-          <string>OpenCL Filtering</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="leftMargin">
-           <number>6</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="OpenCLFilteringLogRadioButton">
-            <property name="toolTip">
-             <string>Use log scale filtering for interactive editing using OpenCL.</string>
-            </property>
-            <property name="text">
-             <string>Log Scale</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="OpenCLFilteringDERadioButton">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use full density estimation filtering for interactive editing using OpenCL.&lt;/p&gt;&lt;p&gt;This is slower, but gives better feedback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Full DE</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QSpinBox" name="RandomCountSpin">
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="LoadLastOnStartCheckBox">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of random flames to generate on startup.&lt;/p&gt;&lt;p&gt;These are usually of low quality, so leave the count as 1 unless you are searching for good randoms.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="prefix">
-          <string>Randoms </string>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>99999</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QCheckBox" name="ToggleTypeCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: right clicking toggles spin boxes, right button dragging disabled.&lt;/p&gt;&lt;p&gt;Unchecked: double clicking toggles spin boxes, right button dragging enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: load the flame from the previous run on startup.&lt;/p&gt;&lt;p&gt;Unchecked: create randoms on startup.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Right Click Toggles Spinboxes</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="Png16BitCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Save 16-bit Png</string>
+          <string>Load Last on Start</string>
          </property>
         </widget>
        </item>
@@ -858,10 +910,13 @@ in interactive mode for each mouse movement</string>
   <tabstop>ContinuousUpdateCheckBox</tabstop>
   <tabstop>ToggleTypeCheckBox</tabstop>
   <tabstop>Png16BitCheckBox</tabstop>
-  <tabstop>RandomCountSpin</tabstop>
+  <tabstop>LoadLastOnStartCheckBox</tabstop>
   <tabstop>ThreadCountSpin</tabstop>
   <tabstop>CpuSubBatchSpin</tabstop>
+  <tabstop>RandomCountSpin</tabstop>
+  <tabstop>OpenCLQualitySpin</tabstop>
   <tabstop>OpenCLSubBatchSpin</tabstop>
+  <tabstop>CpuQualitySpin</tabstop>
   <tabstop>CpuFilteringLogRadioButton</tabstop>
   <tabstop>CpuFilteringDERadioButton</tabstop>
   <tabstop>OpenCLFilteringLogRadioButton</tabstop>

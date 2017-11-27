@@ -46,6 +46,7 @@ FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 		ui.OpenCLCheckBox->setChecked(false);
 		ui.OpenCLCheckBox->setEnabled(false);
 		ui.OpenCLSubBatchSpin->setEnabled(false);
+		ui.OpenCLQualitySpin->setEnabled(false);
 		ui.OpenCLFilteringDERadioButton->setEnabled(false);
 		ui.OpenCLFilteringLogRadioButton->setEnabled(false);
 		ui.InteraciveGpuFilteringGroupBox->setEnabled(false);
@@ -69,8 +70,11 @@ bool FractoriumOptionsDialog::ShowAllXforms() { return ui.ShowAllXformsCheckBox-
 bool FractoriumOptionsDialog::ToggleType() { return ui.ToggleTypeCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::Png16Bit() { return ui.Png16BitCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::AutoUnique() { return ui.AutoUniqueCheckBox->isChecked(); }
+bool FractoriumOptionsDialog::LoadLast() { return ui.LoadLastOnStartCheckBox->isChecked(); }
 uint FractoriumOptionsDialog::ThreadCount() { return ui.ThreadCountSpin->value(); }
 uint FractoriumOptionsDialog::RandomCount() { return ui.RandomCountSpin->value(); }
+uint FractoriumOptionsDialog::CpuQuality() { return ui.CpuQualitySpin->value(); }
+uint FractoriumOptionsDialog::OpenClQuality() { return ui.OpenCLQualitySpin->value(); }
 
 /// <summary>
 /// The check state of one of the OpenCL devices was changed.
@@ -122,6 +126,8 @@ void FractoriumOptionsDialog::OnOpenCLCheckBoxStateChanged(int state)
 	ui.ThreadCountSpin->setEnabled(!checked);
 	ui.CpuSubBatchSpin->setEnabled(!checked);
 	ui.OpenCLSubBatchSpin->setEnabled(checked);
+	ui.OpenCLQualitySpin->setEnabled(checked);
+	ui.CpuQualitySpin->setEnabled(!checked);
 	ui.CpuFilteringDERadioButton->setEnabled(!checked);
 	ui.CpuFilteringLogRadioButton->setEnabled(!checked);
 	ui.OpenCLFilteringDERadioButton->setEnabled(checked);
@@ -178,6 +184,9 @@ void FractoriumOptionsDialog::GuiToData()
 	m_Settings->Png16Bit(Png16Bit());
 	m_Settings->ThreadCount(ThreadCount());
 	m_Settings->RandomCount(RandomCount());
+	m_Settings->LoadLast(LoadLast());
+	m_Settings->CpuQuality(CpuQuality());
+	m_Settings->OpenClQuality(OpenClQuality());
 	m_Settings->CpuSubBatch(ui.CpuSubBatchSpin->value());
 	m_Settings->OpenCLSubBatch(ui.OpenCLSubBatchSpin->value());
 	m_Settings->CpuDEFilter(ui.CpuFilteringDERadioButton->isChecked());
@@ -212,6 +221,9 @@ void FractoriumOptionsDialog::DataToGui()
 	ui.Png16BitCheckBox->setChecked(m_Settings->Png16Bit());
 	ui.ThreadCountSpin->setValue(m_Settings->ThreadCount());
 	ui.RandomCountSpin->setValue(m_Settings->RandomCount());
+	ui.LoadLastOnStartCheckBox->setChecked(m_Settings->LoadLast());
+	ui.CpuQualitySpin->setValue(m_Settings->CpuQuality());
+	ui.OpenCLQualitySpin->setValue(m_Settings->OpenClQuality());
 	ui.CpuSubBatchSpin->setValue(m_Settings->CpuSubBatch());
 	ui.OpenCLSubBatchSpin->setValue(m_Settings->OpenCLSubBatch());
 	SettingsToDeviceTable(ui.DeviceTable, devices);

@@ -64,7 +64,7 @@ void Fractorium::InitParamsUI()
 	//Filter.
 	row = 0;
 	table = ui.FilterTable;
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight, 0.1, 2, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 0.1);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight,   0, 2, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 0);
 	m_SpatialFilterWidthSpin->DoubleClickLowVal(0.1);
 	comboVals = SpatialFilterCreator<float>::FilterTypes();
 	SetupCombo(table, this, row, 1, m_SpatialFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnSpatialFilterTypeComboCurrentIndexChanged(const QString&)));
@@ -74,10 +74,11 @@ void Fractorium::InitParamsUI()
 	//Iteration.
 	row = 0;
 	table = ui.IterationTable;
+	auto quality = m_Settings->OpenCL() ? m_Settings->OpenClQuality() : m_Settings->CpuQuality();
 	SetupSpinner<SpinBox, int>(			table, this, row, 1, m_SbsSpin,				spinHeight, 1000, 100000, 100, SIGNAL(valueChanged(int)),	 SLOT(OnSbsChanged(int)),			  true, DEFAULT_SBS, DEFAULT_SBS, DEFAULT_SBS);
-	SetupSpinner<SpinBox, int>(			table, this, row, 1, m_FuseSpin,			spinHeight, 1,      1000,   5, SIGNAL(valueChanged(int)),	 SLOT(OnFuseChanged(int)),			  true,	   15,	  15, 15);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_QualitySpin,			spinHeight, 1,      dmax,  50, SIGNAL(valueChanged(double)), SLOT(OnQualityChanged(double)),	  true,    10,	  10, 10);
-	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_SupersampleSpin,		spinHeight, 1,         4,   1, SIGNAL(valueChanged(int)),	 SLOT(OnSupersampleChanged(int)),	  true,     1,	   1,  1);
+	SetupSpinner<SpinBox, int>(			table, this, row, 1, m_FuseSpin,			spinHeight, 1,      1000,   5, SIGNAL(valueChanged(int)),	 SLOT(OnFuseChanged(int)),			  true,	     15, 15, 15);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_QualitySpin,			spinHeight, 1,      dmax,  50, SIGNAL(valueChanged(double)), SLOT(OnQualityChanged(double)),	  true, quality, 10, 10);
+	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_SupersampleSpin,		spinHeight, 1,         4,   1, SIGNAL(valueChanged(int)),	 SLOT(OnSupersampleChanged(int)),	  true,       1,  1,  1);
 	//Animation.
 	row = 0;
 	table = ui.AnimationTable;

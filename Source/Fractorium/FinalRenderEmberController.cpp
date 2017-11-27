@@ -118,9 +118,9 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 
 		//Save backup Xml.
 		if (doAll)
-			m_XmlWriter.Save(backup.toStdString().c_str(), m_EmberFile.m_Embers, 0, true, false, true);
+			m_XmlWriter.Save(backup.toStdString().c_str(), m_EmberFile.m_Embers, 0, true, false, true, false, false);
 		else
-			m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true);
+			m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true, false, false);
 
 		m_FinishedImageCount.store(0);
 		SyncGuiToRenderer();

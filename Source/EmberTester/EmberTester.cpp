@@ -255,7 +255,7 @@ void MakeTestAllVarsRegPrePostComboFile(const string& filename)
 	EmberToXml<float> writer;
 	vector<Ember<float>> embers;
 	MakeTestAllVarsRegPrePost(embers);
-	writer.Save(filename, embers, 0, true, true, false);
+	writer.Save(filename, embers, 0, true, true, false, false, false);
 }
 
 void TestAtomicAdd()

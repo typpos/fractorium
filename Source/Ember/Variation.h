@@ -39,12 +39,16 @@ enum class eVariationAssignType : et
 	ASSIGNTYPE_SUM
 };
 
+#define WEIGHT_PREFIX "parVars[WEIGHT_"
+
 /// <summary>
 /// Complete list of every variation class ID.
 /// </summary>
 enum class eVariationId : et
 {
 	VAR_ARCH,
+	//VAR_ARCSINH,
+	//VAR_ARCTANH,
 	VAR_AUGER		,
 	VAR_BARYCENTROID,
 	VAR_BCIRCLE		,
@@ -90,6 +94,7 @@ enum class eVariationId : et
 	VAR_CIRCLIZE2	,
 	VAR_CIRCUS,
 	VAR_COLLIDEOSCOPE,
+	VAR_CONCENTRIC		,
 	VAR_CONIC		,
 	VAR_COS			,
 	VAR_COS_WRAP	,
@@ -103,6 +108,7 @@ enum class eVariationId : et
 	VAR_COTQ		,
 	VAR_CPOW		,
 	VAR_CPOW2		,
+	VAR_CPOW3		,
 	VAR_CRACKLE		,
 	VAR_CRESCENTS	,
 	VAR_CROB		,
@@ -180,6 +186,8 @@ enum class eVariationId : et
 	VAR_HANDKERCHIEF,
 	VAR_HEART		,
 	VAR_HEAT,
+	VAR_HELICOID,
+	VAR_HELIX,
 	VAR_HEMISPHERE	,
 	VAR_HEXAPLAY3D	,
 	VAR_HEXCROP		,
@@ -275,6 +283,7 @@ enum class eVariationId : et
 	VAR_PSPHERE		,
 	VAR_Q_ODE,
 	VAR_RADIAL_BLUR	,
+	VAR_RAND_CUBES	,
 	VAR_RATIONAL3	,
 	VAR_RAYS		,
 	VAR_RBLUR,
@@ -309,6 +318,7 @@ enum class eVariationId : et
 	VAR_SINUSOIDAL	,
 	VAR_SINUSOIDAL3D,
 	//VAR_SMARTCROP	   ,
+	VAR_SPHEREBLUR	,
 	VAR_SPHERICAL	,
 	VAR_SPHERICAL3D	,
 	VAR_SPHERICALN	,
@@ -376,6 +386,8 @@ enum class eVariationId : et
 	VAR_ZTRANSLATE,
 
 	VAR_PRE_ARCH,
+	//VAR_PRE_ARCSINH,
+	//VAR_PRE_ARCTANH,
 	VAR_PRE_AUGER,
 	VAR_PRE_BARYCENTROID,
 	VAR_PRE_BCIRCLE,
@@ -421,6 +433,7 @@ enum class eVariationId : et
 	VAR_PRE_CIRCLIZE2,
 	VAR_PRE_CIRCUS,
 	VAR_PRE_COLLIDEOSCOPE,
+	VAR_PRE_CONCENTRIC,
 	VAR_PRE_CONIC,
 	VAR_PRE_COS,
 	VAR_PRE_COS_WRAP,
@@ -434,6 +447,7 @@ enum class eVariationId : et
 	VAR_PRE_COTQ,
 	VAR_PRE_CPOW,
 	VAR_PRE_CPOW2,
+	VAR_PRE_CPOW3,
 	VAR_PRE_CRACKLE,
 	VAR_PRE_CRESCENTS,
 	VAR_PRE_CROB,
@@ -511,6 +525,8 @@ enum class eVariationId : et
 	VAR_PRE_HANDKERCHIEF,
 	VAR_PRE_HEART,
 	VAR_PRE_HEAT,
+	VAR_PRE_HELICOID,
+	VAR_PRE_HELIX,
 	VAR_PRE_HEMISPHERE,
 	VAR_PRE_HEXAPLAY3D,
 	VAR_PRE_HEXCROP,
@@ -606,6 +622,7 @@ enum class eVariationId : et
 	VAR_PRE_PSPHERE,
 	VAR_PRE_Q_ODE,
 	VAR_PRE_RADIAL_BLUR,
+	VAR_PRE_RAND_CUBES,
 	VAR_PRE_RATIONAL3,
 	VAR_PRE_RAYS,
 	VAR_PRE_RBLUR,
@@ -640,6 +657,7 @@ enum class eVariationId : et
 	VAR_PRE_SINUSOIDAL,
 	VAR_PRE_SINUSOIDAL3D,
 	//VAR_PRE_SMARTCROP,
+	VAR_PRE_SPHEREBLUR,
 	VAR_PRE_SPHERICAL,
 	VAR_PRE_SPHERICAL3D,
 	VAR_PRE_SPHERICALN,
@@ -707,6 +725,8 @@ enum class eVariationId : et
 	VAR_PRE_ZTRANSLATE,
 
 	VAR_POST_ARCH,
+	//VAR_POST_ARCSINH,
+	//VAR_POST_ARCTANH,
 	VAR_POST_AUGER,
 	VAR_POST_BARYCENTROID,
 	VAR_POST_BCIRCLE,
@@ -752,6 +772,7 @@ enum class eVariationId : et
 	VAR_POST_CIRCLIZE2,
 	VAR_POST_CIRCUS,
 	VAR_POST_COLLIDEOSCOPE,
+	VAR_POST_CONCENTRIC,
 	VAR_POST_CONIC,
 	VAR_POST_COS,
 	VAR_POST_COS_WRAP,
@@ -765,6 +786,7 @@ enum class eVariationId : et
 	VAR_POST_COTQ,
 	VAR_POST_CPOW,
 	VAR_POST_CPOW2,
+	VAR_POST_CPOW3,
 	VAR_POST_CRACKLE,
 	VAR_POST_CRESCENTS,
 	VAR_POST_CROB,
@@ -842,6 +864,8 @@ enum class eVariationId : et
 	VAR_POST_HANDKERCHIEF,
 	VAR_POST_HEART,
 	VAR_POST_HEAT,
+	VAR_POST_HELICOID,
+	VAR_POST_HELIX,
 	VAR_POST_HEMISPHERE,
 	VAR_POST_HEXAPLAY3D,
 	VAR_POST_HEXCROP,
@@ -937,6 +961,7 @@ enum class eVariationId : et
 	VAR_POST_PSPHERE,
 	VAR_POST_Q_ODE,
 	VAR_POST_RADIAL_BLUR,
+	VAR_POST_RAND_CUBES,
 	VAR_POST_RATIONAL3,
 	VAR_POST_RAYS,
 	VAR_POST_RBLUR,
@@ -971,6 +996,7 @@ enum class eVariationId : et
 	VAR_POST_SINUSOIDAL,
 	VAR_POST_SINUSOIDAL3D,
 	VAR_POST_SMARTCROP,
+	VAR_POST_SPHEREBLUR,
 	VAR_POST_SPHERICAL,
 	VAR_POST_SPHERICAL3D,
 	VAR_POST_SPHERICALN,
@@ -1470,6 +1496,11 @@ protected:
 	string DefaultZCl() const
 	{
 		return m_VarType == eVariationType::VARTYPE_REG ? "0;\n" : (m_PrePostAssignType == eVariationAssignType::ASSIGNTYPE_SET ? "vIn.z;\n" : "0;\n");
+	}
+
+	string WeightDefineString() const
+	{
+		return WEIGHT_PREFIX + std::to_string(XformIndexInEmber()) + "_" + std::to_string(IndexInXform()) + "]";
 	}
 
 	Xform<T>* m_Xform;//The parent Xform that this variation is a child of.

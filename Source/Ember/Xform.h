@@ -656,9 +656,9 @@ public:
 		{
 			//There are no variations, so the affine transformed points can be assigned directly to the output points.
 			T inX = inPoint->m_X;
-			outPoint->m_X = (m_Affine.A() * inX) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
-			outPoint->m_Y = (m_Affine.D() * inX) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
-			outPoint->m_Z = inPoint->m_Z;
+			outPoint->m_X = 0;//(m_Affine.A() * inX) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
+			outPoint->m_Y = 0;//(m_Affine.D() * inX) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
+			outPoint->m_Z = 0;//inPoint->m_Z;
 		}
 
 		//Apply post variations, these will modify outPoint.
@@ -917,17 +917,15 @@ public:
 
 			if (shouldFlatten)//Flatten was not present and neither was any variation name or parameter in the list.
 			{
-				auto var = vl->GetVariationCopy(eVariationId::VAR_FLATTEN);
+				auto varflatten = vl->GetVariationCopy(eVariationId::VAR_FLATTEN);
 
-				if (AddVariation(var))
+				if (!AddVariation(varflatten))
 				{
-					return true;
-				}
-				else
-				{
-					delete var;
+					delete varflatten;
 					return false;
 				}
+
+				return true;
 			}
 		}
 

@@ -15,7 +15,7 @@ if not exist ".\output" mkdir .\output
 
 cd IlmBase
 
-cmake -G "Visual Studio 14 2015 Win64"^
+cmake -G "Visual Studio 15 2017 Win64"^
       -DCMAKE_PREFIX_PATH="%current%\output"^
       -DCMAKE_INSTALL_PREFIX="%current%\output"^
       .\
@@ -24,7 +24,7 @@ cmake --build . --target install --config Release -- /maxcpucount:8
 
 cd ..\OpenEXR
 
-cmake -G "Visual Studio 14 2015 Win64"^
+cmake -G "Visual Studio 15 2017 Win64"^
       -DCMAKE_PREFIX_PATH="%current%\output"^
       -DCMAKE_INSTALL_PREFIX="%current%\output"^
       -DILMBASE_PACKAGE_PREFIX="%current%\output" ^

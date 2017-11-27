@@ -39,6 +39,25 @@ bool Fractorium::IsXformSelected(size_t i)
 }
 
 /// <summary>
+/// Return the number of xforms selected, optionally counting the final xform.
+/// </summary>
+/// <param name="includeFinal">Whether to include the final in the count if selected.</param>
+/// <returns>The caption string</returns>
+int Fractorium::SelectedXformCount(bool includeFinal)
+{
+	int selCount = 0;
+	ForEachXformCheckbox([&](int index, QCheckBox * cb, bool isFinal)
+	{
+		if (cb->isChecked())
+		{
+			if (!isFinal || includeFinal)
+				selCount++;
+		}
+	});
+	return selCount;
+}
+
+/// <summary>
 /// Clear all of the dynamically created xform checkboxes.
 /// </summary>
 void Fractorium::ClearXformsSelections()
@@ -81,7 +100,7 @@ QString FractoriumEmberController<T>::MakeXformCaption(size_t i)
 /// <summary>
 /// Function to perform the specified operation on every dynamically created xform selection checkbox.
 /// </summary>
-/// <param name="func">The operation to perform</param>
+/// <param name="func">The operation to perform which is a function taking the index of the xform, its checkbox, and a bool specifying whether it's final.</param>
 void Fractorium::ForEachXformCheckbox(std::function<void(int, QCheckBox*, bool)> func)
 {
 	int i = 0;

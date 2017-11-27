@@ -104,6 +104,7 @@ void FractoriumEmberController<T>::AddXform()
 		Xform<T> newXform;
 		newXform.m_Weight = 0.25;
 		newXform.m_ColorX = m_Rand.Frand01<T>();
+		newXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 		m_Ember.AddXform(newXform);
 		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);
@@ -115,7 +116,12 @@ void Fractorium::OnAddXformButtonClicked(bool checked) { m_Controller->AddXform(
 /// <summary>
 /// Add a new linked xform in the current ember and set it as the current xform.
 /// Linked means:
-///
+///		Add an xform whose xaos values are:
+///			From: All xaos values from the current xform are zero when going to any xform but the new one added, which is 1.
+///			To: The xaos value coming from the current xform is 1 and the xaos values from all other xforms are 0, when going to the newly added xform.
+///     Take different action when a single xform is selected vs. multiple.
+///         Single: Copy current xform's xaos values to the new one.
+///         Multiple: Set new xform's xaos values to 1, and except the last entry which is 0.
 /// Called when the add xform button is clicked.
 /// Resets the rendering process.
 /// </summary>
@@ -123,40 +129,71 @@ void Fractorium::OnAddXformButtonClicked(bool checked) { m_Controller->AddXform(
 template <typename T>
 void FractoriumEmberController<T>::AddLinkedXform()
 {
+	bool hasAdded = false;
 	bool forceFinal = m_Fractorium->HaveFinal();
+	auto selCount = m_Fractorium->SelectedXformCount(false);
+
+	if (!selCount)//If none explicitly selected, use current.
+		selCount = 1;
+
+	Ember<T> ember = m_Ember;
+	m_Ember.Reserve(m_Ember.XformCount() + 1);//Doing this ahead of time ensures pointers remain valid.
+	auto iterCount = 0;
 	UpdateXform([&](Xform<T>* xform)
 	{
-		size_t i, count = m_Ember.XformCount();
-		Xform<T> newXform;
-		newXform.m_Weight = 0.5;
-		newXform.m_Opacity = 1;
-		newXform.m_ColorSpeed = 1;
-		newXform.m_ColorX = xform->m_ColorX;
-		//newXform.m_ColorY = xform->m_ColorY;
-
-		//Set all of the new xform's xaos values to the selected xform's xaos values,
-		//then set the selected xform's xaos values to 0.
-		for (i = 0; i < count; i++)
+		//Covers very strange case where final is selected, but initially not considered because final is excluded,
+		//but after adding the new xform, it thinks its selected index is non-final.
+		if (iterCount < selCount)
 		{
-			newXform.SetXaos(i, xform->Xaos(i));
-			xform->SetXaos(i, 0);
+			size_t i, count = m_Ember.XformCount();
+
+			if (!hasAdded)
+			{
+				Xform<T> newXform;
+				newXform.m_Weight = 0.5;
+				newXform.m_Opacity = xform->m_Opacity;
+				newXform.m_ColorSpeed = 0;
+				newXform.m_ColorX = 0;
+				//newXform.m_ColorY = xform->m_ColorY;
+				newXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
+
+				//Set all of the new xform's xaos values to the selected xform's xaos values,
+				//then set the selected xform's xaos values to 0.
+				for (i = 0; i < count; i++)
+				{
+					if (selCount == 1)
+						newXform.SetXaos(i, xform->Xaos(i));
+					else
+						newXform.SetXaos(i, 1);
+				}
+
+				//Add the new xform and update the total count.
+				m_Ember.AddXform(newXform);
+				count = m_Ember.XformCount();
+
+				//Set the xaos for all xforms pointing to the new one to zero.
+				//Will set the last element of all linking and non-linking xforms, including the one we just added.
+				//Linking xforms will have their last xaos element set to 1 below.
+				for (i = 0; i < count; i++)
+					if (auto xf = m_Ember.GetXform(i))
+						xf->SetXaos(count - 1, 0);
+
+				hasAdded = true;
+			}
+
+			//Linking xform, so set all xaos elements to 0, except the last.
+			for (i = 0; i < count - 1; i++)
+				xform->SetXaos(i, 0);
+
+			xform->SetXaos(count - 1, 1);//Set the xaos value for the linking xform pointing to the new one to one.
+			xform->m_Opacity = 0;//Clear the opacity of the all linking xform.
+			iterCount++;
 		}
-
-		//Add the new xform and update the total count.
-		m_Ember.AddXform(newXform);
-		count = m_Ember.XformCount();
-
-		//Set the xaos for all xforms pointing to the new one to zero.
-		for (i = 0; i < count; i++)
-			if (auto xf = m_Ember.GetXform(i))
-				xf->SetXaos(count - 1, 0);
-
-		xform->SetXaos(count - 1, 1);//Set the xaos value for the previous xform pointing to the new one to one.
-		xform->m_Opacity = 0;//Clear the opacity of the previous xform.
-		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
-		FillXforms(index);
-		FillXaos();
-	}, eXformUpdate::UPDATE_CURRENT);
+	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL);
+	//Now update the GUI.
+	int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
+	FillXforms(index);
+	FillXaos();
 }
 
 void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->AddLinkedXform(); }

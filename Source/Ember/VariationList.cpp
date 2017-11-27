@@ -351,6 +351,11 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(Waves2Radial)
 	ADDPREPOSTREGVAR(Panorama1)
 	ADDPREPOSTREGVAR(Panorama2)
+	ADDPREPOSTREGVAR(Helicoid)
+	ADDPREPOSTREGVAR(Helix)
+	ADDPREPOSTREGVAR(Sphereblur)
+	ADDPREPOSTREGVAR(Cpow3)
+	ADDPREPOSTREGVAR(Concentric)
 	//ADDPREPOSTREGVAR(LinearXZ)
 	//ADDPREPOSTREGVAR(LinearYZ)
 	//DC are special.
@@ -363,6 +368,7 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(DCPerlin)
 	ADDPREPOSTREGVAR(DCTriangle)
 	ADDPREPOSTREGVAR(DCZTransl)
+	ADDPREPOSTREGVAR(RandCubes)
 
 	for (auto var : m_Variations) const_cast<Variation<T>*>(var)->Precalc();//Modify once here, then const after this.
 

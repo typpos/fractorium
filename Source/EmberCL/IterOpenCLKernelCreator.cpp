@@ -96,9 +96,9 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		if (xform->PreVariationCount() + xform->VariationCount() == 0)
 		{
 			xformFuncs <<
-					   "	outPoint->m_X = (xform->m_A * inPoint->m_X) + (xform->m_B * inPoint->m_Y) + xform->m_C;\n" <<
-					   "	outPoint->m_Y = (xform->m_D * inPoint->m_X) + (xform->m_E * inPoint->m_Y) + xform->m_F;\n" <<
-					   "	outPoint->m_Z = inPoint->m_Z;\n";
+					   "	outPoint->m_X = 0;\n"
+					   "	outPoint->m_Y = 0;\n"
+					   "	outPoint->m_Z = 0;\n";
 		}
 		else
 		{
@@ -577,7 +577,7 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 }
 
 /// <summary>
-/// Create an OpenCL string of #defines and a corresponding host side vector for parametric variation values.
+/// Create an OpenCL string of #defines and a corresponding host side vector for variation weights and parametric variation values.
 /// Parametric variations present a special problem in the iteration code.
 /// The values can't be passed in with the array of other xform values because
 /// the length of the parametric values is unknown.
@@ -609,6 +609,7 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 /// The variations use these #defines by first looking up the index of the
 /// xform they belong to in the parent ember and generating the OpenCL string based on that
 /// in their overridden OpenCLString() functions.
+/// Note that variation weights are also included in this buffer and are looked up in a similar manner.
 /// Template argument expected to be float or double.
 /// </summary>
 /// <param name="ember">The ember to create the values from</param>
@@ -618,7 +619,7 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 template <typename T>
 void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals, bool doString)
 {
-	size_t i = 0, j, k, size = 0;
+	size_t i = 0, size = 0;
 	ostringstream os;
 
 	if (doVals)
@@ -626,13 +627,19 @@ void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<
 
 	while (auto xform = ember.GetTotalXform(i))
 	{
-		size_t varCount = xform->TotalVariationCount();
+		size_t j = 0;
 
-		for (j = 0; j < varCount; j++)
+		while (auto var = xform->GetVariation(j))
 		{
-			if (auto parVar = dynamic_cast<ParametricVariation<T>*>(xform->GetVariation(j)))
+			if (doString)
+				os << "#define WEIGHT_" << i << "_" << j << " " << size++ << "\n";//Uniquely identify the weight of this variation in this xform.
+
+			if (doVals)
+				params.second.push_back(var->m_Weight);
+
+			if (auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
 			{
-				for (k = 0; k < parVar->ParamCount(); k++)
+				for (size_t k = 0; k < parVar->ParamCount(); k++)
 				{
 					if (!parVar->Params()[k].IsState())
 					{
@@ -651,6 +658,8 @@ void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<
 					}
 				}
 			}
+
+			j++;
 		}
 
 		i++;

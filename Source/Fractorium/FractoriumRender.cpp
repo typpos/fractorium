@@ -97,7 +97,7 @@ void FractoriumEmberControllerBase::UpdateRender(eProcessAction action)
 void FractoriumEmberControllerBase::DeleteRenderer()
 {
 	Shutdown();
-	m_Renderer.reset();
+	m_Renderer = make_unique<EmberNs::Renderer<float, float>>();
 
 	if (GLController())
 		GLController()->ClearWindow();
@@ -299,6 +299,9 @@ bool FractoriumEmberController<T>::SyncSizes()
 template <typename T>
 bool FractoriumEmberController<T>::Render()
 {
+	if (!m_Renderer.get())
+		return false;
+
 	m_Rendering = true;
 	bool success = true;
 	auto gl = m_Fractorium->ui.GLDisplay;
@@ -567,7 +570,7 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 
 		if (m_RenderType == eRendererType::OPENCL_RENDERER)
 		{
-			auto val = 30 * m_Fractorium->m_Settings->Devices().size();
+			auto val = m_Fractorium->m_Settings->OpenClQuality() * m_Fractorium->m_Settings->Devices().size();
 			m_Fractorium->m_QualitySpin->DoubleClickZero(val);
 			m_Fractorium->m_QualitySpin->DoubleClickNonZero(val);
 
@@ -576,11 +579,12 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 		}
 		else
 		{
-			m_Fractorium->m_QualitySpin->DoubleClickZero(10);
-			m_Fractorium->m_QualitySpin->DoubleClickNonZero(10);
+			auto quality = m_Fractorium->m_Settings->CpuQuality();
+			m_Fractorium->m_QualitySpin->DoubleClickZero(quality);
+			m_Fractorium->m_QualitySpin->DoubleClickNonZero(quality);
 
-			if (m_Fractorium->m_QualitySpin->value() > 10)
-				m_Fractorium->m_QualitySpin->setValue(10);
+			if (m_Fractorium->m_QualitySpin->value() > quality)
+				m_Fractorium->m_QualitySpin->setValue(quality);
 		}
 
 		m_Renderer->Callback(this);

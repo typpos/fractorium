@@ -47,23 +47,23 @@ class EMBER_API XmlToEmber : public EmberReport
 public:
 	XmlToEmber();
 	template <typename Alloc, template <typename, typename> class C>
-	bool Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults = true);
+	bool Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults);
 	template <typename Alloc, template <typename, typename> class C>
-	bool Parse(const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults = true);
+	bool Parse(const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults);
 	template <typename valT>
 	bool Aton(const char* str, valT& val);
 	static vector<string> m_FlattenNames;
 
 private:
 	template <typename Alloc, template <typename, typename> class C>
-	void ScanForEmberNodes(xmlNode* curNode, char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults);
+	void ScanForEmberNodes(xmlNode* curNode, const char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults);
 	bool ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber);
 	bool AttToEmberMotionFloat(xmlAttrPtr att, const char* attStr, eEmberMotionParam param, EmberMotion<T>& motion);
 	bool ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion, bool fromEmber);
 	static string GetCorrectedParamName(const unordered_map<string, string>& names, const char* name);
 	static string GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, xmlAttrPtr att);
 	static bool XmlContainsTag(xmlAttrPtr att, const char* name);
-	bool ParseHexColors(char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan);
+	bool ParseHexColors(const char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan);
 	template <typename valT>
 	bool ParseAndAssign(const xmlChar* name, const char* attStr, const char* str, valT& val, bool& b);
 

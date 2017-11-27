@@ -37,7 +37,7 @@ static void sincos(float x, float* s, float* c)
 
 namespace EmberNs
 {
-#define EMBER_VERSION "1.0.0.6"
+#define EMBER_VERSION "1.0.0.7"
 #define EPS6 T(1e-6)
 #define EPS std::numeric_limits<T>::epsilon()//Apoplugin.h uses -20, but it's more mathematically correct to do it this way.
 #define ISAAC_SIZE 4
@@ -60,7 +60,7 @@ namespace EmberNs
 #define XC(c) (reinterpret_cast<const xmlChar*>(c))
 #define CX(c) (reinterpret_cast<char*>(c))
 #define CCX(c) (reinterpret_cast<const char*>(c))
-#define BadVal(x) (((x) != (x)) || ((x) > 1e10) || ((x) < -1e10))
+#define BadVal(x) (((x) != (x)) || ((x) > 1e20) || ((x) < -1e20))
 #define Vlen(x) (sizeof(x) / sizeof(*x))
 #define SQR(x) ((x) * (x))
 #define CUBE(x) ((x) * (x) * (x))
@@ -72,17 +72,17 @@ namespace EmberNs
 #define CURVES_LENGTH_M1 65535.0f
 #define ONE_OVER_CURVES_LENGTH_M1 1.525902189669e-5f
 #define EMPTYFIELD -9999
-typedef std::chrono::high_resolution_clock Clock;
-typedef std::chrono::duration<double, std::ratio<1, 1000>> DoubleMs;
-typedef std::chrono::time_point<Clock, DoubleMs> DoubleMsTimePoint;
-static inline DoubleMsTimePoint NowMsD() { return time_point_cast<DoubleMs>(Clock::now()); }
-static inline size_t NowMs() { return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count(); }
 typedef uint et;
 typedef std::lock_guard <std::recursive_mutex> rlg;
 
 /// <summary>
 /// Thin wrapper around getting the current time in milliseconds.
 /// </summary>
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::duration<double, std::ratio<1, 1000>> DoubleMs;
+typedef std::chrono::time_point<Clock, DoubleMs> DoubleMsTimePoint;
+static inline DoubleMsTimePoint NowMsD() { return time_point_cast<DoubleMs>(Clock::now()); }
+static inline size_t NowMs() { return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count(); }
 
 #ifndef byte
 	typedef unsigned char byte;

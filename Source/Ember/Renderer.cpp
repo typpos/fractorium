@@ -806,6 +806,12 @@ bool Renderer<T, bucketT>::Alloc(bool histOnly)
 		}
 	}
 
+	if (!m_StandardIterator.get())
+		m_StandardIterator = make_unique<StandardIterator<T>>();
+
+	if (!m_XaosIterator.get())
+		m_XaosIterator = make_unique<XaosIterator<T>>();
+
 	if (lock)
 		LeaveResize();
 

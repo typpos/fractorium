@@ -45,7 +45,7 @@ XmlToEmber<T>::XmlToEmber()
 	if (!m_Init)
 	{
 		//This list is for variation params which are incorrect, but their parent variation name may or may not be correct.
-		//This has some overlap with the list below since some of these have parent variation names that are incorrect.
+		//This has some overlap with the list below since some of these have parent variation names that are also incorrect.
 		m_BadParamNames = unordered_map<string, string>
 		{
 			{ "swtin_distort", "stwin_distort" },           //stwin.
@@ -163,7 +163,16 @@ XmlToEmber<T>::XmlToEmber()
 			{ "w2r_distance", "waves2_radial_distance" },
 			{ "tf_exponent", "Truchet_fill_exponent" },
 			{ "tf_arc_width", "Truchet_fill_arc_width" },
-			{ "tf_seed", "Truchet_fill_seed" }
+			{ "tf_seed", "Truchet_fill_seed" },
+			{ "blockSize", "randCubes_blockSize" },
+			{ "blockHeight", "randCubes_blockHeight" },
+			{ "spread", "randCubes_spread" },
+			{ "seed", "randCubes_seed" },
+			{ "density", "randCubes_density" },
+			{ "radius", "concentric_radius" },
+			//{ "density", "concentric_density" },//Can't have two, which means you can never properly paste from Apophysis with both of these in one xform.
+			{ "R_blur", "concentric_R_blur" },
+			{ "Z_blur", "concentric_Z_blur" }
 		};
 		m_FlattenNames =
 		{
@@ -191,6 +200,7 @@ XmlToEmber<T>::XmlToEmber()
 			"post_rotate_x",
 			"post_rotate_y",
 			"curl3D_cz",
+			"flatten"//Of course don't flatten if it's already present.
 		};
 		//This is a vector of the incorrect variation names and their param names as they are in the legacy, badly named flam3/Apophysis code.
 		vector<string> badParams =
@@ -284,7 +294,6 @@ template <typename T>
 template <typename Alloc, template <typename, typename> class C>
 bool XmlToEmber<T>::Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& embers, bool useDefaults)
 {
-	char* bn;
 	const char* xmlPtr;
 	const char* loc = __FUNCTION__;
 	size_t emberSize;
@@ -298,16 +307,17 @@ bool XmlToEmber<T>::Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& e
 	xmlPtr = CX(&buf[0]);
 	bufSize = strlen(xmlPtr);
 	//embers.reserve(bufSize / 2500);//The Xml text for an ember is around 2500 bytes, but can be much more. Pre-allocate to aovid unnecessary resizing.
-	doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "ISO-8859-1", XML_PARSE_HUGE);
+	int flags = XML_PARSE_HUGE;// | XML_PARSE_RECOVER;
+	doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "ISO-8859-1", flags);
 	//t.Toc("xmlReadMemory");
 
 	if (doc == nullptr)
 	{
-		doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "UTF-8", XML_PARSE_HUGE);
+		doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "UTF-8", flags);
 
 		if (doc == nullptr)
 		{
-			doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "UTF-16", XML_PARSE_HUGE);
+			doc = xmlReadMemory(xmlPtr, int(bufSize), filename, "UTF-16", flags);
 		}
 	}
 
@@ -321,8 +331,7 @@ bool XmlToEmber<T>::Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& e
 	rootnode = xmlDocGetRootElement(doc);
 	//Scan for <flame> nodes, starting with this node.
 	//t.Tic();
-	bn = basename(const_cast<char*>(filename));
-	ScanForEmberNodes(rootnode, bn, embers, useDefaults);
+	ScanForEmberNodes(rootnode, filename, embers, useDefaults);
 	xmlFreeDoc(doc);
 	emberSize = embers.size();
 	auto first = embers.begin();
@@ -344,6 +353,11 @@ bool XmlToEmber<T>::Parse(byte* buf, const char* filename, C<Ember<T>, Alloc>& e
 			if (secondToLast->m_Interp == eInterp::EMBER_INTERP_SMOOTH)
 				secondToLast->m_Interp = eInterp::EMBER_INTERP_LINEAR;
 		}
+	}
+	else
+	{
+		AddToReport(string(loc) + " : Error parsing xml file " + string(filename) + ", no flames present.");
+		return false;
 	}
 
 	//Finally, ensure that consecutive 'rotate' parameters never exceed
@@ -438,7 +452,7 @@ bool XmlToEmber<T>::Aton(const char* str, valT& val)
 /// <param name="useDefaults">True to use defaults if they are not present in the file, else false to use invalid values as placeholders to indicate the values were not present.</param>
 template <typename T>
 template <typename Alloc, template <typename, typename> class C>
-void XmlToEmber<T>::ScanForEmberNodes(xmlNode* curNode, char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults)
+void XmlToEmber<T>::ScanForEmberNodes(xmlNode* curNode, const char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults)
 {
 	bool parseEmberSuccess;
 	xmlNodePtr thisNode = nullptr;
@@ -1025,6 +1039,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		}
 	}
 
+	//If new_linear == 0, manually add a linear
 	if (!fromEmber && !newLinear)
 		currentEmber.Flatten(m_FlattenNames);
 
@@ -1107,7 +1122,7 @@ bool XmlToEmber<T>::ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion,
 			xform.m_Name = string(attStr);
 			std::replace(xform.m_Name.begin(), xform.m_Name.end(), ' ', '_');
 		}
-		else if (!Compare(curAtt->name, "symmetry"))//Legacy support.
+		else if (!fromEmber && !Compare(curAtt->name, "symmetry"))//Legacy support.
 		{
 			//Deprecated, set both color_speed and animate to this value.
 			//Huh? Either set it or not?
@@ -1284,6 +1299,8 @@ bool XmlToEmber<T>::ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion,
 					if (Aton(attStr, val))
 					{
 						parVar->SetParamVal(name, val);
+						//if (!parVar->SetParamVal(name, val))
+						//	AddToReport(string(loc) + " : Failed to set parametric variation parameter " + name);
 					}
 					else
 					{
@@ -1382,7 +1399,7 @@ bool XmlToEmber<T>::XmlContainsTag(xmlAttrPtr att, const char* name)
 /// <param name="chan">The number of channels in each color</param>
 /// <returns>True if there were no errors, else false.</returns>
 template <typename T>
-bool XmlToEmber<T>::ParseHexColors(char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan)
+bool XmlToEmber<T>::ParseHexColors(const char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan)
 {
 	stringstream ss, temp(colstr); ss >> std::hex;
 	string s1, s;

@@ -32,12 +32,13 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string effect = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t temp = 1 / Zeps(cos(vIn.y)) + " << effect << " * MPI;\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (tanh(vIn.x) * temp);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (tanh(vIn.y) * temp);\n"
+		   << "\t\tvOut.x = " << weight << " * (tanh(vIn.x) * temp);\n"
+		   << "\t\tvOut.y = " << weight << " * (tanh(vIn.y) * temp);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -82,10 +83,11 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\tvOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -120,14 +122,15 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string numerator   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string numerator = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string denominator = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string root        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string correctN    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string correctD    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string power       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string root = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string correctN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string correctD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t r2 = pow(precalcSumSquares, " << power << " * (real_t)(0.5)) * xform->m_VariationWeights[" << varIndex << "];\n"
+		   << "\t\treal_t r2 = pow(precalcSumSquares, " << power << " * (real_t)(0.5)) * " << weight << ";\n"
 		   << "\t\treal_t ran = (precalcAtanyx / Zeps(" << denominator << ") + (" << root << " * M_2PI * floor(MwcNext01(mwc) * " << denominator << ") / Zeps(" << denominator << "))) * " << numerator << ";\n"
 		   << "\n"
 		   << "\t\tvOut.x = r2 * cos(ran);\n"
@@ -152,11 +155,11 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Numerator,   prefix + "pow_block_numerator", 3));//Original used a prefix of pow_, which is incompatible with Ember's design.
+		m_Params.push_back(ParamWithName<T>(&m_Numerator, prefix + "pow_block_numerator", 3));//Original used a prefix of pow_, which is incompatible with Ember's design.
 		m_Params.push_back(ParamWithName<T>(&m_Denominator, prefix + "pow_block_denominator", 2));
-		m_Params.push_back(ParamWithName<T>(&m_Root,        prefix + "pow_block_root", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Correctn,    prefix + "pow_block_correctn", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Correctd,    prefix + "pow_block_correctd", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Root, prefix + "pow_block_root", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Correctn, prefix + "pow_block_correctn", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Correctd, prefix + "pow_block_correctd", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Power, prefix + "pow_block_power"));//Precalc.
 	}
 
@@ -197,13 +200,14 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t u = sqrt(ClampGte(Zeps(" << a << ") * SQR(vIn.x) + Zeps(" << b << ") * SQR(vIn.y), (real_t)(0.0)));\n"
 		   << "\n"
-		   << "\t\tvOut.x = cos(u) * tan(vIn.x) * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.y = sin(u) * tan(vIn.y) * xform->m_VariationWeights[" << varIndex << "];\n"
+		   << "\t\tvOut.x = cos(u) * tan(vIn.x) * " << weight << ";\n"
+		   << "\t\tvOut.y = sin(u) * tan(vIn.y) * " << weight << ";\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -250,9 +254,10 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (vIn.x - ((SQR(vIn.x) * vIn.x) / 3)) + vIn.x * SQR(vIn.y);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (vIn.y - ((SQR(vIn.y) * vIn.y) / 3)) + vIn.y * SQR(vIn.x);\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x - ((SQR(vIn.x) * vIn.x) / 3)) + vIn.x * SQR(vIn.y);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y - ((SQR(vIn.y) * vIn.y) / 3)) + vIn.y * SQR(vIn.x);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -291,8 +296,9 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t r = Zeps(pow(precalcSqrtSumSquares, " << dist << "));\n"
 		   << "\t\tint n = floor(" << power << " * MwcNext01(mwc));\n"
@@ -300,8 +306,8 @@ public:
 		   << "\t\treal_t sina = sin(alpha);\n"
 		   << "\t\treal_t cosa = cos(alpha);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosa / r;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sina / r;\n"
+		   << "\t\tvOut.x = " << weight << " * cosa / r;\n"
+		   << "\t\tvOut.y = " << weight << " * sina / r;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -318,7 +324,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "SphericalN_Power", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Dist,  prefix + "SphericalN_Dist",  1));
+		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "SphericalN_Dist", 1));
 	}
 
 private:
@@ -344,13 +350,13 @@ public:
 	{
 		T sin45 = std::sin(45 * DEG_2_RAD_T);//Was 45 radians? They probably meant to convert this from degrees.
 		T cos45 = std::cos(45 * DEG_2_RAD_T);
-		helper.Out.x = ((m_Rotate * helper.In.x) * cos45 - helper.In.y * sin45 +  m_LineUp) + m_X;
+		helper.Out.x = ((m_Rotate * helper.In.x) * cos45 - helper.In.y * sin45 + m_LineUp) + m_X;
 
 		//The if function splits the plugin in two.
 		if (helper.In.y > 0)
 			helper.Out.y = ((m_Rotate * helper.In.y) * cos45 + helper.In.x * sin45 + m_Pull + m_LineUp) + m_Y;
 		else
-			helper.Out.y = (m_Rotate * helper.In.y) * cos45 + helper.In.x * sin45 - m_Pull  - m_LineUp;
+			helper.Out.y = (m_Rotate * helper.In.y) * cos45 + helper.In.x * sin45 - m_Pull - m_LineUp;
 
 		helper.Out.z = DefaultZ(helper);
 	}
@@ -361,11 +367,12 @@ public:
 		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string pull   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string pull = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string lineUp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string x      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string y      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t sin45 = sin(45 * DEG_2_RAD);\n"
 		   << "\t\treal_t cos45 = cos(45 * DEG_2_RAD);\n"
@@ -387,11 +394,11 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Pull,   prefix + "Kaleidoscope_pull"));
-		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "Kaleidoscope_rotate",  1));
+		m_Params.push_back(ParamWithName<T>(&m_Pull, prefix + "Kaleidoscope_pull"));
+		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "Kaleidoscope_rotate", 1));
 		m_Params.push_back(ParamWithName<T>(&m_LineUp, prefix + "Kaleidoscope_line_up", 1));
-		m_Params.push_back(ParamWithName<T>(&m_X,      prefix + "Kaleidoscope_x"));
-		m_Params.push_back(ParamWithName<T>(&m_Y,      prefix + "Kaleidoscope_y"));
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "Kaleidoscope_x"));
+		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "Kaleidoscope_y"));
 	}
 
 private:
@@ -465,22 +472,23 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string radius    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius1   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string phi1      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phi1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string contrast  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pow       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string x1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string y1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string contrast = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pow = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x, y, z;\n"
 		   << "\n"
 		   << "\t\tif (precalcSqrtSumSquares < " << radius << ")\n"
 		   << "\t\t{\n"
 		   << "\t\t	GlynnSim1Circle(&" << radius1 << ", &" << thickness << ", &" << x1 << ", &" << y1 << ", mwc, &x, &y);\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * y;\n"
+		   << "\t\t	vOut.x = " << weight << " * x;\n"
+		   << "\t\t	vOut.y = " << weight << " * y;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -502,13 +510,13 @@ public:
 		   << "\t\t	if (z < SQR(" << radius1 << "))\n"
 		   << "\t\t	{\n"
 		   << "\t\t		GlynnSim1Circle(&" << radius1 << ", &" << thickness << ", &" << x1 << ", &" << y1 << ", mwc, &x, &y);\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * y;\n"
+		   << "\t\t		vOut.x = " << weight << " * x;\n"
+		   << "\t\t		vOut.y = " << weight << " * y;\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * y;\n"
+		   << "\t\t		vOut.x = " << weight << " * x;\n"
+		   << "\t\t		vOut.y = " << weight << " * y;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
@@ -553,14 +561,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,    prefix + "GlynnSim1_radius", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Radius1,   prefix + "GlynnSim1_radius1", T(0.1)));
-		m_Params.push_back(ParamWithName<T>(&m_Phi1,      prefix + "GlynnSim1_phi1"));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "GlynnSim1_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius1, prefix + "GlynnSim1_radius1", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Phi1, prefix + "GlynnSim1_phi1"));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim1_thickness", T(0.1), eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Contrast,  prefix + "GlynnSim1_contrast", T(1.5)));
-		m_Params.push_back(ParamWithName<T>(&m_Pow,       prefix + "GlynnSim1_pow", T(0.5), eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_X1,  prefix + "GlynnSim1_x1"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Y1,  prefix + "GlynnSim1_y1"));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast, prefix + "GlynnSim1_contrast", T(1.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Pow, prefix + "GlynnSim1_pow", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_X1, prefix + "GlynnSim1_x1"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Y1, prefix + "GlynnSim1_y1"));
 	}
 
 private:
@@ -633,24 +641,25 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string radius    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string contrast  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pow       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string phi1      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string phi2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string phi10     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string phi20     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string gamma     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string delta     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string contrast = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pow = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phi1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phi2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phi10 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phi20 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string gamma = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string delta = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x, y;\n"
 		   << "\n"
 		   << "\t\tif (precalcSqrtSumSquares < " << radius << ")\n"
 		   << "\t\t{\n"
 		   << "\t\t	GlynnSim2Circle(&" << radius << ", &" << thickness << ", &" << phi10 << ", &" << delta << ", &" << gamma << ", mwc, &x,&y);\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * y;\n"
+		   << "\t\t	vOut.x = " << weight << " * x;\n"
+		   << "\t\t	vOut.y = " << weight << " * y;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -658,13 +667,13 @@ public:
 		   << "\n"
 		   << "\t\t	if (MwcNext01(mwc) > " << contrast << " * pow(alpha, " << pow << "))\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t		vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * SQR(alpha) * vIn.x;\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * SQR(alpha) * vIn.y;\n"
+		   << "\t\t		vOut.x = " << weight << " * SQR(alpha) * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * SQR(alpha) * vIn.y;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
@@ -708,12 +717,12 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,    prefix + "GlynnSim2_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "GlynnSim2_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim2_thickness", T(0.1), eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Contrast,  prefix + "GlynnSim2_contrast", T(0.5), eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Pow,       prefix + "GlynnSim2_pow", T(1.5)));
-		m_Params.push_back(ParamWithName<T>(&m_Phi1,      prefix + "GlynnSim2_Phi1"));
-		m_Params.push_back(ParamWithName<T>(&m_Phi2,      prefix + "GlynnSim2_Phi2", 360));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast, prefix + "GlynnSim2_contrast", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Pow, prefix + "GlynnSim2_pow", T(1.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Phi1, prefix + "GlynnSim2_Phi1"));
+		m_Params.push_back(ParamWithName<T>(&m_Phi2, prefix + "GlynnSim2_Phi2", 360));
 		m_Params.push_back(ParamWithName<T>(true, &m_Phi10, prefix + "GlynnSim2_Phi10"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Phi20, prefix + "GlynnSim2_Phi20"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Gamma, prefix + "GlynnSim2_Gamma"));
@@ -792,22 +801,23 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string radius     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string thickness  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string thickness2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string contrast   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pow        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius1    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius2    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string gamma      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string contrast = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pow = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string gamma = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x, y;\n"
 		   << "\n"
 		   << "\t\tif (precalcSqrtSumSquares < " << radius1 << ")\n"
 		   << "\t\t{\n"
 		   << "\t\t	GlynnSim3Circle(&" << radius << ", &" << radius1 << ", &" << radius2 << ", &" << thickness << ", &" << gamma << ", mwc, &x,&y);\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * y;\n"
+		   << "\t\t	vOut.x = " << weight << " * x;\n"
+		   << "\t\t	vOut.y = " << weight << " * y;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -815,13 +825,13 @@ public:
 		   << "\n"
 		   << "\t\t	if (MwcNext01(mwc) > " << contrast << " * pow(alpha, " << pow << "))\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t		vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * SQR(alpha) * vIn.x;\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * SQR(alpha) * vIn.y;\n"
+		   << "\t\t		vOut.x = " << weight << " * SQR(alpha) * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * SQR(alpha) * vIn.y;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
@@ -868,14 +878,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,     prefix + "GlynnSim3_radius", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Thickness,  prefix + "GlynnSim3_thickness", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "GlynnSim3_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim3_thickness", T(0.1)));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness2, prefix + "GlynnSim3_thickness2", T(0.1)));
-		m_Params.push_back(ParamWithName<T>(&m_Contrast,   prefix + "GlynnSim3_contrast", T(0.5), eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Pow,        prefix + "GlynnSim3_pow", T(1.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast, prefix + "GlynnSim3_contrast", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Pow, prefix + "GlynnSim3_pow", T(1.5)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Radius1, prefix + "GlynnSim3_radius1"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Radius2, prefix + "GlynnSim3_radius2"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Gamma,   prefix + "GlynnSim3_Gamma"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Gamma, prefix + "GlynnSim3_Gamma"));
 	}
 
 private:
@@ -945,10 +955,11 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string range  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string range = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string length = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string alpha  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t f = MwcNext01(mwc) * " << power << " * 2;\n"
 		   << "\t\treal_t angle = (real_t)(int)(f);\n"
@@ -967,8 +978,8 @@ public:
 		   << "\n"
 		   << "\t\treal_t temp = angle - MPI2;\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * z * cos(temp);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * z * sin(temp);\n"
+		   << "\t\tvOut.x = " << weight << " * z * cos(temp);\n"
+		   << "\t\tvOut.y = " << weight << " * z * sin(temp);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -989,7 +1000,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "starblur_power", 5, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_Range, prefix + "starblur_range", T(0.4016228317)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Length, prefix + "starblur_length"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,  prefix + "starblur_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "starblur_alpha"));
 	}
 
 private:
@@ -1030,12 +1041,13 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t ang = MwcNext01(mwc) * M_2PI;\n"
 		   << "\t\treal_t s = sin(ang);\n"
 		   << "\t\treal_t c = cos(ang);\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * (" << power << " == 1 ? acos(MwcNext01(mwc) * 2 - 1) / MPI : acos(exp(log(MwcNext01(mwc)) * " << power << ") * 2 - 1) / MPI);\n"
+		   << "\t\treal_t r = " << weight << " * (" << power << " == 1 ? acos(MwcNext01(mwc) * 2 - 1) / MPI : acos(exp(log(MwcNext01(mwc)) * " << power << ") * 2 - 1) / MPI);\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * c;\n"
 		   << "\t\tvOut.y = r * s;\n"
@@ -1080,12 +1092,13 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t rad = sqrt(MwcNext01(mwc));\n"
 		   << "\t\treal_t temp = MwcNext01(mwc) * M_2PI;\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cos(temp) * rad;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(temp) * rad;\n"
+		   << "\t\tvOut.x = " << weight << " * cos(temp) * rad;\n"
+		   << "\t\tvOut.y = " << weight << " * sin(temp) * rad;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1124,16 +1137,17 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t coeff = fabs(vIn.z);\n"
 		   << "\n"
 		   << "\t\tif (coeff != 0 && " << power << " != 1)\n"
 		   << "\t\t	coeff = exp(log(coeff) * " << power << ");\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (transX + vIn.x * coeff);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (transY + vIn.y * coeff);\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (transZ + vIn.z * coeff);\n"
+		   << "\t\tvOut.x = " << weight << " * (transX + vIn.x * coeff);\n"
+		   << "\t\tvOut.y = " << weight << " * (transY + vIn.y * coeff);\n"
+		   << "\t\tvOut.z = " << weight << " * (transZ + vIn.z * coeff);\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1199,12 +1213,13 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string power       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scatterDist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string zero        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string workPower   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string alpha       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zero = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string workPower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xang = (precalcAtanyx + MPI) / " << alpha << ";\n"
 		   << "\n"
@@ -1223,14 +1238,14 @@ public:
 		   << "\t\t	{\n"
 		   << "\t\t		real_t rdc = xr + (MwcNext01(mwc) * (real_t)(0.5) * " << scatterDist << ");\n"
 		   << "\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * rdc * cos(precalcAtanyx);\n"
-		   << "\t\t		vOut.y = xform->m_VariationWeights[" << varIndex << "] * rdc * sin(precalcAtanyx);\n"
+		   << "\t\t		vOut.x = " << weight << " * rdc * cos(precalcAtanyx);\n"
+		   << "\t\t		vOut.y = " << weight << " * rdc * sin(precalcAtanyx);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t	vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -1251,12 +1266,12 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power,       prefix + "cropn_power", -5));
-		m_Params.push_back(ParamWithName<T>(&m_Radius,      prefix + "cropn_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "cropn_power", -5));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "cropn_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_ScatterDist, prefix + "cropn_scatterdist"));
-		m_Params.push_back(ParamWithName<T>(&m_Zero,        prefix + "cropn_zero", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero, prefix + "cropn_zero", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_WorkPower, prefix + "cropn_workpower"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,     prefix + "cropn_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "cropn_alpha"));
 	}
 
 private:
@@ -1297,16 +1312,17 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string n     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xang = (precalcAtanyx + M_3PI + " << alpha << " / 2) / " << alpha << ";\n"
 		   << "\t\treal_t zang = ((xang - (int)xang) * " << width << " + (int)xang) * " << alpha << " - MPI - " << alpha << " / 2 * " << width << ";\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares * cos(zang);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares * sin(zang);\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.x = " << weight << " * precalcSqrtSumSquares * cos(zang);\n"
+		   << "\t\tvOut.y = " << weight << " * precalcSqrtSumSquares * sin(zang);\n"
+		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1321,7 +1337,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_N,     prefix + "shredrad_n", 4, eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "shredrad_n", 4, eParamType::REAL_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_Width, prefix + "shredrad_width", T(0.5), eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "shredrad_alpha"));//Precalc.
 	}
@@ -1377,19 +1393,20 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string mode      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string n         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string prescale  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string mode = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string prescale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string postscale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string symmetry  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string comp      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dataHelp  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string symmetry = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string comp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dataHelp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tif (precalcSqrtSumSquares < " << radius << ")\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t	vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -1403,10 +1420,10 @@ public:
 		   << "\n"
 		   << "\t\t	real_t rad = " << radius << " + (precalcSqrtSumSquares - " << radius << ") * delta;\n"
 		   << "\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * rad * cos(precalcAtanyx);\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * rad * sin(precalcAtanyx);\n"
-		   << "\t\t	vOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
-		   //<< "\t\t	transZ += xform->m_VariationWeights[" << varIndex << "] * outPoint->m_Z;\n"//Original had this which is probably wrong.
+		   << "\t\t	vOut.x = " << weight << " * rad * cos(precalcAtanyx);\n"
+		   << "\t\t	vOut.y = " << weight << " * rad * sin(precalcAtanyx);\n"
+		   << "\t\t	vOut.z = " << weight << " * vIn.z;\n"
+		   //<< "\t\t	transZ += " << weight << " * outPoint->m_Z;\n"//Original had this which is probably wrong.
 		   << "\t\t}\n"
 		   << "\t}\n";
 		return ss.str();
@@ -1422,12 +1439,12 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Mode,         prefix + "blob2_mode", 0, eParamType::INTEGER, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_N,            prefix + "blob2_n", 5, eParamType::INTEGER));
-		m_Params.push_back(ParamWithName<T>(&m_Radius,       prefix + "blob2_radius"));
-		m_Params.push_back(ParamWithName<T>(&m_Prescale,     prefix + "blob2_prescale", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Postscale,    prefix + "blob2_postscale", T(0.5)));
-		m_Params.push_back(ParamWithName<T>(&m_Symmetry,     prefix + "blob2_symmetry", 0, eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Mode, prefix + "blob2_mode", 0, eParamType::INTEGER, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "blob2_n", 5, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "blob2_radius"));
+		m_Params.push_back(ParamWithName<T>(&m_Prescale, prefix + "blob2_prescale", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Postscale, prefix + "blob2_postscale", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Symmetry, prefix + "blob2_symmetry", 0, eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Compensation, prefix + "blob2_compensation", 0, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_DeltaHelp, prefix + "blob2_deltahelp"));//Precalc.
 	}
@@ -1474,12 +1491,13 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string n    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t z = vIn.z / " << absn << ";\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * pow(precalcSumSquares + SQR(z), " << cn << ");\n"
+		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares + SQR(z), " << cn << ");\n"
 		   << "\t\treal_t tmp = r * precalcSqrtSumSquares;\n"
 		   << "\t\treal_t ang = (precalcAtanyx + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) / " << n << ";\n"
 		   << "\n"
@@ -1511,7 +1529,7 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "julia3D_power", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsN, prefix + "julia3D_absn"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Cn,   prefix + "julia3D_cn"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Cn, prefix + "julia3D_cn"));
 	}
 
 private:
@@ -1549,11 +1567,12 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string n    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * pow(precalcSumSquares, " << cn << ");\n"
+		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
 		   << "\t\treal_t temp = (precalcAtanyx + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) / " << n << ";\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
@@ -1584,7 +1603,7 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "julia3Dz_power", 2, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsN, prefix + "julia3Dz_absn"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Cn,   prefix + "julia3Dz_cn"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Cn, prefix + "julia3Dz_cn"));
 	}
 
 private:
@@ -1620,11 +1639,12 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string powx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tvOut.x = SignNz(vIn.x) * pow(fabs(vIn.x), " << powx << ") * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.y = SignNz(vIn.y) * pow(fabs(vIn.y), " << powy << ") * xform->m_VariationWeights[" << varIndex << "];\n"
+		   << "\t\tvOut.x = SignNz(vIn.x) * pow(fabs(vIn.x), " << powx << ") * " << weight << ";\n"
+		   << "\t\tvOut.y = SignNz(vIn.y) * pow(fabs(vIn.y), " << powy << ") * " << weight << ";\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1676,13 +1696,14 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string powx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powz = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tvOut.x = (real_t)(vIn.x < 0 ? -1 : 1) * pow(fabs(vIn.x), " << powx << ") * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.y = (real_t)(vIn.y < 0 ? -1 : 1) * pow(fabs(vIn.y), " << powy << ") * xform->m_VariationWeights[" << varIndex << "];\n"
-		   << "\t\tvOut.z = (real_t)(vIn.z < 0 ? -1 : 1) * pow(fabs(vIn.z), " << powz << ") * xform->m_VariationWeights[" << varIndex << "];\n"
+		   << "\t\tvOut.x = (real_t)(vIn.x < 0 ? -1 : 1) * pow(fabs(vIn.x), " << powx << ") * " << weight << ";\n"
+		   << "\t\tvOut.y = (real_t)(vIn.y < 0 ? -1 : 1) * pow(fabs(vIn.y), " << powy << ") * " << weight << ";\n"
+		   << "\t\tvOut.z = (real_t)(vIn.z < 0 ? -1 : 1) * pow(fabs(vIn.z), " << powz << ") * " << weight << ";\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1731,10 +1752,11 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares);\n"
+		   << "\t\treal_t r = " << weight << " / Zeps(precalcSumSquares);\n"
 		   << "\n"
 		   << "\t\tvOut.x = vIn.x * r * " << x << ";\n"
 		   << "\t\tvOut.y = vIn.y * r * " << y << ";\n"
@@ -1790,11 +1812,12 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares + SQR(vIn.z));\n"
+		   << "\t\treal_t r = " << weight << " / Zeps(precalcSumSquares + SQR(vIn.z));\n"
 		   << "\n"
 		   << "\t\tvOut.x = vIn.x * r * " << x << ";\n"
 		   << "\t\tvOut.y = vIn.y * r * " << y << ";\n"
@@ -1855,23 +1878,24 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string a    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string b    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string d    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string tmin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ymin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string tmax = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ymax = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c1   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c2   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t t = (" << tmax << " - " << tmin << ") * MwcNext01(mwc) + " << tmin << ";\n"
 		   << "\t\treal_t y = (" << ymax << " - " << ymin << ") * MwcNext01(mwc) + " << ymin << ";\n"
 		   << "\t\treal_t x1 = (" << a << " + " << b << ") * cos(t) - " << c1 << " * cos((" << a << " + " << b << ") / " << b << " * t);\n"
 		   << "\t\treal_t y1 = (" << a << " + " << b << ") * sin(t) - " << c2 << " * sin((" << a << " + " << b << ") / " << b << " * t);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (x1 + " << d << " * cos(t) + y);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y1 + " << d << " * sin(t) + y);\n"
+		   << "\t\tvOut.x = " << weight << " * (x1 + " << d << " * cos(t) + y);\n"
+		   << "\t\tvOut.y = " << weight << " * (y1 + " << d << " * sin(t) + y);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1882,15 +1906,15 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,    prefix + "Spirograph_a", 3));
-		m_Params.push_back(ParamWithName<T>(&m_B,    prefix + "Spirograph_b", 2));
-		m_Params.push_back(ParamWithName<T>(&m_D,    prefix + "Spirograph_d", 1));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "Spirograph_a", 3));
+		m_Params.push_back(ParamWithName<T>(&m_B, prefix + "Spirograph_b", 2));
+		m_Params.push_back(ParamWithName<T>(&m_D, prefix + "Spirograph_d", 1));
 		m_Params.push_back(ParamWithName<T>(&m_TMin, prefix + "Spirograph_tmin", -1));
 		m_Params.push_back(ParamWithName<T>(&m_YMin, prefix + "Spirograph_ymin", -1));
 		m_Params.push_back(ParamWithName<T>(&m_TMax, prefix + "Spirograph_tmax", 1));
 		m_Params.push_back(ParamWithName<T>(&m_YMax, prefix + "Spirograph_ymax", 1));
-		m_Params.push_back(ParamWithName<T>(&m_C1,   prefix + "Spirograph_c1", 0));
-		m_Params.push_back(ParamWithName<T>(&m_C2,   prefix + "Spirograph_c2", 0));
+		m_Params.push_back(ParamWithName<T>(&m_C1, prefix + "Spirograph_c1", 0));
+		m_Params.push_back(ParamWithName<T>(&m_C2, prefix + "Spirograph_c2", 0));
 	}
 
 private:
@@ -1932,6 +1956,7 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t sinX = sin(vIn.x);\n"
 		   << "\t\treal_t cosX = cos(vIn.x);\n"
@@ -1940,8 +1965,8 @@ public:
 		   << "\t\treal_t bx = Cube(cosX*cosY);\n"
 		   << "\t\treal_t by = Cube(sinX*cosY);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosX * bx;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * cosX * by;\n"
+		   << "\t\tvOut.x = " << weight << " * cosX * bx;\n"
+		   << "\t\tvOut.y = " << weight << " * cosX * by;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1976,11 +2001,12 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t e = 1 / precalcSumSquares + SQR(M2PI);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / precalcSumSquares * vIn.x / e);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / precalcSumSquares * vIn.y / e);\n"
+		   << "\t\tvOut.x = " << weight << " * (" << weight << " / precalcSumSquares * vIn.x / e);\n"
+		   << "\t\tvOut.y = " << weight << " * (" << weight << " / precalcSumSquares * vIn.y / e);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2047,6 +2073,7 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t inZ, otherZ, tempTz, tempPz;\n"
 		   << "\t\tinZ = vIn.z;\n"
@@ -2098,9 +2125,9 @@ public:
 				<< "\t\treal_t d = precalcSumSquares + SQR(tempTz);\n"
 				<< "\t\treal_t e = 1 / d + SQR(M2PI);\n"
 				<< "\n"
-				<< "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * vIn.x / e);\n"
-				<< "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * vIn.y / e);\n"
-				<< "\t\tvOut.z = tempPz + xform->m_VariationWeights[" << varIndex << "] * (xform->m_VariationWeights[" << varIndex << "] / d * tempTz / e);\n"
+				<< "\t\tvOut.x = " << weight << " * (" << weight << " / d * vIn.x / e);\n"
+				<< "\t\tvOut.y = " << weight << " * (" << weight << " / d * vIn.y / e);\n"
+				<< "\t\tvOut.z = tempPz + " << weight << " * (" << weight << " / d * tempTz / e);\n"
 				<< "\t}\n";
 		return ss.str();
 	}
@@ -2131,13 +2158,14 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t d = Zeps(precalcSumSquares);\n"
 		   << "\t\treal_t c1 = Zeps(SQR(vIn.x));\n"
 		   << "\t\treal_t c2 = Zeps(SQR(vIn.y));\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (((real_t)(1.0) / d) * cos(c1) * sin(c2));\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (((real_t)(1.0) / d) * sin(c1) * sin(c2));\n"
+		   << "\t\tvOut.x = " << weight << " * (((real_t)(1.0) / d) * cos(c1) * sin(c2));\n"
+		   << "\t\tvOut.y = " << weight << " * (((real_t)(1.0) / d) * sin(c1) * sin(c2));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2202,6 +2230,7 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
 		   << "\n"
@@ -2212,28 +2241,28 @@ public:
 		   << "\n"
 		   << "\t\tif (p <= 1 * precalcSqrtSumSquares)\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * p;\n"
+		   << "\t\t	vOut.x = " << weight << " * precalcSqrtSumSquares;\n"
+		   << "\t\t	vOut.y = " << weight << " * p;\n"
 		   << "\t\t}\n"
 		   << "\t\telse if (p <= 3 * precalcSqrtSumSquares)\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * (2 * precalcSqrtSumSquares - p);\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares;\n"
+		   << "\t\t	vOut.x = " << weight << " * (2 * precalcSqrtSumSquares - p);\n"
+		   << "\t\t	vOut.y = " << weight << " * precalcSqrtSumSquares;\n"
 		   << "\t\t}\n"
 		   << "\t\telse if (p <= 5 * precalcSqrtSumSquares)\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = -(xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares);\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * (4 * precalcSqrtSumSquares - p);\n"
+		   << "\t\t	vOut.x = -(" << weight << " * precalcSqrtSumSquares);\n"
+		   << "\t\t	vOut.y = " << weight << " * (4 * precalcSqrtSumSquares - p);\n"
 		   << "\t\t}\n"
 		   << "\t\telse if (p <= 7 * precalcSqrtSumSquares)\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = -(xform->m_VariationWeights[" << varIndex << "] * (6 * precalcSqrtSumSquares - p));\n"
-		   << "\t\t	vOut.y = -(xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares);\n"
+		   << "\t\t	vOut.x = -(" << weight << " * (6 * precalcSqrtSumSquares - p));\n"
+		   << "\t\t	vOut.y = -(" << weight << " * precalcSqrtSumSquares);\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares;\n"
-		   << "\t\t	vOut.y = -(xform->m_VariationWeights[" << varIndex << "] * (8 * precalcSqrtSumSquares - p));\n"
+		   << "\t\t	vOut.x = " << weight << " * precalcSqrtSumSquares;\n"
+		   << "\t\t	vOut.y = -(" << weight << " * (8 * precalcSqrtSumSquares - p));\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -2283,13 +2312,14 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string x       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string y       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string size    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rand    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rand = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string invSize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		ss << "\t{\n"
-		   << "\t\treal_t dx, dy, r = xform->m_VariationWeights[" << varIndex << "] / Zeps(precalcSumSquares);\n"
+		   << "\t\treal_t dx, dy, r = " << weight << " / Zeps(precalcSumSquares);\n"
 		   << "\t\tint isXY = LRint(vIn.x * " << invSize << ") + LRint(vIn.y * " << invSize << ");\n"
 		   << "\n"
 		   << "\t\tif (isXY & 1)\n"
@@ -2303,8 +2333,8 @@ public:
 		   << "\t\t	dy = " << y << " + " << rand << " * MwcNext01(mwc);\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (sin(vIn.x) * r + dx);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (sin(vIn.y) * r + dy);\n"
+		   << "\t\tvOut.x = " << weight << " * (sin(vIn.x) * r + dx);\n"
+		   << "\t\tvOut.y = " << weight << " * (sin(vIn.y) * r + dy);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2325,8 +2355,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_X,    prefix + "sschecks_x", T(0.5)));
-		m_Params.push_back(ParamWithName<T>(&m_Y,    prefix + "sschecks_y", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "sschecks_x", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "sschecks_y", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "sschecks_size", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Rand, prefix + "sschecks_rnd"));
 		m_Params.push_back(ParamWithName<T>(true, &m_InvSize, prefix + "sschecks_inv_size"));//Precalc.
@@ -2371,18 +2401,19 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string power    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string xDistort = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string yDistort = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cN       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invN     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string inv2PiN  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string inv2PiN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t preX = vIn.x * (" << xDistort << " + 1);\n"
 		   << "\t\treal_t preY = vIn.y * (" << yDistort << " + 1);\n"
 		   << "\t\treal_t temp = atan2(preY, preX) * " << invN << " + MwcNext(mwc) * " << inv2PiN << ";\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * pow(precalcSumSquares, " << cN << ");\n"
+		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cN << ");\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
 		   << "\t\tvOut.y = r * sin(temp);\n"
@@ -2404,12 +2435,12 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power,    prefix + "phoenix_julia_power", 2));
-		m_Params.push_back(ParamWithName<T>(&m_Dist,     prefix + "phoenix_julia_dist", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "phoenix_julia_power", 2));
+		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "phoenix_julia_dist", 1));
 		m_Params.push_back(ParamWithName<T>(&m_XDistort, prefix + "phoenix_julia_x_distort", T(-0.5)));//Original omitted phoenix_ prefix.
 		m_Params.push_back(ParamWithName<T>(&m_YDistort, prefix + "phoenix_julia_y_distort"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Cn,      prefix + "phoenix_julia_cn"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_InvN,    prefix + "phoenix_julia_invn"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Cn, prefix + "phoenix_julia_cn"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_InvN, prefix + "phoenix_julia_invn"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Inv2PiN, prefix + "phoenix_julia_inv2pin"));
 	}
 
@@ -2455,6 +2486,7 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string reA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string imA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string reB = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -2470,9 +2502,9 @@ public:
 		   << "\t\treal_t vIm = " << reC << " * vIn.y + " << imC << " * vIn.x + " << imD << ";\n"
 		   << "\t\treal_t vDenom = Zeps(vRe * vRe + vIm * vIm);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (uRe * vRe + uIm * vIm) / vDenom;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (uIm * vRe - uRe * vIm) / vDenom;\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * vIn.z;\n"
+		   << "\t\tvOut.x = " << weight << " * (uRe * vRe + uIm * vIm) / vDenom;\n"
+		   << "\t\tvOut.y = " << weight << " * (uIm * vRe - uRe * vIm) / vDenom;\n"
+		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2552,16 +2584,17 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string reA   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string imA   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string reB   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string imB   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string reC   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string imC   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string reD   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string imD   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string reA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string imA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string reB = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string imB = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string reC = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string imC = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string reD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string imD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint n;\n"
 		   << "\n"
@@ -2584,8 +2617,8 @@ public:
 		   << "\t\tn = (int)floor(" << power << " * MwcNext01(mwc));\n"
 		   << "\t\talpha = (atan2(y, x) + n * M_2PI) / floor(" << power << ");\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * r * cos(alpha);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * r * sin(alpha);\n"
+		   << "\t\tvOut.x = " << weight << " * r * cos(alpha);\n"
+		   << "\t\tvOut.y = " << weight << " * r * sin(alpha);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2602,16 +2635,16 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Re_A,  prefix + "MobiusNRe_A", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Im_A,  prefix + "MobiusNIm_A"));
-		m_Params.push_back(ParamWithName<T>(&m_Re_B,  prefix + "MobiusNRe_B"));
-		m_Params.push_back(ParamWithName<T>(&m_Im_B,  prefix + "MobiusNIm_B"));
-		m_Params.push_back(ParamWithName<T>(&m_Re_C,  prefix + "MobiusNRe_C"));
-		m_Params.push_back(ParamWithName<T>(&m_Im_C,  prefix + "MobiusNIm_C"));
-		m_Params.push_back(ParamWithName<T>(&m_Re_D,  prefix + "MobiusNRe_D", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Im_D,  prefix + "MobiusNIm_D"));
+		m_Params.push_back(ParamWithName<T>(&m_Re_A, prefix + "MobiusNRe_A", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Im_A, prefix + "MobiusNIm_A"));
+		m_Params.push_back(ParamWithName<T>(&m_Re_B, prefix + "MobiusNRe_B"));
+		m_Params.push_back(ParamWithName<T>(&m_Im_B, prefix + "MobiusNIm_B"));
+		m_Params.push_back(ParamWithName<T>(&m_Re_C, prefix + "MobiusNRe_C"));
+		m_Params.push_back(ParamWithName<T>(&m_Im_C, prefix + "MobiusNIm_C"));
+		m_Params.push_back(ParamWithName<T>(&m_Re_D, prefix + "MobiusNRe_D", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Im_D, prefix + "MobiusNIm_D"));
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "MobiusN_Power", 2));
-		m_Params.push_back(ParamWithName<T>(&m_Dist,  prefix + "MobiusN_Dist", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "MobiusN_Dist", 1));
 	}
 
 private:
@@ -2699,10 +2732,11 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string radius  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string width   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rectX   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rectY   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rectX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rectY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotateX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotateY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotxSin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -2751,8 +2785,8 @@ public:
 		   << "\t\tmy = ry;\n"
 		   << "\t\tmz = rz * " << rotxCos << " + rx * " << rotxSin << ";\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * mx;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * my;\n"
+		   << "\t\tvOut.x = " << weight << " * mx;\n"
+		   << "\t\tvOut.y = " << weight << " * my;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2771,10 +2805,10 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,  prefix + "mobius_strip_radius", 2));
-		m_Params.push_back(ParamWithName<T>(&m_Width,   prefix + "mobius_strip_width", 1));
-		m_Params.push_back(ParamWithName<T>(&m_RectX,   prefix + "mobius_strip_rect_x", M_2PI));
-		m_Params.push_back(ParamWithName<T>(&m_RectY,   prefix + "mobius_strip_rect_y", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "mobius_strip_radius", 2));
+		m_Params.push_back(ParamWithName<T>(&m_Width, prefix + "mobius_strip_width", 1));
+		m_Params.push_back(ParamWithName<T>(&m_RectX, prefix + "mobius_strip_rect_x", M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_RectY, prefix + "mobius_strip_rect_y", 1));
 		m_Params.push_back(ParamWithName<T>(&m_RotateX, prefix + "mobius_strip_rotate_x"));
 		m_Params.push_back(ParamWithName<T>(&m_RotateY, prefix + "mobius_strip_rotate_y"));
 		m_Params.push_back(ParamWithName<T>(true, &m_RotxSin, prefix + "mobius_strip_rotxsin"));//Precalc.
@@ -2827,21 +2861,22 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string min = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string max = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string a   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string b   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string d   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string e   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string e = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t t = (" << max << " - " << min << ") * MwcNext01(mwc) + " << min << ";\n"
 		   << "\t\treal_t y = MwcNext01(mwc) - (real_t)(0.5);\n"
 		   << "\t\treal_t x1 = sin(" << a << " * t + " << d << ");\n"
 		   << "\t\treal_t y1 = sin(" << b << " * t);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (x1 + " << c << " * t + " << e << " * y);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (y1 + " << c << " * t + " << e << " * y);\n"
+		   << "\t\tvOut.x = " << weight << " * (x1 + " << c << " * t + " << e << " * y);\n"
+		   << "\t\tvOut.y = " << weight << " * (y1 + " << c << " * t + " << e << " * y);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2854,11 +2889,11 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Min, prefix + "Lissajous_tmin", -T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_Max, prefix + "Lissajous_tmax", T(M_PI)));
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "Lissajous_a", 3));
-		m_Params.push_back(ParamWithName<T>(&m_B,   prefix + "Lissajous_b", 2));
-		m_Params.push_back(ParamWithName<T>(&m_C,   prefix + "Lissajous_c"));
-		m_Params.push_back(ParamWithName<T>(&m_D,   prefix + "Lissajous_d"));
-		m_Params.push_back(ParamWithName<T>(&m_E,   prefix + "Lissajous_e"));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "Lissajous_a", 3));
+		m_Params.push_back(ParamWithName<T>(&m_B, prefix + "Lissajous_b", 2));
+		m_Params.push_back(ParamWithName<T>(&m_C, prefix + "Lissajous_c"));
+		m_Params.push_back(ParamWithName<T>(&m_D, prefix + "Lissajous_d"));
+		m_Params.push_back(ParamWithName<T>(&m_E, prefix + "Lissajous_e"));
 	}
 
 private:
@@ -2903,6 +2938,7 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t cn = cos(" << n << " * vIn.y);\n"
@@ -2911,9 +2947,9 @@ public:
 		   << "\t\treal_t sy = sin(vIn.y);\n"
 		   << "\t\treal_t cy = cos(vIn.y);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (cy * (cn * cx));\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (cy * (cn * sx));\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (sy * cn);\n"
+		   << "\t\tvOut.x = " << weight << " * (cy * (cn * cx));\n"
+		   << "\t\tvOut.y = " << weight << " * (cy * (cn * sx));\n"
+		   << "\t\tvOut.z = " << weight << " * (sy * cn);\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2970,9 +3006,10 @@ public:
 		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string even     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string odd      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string size     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string even = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string odd = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string sizeDiv2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
@@ -3006,7 +3043,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Even, prefix + "target_even", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
-		m_Params.push_back(ParamWithName<T>(&m_Odd,  prefix + "target_odd",  0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Odd, prefix + "target_odd", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
 		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "target_size", 1, eParamType::REAL, EPS, TMAX));
 		m_Params.push_back(ParamWithName<T>(true, &m_SizeDiv2, prefix + "target_size_2"));//Precalc.
 	}
@@ -3050,11 +3087,12 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string r           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string n           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string inv         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string sor         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invTimesR   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string r = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string inv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sor = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invTimesR = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneMinusInv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneMinusSor = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
@@ -3064,9 +3102,9 @@ public:
 		   << "\t\treal_t cy = cos(vIn.y);\n"
 		   << "\t\treal_t ir = " << invTimesR << " + (" << oneMinusInv << " * (" << r << " * cos(" << n << " * vIn.x)));\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * (cx * (ir + sy));\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * (sx * (ir + sy));\n"
-		   << "\t\tvOut.z = xform->m_VariationWeights[" << varIndex << "] * (" << sor << " * cy) + (" << oneMinusSor << " * vIn.y);\n"
+		   << "\t\tvOut.x = " << weight << " * (cx * (ir + sy));\n"
+		   << "\t\tvOut.y = " << weight << " * (sx * (ir + sy));\n"
+		   << "\t\tvOut.z = " << weight << " * (" << sor << " * cy) + (" << oneMinusSor << " * vIn.y);\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -3083,8 +3121,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_R,   prefix + "taurus_r",   3));
-		m_Params.push_back(ParamWithName<T>(&m_N,   prefix + "taurus_n",   5));
+		m_Params.push_back(ParamWithName<T>(&m_R, prefix + "taurus_r", 3));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "taurus_n", 5));
 		m_Params.push_back(ParamWithName<T>(&m_Inv, prefix + "taurus_inv", T(1.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Sor, prefix + "taurus_sor", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_InvTimesR, prefix + "taurus_inv_times_r"));//Precalc.
@@ -3152,16 +3190,17 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string a    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string num  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ka   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string num = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ka = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string knpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string kakn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string pikn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint alt;\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
-		   << "\t\treal_t r = xform->m_VariationWeights[" << varIndex << "] * precalcSqrtSumSquares;\n"
+		   << "\t\treal_t r = " << weight << " * precalcSqrtSumSquares;\n"
 		   << "\n"
 		   << "\t\tif (a >= 0)\n"
 		   << "\t\t{\n"
@@ -3203,9 +3242,9 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "collideoscope_a",   0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "collideoscope_a", 0, eParamType::REAL_CYCLIC, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "collideoscope_num", 1, eParamType::INTEGER));
-		m_Params.push_back(ParamWithName<T>(true, &m_Ka,   prefix + "collideoscope_ka"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Ka, prefix + "collideoscope_ka"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_KnPi, prefix + "collideoscope_kn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_KaKn, prefix + "collideoscope_ka_kn"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PiKn, prefix + "collideoscope_pi_kn"));
@@ -3254,8 +3293,9 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y)));\n"
 		   << "\t\treal_t sigma = MPI - atan2(vIn.y, vIn.x + (real_t)(1.0)) - atan2(vIn.y, (real_t)(1.0) - vIn.x);\n"
@@ -3265,8 +3305,8 @@ public:
 		   << "\n"
 		   << "\t\treal_t temp = cosh(tau) - cos(sigma);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * sinh(tau) / temp;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
+		   << "\t\tvOut.x = " << weight << " * sinh(tau) / temp;\n"
+		   << "\t\tvOut.y = " << weight << " * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3282,7 +3322,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "bMod_radius",   1, eParamType::REAL, 0, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "bMod_radius", 1, eParamType::REAL, 0, TMAX));
 		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "bMod_distance", 0, eParamType::REAL_CYCLIC, 0, 2));
 	}
 
@@ -3322,7 +3362,8 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string in  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string in = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string out = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y)));\n"
@@ -3332,8 +3373,8 @@ public:
 		   << "\n"
 		   << "\t\treal_t temp = cosh(tau) - cos(sigma);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * sinh(tau) / temp;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
+		   << "\t\tvOut.x = " << weight << " * sinh(tau) / temp;\n"
+		   << "\t\tvOut.y = " << weight << " * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3349,7 +3390,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_In,  prefix + "bSwirl_in"));
+		m_Params.push_back(ParamWithName<T>(&m_In, prefix + "bSwirl_in"));
 		m_Params.push_back(ParamWithName<T>(&m_Out, prefix + "bSwirl_out"));
 	}
 
@@ -3395,10 +3436,11 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string move   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string split  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string move = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string split = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tau = (real_t)(0.5) * (log(Sqr(vIn.x + (real_t)(1.0)) + SQR(vIn.y)) - log(Sqr(vIn.x - (real_t)(1.0)) + SQR(vIn.y))) / " << power << " + " << move << ";\n"
 		   << "\t\treal_t sigma = MPI - atan2(vIn.y, vIn.x + (real_t)(1.0)) - atan2(vIn.y, (real_t)(1.0) - vIn.x) + " << rotate << ";\n"
@@ -3412,8 +3454,8 @@ public:
 		   << "\n"
 		   << "\t\treal_t temp = cosh(tau) - cos(sigma);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * sinh(tau) / temp;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
+		   << "\t\tvOut.x = " << weight << " * sinh(tau) / temp;\n"
+		   << "\t\tvOut.y = " << weight << " * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3430,9 +3472,9 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "bTransform_rotate"));
-		m_Params.push_back(ParamWithName<T>(&m_Power,  prefix + "bTransform_power", 1, eParamType::INTEGER, 1, T(INT_MAX)));
-		m_Params.push_back(ParamWithName<T>(&m_Move,   prefix + "bTransform_move"));
-		m_Params.push_back(ParamWithName<T>(&m_Split,  prefix + "bTransform_split"));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "bTransform_power", 1, eParamType::INTEGER, 1, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_Move, prefix + "bTransform_move"));
+		m_Params.push_back(ParamWithName<T>(&m_Split, prefix + "bTransform_split"));
 	}
 
 private:
@@ -3479,9 +3521,10 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string a    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string num  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ca   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string num = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ca = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cnPi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string caCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string piCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -3497,8 +3540,8 @@ public:
 		   << "\n"
 		   << "\t\treal_t temp = cosh(tau) - cos(sigma);\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * sinh(tau) / temp;\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sin(sigma) / temp;\n"
+		   << "\t\tvOut.x = " << weight << " * sinh(tau) / temp;\n"
+		   << "\t\tvOut.y = " << weight << " * sin(sigma) / temp;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3513,7 +3556,7 @@ public:
 	{
 		m_CnPi = m_Num * T(M_1_PI);
 		m_PiCn = T(M_PI) / m_Num;
-		m_Ca   = T(M_PI) * m_A;
+		m_Ca = T(M_PI) * m_A;
 		m_CaCn = m_Ca / m_Num;
 	}
 
@@ -3522,9 +3565,9 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "bCollide_a",   0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "bCollide_a", 0, eParamType::REAL_CYCLIC, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "bCollide_num", 1, eParamType::INTEGER, 1, T(INT_MAX)));
-		m_Params.push_back(ParamWithName<T>(true, &m_Ca,   prefix + "bCollide_ca"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Ca, prefix + "bCollide_ca"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CnPi, prefix + "bCollide_cn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CaCn, prefix + "bCollide_ca_cn"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PiCn, prefix + "bCollide_pi_cn"));
@@ -3592,34 +3635,35 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x, c2;\n"
 		   << "\n"
-		   << "\t\tif (fabs(vIn.y) <= xform->m_VariationWeights[" << varIndex << "])\n"
+		   << "\t\tif (fabs(vIn.y) <= " << weight << ")\n"
 		   << "\t\t{\n"
-		   << "\t\t	c2 = sqrt(SQR(xform->m_VariationWeights[" << varIndex << "]) - SQR(vIn.y));\n"
+		   << "\t\t	c2 = sqrt(SQR(" << weight << ") - SQR(vIn.y));\n"
 		   << "\n"
 		   << "\t\t	if (fabs(vIn.x) <= c2)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		x = vIn.x + " << shift << " * xform->m_VariationWeights[" << varIndex << "];\n"
+		   << "\t\t		x = vIn.x + " << shift << " * " << weight << ";\n"
 		   << "\n"
 		   << "\t\t		if (fabs(x) >= c2)\n"
-		   << "\t\t			vOut.x = -(xform->m_VariationWeights[" << varIndex << "] * vIn.x);\n"
+		   << "\t\t			vOut.x = -(" << weight << " * vIn.x);\n"
 		   << "\t\t		else\n"
-		   << "\t\t			vOut.x = xform->m_VariationWeights[" << varIndex << "] * x;\n"
+		   << "\t\t			vOut.x = " << weight << " * x;\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
+		   << "\t\t		vOut.x = " << weight << " * vIn.x;\n"
 		   << "\t\t	}\n"
 		   << "\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t	vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -3671,14 +3715,15 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string ww = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
+		   << "\t\tvOut.x = " << weight << " * vIn.x;\n"
 		   << "\n"
 		   << "\t\tif (precalcSumSquares > " << ww << ")\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\telse\n"
-		   << "\t\t	vOut.y = -(xform->m_VariationWeights[" << varIndex << "] * vIn.y);\n"
+		   << "\t\t	vOut.y = -(" << weight << " * vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -3729,13 +3774,14 @@ public:
 	{
 		ostringstream ss;
 		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * vIn.x;\n"
+		   << "\t\tvOut.x = " << weight << " * vIn.x;\n"
 		   << "\n"
 		   << "\t\tif (vIn.x > 0)\n"
-		   << "\t\t	vOut.y = -(xform->m_VariationWeights[" << varIndex << "] * vIn.y);\n"
+		   << "\t\t	vOut.y = -(" << weight << " * vIn.y);\n"
 		   << "\t\telse\n"
-		   << "\t\t	vOut.y = xform->m_VariationWeights[" << varIndex << "] * vIn.y;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -3801,9 +3847,10 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string a    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string num  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ca   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string num = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ca = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cnPi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string caCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string piCn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -3839,8 +3886,8 @@ public:
 		   << "\t\t	nu *= -1;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * xmax * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * xmax * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3855,7 +3902,7 @@ public:
 	{
 		m_CnPi = m_Num * T(M_1_PI);
 		m_PiCn = T(M_PI) / m_Num;
-		m_Ca   = T(M_PI) * m_A;
+		m_Ca = T(M_PI) * m_A;
 		m_CaCn = m_Ca / m_Num;
 	}
 
@@ -3864,9 +3911,9 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A,   prefix + "eCollide_a",   0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "eCollide_a", 0, eParamType::REAL_CYCLIC, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "eCollide_num", 1, eParamType::INTEGER, 1, T(INT_MAX)));
-		m_Params.push_back(ParamWithName<T>(true, &m_Ca,   prefix + "eCollide_ca"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Ca, prefix + "eCollide_ca"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CnPi, prefix + "eCollide_cn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CaCn, prefix + "eCollide_ca_cn"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PiCn, prefix + "eCollide_pi_cn"));
@@ -3932,8 +3979,9 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string sign  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sign = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x, r2 = precalcSumSquares;\n"
 		   << "\n"
@@ -3963,8 +4011,8 @@ public:
 		   << "\t\tnu = nu / " << power << " + M_2PI / " << power << " * floor(MwcNext01(mwc) * " << power << ");\n"
 		   << "\t\tmu /= " << power << ";\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosh(mu) * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * cosh(mu) * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4026,9 +4074,9 @@ public:
 		if (mu < m_Radius && -mu < m_Radius)
 		{
 			if (nu > 0)
-				mu = fmod(mu + m_Radius + m_Distance * m_Radius, 2 * m_Radius) -  m_Radius;
+				mu = fmod(mu + m_Radius + m_Distance * m_Radius, 2 * m_Radius) - m_Radius;
 			else
-				mu = fmod(mu - m_Radius - m_Distance * m_Radius, 2 * m_Radius) +  m_Radius;
+				mu = fmod(mu - m_Radius - m_Distance * m_Radius, 2 * m_Radius) + m_Radius;
 		}
 
 		helper.Out.x = m_Weight * std::cosh(mu) * std::cos(nu);
@@ -4042,8 +4090,9 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4066,8 +4115,8 @@ public:
 		   << "\t\t		mu = fmod(mu - " << radius << " - " << dist << " * " << radius << ", 2 * " << radius << ") +  " << radius << ";\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosh(mu) * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * cosh(mu) * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4083,7 +4132,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "eMod_radius",   1, eParamType::REAL, 0, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "eMod_radius", 1, eParamType::REAL, 0, TMAX));
 		m_Params.push_back(ParamWithName<T>(&m_Distance, prefix + "eMod_distance", 0, eParamType::REAL_CYCLIC, 0, 2));
 	}
 
@@ -4141,7 +4190,8 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string move   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string move = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
@@ -4170,8 +4220,8 @@ public:
 		   << "\n"
 		   << "\t\tnu += " << rotate << ";\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosh(mu) * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * cosh(mu) * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4187,7 +4237,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Move,   prefix + "eMotion_move"));
+		m_Params.push_back(ParamWithName<T>(&m_Move, prefix + "eMotion_move"));
 		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "eMotion_rotate", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
 	}
 
@@ -4236,8 +4286,9 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string push   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string push = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
@@ -4257,8 +4308,8 @@ public:
 		   << "\t\tmu *= " << dist << ";\n"
 		   << "\t\tmu += " << push << ";\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosh(mu) * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * cosh(mu) * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4274,8 +4325,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Push,   prefix + "ePush_push"));
-		m_Params.push_back(ParamWithName<T>(&m_Dist,   prefix + "ePush_dist", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Push, prefix + "ePush_push"));
+		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "ePush_dist", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "ePush_rotate", 0, eParamType::REAL_CYCLIC, T(-M_PI), T(M_PI)));
 	}
 
@@ -4325,6 +4376,7 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
+		string weight = WeightDefineString();
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
@@ -4341,8 +4393,8 @@ public:
 		   << "\n"
 		   << "\t\tnu = fmod(nu + " << rotate << " + MPI, M_2PI) - MPI;\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * xmax * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * xmax * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4411,8 +4463,9 @@ public:
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
-		string scale   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angle   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string weight = WeightDefineString();
+		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
@@ -4436,8 +4489,8 @@ public:
 		   << "\t\tif (nu < -MPI)\n"
 		   << "\t\t	nu += M_2PI;\n"
 		   << "\n"
-		   << "\t\tvOut.x = xform->m_VariationWeights[" << varIndex << "] * cosh(mu) * cos(nu);\n"
-		   << "\t\tvOut.y = xform->m_VariationWeights[" << varIndex << "] * sinh(mu) * sin(nu);\n"
+		   << "\t\tvOut.x = " << weight << " * cosh(mu) * cos(nu);\n"
+		   << "\t\tvOut.y = " << weight << " * sinh(mu) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();

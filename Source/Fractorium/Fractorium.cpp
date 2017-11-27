@@ -112,10 +112,10 @@ Fractorium::Fractorium(QWidget* p)
 	m_Controller->SetupVariationsTree();
 	m_Controller->FilteredVariations();
 
-	if (m_Info->Ok() && m_Settings->OpenCL() && m_QualitySpin->value() < (30 * m_Settings->Devices().size()))
-		m_QualitySpin->setValue(30 * m_Settings->Devices().size());
+	if (m_Info->Ok() && m_Settings->OpenCL() && m_QualitySpin->value() < (m_Settings->OpenClQuality() * m_Settings->Devices().size()))
+		m_QualitySpin->setValue(m_Settings->OpenClQuality() * m_Settings->Devices().size());
 
-	int statusBarHeight = 20 * devicePixelRatio();
+	int statusBarHeight = 20;// *devicePixelRatio();
 	ui.StatusBar->setMinimumHeight(statusBarHeight);
 	ui.StatusBar->setMaximumHeight(statusBarHeight);
 	m_RenderStatusLabel = new QLabel(this);
@@ -222,6 +222,9 @@ Fractorium::~Fractorium()
 	m_Settings->ShowGrid(ui.ActionDrawGrid->isChecked());
 	m_Settings->setValue("windowState", saveState());
 	m_Settings->sync();
+
+	if (m_Settings->LoadLast())
+		m_Controller->SaveCurrentFileOnShutdown();
 }
 
 /// <summary>
@@ -330,8 +333,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 {
 	if (o == ui.GLParentScrollArea && e->type() == QEvent::Resize)
 	{
-		m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width());
-		m_HeightSpin->DoubleClickNonZero(ui.GLParentScrollArea->height());
+		m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width() * ui.GLDisplay->devicePixelRatioF());
+		m_HeightSpin->DoubleClickNonZero(ui.GLParentScrollArea->height() * ui.GLDisplay->devicePixelRatioF());
 	}
 	else if (auto ke = dynamic_cast<QKeyEvent*>(e))
 	{
@@ -368,8 +371,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 /// <param name="e">The event</param>
 void Fractorium::resizeEvent(QResizeEvent* e)
 {
-	m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width());
-	m_HeightSpin->DoubleClickNonZero(ui.GLParentScrollArea->height());
+	m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width() * ui.GLDisplay->devicePixelRatioF());
+	m_HeightSpin->DoubleClickNonZero(ui.GLParentScrollArea->height() * ui.GLDisplay->devicePixelRatioF());
 	QMainWindow::resizeEvent(e);
 }
 

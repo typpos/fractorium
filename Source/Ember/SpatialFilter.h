@@ -107,6 +107,14 @@ public:
 	{
 		do
 		{
+			if (!m_FilterRadius)
+			{
+				m_Filter.resize(1);
+				m_Filter[0] = 1;
+				m_FinalFilterWidth = 1;
+				return;
+			}
+
 			T fw = T(2.0) * m_Support * m_Supersample * m_FilterRadius / m_PixelAspectRatio;
 			T adjust, ii, jj;
 			int fwidth = int(fw) + 1;

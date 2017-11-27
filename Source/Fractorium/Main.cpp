@@ -11,6 +11,7 @@
 int main(int argc, char* argv[])
 {
 	int rv = -1;
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication a(argc, argv);
 #ifdef TEST_CL
 	QMessageBox::critical(QApplication::desktop(), "Error", "Fractorium cannot be run in test mode, undefine TEST_CL first.");

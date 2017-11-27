@@ -187,6 +187,21 @@ public:
 	}
 
 	/// <summary>
+	/// Integer hash function from http://burtleburtle.net/bob/hash/integer.html
+	/// </summary>
+	/// <param name="a">The value to hash</param>
+	/// <returns>The hashed value</returns>
+	static T Hash(int a)
+	{
+		a = (a ^ 61) ^ (a >> 16);
+		a = a + (a << 3);
+		a = a ^ (a >> 4);
+		a = a * 0x27d4eb2d;
+		a = a ^ (a >> 15);
+		return (T)a / std::numeric_limits<int>::max();
+	}
+
+	/// <summary>
 	/// Retrieve information about a piece of shared data by looking
 	/// up its name.
 	/// </summary>

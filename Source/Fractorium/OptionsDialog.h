@@ -47,8 +47,11 @@ private:
 	bool ToggleType();
 	bool Png16Bit();
 	bool AutoUnique();
+	bool LoadLast();
 	uint ThreadCount();
 	uint RandomCount();
+	uint CpuQuality();
+	uint OpenClQuality();
 	void DataToGui();
 	void GuiToData();
 

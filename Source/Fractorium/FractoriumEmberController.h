@@ -100,6 +100,7 @@ public:
 	virtual void SaveCurrentAsXml() { }
 	virtual void SaveEntireFileAsXml() { }
 	virtual uint SaveCurrentToOpenedFile(bool render = true) { return 0; }
+	virtual void SaveCurrentFileOnShutdown() { }
 	virtual void Undo() { }//Edit.
 	virtual void Redo() { }
 	virtual void CopyXml() { }
@@ -362,6 +363,7 @@ public:
 	virtual void SaveCurrentAsXml() override;
 	virtual void SaveEntireFileAsXml() override;
 	virtual uint SaveCurrentToOpenedFile(bool render = true) override;
+	virtual void SaveCurrentFileOnShutdown() override;
 	virtual void Undo() override;
 	virtual void Redo() override;
 	virtual void CopyXml() override;

@@ -344,7 +344,7 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 		dir.mkpath(".");
 
 	string filename = path.toStdString() + "/last.flame";
-	writer.Save(filename.c_str(), m_Ember, 0, true, true, false, true, true);
+	writer.Save(filename, m_Ember, 0, true, true, false, true, true);
 	m_GLController->ResetMouseState();
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 	FillParamTablesAndPalette();

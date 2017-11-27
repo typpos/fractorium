@@ -74,8 +74,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1269</width>
-      <height>987</height>
+      <width>1259</width>
+      <height>980</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -2007,14 +2007,14 @@
       <rect>
        <x>770</x>
        <y>0</y>
-       <width>294</width>
+       <width>295</width>
        <height>881</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
-       <width>294</width>
-       <height>617</height>
+       <width>295</width>
+       <height>624</height>
       </size>
      </property>
      <property name="features">
@@ -2689,13 +2689,13 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>60</width>
+             <width>65</width>
              <height>22</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>60</width>
+             <width>65</width>
              <height>22</height>
             </size>
            </property>
@@ -3700,8 +3700,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>263</width>
-                <height>722</height>
+                <width>128</width>
+                <height>686</height>
                </rect>
               </property>
               <property name="autoFillBackground">
@@ -5786,8 +5786,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>259</width>
-                   <height>652</height>
+                   <width>136</width>
+                   <height>58</height>
                   </rect>
                  </property>
                  <property name="sizePolicy">
@@ -5920,7 +5920,7 @@
             <x>0</x>
             <y>0</y>
             <width>291</width>
-            <height>851</height>
+            <height>854</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -7027,8 +7027,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>432</width>
-           <height>589</height>
+           <width>442</width>
+           <height>587</height>
           </rect>
          </property>
          <property name="sizePolicy">

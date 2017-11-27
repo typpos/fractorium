@@ -1,3 +1,26 @@
+1.0.0.7 11/26/2017
+--User changes
+ -Support 4k monitors, and in general, properly scale any monitor that is not HD.
+ -Allow for a spatial filter of radius zero, which means do not use a spatial filter.
+ -Add new variations: concentric, cpow3, helicoid, helix, rand_cubes, sphereblur.
+ -Use a new method for computing elliptic which is more precise. Developed by Discord user Claude.
+ -Remove the 8 variation per xform limitation on the GPU.
+ -Allow for loading the last flame file on startup, rather than randoms.
+ -Use two different default quality values in the interactive renderer, one each for CPU and GPU.
+ -Creating linked xforms was using non-standard behavior. Make it match Apo and also support creating multiple linked xforms at once.
+
+--Bug fixes
+ -No variations in an xform used to have the same behavior as a single linear variation with weight 1. While sensible, this breaks backward compatibility. No variations now sets the output point to zeroes.
+ -Prevent crashing the program when adjusting a value on the main window while a final render is in progress.
+ -The xaos table was inverted.
+
+--Code changes
+ -Convert projects to Visual Studio 2017.
+ -Change bad vals from +- 1e10 to +-1e20.
+ -Reintroduce the symmetry tag in xforms for legacy support in programs that do not use color_speed.
+ -Compiler will not let us use default values in templated member functions anymore.
+ -Add a benchmarking suite.
+
 1.0.0.6 09/02/2017
 --Bug fixes
  -Strips renders crashed.

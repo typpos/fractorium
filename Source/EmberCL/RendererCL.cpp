@@ -1772,9 +1772,6 @@ void RendererCL<T, bucketT>::ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, 
 		xformsCL[i].m_ColorSpeedCache = xform->ColorSpeedCache();
 		xformsCL[i].m_OneMinusColorCache = xform->OneMinusColorCache();
 		xformsCL[i].m_Opacity = xform->m_Opacity;
-
-		for (size_t varIndex = 0; varIndex < xform->TotalVariationCount() && varIndex < MAX_CL_VARS; varIndex++)//Assign all variation weights for this xform, with a max of MAX_CL_VARS.
-			xformsCL[i].m_VariationWeights[varIndex] = xform->GetVariation(varIndex)->m_Weight;
 	}
 }
 

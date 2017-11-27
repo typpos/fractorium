@@ -24,6 +24,9 @@
 #define CPUSUBBATCH		     "render/cpusubbatch"
 #define OPENCLSUBBATCH	     "render/openclsubbatch"
 #define RANDOMCOUNT			 "render/randomcount"
+#define CPU_QUALITY          "render/cpuquality"
+#define OPENCL_QUALITY       "render/openclquality"
+#define LOAD_LAST            "render/loadlastonstart"
 
 #define STAGGER		         "sequence/stagger"
 #define STAGGERMAX		     "sequence/staggermax"
@@ -152,6 +155,15 @@ public:
 
 	uint RandomCount();
 	void RandomCount(uint i);
+
+	uint CpuQuality();
+	void CpuQuality(uint i);
+
+	uint OpenClQuality();
+	void OpenClQuality(uint i);
+
+	bool LoadLast();
+	void LoadLast(bool b);
 
 	double Stagger();
 	void Stagger(double i);

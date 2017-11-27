@@ -669,7 +669,7 @@ bool EmberGenome(EmberOptions& opt)
 						mutMeth = eMutateMode::MUTATE_NOT_SPECIFIED;
 					}
 
-					os << tools.Mutate(orig, mutMeth, vars, opt.Symmetry(), T(opt.Speed()), MAX_CL_VARS);
+					os << tools.Mutate(orig, mutMeth, vars, opt.Symmetry(), T(opt.Speed()), 8);
 
 					//Scan string returned for 'mutate color'.
 					if (strstr(os.str().c_str(), "mutate color"))
@@ -718,7 +718,7 @@ bool EmberGenome(EmberOptions& opt)
 				{
 					os << "random";
 					randomMode = true;
-					tools.Random(orig, vars, opt.Symmetry(), 0, MAX_CL_VARS);
+					tools.Random(orig, vars, opt.Symmetry(), 0, 8);
 					orig.m_FinalRasW = 1920;
 					orig.m_FinalRasH = 1080;
 					aselp0 = nullptr;

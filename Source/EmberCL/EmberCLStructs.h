@@ -72,7 +72,7 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define COLORMAP_LENGTH 256u\n"
 	   "#define COLORMAP_LENGTH_MINUS_1 255\n"
 	   "#define DE_THRESH 100u\n"
-	   "#define BadVal(x) (((x) != (x)) || ((x) > 1e10) || ((x) < -1e10))\n"
+	   "#define BadVal(x) (((x) != (x)) || ((x) > 1e20) || ((x) < -1e20))\n"
 	   "#define SQR(x) ((x) * (x))\n"
 	   "#define CUBE(x) ((x) * (x) * (x))\n"
 	   "#define MPI ((real_t)M_PI)\n"
@@ -158,9 +158,6 @@ static const char* PointCLStructString =
 	"} Point;\n"
 	"\n";
 
-#define MAX_CL_VARS 8//These must always match.
-#define MAX_CL_VARS_STRING "8"
-
 /// <summary>
 /// A structure on the host used to hold all of the needed information for an xform used on the device to iterate in OpenCL.
 /// Template argument expected to be float or double.
@@ -169,12 +166,11 @@ template <typename T>
 struct ALIGN XformCL
 {
 	T m_A, m_B, m_C, m_D, m_E, m_F;//24 (48)
-	T m_VariationWeights[MAX_CL_VARS];//56 (112)
-	T m_PostA, m_PostB, m_PostC, m_PostD, m_PostE, m_PostF;//80 (160)
-	T m_DirectColor;//84 (168)
-	T m_ColorSpeedCache;//88 (176)
-	T m_OneMinusColorCache;//92 (184)
-	T m_Opacity;//96 (192)
+	T m_PostA, m_PostB, m_PostC, m_PostD, m_PostE, m_PostF;//48 (96)
+	T m_DirectColor;//52 (104)
+	T m_ColorSpeedCache;//56 (112)
+	T m_OneMinusColorCache;//60 (120)
+	T m_Opacity;//64 (128)
 };
 
 /// <summary>
@@ -184,7 +180,6 @@ static const char* XformCLStructString =
 	"typedef struct __attribute__ " ALIGN_CL " _XformCL\n"
 	"{\n"
 	"	real_t m_A, m_B, m_C, m_D, m_E, m_F;\n"
-	"	real_t m_VariationWeights[" MAX_CL_VARS_STRING "];\n"
 	"	real_t m_PostA, m_PostB, m_PostC, m_PostD, m_PostE, m_PostF;\n"
 	"	real_t m_DirectColor;\n"
 	"	real_t m_ColorSpeedCache;\n"

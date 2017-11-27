@@ -29,7 +29,7 @@ public:
 
 	bool Save(const string& filename, Ember<T>& ember, size_t printEditDepth, bool doEdits, bool hexPalette, bool append = false, bool start = false, bool finish = false);
 	template <typename Alloc, template <typename, typename> class C>
-	bool Save(const string& filename, C<Ember<T>, Alloc>& embers, size_t printEditDepth, bool doEdits, bool hexPalette, bool append = false, bool start = false, bool finish = false);
+	bool Save(const string& filename, C<Ember<T>, Alloc>& embers, size_t printEditDepth, bool doEdits, bool hexPalette, bool append, bool start, bool finish);
 	string ToString(Ember<T>& ember, const string& extraAttributes, size_t printEditDepth, bool doEdits, bool hexPalette = true);
 	xmlDocPtr CreateNewEditdoc(Ember<T>* parent0, Ember<T>* parent1, const string& action, const string& nick, const string& url, const string& id, const string& comment, intmax_t sheepGen = 0, intmax_t sheepId = 0);
 

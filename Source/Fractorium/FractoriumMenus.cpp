@@ -77,7 +77,7 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 
 	for (size_t i = 0; i < count; i++)
 	{
-		m_SheepTools->Random(ember, filteredVariationsRef, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
+		m_SheepTools->Random(ember, filteredVariationsRef, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, 8);
 		ParamsToEmber(ember);
 		ember.m_Index = i;
 		ember.m_Name = m_EmberFile.m_Filename.toStdString() + "_" + ToString(i + 1ULL).toStdString();
@@ -114,6 +114,7 @@ void FractoriumEmberController<T>::NewEmptyFlameInCurrentFile()
 	ParamsToEmber(ember);
 	xform.m_Weight = T(0.25);
 	xform.m_ColorX = m_Rand.Frand01<T>();
+	xform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 	ember.AddXform(xform);
 	ember.m_Palette = *m_PaletteList->GetRandomPalette();
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
@@ -136,7 +137,7 @@ void FractoriumEmberController<T>::NewRandomFlameInCurrentFile()
 {
 	Ember<T> ember;
 	StopAllPreviewRenderers();
-	m_SheepTools->Random(ember, m_FilteredVariations, static_cast<int>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, MAX_CL_VARS);
+	m_SheepTools->Random(ember, m_FilteredVariations, static_cast<int>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, 8);
 	ParamsToEmber(ember);
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
 	ember.m_Index = m_EmberFile.Size();
@@ -198,7 +199,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 		{
 			embers.clear();
 
-			if (parser.Parse(filename.toStdString().c_str(), embers) && !embers.empty())
+			if (parser.Parse(filename.toStdString().c_str(), embers, true) && !embers.empty())
 			{
 				for (i = 0; i < embers.size(); i++)
 				{
@@ -235,6 +236,12 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 		}
 		else if (emberFile.Size() > 0)//Ensure at least something was read.
 			m_EmberFile = std::move(emberFile);//Move the temp to avoid creating dupes because we no longer need it.
+		else if (!m_EmberFile.Size())
+		{
+			//Loading failed, so fill it with a dummy.
+			Ember<T> ember;
+			m_EmberFile.m_Embers.push_back(ember);
+		}
 
 		//Resync indices and names.
 		i = 0;
@@ -343,7 +350,7 @@ void FractoriumEmberController<T>::SaveEntireFileAsXml()
 		for (auto& ember : emberFile.m_Embers)
 			ApplyXmlSavingTemplate(ember);
 
-		if (writer.Save(filename.toStdString().c_str(), emberFile.m_Embers, 0, true, true))
+		if (writer.Save(filename.toStdString().c_str(), emberFile.m_Embers, 0, true, true, false, false, false))
 		{
 			if (!s->SaveAutoUnique() || m_LastSaveAll == "")//Only save filename on first time through when doing auto unique names.
 				m_LastSaveAll = filename;
@@ -356,6 +363,20 @@ void FractoriumEmberController<T>::SaveEntireFileAsXml()
 }
 
 void Fractorium::OnActionSaveEntireFileAsXml(bool checked) { m_Controller->SaveEntireFileAsXml(); }
+
+template <typename T>
+void FractoriumEmberController<T>::SaveCurrentFileOnShutdown()
+{
+	EmberToXml<T> writer;
+	auto path = GetDefaultUserPath();
+	QDir dir(path);
+
+	if (!dir.exists())
+		dir.mkpath(".");
+
+	string filename = path.toStdString() + "/lastonshutdown.flame";
+	writer.Save(filename, m_EmberFile.m_Embers, 0, true, true, false, false, false);
+}
 
 /// <summary>
 /// Show a file save dialog and save what is currently shown in the render window to disk as an image.
@@ -557,7 +578,7 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 
 	b.clear();
 	StopAllPreviewRenderers();
-	parser.Parse(reinterpret_cast<byte*>(const_cast<char*>(s.c_str())), "", embers);
+	parser.Parse(reinterpret_cast<byte*>(const_cast<char*>(s.c_str())), "", embers, true);
 	errors = parser.ErrorReportString();
 
 	if (errors != "")
@@ -598,7 +619,8 @@ void FractoriumEmberController<T>::PasteXmlOver()
 	size_t i = 0;
 	string s, errors;
 	XmlToEmber<T> parser;
-	auto backupEmber = m_EmberFile.m_Embers.begin();
+	list<Ember<T>> embers;
+	auto backupEmber = *m_EmberFile.m_Embers.begin();
 	auto codec = QTextCodec::codecForName("UTF-8");
 	auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
@@ -611,8 +633,7 @@ void FractoriumEmberController<T>::PasteXmlOver()
 
 	b.clear();
 	StopAllPreviewRenderers();
-	m_EmberFile.m_Embers.clear();//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
-	parser.Parse(reinterpret_cast<byte*>(const_cast<char*>(s.c_str())), "", m_EmberFile.m_Embers);
+	parser.Parse(reinterpret_cast<byte*>(const_cast<char*>(s.c_str())), "", embers, true);
 	errors = parser.ErrorReportString();
 
 	if (errors != "")
@@ -620,8 +641,10 @@ void FractoriumEmberController<T>::PasteXmlOver()
 		m_Fractorium->ShowCritical("Paste Error", QString::fromStdString(errors));
 	}
 
-	if (m_EmberFile.Size())
+	if (embers.size())
 	{
+		m_EmberFile.m_Embers = std::move(embers);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
+
 		for (auto it : m_EmberFile.m_Embers)
 		{
 			it.m_Index = i++;
@@ -631,16 +654,11 @@ void FractoriumEmberController<T>::PasteXmlOver()
 			if (it.m_Name == "" || it.m_Name == "No name")
 				it.m_Name = ToString<qulonglong>(it.m_Index).toStdString();
 		}
-	}
-	else
-	{
-		backupEmber->m_Index = 0;
-		m_EmberFile.m_Embers.push_back(*backupEmber);
-	}
 
-	m_EmberFile.MakeNamesUnique();
-	FillLibraryTree();
-	SetEmber(0, false);
+		m_EmberFile.MakeNamesUnique();
+		FillLibraryTree();
+		SetEmber(0, false);
+	}
 }
 
 void Fractorium::OnActionPasteXmlOver(bool checked) { m_Controller->PasteXmlOver(); }
@@ -856,6 +874,7 @@ void FractoriumEmberController<T>::ClearFlame()
 			if (auto xform = m_Ember.GetXform(0))
 			{
 				xform->Clear();
+				xform->AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 				xform->ParentEmber(&m_Ember);
 			}
 		}

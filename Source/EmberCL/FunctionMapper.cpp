@@ -125,6 +125,16 @@ FunctionMapper::FunctionMapper()
 			"	*val1 = *val2;\n"
 			"	*val2 = tmp;\n"
 			"}\n";
+		s_GlobalMap["Hash"] =
+			"inline real_t Hash(int a)\n"
+			"{\n"
+			"	a = (a ^ 61) ^ (a >> 16);\n"
+			"	a = a + (a << 3);\n"
+			"	a = a ^ (a >> 4);\n"
+			"	a = a * 0x27d4eb2d;\n"
+			"	a = a ^ (a >> 15);\n"
+			"	return (real_t)a / INT_MAX;\n"
+			"}\n";
 		s_GlobalMap["Vratio"] =
 			"inline real_t Vratio(real2* p, real2* q, real2* u)\n"
 			"{\n"

@@ -32,13 +32,36 @@ void GLWidget::InitGL()
 {
 	if (!m_Init)
 	{
-		int w = m_Fractorium->ui.GLParentScrollArea->width();
-		int h = m_Fractorium->ui.GLParentScrollArea->height();
+		int w = std::ceil(m_Fractorium->ui.GLParentScrollArea->width() * devicePixelRatioF());
+		int h = std::ceil(m_Fractorium->ui.GLParentScrollArea->height() * devicePixelRatioF());
 		SetDimensions(w, h);
-		m_Fractorium->m_WidthSpin->setValue(w);
-		m_Fractorium->m_HeightSpin->setValue(h);
-		//Start with a flock of random embers. Can't do this until now because the window wasn't maximized yet, so the sizes would have been off.
-		m_Fractorium->OnActionNewFlock(false);
+		//Start with either a flock of random embers, or the last flame from the previous run.
+		//Can't do this until now because the window wasn't maximized yet, so the sizes would have been off.
+		bool b = m_Fractorium->m_Settings->LoadLast();
+
+		if (b)
+		{
+			auto path = GetDefaultUserPath();
+			QDir dir(path);
+			QString filename = path + "/lastonshutdown.flame";
+
+			if (dir.exists(filename))
+			{
+				QStringList ql;
+				ql << filename;
+				m_Fractorium->m_Controller->OpenAndPrepFiles(ql, false);
+			}
+			else
+				b = false;
+		}
+
+		if (!b)
+		{
+			m_Fractorium->OnActionNewFlock(false);
+			m_Fractorium->m_WidthSpin->setValue(w);
+			m_Fractorium->m_HeightSpin->setValue(h);
+		}
+
 		m_Fractorium->m_Controller->DelayedStartRenderTimer();
 		m_Init = true;
 	}
@@ -61,9 +84,14 @@ void GLWidget::DrawQuad()
 	if (m_OutputTexID != 0 && finalImage && !finalImage->empty())
 	{
 		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);//The texture to draw to.
+		auto scaledW = std::ceil(width() * devicePixelRatioF());
+		auto scaledH = std::ceil(height() * devicePixelRatioF());
 
 		//Only draw if the dimensions match exactly.
-		if (m_TexWidth == width() && m_TexHeight == height() && ((m_TexWidth * m_TexHeight) == GLint(finalImage->size())))
+		if (m_TexWidth == m_Fractorium->m_Controller->FinalRasW() &&
+				m_TexHeight == m_Fractorium->m_Controller->FinalRasH() &&
+				((m_TexWidth * m_TexHeight) == GLint(finalImage->size())))
+			//if (m_TexWidth == scaledW && m_TexHeight == scaledH && ((m_TexWidth * m_TexHeight) == GLint(finalImage->size())))
 		{
 			glMatrixMode(GL_PROJECTION);
 			glPushMatrix();
@@ -337,16 +365,16 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 
 	if (dragging)//Draw large yellow dot on select or drag.
 	{
-		m_GL->glPointSize(6.0f);
+		m_GL->glPointSize(6.0f * m_GL->devicePixelRatioF());
 		m_GL->glBegin(GL_POINTS);
 		m_GL->glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
 		m_GL->glVertex2f(m_DragHandlePos.x, m_DragHandlePos.y);
 		m_GL->glEnd();
-		m_GL->glPointSize(1.0f);//Restore point size.
+		m_GL->glPointSize(1.0f * m_GL->devicePixelRatioF());//Restore point size.
 	}
 	else if (m_DragState == eDragState::DragSelect)
 	{
-		m_GL->glLineWidth(2.0f);
+		m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());
 		m_GL->glBegin(GL_LINES);
 		m_GL->glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
 		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseDownWorldPos.y);//UL->UR
@@ -358,16 +386,16 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseDownWorldPos.y);//UR->LR
 		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseWorldPos.y);
 		m_GL->glEnd();
-		m_GL->glLineWidth(1.0f);
+		m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());
 	}
 	else if (m_HoverType != eHoverType::HoverNone && m_HoverXform == m_SelectedXform)//Draw large turquoise dot on hover if they are hovering over the selected xform.
 	{
-		m_GL->glPointSize(6.0f);
+		m_GL->glPointSize(6.0f * m_GL->devicePixelRatioF());
 		m_GL->glBegin(GL_POINTS);
 		m_GL->glColor4f(0.5f, 1.0f, 1.0f, 1.0f);
 		m_GL->glVertex2f(m_HoverHandlePos.x, m_HoverHandlePos.y);
 		m_GL->glEnd();
-		m_GL->glPointSize(1.0f);
+		m_GL->glPointSize(1.0f * m_GL->devicePixelRatioF());
 	}
 }
 
@@ -435,7 +463,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent* e)
 template <typename T>
 void GLEmberController<T>::MousePress(QMouseEvent* e)
 {
-	v3T mouseFlipped(e->x() * m_GL->devicePixelRatio(), m_Viewport[3] - e->y() * m_GL->devicePixelRatio(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+	v3T mouseFlipped(e->x() * m_GL->devicePixelRatioF(), m_Viewport[3] - e->y() * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	auto renderer = m_FractoriumEmberController->Renderer();
 
@@ -443,7 +471,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 	if (!renderer)
 		return;
 
-	m_MouseDownPos = glm::ivec2(e->x() * m_GL->devicePixelRatio(), e->y() * m_GL->devicePixelRatio());//Capture the raster coordinates of where the mouse was clicked.
+	m_MouseDownPos = glm::ivec2(e->x() * m_GL->devicePixelRatioF(), e->y() * m_GL->devicePixelRatioF());//Capture the raster coordinates of where the mouse was clicked.
 	m_MouseWorldPos = WindowToWorld(mouseFlipped, false);//Capture the world cartesian coordinates of where the mouse is.
 	m_BoundsDown.w = renderer->LowerLeftX(false);//Need to capture these because they'll be changing if scaling.
 	m_BoundsDown.x = renderer->LowerLeftY(false);
@@ -530,7 +558,7 @@ void GLWidget::mousePressEvent(QMouseEvent* e)
 template <typename T>
 void GLEmberController<T>::MouseRelease(QMouseEvent* e)
 {
-	v3T mouseFlipped(e->x() * m_GL->devicePixelRatio(), m_Viewport[3] - e->y() * m_GL->devicePixelRatio(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+	v3T mouseFlipped(e->x() * m_GL->devicePixelRatioF(), m_Viewport[3] - e->y() * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	m_MouseWorldPos = WindowToWorld(mouseFlipped, false);
 
 	if (m_DragState == eDragState::DragDragging && (e->button() & Qt::LeftButton))
@@ -567,8 +595,8 @@ template <typename T>
 void GLEmberController<T>::MouseMove(QMouseEvent* e)
 {
 	bool draw = true;
-	glm::ivec2 mouse(e->x() * m_GL->devicePixelRatio(), e->y() * m_GL->devicePixelRatio());
-	v3T mouseFlipped(e->x() * m_GL->devicePixelRatio(), m_Viewport[3] - e->y() * m_GL->devicePixelRatio(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+	glm::ivec2 mouse(e->x() * m_GL->devicePixelRatioF(), e->y() * m_GL->devicePixelRatioF());
+	v3T mouseFlipped(e->x() * m_GL->devicePixelRatioF(), m_Viewport[3] - e->y() * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 
 	//First check to see if the mouse actually moved.
@@ -580,7 +608,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 
 	//Update status bar on main window, regardless of whether anything is being dragged.
 	if (m_Fractorium->m_Controller->RenderTimerRunning())
-		m_Fractorium->SetCoordinateStatus(e->x() * m_GL->devicePixelRatio(), e->y() * m_GL->devicePixelRatio(), m_MouseWorldPos.x, m_MouseWorldPos.y);
+		m_Fractorium->SetCoordinateStatus(e->x() * m_GL->devicePixelRatioF(), e->y() * m_GL->devicePixelRatioF(), m_MouseWorldPos.x, m_MouseWorldPos.y);
 
 	if (m_SelectedXform && m_DragState == eDragState::DragDragging)//Dragging and affine.
 	{
@@ -723,7 +751,9 @@ void GLWidget::wheelEvent(QWheelEvent* e)
 /// <param name="h">Height in pixels</param>
 void GLWidget::SetDimensions(int w, int h)
 {
-	setFixedSize(w, h);
+	auto downscaledW = std::ceil(w / devicePixelRatioF());
+	auto downscaledH = std::ceil(h / devicePixelRatioF());
+	setFixedSize(downscaledW, downscaledH);
 }
 
 /// <summary>
@@ -736,13 +766,18 @@ void GLWidget::SetDimensions(int w, int h)
 bool GLWidget::Allocate(bool force)
 {
 	bool alloc = false;
-	bool doResize = force || m_TexWidth != width() || m_TexHeight != height();
+	//auto scaledW = std::ceil(width() * devicePixelRatioF());
+	auto w = m_Fractorium->m_Controller->FinalRasW();
+	auto h = m_Fractorium->m_Controller->FinalRasH();
+	bool doResize = force || m_TexWidth != w || m_TexHeight != h;
 	bool doIt = doResize || m_OutputTexID == 0;
 
 	if (doIt)
 	{
-		m_TexWidth = width();
-		m_TexHeight = height();
+		//m_TexWidth = scaledW;
+		//m_TexHeight = scaledH;
+		m_TexWidth = GLint(w);
+		m_TexHeight = GLint(h);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
@@ -811,12 +846,12 @@ void GLWidget::SetViewport()
 template <typename T>
 bool GLEmberController<T>::SizesMatch()
 {
+	//auto scaledW = std::ceil(m_GL->width() * m_GL->devicePixelRatioF());
+	//auto scaledH = std::ceil(m_GL->height() * m_GL->devicePixelRatioF());
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	return (ember &&
-			ember->m_FinalRasW == m_GL->width() &&
-			ember->m_FinalRasH == m_GL->height() &&
-			m_GL->width() == m_GL->m_TexWidth &&
-			m_GL->height() == m_GL->m_TexHeight &&
+			ember->m_FinalRasW == m_GL->m_TexWidth &&
+			ember->m_FinalRasH == m_GL->m_TexHeight &&
 			m_GL->m_TexWidth == m_GL->m_ViewWidth &&
 			m_GL->m_TexHeight == m_GL->m_ViewHeight);
 }
@@ -826,7 +861,7 @@ bool GLEmberController<T>::SizesMatch()
 /// </summary>
 void GLWidget::DrawUnitSquare()
 {
-	glLineWidth(1.0f);
+	glLineWidth(1.0f * devicePixelRatioF());
 	glBegin(GL_LINES);
 	glColor4f(1.0f, 1.0f, 1.0f, 0.25f);
 	glVertex2f(-1, -1);
@@ -868,7 +903,7 @@ void GLEmberController<T>::DrawGrid()
 	m_GL->glPushMatrix();
 	m_GL->glLoadIdentity();
 	MultMatrix(mat);
-	m_GL->glLineWidth(1.0f);
+	m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());
 	m_GL->glBegin(GL_LINES);
 	m_GL->glColor4f(0.5f, 0.5f, 0.5f, alpha);
 
@@ -924,24 +959,24 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_GL->glPushMatrix();
 	m_GL->glLoadIdentity();
 	MultMatrix(mat);
-	m_GL->glLineWidth(3.0f);//One 3px wide, colored black, except green on x axis for post affine.
+	m_GL->glLineWidth(3.0f * m_GL->devicePixelRatioF());//One 3px wide, colored black, except green on x axis for post affine.
 	m_GL->DrawAffineHelper(index, selected, pre, final, true);
-	m_GL->glLineWidth(1.0f);//Again 1px wide, colored white, to give a white middle with black outline effect.
+	m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());//Again 1px wide, colored white, to give a white middle with black outline effect.
 	m_GL->DrawAffineHelper(index, selected, pre, final, false);
-	m_GL->glPointSize(5.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
+	m_GL->glPointSize(5.0f * m_GL->devicePixelRatioF());//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
 	m_GL->glBegin(GL_POINTS);
 	m_GL->glColor4f(0.0f, 0.0f, 0.0f, selected ? 1.0f : 0.5f);
 	m_GL->glVertex2f(0.0f, 0.0f);
 	m_GL->glVertex2f(1.0f, 0.0f);
 	m_GL->glVertex2f(0.0f, 1.0f);
 	m_GL->glEnd();
-	m_GL->glLineWidth(2.0f);//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
+	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
 	m_GL->glBegin(GL_LINES);
 	m_GL->glColor4f(color.r, color.g, color.b, 1.0f);
 	m_GL->glVertex2f(0.0f, 0.0f);
 	m_GL->glVertex2f(0.0f, 1.0f);
 	m_GL->glEnd();
-	m_GL->glPointSize(3.0f);//Draw smaller white points, to give a black outline effect.
+	m_GL->glPointSize(3.0f * m_GL->devicePixelRatioF());//Draw smaller white points, to give a black outline effect.
 	m_GL->glBegin(GL_POINTS);
 	m_GL->glColor4f(1.0f, 1.0f, 1.0f, selected ? 1.0f : 0.5f);
 	m_GL->glVertex2f(0.0f, 0.0f);

@@ -182,6 +182,19 @@ public:
 	}
 
 	/// <summary>
+	/// Reserve the underlying xforms vector to contain the specified capacity.
+	/// This should be called at the start of scenarios where xforms are added and their pointers
+	/// are used in the process. That way no resizing takes place and the pointers remain valid.
+	/// No action is taken if i is less than the existing capacity.
+	/// </summary>
+	/// <param name="i">The capacity to reserve</param>
+	void Reserve(size_t i)
+	{
+		if (i > m_Xforms.capacity())
+			m_Xforms.reserve(i);
+	}
+
+	/// <summary>
 	/// Add a copy of a new xform to the xforms vector.
 	/// </summary>
 	/// <param name="xform">The xform to copy and add</param>
@@ -201,6 +214,7 @@ public:
 		for (size_t i = 0; i < count; i++)
 		{
 			Xform<T> xform;
+			xform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 			AddXform(xform);
 		}
 	}

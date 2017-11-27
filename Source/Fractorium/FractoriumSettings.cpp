@@ -57,6 +57,12 @@ void FractoriumSettings::EnsureDefaults()
 	OpenCLSubBatch(std::max(1u, OpenCLSubBatch()));
 	RandomCount(std::max(1u, RandomCount()));
 
+	if (CpuQuality() == 0)
+		CpuQuality(10);
+
+	if (OpenClQuality() == 0)
+		OpenClQuality(30);
+
 	if (FinalScale() > int(eScaleType::SCALE_HEIGHT))
 		FinalScale(0);
 
@@ -72,7 +78,11 @@ void FractoriumSettings::EnsureDefaults()
 	if (SaveImageExt() == "")
 		SaveImageExt(".png");
 
-	if (FinalExt() != "jpg" && FinalExt() != "png")
+	if (FinalExt() != "jpg" && FinalExt() != "png" && FinalExt() != "exr"
+#ifdef _WIN32
+			&& FinalExt() != "bmp"
+#endif
+	   )
 		FinalExt("png");
 
 	auto s = SaveFolder();
@@ -147,6 +157,15 @@ void FractoriumSettings::OpenCLSubBatch(uint i)					 { setValue(OPENCLSUBBATCH, 
 
 uint FractoriumSettings::RandomCount()							 { return value(RANDOMCOUNT).toUInt();	   }
 void FractoriumSettings::RandomCount(uint i)					 { setValue(RANDOMCOUNT, i);			   }
+
+uint FractoriumSettings::CpuQuality()                            { return value(CPU_QUALITY).toUInt();     }
+void FractoriumSettings::CpuQuality(uint i)                      { setValue(CPU_QUALITY, i);               }
+
+uint FractoriumSettings::OpenClQuality()                         { return value(OPENCL_QUALITY).toUInt();  }
+void FractoriumSettings::OpenClQuality(uint i)                   { setValue(OPENCL_QUALITY, i);            }
+
+bool FractoriumSettings::LoadLast()                              { return value(LOAD_LAST).toBool();       }
+void FractoriumSettings::LoadLast(bool b)                        { setValue(LOAD_LAST, b);                 }
 
 /// <summary>
 /// Sequence generation settings.

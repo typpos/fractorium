@@ -500,7 +500,8 @@ string EmberToXml<T>::ToString(Xform<T>& xform, size_t xformCount, bool isFinal,
 
 	if (!doMotion || xform.m_ColorSpeed != EMPTYFIELD) os << "color_speed=\"" << xform.m_ColorSpeed << "\" ";
 
-	//os << "symmetry=\"" << fabs(xform.m_ColorSpeed - 1) * 2 << "\" ";//Legacy support.
+	//Legacy support.
+	os << "symmetry=\"" << 1 - (xform.m_ColorSpeed * 2) << "\" ";
 
 	if (!doMotion)
 	{

@@ -768,7 +768,7 @@ void FractoriumEmberController<T>::SequenceSaveButtonClicked()
 		for (auto& ember : m_SequenceFile.m_Embers)
 			ApplyXmlSavingTemplate(ember);
 
-		if (writer.Save(filename.toStdString().c_str(), m_SequenceFile.m_Embers, 0, true, true))
+		if (writer.Save(filename.toStdString().c_str(), m_SequenceFile.m_Embers, 0, true, true, false, false, false))
 			s->SaveFolder(fileInfo.canonicalPath());
 		else
 			m_Fractorium->ShowCritical("Save Failed", "Could not save sequence file, try saving to a different folder.");
@@ -800,7 +800,7 @@ void FractoriumEmberController<T>::SequenceOpenButtonClicked()
 		{
 			embers.clear();
 
-			if (parser.Parse(filename.toStdString().c_str(), embers) && !embers.empty())
+			if (parser.Parse(filename.toStdString().c_str(), embers, true) && !embers.empty())
 			{
 				for (i = 0; i < embers.size(); i++)
 					if (embers[i].m_Name == "" || embers[i].m_Name == "No name")//Ensure it has a name.

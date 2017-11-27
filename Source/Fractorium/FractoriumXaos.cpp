@@ -32,13 +32,13 @@ void Fractorium::InitXaosUI()
 template <typename T>
 void FractoriumEmberController<T>::FillXaos()
 {
-	for (int i = 0, count = int(XformCount()); i < count; i++)
+	for (int i = 0, count = int(XformCount()); i < count; i++)//Column.
 	{
 		if (auto xform = m_Ember.GetXform(i))
 		{
-			for (int j = 0; j < count; j++)
+			for (int j = 0; j < count; j++)//Row.
 			{
-				QModelIndex index = m_Fractorium->m_XaosTableModel->index(i, j, QModelIndex());
+				QModelIndex index = m_Fractorium->m_XaosTableModel->index(j, i, QModelIndex());//j and i are intentionally swapped here.
 				m_Fractorium->m_XaosTableModel->setData(index, xform->Xaos(j));
 			}
 		}
@@ -57,7 +57,9 @@ void FractoriumEmberController<T>::FillXaos()
 /// xaos value.
 /// Resets the rendering process.
 /// </summary>
-/// <param name="sender">The DoubleSpinBox that triggered this event</param>
+/// <param name="x">The index of the xform whose xaos value was changed (column)</param>
+/// <param name="y">The index of the to value that was changed for the xform (row)</param>
+/// <param name="val">The changed value of the xaos element</param>
 template <typename T>
 void FractoriumEmberController<T>::XaosChanged(int x, int y, double val)
 {
@@ -73,13 +75,13 @@ void Fractorium::OnXaosChanged(double d)
 	if (auto senderSpinBox = qobject_cast<DoubleSpinBox*>(sender()))
 	{
 		auto p = senderSpinBox->property("tableindex").toPoint();
-		m_Controller->XaosChanged(p.x(), p.y(), d);
+		m_Controller->XaosChanged(p.y(), p.x(), d);//Intentionally switched, column is the from xform, row is the to xform.
 	}
 }
 
 void Fractorium::OnXaosTableModelDataChanged(const QModelIndex& indexA, const QModelIndex& indexB)
 {
-	m_Controller->XaosChanged(indexA.row(), indexA.column(), indexA.data().toDouble());
+	m_Controller->XaosChanged(indexA.column(), indexA.row(), indexA.data().toDouble());//Intentionally switched, column is the from xform, row is the to xform.
 }
 
 /// <summary>
@@ -190,5 +192,5 @@ void Fractorium::OnXaosColDoubleClicked(int logicalIndex)
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE
-template class FractoriumEmberController<double>;
+	template class FractoriumEmberController<double>;
 #endif

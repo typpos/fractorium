@@ -1826,6 +1826,7 @@ private:
 	using Variation<T>::Prefix; \
 	using Variation<T>::Precalc; \
 	using Variation<T>::StateOpenCLString; \
+	using Variation<T>::WeightDefineString; \
 	using Variation<T>::DefaultZ; \
 	using Variation<T>::DefaultZCl;
 

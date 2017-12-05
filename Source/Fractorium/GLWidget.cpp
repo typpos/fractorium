@@ -774,8 +774,6 @@ bool GLWidget::Allocate(bool force)
 
 	if (doIt)
 	{
-		//m_TexWidth = scaledW;
-		//m_TexHeight = scaledH;
 		m_TexWidth = GLint(w);
 		m_TexHeight = GLint(h);
 		glEnable(GL_TEXTURE_2D);

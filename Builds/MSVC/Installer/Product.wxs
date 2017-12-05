@@ -13,7 +13,7 @@
 	<!--
 	Change this for every release.
 	-->
-	<?define ProductCode="{DE7A6FFA-8D93-48EE-84E8-95F71D28168F}"?>
+	<?define ProductCode="{FCEA107E-1FEE-4510-8361-6509749BEF80}"?>
 	
 	<Product Id="$(var.ProductCode)" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package
@@ -49,6 +49,7 @@
 		<Property Id="ARPPRODUCTICON" Value="AddRemoveProgramsIcon" />
 		<Feature Id="MainApplication" Title="Main Application" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="BenchComponents" />
 			<ComponentGroupRef Id="PlatformComponents" />
 			<ComponentRef Id="FractoriumStartMenuShortcut"/>
 			<ComponentRef Id="FractoriumDesktopShortcut"/>
@@ -81,6 +82,7 @@
 			-->
 			<Directory Id="AppDataFolder" >
 				<Directory Id="INSTALLFOLDER" Name="Fractorium" >
+					<Directory Id="INSTALLFOLDERBENCH" Name="Bench" />
 					<Directory Id="INSTALLFOLDERPLATFORMS" Name="platforms" />
 				</Directory>
 			</Directory>
@@ -263,6 +265,34 @@
 				
 			<Component Id="Qt5Widgets.dll" Guid="006bb2f1-7a38-426f-ba2c-5196d1d6c24d">
 				<File Id="Qt5Widgets.dll" Source="$(env.QTDIR)\bin\Qt5Widgets.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+	
+	<Fragment>
+		<ComponentGroup Id="BenchComponents" Directory="INSTALLFOLDERBENCH">
+			<Component Id="EmberBench.ps1" Guid="a0362c11-e54a-4712-b800-0bb7c43d285e">
+				<File Id="EmberBench.ps1" Source="$(var.SolutionDir)..\..\..\Data\Bench\EmberBench.ps1" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="golubaja_rippingfrominside_complexcode.flame" Guid="74fc54d8-eb7f-4e88-b839-c6d0b847d78e">
+				<File Id="golubaja_rippingfrominside_complexcode.flame" Source="$(var.SolutionDir)..\..\..\Data\Bench\golubaja_rippingfrominside_complexcode.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="mfeemster_basicmemory.flame" Guid="4ebf1154-b06a-4e04-aeb7-6fb505dd9b90">
+				<File Id="mfeemster_basicmemory.flame" Source="$(var.SolutionDir)..\..\..\Data\Bench\mfeemster_basicmemory.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="tatasz_springcrown_manysimplexforms.flame" Guid="29993c8f-26b6-41ab-b585-d535aac0bfb5">
+				<File Id="tatasz_springcrown_manysimplexforms.flame" Source="$(var.SolutionDir)..\..\..\Data\Bench\tatasz_springcrown_manysimplexforms.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="tyrantwave_flippeddisc_normal.flame" Guid="ee38fdfd-8300-45c8-b3fb-897dca530df0">
+				<File Id="tyrantwave_flippeddisc_normal.flame" Source="$(var.SolutionDir)..\..\..\Data\Bench\tyrantwave_flippeddisc_normal.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="zy0rg_six_bigcomplexcode.flame" Guid="95ef408d-6d99-4dd0-89c3-105b56ff50b2">
+				<File Id="zy0rg_six_bigcomplexcode.flame" Source="$(var.SolutionDir)..\..\..\Data\Bench\zy0rg_six_bigcomplexcode.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 		</ComponentGroup>
 	</Fragment>

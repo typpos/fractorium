@@ -24,11 +24,8 @@
 *.txt
 *.msi
 *.idb
-*.flam3
-*.flame
 *.bmp
 *.jpg
-Data/*.png
 *.zip
 *.avi
 *.ini
@@ -57,7 +54,8 @@ Builds/MSVC/VS2015/Obj
 Bin/x64/Release/testallvarsout.flame
 fractorium.com/
 Site/
-*.ps1
+Data/*.png
+/Data/Variations Bench.xlsx
 *.o
 ui_*.h
 qrc_*.cpp
@@ -82,7 +80,6 @@ Builds/QtCreator/Fractorium/Makefile
 Builds/lib/libOpenCL.so
 Builds/include/CL
 Builds/include/GL
-/Data/Variations Bench.xlsx
 /Builds/QtCreator/EmberCL/EmberCL.pro.user.18
 /Builds/QtCreator/Ember/Ember.pro.user.18
 /Builds/QtCreator/Fractorium/Fractorium.pro.user.18
@@ -255,3 +252,4 @@ Builds/include/GL
 /Builds/MSVC/VS2017/flam3-palettes.xml
 /Builds/MSVC/VS2017/UpgradeLog.htm
 /Builds/MSVC/VS2017/zlib.props
+*last.flame

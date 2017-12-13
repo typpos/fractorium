@@ -254,7 +254,11 @@ void GLWidget::paintGL()
 		glEnable(GL_BLEND);
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
+#if defined (__APPLE__) || defined(MACOSX)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+#else
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+#endif
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
@@ -788,7 +792,11 @@ bool GLWidget::Allocate(bool force)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+#if defined (__APPLE__) || defined(MACOSX)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_TexWidth, m_TexHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+#else
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+#endif
 		alloc = true;
 	}
 
@@ -929,6 +937,7 @@ void GLEmberController<T>::DrawGrid()
 	m_GL->glColor4f(0.0f,   0.5f, 0.0f, alpha);
 	m_GL->glVertex2f(0.0f,  0.0f);
 	m_GL->glVertex2f(0.0f,  yLow);
+	m_GL->glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 	m_GL->glEnd();
 	m_GL->glPopMatrix();
 }
@@ -980,6 +989,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_GL->glVertex2f(0.0f, 0.0f);
 	m_GL->glVertex2f(1.0f, 0.0f);
 	m_GL->glVertex2f(0.0f, 1.0f);
+	m_GL->glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 	m_GL->glEnd();
 	m_GL->glPopMatrix();
 }

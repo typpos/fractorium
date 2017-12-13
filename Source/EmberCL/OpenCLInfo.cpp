@@ -184,7 +184,7 @@ size_t OpenCLInfo::TotalDeviceIndex(size_t platform, size_t device) const
 }
 
 /// <summary>
-/// Create a context that is optionally shared with OpenGL and plact it in the
+/// Create a context that is optionally shared with OpenGL and place it in the
 /// passed in context ref parameter.
 /// </summary>
 /// <param name="platform">The platform object to create the context on</param>

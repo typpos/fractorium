@@ -687,6 +687,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_HighlightSpin->SetValueStealth(m_Ember.m_HighlightPower);
 	m_Fractorium->m_ColorDialog->setCurrentColor(QColor(m_Ember.m_Background.r * 255, m_Ember.m_Background.g * 255, m_Ember.m_Background.b * 255));
 	m_Fractorium->ui.ColorTable->item(5, 1)->setBackgroundColor(m_Fractorium->m_ColorDialog->currentColor());
+	BackgroundChanged(m_Fractorium->m_ColorDialog->currentColor());
 	m_Fractorium->m_PaletteModeCombo->SetCurrentIndexStealth(int(m_Ember.m_PaletteMode));
 	m_Fractorium->m_WidthSpin->SetValueStealth(m_Ember.m_FinalRasW);//Geometry.
 	m_Fractorium->m_HeightSpin->SetValueStealth(m_Ember.m_FinalRasH);

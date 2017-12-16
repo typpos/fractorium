@@ -47,10 +47,6 @@ Fractorium::Fractorium(QWidget* p)
 	m_VarSortMode = 1;//Sort by weight by default.
 	m_PaletteSortMode = 0;//Sort by palette ascending by default.
 	m_ColorDialog = new QColorDialog(this);
-#ifdef __APPLE__
-	//Fixes crashing problem when closing Fractorium in Mac OS 10.12 Sierra.
-	m_ColorDialog->setOption(QColorDialog::NoButtons);
-#endif
 	m_Settings = FractoriumSettings::Instance();
 	m_QssDialog = new QssDialog(this);
 	m_FinalRenderDialog = new FractoriumFinalRenderDialog(this);

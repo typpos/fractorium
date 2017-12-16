@@ -255,7 +255,7 @@ void GLWidget::paintGL()
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
 #if defined (__APPLE__) || defined(MACOSX)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_COLOR);
 #else
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 #endif
@@ -793,7 +793,7 @@ bool GLWidget::Allocate(bool force)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 #if defined (__APPLE__) || defined(MACOSX)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_TexWidth, m_TexHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_TexWidth, m_TexHeight, 0, GL_RGB, GL_FLOAT, nullptr);
 #else
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
 #endif

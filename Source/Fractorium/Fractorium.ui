@@ -41,6 +41,9 @@
     <height>16</height>
    </size>
   </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::GroupedDragging</set>
+  </property>
   <widget class="QScrollArea" name="GLParentScrollArea">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -112,7 +115,7 @@
       </size>
      </property>
      <property name="floating">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="features">
       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
@@ -258,7 +261,7 @@
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>110</number>
+              <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
@@ -834,7 +837,7 @@
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>110</number>
+              <number>120</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
@@ -1166,7 +1169,7 @@
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>125</number>
+              <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
@@ -1375,7 +1378,7 @@
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>110</number>
+              <number>120</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
@@ -1696,7 +1699,7 @@
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>125</number>
+              <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
@@ -1813,6 +1816,9 @@
        <width>240</width>
        <height>200</height>
       </size>
+     </property>
+     <property name="floating">
+      <bool>false</bool>
      </property>
      <property name="features">
       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
@@ -2008,14 +2014,17 @@
        <x>770</x>
        <y>0</y>
        <width>295</width>
-       <height>881</height>
+       <height>700</height>
       </rect>
      </property>
      <property name="minimumSize">
       <size>
        <width>295</width>
-       <height>624</height>
+       <height>200</height>
       </size>
+     </property>
+     <property name="floating">
+      <bool>false</bool>
      </property>
      <property name="features">
       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
@@ -2027,12 +2036,12 @@
       <string>Palette</string>
      </property>
      <widget class="QWidget" name="PaletteDockWidgetContents">
-      <layout class="QGridLayout" name="gridLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_11">
        <property name="leftMargin">
         <number>5</number>
        </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>4</number>
        </property>
        <property name="rightMargin">
         <number>5</number>
@@ -2040,1417 +2049,70 @@
        <property name="bottomMargin">
         <number>4</number>
        </property>
-       <item row="6" column="0">
-        <widget class="TableWidget" name="PalettePreviewTable">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>21</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>21</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="autoScroll">
-          <bool>false</bool>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="verticalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="horizontalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="rowCount">
-          <number>1</number>
-         </property>
-         <property name="columnCount">
-          <number>2</number>
-         </property>
-         <attribute name="horizontalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>27</number>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>20</number>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
-         </attribute>
-         <row/>
-         <column/>
-         <column/>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <layout class="QHBoxLayout" name="PaletteTabHLayout2" stretch="0,0">
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLineEdit" name="PaletteFilterLineEdit">
-           <property name="frame">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="PaletteFilterClearButton">
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>X</string>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="8" column="0">
-        <widget class="QTableWidget" name="PaletteListTable">
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAsNeeded</enum>
-         </property>
-         <property name="autoScroll">
-          <bool>false</bool>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="tabKeyNavigation">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="horizontalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="columnCount">
-          <number>2</number>
-         </property>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>16</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>16</number>
-         </attribute>
-         <attribute name="verticalHeaderStretchLastSection">
-          <bool>false</bool>
-         </attribute>
-         <column>
-          <property name="text">
-           <string>Name</string>
-          </property>
-          <property name="textAlignment">
-           <set>AlignLeading|AlignVCenter</set>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Palette</string>
-          </property>
-          <property name="textAlignment">
-           <set>AlignLeading|AlignVCenter</set>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="PaletteFilenameCombo">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="TableWidget" name="PaletteAdjustTable">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>2</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>67</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>67</height>
-          </size>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="autoScroll">
-          <bool>false</bool>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="tabKeyNavigation">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="verticalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="horizontalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="rowCount">
-          <number>3</number>
-         </property>
-         <property name="columnCount">
-          <number>4</number>
-         </property>
-         <attribute name="horizontalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>62</number>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>62</number>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>22</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
-         </attribute>
-         <row/>
-         <row/>
-         <row/>
-         <column/>
-         <column/>
-         <column/>
-         <column/>
-         <item row="0" column="0">
-          <property name="text">
-           <string>Hue</string>
-          </property>
-          <property name="toolTip">
-           <string>The degrees to rotate the hue of the HSV representation of the RGB color by</string>
-          </property>
-         </item>
-         <item row="0" column="2">
-          <property name="text">
-           <string>Contrast</string>
-          </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The difference between the lightest and darkest colors in the palette.&lt;/p&gt;&lt;p&gt;Negative values decrease the difference, and bring the colors toward gray.&lt;/p&gt;&lt;p&gt;Positive values increase the difference and make the colors more saturated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-         </item>
-         <item row="1" column="0">
-          <property name="text">
-           <string>Saturation</string>
-          </property>
-          <property name="toolTip">
-           <string>The percentage to add to the saturation (intensity) component of the HSV representation of the RGB color</string>
-          </property>
-         </item>
-         <item row="1" column="2">
-          <property name="text">
-           <string>Blur</string>
-          </property>
-          <property name="toolTip">
-           <string>The width in pixels of the blurring</string>
-          </property>
-         </item>
-         <item row="2" column="0">
-          <property name="text">
-           <string>Brightness</string>
-          </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The value to add to each channel. Negative values bring it toward black, positive values toward white.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-         </item>
-         <item row="2" column="1">
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-         <item row="2" column="2">
-          <property name="text">
-           <string>Frequency</string>
-          </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times to repeat the palette&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <layout class="QHBoxLayout" name="PaletteTabHLayout">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="PaletteRandomSelectButton">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Select a random palette from the list</string>
-           </property>
-           <property name="text">
-            <string>Random Palette</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="PaletteRandomAdjustButton">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Apply a random adjustment to the current palette</string>
-           </property>
-           <property name="text">
-            <string>Random Adjustment</string>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="PaletteEditorButton">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Open the palette editor to make a custom palette</string>
-           </property>
-           <property name="text">
-            <string>Palette Editor...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="9" column="0">
-        <widget class="QPushButton" name="ResetCurvesButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset all of the curves to their default position. This has the effect of disabling application of the color curves.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Reset Curves</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="CurvesGraphicsView" name="CurvesView">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>245</width>
-           <height>245</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>245</width>
-           <height>245</height>
-          </size>
-         </property>
-         <property name="mouseTracking">
-          <bool>true</bool>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
+       <item>
+        <widget class="QScrollArea" name="PaletteDockScrollArea">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
          </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="backgroundBrush">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>219</red>
-            <green>219</green>
-            <blue>219</blue>
-           </color>
-          </brush>
-         </property>
-         <property name="sceneRect">
-          <rectf>
-           <x>0.000000000000000</x>
-           <y>0.000000000000000</y>
-           <width>245.000000000000000</width>
-           <height>245.000000000000000</height>
-          </rectf>
-         </property>
-         <property name="resizeAnchor">
-          <enum>QGraphicsView::NoAnchor</enum>
-         </property>
-         <property name="viewportUpdateMode">
-          <enum>QGraphicsView::FullViewportUpdate</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QGroupBox" name="CurvesGroupBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When curves are on top of each other, it can be hard to grab them with the mouse, so use these radio buttons to specify which color you intend to grab.&lt;/p&gt;&lt;p&gt;If they are not on top of each other, just dragging the desired dot with the mouse will work.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="title">
-          <string>Curve</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <property name="spacing">
-           <number>4</number>
-          </property>
-          <property name="leftMargin">
-           <number>6</number>
-          </property>
-          <property name="topMargin">
-           <number>2</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>6</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="CurvesAllRadio">
-            <property name="text">
-             <string>All</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="CurvesRedRadio">
-            <property name="text">
-             <string>Red</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="CurvesGreenRadio">
-            <property name="text">
-             <string>Green</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="CurvesBlueRadio">
-            <property name="text">
-             <string>Blue</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-    <widget class="QDockWidget" name="XformsDockWidget">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>0</y>
-       <width>291</width>
-       <height>881</height>
-      </rect>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>291</width>
-       <height>632</height>
-      </size>
-     </property>
-     <property name="features">
-      <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
-     </property>
-     <property name="allowedAreas">
-      <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-     </property>
-     <property name="windowTitle">
-      <string>Xforms</string>
-     </property>
-     <widget class="QWidget" name="XformsDockWidgetContents">
-      <layout class="QGridLayout" name="gridLayout_4">
-       <property name="leftMargin">
-        <number>5</number>
-       </property>
-       <property name="topMargin">
-        <number>4</number>
-       </property>
-       <property name="rightMargin">
-        <number>5</number>
-       </property>
-       <property name="bottomMargin">
-        <number>4</number>
-       </property>
-       <property name="spacing">
-        <number>4</number>
-       </property>
-       <item row="0" column="0">
-        <layout class="QHBoxLayout" name="XformTabHLayout">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QComboBox" name="CurrentXformCombo">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>22</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>65</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>65</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Current xform</string>
-           </property>
-           <property name="editable">
-            <bool>false</bool>
-           </property>
-           <property name="maxVisibleItems">
-            <number>12</number>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>9</width>
-             <height>9</height>
-            </size>
-           </property>
-           <property name="frame">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="AddXformButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>25</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Add xform</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="Fractorium.qrc">
-             <normaloff>:/Fractorium/Icons/add.png</normaloff>:/Fractorium/Icons/add.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="AddLinkedXformButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>25</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Add linked xform</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="Fractorium.qrc">
-             <normaloff>:/Fractorium/Icons/link-add.png</normaloff>:/Fractorium/Icons/link-add.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="DuplicateXformButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>25</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Duplicate selected xforms</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="Fractorium.qrc">
-             <normaloff>:/Fractorium/Icons/editraise.png</normaloff>:/Fractorium/Icons/editraise.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="ClearXformButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>25</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Clear selected xforms' variations</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="Fractorium.qrc">
-             <normaloff>:/Fractorium/Icons/eraser.png</normaloff>:/Fractorium/Icons/eraser.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="DeleteXformButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>25</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Delete selected xforms</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="Fractorium.qrc">
-             <normaloff>:/Fractorium/Icons/del.png</normaloff>:/Fractorium/Icons/del.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="AddFinalXformButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>58</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>58</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="baseSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Add final xform</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Final</string>
-           </property>
-           <property name="icon">
-            <iconset resource="Fractorium.qrc">
-             <normaloff>:/Fractorium/Icons/add.png</normaloff>:/Fractorium/Icons/add.png</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="TableWidget" name="XformWeightNameTable">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>2</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>44</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>44</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <kerning>true</kerning>
-          </font>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Panel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="autoScroll">
-          <bool>false</bool>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
-         </property>
-         <property name="tabKeyNavigation">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="verticalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="horizontalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="rowCount">
-          <number>1</number>
-         </property>
-         <property name="columnCount">
-          <number>2</number>
-         </property>
-         <attribute name="horizontalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>110</number>
-         </attribute>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>27</number>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
+         <property name="widgetResizable">
           <bool>true</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>21</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>21</number>
-         </attribute>
-         <row/>
-         <column>
-          <property name="text">
-           <string>Weight</string>
+         </property>
+         <widget class="QWidget" name="PaletteDockScrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>285</width>
+            <height>673</height>
+           </rect>
           </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Name</string>
-          </property>
-         </column>
-         <item row="0" column="0">
-          <property name="textAlignment">
-           <set>AlignLeading|AlignVCenter</set>
-          </property>
-         </item>
-         <item row="0" column="1">
-          <property name="textAlignment">
-           <set>AlignLeading|AlignVCenter</set>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QTabWidget" name="XformsTabWidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="tabShape">
-          <enum>QTabWidget::Triangular</enum>
-         </property>
-         <property name="currentIndex">
-          <number>2</number>
-         </property>
-         <widget class="QWidget" name="XformColorTab">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <attribute name="title">
-           <string>Color</string>
-          </attribute>
-          <attribute name="toolTip">
-           <string>Color palette index for the current xform, and curve adjustment</string>
-          </attribute>
-          <layout class="QFormLayout" name="formLayout_3">
-           <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-           </property>
+          <layout class="QGridLayout" name="gridLayout_3">
            <property name="leftMargin">
-            <number>6</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>6</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>6</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>6</number>
+            <number>0</number>
            </property>
-           <item row="0" column="0" colspan="2">
-            <widget class="TableWidget" name="XformColorIndexTable">
+           <property name="horizontalSpacing">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QComboBox" name="PaletteFilenameCombo">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="TableWidget" name="PaletteAdjustTable">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
+               <horstretch>2</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>22</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>22</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <kerning>true</kerning>
-              </font>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="toolTip">
-              <string/>
-             </property>
-             <property name="autoFillBackground">
-              <bool>false</bool>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::Panel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-             <property name="lineWidth">
-              <number>1</number>
-             </property>
-             <property name="midLineWidth">
-              <number>0</number>
-             </property>
-             <property name="verticalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
-             </property>
-             <property name="tabKeyNavigation">
-              <bool>false</bool>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
-             </property>
-             <property name="verticalScrollMode">
-              <enum>QAbstractItemView::ScrollPerPixel</enum>
-             </property>
-             <property name="horizontalScrollMode">
-              <enum>QAbstractItemView::ScrollPerPixel</enum>
-             </property>
-             <property name="showGrid">
-              <bool>true</bool>
-             </property>
-             <property name="wordWrap">
-              <bool>false</bool>
-             </property>
-             <property name="cornerButtonEnabled">
-              <bool>false</bool>
-             </property>
-             <property name="rowCount">
-              <number>1</number>
-             </property>
-             <property name="columnCount">
-              <number>2</number>
-             </property>
-             <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderHighlightSections">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>27</number>
-             </attribute>
-             <attribute name="horizontalHeaderStretchLastSection">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="verticalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderDefaultSectionSize">
-              <number>21</number>
-             </attribute>
-             <attribute name="verticalHeaderHighlightSections">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>21</number>
-             </attribute>
-             <attribute name="verticalHeaderStretchLastSection">
-              <bool>false</bool>
-             </attribute>
-             <row/>
-             <column/>
-             <column/>
-             <item row="0" column="0">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="toolTip">
-               <string/>
-              </property>
-             </item>
-             <item row="0" column="1">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="toolTip">
-               <string/>
-              </property>
-              <property name="textAlignment">
-               <set>AlignLeading|AlignVCenter</set>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="2">
-            <widget class="QTableWidget" name="XformPaletteRefTable">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::Panel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-             <property name="verticalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
-             </property>
-             <property name="tabKeyNavigation">
-              <bool>false</bool>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
-             </property>
-             <property name="verticalScrollMode">
-              <enum>QAbstractItemView::ScrollPerPixel</enum>
-             </property>
-             <property name="horizontalScrollMode">
-              <enum>QAbstractItemView::ScrollPerPixel</enum>
-             </property>
-             <property name="showGrid">
-              <bool>false</bool>
-             </property>
-             <property name="wordWrap">
-              <bool>false</bool>
-             </property>
-             <property name="cornerButtonEnabled">
-              <bool>false</bool>
-             </property>
-             <property name="rowCount">
-              <number>1</number>
-             </property>
-             <property name="columnCount">
-              <number>1</number>
-             </property>
-             <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>256</number>
-             </attribute>
-             <attribute name="horizontalHeaderStretchLastSection">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="verticalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderDefaultSectionSize">
-              <number>19</number>
-             </attribute>
-             <attribute name="verticalHeaderHighlightSections">
-              <bool>false</bool>
-             </attribute>
-             <row/>
-             <column/>
-             <item row="0" column="0">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="flags">
-               <set>NoItemFlags</set>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="2" column="0" colspan="2">
-            <widget class="QScrollBar" name="XformColorScroll">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>162</width>
-               <height>18</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>18</height>
-              </size>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="minimum">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <number>255</number>
-             </property>
-             <property name="singleStep">
-              <number>1</number>
-             </property>
-             <property name="pageStep">
-              <number>10</number>
-             </property>
-             <property name="value">
-              <number>128</number>
-             </property>
-             <property name="tracking">
-              <bool>true</bool>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="invertedAppearance">
-              <bool>false</bool>
-             </property>
-             <property name="invertedControls">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0" colspan="2">
-            <layout class="QGridLayout" name="gridLayout_5">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="RandomColorIndicesButton">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Random Indices</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="ToggleColorIndicesButton">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1, alternating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Toggle Indices</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="RandomColorSpeedButton">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Random Color Speeds</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="ToggleColorSpeedButton">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to 0 or 1, alternating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Toggle Color Speed</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item row="4" column="0" colspan="2">
-            <widget class="TableWidget" name="XformColorValuesTable">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>45</height>
+               <height>67</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -3459,25 +2121,14 @@
                <height>67</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <kerning>true</kerning>
-              </font>
-             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
              </property>
              <property name="frameShape">
               <enum>QFrame::Panel</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Plain</enum>
-             </property>
-             <property name="lineWidth">
-              <number>1</number>
              </property>
              <property name="verticalScrollBarPolicy">
               <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -3494,13 +2145,933 @@
              <property name="tabKeyNavigation">
               <bool>false</bool>
              </property>
-             <property name="showDropIndicator" stdset="0">
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+             <property name="verticalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="wordWrap">
               <bool>false</bool>
              </property>
-             <property name="dragDropOverwriteMode">
+             <property name="cornerButtonEnabled">
               <bool>false</bool>
              </property>
-             <property name="alternatingRowColors">
+             <property name="rowCount">
+              <number>3</number>
+             </property>
+             <property name="columnCount">
+              <number>4</number>
+             </property>
+             <attribute name="horizontalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>62</number>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>62</number>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>22</number>
+             </attribute>
+             <attribute name="verticalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
+             <row/>
+             <row/>
+             <row/>
+             <column/>
+             <column/>
+             <column/>
+             <column/>
+             <item row="0" column="0">
+              <property name="text">
+               <string>Hue</string>
+              </property>
+              <property name="toolTip">
+               <string>The degrees to rotate the hue of the HSV representation of the RGB color by</string>
+              </property>
+             </item>
+             <item row="0" column="2">
+              <property name="text">
+               <string>Contrast</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The difference between the lightest and darkest colors in the palette.&lt;/p&gt;&lt;p&gt;Negative values decrease the difference, and bring the colors toward gray.&lt;/p&gt;&lt;p&gt;Positive values increase the difference and make the colors more saturated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </item>
+             <item row="1" column="0">
+              <property name="text">
+               <string>Saturation</string>
+              </property>
+              <property name="toolTip">
+               <string>The percentage to add to the saturation (intensity) component of the HSV representation of the RGB color</string>
+              </property>
+             </item>
+             <item row="1" column="2">
+              <property name="text">
+               <string>Blur</string>
+              </property>
+              <property name="toolTip">
+               <string>The width in pixels of the blurring</string>
+              </property>
+             </item>
+             <item row="2" column="0">
+              <property name="text">
+               <string>Brightness</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The value to add to each channel. Negative values bring it toward black, positive values toward white.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </item>
+             <item row="2" column="1">
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item row="2" column="2">
+              <property name="text">
+               <string>Frequency</string>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times to repeat the palette&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <layout class="QHBoxLayout" name="PaletteTabHLayout">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="PaletteRandomSelectButton">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Select a random palette from the list</string>
+               </property>
+               <property name="text">
+                <string>Random Palette</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="PaletteRandomAdjustButton">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Apply a random adjustment to the current palette</string>
+               </property>
+               <property name="text">
+                <string>Random Adjustment</string>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="PaletteEditorButton">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Open the palette editor to make a custom palette</string>
+               </property>
+               <property name="text">
+                <string>Palette Editor...</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="0">
+            <widget class="TableWidget" name="PalettePreviewTable">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>21</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>21</height>
+              </size>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::NoFocus</enum>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Panel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="autoScroll">
+              <bool>false</bool>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+             <property name="verticalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>false</bool>
+             </property>
+             <property name="rowCount">
+              <number>1</number>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <attribute name="horizontalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>27</number>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>20</number>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>20</number>
+             </attribute>
+             <row/>
+             <column/>
+             <column/>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <layout class="QHBoxLayout" name="PaletteTabHLayout2" stretch="0,0">
+             <property name="spacing">
+              <number>5</number>
+             </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SetDefaultConstraint</enum>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLineEdit" name="PaletteFilterLineEdit">
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="PaletteFilterClearButton">
+               <property name="minimumSize">
+                <size>
+                 <width>30</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>X</string>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="0">
+            <widget class="QTableWidget" name="PaletteListTable">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>147</height>
+              </size>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Panel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAsNeeded</enum>
+             </property>
+             <property name="autoScroll">
+              <bool>false</bool>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="tabKeyNavigation">
+              <bool>false</bool>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>false</bool>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <attribute name="horizontalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>16</number>
+             </attribute>
+             <attribute name="verticalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>16</number>
+             </attribute>
+             <attribute name="verticalHeaderStretchLastSection">
+              <bool>false</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Name</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignLeading|AlignVCenter</set>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Palette</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignLeading|AlignVCenter</set>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QPushButton" name="ResetCurvesButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset all of the curves to their default position. This has the effect of disabling application of the color curves.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Reset Curves</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="CurvesGraphicsView" name="CurvesView">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>245</width>
+               <height>245</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>245</width>
+               <height>245</height>
+              </size>
+             </property>
+             <property name="mouseTracking">
+              <bool>true</bool>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="backgroundBrush">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>219</red>
+                <green>219</green>
+                <blue>219</blue>
+               </color>
+              </brush>
+             </property>
+             <property name="sceneRect">
+              <rectf>
+               <x>0.000000000000000</x>
+               <y>0.000000000000000</y>
+               <width>245.000000000000000</width>
+               <height>245.000000000000000</height>
+              </rectf>
+             </property>
+             <property name="resizeAnchor">
+              <enum>QGraphicsView::NoAnchor</enum>
+             </property>
+             <property name="viewportUpdateMode">
+              <enum>QGraphicsView::FullViewportUpdate</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QGroupBox" name="CurvesGroupBox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When curves are on top of each other, it can be hard to grab them with the mouse, so use these radio buttons to specify which color you intend to grab.&lt;/p&gt;&lt;p&gt;If they are not on top of each other, just dragging the desired dot with the mouse will work.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="title">
+              <string>Curve</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <property name="leftMargin">
+               <number>6</number>
+              </property>
+              <property name="topMargin">
+               <number>2</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QRadioButton" name="CurvesAllRadio">
+                <property name="text">
+                 <string>All</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="CurvesRedRadio">
+                <property name="text">
+                 <string>Red</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="CurvesGreenRadio">
+                <property name="text">
+                 <string>Green</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="CurvesBlueRadio">
+                <property name="text">
+                 <string>Blue</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QDockWidget" name="XformsDockWidget">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>0</y>
+       <width>301</width>
+       <height>901</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>291</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="floating">
+      <bool>false</bool>
+     </property>
+     <property name="features">
+      <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+     </property>
+     <property name="allowedAreas">
+      <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+     </property>
+     <property name="windowTitle">
+      <string>Xforms</string>
+     </property>
+     <widget class="QWidget" name="XformsDockWidgetContents">
+      <layout class="QVBoxLayout" name="verticalLayout_17">
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="XformsDockWidgetScrollArea">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="XformsDockScrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>291</width>
+            <height>874</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_16">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="XformTabHLayout">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QComboBox" name="CurrentXformCombo">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>22</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>65</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>65</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Current xform</string>
+               </property>
+               <property name="editable">
+                <bool>false</bool>
+               </property>
+               <property name="maxVisibleItems">
+                <number>12</number>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>9</width>
+                 <height>9</height>
+                </size>
+               </property>
+               <property name="frame">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="AddXformButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>25</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Add xform</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Fractorium.qrc">
+                 <normaloff>:/Fractorium/Icons/add.png</normaloff>:/Fractorium/Icons/add.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="AddLinkedXformButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>25</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Add linked xform</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Fractorium.qrc">
+                 <normaloff>:/Fractorium/Icons/link-add.png</normaloff>:/Fractorium/Icons/link-add.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="DuplicateXformButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>25</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Duplicate selected xforms</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Fractorium.qrc">
+                 <normaloff>:/Fractorium/Icons/editraise.png</normaloff>:/Fractorium/Icons/editraise.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="ClearXformButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>25</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Clear selected xforms' variations</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Fractorium.qrc">
+                 <normaloff>:/Fractorium/Icons/eraser.png</normaloff>:/Fractorium/Icons/eraser.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="DeleteXformButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>25</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Delete selected xforms</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Fractorium.qrc">
+                 <normaloff>:/Fractorium/Icons/del.png</normaloff>:/Fractorium/Icons/del.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="AddFinalXformButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>58</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>58</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="baseSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Add final xform</string>
+               </property>
+               <property name="layoutDirection">
+                <enum>Qt::LeftToRight</enum>
+               </property>
+               <property name="text">
+                <string>Final</string>
+               </property>
+               <property name="icon">
+                <iconset resource="Fractorium.qrc">
+                 <normaloff>:/Fractorium/Icons/add.png</normaloff>:/Fractorium/Icons/add.png</iconset>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="TableWidget" name="XformWeightNameTable">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+               <horstretch>2</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>44</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>44</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <kerning>true</kerning>
+              </font>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Panel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="autoScroll">
+              <bool>false</bool>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+             </property>
+             <property name="tabKeyNavigation">
               <bool>false</bool>
              </property>
              <property name="selectionMode">
@@ -3512,25 +3083,19 @@
              <property name="horizontalScrollMode">
               <enum>QAbstractItemView::ScrollPerPixel</enum>
              </property>
-             <property name="showGrid">
-              <bool>true</bool>
-             </property>
-             <property name="gridStyle">
-              <enum>Qt::SolidLine</enum>
-             </property>
              <property name="wordWrap">
               <bool>false</bool>
              </property>
              <property name="cornerButtonEnabled">
               <bool>false</bool>
              </property>
+             <property name="rowCount">
+              <number>1</number>
+             </property>
              <property name="columnCount">
               <number>2</number>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
@@ -3549,179 +3114,679 @@
               <bool>false</bool>
              </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
-              <number>22</number>
+              <number>21</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
              </attribute>
              <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
+              <number>21</number>
              </attribute>
-             <attribute name="verticalHeaderStretchLastSection">
-              <bool>false</bool>
-             </attribute>
-             <row>
-              <property name="text">
-               <string>Color Speed</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>Opacity</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>Direct Color</string>
-              </property>
-             </row>
+             <row/>
              <column>
               <property name="text">
-               <string>Field</string>
+               <string>Weight</string>
               </property>
              </column>
              <column>
               <property name="text">
-               <string/>
+               <string>Name</string>
               </property>
              </column>
              <item row="0" column="0">
-              <property name="text">
-               <string>Color Speed</string>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The speed with which the color indices are pulled toward the current xform’s color index. Negative values push the color index away.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </item>
-             <item row="0" column="1">
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="font">
-               <font>
-                <kerning>true</kerning>
-               </font>
-              </property>
               <property name="textAlignment">
                <set>AlignLeading|AlignVCenter</set>
               </property>
              </item>
-             <item row="1" column="0">
-              <property name="text">
-               <string>Opacity</string>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How visible the current xform’s contribution to the image is.&lt;/p&gt;&lt;p&gt;0 is invisible, 1 is fully visible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </item>
-             <item row="1" column="1">
-              <property name="text">
-               <string>0</string>
-              </property>
-             </item>
-             <item row="2" column="0">
-              <property name="text">
-               <string>Direct Color</string>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Amount of directly computed color value to add to the color index.&lt;/p&gt;&lt;p&gt;Used only with variations that use direct coloring which are usually prefixed with dc_.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </item>
-             <item row="2" column="1">
-              <property name="text">
-               <string>0</string>
+             <item row="0" column="1">
+              <property name="textAlignment">
+               <set>AlignLeading|AlignVCenter</set>
               </property>
              </item>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QCheckBox" name="SoloXformCheckBox">
+           <item>
+            <widget class="QCheckBox" name="AnimateXformCheckBox">
              <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the current xform is the only visible one. This feature is useful for determining how much each xform contributes to the final image.&lt;/p&gt;&lt;p&gt;Note that checking this does not affect the opacity values stored in the Xml file when saved. It is only a temporary adjustment when editing within the program.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate this xform during the rotation phase when creating a sequence for animation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Solo</string>
+              <string>Animate</string>
              </property>
             </widget>
            </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="XformAffineTab">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <attribute name="title">
-           <string>Affine</string>
-          </attribute>
-          <attribute name="toolTip">
-           <string>Affine transforms for the current xform</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_12">
-           <property name="spacing">
-            <number>5</number>
-           </property>
-           <property name="leftMargin">
-            <number>6</number>
-           </property>
-           <property name="topMargin">
-            <number>5</number>
-           </property>
-           <property name="rightMargin">
-            <number>6</number>
-           </property>
-           <property name="bottomMargin">
-            <number>5</number>
-           </property>
            <item>
-            <widget class="QScrollArea" name="AffineTabScrollArea">
+            <widget class="QTabWidget" name="XformsTabWidget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string/>
+             </property>
              <property name="autoFillBackground">
               <bool>false</bool>
              </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
+             <property name="tabShape">
+              <enum>QTabWidget::Triangular</enum>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+             <property name="currentIndex">
+              <number>2</number>
              </property>
-             <property name="widgetResizable">
-              <bool>true</bool>
-             </property>
-             <widget class="QWidget" name="AffineTabScrollWidgetContents">
-              <property name="geometry">
-               <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>128</width>
-                <height>686</height>
-               </rect>
+             <widget class="QWidget" name="XformColorTab">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string/>
               </property>
               <property name="autoFillBackground">
                <bool>true</bool>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <property name="spacing">
-                <number>4</number>
+              <attribute name="title">
+               <string>Color</string>
+              </attribute>
+              <attribute name="toolTip">
+               <string>Color palette index for the current xform, and curve adjustment</string>
+              </attribute>
+              <layout class="QFormLayout" name="formLayout_3">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>6</number>
                </property>
                <property name="topMargin">
-                <number>0</number>
+                <number>6</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>6</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>6</number>
+               </property>
+               <item row="0" column="0" colspan="2">
+                <widget class="TableWidget" name="XformColorIndexTable">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>22</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <kerning>true</kerning>
+                  </font>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="autoFillBackground">
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Panel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="lineWidth">
+                  <number>1</number>
+                 </property>
+                 <property name="midLineWidth">
+                  <number>0</number>
+                 </property>
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="tabKeyNavigation">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                 <property name="verticalScrollMode">
+                  <enum>QAbstractItemView::ScrollPerPixel</enum>
+                 </property>
+                 <property name="horizontalScrollMode">
+                  <enum>QAbstractItemView::ScrollPerPixel</enum>
+                 </property>
+                 <property name="showGrid">
+                  <bool>true</bool>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                 <property name="cornerButtonEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="rowCount">
+                  <number>1</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="horizontalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderHighlightSections">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>27</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderDefaultSectionSize">
+                  <number>21</number>
+                 </attribute>
+                 <attribute name="verticalHeaderHighlightSections">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>21</number>
+                 </attribute>
+                 <attribute name="verticalHeaderStretchLastSection">
+                  <bool>false</bool>
+                 </attribute>
+                 <row/>
+                 <column/>
+                 <column/>
+                 <item row="0" column="0">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="toolTip">
+                   <string/>
+                  </property>
+                 </item>
+                 <item row="0" column="1">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="toolTip">
+                   <string/>
+                  </property>
+                  <property name="textAlignment">
+                   <set>AlignLeading|AlignVCenter</set>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <widget class="QTableWidget" name="XformPaletteRefTable">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>19</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>19</height>
+                  </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Panel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="tabKeyNavigation">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                 <property name="verticalScrollMode">
+                  <enum>QAbstractItemView::ScrollPerPixel</enum>
+                 </property>
+                 <property name="horizontalScrollMode">
+                  <enum>QAbstractItemView::ScrollPerPixel</enum>
+                 </property>
+                 <property name="showGrid">
+                  <bool>false</bool>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                 <property name="cornerButtonEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="rowCount">
+                  <number>1</number>
+                 </property>
+                 <property name="columnCount">
+                  <number>1</number>
+                 </property>
+                 <attribute name="horizontalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderDefaultSectionSize">
+                  <number>256</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderDefaultSectionSize">
+                  <number>19</number>
+                 </attribute>
+                 <attribute name="verticalHeaderHighlightSections">
+                  <bool>false</bool>
+                 </attribute>
+                 <row/>
+                 <column/>
+                 <item row="0" column="0">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="flags">
+                   <set>NoItemFlags</set>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QScrollBar" name="XformColorScroll">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>162</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="minimum">
+                  <number>0</number>
+                 </property>
+                 <property name="maximum">
+                  <number>255</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>1</number>
+                 </property>
+                 <property name="pageStep">
+                  <number>10</number>
+                 </property>
+                 <property name="value">
+                  <number>128</number>
+                 </property>
+                 <property name="tracking">
+                  <bool>true</bool>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="invertedAppearance">
+                  <bool>false</bool>
+                 </property>
+                 <property name="invertedControls">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <layout class="QGridLayout" name="gridLayout_5">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QPushButton" name="RandomColorIndicesButton">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>Random Indices</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QPushButton" name="ToggleColorIndicesButton">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color indices to 0 or 1, alternating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>Toggle Indices</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QPushButton" name="RandomColorSpeedButton">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to random numbers between 0 and 1, inclusive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>Random Color Speeds</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="ToggleColorSpeedButton">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xform color speed values to 0 or 1, alternating&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string>Toggle Color Speed</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="4" column="0" colspan="2">
+                <widget class="TableWidget" name="XformColorValuesTable">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>45</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>67</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <kerning>true</kerning>
+                  </font>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Panel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="lineWidth">
+                  <number>1</number>
+                 </property>
+                 <property name="verticalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="horizontalScrollBarPolicy">
+                  <enum>Qt::ScrollBarAlwaysOff</enum>
+                 </property>
+                 <property name="autoScroll">
+                  <bool>false</bool>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="tabKeyNavigation">
+                  <bool>false</bool>
+                 </property>
+                 <property name="showDropIndicator" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>false</bool>
+                 </property>
+                 <property name="alternatingRowColors">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::NoSelection</enum>
+                 </property>
+                 <property name="verticalScrollMode">
+                  <enum>QAbstractItemView::ScrollPerPixel</enum>
+                 </property>
+                 <property name="horizontalScrollMode">
+                  <enum>QAbstractItemView::ScrollPerPixel</enum>
+                 </property>
+                 <property name="showGrid">
+                  <bool>true</bool>
+                 </property>
+                 <property name="gridStyle">
+                  <enum>Qt::SolidLine</enum>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                 <property name="cornerButtonEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="horizontalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderCascadingSectionResizes">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderDefaultSectionSize">
+                  <number>125</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderHighlightSections">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>27</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderVisible">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderDefaultSectionSize">
+                  <number>22</number>
+                 </attribute>
+                 <attribute name="verticalHeaderHighlightSections">
+                  <bool>false</bool>
+                 </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>22</number>
+                 </attribute>
+                 <attribute name="verticalHeaderStretchLastSection">
+                  <bool>false</bool>
+                 </attribute>
+                 <row>
+                  <property name="text">
+                   <string>Color Speed</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>Opacity</string>
+                  </property>
+                 </row>
+                 <row>
+                  <property name="text">
+                   <string>Direct Color</string>
+                  </property>
+                 </row>
+                 <column>
+                  <property name="text">
+                   <string>Field</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </column>
+                 <item row="0" column="0">
+                  <property name="text">
+                   <string>Color Speed</string>
+                  </property>
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The speed with which the color indices are pulled toward the current xform’s color index. Negative values push the color index away.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </item>
+                 <item row="0" column="1">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <kerning>true</kerning>
+                   </font>
+                  </property>
+                  <property name="textAlignment">
+                   <set>AlignLeading|AlignVCenter</set>
+                  </property>
+                 </item>
+                 <item row="1" column="0">
+                  <property name="text">
+                   <string>Opacity</string>
+                  </property>
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;How visible the current xform’s contribution to the image is.&lt;/p&gt;&lt;p&gt;0 is invisible, 1 is fully visible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </item>
+                 <item row="1" column="1">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </item>
+                 <item row="2" column="0">
+                  <property name="text">
+                   <string>Direct Color</string>
+                  </property>
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Amount of directly computed color value to add to the color index.&lt;/p&gt;&lt;p&gt;Used only with variations that use direct coloring which are usually prefixed with dc_.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </item>
+                 <item row="2" column="1">
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QCheckBox" name="SoloXformCheckBox">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the current xform is the only visible one. This feature is useful for determining how much each xform contributes to the final image.&lt;/p&gt;&lt;p&gt;Note that checking this does not affect the opacity values stored in the Xml file when saved. It is only a temporary adjustment when editing within the program.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Solo</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="XformAffineTab">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <attribute name="title">
+               <string>Affine</string>
+              </attribute>
+              <attribute name="toolTip">
+               <string>Affine transforms for the current xform</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <property name="spacing">
+                <number>5</number>
+               </property>
+               <property name="leftMargin">
+                <number>6</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>6</number>
+               </property>
+               <property name="bottomMargin">
+                <number>5</number>
                </property>
                <item>
                 <widget class="QGroupBox" name="PreAffineGroupBox">
@@ -5342,16 +5407,6 @@
                 </widget>
                </item>
                <item>
-                <widget class="QCheckBox" name="PolarAffineCheckBox">
-                 <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to display affine values in polar coordinates, uncheck to display them in Cartesian form.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                 <property name="text">
-                  <string>Polar</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QGroupBox" name="PivotGroupBox">
                  <property name="toolTip">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This affects the behavior of dragging the affines in the render window.&lt;/p&gt;&lt;p&gt;When dragging the X or Y component of an affine transform and holding Shift+Alt:&lt;/p&gt;&lt;p&gt;--Local: Rotate the point around the center of the transform.&lt;/p&gt;&lt;p&gt;--World: Rotate the point around 0, 0.&lt;/p&gt;&lt;p&gt;When dragging the center of an affine transform and holding Shift:&lt;/p&gt;&lt;p&gt;--Local: Rotate entire transform around the origin, keeping its local orientation fixed.&lt;/p&gt;&lt;p&gt;--World: Rotate entire transform around the origin, also rotating the local orientation.&lt;/p&gt;&lt;p&gt;When reflecting an affine transform:&lt;/p&gt;&lt;p&gt;--Local: Reflect horizontally and vertically around the center of the transform.&lt;/p&gt;&lt;p&gt;--World: Reflect horizontally around the Y axis, and vertically around the X axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -5402,6 +5457,16 @@
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="PolarAffineCheckBox">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to display affine values in polar coordinates, uncheck to display them in Cartesian form.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Polar</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <spacer name="AffineTabVerticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -5419,432 +5484,422 @@
                </item>
               </layout>
              </widget>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="XformVariationsTab">
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <attribute name="title">
-           <string>Variations</string>
-          </attribute>
-          <attribute name="toolTip">
-           <string>Full list of available variations and their weights for the currently selected xform</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_15">
-           <property name="leftMargin">
-            <number>6</number>
-           </property>
-           <property name="topMargin">
-            <number>6</number>
-           </property>
-           <property name="rightMargin">
-            <number>6</number>
-           </property>
-           <property name="bottomMargin">
-            <number>6</number>
-           </property>
-           <item>
-            <layout class="QHBoxLayout" name="VariationsTabHLayout" stretch="0,0">
-             <property name="spacing">
-              <number>5</number>
-             </property>
-             <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLineEdit" name="VariationsFilterLineEdit">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>22</height>
-                </size>
+             <widget class="QWidget" name="XformVariationsTab">
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <attribute name="title">
+               <string>Variations</string>
+              </attribute>
+              <attribute name="toolTip">
+               <string>Full list of available variations and their weights for the currently selected xform</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_15">
+               <property name="leftMargin">
+                <number>6</number>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>22</height>
-                </size>
+               <property name="topMargin">
+                <number>6</number>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="VariationsFilterClearButton">
-               <property name="minimumSize">
-                <size>
-                 <width>30</width>
-                 <height>23</height>
-                </size>
+               <property name="rightMargin">
+                <number>6</number>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>30</width>
-                 <height>23</height>
-                </size>
+               <property name="bottomMargin">
+                <number>6</number>
                </property>
-               <property name="text">
-                <string>X</string>
-               </property>
-               <property name="flat">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QTreeWidget" name="VariationsTree">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::WheelFocus</enum>
-             </property>
-             <property name="contextMenuPolicy">
-              <enum>Qt::DefaultContextMenu</enum>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::Panel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-             <property name="lineWidth">
-              <number>1</number>
-             </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
-             </property>
-             <property name="showDropIndicator" stdset="0">
-              <bool>false</bool>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::SingleSelection</enum>
-             </property>
-             <property name="selectionBehavior">
-              <enum>QAbstractItemView::SelectRows</enum>
-             </property>
-             <property name="indentation">
-              <number>12</number>
-             </property>
-             <property name="uniformRowHeights">
-              <bool>true</bool>
-             </property>
-             <property name="itemsExpandable">
-              <bool>true</bool>
-             </property>
-             <property name="sortingEnabled">
-              <bool>false</bool>
-             </property>
-             <property name="headerHidden">
-              <bool>false</bool>
-             </property>
-             <property name="columnCount">
-              <number>2</number>
-             </property>
-             <attribute name="headerDefaultSectionSize">
-              <number>70</number>
-             </attribute>
-             <attribute name="headerHighlightSections">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="headerMinimumSectionSize">
-              <number>10</number>
-             </attribute>
-             <attribute name="headerShowSortIndicator" stdset="0">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="headerStretchLastSection">
-              <bool>true</bool>
-             </attribute>
-             <column>
-              <property name="text">
-               <string>Variation</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Weight</string>
-              </property>
-             </column>
-             <item>
-              <property name="text">
-               <string>Spherical</string>
-              </property>
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="flags">
-               <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Sinusoidal</string>
-              </property>
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="flags">
-               <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Pdj</string>
-              </property>
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="flags">
-               <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-              </property>
-              <item>
-               <property name="text">
-                <string>pdj_d</string>
-               </property>
-               <property name="text">
-                <string>1</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>pdj_c</string>
-               </property>
-               <property name="text">
-                <string>2</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>pdj_b</string>
-               </property>
-               <property name="text">
-                <string>1.5</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>pdj_a</string>
-               </property>
-               <property name="text">
-                <string>1</string>
-               </property>
-               <property name="flags">
-                <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-               </property>
-              </item>
-             </item>
-             <item>
-              <property name="text">
-               <string>Linear</string>
-              </property>
-              <property name="text">
-               <string>0</string>
-              </property>
-              <property name="flags">
-               <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="XformSelectTab">
-          <property name="toolTip">
-           <string/>
-          </property>
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <attribute name="title">
-           <string>Select</string>
-          </attribute>
-          <attribute name="toolTip">
-           <string>Select multiple xforms to apply operations to</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <property name="spacing">
-            <number>3</number>
-           </property>
-           <property name="leftMargin">
-            <number>5</number>
-           </property>
-           <property name="topMargin">
-            <number>5</number>
-           </property>
-           <property name="rightMargin">
-            <number>5</number>
-           </property>
-           <property name="bottomMargin">
-            <number>4</number>
-           </property>
-           <item>
-            <widget class="QPushButton" name="XformsSelectAllButton">
-             <property name="text">
-              <string>Select All</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="XformsSelectNoneButton">
-             <property name="text">
-              <string>Select None</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="XformsSelectGroupBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="autoFillBackground">
-              <bool>false</bool>
-             </property>
-             <property name="title">
-              <string>Select Xforms</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_6">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <property name="leftMargin">
-               <number>2</number>
-              </property>
-              <property name="topMargin">
-               <number>2</number>
-              </property>
-              <property name="rightMargin">
-               <number>2</number>
-              </property>
-              <property name="bottomMargin">
-               <number>2</number>
-              </property>
-              <item>
-               <widget class="QScrollArea" name="XformsSelectGroupBoxScrollArea">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::NoFrame</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Plain</enum>
-                </property>
-                <property name="sizeAdjustPolicy">
-                 <enum>QAbstractScrollArea::AdjustToContents</enum>
-                </property>
-                <property name="widgetResizable">
-                 <bool>true</bool>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-                </property>
-                <widget class="QWidget" name="XformsSelectGroupBoxScrollAreaWidget">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>136</width>
-                   <height>58</height>
-                  </rect>
+               <item>
+                <layout class="QHBoxLayout" name="VariationsTabHLayout" stretch="0,0">
+                 <property name="spacing">
+                  <number>5</number>
                  </property>
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetDefaultConstraint</enum>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLineEdit" name="VariationsFilterLineEdit">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>22</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>22</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="VariationsFilterClearButton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>30</width>
+                     <height>23</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>23</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>X</string>
+                   </property>
+                   <property name="flat">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QTreeWidget" name="VariationsTree">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="mouseTracking">
+                  <bool>true</bool>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::WheelFocus</enum>
+                 </property>
+                 <property name="contextMenuPolicy">
+                  <enum>Qt::DefaultContextMenu</enum>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::Panel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="lineWidth">
+                  <number>1</number>
+                 </property>
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::NoEditTriggers</set>
+                 </property>
+                 <property name="showDropIndicator" stdset="0">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::SingleSelection</enum>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="indentation">
+                  <number>12</number>
+                 </property>
+                 <property name="uniformRowHeights">
+                  <bool>true</bool>
+                 </property>
+                 <property name="itemsExpandable">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sortingEnabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="headerHidden">
+                  <bool>false</bool>
+                 </property>
+                 <property name="columnCount">
+                  <number>2</number>
+                 </property>
+                 <attribute name="headerDefaultSectionSize">
+                  <number>70</number>
+                 </attribute>
+                 <attribute name="headerHighlightSections">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="headerMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
+                 <attribute name="headerShowSortIndicator" stdset="0">
+                  <bool>true</bool>
+                 </attribute>
+                 <attribute name="headerStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                 <column>
+                  <property name="text">
+                   <string>Variation</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Weight</string>
+                  </property>
+                 </column>
+                 <item>
+                  <property name="text">
+                   <string>Spherical</string>
+                  </property>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="flags">
+                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Sinusoidal</string>
+                  </property>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="flags">
+                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Pdj</string>
+                  </property>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="flags">
+                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>pdj_d</string>
+                   </property>
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                   <property name="flags">
+                    <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>pdj_c</string>
+                   </property>
+                   <property name="text">
+                    <string>2</string>
+                   </property>
+                   <property name="flags">
+                    <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>pdj_b</string>
+                   </property>
+                   <property name="text">
+                    <string>1.5</string>
+                   </property>
+                   <property name="flags">
+                    <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>pdj_a</string>
+                   </property>
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                   <property name="flags">
+                    <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                   </property>
+                  </item>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Linear</string>
+                  </property>
+                  <property name="text">
+                   <string>0</string>
+                  </property>
+                  <property name="flags">
+                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="XformSelectTab">
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <attribute name="title">
+               <string>Select</string>
+              </attribute>
+              <attribute name="toolTip">
+               <string>Select multiple xforms to apply operations to</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>3</number>
+               </property>
+               <property name="leftMargin">
+                <number>5</number>
+               </property>
+               <property name="topMargin">
+                <number>5</number>
+               </property>
+               <property name="rightMargin">
+                <number>5</number>
+               </property>
+               <property name="bottomMargin">
+                <number>4</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="XformsSelectAllButton">
+                 <property name="text">
+                  <string>Select All</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="XformsSelectNoneButton">
+                 <property name="text">
+                  <string>Select None</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="XformsSelectGroupBox">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <layout class="QFormLayout" name="formLayout">
-                  <property name="verticalSpacing">
-                   <number>6</number>
+                 <property name="autoFillBackground">
+                  <bool>false</bool>
+                 </property>
+                 <property name="title">
+                  <string>Select Xforms</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                  <property name="spacing">
+                   <number>0</number>
                   </property>
                   <property name="leftMargin">
-                   <number>6</number>
+                   <number>2</number>
                   </property>
                   <property name="topMargin">
-                   <number>6</number>
+                   <number>2</number>
                   </property>
                   <property name="rightMargin">
-                   <number>6</number>
+                   <number>2</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>6</number>
+                   <number>2</number>
                   </property>
-                  <item row="0" column="0">
-                   <widget class="QCheckBox" name="DeleteMeCheckBox1">
-                    <property name="text">
-                     <string>DeleteMeCheckBox</string>
+                  <item>
+                   <widget class="QScrollArea" name="XformsSelectGroupBoxScrollArea">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QCheckBox" name="DeleteMeCheckBox2">
-                    <property name="text">
-                     <string>CheckBox</string>
+                    <property name="autoFillBackground">
+                     <bool>false</bool>
                     </property>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Plain</enum>
+                    </property>
+                    <property name="sizeAdjustPolicy">
+                     <enum>QAbstractScrollArea::AdjustToContents</enum>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                    </property>
+                    <widget class="QWidget" name="XformsSelectGroupBoxScrollAreaWidget">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>267</width>
+                       <height>653</height>
+                      </rect>
+                     </property>
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <layout class="QFormLayout" name="formLayout">
+                      <property name="verticalSpacing">
+                       <number>6</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>6</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>6</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>6</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>6</number>
+                      </property>
+                      <item row="0" column="0">
+                       <widget class="QCheckBox" name="DeleteMeCheckBox1">
+                        <property name="text">
+                         <string>DeleteMeCheckBox</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QCheckBox" name="DeleteMeCheckBox2">
+                        <property name="text">
+                         <string>CheckBox</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
                    </widget>
                   </item>
                  </layout>
                 </widget>
-               </widget>
-              </item>
-             </layout>
+               </item>
+              </layout>
+             </widget>
             </widget>
            </item>
           </layout>
          </widget>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="AnimateXformCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate this xform during the rotation phase when creating a sequence for animation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Animate</string>
-         </property>
         </widget>
        </item>
       </layout>
@@ -5864,6 +5919,9 @@
        <width>137</width>
        <height>200</height>
       </size>
+     </property>
+     <property name="floating">
+      <bool>false</bool>
      </property>
      <property name="features">
       <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
@@ -6895,8 +6953,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>150</width>
-     <height>251</height>
+     <width>200</width>
+     <height>200</height>
     </size>
    </property>
    <property name="maximumSize">

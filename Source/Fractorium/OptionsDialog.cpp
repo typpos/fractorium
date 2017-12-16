@@ -28,6 +28,8 @@ FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 	ui.OptionsIdentityTable->setCellWidget(1, 1, m_UrlEdit);
 	m_NickEdit = new QLineEdit(ui.OptionsIdentityTable);
 	ui.OptionsIdentityTable->setCellWidget(2, 1, m_NickEdit);
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	ui.OptionsIdentityTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	table = ui.DeviceTable;
 	table->clearContents();
 	table->setRowCount(0);

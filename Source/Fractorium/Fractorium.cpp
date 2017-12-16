@@ -28,14 +28,13 @@ Fractorium::Fractorium(QWidget* p)
 	qRegisterMetaType<vector<byte>>("vector<byte>");
 	qRegisterMetaType<vv4F>("vv4F");
 	qRegisterMetaType<EmberTreeWidgetItemBase*>("EmberTreeWidgetItemBase*");
-	setDockOptions(DockOption::AllowNestedDocks | DockOption::AllowTabbedDocks);
-	setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::TabPosition::North);
-	setTabShape(QTabWidget::TabShape::Triangular);
 	tabifyDockWidget(ui.LibraryDockWidget, ui.FlameDockWidget);
 	tabifyDockWidget(ui.FlameDockWidget, ui.XformsDockWidget);
 	tabifyDockWidget(ui.XformsDockWidget, ui.XaosDockWidget);
 	tabifyDockWidget(ui.XaosDockWidget, ui.PaletteDockWidget);
 	tabifyDockWidget(ui.PaletteDockWidget, ui.InfoDockWidget);
+	setTabPosition(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea, QTabWidget::TabPosition::North);
+	setTabShape(QTabWidget::TabShape::Triangular);
 	m_Docks.reserve(8);
 	m_Docks.push_back(ui.LibraryDockWidget);
 	m_Docks.push_back(ui.FlameDockWidget);
@@ -43,6 +42,13 @@ Fractorium::Fractorium(QWidget* p)
 	m_Docks.push_back(ui.XaosDockWidget);
 	m_Docks.push_back(ui.PaletteDockWidget);
 	m_Docks.push_back(ui.InfoDockWidget);
+
+	for (auto dock : m_Docks)//Prevents a dock from ever getting accidentally hidden.
+	{
+		dock->setWindowFlags(dock->windowFlags() & Qt::WindowStaysOnTopHint);
+		dock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
+	}
+
 	m_FontSize = 9;
 	m_VarSortMode = 1;//Sort by weight by default.
 	m_PaletteSortMode = 0;//Sort by palette ascending by default.
@@ -286,6 +292,7 @@ bool Fractorium::HaveFinal()
 /// <param name="topLevel">True if top level, else false.</param>
 void Fractorium::OnDockTopLevelChanged(bool topLevel)
 {
+	//setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::TabPosition::North);
 	//if (topLevel)
 	//{
 	//	if (ui.DockWidget->y() <= 0)
@@ -306,6 +313,7 @@ void Fractorium::OnDockTopLevelChanged(bool topLevel)
 /// <param name="area">The dock widget area</param>
 void Fractorium::dockLocationChanged(Qt::DockWidgetArea area)
 {
+	//setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::TabPosition::North);
 	//ui.DockWidget->resize(500, ui.DockWidget->height());
 	//ui.DockWidget->update();
 	//ui.dockWidget->setFloating(true);

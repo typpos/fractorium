@@ -73,6 +73,8 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	ui.FinalRenderStartButton->disconnect(SIGNAL(clicked(bool)));
 	connect(ui.FinalRenderStartButton, SIGNAL(clicked(bool)), this, SLOT(OnRenderClicked(bool)),		  Qt::QueuedConnection);
 	connect(ui.FinalRenderStopButton,  SIGNAL(clicked(bool)), this, SLOT(OnCancelRenderClicked(bool)), Qt::QueuedConnection);
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	ui.FinalRenderSizeTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	table = ui.FinalRenderDeviceTable;
 	table->clearContents();
 	table->setRowCount(0);

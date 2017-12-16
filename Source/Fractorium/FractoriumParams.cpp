@@ -40,6 +40,7 @@ void Fractorium::InitParamsUI()
 	comboVals.push_back("Linear");
 	SetupCombo(table, this, row, 1, m_PaletteModeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnPaletteModeComboCurrentIndexChanged(int)));
 	m_PaletteModeCombo->SetCurrentIndexStealth(int(ePaletteMode::PALETTE_LINEAR));
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	//Geometry.
 	row = 0;
 	table = ui.GeometryTable;
@@ -61,6 +62,7 @@ void Fractorium::InitParamsUI()
 	m_ZPosSpin->setDecimals(3);
 	m_PerspectiveSpin->setDecimals(4);
 	m_DepthBlurSpin->setDecimals(3);
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	//Filter.
 	row = 0;
 	table = ui.FilterTable;
@@ -71,6 +73,7 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMinRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMinRadiusWidthChanged(double)), true,   0,   0,   0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMaxRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMaxRadiusWidthChanged(double)), true, 0.0, 9.0,   0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DECurveSpin,			  spinHeight, 0.15,  5, 0.1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterCurveWidthChanged(double)),     true, 0.4, 0.4, 0.4);
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	//Iteration.
 	row = 0;
 	table = ui.IterationTable;
@@ -79,6 +82,7 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<SpinBox, int>(			table, this, row, 1, m_FuseSpin,			spinHeight, 1,      1000,   5, SIGNAL(valueChanged(int)),	 SLOT(OnFuseChanged(int)),			  true,	     15, 15, 15);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_QualitySpin,			spinHeight, 1,      dmax,  50, SIGNAL(valueChanged(double)), SLOT(OnQualityChanged(double)),	  true, quality, 10, 10);
 	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_SupersampleSpin,		spinHeight, 1,         4,   1, SIGNAL(valueChanged(int)),	 SLOT(OnSupersampleChanged(int)),	  true,       1,  1,  1);
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	//Animation.
 	row = 0;
 	table = ui.AnimationTable;
@@ -96,6 +100,7 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1);
 	comboVals = TemporalFilterCreator<float>::FilterTypes();
 	SetupCombo(                         table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
+	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 }
 
 /// <summary>

@@ -2483,6 +2483,152 @@ public:
 };
 
 /// <summary>
+/// Rays1 from JWildfire by Raykoid666.
+/// </summary>
+template <typename T>
+class Rays1Variation : public Variation<T>
+{
+public:
+	Rays1Variation(T weight = 1.0) : Variation<T>("rays1", eVariationId::VAR_RAYS1, weight, true, true) { }
+
+	VARCOPY(Rays1Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T u = 1 / Zeps(SafeTan<T>(helper.m_PrecalcSqrtSumSquares)) + (m_Weight * T(SQR(M_2_PI)));
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			outPoint.m_X = outPoint.m_Y = 0;//This variation assigns, instead of summing, so order will matter.
+
+		helper.Out.x = m_Weight * u * helper.m_PrecalcSumSquares / Zeps(helper.In.x);
+		helper.Out.y = m_Weight * u * helper.m_PrecalcSumSquares / Zeps(helper.In.y);
+		helper.Out.z = m_Weight * helper.In.z;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		string weight = WeightDefineString();
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\t\treal_t u = 1 / Zeps(tan(precalcSqrtSumSquares)) + (" << weight << " * SQR(M_2_PI));\n";
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			ss << "\t\toutPoint->m_X = outPoint->m_Y = 0;\n";
+
+		ss
+				<< "\t\tvOut.x = " << weight << " * u * precalcSumSquares / Zeps(vIn.x);\n"
+				<< "\t\tvOut.y = " << weight << " * u * precalcSumSquares / Zeps(vIn.y);\n"
+				<< "\t\tvOut.z = " << weight << " * vIn.z;\n"
+				<< "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+};
+
+/// <summary>
+/// Rays2 from JWildfire by Raykoid666.
+/// </summary>
+template <typename T>
+class Rays2Variation : public Variation<T>
+{
+public:
+	Rays2Variation(T weight = 1.0) : Variation<T>("rays2", eVariationId::VAR_RAYS2, weight, true) { }
+
+	VARCOPY(Rays2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T u = 1 / std::cos(helper.m_PrecalcSumSquares * std::tan(1 / Zeps(helper.m_PrecalcSumSquares)));
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			outPoint.m_X = outPoint.m_Y = 0;//This variation assigns, instead of summing, so order will matter.
+
+		helper.Out.x = (m_Weight / 10) * u * helper.m_PrecalcSumSquares / Zeps(helper.In.x);
+		helper.Out.y = (m_Weight / 10) * u * helper.m_PrecalcSumSquares / Zeps(helper.In.y);
+		helper.Out.z = m_Weight * helper.In.z;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		string weight = WeightDefineString();
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\t\treal_t u = 1 / cos(precalcSumSquares * tan(1 / Zeps(precalcSumSquares)));\n";
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			ss << "\t\toutPoint->m_X = outPoint->m_Y = 0;\n";
+
+		ss
+				<< "\t\tvOut.x = (" << weight << " / 10) * u * precalcSumSquares / Zeps(vIn.x);\n"
+				<< "\t\tvOut.y = (" << weight << " / 10) * u * precalcSumSquares / Zeps(vIn.y);\n"
+				<< "\t\tvOut.z = " << weight << " * vIn.z;\n"
+				<< "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+};
+
+/// <summary>
+/// Rays3 from JWildfire by Raykoid666.
+/// </summary>
+template <typename T>
+class Rays3Variation : public Variation<T>
+{
+public:
+	Rays3Variation(T weight = 1.0) : Variation<T>("rays3", eVariationId::VAR_RAYS3, weight, true) { }
+
+	VARCOPY(Rays3Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T sq = SQR(helper.m_PrecalcSumSquares);
+		T u = 1 / std::sqrt(std::cos(std::sin(sq) * std::sin(1 / Zeps(sq))));
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			outPoint.m_X = outPoint.m_Y = 0;//This variation assigns, instead of summing, so order will matter.
+
+		helper.Out.x = (m_Weight / 10) * u * std::cos(helper.m_PrecalcSumSquares) * helper.m_PrecalcSumSquares / Zeps(helper.In.x);
+		helper.Out.y = (m_Weight / 10) * u * std::tan(helper.m_PrecalcSumSquares) * helper.m_PrecalcSumSquares / Zeps(helper.In.y);
+		helper.Out.z = m_Weight * helper.In.z;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		string weight = WeightDefineString();
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\t\treal_t sq = SQR(precalcSumSquares);\n"
+		   << "\t\treal_t u = 1 / sqrt(cos(sin(sq) * sin(1 / Zeps(sq))));\n";
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			ss << "\t\toutPoint->m_X = outPoint->m_Y = 0;\n";
+
+		ss
+				<< "\t\tvOut.x = (" << weight << " / 10) * u * cos(precalcSumSquares) * precalcSumSquares / Zeps(vIn.x);\n"
+				<< "\t\tvOut.y = (" << weight << " / 10) * u * tan(precalcSumSquares) * precalcSumSquares / Zeps(vIn.y);\n"
+				<< "\t\tvOut.z = " << weight << " * vIn.z;\n"
+				<< "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+};
+
+/// <summary>
 /// Blade.
 /// </summary>
 template <typename T>
@@ -6258,6 +6404,9 @@ MAKEPREPOSTVARASSIGN(Arch, arch, ARCH, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVAR(Tangent, tangent, TANGENT)
 MAKEPREPOSTVARASSIGN(Square, square, SQUARE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVAR(Rays, rays, RAYS)
+MAKEPREPOSTVAR(Rays1, rays1, RAYS1)
+MAKEPREPOSTVAR(Rays2, rays2, RAYS2)
+MAKEPREPOSTVAR(Rays3, rays3, RAYS3)
 MAKEPREPOSTVAR(Blade, blade, BLADE)
 MAKEPREPOSTVAR(Secant2, secant2, SECANT2)
 MAKEPREPOSTVAR(TwinTrian, TwinTrian, TWINTRIAN)

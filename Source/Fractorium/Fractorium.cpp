@@ -46,7 +46,11 @@ Fractorium::Fractorium(QWidget* p)
 	for (auto dock : m_Docks)//Prevents a dock from ever getting accidentally hidden.
 	{
 		dock->setWindowFlags(dock->windowFlags() & Qt::WindowStaysOnTopHint);
-		dock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea);
+		dock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea
+//#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+							  | Qt::DockWidgetArea::RightDockWidgetArea
+//#endif
+							 );
 	}
 
 	m_FontSize = 9;

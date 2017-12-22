@@ -93,11 +93,14 @@ void FractoriumEmberControllerBase::UpdateRender(eProcessAction action)
 
 /// <summary>
 /// Call Shutdown() then delete the renderer and clear the textures in the output window if there is one.
+/// Note the name is somewhat misleading because a new empty renderer is actually created as a placeholder.
+/// This is that the program won't crash if the user adjusts any of the controls while the renderer is shut down.
 /// </summary>
-void FractoriumEmberControllerBase::DeleteRenderer()
+template <typename T>
+void FractoriumEmberController<T>::DeleteRenderer()
 {
 	Shutdown();
-	m_Renderer = make_unique<EmberNs::Renderer<float, float>>();
+	m_Renderer = make_unique<EmberNs::Renderer<T, float>>();
 
 	if (GLController())
 		GLController()->ClearWindow();

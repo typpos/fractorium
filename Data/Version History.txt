@@ -1,8 +1,8 @@
-1.0.0.7 11/26/2017
+1.0.0.7 12/21/2017
 --User changes
  -Support 4k monitors, and in general, properly scale any monitor that is not HD.
  -Allow for a spatial filter of radius zero, which means do not use a spatial filter.
- -Add new variations: concentric, cpow3, helicoid, helix, rand_cubes, sphereblur.
+ -Add new variations: concentric, cpow3, helicoid, helix, rand_cubes, rays1, rays2, rays3, sphereblur.
  -Use a new method for computing elliptic which is more precise. Developed by Discord user Claude.
  -Remove the 8 variation per xform limitation on the GPU.
  -Allow for loading the last flame file on startup, rather than randoms.
@@ -13,6 +13,10 @@
  -No variations in an xform used to have the same behavior as a single linear variation with weight 1. While sensible, this breaks backward compatibility. No variations now sets the output point to zeroes.
  -Prevent crashing the program when adjusting a value on the main window while a final render is in progress.
  -The xaos table was inverted.
+ -Place the xforms and palette tabs in a scroll area to prevent weird sizing problems on low resolution monitors.
+ -Allow group dragging and floating of dock widgets.
+ -Make some tables auto size to their contents because some text appeared obscured on Linux.
+ -Opening an Xml was not properly setting the background field on the GUI, even though it was correctly parsed and used.
 
 --Code changes
  -Convert projects to Visual Studio 2017.

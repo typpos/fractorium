@@ -497,7 +497,7 @@ static QString BaseStyle()
 #ifndef _WIN32
 		   "QTabBar::tab { height: 3ex; }\n\n"
 #else
-		   "QTabBar::tab { height: 5ex; }\n\n"
+		   "QTabBar::tab { height: 3ex; }\n\n"
 #endif
 		   "/*This is needed to give the labels on the status bar some padding.*/\n"
 		   "QStatusBar QLabel { padding-left: 2px; padding-right: 2px; }\n\n"

@@ -243,6 +243,7 @@ public:
 	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) { return false; }
 	virtual uint SizeOfT() const { return 0; }
 	virtual void ClearUndo() { }
+	virtual void DeleteRenderer() { }
 	virtual GLEmberControllerBase* GLController() { return nullptr; }
 	bool RenderTimerRunning();
 	void StartRenderTimer();
@@ -251,7 +252,6 @@ public:
 	void ClearFinalImages();
 	void Shutdown();
 	void UpdateRender(eProcessAction action = eProcessAction::FULL_RENDER);
-	void DeleteRenderer();
 	void SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
 	RendererBase* Renderer() { return m_Renderer.get(); }
 	vector<v4F>* FinalImage() { return &(m_FinalImage); }
@@ -515,6 +515,7 @@ public:
 	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
 	virtual void ClearUndo() override;
 	virtual GLEmberControllerBase* GLController() override { return m_GLController.get(); }
+	virtual void DeleteRenderer() override;
 
 private:
 	//Embers.

@@ -2,7 +2,7 @@
 		This is needed to deal with the large tabs in the fusion theme which is the default on Linux, and optional on Windows.
 		It's not needed for other themes.
 		You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/
-QTabBar::tab { height: 5ex; }
+QTabBar::tab { height: 3ex; }
 
 /*This is needed to give the labels on the status bar some padding.*/
 QStatusBar QLabel { padding-left: 2px; padding-right: 2px; }

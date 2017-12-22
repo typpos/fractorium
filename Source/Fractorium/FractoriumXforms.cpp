@@ -120,8 +120,8 @@ void Fractorium::OnAddXformButtonClicked(bool checked) { m_Controller->AddXform(
 ///			From: All xaos values from the current xform are zero when going to any xform but the new one added, which is 1.
 ///			To: The xaos value coming from the current xform is 1 and the xaos values from all other xforms are 0, when going to the newly added xform.
 ///     Take different action when a single xform is selected vs. multiple.
-///         Single: Copy current xform's xaos values to the new one.
-///         Multiple: Set new xform's xaos values to 1, and except the last entry which is 0.
+///         Single: Copy the current xform's xaos values to the new one.
+///         Multiple: Set the new xform's xaos values to 1, and except the last entry which is 0.
 /// Called when the add xform button is clicked.
 /// Resets the rendering process.
 /// </summary>

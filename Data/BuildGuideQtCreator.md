@@ -106,7 +106,7 @@ This will download and build `glm libopenexr libpng libxml zlib`. You will have 
 
 ###Begin build with Qt Creator
 
-Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2015 64bit*.
+Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2017 64bit*.
 Make sure *Shadow build* in *Edit build configuration* for both *Debug* and *Release* is unchecked.
 
 Switch to the *Release* configuration.
@@ -135,7 +135,7 @@ The name "Qt5" must match exactly and this step must be completed before the Fra
 
 Set the default version to the newly created Qt version and click *Ok*.
 
-Open the file Fractorium.sln under Builds/MSVC/2015
+Open the file Fractorium.sln under Builds/MSVC/2017
 
 Set the configuration to release, and build all.
 
@@ -196,7 +196,7 @@ platforms\qwindows.dll
 
 Double click fractorium.exe to run it, and use the command line to run the others.
 
-To run on a computer without Visual Studio 2015, these files also need to be in the folder:
+To run on a computer without Visual Studio 2017, these files also need to be in the folder:
 
 ```
 MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\msvcp140.dll

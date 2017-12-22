@@ -48,7 +48,7 @@ All builds are 64-bit.
 
 ## Windows
 
-[Build Guide for Visual Studio 2015 or Qt Creator](Data/BuildGuideQtCreator.md)
+[Build Guide for Visual Studio 2017 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 

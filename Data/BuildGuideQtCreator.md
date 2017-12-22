@@ -1,4 +1,4 @@
-#Build Guide For Visual Studio 2015 or Qt Creator
+#Build Guide For Visual Studio 2017 or Qt Creator
 ##Tools
 
 ###git
@@ -15,7 +15,7 @@ Install Qt for Windows 64-bit (VS 2017) 5.8 or later (http://www.qt.io/download/
 
 Add system environment variable named `QTPATH` and point it to the location of the Qt folder. On a default install, this will be something like:
 
-`C:\Qt\5.8\msvc2015_64`
+`C:\Qt\5.8\msvc2017_64`
 
 ###Wix
 
@@ -129,7 +129,7 @@ Run Visual Studio and verify there is a menu item named *Qt5*. Click on it and c
 
 Add a new Qt version to the list with the exact name of "Qt5", and set its path to the same as `$QTPATH`, which will be something like:
 
-`C:\Qt\5.8\msvc2015_64`
+`C:\Qt\5.9.1\msvc2017_64`
 
 The name "Qt5" must match exactly and this step must be completed before the Fractorium solution is opened. If not, the Qt add-in will completely ruin all solution and project files that use Qt.
 
@@ -199,13 +199,13 @@ Double click fractorium.exe to run it, and use the command line to run the other
 To run on a computer without Visual Studio 2015, these files also need to be in the folder:
 
 ```
-MSVC2015\VC\redist\x64\Microsoft.VC140.CRT\msvcp140.dll
-MSVC2015\VC\redist\x64\Microsoft.VC140.CRT\vcruntime140.dll
-MSVC2015\VC\redist\x64\Microsoft.VC140.CRT\vccorlib140.dll
-MSVC2015\VC\redist\x64\Microsoft.VC140.CRT\concrt140.dll
+MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\msvcp140.dll
+MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\vcruntime140.dll
+MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\vccorlib140.dll
+MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\concrt140.dll
 ```
 
-or you can install [Visual C++ Redistributable Packages for Visual Studio 2015 (64 bit)](https://www.microsoft.com/en-us/download/details.aspx?id=53840)
+or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (64 bit)](https://www.visualstudio.com/downloads/)
 
 ##Final file structure for distribution
 

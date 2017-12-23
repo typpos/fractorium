@@ -567,8 +567,8 @@ map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filena
 
 	for (int i = 0; i < numPoints; i++)
 	{
-		int x = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % image.width();
-		int y = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % image.height();
+		int x = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(image.width());
+		int y = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(image.height());
 		QRgb rgb = image.pixel(x, y);
 		GradientArrow arrow;
 		arrow.Color(QColor::fromRgb(rgb));

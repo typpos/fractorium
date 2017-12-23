@@ -274,9 +274,9 @@ void Fractorium::OnPaletteCellDoubleClicked(int row, int col)
 void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 {
 	uint i = 0;
-	int rowCount = ui.PaletteListTable->rowCount() - 1;
+	int rowCount = ui.PaletteListTable->rowCount();
 
-	while ((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow));
+	while (((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow)) || i >= uint(rowCount));
 
 	if (checked)
 		OnPaletteCellDoubleClicked(i, 1);//Will clear the adjustments.

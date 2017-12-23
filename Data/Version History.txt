@@ -1,4 +1,4 @@
-1.0.0.7 12/21/2017
+1.0.0.7 12/22/2017
 --User changes
  -Support 4k monitors, and in general, properly scale any monitor that is not HD.
  -Allow for a spatial filter of radius zero, which means do not use a spatial filter.
@@ -17,6 +17,7 @@
  -Allow group dragging and floating of dock widgets.
  -Make some tables auto size to their contents because some text appeared obscured on Linux.
  -Opening an Xml was not properly setting the background field on the GUI, even though it was correctly parsed and used.
+ -Clicking random palette when using a palette file with 2 palettes could lead to a program freeze.
 
 --Code changes
  -Convert projects to Visual Studio 2017.

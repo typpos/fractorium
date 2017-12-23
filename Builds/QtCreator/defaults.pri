@@ -47,7 +47,7 @@ win32 {
 
 !win32 {
 #If your global includes are stored elsewhere, add them here.
-	INCLUDEPATH += /usr/include
+	#INCLUDEPATH += /usr/include
 	INCLUDEPATH += /usr/local/include
 	INCLUDEPATH += /usr/include/GL
 	INCLUDEPATH += /usr/local/include/GL

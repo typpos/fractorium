@@ -27,7 +27,7 @@ SRC_DIR = $$EMBER_ROOT/Source
 SRC_COMMON_DIR = $$absolute_path($$EMBER_ROOT/Source/EmberCommon)
 ASSETS_DIR = $$absolute_path($$EMBER_ROOT/Data)
 QTCREATOR_DIR = $$absolute_path($$EMBER_ROOT/Builds/QtCreator)
-win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2015)
+win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2017)
 
 #4) Add up all include paths.
 INCLUDEPATH += $$LOCAL_INCLUDE_DIR

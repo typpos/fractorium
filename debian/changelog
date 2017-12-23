@@ -1,3 +1,9 @@
+fractorium (1.0.0.7d-0ubuntu1) artful; urgency=low
+
+  * release 1.0.0.7
+
+ -- Matt Feemster <matt.feemster@gmail.com>  Fri, 22 Dec 2017 17:25:44 -0800
+ 
 fractorium (1.0.0.7c-0ubuntu1) artful; urgency=low
 
   * release 1.0.0.7

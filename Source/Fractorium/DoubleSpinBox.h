@@ -98,6 +98,7 @@ public:
 	string ParamName() { return m_Param; }
 	eVariationId GetVariationId() { return m_Id; }
 	VariationTreeWidgetItem* WidgetItem() { return m_WidgetItem; }
+	virtual QString textFromValue(double value) const override;
 
 public slots:
 	void PiActionTriggered(bool checked = false);

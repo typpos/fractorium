@@ -356,7 +356,7 @@ VariationTreeDoubleSpinBox::VariationTreeDoubleSpinBox(QWidget* p, VariationTree
 	m_WidgetItem = widgetItem;
 	m_Param = param;
 	m_Id = id;
-	setDecimals(3);
+	//setDecimals(3);
 	//PI
 	auto piAction = new QAction("PI", this);
 	connect(piAction, SIGNAL(triggered(bool)), this, SLOT(PiActionTriggered(bool)), Qt::QueuedConnection);
@@ -407,6 +407,7 @@ VariationTreeDoubleSpinBox::VariationTreeDoubleSpinBox(QWidget* p, VariationTree
 	this->addAction(sqrtThreeAction);
 	//Need this for it to show up properly.
 	this->setContextMenuPolicy(Qt::ActionsContextMenu);
+	lineEdit()->setValidator(new QDoubleValidator(this));
 }
 
 void VariationTreeDoubleSpinBox::PiActionTriggered(bool checked) { setValue(M_PI); }
@@ -421,6 +422,12 @@ void VariationTreeDoubleSpinBox::ThreeOverPiActionTriggered(bool checked) { setV
 void VariationTreeDoubleSpinBox::FourOverPiActionTriggered(bool checked)  { setValue(4 / M_PI); }
 void VariationTreeDoubleSpinBox::SqrtTwoActionTriggered(bool checked) { setValue(M_SQRT2); }
 void VariationTreeDoubleSpinBox::SqrtThreeActionTriggered(bool checked) { setValue(std::sqrt(3.0)); }
+
+
+QString VariationTreeDoubleSpinBox::textFromValue(double value) const
+{
+	return QWidget::locale().toString(value, 'g', 10);
+}
 
 /// <summary>
 /// Constructor that sets up the context menu for special numerical values specific to affine spinners.

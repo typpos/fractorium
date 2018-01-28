@@ -272,7 +272,7 @@
 	<Fragment>
 		<ComponentGroup Id="BenchComponents" Directory="INSTALLFOLDERBENCH">
 			<Component Id="EmberBench.ps1" Guid="a0362c11-e54a-4712-b800-0bb7c43d285e">
-				<File Id="EmberBench.ps1" Source="$(var.SolutionDir)..\..\..\Data\Bench\EmberBench.ps1" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="EmberBench.ps1" Source="$(var.SolutionDir)..\..\..\Data\Bench\EmberBench.ps1" KeyPath="yes" Checksum="yes" ReadOnly="no"/>
 			</Component>
 
 			<Component Id="golubaja_rippingfrominside_complexcode.flame" Guid="74fc54d8-eb7f-4e88-b839-c6d0b847d78e">

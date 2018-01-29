@@ -99,6 +99,7 @@ public:
 	eVariationId GetVariationId() { return m_Id; }
 	VariationTreeWidgetItem* WidgetItem() { return m_WidgetItem; }
 	virtual QString textFromValue(double value) const override;
+	virtual double valueFromText(const QString& text) const override;
 
 public slots:
 	void PiActionTriggered(bool checked = false);

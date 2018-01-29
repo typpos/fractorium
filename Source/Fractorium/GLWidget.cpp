@@ -897,13 +897,17 @@ void GLEmberController<T>::DrawGrid()
 {
 	auto renderer = m_Fractorium->m_Controller->Renderer();
 	double scale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	//qDebug() << renderer->UpperRightX(false) << " " << renderer->LowerLeftX(false) << " " << renderer->UpperRightY(false) << " " << renderer->LowerLeftY(false);
 	float unitX = (std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0f) / scale;
 	float unitY = (std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0f) / scale;
+	//qDebug() << unitX << " " << unitY;
 	float xLow = std::floor(-unitX);
 	float xHigh = std::ceil(unitX);
 	float yLow = std::floor(-unitY);
 	float yHigh = std::ceil(unitY);
 	float alpha = 0.25f;
+	int xsteps = std::ceil(std::abs(xHigh - xLow) / GridStep);//Need these because sometimes the float value never reaches the max and it gets stuck in an infinite loop.
+	int ysteps = std::ceil(std::abs(yHigh - yLow) / GridStep);
 	Affine2D<T> temp;
 	m4T mat = (temp * scale).ToMat4RowMajor();
 	m_GL->glPushMatrix();
@@ -913,13 +917,13 @@ void GLEmberController<T>::DrawGrid()
 	m_GL->glBegin(GL_LINES);
 	m_GL->glColor4f(0.5f, 0.5f, 0.5f, alpha);
 
-	for (float fx = xLow; fx <= xHigh; fx += GridStep)
+	for (float fx = xLow, i = 0; fx <= xHigh && i < xsteps; fx += GridStep, i++)
 	{
 		m_GL->glVertex2f(fx, yLow);
 		m_GL->glVertex2f(fx, yHigh);
 	}
 
-	for (float fy = yLow; fy < yHigh; fy += GridStep)
+	for (float fy = yLow, i = 0; fy < yHigh && i < ysteps; fy += GridStep, i++)
 	{
 		m_GL->glVertex2f(xLow,  fy);
 		m_GL->glVertex2f(xHigh, fy);

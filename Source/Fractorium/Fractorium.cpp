@@ -213,7 +213,7 @@ Fractorium::Fractorium(QWidget* p)
 	//this constructor exits, GLWidget::InitGL() will create the initial flock and start the rendering timer
 	//which executes whenever the program is idle. Upon starting the timer, the renderer
 	//will be initialized.
-	QTimer::singleShot(500, [&]() { ui.GLDisplay->InitGL(); });
+	QTimer::singleShot(1000, [&]() { ui.GLDisplay->InitGL(); });
 }
 
 /// <summary>

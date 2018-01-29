@@ -356,7 +356,7 @@ VariationTreeDoubleSpinBox::VariationTreeDoubleSpinBox(QWidget* p, VariationTree
 	m_WidgetItem = widgetItem;
 	m_Param = param;
 	m_Id = id;
-	//setDecimals(3);
+	setDecimals(7);
 	//PI
 	auto piAction = new QAction("PI", this);
 	connect(piAction, SIGNAL(triggered(bool)), this, SLOT(PiActionTriggered(bool)), Qt::QueuedConnection);
@@ -426,7 +426,13 @@ void VariationTreeDoubleSpinBox::SqrtThreeActionTriggered(bool checked) { setVal
 
 QString VariationTreeDoubleSpinBox::textFromValue(double value) const
 {
-	return QWidget::locale().toString(value, 'g', 10);
+	return QWidget::locale().toString(value, 'g', decimals());
+}
+
+
+double VariationTreeDoubleSpinBox::valueFromText(const QString& text) const
+{
+	return QWidget::locale().toDouble(text);
 }
 
 /// <summary>

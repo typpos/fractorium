@@ -122,7 +122,6 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 		spinBox->DoubleClickZero(1);
 		spinBox->DoubleClickNonZero(0);
 		spinBox->SmallStep(0.001);
-		//spinBox->setDecimals(4);
 		tree->setItemWidget(item, 1, spinBox);
 		m_Fractorium->connect(spinBox, SIGNAL(valueChanged(double)), SLOT(OnVariationSpinBoxValueChanged(double)), Qt::QueuedConnection);
 
@@ -153,7 +152,6 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 						varSpinBox->SmallStep(1);
 					}
 
-					varSpinBox->setDecimals(4);
 					tree->setItemWidget(paramWidget, 1, varSpinBox);
 					m_Fractorium->connect(varSpinBox, SIGNAL(valueChanged(double)), SLOT(OnVariationSpinBoxValueChanged(double)), Qt::QueuedConnection);
 				}

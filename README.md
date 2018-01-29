@@ -13,7 +13,7 @@ Download: [Fractorium_1.0.0.7.msi](https://drive.google.com/open?id=1R0XbMT5b_hq
 
 ## Mac
 
-Download: [Fractorium_1.0.0.6.dmg](https://drive.google.com/open?id=0Bws5xPbHJph6VkpmZHM4MVBvdWc)
+Download: [Fractorium_1.0.0.7.dmg](https://drive.google.com/file/d/11mu6K7im7KweMmyg8aui-EoAut4kSX1X/view?usp=sharing)
 
 ## Linux
 

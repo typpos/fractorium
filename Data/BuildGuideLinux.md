@@ -1,6 +1,6 @@
 # Build Guide for Linux
 
-The following has been tested on 16.04.2 (xenial).
+The following has been tested on Ubuntu 17.10 (artful).
 
 Make sure the package lists are up-to-date:
 
@@ -19,7 +19,7 @@ git clone --depth=1 https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 Install the dependencies.
 
 ```
-sudo apt-get install g++ libgl1-mesa-dev libgl-dev libglm-dev libjpeg-dev libpng16-dev libqt5opengl5-dev libtbb-dev libxml2-dev ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers qt5-default qt5-qmake qtbase5-dev libopenexr22 libopenexr-dev
+sudo apt-get install g++ libc6-dev libgl1-mesa-dev libgl-dev libglm-dev libjpeg-dev libpng-dev libqt5opengl5-dev libtbb-dev libxml2-dev ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers qt5-default qt5-qmake qtbase5-dev libopenexr22 libopenexr-dev
 ```
 
 Install the OpenCL drivers and opencl support for your hardware.
@@ -29,10 +29,10 @@ For AMD get their drivers from their site, build and install the .deb package.
 For Nvidia:
 
 ```
-sudo apt-get install nvidia-modprobe nvidia-prime nvidia-367 nvidia-367-dev 
+sudo apt-get install nvidia-modprobe nvidia-prime nvidia-384 nvidia-384-dev 
 ```
 
-Optionally you can install the Nvidia-specific `nvidia-libopencl1-367` package,
+Optionally you can install the Nvidia-specific `nvidia-libopencl1-384` package,
 but keep in mind that this will remove the generic ones (`ocl-icd-opencl-dev`
 and `ocl-icd-libopencl1`).
 

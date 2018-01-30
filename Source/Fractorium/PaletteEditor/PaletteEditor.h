@@ -73,6 +73,7 @@ private:
 	map<float, GradientArrow> GetRandomColorsFromImage(QString filename, int numPoints);
 	void EnablePaletteFileControls();
 	void EnablePaletteControls();
+	bool IsCurrentPaletteAndFileEditable();
 	bool m_PaletteFileChanged = false;
 	int m_PaletteIndex = 0;
 	QString m_Filename;

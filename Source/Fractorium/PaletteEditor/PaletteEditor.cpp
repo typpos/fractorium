@@ -484,6 +484,7 @@ void PaletteEditor::EmitColorIndexChanged(size_t index, float value)
 /// Helper to lazily instantiate an open file dialog.
 /// Once created, it will remain alive for the duration of the program run.
 /// </summary>
+/// <returns>The list of filenames selected</returns>
 QStringList PaletteEditor::SetupOpenImagesDialog()
 {
 	QStringList filenames;
@@ -555,6 +556,7 @@ void PaletteEditor::AddArrow(const QColor& color)
 /// </summary>
 /// <param name="filename">The full path to the image file to get random colors from</param>
 /// <param name="numPoints">The number of colors to get</param>
+/// <returns>A map whose keys are the color indices from 0-1, and whose values are the gradient arrows containing the color for each key position.</returns>
 map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filename, int numPoints)
 {
 	map<float, GradientArrow> colors;
@@ -585,10 +587,11 @@ map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filena
 /// </summary>
 void PaletteEditor::EnablePaletteFileControls()
 {
-	bool b = m_PaletteList->IsModifiable(m_CurrentPaletteFilePath);//At least one in the file is not fixed.
+	bool b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
 	ui->DeletePaletteButton->setEnabled(b);
 	ui->CopyPaletteFileButton->setEnabled(b);
 	ui->AppendPaletteButton->setEnabled(b);
+	ui->OverwritePaletteButton->setEnabled(b);
 }
 
 /// <summary>
@@ -596,10 +599,11 @@ void PaletteEditor::EnablePaletteFileControls()
 /// </summary>
 void PaletteEditor::EnablePaletteControls()
 {
-	auto& palette = m_GradientColorView->GetPalette(256);
-	bool b = !palette.m_SourceColors.empty();
-	bool any = m_PaletteList->IsModifiable(m_CurrentPaletteFilePath);//At least one in the file is not fixed.
-	ui->OverwritePaletteButton->setEnabled(b && any);
+	bool b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
+	ui->DeletePaletteButton->setEnabled(b);
+	ui->CopyPaletteFileButton->setEnabled(b);
+	ui->AppendPaletteButton->setEnabled(b);
+	ui->OverwritePaletteButton->setEnabled(b && (GetFilename(m_CurrentPaletteFilePath) == GetFilename(*m_GradientColorView->GetPalette(256).m_Filename.get())));//Only allow overwrite if the palette is from the file it's overwriting a palette in.
 	ui->AddColorButton->setEnabled(b);
 	ui->DistributeColorsButton->setEnabled(b);
 	ui->AutoDistributeCheckBox->setEnabled(b);
@@ -609,4 +613,13 @@ void PaletteEditor::EnablePaletteControls()
 	ui->ArrowsSpinBox->setEnabled(b);
 	ui->CreatePaletteFromImageButton->setEnabled(b);
 	ui->CreatePaletteAgainFromImageButton->setEnabled(b);
+}
+
+/// <summary>
+/// Determine whether the current file and the palette selected within it are both editable.
+/// </summary>
+/// <returns>True if both the currently selected palette is editable and if all palettes in the currently selected file are editable.</returns>
+bool PaletteEditor::IsCurrentPaletteAndFileEditable()
+{
+	return m_PaletteList->IsModifiable(m_CurrentPaletteFilePath) && !m_GradientColorView->GetPalette(256).m_SourceColors.empty();
 }

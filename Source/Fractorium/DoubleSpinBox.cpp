@@ -87,6 +87,7 @@ void DoubleSpinBox::DoubleClickNonZero(double val)
 /// <summary>
 /// Get the default step used when the user scrolls.
 /// </summary>
+/// <returns>The default step as a double.</returns>
 double DoubleSpinBox::Step()
 {
 	return m_Step;
@@ -104,6 +105,7 @@ void DoubleSpinBox::Step(double step)
 /// <summary>
 /// Get the small step to be used when the user holds down shift while scrolling.
 /// </summary>
+/// <returns>The small step as a double.</returns>
 double DoubleSpinBox::SmallStep()
 {
 	return m_SmallStep;
@@ -423,13 +425,19 @@ void VariationTreeDoubleSpinBox::FourOverPiActionTriggered(bool checked)  { setV
 void VariationTreeDoubleSpinBox::SqrtTwoActionTriggered(bool checked) { setValue(M_SQRT2); }
 void VariationTreeDoubleSpinBox::SqrtThreeActionTriggered(bool checked) { setValue(std::sqrt(3.0)); }
 
-
+/// <summary>
+/// Override which converts the passed in double to text.
+/// </summary>
+/// <returns>Text showing decimals() decimal places, or sometimes scientific notation.</returns>
 QString VariationTreeDoubleSpinBox::textFromValue(double value) const
 {
 	return QWidget::locale().toString(value, 'g', decimals());
 }
 
-
+/// <summary>
+/// Override which converts the passed in text to a double
+/// </summary>
+/// <returns>The converted double</returns>
 double VariationTreeDoubleSpinBox::valueFromText(const QString& text) const
 {
 	return QWidget::locale().toDouble(text);

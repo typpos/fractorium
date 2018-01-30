@@ -84,6 +84,7 @@ bool PaletteList<T>::AddPaletteToFile(const string& filename, const Palette<T>& 
 	if (auto p = GetPaletteListByFullPathOrFilename(filename))
 	{
 		p->push_back(palette);
+		p->back().m_Filename = make_shared<string>(filename);//Ensure the filename matches because this could have been duplicated from another palette file.
 		p->back().m_Index = int(p->size()) - 1;
 		Save(filename);
 		return true;
@@ -489,22 +490,20 @@ const string& PaletteList<T>::Name(size_t index)
 }
 
 /// <summary>
-/// Determines whether at least one palette in the passed in palette file is modifiable,
+/// Determines whether all palettes in the passed in palette file are modifiable,
 /// meaning whether the source colors have at least one element in them.
 /// </summary>
 /// <param name="filename">The full path to the existing palette file to search for a modifiable palette in</param>
-/// <returns>True if at least one palette in the file was modifiable, else false.</returns>
+/// <returns>True if at all palettes in the file were modifiable, else false.</returns>
 template <typename T>
 bool PaletteList<T>::IsModifiable(const string& filename)
 {
 	if (auto palFile = GetPaletteListByFullPathOrFilename(filename))
-	{
 		for (auto& pal : *palFile)
-			if (!pal.m_SourceColors.empty())
-				return true;
-	}
+			if (pal.m_SourceColors.empty())
+				return false;
 
-	return false;
+	return true;
 }
 
 /// <summary>

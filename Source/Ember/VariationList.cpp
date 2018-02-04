@@ -372,6 +372,7 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(DCTriangle)
 	ADDPREPOSTREGVAR(DCZTransl)
 	ADDPREPOSTREGVAR(RandCubes)
+	ADDPREPOSTREGVAR(PixelFlow)
 
 	for (auto var : m_Variations) const_cast<Variation<T>*>(var)->Precalc();//Modify once here, then const after this.
 

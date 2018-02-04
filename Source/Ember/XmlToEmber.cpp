@@ -172,7 +172,12 @@ XmlToEmber<T>::XmlToEmber()
 			{ "radius", "concentric_radius" },
 			//{ "density", "concentric_density" },//Can't have two, which means you can never properly paste from Apophysis with both of these in one xform.
 			{ "R_blur", "concentric_R_blur" },
-			{ "Z_blur", "concentric_Z_blur" }
+			{ "Z_blur", "concentric_Z_blur" },
+			{ "angle", "pixel_flow_angle" },
+			{ "len", "pixel_flow_len" },
+			{ "width", "pixel_flow_width" },
+			//{ "seed", "pixel_flow_seed" },//randCubes above already uses "seed", but it's just for randomness, so it shouldn't matter.
+			{ "enable_dc", "pixel_flow_enable_dc" }
 		};
 		m_FlattenNames =
 		{

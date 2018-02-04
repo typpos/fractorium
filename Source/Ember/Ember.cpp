@@ -402,6 +402,13 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(TileLog, T) \
 	EXPORTPREPOSTREGVAR(TruchetFill, T) \
 	EXPORTPREPOSTREGVAR(Waves2Radial, T) \
+	EXPORTPREPOSTREGVAR(Panorama1, T) \
+	EXPORTPREPOSTREGVAR(Panorama2, T) \
+	EXPORTPREPOSTREGVAR(Helicoid, T) \
+	EXPORTPREPOSTREGVAR(Helix, T) \
+	EXPORTPREPOSTREGVAR(Sphereblur, T) \
+	EXPORTPREPOSTREGVAR(Cpow3, T) \
+	EXPORTPREPOSTREGVAR(Concentric, T) \
 	template EMBER_API class PostSmartcropVariation<T>; /*Only implemented as post.*/ \
 	EXPORTPREPOSTREGVAR(DCBubble, T) \
 	EXPORTPREPOSTREGVAR(DCCarpet, T) \
@@ -412,6 +419,8 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(DCPerlin, T) \
 	EXPORTPREPOSTREGVAR(DCZTransl, T) \
 	EXPORTPREPOSTREGVAR(DCTriangle, T) \
+	EXPORTPREPOSTREGVAR(RandCubes, T) \
+	EXPORTPREPOSTREGVAR(PixelFlow, T) \
 	template EMBER_API class VariationList<T>; \
 	template EMBER_API class SpatialFilter<T>; \
 	template EMBER_API class GaussianFilter<T>; \

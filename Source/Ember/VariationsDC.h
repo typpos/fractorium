@@ -1551,6 +1551,103 @@ private:
 	T m_Density;
 };
 
+/// <summary>
+/// pixel_flow.
+/// </summary>
+template <typename T>
+class PixelFlowVariation : public ParametricVariation<T>
+{
+public:
+	PixelFlowVariation(T weight = 1.0) : ParametricVariation<T>("pixel_flow", eVariationId::VAR_PIXEL_FLOW, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(PixelFlowVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T xl, yl;
+		sincos(m_Rad, &xl, &yl);
+		auto blockx = (int)Floor(helper.In.x * m_Width);//Calculate which block we're in.
+		blockx += int(2 - 4 * VarFuncs<T>::Hash(int(blockx * m_Seed + 1)));//Varying width and length.
+		auto blocky = (int)Floor(helper.In.y * m_Width);
+		blocky += int(2 - 4 * VarFuncs<T>::Hash(int(blocky * m_Seed + 1)));
+		T fLen = (VarFuncs<T>::Hash(int(blocky + blockx * -m_Seed)) + VarFuncs<T>::Hash(int(blockx + blocky * m_Seed * T(0.5)))) * T(0.5); //doesnt matter just needs to be random enough
+		T r01 = rand.Frand01<T>();
+		T fade = fLen * r01 * r01 * r01 * r01;//Fading effect.
+		helper.Out.x = m_Weight * m_Len * xl * fade;
+		helper.Out.y = m_Weight * m_Len * yl * fade;
+		helper.Out.z = DefaultZ(helper);
+
+		if (m_EnableDC)
+			outPoint.m_ColorX = r01;//Direct color.
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string len = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rad = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t xl, yl;\n"
+		   << "\t\txl = sincos(" << rad << ", &yl);\n"
+		   << "\t\tint blockx = (int)floor(vIn.x * " << width << ");\n"
+		   << "\t\tblockx += (int)(2 - 4 * Hash((int)(blockx * " << seed << " + 1)));\n"
+		   << "\t\tint blocky = (int)floor(vIn.y * " << width << ");\n"
+		   << "\t\tblocky += (int)(2 - 4 * Hash((int)(blocky * " << seed << " + 1)));\n"
+		   << "\t\treal_t fLen = (Hash((int)(blocky + blockx * -" << seed << ")) + Hash((int)(blockx + blocky * " << seed << " * (real_t)0.5))) * (real_t)0.5;\n"
+		   << "\t\treal_t r01 = MwcNext01(mwc);\n"
+		   << "\t\treal_t fade = fLen * r01 * r01 * r01 * r01;\n"
+		   << "\t\tvOut.x = " << weight << " * " << len << " * xl * fade;\n"
+		   << "\t\tvOut.y = " << weight << " * " << len << " * yl * fade;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t\tif (" << dc << ")\n"
+		   << "\t\t\toutPoint->m_ColorX = r01;\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Rad = m_Angle * DEG_2_RAD_T;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Hash" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "pixel_flow_angle", 90));
+		m_Params.push_back(ParamWithName<T>(&m_Len, prefix + "pixel_flow_len", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Width, prefix + "pixel_flow_width", 200));
+		m_Params.push_back(ParamWithName<T>(&m_Seed, prefix + "pixel_flow_seed", 42, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_EnableDC, prefix + "pixel_flow_enable_dc", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rad, prefix + "pixel_flow_rad"));
+	}
+
+private:
+	T m_Angle;
+	T m_Len;
+	T m_Width;
+	T m_Seed;
+	T m_EnableDC;
+	T m_Rad;//Precalc.
+};
+
 MAKEPREPOSTPARVAR(DCBubble, dc_bubble, DC_BUBBLE)
 MAKEPREPOSTPARVAR(DCCarpet, dc_carpet, DC_CARPET)
 MAKEPREPOSTPARVARASSIGN(DCCube, dc_cube, DC_CUBE, eVariationAssignType::ASSIGNTYPE_SUM)
@@ -1561,4 +1658,5 @@ MAKEPREPOSTPARVAR(DCTriangle, dc_triangle, DC_TRIANGLE)
 MAKEPREPOSTPARVAR(DCZTransl, dc_ztransl, DC_ZTRANSL)
 MAKEPREPOSTPARVAR(DCPerlin, dc_perlin, DC_PERLIN)
 MAKEPREPOSTPARVAR(RandCubes, randCubes, RAND_CUBES)
+MAKEPREPOSTPARVARASSIGN(PixelFlow, pixel_flow, PIXEL_FLOW, eVariationAssignType::ASSIGNTYPE_SUM)
 }

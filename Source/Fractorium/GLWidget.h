@@ -26,7 +26,12 @@ template<typename T> class FractoriumEmberController;
 /// the main window and several of its members.
 /// This class uses a controller-based design similar to the main window.
 /// </summary>
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_2_0//QOpenGLFunctions_3_2_Compatibility//QOpenGLFunctions_3_2_Core//, protected QOpenGLFunctions
+class GLWidget : public QOpenGLWidget, protected
+#ifdef USE_GLSL
+	QOpenGLFunctions_3_2_Core
+#else
+	QOpenGLFunctions_2_0
+#endif
 {
 	Q_OBJECT
 
@@ -61,6 +66,9 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
 	virtual void wheelEvent(QWheelEvent* e) override;
 
+	void DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType);
+	void DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType);
+
 private:
 	void SetDimensions(int w, int h);
 	bool Allocate(bool force = false);
@@ -78,5 +86,29 @@ private:
 	GLint m_ViewWidth = 0;
 	GLint m_ViewHeight = 0;
 	GLuint m_OutputTexID = 0;
+#ifdef USE_GLSL
+	GLuint m_PosAttr;
+	GLuint m_ColAttr;
+	GLuint m_MatrixUniform;
+	GLuint m_TexturePosAttr;
+	GLuint m_TextureUniform;
+	GLuint m_TextureMatrixUniform;
+	glm::ivec4 m_Viewport;
+	QMatrix4x4 m_ProjMatrix;
+	QMatrix4x4 m_ModelViewMatrix;
+	QMatrix4x4 m_ModelViewProjectionMatrix;
+	QMatrix4x4 m_TextureProjMatrix;
+	vector<float> m_Verts;
+	std::array<GLfloat, 10> m_TexVerts =
+	{
+		0, 0,
+		0, 1,
+		1, 1,
+		1, 0,
+		0, 0
+	};
+	QOpenGLShaderProgram* m_Program = nullptr;
+	QOpenGLShaderProgram* m_QuadProgram = nullptr;
+#endif
 	Fractorium* m_Fractorium = nullptr;
 };

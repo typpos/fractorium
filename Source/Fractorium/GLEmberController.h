@@ -34,6 +34,8 @@ class GLWidget;
 class Fractorium;
 template <typename T> class FractoriumEmberController;
 
+#define USE_GLSL 1
+
 /// <summary>
 /// GLEmberControllerBase serves as a non-templated base class with virtual
 /// functions which will be overridden in a derived class that takes a template parameter.
@@ -124,7 +126,9 @@ private:
 	v3T SnapToNormalizedAngle(v3T& vec, uint divisions);
 	v3T WindowToWorld(v3T& v, bool flip);
 	void QueryVMP();
+#ifndef USE_GLSL
 	void MultMatrix(m4T& mat);
+#endif
 
 	T m_CenterDownX;
 	T m_CenterDownY;
@@ -147,5 +151,6 @@ private:
 	Xform<T>* m_SelectedXform;
 	FractoriumEmberController<T>* m_FractoriumEmberController;
 	T GridStep;
+	vector<float> m_Verts;//Can't make this T because GLSL only works with floats.
 };
 

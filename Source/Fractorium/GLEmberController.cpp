@@ -128,6 +128,7 @@ typename v3T GLEmberController<T>::SnapToGrid(v3T& vec)
 	v3T ret;
 	ret.x = glm::round(vec.x / GridStep) * GridStep;
 	ret.y = glm::round(vec.y / GridStep) * GridStep;
+	ret.z = vec.z;
 	return ret;
 }
 
@@ -185,9 +186,17 @@ typename v3T GLEmberController<T>::WindowToWorld(v3T& v, bool flip)
 template <>
 void GLEmberController<float>::QueryVMP()
 {
+#ifndef USE_GLSL
 	m_GL->glGetIntegerv(GL_VIEWPORT, glm::value_ptr(m_Viewport));
 	m_GL->glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(m_Modelview));
 	m_GL->glGetFloatv(GL_PROJECTION_MATRIX, glm::value_ptr(m_Projection));
+#else
+	m_Viewport = m_GL->m_Viewport;
+	glm::tmat4x4<float, glm::defaultp> tempmat = glm::make_mat4(m_GL->m_ModelViewMatrix.data());
+	m_Modelview = tempmat;
+	tempmat = glm::make_mat4(m_GL->m_ProjMatrix.data());
+	m_Projection = tempmat;
+#endif
 }
 
 #ifdef DO_DOUBLE
@@ -198,9 +207,17 @@ void GLEmberController<float>::QueryVMP()
 template <>
 void GLEmberController<double>::QueryVMP()
 {
+#ifndef USE_GLSL
 	m_GL->glGetIntegerv(GL_VIEWPORT, glm::value_ptr(m_Viewport));
 	m_GL->glGetDoublev(GL_MODELVIEW_MATRIX, glm::value_ptr(m_Modelview));
 	m_GL->glGetDoublev(GL_PROJECTION_MATRIX, glm::value_ptr(m_Projection));
+#else
+	m_Viewport = m_GL->m_Viewport;
+	glm::tmat4x4<float, glm::defaultp> tempmat = glm::make_mat4(m_GL->m_ModelViewMatrix.data());
+	m_Modelview = tempmat;
+	tempmat = glm::make_mat4(m_GL->m_ProjMatrix.data());
+	m_Projection = tempmat;
+#endif
 }
 #endif
 
@@ -208,22 +225,26 @@ void GLEmberController<double>::QueryVMP()
 /// Template specialization for multiplying the current matrix
 /// by an m4<float>.
 /// </summary>
+#ifndef USE_GLSL
 template <>
 void GLEmberController<float>::MultMatrix(tmat4x4<float, glm::defaultp>& mat)
 {
 	m_GL->glMultMatrixf(glm::value_ptr(mat));
 }
+#endif
 
 #ifdef DO_DOUBLE
 /// <summary>
 /// Template specialization for multiplying the current matrix
 /// by an m4<double>.
 /// </summary>
+#ifndef USE_GLSL
 template <>
 void GLEmberController<double>::MultMatrix(tmat4x4<double, glm::defaultp>& mat)
 {
 	m_GL->glMultMatrixd(glm::value_ptr(mat));
 }
+#endif
 #endif
 
 /// <summary>
@@ -238,20 +259,7 @@ void GLEmberController<T>::QueryMatrices(bool print)
 
 	if (renderer)
 	{
-		double unitX = std::abs(renderer->UpperRightX(false) - renderer->LowerLeftX(false)) / 2.0;
-		double unitY = std::abs(renderer->UpperRightY(false) - renderer->LowerLeftY(false)) / 2.0;
-		m_GL->glMatrixMode(GL_PROJECTION);
-		m_GL->glPushMatrix();
-		m_GL->glLoadIdentity();
-		m_GL->glOrtho(-unitX, unitX, -unitY, unitY, -1, 1);
-		m_GL->glMatrixMode(GL_MODELVIEW);
-		m_GL->glPushMatrix();
-		m_GL->glLoadIdentity();
 		QueryVMP();
-		m_GL->glMatrixMode(GL_PROJECTION);
-		m_GL->glPopMatrix();
-		m_GL->glMatrixMode(GL_MODELVIEW);
-		m_GL->glPopMatrix();
 
 		if (print)
 		{

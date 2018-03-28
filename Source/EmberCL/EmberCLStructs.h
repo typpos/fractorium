@@ -19,16 +19,17 @@ namespace EmberCLns
 static string ConstantDefinesString(bool doublePrecision)
 {
 	ostringstream os;
+	os << "#if defined(cl_amd_fp64)\n"//AMD extension available?
+	   "	#pragma OPENCL EXTENSION cl_amd_fp64 : enable\n"
+	   "#endif\n"
+	   "#if defined(cl_khr_fp64)\n"//Khronos extension available?
+	   "	#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
+	   "#endif\n"
+	   "#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable\n";//Only supported on nVidia.
 
 	if (doublePrecision)
 	{
-		os << "#if defined(cl_amd_fp64)\n"//AMD extension available?
-		   "	#pragma OPENCL EXTENSION cl_amd_fp64 : enable\n"
-		   "#endif\n"
-		   "#if defined(cl_khr_fp64)\n"//Khronos extension available?
-		   "	#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n"
-		   "#endif\n"
-		   "#pragma OPENCL EXTENSION cl_khr_int64_base_atomics : enable\n"//Only supported on nVidia.
+		os <<
 		   "typedef long intPrec;\n"
 		   "typedef uint atomi;\n"//Same size as real_bucket_t, always 4 bytes.
 		   "typedef double real_t;\n"

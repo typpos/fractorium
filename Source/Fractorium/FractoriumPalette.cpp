@@ -13,6 +13,10 @@ void Fractorium::InitPaletteUI()
 	connect(ui.PaletteFilenameCombo, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
 	connect(paletteTable, SIGNAL(cellClicked(int, int)),	   this, SLOT(OnPaletteCellClicked(int, int)),		 Qt::QueuedConnection);
 	connect(paletteTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnPaletteCellDoubleClicked(int, int)), Qt::QueuedConnection);
+	connect(palettePreviewTable, SIGNAL(MouseDragged(const QPointF&, const QPoint&)), this, SLOT(OnPreviewPaletteMouseDragged(const QPointF&, const QPoint&)), Qt::QueuedConnection);
+	connect(palettePreviewTable, SIGNAL(MouseReleased()), this, SLOT(OnPreviewPaletteMouseReleased()), Qt::QueuedConnection);
+	connect(palettePreviewTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnPreviewPaletteCellDoubleClicked(int, int)), Qt::QueuedConnection);
+	connect(palettePreviewTable, SIGNAL(cellPressed(int, int)), this, SLOT(OnPreviewPaletteCellPressed(int, int)), Qt::QueuedConnection);
 	//Palette adjustment table.
 	auto table = ui.PaletteAdjustTable;
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);//Split width over all columns evenly.
@@ -34,6 +38,7 @@ void Fractorium::InitPaletteUI()
 	palettePreviewTable->setItem(0, 0, previewNameCol);
 	auto previewPaletteItem = new QTableWidgetItem();
 	palettePreviewTable->setItem(0, 1, previewPaletteItem);
+	palettePreviewTable->installEventFilter(this);
 	connect(ui.PaletteFilterLineEdit,	 SIGNAL(textChanged(const QString&)), this, SLOT(OnPaletteFilterLineEditTextChanged(const QString&)));
 	connect(ui.PaletteFilterClearButton, SIGNAL(clicked(bool)),				  this, SLOT(OnPaletteFilterClearButtonClicked(bool)));
 	paletteTable->setColumnWidth(1, 260);//256 plus small margin on each side.
@@ -140,7 +145,7 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 	double contrast = double(m_Fractorium->m_PaletteContrastSpin->value() > 0 ? (m_Fractorium->m_PaletteContrastSpin->value() * 2) : m_Fractorium->m_PaletteContrastSpin->value()) / 100.0;
 	double hue = double(m_Fractorium->m_PaletteHueSpin->value()) / 360.0;
 	//Use the temp palette as the base and apply the adjustments gotten from the GUI and save the result in the ember palette.
-	m_TempPalette.MakeAdjustedPalette(m_Ember.m_Palette, 0, hue, sat, brightness, contrast, blur, freq);
+	m_TempPalette.MakeAdjustedPalette(m_Ember.m_Palette, m_Fractorium->m_PreviewPaletteRotation, hue, sat, brightness, contrast, blur, freq);
 }
 
 /// <summary>
@@ -247,6 +252,61 @@ void Fractorium::OnPaletteCellClicked(int row, int col)
 			m_PreviousPaletteRow = index;//Save for comparison on next click.
 		}
 	}
+}
+
+/// <summary>
+/// Called when the mouse has been moved while pressed on the palette preview table.
+/// Computes the difference between where the mouse was clicked and where it is now, then
+/// uses that difference as a rotation value to pass into the palette adjustment.
+/// Updates the palette and resets the rendering process.
+/// </summary>
+/// <param name="local">The local mouse coordinates relative to the palette preview table</param>
+/// <param name="global">The global mouse coordinates</param>
+void Fractorium::OnPreviewPaletteMouseDragged(const QPointF& local, const QPoint& global)
+{
+	if (m_PreviewPaletteMouseDown)
+	{
+		m_PreviewPaletteRotation = m_PreviewPaletteMouseDownRotation + (global.x() - m_PreviewPaletteMouseDownPosition.x());
+		//qDebug() << "Palette preview table drag reached main window event: " << local.x() << ' ' << local.y() << ", global: " << global.x() << ' ' << global.y() << ", final: " << m_PreviewPaletteRotation;
+		m_Controller->PaletteAdjust();
+	}
+}
+
+/// <summary>
+/// Called when the mouse has been released over the palette preview table.
+/// Does nothing but set the dragging state to false.
+/// </summary>
+void Fractorium::OnPreviewPaletteMouseReleased()
+{
+	m_PreviewPaletteMouseDown = false;
+}
+
+/// <summary>
+/// Sets the palette rotation to zero.
+/// Updates the palette and resets the rendering process.
+/// </summary>
+/// <param name="row">Ignored</param>
+/// <param name="col">Ignored</param>
+void Fractorium::OnPreviewPaletteCellDoubleClicked(int row, int col)
+{
+	m_PreviewPaletteRotation = 0;
+	m_PreviewPaletteMouseDown = false;
+	m_Controller->PaletteAdjust();
+}
+
+/// <summary>
+/// Called when the mouse has been pressed on the palette preview table.
+/// Subsequent mouse movements will compute a rotation value to pass into the palette adjustment, based on the location
+/// of the mouse when this slot is called.
+/// </summary>
+/// <param name="row">Ignored</param>
+/// <param name="col">Ignored</param>
+void Fractorium::OnPreviewPaletteCellPressed(int row, int col)
+{
+	m_PreviewPaletteMouseDown = true;
+	m_PreviewPaletteMouseDownPosition = QCursor::pos();//Get the global mouse position.
+	m_PreviewPaletteMouseDownRotation = m_PreviewPaletteRotation;
+	//qDebug() << "Mouse down with initial pos: " << m_PreviewPaletteMouseDownPosition.x() << " and initial rotation: " << m_PreviewPaletteMouseDownRotation;
 }
 
 /// <summary>

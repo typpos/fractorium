@@ -37,9 +37,16 @@ public:
 		viewport()->installEventFilter(this);
 	}
 
+
+signals:
+	void MouseDragged(const QPointF& local, const QPoint& global);
+	void MouseReleased();
+
 protected:
+
 	/// <summary>
-	/// Event filter to ignore mouse wheel events.
+	/// Event filter to ignore mouse wheel events and also handle others such as mouse move and mouse button release.
+	/// Sadly, QTableWidget makes these hard to get to, so we must handle them here.
 	/// </summary>
 	/// <param name="obj">The object sending the event</param>
 	/// <param name="e">The event</param>
@@ -50,6 +57,17 @@ protected:
 		{
 			e->ignore();
 			return true;
+		}
+		else if (e->type() == QEvent::MouseMove)
+		{
+			if (auto me = dynamic_cast<QMouseEvent*>(e))
+			{
+				emit MouseDragged(me->localPos(), me->globalPos());
+			}
+		}
+		else if (e->type() == QEvent::MouseButtonRelease)
+		{
+			emit MouseReleased();
 		}
 
 		return QTableWidget::eventFilter(obj, e);

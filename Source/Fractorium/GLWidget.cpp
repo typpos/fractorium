@@ -520,7 +520,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 #else
 		GLfloat vertices[] =//Should these be of type T?//TODO
 		{
-			m_DragHandlePos.x, m_DragHandlePos.y
+			GLfloat(m_DragHandlePos.x), GLfloat(m_DragHandlePos.y)
 		};
 		QVector4D col(1.0f, 1.0f, 0.5f, 1.0f);
 		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS);
@@ -545,14 +545,14 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 #else
 		GLfloat vertices[] =//Should these be of type T?//TODO
 		{
-			m_MouseDownWorldPos.x, m_MouseDownWorldPos.y,//UL->UR
-			m_MouseWorldPos.x, m_MouseDownWorldPos.y,
-			m_MouseDownWorldPos.x, m_MouseWorldPos.y,//LL->LR
-			m_MouseWorldPos.x, m_MouseWorldPos.y,
-			m_MouseDownWorldPos.x, m_MouseDownWorldPos.y,//UL->LL
-			m_MouseDownWorldPos.x, m_MouseWorldPos.y,
-			m_MouseWorldPos.x, m_MouseDownWorldPos.y,//UR->LR
-			m_MouseWorldPos.x, m_MouseWorldPos.y
+			GLfloat(m_MouseDownWorldPos.x), GLfloat(m_MouseDownWorldPos.y),//UL->UR
+			GLfloat(m_MouseWorldPos.x    ), GLfloat(m_MouseDownWorldPos.y),
+			GLfloat(m_MouseDownWorldPos.x), GLfloat(m_MouseWorldPos.y),//LL->LR
+			GLfloat(m_MouseWorldPos.x    ), GLfloat(m_MouseWorldPos.y),
+			GLfloat(m_MouseDownWorldPos.x), GLfloat(m_MouseDownWorldPos.y),//UL->LL
+			GLfloat(m_MouseDownWorldPos.x), GLfloat(m_MouseWorldPos.y),
+			GLfloat(m_MouseWorldPos.x    ), GLfloat(m_MouseDownWorldPos.y),//UR->LR
+			GLfloat(m_MouseWorldPos.x    ), GLfloat(m_MouseWorldPos.y)
 		};
 		QVector4D col(0.0f, 0.0f, 1.0f, 1.0f);
 		m_GL->DrawPointOrLine(col, vertices, 8, GL_LINES);
@@ -570,7 +570,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 #else
 		GLfloat vertices[] =//Should these be of type T?//TODO
 		{
-			m_HoverHandlePos.x, m_HoverHandlePos.y
+			GLfloat(m_HoverHandlePos.x), GLfloat(m_HoverHandlePos.y)
 		};
 		QVector4D col(0.5f, 1.0f, 1.0f, 1.0f);
 		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS);
@@ -931,7 +931,7 @@ void GLWidget::wheelEvent(QWheelEvent* e)
 /// <param name="drawType">The type of primitive to draw, such as GL_POINT or GL_LINES</param>
 void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType)
 {
-	DrawPointOrLine(col, vertices.data(), vertices.size() / 2, drawType);
+	DrawPointOrLine(col, vertices.data(), int(vertices.size() / 2), drawType);
 }
 
 /// <summary>

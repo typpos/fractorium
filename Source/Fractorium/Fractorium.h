@@ -325,6 +325,10 @@ public slots:
 	void OnPaletteAdjust(int d);
 	void OnPaletteCellClicked(int row, int col);
 	void OnPaletteCellDoubleClicked(int row, int col);
+	void OnPreviewPaletteMouseDragged(const QPointF& local, const QPoint& global);
+	void OnPreviewPaletteMouseReleased();
+	void OnPreviewPaletteCellDoubleClicked(int row, int col);
+	void OnPreviewPaletteCellPressed(int row, int col);
 	void OnPaletteRandomSelectButtonClicked(bool checked);
 	void OnPaletteRandomAdjustButtonClicked(bool checked);
 	void OnPaletteEditorButtonClicked(bool checked);
@@ -513,8 +517,12 @@ private:
 	DoubleSpinBoxTableItemDelegate* m_XaosTableItemDelegate;
 
 	//Palette.
-	bool m_PaletteChanged;
-	bool m_PaletteFileChanged;
+	bool m_PaletteChanged = false;
+	bool m_PaletteFileChanged = false;
+	bool m_PreviewPaletteMouseDown = false;
+	int m_PreviewPaletteMouseDownRotation = 0;
+	int m_PreviewPaletteRotation = 0;
+	QPoint m_PreviewPaletteMouseDownPosition = QPoint(0, 0);
 	SpinBox* m_PaletteHueSpin;
 	SpinBox* m_PaletteSaturationSpin;
 	SpinBox* m_PaletteBrightnessSpin;

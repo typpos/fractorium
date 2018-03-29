@@ -305,12 +305,14 @@ public:
 			palette = *this;
 		}
 
+		auto tempPal = palette;
+
 		for (size_t i = 0; i < Size(); i++)
 		{
-			size_t ii = (i * 256) / COLORMAP_LENGTH;
-			rgb[0] = palette[(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].r;//Rotation.
-			rgb[1] = palette[(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].g;
-			rgb[2] = palette[(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].b;
+			int ii = int(i);
+			rgb[0] = tempPal[std::abs(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].r;//Rotation.
+			rgb[1] = tempPal[std::abs(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].g;
+			rgb[2] = tempPal[std::abs(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].b;
 			RgbToHsv(rgb, hsv);
 			hsv[0] += hue * T(6.0);//Hue.
 			hsv[1] = Clamp<T>(hsv[1] + sat, 0, 1);//Saturation.
@@ -331,7 +333,7 @@ public:
 
 		if (blur > 0)
 		{
-			Palette<T> blurPal = palette;
+			tempPal = palette;
 
 			for (int i = 0; i < 256; i++)
 			{
@@ -347,9 +349,9 @@ public:
 
 					if (k != i)
 					{
-						rgb[0] = rgb[0] + blurPal[k].r;
-						rgb[1] = rgb[1] + blurPal[k].g;
-						rgb[2] = rgb[2] + blurPal[k].b;
+						rgb[0] = rgb[0] + tempPal[k].r;
+						rgb[1] = rgb[1] + tempPal[k].g;
+						rgb[2] = rgb[2] + tempPal[k].b;
 					}
 				}
 

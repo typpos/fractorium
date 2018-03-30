@@ -188,6 +188,8 @@ public:
 	void LeaveResize();
 	void Abort();
 	bool Aborted();
+	void Pause(bool pause);
+	bool Paused();
 	bool InRender();
 	bool InFinalAccum();
 
@@ -203,6 +205,7 @@ protected:
 	bool m_ReclaimOnResize = false;
 	bool m_CurvesSet = false;
 	volatile bool m_Abort = false;
+	volatile bool m_Pause = false;
 	size_t m_SuperRasW;
 	size_t m_SuperRasH;
 	size_t m_SuperSize = 0;

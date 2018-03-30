@@ -541,8 +541,11 @@ void RendererBase::LeaveFinalAccum() { m_FinalAccumCs.unlock(); m_InFinalAccum =
 void RendererBase::EnterResize() { m_ResizeCs.lock(); }
 void RendererBase::LeaveResize() { m_ResizeCs.unlock(); }
 
-void RendererBase::Abort()   { m_Abort = true; }
+void RendererBase::Abort() { m_Abort = true; Pause(false); }
 bool RendererBase::Aborted() { return m_Abort; }
+
+void RendererBase::Pause(bool pause) { m_Pause = pause; }
+bool RendererBase::Paused() { return m_Pause; }
 
 bool RendererBase::InRender()	  { return m_InRender; }
 bool RendererBase::InFinalAccum() { return m_InFinalAccum; }

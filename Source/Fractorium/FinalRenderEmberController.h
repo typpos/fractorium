@@ -71,6 +71,7 @@ public:
 	virtual void CancelRender() { }
 	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) { return ""; }
 
+	bool Running() { return m_Result.isRunning(); }
 	bool CreateRendererFromGUI();
 	void Output(const QString& s);
 
@@ -133,6 +134,8 @@ public:
 	EmberNs::Renderer<T, float>* FirstOrDefaultRenderer();
 
 protected:
+	virtual void Pause(bool pause) override;
+	virtual bool Paused() override;
 	void HandleFinishedProgress();
 	void SaveCurrentRender(Ember<T>& ember);
 	void SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);

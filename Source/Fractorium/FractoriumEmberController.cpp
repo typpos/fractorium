@@ -33,6 +33,24 @@ FractoriumEmberControllerBase::~FractoriumEmberControllerBase()
 }
 
 /// <summary>
+/// Pause or resume the renderer.
+/// </summary>
+/// <param name="pause">True to pause, false to unpause.</param>
+void FractoriumEmberControllerBase::Pause(bool pause)
+{
+	m_Renderer->Pause(pause);
+}
+
+/// <summary>
+/// Retrieve the paused state of the renderer.
+/// </summary>
+/// <returns>True if the renderer is paused, else false.</returns>
+bool FractoriumEmberControllerBase::Paused()
+{
+	return m_Renderer->Paused();
+}
+
+/// <summary>
 /// Constructor which passes the main window parameter to the base, initializes the templated members contained in this class.
 /// Then sets up the parts of the GUI that require templated Widgets, such as the variations tree and the palette table.
 /// Note the renderer is not setup here automatically. Instead, it must be manually created by the caller later.

@@ -245,6 +245,8 @@ public:
 	virtual void ClearUndo() { }
 	virtual void DeleteRenderer() { }
 	virtual GLEmberControllerBase* GLController() { return nullptr; }
+	virtual void Pause(bool pause);
+	virtual bool Paused();
 	bool RenderTimerRunning();
 	void StartRenderTimer();
 	void DelayedStartRenderTimer();

@@ -71,7 +71,8 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	connect(m_PrefixEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnPrefixChanged(const QString&)), Qt::QueuedConnection);
 	connect(m_SuffixEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnSuffixChanged(const QString&)), Qt::QueuedConnection);
 	ui.FinalRenderStartButton->disconnect(SIGNAL(clicked(bool)));
-	connect(ui.FinalRenderStartButton, SIGNAL(clicked(bool)), this, SLOT(OnRenderClicked(bool)),		  Qt::QueuedConnection);
+	connect(ui.FinalRenderStartButton, SIGNAL(clicked(bool)), this, SLOT(OnRenderClicked(bool)),	   Qt::QueuedConnection);
+	connect(ui.FinalRenderPauseButton, SIGNAL(clicked(bool)), this, SLOT(OnPauseClicked(bool)),		   Qt::QueuedConnection);
 	connect(ui.FinalRenderStopButton,  SIGNAL(clicked(bool)), this, SLOT(OnCancelRenderClicked(bool)), Qt::QueuedConnection);
 	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	ui.FinalRenderSizeTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -205,6 +206,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	w = SetTabOrder(this, w, m_SuffixEdit);
 	w = SetTabOrder(this, w, ui.FinalRenderTextOutput);
 	w = SetTabOrder(this, w, ui.FinalRenderStartButton);
+	w = SetTabOrder(this, w, ui.FinalRenderPauseButton);
 	w = SetTabOrder(this, w, ui.FinalRenderStopButton);
 	w = SetTabOrder(this, w, ui.FinalRenderCloseButton);
 }
@@ -652,7 +654,21 @@ void FractoriumFinalRenderDialog::OnSuffixChanged(const QString& s)
 void FractoriumFinalRenderDialog::OnRenderClicked(bool checked)
 {
 	if (CreateControllerFromGUI(true))
+	{
+		Pause(false);
 		m_Controller->Render();
+	}
+}
+
+/// <summary>
+/// Pause or resume the render process.
+/// </summary>
+/// <param name="checked">Ignored</param>
+void FractoriumFinalRenderDialog::OnPauseClicked(bool checked)
+{
+	if (m_Controller.get())
+		if (m_Controller->Running())
+			Pause(!m_Controller->Paused());
 }
 
 /// <summary>
@@ -662,7 +678,28 @@ void FractoriumFinalRenderDialog::OnRenderClicked(bool checked)
 void FractoriumFinalRenderDialog::OnCancelRenderClicked(bool checked)
 {
 	if (m_Controller.get())
+	{
+		Pause(false);
 		m_Controller->CancelRender();
+	}
+}
+
+/// <summary>
+/// Pause or resume the render process.
+/// </summary>
+/// <param name="checked">True to pause, else resume.</param>
+void FractoriumFinalRenderDialog::Pause(bool paused)
+{
+	if (paused)
+	{
+		m_Controller->Pause(true);
+		ui.FinalRenderPauseButton->setText("Resume");
+	}
+	else
+	{
+		m_Controller->Pause(false);
+		ui.FinalRenderPauseButton->setText("Pause");
+	}
 }
 
 /// <summary>

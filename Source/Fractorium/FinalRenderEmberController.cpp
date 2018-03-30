@@ -28,7 +28,6 @@ void FinalRenderEmberController<T>::CancelRender()
 {
 	if (m_Result.isRunning())
 	{
-		//tbb::task_group g;
 		std::thread th([&]
 		{
 			m_Run = false;
@@ -123,6 +122,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true, false, false);
 
 		m_FinishedImageCount.store(0);
+		Pause(false);
 		SyncGuiToRenderer();
 		FirstOrDefaultRenderer()->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//When animating, only the first (primary) device has a progress parameter.
 		m_GuiState.m_Strips = VerifyStrips(m_Ember->m_FinalRasH, m_GuiState.m_Strips,
@@ -324,6 +324,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		QString totalTimeString = "All renders completed in: " + QString::fromStdString(m_TotalTimer.Format(m_TotalTimer.Toc())) + ".";
 		Output(totalTimeString);
 		QFile::remove(backup);
+		QMetaObject::invokeMethod(m_FinalRenderDialog, "Pause", Qt::QueuedConnection, Q_ARG(bool, false));
 		m_Run = false;
 	};
 }
@@ -728,6 +729,46 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember)
 {
 	if (auto renderer = dynamic_cast<EmberNs::Renderer<T, float>*>(m_Renderer.get()))
 		RenderComplete(ember, m_Stats, m_RenderTimer);
+}
+
+/// <summary>
+/// Pause or resume the renderer(s).
+/// </summary>
+/// <param name="pause">True to pause, false to unpause.</param>
+template<typename T>
+void FinalRenderEmberController<T>::Pause(bool pause)
+{
+	if (m_Renderer.get())
+	{
+		m_Renderer->Pause(pause);
+	}
+	else
+	{
+		for (auto& r : m_Renderers)
+			r->Pause(pause);
+	}
+}
+
+/// <summary>
+/// Retrieve the paused state of the renderer(s).
+/// </summary>
+/// <returns>True if the renderer(s) is paused, else false.</returns>
+template<typename T>
+bool FinalRenderEmberController<T>::Paused()
+{
+	if (m_Renderer.get())
+	{
+		return m_Renderer->Paused();
+	}
+	else
+	{
+		bool b = !m_Renderers.empty();
+
+		for (auto& r : m_Renderers)
+			b &= r->Paused();
+
+		return b;
+	}
 }
 
 /// <summary>

@@ -109,7 +109,9 @@ public slots:
 	void OnPrefixChanged(const QString& s);
 	void OnSuffixChanged(const QString& s);
 	void OnRenderClicked(bool checked);
+	void OnPauseClicked(bool checked);
 	void OnCancelRenderClicked(bool checked);
+	void Pause(bool paused);
 	virtual void reject() override;
 
 protected:

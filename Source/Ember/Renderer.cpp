@@ -1287,6 +1287,11 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 			m_Samples[threadIndex][0].m_Y = m_Rand[threadIndex].template Frand11<T>();
 			m_Samples[threadIndex][0].m_Z = 0;//m_Ember.m_CamZPos;//Apo set this to 0, then made the user use special variations to kick it. It seems easier to just set it to zpos.
 			m_Samples[threadIndex][0].m_ColorX = m_Rand[threadIndex].template Frand01<T>();
+
+			//Check if the user wanted to suspend the process.
+			while (Paused())
+				std::this_thread::sleep_for(500ms);
+
 			//Finally, iterate.
 			//t.Tic();
 			//Iterating, loop 3.

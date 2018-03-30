@@ -62,8 +62,6 @@ uint Timing::m_ProcessorCount;
 	template<> vector<pair<pair<string, string>, vector<string>>> XmlToEmber<T>::m_BadVariationNames = vector<pair<pair<string, string>, vector<string>>>(); \
 	template EMBER_API class Point<T>; \
 	template EMBER_API struct Color<T>; \
-	template EMBER_API class Palette<T>; \
-	template EMBER_API class PaletteList<T>; \
 	template EMBER_API class Iterator<T>; \
 	template EMBER_API class StandardIterator<T>; \
 	template EMBER_API class XaosIterator<T>; \
@@ -456,6 +454,10 @@ uint Timing::m_ProcessorCount;
 
 EXPORT_SINGLE_TYPE_EMBER(float)
 EXPORT_TWO_TYPE_EMBER(float, float)
+
+//Only ever use float palettes.
+template EMBER_API class Palette<float>;
+template EMBER_API class PaletteList<float>;
 
 #ifdef DO_DOUBLE
 	EXPORT_SINGLE_TYPE_EMBER(double)

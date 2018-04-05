@@ -4,32 +4,38 @@
 
 #ifdef USE_GLSL
 	static const char* vertexShaderSource =
-	"attribute vec4 posattr;\n"
+	"#version 130\n"
+	"in vec4 posattr;\n"
 	"uniform mat4 matrix;\n"
 	"void main() {\n"
 	"   gl_Position = matrix * posattr;\n"
 	"}\n";
 
 	static const char* fragmentShaderSource =
+	"#version 130\n"
 	"uniform vec4 mycolor;\n"
+	"out vec4 fragout;"
 	"void main() {\n"
-	"   gl_FragColor = mycolor;\n"
+	"   fragout = mycolor;\n"
 	"}\n";
 
 	static const char* quadVertexShaderSource =
-	"attribute vec4 posattr;\n"
+	"#version 130\n"
+	"in vec4 posattr;\n"
 	"uniform mat4 matrix;\n"
-	"varying vec4 texcoord;\n"
+	"out vec4 texcoord;\n"
 	"void main() {\n"
 	"	gl_Position = matrix * posattr;\n"
 	"	texcoord = posattr;\n"
 	"}\n";
 
 	static const char* quadFragmentShaderSource =
+	"#version 130\n"
 	"uniform sampler2D quadtex;\n"
-	"varying vec4 texcoord;\n"
+	"in vec4 texcoord;\n"
+	"out vec4 fragout;"
 	"void main() {\n"
-	"	gl_FragColor = texture2D(quadtex, texcoord.st);\n"
+	"	fragout = texture(quadtex, texcoord.st);\n"
 	"}\n";
 #endif
 
@@ -41,13 +47,28 @@
 GLWidget::GLWidget(QWidget* p)
 	: QOpenGLWidget(p)
 {
-#ifndef USE_GLSL
-	QSurfaceFormat qsf;
-	qsf.setSwapInterval(1);//Vsync.
-	qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-	qsf.setVersion(2, 0);
-	setFormat(qsf);
-#endif
+	/*
+	    auto qsf = this->format();
+	    qDebug() << "Version: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+	    qDebug() << "Profile: " << qsf.profile();
+	    qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+	    qDebug() << "Swap behavior: " << qsf.swapBehavior();
+	    qDebug() << "Swap interval: " << qsf.swapInterval();
+	    //QSurfaceFormat qsf;
+	    //QSurfaceFormat::FormatOptions fo;
+	    //fo.
+	    //qsf.setDepthBufferSize(24);
+	    //qsf.setSwapInterval(1);//Vsync.
+	    //qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+	    #ifndef USE_GLSL
+	    qsf.setVersion(2, 0);
+	    qsf.setProfile(QSurfaceFormat::CompatibilityProfile);
+	    #else
+	    qsf.setVersion(3, 3);
+	    //qsf.setProfile(QSurfaceFormat::CoreProfile);
+	    #endif
+	    setFormat(qsf);
+	*/
 }
 
 /// <summary>
@@ -281,7 +302,7 @@ void GLWidget::initializeGL()
 
 	if (!m_Init && m_Fractorium)
 	{
-		initializeOpenGLFunctions();
+		this->initializeOpenGLFunctions();
 
 		if (!m_Program)
 		{
@@ -289,19 +310,19 @@ void GLWidget::initializeGL()
 
 			if (!m_Program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource))
 			{
-				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling affine vertex source.");
+				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling affine vertex source: " + m_Program->log());
 				QApplication::exit(1);
 			}
 
 			if (!m_Program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource))
 			{
-				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling affine fragment source.");
+				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling affine fragment source: " + m_Program->log());
 				QApplication::exit(1);
 			}
 
 			if (!m_Program->link())
 			{
-				QMessageBox::critical(m_Fractorium, "Shader Error", "Error linking affine source.");
+				QMessageBox::critical(m_Fractorium, "Shader Error", "Error linking affine source: " + m_Program->log());
 				QApplication::exit(1);
 			}
 
@@ -316,19 +337,19 @@ void GLWidget::initializeGL()
 
 			if (!m_QuadProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, quadVertexShaderSource))
 			{
-				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling image texture vertex source.");
+				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling image texture vertex source: " + m_QuadProgram->log());
 				QApplication::exit(1);
 			}
 
 			if (!m_QuadProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, quadFragmentShaderSource))
 			{
-				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling image texture fragment source.");
+				QMessageBox::critical(m_Fractorium, "Shader Error", "Error compiling image texture fragment source: " + m_QuadProgram->log());
 				QApplication::exit(1);
 			}
 
 			if (!m_QuadProgram->link())
 			{
-				QMessageBox::critical(m_Fractorium, "Shader Error", "Error linking image texture source.");
+				QMessageBox::critical(m_Fractorium, "Shader Error", "Error linking image texture source: " + m_QuadProgram->log());
 				QApplication::exit(1);
 			}
 

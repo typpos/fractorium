@@ -28,7 +28,8 @@ template<typename T> class FractoriumEmberController;
 /// </summary>
 class GLWidget : public QOpenGLWidget, protected
 #ifdef USE_GLSL
-	QOpenGLFunctions_3_2_Core
+//QOpenGLFunctions_4_5_Core
+	QOpenGLFunctions_3_3_Core
 #else
 	QOpenGLFunctions_2_0
 #endif
@@ -99,7 +100,7 @@ private:
 	QMatrix4x4 m_ModelViewProjectionMatrix;
 	QMatrix4x4 m_TextureProjMatrix;
 	vector<float> m_Verts;
-	std::array<GLfloat, 10> m_TexVerts =
+	std::array<GLfloat, 10> m_TexVerts = std::array<GLfloat, 10>
 	{
 		0, 0,
 		0, 1,

@@ -28,8 +28,7 @@ template<typename T> class FractoriumEmberController;
 /// </summary>
 class GLWidget : public QOpenGLWidget, protected
 #ifdef USE_GLSL
-//QOpenGLFunctions_4_5_Core
-	QOpenGLFunctions_3_3_Core
+	QOpenGLFunctions
 #else
 	QOpenGLFunctions_2_0
 #endif
@@ -67,8 +66,8 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
 	virtual void wheelEvent(QWheelEvent* e) override;
 
-	void DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType);
-	void DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType);
+	void DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, GLfloat pointSize = 1.0f);
+	void DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, GLfloat pointSize = 1.0f);
 
 private:
 	void SetDimensions(int w, int h);
@@ -90,6 +89,7 @@ private:
 #ifdef USE_GLSL
 	GLuint m_PosAttr;
 	GLuint m_ColAttr;
+	GLuint m_PointSizeUniform;
 	GLuint m_MatrixUniform;
 	GLuint m_TexturePosAttr;
 	GLuint m_TextureUniform;

@@ -3,8 +3,41 @@
 #include "Fractorium.h"
 
 #ifdef USE_GLSL
+
 	static const char* vertexShaderSource =
-	"#version 130\n"
+	"attribute vec4 posattr;\n"
+	"uniform mat4 matrix;\n"
+	"uniform float ps;\n"
+	"void main() {\n"
+	"   gl_Position = matrix * posattr;\n"
+	"	gl_PointSize = ps;\n"
+	"}\n";
+
+	static const char* fragmentShaderSource =
+	"uniform vec4 mycolor;\n"
+	"void main() {\n"
+	"   gl_FragColor = mycolor;\n"
+	"}\n";
+
+	static const char* quadVertexShaderSource =
+	"attribute vec4 posattr;\n"
+	"uniform mat4 matrix;\n"
+	"varying vec4 texcoord;\n"
+	"void main() {\n"
+	"	gl_Position = matrix * posattr;\n"
+	"	texcoord = posattr;\n"
+	"}\n";
+
+	static const char* quadFragmentShaderSource =
+	"uniform sampler2D quadtex;\n"
+	"varying vec4 texcoord;\n"
+	"void main() {\n"
+	"	gl_FragColor = texture2D(quadtex, texcoord.st);\n"
+	"}\n";
+
+	/*
+	static const char* vertexShaderSource =
+	"#version 120\n"
 	"in vec4 posattr;\n"
 	"uniform mat4 matrix;\n"
 	"void main() {\n"
@@ -12,7 +45,7 @@
 	"}\n";
 
 	static const char* fragmentShaderSource =
-	"#version 130\n"
+	"#version 120\n"
 	"uniform vec4 mycolor;\n"
 	"out vec4 fragout;"
 	"void main() {\n"
@@ -20,7 +53,7 @@
 	"}\n";
 
 	static const char* quadVertexShaderSource =
-	"#version 130\n"
+	"#version 120\n"
 	"in vec4 posattr;\n"
 	"uniform mat4 matrix;\n"
 	"out vec4 texcoord;\n"
@@ -30,13 +63,13 @@
 	"}\n";
 
 	static const char* quadFragmentShaderSource =
-	"#version 130\n"
+	"#version 120\n"
 	"uniform sampler2D quadtex;\n"
 	"in vec4 texcoord;\n"
 	"out vec4 fragout;"
 	"void main() {\n"
 	"	fragout = texture(quadtex, texcoord.st);\n"
-	"}\n";
+	"}\n"; */
 #endif
 
 /// <summary>
@@ -48,27 +81,52 @@ GLWidget::GLWidget(QWidget* p)
 	: QOpenGLWidget(p)
 {
 	/*
-	    auto qsf = this->format();
-	    qDebug() << "Version: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-	    qDebug() << "Profile: " << qsf.profile();
-	    qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-	    qDebug() << "Swap behavior: " << qsf.swapBehavior();
-	    qDebug() << "Swap interval: " << qsf.swapInterval();
-	    //QSurfaceFormat qsf;
-	    //QSurfaceFormat::FormatOptions fo;
-	    //fo.
-	    //qsf.setDepthBufferSize(24);
-	    //qsf.setSwapInterval(1);//Vsync.
-	    //qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-	    #ifndef USE_GLSL
-	    qsf.setVersion(2, 0);
-	    qsf.setProfile(QSurfaceFormat::CompatibilityProfile);
-	    #else
-	    qsf.setVersion(3, 3);
-	    //qsf.setProfile(QSurfaceFormat::CoreProfile);
-	    #endif
-	    setFormat(qsf);
+		auto qsf = this->format();
+		qDebug() << "Version: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+		qDebug() << "Profile: " << qsf.profile();
+		qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+		qDebug() << "Swap behavior: " << qsf.swapBehavior();
+		qDebug() << "Swap interval: " << qsf.swapInterval();
+		//QSurfaceFormat qsf;
+		//QSurfaceFormat::FormatOptions fo;
+		//fo.
+		//qsf.setDepthBufferSize(24);
+		//qsf.setSwapInterval(1);//Vsync.
+		//qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+		#ifndef USE_GLSL
+		qsf.setVersion(2, 0);
+		qsf.setProfile(QSurfaceFormat::CompatibilityProfile);
+		#else
+		qsf.setVersion(3, 3);
+		//qsf.setProfile(QSurfaceFormat::CoreProfile);
+		#endif
+		setFormat(qsf);
 	*/
+	/*
+		QSurfaceFormat fmt;
+		fmt.setDepthBufferSize(24);
+
+		// Request OpenGL 3.3 compatibility or OpenGL ES 3.0.
+		if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
+		{
+			qDebug("Requesting 3.3 compatibility context");
+			fmt.setVersion(3, 3);
+			fmt.setProfile(QSurfaceFormat::CoreProfile);
+		}
+		else
+		{
+			qDebug("Requesting 3.0 context");
+			fmt.setVersion(3, 0);
+		}
+
+		setFormat(fmt);
+	*/
+	auto qsf = this->format();
+	qDebug() << "Constructor*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+	qDebug() << "Profile: " << qsf.profile();
+	qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+	qDebug() << "Swap behavior: " << qsf.swapBehavior();
+	qDebug() << "Swap interval: " << qsf.swapInterval();
 }
 
 /// <summary>
@@ -86,6 +144,12 @@ void GLWidget::InitGL()
 {
 	if (!m_Init)
 	{
+		auto qsf = this->format();
+		qDebug() << "InitGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+		qDebug() << "Profile: " << qsf.profile();
+		qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+		qDebug() << "Swap behavior: " << qsf.swapBehavior();
+		qDebug() << "Swap interval: " << qsf.swapInterval();
 		int w = std::ceil(m_Fractorium->ui.GLParentScrollArea->width() * devicePixelRatioF());
 		int h = std::ceil(m_Fractorium->ui.GLParentScrollArea->height() * devicePixelRatioF());
 		SetDimensions(w, h);
@@ -299,6 +363,12 @@ GLuint GLWidget::OutputTexID() { return m_OutputTexID; }
 void GLWidget::initializeGL()
 {
 #ifdef USE_GLSL
+	auto  qsf = this->format();
+	qDebug() << "initializeGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+	qDebug() << "Profile: " << qsf.profile();
+	qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+	qDebug() << "Swap behavior: " << qsf.swapBehavior();
+	qDebug() << "Swap interval: " << qsf.swapInterval();
 
 	if (!m_Init && m_Fractorium)
 	{
@@ -328,6 +398,7 @@ void GLWidget::initializeGL()
 
 			m_PosAttr = m_Program->attributeLocation("posattr");
 			m_ColAttr = m_Program->uniformLocation("mycolor");
+			m_PointSizeUniform = m_Program->uniformLocation("ps");
 			m_MatrixUniform = m_Program->uniformLocation("matrix");
 		}
 
@@ -368,9 +439,12 @@ void GLWidget::initializeGL()
 	if (!m_Init && initializeOpenGLFunctions() && m_Fractorium)
 	{
 #endif
+		//cout << "GL Version: " << (char *) glGetString(GL_VERSION) << endl;
+		//cout << "GLSL version: " << (char *) glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 		this->glClearColor(0.0, 0.0, 0.0, 1.0);
 		this->glDisable(GL_DEPTH_TEST);//This will remain disabled for the duration of the program.
 		this->glEnable(GL_TEXTURE_2D);
+		this->glEnable(GL_PROGRAM_POINT_SIZE);
 		this->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_MaxTexSize);
 		this->glDisable(GL_TEXTURE_2D);
 		m_Fractorium->m_WidthSpin->setMaximum(m_MaxTexSize);//This should also apply to the final render dialog.//TODO
@@ -384,6 +458,14 @@ void GLWidget::initializeGL()
 /// </summary>
 void GLWidget::paintGL()
 {
+	/*
+	    auto  qsf = this->format();
+	    qDebug() << "paintGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+	    qDebug() << "Profile: " << qsf.profile();
+	    qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+	    qDebug() << "Swap behavior: " << qsf.swapBehavior();
+	    qDebug() << "Swap interval: " << qsf.swapInterval();
+	*/
 	auto controller = m_Fractorium->m_Controller.get();
 
 	//Ensure there is a renderer and that it's supposed to be drawing, signified by the running timer.
@@ -532,7 +614,6 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 
 	if (dragging)//Draw large yellow dot on select or drag.
 	{
-		m_GL->glPointSize(6.0f * m_GL->devicePixelRatioF());
 #ifndef USE_GLSL
 		m_GL->glBegin(GL_POINTS);
 		m_GL->glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
@@ -544,9 +625,8 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			GLfloat(m_DragHandlePos.x), GLfloat(m_DragHandlePos.y)
 		};
 		QVector4D col(1.0f, 1.0f, 0.5f, 1.0f);
-		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS);
+		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, 6.0f);
 #endif
-		m_GL->glPointSize(1.0f * m_GL->devicePixelRatioF());//Restore point size.
 	}
 	else if (m_DragState == eDragState::DragSelect)
 	{
@@ -582,7 +662,6 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 	}
 	else if (m_HoverType != eHoverType::HoverNone && m_HoverXform == m_SelectedXform)//Draw large turquoise dot on hover if they are hovering over the selected xform.
 	{
-		m_GL->glPointSize(6.0f * m_GL->devicePixelRatioF());
 #ifndef USE_GLSL
 		m_GL->glBegin(GL_POINTS);
 		m_GL->glColor4f(0.5f, 1.0f, 1.0f, 1.0f);
@@ -594,9 +673,8 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			GLfloat(m_HoverHandlePos.x), GLfloat(m_HoverHandlePos.y)
 		};
 		QVector4D col(0.5f, 1.0f, 1.0f, 1.0f);
-		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS);
+		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, 6.0f);
 #endif
-		m_GL->glPointSize(1.0f * m_GL->devicePixelRatioF());
 	}
 }
 
@@ -950,9 +1028,10 @@ void GLWidget::wheelEvent(QWheelEvent* e)
 /// <param name="col">The color to draw with</param>
 /// <param name="vertices">The vertices to use</param>
 /// <param name="drawType">The type of primitive to draw, such as GL_POINT or GL_LINES</param>
-void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType)
+/// <param name="pointSize">The size in pixels of points, which is internally scaled by the device pixel ratio.</param>
+void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, GLfloat pointSize)
 {
-	DrawPointOrLine(col, vertices.data(), int(vertices.size() / 2), drawType);
+	DrawPointOrLine(col, vertices.data(), int(vertices.size() / 2), drawType, pointSize);
 }
 
 /// <summary>
@@ -962,11 +1041,13 @@ void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& v
 /// <param name="vertices">The vertices to use</param>
 /// <param name="size">The number of verticies. This is usually the size of vertices / 2.</param>
 /// <param name="drawType">The type of primitive to draw, such as GL_POINT or GL_LINES</param>
-void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType)
+/// <param name="pointSize">The size in pixels of points, which is internally scaled by the device pixel ratio.</param>
+void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, GLfloat pointSize)
 {
 #ifdef USE_GLSL
 	m_ModelViewProjectionMatrix = m_ProjMatrix * m_ModelViewMatrix;
 	m_Program->setUniformValue(m_ColAttr, col);
+	m_Program->setUniformValue(m_PointSizeUniform, pointSize * GLfloat(devicePixelRatioF()));
 	m_Program->setUniformValue(m_MatrixUniform, m_ModelViewProjectionMatrix);
 	this->glVertexAttribPointer(m_PosAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices);
 	this->glEnableVertexAttribArray(0);
@@ -1352,13 +1433,10 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m4T mat = (affine * m_FractoriumEmberController->AffineScaleCurrentToLocked()).ToMat4ColMajor();
 	glm::tmat4x4<float, glm::defaultp> tempmat4 = mat;
 	m_GL->m_ModelViewMatrix = QMatrix4x4(glm::value_ptr(tempmat4));
-	//Need to figure out multmatrix calls here.//TODO
-	//QueryMatrices(true);
 	m_GL->glLineWidth(3.0f * m_GL->devicePixelRatioF());//One 3px wide, colored black, except green on x axis for post affine.
 	m_GL->DrawAffineHelper(index, selected, pre, final, true);
 	m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());//Again 1px wide, colored white, to give a white middle with black outline effect.
 	m_GL->DrawAffineHelper(index, selected, pre, final, false);
-	m_GL->glPointSize(5.0f * m_GL->devicePixelRatioF());//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
 	QVector4D col(0.0f, 0.0f, 0.0f, selected ? 1.0f : 0.5f);
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);
@@ -1367,7 +1445,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS);
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, 5.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
 	//
 	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
 	m_Verts.clear();
@@ -1378,7 +1456,6 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	col = QVector4D(color.r, color.g, color.b, 1.0f);
 	m_GL->DrawPointOrLine(col, m_Verts, GL_LINES);
 	//
-	m_GL->glPointSize(3.0f * m_GL->devicePixelRatioF());//Draw smaller white points, to give a black outline effect.
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(0.0f);
@@ -1387,7 +1464,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
 	col = QVector4D(1.0f, 1.0f, 1.0f, selected ? 1.0f : 0.5f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS);
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, 3.0f);//Draw smaller white points, to give a black outline effect.
 	m_GL->m_ModelViewMatrix.setToIdentity();
 #endif
 }

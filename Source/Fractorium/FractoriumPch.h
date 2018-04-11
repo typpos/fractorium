@@ -70,9 +70,7 @@
 #include <QMimeData>
 #include <QModelIndex>
 #include <QMouseEvent>
-//#include <qopenglfunctions_4_5_core.h>
-#include <qopenglfunctions_3_3_core.h>
-//#include <qopenglfunctions_2_0.h>
+#include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QPainter>
 #include <QPainterPath>

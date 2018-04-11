@@ -41,24 +41,6 @@ int main(int argc, char* argv[])
 #else
 		putenv(const_cast<char*>("GPU_MAX_ALLOC_PERCENT=100"));
 #endif
-		//auto qsf = QSurfaceFormat::defaultFormat();
-		//qDebug() << "Version: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-		//qDebug() << "Profile: " << qsf.profile();
-		//qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-		//qDebug() << "Swap behavior: " << qsf.swapBehavior();
-		//qDebug() << "Swap interval: " << qsf.swapInterval();
-		//qsf.setDepthBufferSize(24);
-		//qsf.setSwapInterval(1);//Vsync.
-		//qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-#ifndef USE_GLSL
-		qsf.setVersion(2, 0);
-		qsf.setProfile(QSurfaceFormat::CompatibilityProfile);
-#else
-		//qsf.setVersion(4, 5);
-		//qsf.setRenderableType(QSurfaceFormat::OpenGL);
-		//qsf.setProfile(QSurfaceFormat::CoreProfile);
-#endif
-		//QSurfaceFormat::setDefaultFormat(qsf);
 		Fractorium w;
 		w.show();
 		a.installEventFilter(&w);

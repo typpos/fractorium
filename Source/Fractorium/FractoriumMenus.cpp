@@ -833,7 +833,7 @@ void Fractorium::OnActionAddBothSymmetry(bool checked) { m_Controller->AddBothSy
 template <typename T>
 void FractoriumEmberController<T>::Flatten()
 {
-	UpdateAll([&](Ember<T>& ember)
+	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
 		ember.Flatten(XmlToEmber<T>::m_FlattenNames);
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
@@ -848,7 +848,7 @@ void Fractorium::OnActionFlatten(bool checked) { m_Controller->Flatten(); }
 template <typename T>
 void FractoriumEmberController<T>::Unflatten()
 {
-	UpdateAll([&](Ember<T>& ember)
+	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
 		ember.Unflatten();
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());

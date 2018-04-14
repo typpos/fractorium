@@ -542,7 +542,7 @@ private:
 
 	//Rendering/progress.
 	void Update(std::function<void (void)> func, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER);
-	void UpdateAll(std::function<void (Ember<T>&)> func, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, bool applyAll = false);
+	void UpdateAll(std::function<void (Ember<T>&, bool)> func, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, bool applyAll = false);
 	bool SyncSizes();
 
 	//Templated members.
@@ -550,7 +550,7 @@ private:
 	vector<T> m_TempOpacities;
 	vector<T> m_NormalizedWeights;
 	Ember<T> m_Ember;
-	const void* m_EmberFilePointer = nullptr;
+	Ember<T>* m_EmberFilePointer = nullptr;
 	EmberFile<T> m_EmberFile;
 	EmberFile<T> m_SequenceFile;
 	deque<Ember<T>> m_UndoList;

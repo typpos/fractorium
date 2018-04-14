@@ -261,7 +261,7 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 			SyncLibrary(eLibraryUpdate::NAME);//Copy all ember names to the tree items since some might have changed to be made unique.
 			newName = emberItem->GetEmber()->m_Name;//Get the new, final, unique name.
 
-			if (m_EmberFilePointer == emberItem->GetEmber() && oldName != newName)//If the ember edited was the current one, and the name was indeed changed, update the name of the current one.
+			if (m_EmberFilePointer && m_EmberFilePointer == emberItem->GetEmber() && oldName != newName)//If the ember edited was the current one, and the name was indeed changed, update the name of the current one.
 			{
 				m_Ember.m_Name = newName;
 				m_LastSaveCurrent = "";//Reset will force the dialog to show on the next save current since the user probably wants a different name.

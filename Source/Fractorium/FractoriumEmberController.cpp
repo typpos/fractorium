@@ -200,13 +200,13 @@ void FractoriumEmberController<T>::Update(std::function<void(void)> func, bool u
 /// <param name="action">The action to add to the rendering queue. Default: eProcessAction::FULL_RENDER.</param>
 /// <param name="applyAll">True to apply the action to all embers in the file in addition to the curent one, false to apply the action only to the current one.</param>
 template <typename T>
-void FractoriumEmberController<T>::UpdateAll(std::function<void(Ember<T>& ember)> func, bool updateRender, eProcessAction action, bool applyAll)
+void FractoriumEmberController<T>::UpdateAll(std::function<void(Ember<T>& ember, bool isMain)> func, bool updateRender, eProcessAction action, bool applyAll)
 {
-	func(m_Ember);
+	func(m_Ember, true);
 
 	if (applyAll)
 		for (auto& it : m_EmberFile.m_Embers)
-			func(it);
+			func(it, false);
 
 	if (updateRender)
 		UpdateRender(action);
@@ -344,8 +344,10 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	size_t h = m_Ember.m_FinalRasH;
 	m_Ember = ember;
 
-	if (updatePointer)
-		m_EmberFilePointer = &ember;
+	if (updatePointer && (typeid(T) == typeid(U)))
+		m_EmberFilePointer = (Ember<T>*)&ember;
+	else
+		m_EmberFilePointer = nullptr;
 
 	if (!verbatim)
 	{

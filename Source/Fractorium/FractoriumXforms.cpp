@@ -402,20 +402,29 @@ void FractoriumEmberController<T>::XformAnimateChanged(int state)
 {
 	bool final = IsFinal(CurrentXform());
 	auto index = m_Fractorium->ui.CurrentXformCombo->currentIndex();
-	UpdateAll([&](Ember<T>& ember)
+	T animate = state > 0 ? 1 : 0;
+	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
 		if (final)//If the current xform was final, only apply to other embers which also have a final xform.
 		{
 			if (ember.UseFinalXform())
 			{
 				auto xform = ember.NonConstFinalXform();
-				xform->m_Animate = state > 0 ? 1 : 0;
+				xform->m_Animate = animate;
 			}
+
+			if (!m_Fractorium->ApplyAll())
+				if (m_EmberFilePointer && m_EmberFilePointer->UseFinalXform())
+					m_EmberFilePointer->NonConstFinalXform()->m_Animate = animate;
 		}
 		else//Current was not final, so apply to other embers which have a non-final xform at this index.
 		{
 			if (auto xform = ember.GetXform(index))
-				xform->m_Animate = state > 0 ? 1 : 0;
+				xform->m_Animate = animate;
+
+			if (!m_Fractorium->ApplyAll() && m_EmberFilePointer)
+				if (auto xform = m_EmberFilePointer->GetXform(index))
+					xform->m_Animate = animate;
 		}
 	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }

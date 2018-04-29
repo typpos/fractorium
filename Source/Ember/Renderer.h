@@ -77,7 +77,6 @@ protected:
 	virtual eRenderStatus LogScaleDensityFilter(bool forceOutput = false);
 	virtual eRenderStatus GaussianDensityFilter();
 	virtual eRenderStatus AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset);
-	virtual eRenderStatus AccumulatorToFinalImage(v4F* pixels, size_t finalOffset);
 	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample);
 	virtual void ComputeCurves();
 

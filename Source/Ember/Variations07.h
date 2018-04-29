@@ -2013,6 +2013,256 @@ private:
 	T m_Zblur;
 };
 
+/// <summary>
+/// hypercrop.
+/// </summary>
+template <typename T>
+class HypercropVariation : public ParametricVariation<T>
+{
+public:
+	HypercropVariation(T weight = 1.0) : ParametricVariation<T>("hypercrop", eVariationId::VAR_HYPERCROP, weight, false, false, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(HypercropVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T fx = helper.In.x;
+		T fy = helper.In.y;
+		T fz = helper.In.z;
+		T a0 = T(M_PI) / m_N;
+		T len = 1 / Zeps(std::cos(a0));
+		T d = m_Rad * std::sin(a0) * len;
+		T angle = Floor<T>(helper.m_PrecalcAtanyx * m_Coeff) / m_Coeff + T(M_PI) / m_N;
+		T x0 = std::cos(angle) * len;
+		T y0 = std::sin(angle) * len;
+
+		if (std::sqrt(Sqr(helper.In.x - x0) + Sqr(helper.In.y - y0)) < d)
+		{
+			if (m_Zero > 1.5)
+			{
+				fx = x0;
+				fy = y0;
+				fz = 0;
+			}
+			else
+			{
+				if (m_Zero > 0.5)
+				{
+					fx = 0;
+					fy = 0;
+					fz = 0;
+				}
+				else
+				{
+					T rangle = std::atan2(helper.In.y - y0, helper.In.x - x0);
+					fx = x0 + std::cos(rangle) * d;
+					fy = y0 + std::sin(rangle) * d;
+					fz = 0;
+				}
+			}
+		}
+
+		helper.Out.x = fx * m_Weight;
+		helper.Out.y = fy * m_Weight;
+		helper.Out.z = fz * m_Weight;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string n     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rad   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zero  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string coeff = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t fx = vIn.x;\n"
+		   << "\t\treal_t fy = vIn.y;\n"
+		   << "\t\treal_t fz = vIn.z;\n"
+		   << "\t\treal_t a0 = M_PI / " << n << ";\n"
+		   << "\t\treal_t len = 1 / Zeps(cos(a0));\n"
+		   << "\t\treal_t d = " << rad << " * sin(a0) * len;\n"
+		   << "\t\treal_t angle = floor(precalcAtanyx * " << coeff << ") / " << coeff << " + M_PI / " << n << ";\n"
+		   << "\t\treal_t x0 = cos(angle) * len;\n"
+		   << "\t\treal_t y0 = sin(angle) * len;\n"
+		   << "\n"
+		   << "\t\tif (sqrt(Sqr(vIn.x - x0) + Sqr(vIn.y - y0)) < d)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (" << zero << " > 1.5)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		fx = x0;\n"
+		   << "\t\t		fy = y0;\n"
+		   << "\t\t		fz = 0;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		if (" << zero << " > 0.5)\n"
+		   << "\t\t		{\n"
+		   << "\t\t			fx = 0;\n"
+		   << "\t\t			fy = 0;\n"
+		   << "\t\t			fz = 0;\n"
+		   << "\t\t		}\n"
+		   << "\t\t		else\n"
+		   << "\t\t		{\n"
+		   << "\t\t			real_t rangle = atan2(vIn.y - y0, vIn.x - x0);\n"
+		   << "\t\t			fx = x0 + cos(rangle) * d;\n"
+		   << "\t\t			fy = y0 + sin(rangle) * d;\n"
+		   << "\t\t			fz = 0;\n"
+		   << "\t\t		}\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = fx * " << weight << ";\n"
+		   << "\t\tvOut.y = fy * " << weight << ";\n"
+		   << "\t\tvOut.z = fz * " << weight << ";\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_N = Zeps(m_N);
+		m_Coeff = Zeps<T>(m_N * T(0.5) / T(M_PI));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_N,     prefix + "hypercrop_n", 4));
+		m_Params.push_back(ParamWithName<T>(&m_Rad,   prefix + "hypercrop_rad", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero,  prefix + "hypercrop_zero"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Coeff, prefix + "hypercrop_coeff"));//Precalc.
+	}
+
+private:
+	T m_N;
+	T m_Rad;
+	T m_Zero;
+	T m_Coeff;//Precalc.
+};
+
+/// <summary>
+/// hypershift2.
+/// </summary>
+template <typename T>
+class Hypershift2Variation : public ParametricVariation<T>
+{
+public:
+	Hypershift2Variation(T weight = 1.0) : ParametricVariation<T>("hypershift2", eVariationId::VAR_HYPERSHIFT2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Hypershift2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T fx = helper.In.x * m_Scale2;
+		T fy = helper.In.y * m_Scale2;
+		T rad = 1 / Zeps(fx * fx + fy * fy);
+		T x = rad * fx + m_Shift;
+		T y = rad * fy;
+		rad = m_Weight * m_Scale / Zeps(x * x + y * y);
+		T angle = ((rand.Rand() % int(m_P)) * 2 + 1) * T(M_PI) / m_P;
+		T X = rad * x + m_Shift;
+		T Y = rad * y;
+		T cosa = std::cos(angle);
+		T sina = std::sin(angle);
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			outPoint.m_X = outPoint.m_Y = outPoint.m_Z = 0;//This variation assigns, instead of summing, so order will matter.
+
+		helper.Out.x = cosa * X - sina * Y;
+		helper.Out.y = sina * X + cosa * Y;
+		helper.Out.z = helper.In.z * rad;
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string p      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string q      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string shift  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t fx = vIn.x * " << scale2 << ";\n"
+		   << "\t\treal_t fy = vIn.y * " << scale2 << ";\n"
+		   << "\t\treal_t rad = 1 / Zeps(fx * fx + fy * fy);\n"
+		   << "\t\treal_t x = rad * fx + " << shift << ";\n"
+		   << "\t\treal_t y = rad * fy;\n"
+		   << "\t\trad = " << weight << " * " << shift << " / Zeps(x * x + y * y);\n"
+		   << "\t\treal_t angle = ((MwcNext(mwc) % (int)" << p << ") * 2 + 1) * M_PI / " << p << ";\n"
+		   << "\t\treal_t X = rad * x + " << shift << ";\n"
+		   << "\t\treal_t Y = rad * y;\n"
+		   << "\t\treal_t cosa = cos(angle);\n"
+		   << "\t\treal_t sina = sin(angle);\n";
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			ss << "\t\toutPoint->m_X = outPoint->m_Y = outPoint->m_Z = 0;\n";
+
+		ss << "\t\tvOut.x = cosa * X - sina * Y;\n"
+		   << "\t\tvOut.y = sina * X + cosa * Y;\n"
+		   << "\t\tvOut.z = vIn.z * rad;\n"
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		T pq = T(M_PI) / m_Q;
+		T pp = T(M_PI) / m_P;
+		T spq = std::sin(pq);
+		T spp = std::sin(pp);
+		m_Shift = std::sin(T(M_PI) * T(0.5) - pq - pp);
+		m_Shift = m_Shift / std::sqrt(1 - Sqr(spq) - Sqr(spp));
+		m_Scale2 = 1 / std::sqrt(Sqr(sin(T(M_PI) / 2 + pp)) / Sqr(spq) - 1);
+		m_Scale2 = m_Scale2 * (std::sin(T(M_PI) / 2 + pp) / spq - 1);
+		m_Scale = 1 - m_Shift * m_Shift;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypershift2_p", 3, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypershift2_q", 7, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(true, &m_Shift,  prefix + "hypershift2_shift"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale,  prefix + "hypershift2_scale"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale2, prefix + "hypershift2_scale2"));
+	}
+
+private:
+	T m_P;
+	T m_Q;
+	T m_Shift;//Precalc.
+	T m_Scale;
+	T m_Scale2;
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -2035,4 +2285,6 @@ MAKEPREPOSTPARVAR(Helix, helix, HELIX)
 MAKEPREPOSTPARVAR(Sphereblur, sphereblur, SPHEREBLUR)
 MAKEPREPOSTPARVAR(Cpow3, cpow3, CPOW3)
 MAKEPREPOSTPARVAR(Concentric, concentric, CONCENTRIC)
+MAKEPREPOSTPARVAR(Hypercrop, hypercrop, HYPERCROP)
+MAKEPREPOSTPARVAR(Hypershift2, hypershift2, HYPERSHIFT2)
 }

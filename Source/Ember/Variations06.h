@@ -1487,12 +1487,6 @@ public:
 
 	PARVARCOPY(CrobVariation)
 
-	/// <summary>
-	/// Functions the specified helper.
-	/// </summary>
-	/// <param name="helper">The helper.</param>
-	/// <param name="outPoint">The out point.</param>
-	/// <param name="rand">The rand.</param>
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T gradTmp, secTmp, xTmp = 0, yTmp = 0;

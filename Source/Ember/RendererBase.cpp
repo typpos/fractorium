@@ -515,6 +515,13 @@ size_t RendererBase::ThreadCount() const { return m_ThreadsToUse; }
 eRendererType RendererBase::RendererType() const { return eRendererType::CPU_RENDERER; }
 
 /// <summary>
+/// Get whether the renderer uses a shared texture with OpenGL.
+/// This only applies to the OpenCL renderer (which can be shared or unshared), so it's always false in the base.
+/// </summary>
+/// <returns>True if shared, else false. Always false in the base.</returns>
+bool RendererBase::Shared() const { return false; }
+
+/// <summary>
 /// //Non-virtual threading control.
 /// </summary>
 

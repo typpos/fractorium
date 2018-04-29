@@ -359,6 +359,8 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(Sphereblur)
 	ADDPREPOSTREGVAR(Cpow3)
 	ADDPREPOSTREGVAR(Concentric)
+	ADDPREPOSTREGVAR(Hypercrop)
+	ADDPREPOSTREGVAR(Hypershift2)
 	//ADDPREPOSTREGVAR(LinearXZ)
 	//ADDPREPOSTREGVAR(LinearYZ)
 	//DC are special.

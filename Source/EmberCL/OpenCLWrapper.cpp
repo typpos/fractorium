@@ -387,7 +387,6 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 		{
 			if (shared)
 			{
-				//::wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
 				cl::ImageGL imageGL(m_Context, flags, GL_TEXTURE_2D, 0, texName, &err);
 				NamedImage2DGL namedImageGL(imageGL, name);
 

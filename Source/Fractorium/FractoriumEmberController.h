@@ -268,7 +268,6 @@ protected:
 
 	//Non-templated members.
 	bool m_Rendering = false;
-	bool m_Shared = true;
 	bool m_LastEditWasUndoRedo;
 	vector<pair<size_t, size_t>> m_Devices;
 	size_t m_SubBatchCount = 1;//Will be ovewritten by the options on first render.

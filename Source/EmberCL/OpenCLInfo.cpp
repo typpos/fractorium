@@ -43,7 +43,7 @@ OpenCLInfo::OpenCLInfo()
 					if (!platformOk)
 					{
 						m_Platforms.push_back(platforms[platform]);
-						m_PlatformNames.push_back(platforms[platform].getInfo<CL_PLATFORM_VENDOR>(nullptr) + " " + platforms[platform].getInfo<CL_PLATFORM_NAME>(nullptr) + " " + platforms[platform].getInfo<CL_PLATFORM_VERSION>(nullptr));
+						m_PlatformNames.push_back(platforms[platform].getInfo<CL_PLATFORM_VENDOR>(nullptr).c_str() + " "s + platforms[platform].getInfo<CL_PLATFORM_NAME>(nullptr).c_str() + " "s + platforms[platform].getInfo<CL_PLATFORM_VERSION>(nullptr).c_str());
 						workingPlatformIndex++;
 						platformOk = true;
 					}
@@ -58,7 +58,7 @@ OpenCLInfo::OpenCLInfo()
 					}
 
 					m_Devices.back().push_back(devices[platform][device]);
-					m_DeviceNames.back().push_back(devices[platform][device].getInfo<CL_DEVICE_VENDOR>(nullptr) + " " + devices[platform][device].getInfo<CL_DEVICE_NAME>(nullptr));// + " " + devices[platform][device].getInfo<CL_DEVICE_VERSION>());
+					m_DeviceNames.back().push_back(devices[platform][device].getInfo<CL_DEVICE_VENDOR>(nullptr).c_str() + " "s + devices[platform][device].getInfo<CL_DEVICE_NAME>(nullptr).c_str());// + " " + devices[platform][device].getInfo<CL_DEVICE_VERSION>().c_str());
 					m_AllDeviceNames.push_back(m_DeviceNames.back().back());
 					m_DeviceIndices.push_back(pair<size_t, size_t>(workingPlatformIndex, workingDeviceIndex++));
 					m_Init = true;//If at least one platform and device succeeded, OpenCL is ok. It's now ok to begin building and running programs.
@@ -184,6 +184,29 @@ size_t OpenCLInfo::TotalDeviceIndex(size_t platform, size_t device) const
 }
 
 /// <summary>
+/// Get a pointer to a device based on its ID.
+/// </summary>
+/// <param name="id">The device ID</param>
+/// <param name="platform">Stores the platform index of the device if found.</param>
+/// <param name="device">Stores the device index of the device if found.</param>
+/// <returns>A pointer to the device if found, else nullptr.</returns>
+const cl::Device* OpenCLInfo::DeviceFromId(cl_device_id id, size_t& platform, size_t& device) const
+{
+	for (auto& p : m_DeviceIndices)
+	{
+		if (m_Devices[p.first][p.second]() == id)
+		{
+			platform = p.first;
+			device = p.second;
+			return &(m_Devices[p.first][p.second]);
+		}
+	}
+
+	platform = device = 0;
+	return nullptr;
+}
+
+/// <summary>
 /// Create a context that is optionally shared with OpenGL and place it in the
 /// passed in context ref parameter.
 /// </summary>
@@ -209,6 +232,7 @@ bool OpenCLInfo::CreateContext(const cl::Platform& platform, cl::Context& contex
 		context = cl::Context(CL_DEVICE_TYPE_GPU, props, nullptr, nullptr, &err);//May need to tinker with this on Mac.
 #else
 #if defined WIN32
+		//::wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
 		cl_context_properties props[] =
 		{
 			CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -269,7 +293,7 @@ string OpenCLInfo::DumpInfo() const
 		for (size_t device = 0; device < m_Devices[platform].size(); device++)
 		{
 			os << "Device " << device << ": " << DeviceName(platform, device);
-			os << "\nCL_DEVICE_OPENCL_C_VERSION: " << GetInfo<string>(platform, device, CL_DEVICE_OPENCL_C_VERSION);
+			os << "\nCL_DEVICE_OPENCL_C_VERSION: " << GetInfo<string>(platform, device, CL_DEVICE_OPENCL_C_VERSION).c_str();
 			os << "\nCL_DEVICE_LOCAL_MEM_SIZE: " << GetInfo<cl_ulong>(platform, device, CL_DEVICE_LOCAL_MEM_SIZE);
 			os << "\nCL_DEVICE_LOCAL_MEM_TYPE: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_LOCAL_MEM_TYPE);
 			os << "\nCL_DEVICE_MAX_COMPUTE_UNITS: " << GetInfo<cl_uint>(platform, device, CL_DEVICE_MAX_COMPUTE_UNITS);

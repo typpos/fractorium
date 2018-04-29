@@ -476,8 +476,7 @@ bool FractoriumEmberController<T>::Render()
 			//Update it on finish because the rendering process is completely done.
 			if (update || ProcessState() == eProcessState::ACCUM_DONE)
 			{
-				if (m_FinalImage.size() == m_Renderer->FinalDimensions())//Make absolutely sure the correct amount of data is passed.
-					gl->update();
+				gl->update();//Queue update.
 
 				if (ProcessState() == eProcessState::ACCUM_DONE)
 					SaveCurrentToOpenedFile();//Will not save if the previews are still rendering.
@@ -543,26 +542,34 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 	auto s = m_Fractorium->m_Settings;
 	auto gl = m_Fractorium->ui.GLDisplay;
 
-	if (!m_Renderer.get() || (m_Renderer->RendererType() != renderType) || !Equal(m_Devices, devices))
+	if (!m_Renderer.get() || (m_Renderer->RendererType() != renderType) || !Equal(m_Devices, devices) || m_Renderer->Shared() != shared)
 	{
 		EmberReport emberReport;
 		vector<string> errorReport;
 		DeleteRenderer();//Delete the renderer and refresh the textures.
-		//Before starting, must take care of allocations.
-		gl->Allocate(true);//Forcing a realloc of the texture is necessary on AMD, but not on nVidia.
-		m_Renderer = unique_ptr<EmberNs::RendererBase>(::CreateRenderer<T>(renderType, devices, shared, gl->OutputTexID(), emberReport));//Always make bucket type float.
-		errorReport = emberReport.ErrorReport();
 
-		if (errorReport.empty())
+		//Before starting, must take care of allocations.
+		if (gl->Allocate(true))//Forcing a realloc of the texture is necessary on AMD, but not on nVidia.
 		{
-			m_Devices = devices;
-			m_OutputTexID = gl->OutputTexID();
-			m_Shared = shared;
+			m_Renderer = unique_ptr<EmberNs::RendererBase>(::CreateRenderer<T>(renderType, devices, shared, gl->OutputTexID(), emberReport));//Always make bucket type float.
+			errorReport = emberReport.ErrorReport();
+
+			if (errorReport.empty())
+			{
+				m_Devices = devices;
+				m_OutputTexID = gl->OutputTexID();
+			}
+			else
+			{
+				ok = false;
+				m_Fractorium->ShowCritical("Renderer Creation Error", "Could not create requested renderer, fallback CPU renderer created. See info tab for details.");
+				m_Fractorium->ErrorReportToQTextEdit(errorReport, m_Fractorium->ui.InfoRenderingTextEdit);
+			}
 		}
 		else
 		{
 			ok = false;
-			m_Fractorium->ShowCritical("Renderer Creation Error", "Could not create requested renderer, fallback CPU renderer created. See info tab for details.");
+			m_Fractorium->ShowCritical("Renderer Creation Error", "Could not create OpenGL texture, interactive rendering will be disabled.");
 			m_Fractorium->ErrorReportToQTextEdit(errorReport, m_Fractorium->ui.InfoRenderingTextEdit);
 		}
 	}
@@ -662,14 +669,16 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 	auto v = Devices(m_Settings->Devices());
 
 	//The most important option to process is what kind of renderer is desired, so do it first.
-	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v, updatePreviews))
+	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v, updatePreviews, useOpenCL && m_Settings->SharedTexture()))
 	{
 		//If using OpenCL, will only get here if creating RendererCL failed, but creating a backup CPU Renderer succeeded.
 		ShowCritical("Renderer Creation Error", "Error creating renderer, most likely a GPU problem. Using CPU instead.");
 		m_Settings->OpenCL(false);
+		m_Settings->SharedTexture(false);
 		ui.ActionCpu->setChecked(true);
 		ui.ActionCL->setChecked(false);
 		m_OptionsDialog->ui.OpenCLCheckBox->setChecked(false);
+		m_OptionsDialog->ui.SharedTextureCheckBox->setChecked(false);
 		m_FinalRenderDialog->ui.FinalRenderOpenCLCheckBox->setChecked(false);
 		ok = false;
 	}

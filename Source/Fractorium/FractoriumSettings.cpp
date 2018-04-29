@@ -98,6 +98,9 @@ void FractoriumSettings::EnsureDefaults()
 
 	if (OpenPaletteImageFolder() == "")
 		OpenPaletteImageFolder(QCoreApplication::applicationDirPath());
+
+	if (value(SHAREDTEXTURE).toString() == "")//Set this to true if the setting is missing because it only needs to be false for the rare system that has problems with shared textures.
+		SharedTexture(true);
 }
 
 /// <summary>
@@ -115,6 +118,9 @@ void FractoriumSettings::Transparency(bool b)					 { setValue(TRANSPARENCY, b); 
 
 bool FractoriumSettings::OpenCL()								 { return value(OPENCL).toBool();          }
 void FractoriumSettings::OpenCL(bool b)							 { setValue(OPENCL, b);                    }
+
+bool FractoriumSettings::SharedTexture()						 { return value(SHAREDTEXTURE).toBool();   }
+void FractoriumSettings::SharedTexture(bool b)					 { setValue(SHAREDTEXTURE, b);             }
 
 bool FractoriumSettings::Double()								 { return value(DOUBLEPRECISION).toBool(); }
 void FractoriumSettings::Double(bool b)							 { setValue(DOUBLEPRECISION, b);		   }
@@ -158,14 +164,14 @@ void FractoriumSettings::OpenCLSubBatch(uint i)					 { setValue(OPENCLSUBBATCH, 
 uint FractoriumSettings::RandomCount()							 { return value(RANDOMCOUNT).toUInt();	   }
 void FractoriumSettings::RandomCount(uint i)					 { setValue(RANDOMCOUNT, i);			   }
 
-uint FractoriumSettings::CpuQuality()                            { return value(CPU_QUALITY).toUInt();     }
-void FractoriumSettings::CpuQuality(uint i)                      { setValue(CPU_QUALITY, i);               }
+uint FractoriumSettings::CpuQuality()                            { return value(CPUQUALITY).toUInt();      }
+void FractoriumSettings::CpuQuality(uint i)                      { setValue(CPUQUALITY, i);                }
 
-uint FractoriumSettings::OpenClQuality()                         { return value(OPENCL_QUALITY).toUInt();  }
-void FractoriumSettings::OpenClQuality(uint i)                   { setValue(OPENCL_QUALITY, i);            }
+uint FractoriumSettings::OpenClQuality()                         { return value(OPENCLQUALITY).toUInt();   }
+void FractoriumSettings::OpenClQuality(uint i)                   { setValue(OPENCLQUALITY, i);             }
 
-bool FractoriumSettings::LoadLast()                              { return value(LOAD_LAST).toBool();       }
-void FractoriumSettings::LoadLast(bool b)                        { setValue(LOAD_LAST, b);                 }
+bool FractoriumSettings::LoadLast()                              { return value(LOADLAST).toBool();        }
+void FractoriumSettings::LoadLast(bool b)                        { setValue(LOADLAST, b);                  }
 
 /// <summary>
 /// Sequence generation settings.

@@ -29,50 +29,11 @@ RendererCL<T, bucketT>::RendererCL(const vector<pair<size_t, size_t>>& devices, 
 	m_DEOpenCLKernelCreator(typeid(T) == typeid(double), false),
 	m_FinalAccumOpenCLKernelCreator(typeid(T) == typeid(double))
 {
-	Init();
-	Init(devices, shared, outputTexID);
-}
-
-/// <summary>
-/// Initialization of fields, no OpenCL initialization is done here.
-template <typename T, typename bucketT>
-void RendererCL<T, bucketT>::Init()
-{
-	m_Init = false;
-	m_DoublePrecision = typeid(T) == typeid(double);
-	//Buffer names.
-	m_EmberBufferName = "Ember";
-	m_XformsBufferName = "Xforms";
-	m_ParVarsBufferName = "ParVars";
-	m_GlobalSharedBufferName = "GlobalShared";
-	m_SeedsBufferName = "Seeds";
-	m_DistBufferName = "Dist";
-	m_CarToRasBufferName = "CarToRas";
-	m_DEFilterParamsBufferName = "DEFilterParams";
-	m_SpatialFilterParamsBufferName = "SpatialFilterParams";
-	m_DECoefsBufferName = "DECoefs";
-	m_DEWidthsBufferName = "DEWidths";
-	m_DECoefIndicesBufferName = "DECoefIndices";
-	m_SpatialFilterCoefsBufferName = "SpatialFilterCoefs";
-	m_CurvesCsaName = "CurvesCsa";
-	m_HostBufferName = "Host";
-	m_HistBufferName = "Hist";
-	m_AccumBufferName = "Accum";
-	m_FinalImageName = "Final";
-	m_PointsBufferName = "Points";
-	//It's critical that these numbers never change. They are
-	//based on the cuburn model of each kernel launch containing
-	//256 threads. 32 wide by 8 high. Everything done in the OpenCL
-	//iteraion kernel depends on these dimensions.
-	m_IterCountPerKernel = 256;
-	m_IterBlockWidth = 32;
-	m_IterBlockHeight = 8;
-	m_IterBlocksWide = 64;
-	m_IterBlocksHigh = 2;
 	m_PaletteFormat.image_channel_order = CL_RGBA;
 	m_PaletteFormat.image_channel_data_type = CL_FLOAT;
 	m_FinalFormat.image_channel_order = CL_RGBA;
 	m_FinalFormat.image_channel_data_type = CL_FLOAT;
+	Init(devices, shared, outputTexID);
 }
 
 /// <summary>
@@ -97,11 +58,12 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 		return false;
 
 	bool b = false;
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 	auto& zeroizeProgram = m_IterOpenCLKernelCreator.ZeroizeKernel();
 	auto& sumHistProgram = m_IterOpenCLKernelCreator.SumHistKernel();
 	ostringstream os;
 	m_Init = false;
+	m_Shared = false;
 	m_Devices.clear();
 	m_Devices.reserve(devices.size());
 	m_OutputTexID = outputTexID;
@@ -115,11 +77,11 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 
 			if ((b = cld->Init()))//Build a simple program to ensure OpenCL is working right.
 			{
-				if (b && !(b = cld->m_Wrapper.AddProgram(m_IterOpenCLKernelCreator.ZeroizeEntryPoint(), zeroizeProgram, m_IterOpenCLKernelCreator.ZeroizeEntryPoint(), m_DoublePrecision))) { AddToReport(loc); }
+				if (b && !(b = cld->m_Wrapper.AddProgram(m_IterOpenCLKernelCreator.ZeroizeEntryPoint(), zeroizeProgram, m_IterOpenCLKernelCreator.ZeroizeEntryPoint(), m_DoublePrecision))) { ErrorStr(loc, "Failed to init zeroize program: "s + cld->ErrorReportString(), cld.get()); }
 
-				if (b && !(b = cld->m_Wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, 256, 1, 0, nullptr))) { AddToReport(loc); }
+				if (b && !(b = cld->m_Wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, 256, 1, 0, nullptr))) { ErrorStr(loc, "Failed to init palette buffer: "s + cld->ErrorReportString(), cld.get()); }
 
-				if (b && !(b = cld->m_Wrapper.AddAndWriteBuffer(m_GlobalSharedBufferName, m_GlobalShared.second.data(), m_GlobalShared.second.size() * sizeof(m_GlobalShared.second[0])))) { AddToReport(loc); }//Empty at start, will be filled in later if needed.
+				if (b && !(b = cld->m_Wrapper.AddAndWriteBuffer(m_GlobalSharedBufferName, m_GlobalShared.second.data(), m_GlobalShared.second.size() * sizeof(m_GlobalShared.second[0])))) { ErrorStr(loc, "Failed to init global shared buffer: "s + cld->ErrorReportString(), cld.get()); }//Empty at start, will be filled in later if needed.
 
 				if (b)
 				{
@@ -127,33 +89,35 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 				}
 				else
 				{
-					os << loc << ": failed to init platform " << devices[i].first << ", device " << devices[i].second;
-					AddToReport(loc);
+					ErrorStr(loc, "Failed to init programs for platform", cld.get());
 					break;
 				}
+			}
+			else
+			{
+				ErrorStr(loc, "Failed to init device, "s + cld->ErrorReportString(), cld.get());
+				break;
 			}
 		}
 		catch (const std::exception& e)
 		{
-			os << loc << ": failed to init platform " << devices[i].first << ", device " << devices[i].second << ": " << e.what();
-			AddToReport(os.str());
+			ErrorStr(loc, "Failed to init platform: "s + e.what(), nullptr);
 		}
 		catch (...)
 		{
-			os << loc << ": failed to init platform " << devices[i].first << ", device " << devices[i].second;
-			AddToReport(os.str());
+			ErrorStr(loc, "Failed to init platform with unknown exception", nullptr);
 		}
 	}
 
-	if (b && m_Devices.size() == devices.size())
+	if (b && (m_Devices.size() == devices.size()))
 	{
 		auto& firstWrapper = m_Devices[0]->m_Wrapper;
 		m_DEOpenCLKernelCreator = DEOpenCLKernelCreator(m_DoublePrecision, m_Devices[0]->Nvidia());
 
 		//Build a simple program to ensure OpenCL is working right.
-		if (b && !(b = firstWrapper.AddProgram(m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint(), m_DEOpenCLKernelCreator.LogScaleAssignDEKernel(), m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint(), m_DoublePrecision))) { AddToReport(loc); }
+		if (b && !(b = firstWrapper.AddProgram(m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint(), m_DEOpenCLKernelCreator.LogScaleAssignDEKernel(), m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint(), m_DoublePrecision))) { ErrorStr(loc, "failed to init log scale program", m_Devices[0].get()); }
 
-		if (b && !(b = firstWrapper.AddProgram(m_IterOpenCLKernelCreator.SumHistEntryPoint(), sumHistProgram, m_IterOpenCLKernelCreator.SumHistEntryPoint(), m_DoublePrecision))) { AddToReport(loc); }
+		if (b && !(b = firstWrapper.AddProgram(m_IterOpenCLKernelCreator.SumHistEntryPoint(), sumHistProgram, m_IterOpenCLKernelCreator.SumHistEntryPoint(), m_DoublePrecision))) { ErrorStr(loc, "Failed to init sum histogram program", m_Devices[0].get()); }
 
 		if (b)
 		{
@@ -168,16 +132,15 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 			FillSeeds();
 
 			for (size_t device = 0; device < m_Devices.size(); device++)
-				if (b && !(b = m_Devices[device]->m_Wrapper.AddAndWriteBuffer(m_SeedsBufferName, reinterpret_cast<void*>(m_Seeds[device].data()), SizeOf(m_Seeds[device])))) { AddToReport(loc); break; }
+				if (b && !(b = m_Devices[device]->m_Wrapper.AddAndWriteBuffer(m_SeedsBufferName, reinterpret_cast<void*>(m_Seeds[device].data()), SizeOf(m_Seeds[device])))) { ErrorStr(loc, "Failed to init seeds buffer", m_Devices[device].get()); break; }
 		}
 
+		m_Shared = shared;
 		m_Init = b;
 	}
 	else
 	{
-		m_Devices.clear();
-		os << loc << ": failed to init all devices and platforms.";
-		AddToReport(os.str());
+		ErrorStr(loc, "Failed to init all devices and platforms", nullptr);
 	}
 
 	return m_Init;
@@ -192,7 +155,7 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::SetOutputTexture(GLuint outputTexID)
 {
 	bool success = true;
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Devices.empty())
 	{
@@ -202,7 +165,7 @@ bool RendererCL<T, bucketT>::SetOutputTexture(GLuint outputTexID)
 
 		if (!firstWrapper.AddAndWriteImage(m_FinalImageName, CL_MEM_WRITE_ONLY, m_FinalFormat, FinalRasW(), FinalRasH(), 0, nullptr, firstWrapper.Shared(), m_OutputTexID))
 		{
-			AddToReport(loc);
+			ErrorStr(loc, "Failed to init set output texture", m_Devices[0].get());
 			success = false;
 		}
 
@@ -293,10 +256,10 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::ClearHist()
 {
 	bool b = !m_Devices.empty();
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	for (size_t i = 0; i < m_Devices.size(); i++)
-		if (b && !(b = ClearBuffer(i, m_HistBufferName, uint(SuperRasW()), uint(SuperRasH()), sizeof(v4bT)))) { AddToReport(loc); break; }
+		if (b && !(b = ClearBuffer(i, m_HistBufferName, uint(SuperRasW()), uint(SuperRasH()), sizeof(v4bT)))) {	ErrorStr(loc, "Failed to clear histogram", m_Devices[i].get()); break; }
 
 	return b;
 }
@@ -310,9 +273,9 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::ClearHist(size_t device)
 {
 	bool b = device < m_Devices.size();
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
-	if (b && !(b = ClearBuffer(device, m_HistBufferName, uint(SuperRasW()), uint(SuperRasH()), sizeof(v4bT)))) { AddToReport(loc); }
+	if (b && !(b = ClearBuffer(device, m_HistBufferName, uint(SuperRasW()), uint(SuperRasH()), sizeof(v4bT)))) { ErrorStr(loc, "Failed to clear histogram", m_Devices[device].get()); }
 
 	return b;
 }
@@ -338,10 +301,10 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::WritePoints(size_t device, vector<PointCL<T>>& vec)
 {
 	bool b = false;
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	if (device < m_Devices.size())
-		if (!(b = m_Devices[device]->m_Wrapper.WriteBuffer(m_PointsBufferName, reinterpret_cast<void*>(vec.data()), SizeOf(vec)))) { AddToReport(loc); }
+		if (!(b = m_Devices[device]->m_Wrapper.WriteBuffer(m_PointsBufferName, reinterpret_cast<void*>(vec.data()), SizeOf(vec)))) { ErrorStr(loc, "Failed to write points buffer", m_Devices[device].get()); }
 
 	return b;
 }
@@ -423,6 +386,7 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::ClearFinal()
 {
 	vector<v4F> v;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Devices.empty())
 	{
@@ -431,18 +395,16 @@ bool RendererCL<T, bucketT>::ClearFinal()
 
 		if (this->PrepFinalAccumVector(v))
 		{
-			bool b = wrapper.WriteImage2D(index, wrapper.Shared(), FinalRasW(), FinalRasH(), 0, v.data());
-
-			if (!b)
-				AddToReport(__FUNCTION__);
-
-			return b;
+			if (!wrapper.WriteImage2D(index, wrapper.Shared(), FinalRasW(), FinalRasH(), 0, v.data()))
+				ErrorStr(loc, "Failed to clear final buffer", m_Devices[0].get());
+			else
+				return false;
 		}
 		else
 			return false;
 	}
-	else
-		return false;
+
+	return false;
 }
 
 /// <summary>
@@ -467,18 +429,6 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::Ok() const
 {
 	return !m_Devices.empty() && m_Init;
-}
-
-/// <summary>
-/// Clear the error report for this class as well as the OpenCLWrapper members of each device.
-/// </summary>
-template <typename T, typename bucketT>
-void RendererCL<T, bucketT>::ClearErrorReport()
-{
-	EmberReport::ClearErrorReport();
-
-	for (auto& device : m_Devices)
-		device->m_Wrapper.ClearErrorReport();
 }
 
 /// <summary>
@@ -514,20 +464,23 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::CreateDEFilter(bool& newAlloc)
 {
 	bool b = true;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Devices.empty() && Renderer<T, bucketT>::CreateDEFilter(newAlloc))
 	{
 		//Copy coefs and widths here. Convert and copy the other filter params right before calling the filtering kernel.
 		if (newAlloc)
 		{
-			const char* loc = __FUNCTION__;
 			auto& wrapper = m_Devices[0]->m_Wrapper;
 
-			if (b && !(b = wrapper.AddAndWriteBuffer(m_DECoefsBufferName,		reinterpret_cast<void*>(const_cast<bucketT*>(m_DensityFilter->Coefs())),	m_DensityFilter->CoefsSizeBytes())))		{ AddToReport(loc); }
+			if (b && !(b = wrapper.AddAndWriteBuffer(m_DECoefsBufferName,		reinterpret_cast<void*>(const_cast<bucketT*>(m_DensityFilter->Coefs())),	m_DensityFilter->CoefsSizeBytes())))
+				ErrorStr(loc, "Failed to set DE coefficients buffer", m_Devices[0].get());
 
-			if (b && !(b = wrapper.AddAndWriteBuffer(m_DEWidthsBufferName,	    reinterpret_cast<void*>(const_cast<bucketT*>(m_DensityFilter->Widths())),	m_DensityFilter->WidthsSizeBytes())))		{ AddToReport(loc); }
+			if (b && !(b = wrapper.AddAndWriteBuffer(m_DEWidthsBufferName,	    reinterpret_cast<void*>(const_cast<bucketT*>(m_DensityFilter->Widths())),	m_DensityFilter->WidthsSizeBytes())))
+				ErrorStr(loc, "Failed to set DE widths buffer", m_Devices[0].get());
 
-			if (b && !(b = wrapper.AddAndWriteBuffer(m_DECoefIndicesBufferName, reinterpret_cast<void*>(const_cast<uint*>(m_DensityFilter->CoefIndices())), m_DensityFilter->CoefsIndicesSizeBytes()))) { AddToReport(loc); }
+			if (b && !(b = wrapper.AddAndWriteBuffer(m_DECoefIndicesBufferName, reinterpret_cast<void*>(const_cast<uint*>(m_DensityFilter->CoefIndices())), m_DensityFilter->CoefsIndicesSizeBytes())))
+				ErrorStr(loc, "Failed to set DE coefficient indices buffer", m_Devices[0].get());
 		}
 	}
 	else
@@ -546,11 +499,13 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::CreateSpatialFilter(bool& newAlloc)
 {
 	bool b = true;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Devices.empty() && Renderer<T, bucketT>::CreateSpatialFilter(newAlloc))
 	{
 		if (newAlloc)
-			if (!(b = m_Devices[0]->m_Wrapper.AddAndWriteBuffer(m_SpatialFilterCoefsBufferName, reinterpret_cast<void*>(m_SpatialFilter->Filter()), m_SpatialFilter->BufferSizeBytes()))) { AddToReport(__FUNCTION__); }
+			if (!(b = m_Devices[0]->m_Wrapper.AddAndWriteBuffer(m_SpatialFilterCoefsBufferName, reinterpret_cast<void*>(m_SpatialFilter->Filter()), m_SpatialFilter->BufferSizeBytes())))
+				ErrorStr(loc, "Failed to set patial filter coefficients buffer", m_Devices[0].get());
 	}
 	else
 		b = false;
@@ -569,6 +524,25 @@ eRendererType RendererCL<T, bucketT>::RendererType() const
 }
 
 /// <summary>
+/// Get whether the renderer uses a shared texture with OpenGL.
+/// </summary>
+/// <returns>True if shared, else false.</returns>
+template <typename T, typename bucketT>
+bool RendererCL<T, bucketT>::Shared() const { return m_Shared; }
+
+/// <summary>
+/// Clear the error report for this class as well as the OpenCLWrapper members of each device.
+/// </summary>
+template <typename T, typename bucketT>
+void RendererCL<T, bucketT>::ClearErrorReport()
+{
+	EmberReport::ClearErrorReport();
+
+	for (auto& device : m_Devices)
+		device->m_Wrapper.ClearErrorReport();
+}
+
+/// <summary>
 /// Concatenate and return the error report for this class and the
 /// OpenCLWrapper member of each device as a single string.
 /// </summary>
@@ -579,7 +553,7 @@ string RendererCL<T, bucketT>::ErrorReportString()
 	auto s = EmberReport::ErrorReportString();
 
 	for (auto& device : m_Devices)
-		s += device->m_Wrapper.ErrorReportString();
+		s += device->ErrorReportString();
 
 	return s;
 }
@@ -596,7 +570,7 @@ vector<string> RendererCL<T, bucketT>::ErrorReport()
 
 	for (auto& device : m_Devices)
 	{
-		auto s = device->m_Wrapper.ErrorReport();
+		auto s = device->ErrorReport();
 		ours.insert(ours.end(), s.begin(), s.end());
 	}
 
@@ -615,14 +589,18 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec)
 {
 	bool b = Renderer<T, bucketT>::RandVec(randVec);
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Devices.empty())
 	{
 		FillSeeds();
 
 		for (size_t device = 0; device < m_Devices.size(); device++)
-			if (b && !(b = m_Devices[device]->m_Wrapper.AddAndWriteBuffer(m_SeedsBufferName, reinterpret_cast<void*>(m_Seeds[device].data()), SizeOf(m_Seeds[device])))) { AddToReport(loc); break; }
+			if (b && !(b = m_Devices[device]->m_Wrapper.AddAndWriteBuffer(m_SeedsBufferName, reinterpret_cast<void*>(m_Seeds[device].data()), SizeOf(m_Seeds[device]))))
+			{
+				ErrorStr(loc, "Failed to set randoms buffer", m_Devices[device].get());
+				break;
+			}
 	}
 	else
 		b = false;
@@ -664,32 +642,32 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 	m_XformsCL.resize(m_Ember.TotalXformCount());
 	bool b = true;
 	size_t size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 	auto& wrapper = m_Devices[0]->m_Wrapper;
 
-	if (b && !(b = wrapper.AddBuffer(m_DEFilterParamsBufferName, sizeof(m_DensityFilterCL))))		 { AddToReport(loc); }
+	if (b && !(b = wrapper.AddBuffer(m_DEFilterParamsBufferName, sizeof(m_DensityFilterCL))))      { ErrorStr(loc, "Failed to set DE filter parameters buffer", m_Devices[0].get()); }
 
-	if (b && !(b = wrapper.AddBuffer(m_SpatialFilterParamsBufferName, sizeof(m_SpatialFilterCL))))	 { AddToReport(loc); }
+	if (b && !(b = wrapper.AddBuffer(m_SpatialFilterParamsBufferName, sizeof(m_SpatialFilterCL)))) { ErrorStr(loc, "Failed to set spatial filter parameters buffer", m_Devices[0].get()); }
 
-	if (b && !(b = wrapper.AddBuffer(m_CurvesCsaName, SizeOf(m_Csa))))					             { AddToReport(loc); }
+	if (b && !(b = wrapper.AddBuffer(m_CurvesCsaName, SizeOf(m_Csa))))                             { ErrorStr(loc, "Failed to set curves buffer", m_Devices[0].get()); }
 
-	if (b && !(b = wrapper.AddBuffer(m_AccumBufferName, size)))										 { AddToReport(loc); }//Accum buffer.
+	if (b && !(b = wrapper.AddBuffer(m_AccumBufferName, size)))                                    { ErrorStr(loc, "Failed to set accum buffer", m_Devices[0].get()); }
 
 	for (auto& device : m_Devices)
 	{
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_EmberBufferName, sizeof(m_EmberCL))))							 { AddToReport(loc); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_EmberBufferName, sizeof(m_EmberCL))))							 { ErrorStr(loc, "Failed to set ember buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_XformsBufferName, SizeOf(m_XformsCL))))						 { AddToReport(loc); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_XformsBufferName, SizeOf(m_XformsCL))))						 { ErrorStr(loc, "Failed to set xforms buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_ParVarsBufferName, 128 * sizeof(T))))							 { AddToReport(loc); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_ParVarsBufferName, 128 * sizeof(T))))                           { ErrorStr(loc, "Failed to set parametric variations buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_DistBufferName, CHOOSE_XFORM_GRAIN)))							 { AddToReport(loc); break; }//Will be resized for xaos.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_DistBufferName, CHOOSE_XFORM_GRAIN)))                           { ErrorStr(loc, "Failed to set xforms distribution buffer", device.get()); break; }//Will be resized for xaos.
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_CarToRasBufferName, sizeof(m_CarToRasCL))))					 { AddToReport(loc); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_CarToRasBufferName, sizeof(m_CarToRasCL))))                     { ErrorStr(loc, "Failed to set cartesian to raster buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, size)))										 { AddToReport(loc); break; }//Histogram. Will memset to zero later.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, size)))                                         { ErrorStr(loc, "Failed to set histogram buffer", device.get()); break; }//Histogram. Will memset to zero later.
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_PointsBufferName, IterGridKernelCount() * sizeof(PointCL<T>)))) { AddToReport(loc); break; }//Points between iter calls.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_PointsBufferName, IterGridKernelCount() * sizeof(PointCL<T>)))) { ErrorStr(loc, "Failed to set points buffer", device.get()); break; }//Points between iter calls.
 
 		//Global shared is allocated once and written when building the kernel.
 	}
@@ -699,7 +677,7 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 
 	LeaveResize();
 
-	if (b && !(b = SetOutputTexture(m_OutputTexID))) { AddToReport(loc); }
+	if (b && !(b = SetOutputTexture(m_OutputTexID))) { ErrorStr(loc, "Failed to set output texture", m_Devices[0].get()); }
 
 	return b;
 }
@@ -765,23 +743,28 @@ eRenderStatus RendererCL<T, bucketT>::GaussianDensityFilter()
 
 /// <summary>
 /// Run final accumulation on the primary device.
-/// If pixels is nullptr, the output will remain in the OpenCL 2D image.
-/// However, if pixels is not nullptr, the output will be copied. This is
-/// useful when rendering in OpenCL, but saving the output to a file.
+/// If the first device is not shared, the output will remain in the OpenCL 2D image and no copying will take place.
+/// If it is shared, then the image will be copied into the pixels vector.
 /// </summary>
-/// <param name="pixels">The pixels to copy the final image to if not nullptr</param>
+/// <param name="pixels">The pixel vector to allocate and store the final image in</param>
 /// <param name="finalOffset">Offset in the buffer to store the pixels to</param>
-/// <returns>True if success and not aborted, else false.</returns>
+/// <returns>True if not prematurely aborted, else false.</returns>
 template <typename T, typename bucketT>
-eRenderStatus RendererCL<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t finalOffset)
+eRenderStatus RendererCL<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset)
 {
 	auto status = RunFinalAccum();
 
-	if (status == eRenderStatus::RENDER_OK && pixels && !m_Devices.empty() && !m_Devices[0]->m_Wrapper.Shared())
+	if (status == eRenderStatus::RENDER_OK && !m_Devices.empty() && !m_Devices[0]->m_Wrapper.Shared())
 	{
-		pixels += finalOffset;
+		if (PrepFinalAccumVector(pixels))
+		{
+			auto p = pixels.data();
+			p += finalOffset;
 
-		if (!ReadFinal(pixels))
+			if (!ReadFinal(p))
+				status = eRenderStatus::RENDER_ERROR;
+		}
+		else
 			status = eRenderStatus::RENDER_ERROR;
 	}
 
@@ -805,7 +788,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 {
 	bool b = true;
 	EmberStats stats;//Do not record bad vals with with GPU. If the user needs to investigate bad vals, use the CPU.
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	//Only need to do this once on the beginning of a new render. Last iter will always be 0 at the beginning of a full render or temporal sample.
 	if (m_LastIter == 0)
@@ -825,19 +808,34 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 				auto& wrapper = device->m_Wrapper;
 
 				if (b && !(b = wrapper.WriteBuffer(m_EmberBufferName, reinterpret_cast<void*>(&m_EmberCL), sizeof(m_EmberCL))))
+				{
+					ErrorStr(loc, "Write ember buffer failed", device.get());
 					break;
+				}
 
 				if (b && !(b = wrapper.WriteBuffer(m_XformsBufferName, reinterpret_cast<void*>(m_XformsCL.data()), sizeof(m_XformsCL[0]) * m_XformsCL.size())))
+				{
+					ErrorStr(loc, "Write xforms buffer failed", device.get());
 					break;
+				}
 
 				if (b && !(b = wrapper.AddAndWriteBuffer(m_DistBufferName, reinterpret_cast<void*>(const_cast<byte*>(XformDistributions())), XformDistributionsSize())))//Will be resized for xaos.
+				{
+					ErrorStr(loc, "Write xforms distribution buffer failed", device.get());
 					break;
+				}
 
 				if (b && !(b = wrapper.WriteBuffer(m_CarToRasBufferName, reinterpret_cast<void*>(&m_CarToRasCL), sizeof(m_CarToRasCL))))
+				{
+					ErrorStr(loc, "Write cartesian to raster buffer failed", device.get());
 					break;
+				}
 
 				if (b && !(b = wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, m_Dmap.m_Entries.size(), 1, 0, m_Dmap.m_Entries.data())))
+				{
+					ErrorStr(loc, "Write palette buffer failed", device.get());
 					break;
+				}
 
 				if (b)
 				{
@@ -846,8 +844,13 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 					//Don't know the size of the parametric varations parameters buffer until the ember is examined.
 					//So set it up right before the run.
 					if (!m_Params.second.empty())
+					{
 						if (!wrapper.AddAndWriteBuffer(m_ParVarsBufferName, m_Params.second.data(), m_Params.second.size() * sizeof(m_Params.second[0])))
+						{
+							ErrorStr(loc, "Write parametric variations buffer failed", device.get());
 							break;
+						}
+					}
 				}
 				else
 					break;
@@ -873,7 +876,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 	else
 	{
 		m_Abort = true;
-		AddToReport(loc);
+		ErrorStr(loc, "Iiteration failed", nullptr);
 	}
 
 	return stats;
@@ -894,7 +897,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 {
 	//Timing t;
 	bool b = !m_Devices.empty();
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 	IterOpenCLKernelCreator<T>::ParVarIndexDefines(m_Ember, m_Params, false, true);//Do with string and no vals.
 	IterOpenCLKernelCreator<T>::SharedDataIndexDefines(m_Ember, m_GlobalShared, true, true);//Do with string and vals only once on build since it won't change until another build occurs.
 
@@ -909,7 +912,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 			{
 				rlg l(m_ResizeCs);//Just use the resize CS for lack of a better one.
 				b = false;
-				AddToReport(string(loc) + "()\n" + dev->m_Wrapper.DeviceName() + ":\nBuilding the following program failed: \n" + m_IterKernel + "\n");
+				ErrorStr(loc, "Building the following program failed\n"s + m_IterKernel, dev);
 			}
 			else if (!m_GlobalShared.second.empty())
 			{
@@ -917,7 +920,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 				{
 					rlg l(m_ResizeCs);//Just use the resize CS for lack of a better one.
 					b = false;
-					AddToReport(string(loc) + "()\n" + dev->m_Wrapper.DeviceName() + ":\nAdding global shared buffer failed.\n");
+					ErrorStr(loc, "Adding global shared buffer failed", dev);
 				}
 			}
 		};
@@ -960,7 +963,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	bool success = !m_Devices.empty();
 	uint histSuperSize = uint(SuperSize());
 	size_t launches = size_t(ceil(double(iterCount) / IterCountPerGrid()));
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 	vector<std::thread> threadVec;
 	std::atomic<size_t> atomLaunchesRan;
 	std::atomic<intmax_t> atomItersRan, atomItersRemaining;
@@ -1006,31 +1009,31 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			size_t iterCountThisLaunch = iterCountPerKernel * IterGridKernelWidth() * IterGridKernelHeight();
 			//cout << "itersRemaining " << itersRemaining << ", iterCountPerKernel " << iterCountPerKernel << ", iterCountThisLaunch " << iterCountThisLaunch << "\n";
 
-			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, iterCountPerKernel)))        { AddToReport(loc); }//Number of iters for each thread to run.
+			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, iterCountPerKernel)))        { ErrorStr(loc, "Setting iter count argument failed", m_Devices[dev].get()); }//Number of iters for each thread to run.
 
-			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, fuse)))                      { AddToReport(loc); }//Number of iters to fuse.
+			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, fuse)))                      { ErrorStr(loc, "Setting fuse count argument failed", m_Devices[dev].get()); }//Number of iters to fuse.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_SeedsBufferName)))         { AddToReport(loc); }//Seeds.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_SeedsBufferName)))         { ErrorStr(loc, "Setting seeds buffer argument failed", m_Devices[dev].get()); }//Seeds.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_EmberBufferName)))         { AddToReport(loc); }//Ember.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_EmberBufferName)))         { ErrorStr(loc, "Setting ember buffer argument failed", m_Devices[dev].get()); }//Ember.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_XformsBufferName)))        { AddToReport(loc); }//Xforms.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_XformsBufferName)))        { ErrorStr(loc, "Setting xforms buffer argument failed", m_Devices[dev].get()); }//Xforms.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_ParVarsBufferName)))       { AddToReport(loc); }//Parametric variation parameters.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_ParVarsBufferName)))       { ErrorStr(loc, "Setting parametric variations buffer argument failed", m_Devices[dev].get()); }//Parametric variation parameters.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_GlobalSharedBufferName)))  { AddToReport(loc); }//Global shared data.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_GlobalSharedBufferName)))  { ErrorStr(loc, "Setting global shared buffer argument failed", m_Devices[dev].get()); }//Global shared data.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_DistBufferName)))          { AddToReport(loc); }//Xform distributions.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_DistBufferName)))          { ErrorStr(loc, "Setting xforms distribution buffer argument failed", m_Devices[dev].get()); }//Xform distributions.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_CarToRasBufferName)))      { AddToReport(loc); }//Coordinate converter.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_CarToRasBufferName)))      { ErrorStr(loc, "Setting cartesian to raster buffer argument failed", m_Devices[dev].get()); }//Coordinate converter.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))          { AddToReport(loc); }//Histogram.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))          { ErrorStr(loc, "Setting histogram buffer argument failed", m_Devices[dev].get()); }//Histogram.
 
-			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, histSuperSize)))		      { AddToReport(loc); }//Histogram size.
+			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, histSuperSize)))		      { ErrorStr(loc, "Setting histogram size argument failed", m_Devices[dev].get()); }//Histogram size.
 
-			if (b && !(b = wrapper.SetImageArg (kernelIndex, argIndex++, false, "Palette")))          { AddToReport(loc); }//Palette.
+			if (b && !(b = wrapper.SetImageArg (kernelIndex, argIndex++, false, "Palette")))          { ErrorStr(loc, "Setting palette argument failed", m_Devices[dev].get()); }//Palette.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_PointsBufferName)))        { AddToReport(loc); }//Random start points.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_PointsBufferName)))        { ErrorStr(loc, "Setting points buffer argument failed", m_Devices[dev].get()); }//Random start points.
 
 			if (b && !(b = wrapper.RunKernel(kernelIndex,
 											 IterGridKernelWidth(),//Total grid dims.
@@ -1042,7 +1045,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			{
 				success = false;
 				m_Abort = true;
-				AddToReport(loc);
+				ErrorStr(loc, "Error running iteration program", m_Devices[dev].get());
 				atomLaunchesRan.fetch_sub(1);
 				break;
 			}
@@ -1107,9 +1110,9 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 
 	if (m_Devices.size() > 1)//Determine whether/when to sum histograms of secondary devices with the primary.
 	{
-		if (((TemporalSamples() == 1) || (temporalSample == TemporalSamples() - 1)) &&//If there are no temporal samples (not animating), or the current one is the last...
+		if (((TemporalSamples() == 1) || (temporalSample == TemporalSamples() - 1)) &&//If there are no temporal samples (not animating), or the current one is the last... (probably doesn't matter anymore since we never use multiple renders for a single frame when animating, instead each frame gets its own renderer).
 				((m_LastIter + itersRan) >= ItersPerTemporalSample()))//...and the required number of iters for that sample have completed...
-			if (success && !(success = SumDeviceHist())) { AddToReport(loc); }//...read the histogram from the secondary devices and sum them to the primary.
+			if (success && !(success = SumDeviceHist())) { ErrorStr(loc, "Summing histograms failed", nullptr); }//...read the histogram from the secondary devices and sum them to the primary.
 	}
 
 	//t2.Toc(__FUNCTION__);
@@ -1125,12 +1128,12 @@ eRenderStatus RendererCL<T, bucketT>::RunLogScaleFilter()
 {
 	//Timing t(4);
 	bool b = !m_Devices.empty();
+	static std::string loc = __FUNCTION__;
 
 	if (b)
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
 		int kernelIndex = wrapper.FindKernelIndex(m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint());
-		const char* loc = __FUNCTION__;
 
 		if (kernelIndex != -1)
 		{
@@ -1142,16 +1145,16 @@ eRenderStatus RendererCL<T, bucketT>::RunLogScaleFilter()
 			size_t gridH = m_DensityFilterCL.m_SuperRasH;
 			OpenCLWrapper::MakeEvenGridDims(blockW, blockH, gridW, gridH);
 
-			if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { AddToReport(loc); }
+			if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { ErrorStr(loc, "Adding DE filter parameters buffer failed", m_Devices[0].get()); }
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))           { AddToReport(loc); }//Histogram.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))           { ErrorStr(loc, "Setting histogram buffer argument failed", m_Devices[0].get()); }//Histogram.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_AccumBufferName)))          { AddToReport(loc); }//Accumulator.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_AccumBufferName)))          { ErrorStr(loc, "Setting accumulator buffer argument failed", m_Devices[0].get()); }//Accumulator.
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_DEFilterParamsBufferName))) { AddToReport(loc); }//DensityFilterCL.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_DEFilterParamsBufferName))) { ErrorStr(loc, "Setting DE filter parameters buffer argument failed", m_Devices[0].get()); }//DensityFilterCL.
 
 			//t.Tic();
-			if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { AddToReport(loc); }
+			if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { ErrorStr(loc, "Running log scale program failed", m_Devices[0].get()); }
 
 			//t.Toc(loc);
 
@@ -1162,7 +1165,7 @@ eRenderStatus RendererCL<T, bucketT>::RunLogScaleFilter()
 		else
 		{
 			b = false;
-			AddToReport(loc);
+			ErrorStr(loc, "Invalid kernel index for log scale program", m_Devices[0].get());
 		}
 	}
 
@@ -1212,7 +1215,7 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 		uint chunkSizeH = gapH + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap below it.
 		double totalChunks = chunkSizeW * chunkSizeH;
 
-		if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { AddToReport(loc); }
+		if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { ErrorStr(loc, "Writing DE filter parameters buffer failed", m_Devices[0].get()); }
 
 #ifdef ROW_ONLY_DE
 		blockSizeW = 64;//These *must* both be divisible by 16 or else pixels will go missing.
@@ -1256,7 +1259,11 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 			for (uint colChunkPass = 0; b && !m_Abort && colChunkPass < chunkSizeW; colChunkPass++)//Number of horizontal passes.
 			{
 				//t2.Tic();
-				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, chunkSizeW, chunkSizeH, colChunkPass, rowChunkPass))) { m_Abort = true; AddToReport(loc); }
+				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, chunkSizeW, chunkSizeH, colChunkPass, rowChunkPass)))
+				{
+					m_Abort = true;
+					ErrorStr(loc, "Running DE filter program for row chunk "s + std::to_string(rowChunkPass) + ", col chunk "s + std::to_string(colChunkPass) + " failed", m_Devices[0].get());
+				}
 
 				//t2.Toc(loc);
 
@@ -1282,7 +1289,7 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 	else
 	{
 		b = false;
-		AddToReport(loc);
+		ErrorStr(loc, "Invalid kernel index for DE filter program", m_Devices[0].get());
 	}
 
 	return m_Abort ? eRenderStatus::RENDER_ABORT : (b ? eRenderStatus::RENDER_OK : eRenderStatus::RENDER_ERROR);
@@ -1304,7 +1311,7 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 	size_t blockW;
 	size_t blockH;
 	uint curvesSet = m_CurvesSet ? 1 : 0;
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Abort && accumKernelIndex != -1)
 	{
@@ -1312,9 +1319,9 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 		//This is needed with or without early clip.
 		ConvertSpatialFilter();
 
-		if (b && !(b = wrapper.AddAndWriteBuffer(m_SpatialFilterParamsBufferName, reinterpret_cast<void*>(&m_SpatialFilterCL), sizeof(m_SpatialFilterCL)))) { AddToReport(loc); }
+		if (b && !(b = wrapper.AddAndWriteBuffer(m_SpatialFilterParamsBufferName, reinterpret_cast<void*>(&m_SpatialFilterCL), sizeof(m_SpatialFilterCL)))) { ErrorStr(loc, "Adding spatial filter parameters buffer", m_Devices[0].get()); }
 
-		if (b && !(b = wrapper.AddAndWriteBuffer(m_CurvesCsaName,                 m_Csa.data(),                                SizeOf(m_Csa))))             { AddToReport(loc); }
+		if (b && !(b = wrapper.AddAndWriteBuffer(m_CurvesCsaName,                 m_Csa.data(),                                SizeOf(m_Csa))))             { ErrorStr(loc, "Adding curves buffer", m_Devices[0].get()); }
 
 		//Since early clip requires gamma correcting the entire accumulator first,
 		//it can't be done inside of the normal final accumulation kernel, so
@@ -1332,16 +1339,16 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 				gridH = m_SpatialFilterCL.m_SuperRasH;
 				OpenCLWrapper::MakeEvenGridDims(blockW, blockH, gridW, gridH);
 
-				if (b && !(b = wrapper.SetBufferArg(gammaCorrectKernelIndex, argIndex++, m_AccumBufferName)))               { AddToReport(loc); }//Accumulator.
+				if (b && !(b = wrapper.SetBufferArg(gammaCorrectKernelIndex, argIndex++, m_AccumBufferName)))               { ErrorStr(loc, "Setting early clip accumulator buffer argument failed", m_Devices[0].get()); }//Accumulator.
 
-				if (b && !(b = wrapper.SetBufferArg(gammaCorrectKernelIndex, argIndex++, m_SpatialFilterParamsBufferName))) { AddToReport(loc); }//SpatialFilterCL.
+				if (b && !(b = wrapper.SetBufferArg(gammaCorrectKernelIndex, argIndex++, m_SpatialFilterParamsBufferName))) { ErrorStr(loc, "Setting early clip spatial filter parameters buffer argument failed", m_Devices[0].get()); }//SpatialFilterCL.
 
-				if (b && !(b = wrapper.RunKernel(gammaCorrectKernelIndex, gridW, gridH, 1, blockW, blockH, 1)))			  { AddToReport(loc); }
+				if (b && !(b = wrapper.RunKernel(gammaCorrectKernelIndex, gridW, gridH, 1, blockW, blockH, 1)))			    { ErrorStr(loc, "Running early clip gamma correction program failed", m_Devices[0].get()); }
 			}
 			else
 			{
 				b = false;
-				AddToReport(loc);
+				ErrorStr(loc, "Invalid kernel index for early clip gamma correction program", m_Devices[0].get());
 			}
 		}
 
@@ -1352,32 +1359,32 @@ eRenderStatus RendererCL<T, bucketT>::RunFinalAccum()
 		gridH = m_SpatialFilterCL.m_FinalRasH;
 		OpenCLWrapper::MakeEvenGridDims(blockW, blockH, gridW, gridH);
 
-		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_AccumBufferName)))                  { AddToReport(loc); }//Accumulator.
+		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_AccumBufferName)))                  { ErrorStr(loc, "Setting accumulator buffer argument failed", m_Devices[0].get()); }//Accumulator.
 
-		if (b && !(b = wrapper.SetImageArg(accumKernelIndex,  argIndex++, wrapper.Shared(), m_FinalImageName)))	{ AddToReport(loc); }//Final image.
+		if (b && !(b = wrapper.SetImageArg(accumKernelIndex,  argIndex++, wrapper.Shared(), m_FinalImageName)))	{ ErrorStr(loc, "Setting accumulator final image buffer argument failed", m_Devices[0].get()); }//Final image.
 
-		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_SpatialFilterParamsBufferName)))    { AddToReport(loc); }//SpatialFilterCL.
+		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_SpatialFilterParamsBufferName)))    { ErrorStr(loc, "Setting spatial filter parameters buffer argument failed", m_Devices[0].get()); }//SpatialFilterCL.
 
-		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_SpatialFilterCoefsBufferName)))     { AddToReport(loc); }//Filter coefs.
+		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_SpatialFilterCoefsBufferName)))     { ErrorStr(loc, "Setting spatial filter coefficients buffer argument failed", m_Devices[0].get()); }//Filter coefs.
 
-		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_CurvesCsaName)))					{ AddToReport(loc); }//Curve points.
+		if (b && !(b = wrapper.SetBufferArg(accumKernelIndex, argIndex++, m_CurvesCsaName)))					{ ErrorStr(loc, "Setting curves buffer argument failed", m_Devices[0].get()); }//Curve points.
 
-		if (b && !(b = wrapper.SetArg	   (accumKernelIndex, argIndex++, curvesSet)))                          { AddToReport(loc); }//Do curves.
-
-		if (b && wrapper.Shared())
-			if (b && !(b = wrapper.EnqueueAcquireGLObjects(m_FinalImageName))) { AddToReport(loc); }
-
-		if (b && !(b = wrapper.RunKernel(accumKernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { AddToReport(loc); }
+		if (b && !(b = wrapper.SetArg	   (accumKernelIndex, argIndex++, curvesSet)))                          { ErrorStr(loc, "Setting curves boolean argument failed", m_Devices[0].get()); }//Do curves.
 
 		if (b && wrapper.Shared())
-			if (b && !(b = wrapper.EnqueueReleaseGLObjects(m_FinalImageName))) { AddToReport(loc); }
+			if (b && !(b = wrapper.EnqueueAcquireGLObjects(m_FinalImageName)))                   { ErrorStr(loc, "Acquiring OpenGL texture failed", m_Devices[0].get()); }
+
+		if (b && !(b = wrapper.RunKernel(accumKernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { ErrorStr(loc, "Running final accumulation program failed", m_Devices[0].get()); }
+
+		if (b && wrapper.Shared())
+			if (b && !(b = wrapper.EnqueueReleaseGLObjects(m_FinalImageName)))                   { ErrorStr(loc, "Releasing OpenGL texture failed", m_Devices[0].get()); }
 
 		//t.Toc((char*)loc);
 	}
 	else
 	{
 		b = false;
-		AddToReport(loc);
+		ErrorStr(loc, "Invalid kernel index for final accumulation program", m_Devices[0].get());
 	}
 
 	return b ? eRenderStatus::RENDER_OK : eRenderStatus::RENDER_ERROR;
@@ -1402,7 +1409,7 @@ bool RendererCL<T, bucketT>::ClearBuffer(size_t device, const string& bufferName
 		auto& wrapper = m_Devices[device]->m_Wrapper;
 		int kernelIndex = wrapper.FindKernelIndex(m_IterOpenCLKernelCreator.ZeroizeEntryPoint());
 		cl_uint argIndex = 0;
-		const char* loc = __FUNCTION__;
+		static std::string loc = __FUNCTION__;
 
 		if (kernelIndex != -1)
 		{
@@ -1413,17 +1420,17 @@ bool RendererCL<T, bucketT>::ClearBuffer(size_t device, const string& bufferName
 			b = true;
 			OpenCLWrapper::MakeEvenGridDims(blockW, blockH, gridW, gridH);
 
-			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, bufferName)))          { AddToReport(loc); }//Buffer of byte.
+			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, bufferName)))          { ErrorStr(loc, "Setting clear buffer argument failed", m_Devices[device].get()); }//Buffer of byte.
 
-			if (b && !(b = wrapper.SetArg(kernelIndex, argIndex++, width * elementSize)))		{ AddToReport(loc); }//Width.
+			if (b && !(b = wrapper.SetArg(kernelIndex, argIndex++, width * elementSize)))		{ ErrorStr(loc, "Setting clear buffer width argument failed", m_Devices[device].get()); }//Width.
 
-			if (b && !(b = wrapper.SetArg(kernelIndex, argIndex++, height)))					{ AddToReport(loc); }//Height.
+			if (b && !(b = wrapper.SetArg(kernelIndex, argIndex++, height)))					{ ErrorStr(loc, "Setting clear buffer height argument failed", m_Devices[device].get()); }//Height.
 
-			if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { AddToReport(loc); }
+			if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { ErrorStr(loc, "Running clear buffer program failed", m_Devices[device].get()); }
 		}
 		else
 		{
-			AddToReport(loc);
+			ErrorStr(loc, "Invalid kernel index for clear buffer program", m_Devices[device].get());
 		}
 	}
 
@@ -1450,36 +1457,36 @@ bool RendererCL<T, bucketT>::RunDensityFilterPrivate(size_t kernelIndex, size_t 
 	//Timing t(4);
 	bool b = true;
 	cl_uint argIndex = 0;
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
 
-		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_HistBufferName)))           { AddToReport(loc); } argIndex++;//Histogram.
+		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_HistBufferName)))           { ErrorStr(loc, "Setting histogram buffer argument failed", m_Devices[0].get()); } argIndex++;//Histogram.
 
-		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_AccumBufferName)))          { AddToReport(loc); } argIndex++;//Accumulator.
+		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_AccumBufferName)))          { ErrorStr(loc, "Setting accumulator buffer argument failed", m_Devices[0].get()); } argIndex++;//Accumulator.
 
-		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DEFilterParamsBufferName))) { AddToReport(loc); } argIndex++;//FlameDensityFilterCL.
+		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DEFilterParamsBufferName))) { ErrorStr(loc, "Setting DE filter parameters buffer argument failed", m_Devices[0].get()); } argIndex++;//FlameDensityFilterCL.
 
-		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DECoefsBufferName)))        { AddToReport(loc); } argIndex++;//Coefs.
+		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DECoefsBufferName)))        { ErrorStr(loc, "Setting DE coefficients buffer argument failed", m_Devices[0].get()); } argIndex++;//Coefs.
 
-		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DEWidthsBufferName)))       { AddToReport(loc); } argIndex++;//Widths.
+		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DEWidthsBufferName)))       { ErrorStr(loc, "Setting DE widths buffer argument failed", m_Devices[0].get()); } argIndex++;//Widths.
 
-		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DECoefIndicesBufferName)))  { AddToReport(loc); } argIndex++;//Coef indices.
+		if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex, m_DECoefIndicesBufferName)))  { ErrorStr(loc, "Setting DE coefficient indices buffer argument failed", m_Devices[0].get()); } argIndex++;//Coef indices.
 
-		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkSizeW)))						 { AddToReport(loc); } argIndex++;//Chunk size width (gapW + 1).
+		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkSizeW)))						 { ErrorStr(loc, "Setting chunk size width argument failed", m_Devices[0].get()); } argIndex++;//Chunk size width (gapW + 1).
 
-		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkSizeH)))						 { AddToReport(loc); } argIndex++;//Chunk size height (gapH + 1).
+		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, chunkSizeH)))						 { ErrorStr(loc, "Setting chunk size height argument failed", m_Devices[0].get()); } argIndex++;//Chunk size height (gapH + 1).
 
-		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, colChunkPass)))					 { AddToReport(loc); } argIndex++;//Column chunk, horizontal pass.
+		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, colChunkPass)))					 { ErrorStr(loc, "Setting col chunk pass argument failed", m_Devices[0].get()); } argIndex++;//Column chunk, horizontal pass.
 
-		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, rowChunkPass)))					 { AddToReport(loc); } argIndex++;//Row chunk, vertical pass.
+		if (b && !(b = wrapper.SetArg(kernelIndex, argIndex, rowChunkPass)))					 { ErrorStr(loc, "Setting row chunk pass argument failed", m_Devices[0].get()); } argIndex++;//Row chunk, vertical pass.
 
 		//t.Toc(__FUNCTION__ " set args");
 
 		//t.Tic();
-		if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { AddToReport(loc); }//Method 7, accumulating to temp box area.
+		if (b && !(b = wrapper.RunKernel(kernelIndex, gridW, gridH, 1, blockW, blockH, 1))) { ErrorStr(loc, "Running DE filter program failed", m_Devices[0].get()); }//Method 7, accumulating to temp box area.
 
 		//t.Toc(__FUNCTION__ " RunKernel()");
 		return b;
@@ -1512,7 +1519,7 @@ int RendererCL<T, bucketT>::MakeAndGetDensityFilterProgram(size_t ss, uint filte
 			if (wrapper.AddProgram(deEntryPoint, kernel, deEntryPoint, m_DoublePrecision))
 				kernelIndex = wrapper.FindKernelIndex(deEntryPoint);//Try to find it again, it will be present if successfully built.
 			else
-				AddToReport(string(loc) + "():\nBuilding the following program failed: \n" + kernel + "\n");
+				ErrorStr(loc, "Adding the DE filter program at "s + deEntryPoint + " failed to build:\n"s + kernel, m_Devices[0].get());
 		}
 	}
 
@@ -1541,7 +1548,7 @@ int RendererCL<T, bucketT>::MakeAndGetFinalAccumProgram()
 			if (wrapper.AddProgram(finalAccumEntryPoint, kernel, finalAccumEntryPoint, m_DoublePrecision))
 				kernelIndex = wrapper.FindKernelIndex(finalAccumEntryPoint);//Try to find it again, it will be present if successfully built.
 			else
-				AddToReport(loc);
+				ErrorStr(loc, "Adding final accumulation program "s + finalAccumEntryPoint + " failed"s, m_Devices[0].get());
 		}
 	}
 
@@ -1560,7 +1567,7 @@ int RendererCL<T, bucketT>::MakeAndGetGammaCorrectionProgram()
 		auto& wrapper = m_Devices[0]->m_Wrapper;
 		auto& gammaEntryPoint = m_FinalAccumOpenCLKernelCreator.GammaCorrectionEntryPoint();
 		int kernelIndex = wrapper.FindKernelIndex(gammaEntryPoint);
-		const char* loc = __FUNCTION__;
+		static std::string loc = __FUNCTION__;
 
 		if (kernelIndex == -1)//Has not been built yet.
 		{
@@ -1570,7 +1577,7 @@ int RendererCL<T, bucketT>::MakeAndGetGammaCorrectionProgram()
 			if (b)
 				kernelIndex = wrapper.FindKernelIndex(gammaEntryPoint);//Try to find it again, it will be present if successfully built.
 			else
-				AddToReport(loc);
+				ErrorStr(loc, "Adding gamma correction program "s + gammaEntryPoint + " failed"s, m_Devices[0].get());
 		}
 
 		return kernelIndex;
@@ -1589,15 +1596,15 @@ bool RendererCL<T, bucketT>::CreateHostBuffer()
 {
 	bool b = true;
 	size_t size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
-	const char* loc = __FUNCTION__;
+	static std::string loc = __FUNCTION__;
 
 	if (b = Renderer<T, bucketT>::Alloc(true))//Allocate the histogram memory to point this HOST_PTR buffer to, other buffers not needed.
 	{
-		if (b && !(b = m_Devices[0]->m_Wrapper.AddHostBuffer(m_HostBufferName, size, reinterpret_cast<void*>(HistBuckets()))))
-			AddToReport(string(loc) + ": creating OpenCL HOST_PTR buffer to point to host side histogram failed.");//Host side histogram for temporary use with multiple devices.
+		if (b && !(b = m_Devices[0]->m_Wrapper.AddHostBuffer(m_HostBufferName, size, reinterpret_cast<void*>(HistBuckets()))))//Host side histogram for temporary use with multiple devices.
+			ErrorStr(loc, "Creating OpenCL HOST_PTR buffer to point to host side histogram failed", m_Devices[0].get());
 	}
 	else
-		AddToReport(string(loc) + ": allocating host side histogram failed.");//Allocating histogram failed, something is seriously wrong.
+		ErrorStr(loc, "Allocating host side histogram failed", m_Devices[0].get());//Allocating histogram failed, something is seriously wrong.
 
 	return b;
 }
@@ -1617,7 +1624,7 @@ bool RendererCL<T, bucketT>::SumDeviceHist()
 		//Timing t;
 		bool b = true;
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		const char* loc = __FUNCTION__;
+		static std::string loc = __FUNCTION__;
 		size_t blockW = m_Devices[0]->Nvidia() ? 32 : 16;//Max work group size is 256 on AMD, which means 16x16.
 		size_t blockH = m_Devices[0]->Nvidia() ? 32 : 16;
 		size_t gridW = SuperRasW();
@@ -1635,20 +1642,21 @@ bool RendererCL<T, bucketT>::SumDeviceHist()
 				{
 					cl_uint argIndex = 0;
 
-					if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HostBufferName)))						 { break; }//Source buffer of v4bT.
+					if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HostBufferName)))						 { ErrorStr(loc, "Setting host buffer argument failed", m_Devices[device].get()); break; }//Source buffer of v4bT.
 
-					if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))						 { break; }//Dest buffer of v4bT.
+					if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))						 { ErrorStr(loc, "Setting histogram buffer argument failed", m_Devices[device].get()); break; }//Dest buffer of v4bT.
 
-					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasW()))))						 { break; }//Width in pixels.
+					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasW()))))						 { ErrorStr(loc, "Setting width argument failed", m_Devices[device].get()); break; }//Width in pixels.
 
-					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasH()))))						 { break; }//Height in pixels.
+					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, uint(SuperRasH()))))						 { ErrorStr(loc, "Setting height argument failed", m_Devices[device].get()); break; }//Height in pixels.
 
-					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, (device == m_Devices.size() - 1) ? 1 : 0))) { break; }//Clear the source buffer on the last device.
+					if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, (device == m_Devices.size() - 1) ? 1 : 0))) { ErrorStr(loc, "Setting clear argument failed", m_Devices[device].get()); break; }//Clear the source buffer on the last device.
 
-					if (b && !(b = wrapper.RunKernel   (kernelIndex, gridW, gridH, 1, blockW, blockH, 1)))					 { break; }
+					if (b && !(b = wrapper.RunKernel   (kernelIndex, gridW, gridH, 1, blockW, blockH, 1)))					 { ErrorStr(loc, "Running histogram sum program failed", m_Devices[device].get()); break; }
 				}
 				else
 				{
+					ErrorStr(loc, "Running histogram reading and clearing programs failed", m_Devices[device].get());
 					break;
 				}
 			}
@@ -1656,9 +1664,7 @@ bool RendererCL<T, bucketT>::SumDeviceHist()
 
 		if (!b)
 		{
-			ostringstream os;
-			os << loc << ": failed to sum histograms from the secondary device(s) to the primary device.";
-			AddToReport(os.str());
+			ErrorStr(loc, "Summing histograms from the secondary device(s) to the primary device failed", nullptr);
 		}
 
 		//t.Toc(loc);
@@ -1823,6 +1829,25 @@ void RendererCL<T, bucketT>::FillSeeds()
 			}
 		}
 	}
+}
+
+/// <summary>
+/// Compose an error string based on the strings and device passed in, add it to the error report and return the string.
+/// </summary>
+/// <param name="loc">The location where the error occurred</param>
+/// <param name="error">The text of the error</param>
+/// <param name="dev">The device the error occurred on</param>
+/// <returns>The new error string</returns>
+template <typename T, typename bucketT>
+std::string RendererCL<T, bucketT>::ErrorStr(const std::string& loc, const std::string& error, RendererClDevice* dev)
+{
+	std::string str = loc + "()"s + (dev ?
+									 "\n"s +
+									 dev->m_Wrapper.DeviceName() + "\nPlatform: " +
+									 std::to_string(dev->PlatformIndex()) + ", device: " + std::to_string(dev->DeviceIndex()) : "") + ", error:\n" +
+					  error + "\n";
+	AddToReport(str);
+	return str;
 }
 
 template EMBERCL_API class RendererCL<float, float>;

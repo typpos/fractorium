@@ -146,12 +146,13 @@ public:
 	//Public virtual functions overridden from Renderer or RendererBase.
 	virtual size_t MemoryAvailable() override;
 	virtual bool Ok() const override;
-	virtual void ClearErrorReport() override;
 	virtual size_t SubBatchSize() const override;
 	virtual size_t ThreadCount() const override;
 	virtual bool CreateDEFilter(bool& newAlloc) override;
 	virtual bool CreateSpatialFilter(bool& newAlloc) override;
 	virtual eRendererType RendererType() const override;
+	virtual bool Shared() const override;
+	virtual void ClearErrorReport() override;
 	virtual string ErrorReportString() override;
 	virtual vector<string> ErrorReport() override;
 	virtual bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec) override;
@@ -165,13 +166,12 @@ protected:
 	virtual bool ResetBuckets(bool resetHist = true, bool resetAccum = true) override;
 	virtual eRenderStatus LogScaleDensityFilter(bool forceOutput = false) override;
 	virtual eRenderStatus GaussianDensityFilter() override;
-	virtual eRenderStatus AccumulatorToFinalImage(v4F* pixels, size_t finalOffset) override;
+	virtual eRenderStatus AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset) override;
 	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample) override;
 
 #ifndef TEST_CL
 private:
 #endif
-	void Init();
 	//Private functions for making and running OpenCL programs.
 	bool BuildIterProgramForEmber(bool doAccum = true);
 	bool RunIter(size_t iterCount, size_t temporalSample, size_t& itersRan);
@@ -192,35 +192,40 @@ private:
 	void ConvertSpatialFilter();
 	void ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, vector<XformCL<T>>& xformsCL);
 	void ConvertCarToRas(const CarToRas<T>& carToRas);
-
-	bool m_Init;
-	bool m_DoublePrecision;
-	size_t m_IterCountPerKernel;
-	size_t m_IterBlocksWide, m_IterBlockWidth;
-	size_t m_IterBlocksHigh, m_IterBlockHeight;
+	std::string ErrorStr(const std::string& loc, const std::string& error, RendererClDevice* dev);
+	bool m_Init = false;
+	bool m_Shared = false;
+	bool m_DoublePrecision = typeid(T) == typeid(double);
+	//It's critical that these numbers never change. They are
+	//based on the cuburn model of each kernel launch containing
+	//256 threads. 32 wide by 8 high. Everything done in the OpenCL
+	//iteraion kernel depends on these dimensions.
+	size_t m_IterCountPerKernel = 256;
+	size_t m_IterBlocksWide = 64, m_IterBlockWidth = 32;
+	size_t m_IterBlocksHigh = 2, m_IterBlockHeight = 8;
 	size_t m_MaxDEBlockSizeW;
 	size_t m_MaxDEBlockSizeH;
 
 	//Buffer names.
-	string m_EmberBufferName;
-	string m_XformsBufferName;
-	string m_ParVarsBufferName;
-	string m_GlobalSharedBufferName;
-	string m_SeedsBufferName;
-	string m_DistBufferName;
-	string m_CarToRasBufferName;
-	string m_DEFilterParamsBufferName;
-	string m_SpatialFilterParamsBufferName;
-	string m_CurvesCsaName;
-	string m_DECoefsBufferName;
-	string m_DEWidthsBufferName;
-	string m_DECoefIndicesBufferName;
-	string m_SpatialFilterCoefsBufferName;
-	string m_HostBufferName;
-	string m_HistBufferName;
-	string m_AccumBufferName;
-	string m_FinalImageName;
-	string m_PointsBufferName;
+	string m_EmberBufferName = "Ember";
+	string m_XformsBufferName = "Xforms";
+	string m_ParVarsBufferName = "ParVars";
+	string m_GlobalSharedBufferName = "GlobalShared";
+	string m_SeedsBufferName = "Seeds";
+	string m_DistBufferName = "Dist";
+	string m_CarToRasBufferName = "CarToRas";
+	string m_DEFilterParamsBufferName = "DEFilterParams";
+	string m_SpatialFilterParamsBufferName = "SpatialFilterParams";
+	string m_DECoefsBufferName = "DECoefs";
+	string m_DEWidthsBufferName = "DEWidths";
+	string m_DECoefIndicesBufferName = "DECoefIndices";
+	string m_SpatialFilterCoefsBufferName = "SpatialFilterCoefs";
+	string m_CurvesCsaName = "CurvesCsa";
+	string m_HostBufferName = "Host";
+	string m_HistBufferName = "Hist";
+	string m_AccumBufferName = "Accum";
+	string m_FinalImageName = "Final";
+	string m_PointsBufferName = "Points";
 
 	//Kernels.
 	string m_IterKernel;

@@ -439,7 +439,6 @@ bool FinalRenderEmberController<T>::CreateRenderer(eRendererType renderType, con
 		vector<string> errorReport;
 		m_Devices = devices;//Store values for re-creation later on.
 		m_OutputTexID = 0;//Don't care about tex ID when doing final render.
-		m_Shared = shared;//So shared is of course false.
 
 		if (m_FinalRenderDialog->DoSequence())
 		{

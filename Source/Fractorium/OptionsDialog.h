@@ -25,23 +25,12 @@ class FractoriumOptionsDialog : public QDialog
 
 public:
 	FractoriumOptionsDialog(QWidget* p = nullptr, Qt::WindowFlags f = 0);
-
-public slots:
-	void OnOpenCLCheckBoxStateChanged(int state);
-	void OnDeviceTableCellChanged(int row, int col);
-	void OnDeviceTableRadioToggled(bool checked);
-	virtual void accept() override;
-	virtual void reject() override;
-
-protected:
-	virtual void showEvent(QShowEvent* e) override;
-
-private:
 	bool EarlyClip();
 	bool YAxisUp();
 	bool Transparency();
 	bool ContinuousUpdate();
 	bool OpenCL();
+	bool SharedTexture();
 	bool Double();
 	bool ShowAllXforms();
 	bool ToggleType();
@@ -55,6 +44,17 @@ private:
 	void DataToGui();
 	void GuiToData();
 
+public slots:
+	void OnOpenCLCheckBoxStateChanged(int state);
+	void OnDeviceTableCellChanged(int row, int col);
+	void OnDeviceTableRadioToggled(bool checked);
+	virtual void accept() override;
+	virtual void reject() override;
+
+protected:
+	virtual void showEvent(QShowEvent* e) override;
+
+private:
 	Ui::OptionsDialog ui;
 	shared_ptr<OpenCLInfo> m_Info;
 	SpinBox* m_XmlTemporalSamplesSpin;

@@ -29,6 +29,7 @@ public:
 	const vector<string>& AllDeviceNames() const;
 	const vector<string>& DeviceNames(size_t platform) const;
 	size_t TotalDeviceIndex(size_t platform, size_t device) const;
+	const cl::Device* DeviceFromId(cl_device_id id, size_t& platform, size_t& device) const;
 	string DumpInfo() const;
 	bool Ok() const;
 	bool CreateContext(const cl::Platform& platform, cl::Context& context, bool shared);

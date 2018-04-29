@@ -332,6 +332,7 @@ void FractoriumEmberController<T>::AddFinalXform()
 		Update([&]()
 		{
 			Xform<T> final;
+			final.m_Animate = 0;
 			final.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));//Just a placeholder so other parts of the code don't see it as being empty.
 			m_Ember.SetFinalXform(final);
 			int index = int(m_Ember.TotalXformCount() - 1);//Set index to the last item.

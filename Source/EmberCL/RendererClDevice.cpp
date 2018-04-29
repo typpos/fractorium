@@ -55,4 +55,39 @@ bool RendererClDevice::Ok() const { return m_Init; }
 bool RendererClDevice::Shared() const { return m_Shared; }
 bool RendererClDevice::Nvidia() const { return m_NVidia; }
 size_t RendererClDevice::WarpSize() const { return m_WarpSize; }
+size_t RendererClDevice::PlatformIndex() const { return m_PlatformIndex; }
+size_t RendererClDevice::DeviceIndex() const { return m_DeviceIndex; }
+
+/// <summary>
+/// Clear the error report for this class as well as the wrapper.
+/// </summary>
+void RendererClDevice::ClearErrorReport()
+{
+	EmberReport::ClearErrorReport();
+	m_Wrapper.ClearErrorReport();
+}
+
+/// <summary>
+/// Concatenate and return the error report for this class and the
+/// wrapper as a single string.
+/// </summary>
+/// <returns>The concatenated error report string</returns>
+string RendererClDevice::ErrorReportString()
+{
+	auto s = EmberReport::ErrorReportString();
+	return s + m_Wrapper.ErrorReportString();
+}
+
+/// <summary>
+/// Concatenate and return the error report for this class and the
+/// wrapper as a vector of strings.
+/// </summary>
+/// <returns>The concatenated error report vector of strings</returns>
+vector<string> RendererClDevice::ErrorReport()
+{
+	auto ours = EmberReport::ErrorReport();
+	auto s = m_Wrapper.ErrorReport();
+	ours.insert(ours.end(), s.begin(), s.end());
+	return ours;
+}
 }

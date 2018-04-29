@@ -407,6 +407,8 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(Sphereblur, T) \
 	EXPORTPREPOSTREGVAR(Cpow3, T) \
 	EXPORTPREPOSTREGVAR(Concentric, T) \
+	EXPORTPREPOSTREGVAR(Hyperbolic, T) \
+	EXPORTPREPOSTREGVAR(Hypershift2, T) \
 	template EMBER_API class PostSmartcropVariation<T>; /*Only implemented as post.*/ \
 	EXPORTPREPOSTREGVAR(DCBubble, T) \
 	EXPORTPREPOSTREGVAR(DCCarpet, T) \

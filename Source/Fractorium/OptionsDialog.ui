@@ -119,17 +119,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="YAxisUpCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: Positive Y direction is up.&lt;/p&gt;&lt;p&gt;Unchecked: Positive Y direction is down.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Positive Y Up</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="QCheckBox" name="DoublePrecisionCheckBox">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: use 64-bit double precision numbers (slower, but better image quality).&lt;/p&gt;&lt;p&gt;Unchecked: use 32-bit single precision numbers (faster, but worse image quality).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -139,17 +129,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="TransparencyCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use transparency in the final image.&lt;/p&gt;&lt;p&gt;This will not make a difference in the editor, but will when saving as .png and opening in other programs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Transparency</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QCheckBox" name="ShowAllXformsCheckBox">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: show all xforms while dragging.&lt;/p&gt;&lt;p&gt;Unchecked: only show current xform while dragging.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -159,17 +139,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="ContinuousUpdateCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Continually update output image during interactive rendering.&lt;/p&gt;&lt;p&gt;This will slow down performance, but will give continuous updates on how the final render will look. Note that only log scale filtering is applied on each update. Full DE is not applied until iteration is complete.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Continuous Update</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QCheckBox" name="ToggleTypeCheckBox">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: right clicking toggles spin boxes, right button dragging disabled.&lt;/p&gt;&lt;p&gt;Unchecked: double clicking toggles spin boxes, right button dragging enabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -179,17 +149,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="Png16BitCheckBox">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Save 16-bit Png</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="2">
+       <item row="7" column="0" colspan="2">
         <widget class="QTableWidget" name="DeviceTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -277,7 +237,7 @@
          </column>
         </widget>
        </item>
-       <item row="15" column="0" colspan="2">
+       <item row="16" column="0" colspan="2">
         <layout class="QGridLayout" name="InteractiveRenderingTabGridLayout">
          <item row="3" column="1">
           <widget class="QGroupBox" name="InteraciveGpuFilteringGroupBox">
@@ -476,13 +436,63 @@ in interactive mode for each mouse movement</string>
          </item>
         </layout>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QCheckBox" name="LoadLastOnStartCheckBox">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: load the flame from the previous run on startup.&lt;/p&gt;&lt;p&gt;Unchecked: create randoms on startup.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Load Last on Start</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="SharedTextureCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Share the memory between the final image output and the OpenGL texture used to display the image result on the interactive renderer.&lt;/p&gt;&lt;p&gt;This is a highly recommended performance optimization for interactive editing when using OpenCL if your card supports it.&lt;/p&gt;&lt;p&gt;If creating the OpenCL renderer fails, uncheck this option. You will see a slight performance decrease in interactive rendering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Shared Texture</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="YAxisUpCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: Positive Y direction is up.&lt;/p&gt;&lt;p&gt;Unchecked: Positive Y direction is down.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Positive Y Up</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="TransparencyCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use transparency in the final image.&lt;/p&gt;&lt;p&gt;This will not make a difference in the editor, but will when saving as .png and opening in other programs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Transparency</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="ContinuousUpdateCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Continually update output image during interactive rendering.&lt;/p&gt;&lt;p&gt;This will slow down performance, but will give continuous updates on how the final render will look. Note that only log scale filtering is applied on each update. Full DE is not applied until iteration is complete.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Continuous Update</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="Png16BitCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Save 16-bit Png</string>
          </property>
         </widget>
        </item>
@@ -903,13 +913,9 @@ in interactive mode for each mouse movement</string>
  <tabstops>
   <tabstop>EarlyClipCheckBox</tabstop>
   <tabstop>OpenCLCheckBox</tabstop>
-  <tabstop>YAxisUpCheckBox</tabstop>
   <tabstop>DoublePrecisionCheckBox</tabstop>
-  <tabstop>TransparencyCheckBox</tabstop>
   <tabstop>ShowAllXformsCheckBox</tabstop>
-  <tabstop>ContinuousUpdateCheckBox</tabstop>
   <tabstop>ToggleTypeCheckBox</tabstop>
-  <tabstop>Png16BitCheckBox</tabstop>
   <tabstop>LoadLastOnStartCheckBox</tabstop>
   <tabstop>ThreadCountSpin</tabstop>
   <tabstop>CpuSubBatchSpin</tabstop>

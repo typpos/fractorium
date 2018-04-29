@@ -24,6 +24,13 @@ public:
 	bool Shared() const;
 	bool Nvidia() const;
 	size_t WarpSize() const;
+	size_t PlatformIndex() const;
+	size_t DeviceIndex() const;
+
+	//Public virtual functions overridden from base classes.
+	virtual void ClearErrorReport() override;
+	virtual string ErrorReportString() override;
+	virtual vector<string> ErrorReport() override;
 
 	size_t m_Calls;
 	OpenCLWrapper m_Wrapper;

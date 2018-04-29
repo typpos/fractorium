@@ -10,6 +10,7 @@
 #define YAXISUP				 "render/yaxisup"
 #define TRANSPARENCY         "render/transparency"
 #define OPENCL               "render/opencl"
+#define SHAREDTEXTURE        "render/sharedtexture"
 #define DOUBLEPRECISION		 "render/dp64"
 #define CONTUPDATE			 "render/continuousupdate"
 #define SHOWALLXFORMS	     "render/dragshowallxforms"
@@ -24,9 +25,9 @@
 #define CPUSUBBATCH		     "render/cpusubbatch"
 #define OPENCLSUBBATCH	     "render/openclsubbatch"
 #define RANDOMCOUNT			 "render/randomcount"
-#define CPU_QUALITY          "render/cpuquality"
-#define OPENCL_QUALITY       "render/openclquality"
-#define LOAD_LAST            "render/loadlastonstart"
+#define CPUQUALITY           "render/cpuquality"
+#define OPENCLQUALITY        "render/openclquality"
+#define LOADLAST             "render/loadlastonstart"
 
 #define STAGGER		         "sequence/stagger"
 #define STAGGERMAX		     "sequence/staggermax"
@@ -113,6 +114,9 @@ public:
 
 	bool OpenCL();
 	void OpenCL(bool b);
+
+	bool SharedTexture();
+	void SharedTexture(bool b);
 
 	bool Double();
 	void Double(bool b);

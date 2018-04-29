@@ -121,12 +121,12 @@ GLWidget::GLWidget(QWidget* p)
 
 		setFormat(fmt);
 	*/
-	auto qsf = this->format();
-	qDebug() << "Constructor*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-	qDebug() << "Profile: " << qsf.profile();
-	qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-	qDebug() << "Swap behavior: " << qsf.swapBehavior();
-	qDebug() << "Swap interval: " << qsf.swapInterval();
+	//auto qsf = this->format();
+	//qDebug() << "Constructor*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+	//qDebug() << "Profile: " << qsf.profile();
+	//qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+	//qDebug() << "Swap behavior: " << qsf.swapBehavior();
+	//qDebug() << "Swap interval: " << qsf.swapInterval();
 }
 
 /// <summary>
@@ -144,12 +144,12 @@ void GLWidget::InitGL()
 {
 	if (!m_Init)
 	{
-		auto qsf = this->format();
-		qDebug() << "InitGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-		qDebug() << "Profile: " << qsf.profile();
-		qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-		qDebug() << "Swap behavior: " << qsf.swapBehavior();
-		qDebug() << "Swap interval: " << qsf.swapInterval();
+		//auto qsf = this->format();
+		//qDebug() << "InitGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+		//qDebug() << "Profile: " << qsf.profile();
+		//qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+		//qDebug() << "Swap behavior: " << qsf.swapBehavior();
+		//qDebug() << "Swap interval: " << qsf.swapInterval();
 		int w = std::ceil(m_Fractorium->ui.GLParentScrollArea->width() * devicePixelRatioF());
 		int h = std::ceil(m_Fractorium->ui.GLParentScrollArea->height() * devicePixelRatioF());
 		SetDimensions(w, h);
@@ -182,6 +182,65 @@ void GLWidget::InitGL()
 
 		m_Fractorium->m_Controller->DelayedStartRenderTimer();
 		m_Init = true;
+		/*
+		    auto clinfo = OpenCLInfo::DefInstance();
+		    auto& platforms = clinfo->Platforms();
+		    auto& alldevices = clinfo->Devices();
+		    std::vector<std::string> strs;
+		    auto cdc = wglGetCurrentDC();
+		    auto cc = wglGetCurrentContext();
+		    ostringstream os;
+		    strs.push_back(os.str()); os.str(""); os << "GLWidget::InitGL():";
+		    strs.push_back(os.str()); os.str(""); os << "\nCurrent DC: " << cdc;
+		    strs.push_back(os.str()); os.str(""); os << "\nCurrent Context: " << cc;
+
+		    for (int platform = 0; platform < platforms.size(); platform++)
+		    {
+			cl_context_properties props[] =
+			{
+				CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
+				CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
+				CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>((platforms[platform])()),
+				0
+			};
+			// Find CL capable devices in the current GL context
+			//wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
+			::wglMakeCurrent(wglGetCurrentDC(), wglGetCurrentContext());
+			size_t sizedev;
+			cl_device_id devices[32];
+			clGetGLContextInfoKHR_fn clGetGLContextInfo = (clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddressForPlatform(platforms[platform](), "clGetGLContextInfoKHR");
+			clGetGLContextInfo(props, CL_DEVICES_FOR_GL_CONTEXT_KHR, 32 * sizeof(cl_device_id), devices, &sizedev);
+			sizedev = (cl_uint)(sizedev / sizeof(cl_device_id));
+
+			for (int i = 0; i < sizedev; i++)
+			{
+				std::string s;
+				size_t pi, di;
+				auto dd = clinfo->DeviceFromId(devices[i], pi, di);
+
+				if (dd)
+				{
+					auto& dev = *dd;
+					auto& plat = platforms[pi];
+					strs.push_back(os.str()); os.str(""); os << "\nPlatform[" << pi << "], device[" << di << "] is GL capable.";
+					strs.push_back(os.str()); os.str(""); os << "\nPlatform profile: " << plat.getInfo<CL_PLATFORM_PROFILE>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nPlatform version: " << plat.getInfo<CL_PLATFORM_VERSION>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nPlatform name: " << plat.getInfo<CL_PLATFORM_NAME>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nPlatform vendor: " << plat.getInfo<CL_PLATFORM_VENDOR>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nPlatform extensions: " << plat.getInfo<CL_PLATFORM_EXTENSIONS>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nVendor: " << dev.getInfo<CL_DEVICE_VENDOR>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nDevice: " << dev.getInfo<CL_DEVICE_NAME>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nDriver version: " << dev.getInfo<CL_DRIVER_VERSION>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nDevice profile: " << dev.getInfo<CL_DEVICE_PROFILE>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nDevice version: " << dev.getInfo<CL_DEVICE_VERSION>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nDevice extensions: " << dev.getInfo<CL_DEVICE_EXTENSIONS>(nullptr).c_str() << endl;
+					strs.push_back(os.str()); os.str(""); os << "\nDevice OpenCL C version: " << dev.getInfo<CL_DEVICE_OPENCL_C_VERSION>(nullptr).c_str() << endl;
+				}
+			}
+		    }
+
+		    m_Fractorium->ErrorReportToQTextEdit(strs, m_Fractorium->ui.InfoRenderingTextEdit);
+		*/
 	}
 }
 
@@ -243,23 +302,28 @@ void GLWidget::DrawQuad()
 	this->glEnable(GL_TEXTURE_2D);
 	this->glActiveTexture(GL_TEXTURE0);
 	auto renderer = m_Fractorium->m_Controller->Renderer();
-	auto finalImage = m_Fractorium->m_Controller->FinalImage();
 
 	//Ensure all allocation has taken place first.
-	if (m_OutputTexID != 0 && finalImage && !finalImage->empty())
+	if (m_OutputTexID != 0)
 	{
 		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);//The texture to draw to.
 		auto scaledW = std::ceil(width() * devicePixelRatioF());
 		auto scaledH = std::ceil(height() * devicePixelRatioF());
 
 		//Only draw if the dimensions match exactly.
-		if (m_TexWidth == m_Fractorium->m_Controller->FinalRasW() &&
-				m_TexHeight == m_Fractorium->m_Controller->FinalRasH() &&
-				((m_TexWidth * m_TexHeight) == GLint(finalImage->size())))
+		if (m_TexWidth == m_Fractorium->m_Controller->FinalRasW() && m_TexHeight == m_Fractorium->m_Controller->FinalRasH())
 		{
 			//Copy data from CPU to OpenGL if using a CPU renderer. This is not needed when using OpenCL.
-			if (renderer->RendererType() == eRendererType::CPU_RENDERER)
-				this->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_FLOAT, finalImage->data());
+			if (renderer->RendererType() == eRendererType::CPU_RENDERER || !renderer->Shared())
+			{
+				auto finalImage = m_Fractorium->m_Controller->FinalImage();
+
+				if (finalImage &&//Make absolutely sure all image dimensions match when copying host side buffer to GL texture.
+						!finalImage->empty() &&
+						((m_TexWidth * m_TexHeight) == GLint(finalImage->size())) &&
+						(finalImage->size() == renderer->FinalDimensions()))
+					this->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_FLOAT, finalImage->data());
+			}
 
 			m_QuadProgram->bind();
 			this->glVertexAttribPointer(m_TexturePosAttr, 2, GL_FLOAT, GL_FALSE, 0, m_TexVerts.data());
@@ -363,12 +427,12 @@ GLuint GLWidget::OutputTexID() { return m_OutputTexID; }
 void GLWidget::initializeGL()
 {
 #ifdef USE_GLSL
-	auto  qsf = this->format();
-	qDebug() << "initializeGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-	qDebug() << "Profile: " << qsf.profile();
-	qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-	qDebug() << "Swap behavior: " << qsf.swapBehavior();
-	qDebug() << "Swap interval: " << qsf.swapInterval();
+	//auto  qsf = this->format();
+	//qDebug() << "initializeGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+	//qDebug() << "Profile: " << qsf.profile();
+	//qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+	//qDebug() << "Swap behavior: " << qsf.swapBehavior();
+	//qDebug() << "Swap interval: " << qsf.swapInterval();
 
 	if (!m_Init && m_Fractorium)
 	{
@@ -541,11 +605,7 @@ void GLEmberController<T>::DrawImage()
 
 	if (SizesMatch())//Ensure all sizes are correct. If not, do nothing.
 	{
-		auto finalImage = m_FractoriumEmberController->FinalImage();
-
-		if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage)//Final image only matters for CPU renderer.
-			if ((renderer->RendererType() == eRendererType::OPENCL_RENDERER) || finalImage->size() == renderer->FinalDimensions())
-				m_GL->DrawQuad();//Output image is drawn here.
+		m_GL->DrawQuad();//Output image is drawn here.
 	}
 
 	renderer->LeaveResize();//Unlock, may not be necessary.
@@ -1149,6 +1209,7 @@ bool GLWidget::Allocate(bool force)
 	}
 
 #endif
+	this->glFinish();
 	return m_OutputTexID != 0;
 }
 

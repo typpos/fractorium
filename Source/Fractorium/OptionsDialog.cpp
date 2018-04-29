@@ -47,6 +47,8 @@ FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 		ui.DeviceTable->setEnabled(false);
 		ui.OpenCLCheckBox->setChecked(false);
 		ui.OpenCLCheckBox->setEnabled(false);
+		ui.SharedTextureCheckBox->setChecked(false);
+		ui.SharedTextureCheckBox->setEnabled(false);
 		ui.OpenCLSubBatchSpin->setEnabled(false);
 		ui.OpenCLQualitySpin->setEnabled(false);
 		ui.OpenCLFilteringDERadioButton->setEnabled(false);
@@ -67,6 +69,7 @@ bool FractoriumOptionsDialog::YAxisUp() { return ui.YAxisUpCheckBox->isChecked()
 bool FractoriumOptionsDialog::Transparency() { return ui.TransparencyCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::ContinuousUpdate() { return ui.ContinuousUpdateCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::OpenCL() { return ui.OpenCLCheckBox->isChecked(); }
+bool FractoriumOptionsDialog::SharedTexture() { return ui.SharedTextureCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::Double() { return ui.DoublePrecisionCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::ShowAllXforms() { return ui.ShowAllXformsCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::ToggleType() { return ui.ToggleTypeCheckBox->isChecked(); }
@@ -127,6 +130,7 @@ void FractoriumOptionsDialog::OnOpenCLCheckBoxStateChanged(int state)
 	ui.DeviceTable->setEnabled(checked);
 	ui.ThreadCountSpin->setEnabled(!checked);
 	ui.CpuSubBatchSpin->setEnabled(!checked);
+	ui.SharedTextureCheckBox->setEnabled(checked);
 	ui.OpenCLSubBatchSpin->setEnabled(checked);
 	ui.OpenCLQualitySpin->setEnabled(checked);
 	ui.CpuQualitySpin->setEnabled(!checked);
@@ -180,6 +184,7 @@ void FractoriumOptionsDialog::GuiToData()
 	m_Settings->Transparency(Transparency());
 	m_Settings->ContinuousUpdate(ContinuousUpdate());
 	m_Settings->OpenCL(OpenCL());
+	m_Settings->SharedTexture(SharedTexture());
 	m_Settings->Double(Double());
 	m_Settings->ShowAllXforms(ShowAllXforms());
 	m_Settings->ToggleType(ToggleType());
@@ -217,6 +222,7 @@ void FractoriumOptionsDialog::DataToGui()
 	ui.TransparencyCheckBox->setChecked(m_Settings->Transparency());
 	ui.ContinuousUpdateCheckBox->setChecked(m_Settings->ContinuousUpdate());
 	ui.OpenCLCheckBox->setChecked(m_Settings->OpenCL());
+	ui.SharedTextureCheckBox->setChecked(m_Settings->SharedTexture());
 	ui.DoublePrecisionCheckBox->setChecked(m_Settings->Double());
 	ui.ShowAllXformsCheckBox->setChecked(m_Settings->ShowAllXforms());
 	ui.ToggleTypeCheckBox->setChecked(m_Settings->ToggleType());

@@ -1093,7 +1093,8 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 }
 
 /// <summary>
-/// Thin wrapper around AccumulatorToFinalImage().
+/// Produce a final, visible image by clipping, gamma correcting and spatial filtering the color values
+/// in the density filtering buffer and save to the passed in buffer.
 /// </summary>
 /// <param name="pixels">The pixel vector to allocate and store the final image in</param>
 /// <param name="finalOffset">Offset in the buffer to store the pixels to</param>
@@ -1101,31 +1102,20 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 template <typename T, typename bucketT>
 eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset)
 {
-	if (PrepFinalAccumVector(pixels))
-		return AccumulatorToFinalImage(pixels.data(), finalOffset);
-
-	return eRenderStatus::RENDER_ERROR;
-}
-
-/// <summary>
-/// Produce a final, visible image by clipping, gamma correcting and spatial filtering the color values
-/// in the density filtering buffer and save to the passed in buffer.
-/// </summary>
-/// <param name="pixels">The pre-allocated pixel buffer to store the final image in</param>
-/// <param name="finalOffset">Offset in the buffer to store the pixels to. Default: 0.</param>
-/// <returns>True if not prematurely aborted, else false.</returns>
-template <typename T, typename bucketT>
-eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t finalOffset)
-{
-	if (!pixels)
-		return eRenderStatus::RENDER_ERROR;
-
 	EnterFinalAccum();
+
+	if (!PrepFinalAccumVector(pixels))
+	{
+		LeaveFinalAccum();
+		return eRenderStatus::RENDER_ERROR;
+	}
+
 	//Timing t(4);
 	size_t filterWidth = m_SpatialFilter->FinalFilterWidth();
 	bucketT g, linRange, vibrancy;
 	Color<bucketT> background;
-	pixels += finalOffset;
+	auto p = pixels.data();
+	p += finalOffset;
 	PrepFinalAccumVals(background, g, linRange, vibrancy);//After this, background has been scaled from 0-1 to 0-255.
 
 	//If early clip, go through the entire accumulator and perform gamma correction first.
@@ -1165,7 +1155,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t 
 		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRasW();//Pull out of inner loop for optimization.
 		size_t y = m_DensityFilterOffset + (j * Supersample());//Start at the beginning row of each super sample block.
 		size_t clampedFilterH = std::min(filterWidth, m_SuperRasH - y);//Make sure the filter doesn't go past the bottom of the gutter.
-		auto pv4T = pixels + pixelsRowStart;
+		auto pv4T = p + pixelsRowStart;
 
 		for (size_t i = 0; i < FinalRasW(); i++, pv4T++)
 		{
@@ -1210,11 +1200,11 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(v4F* pixels, size_t 
 		{
 			for (i = 0; i < FinalRasW(); i++)
 			{
-				auto p = pixels + (i + j * FinalRasW());
-				p->r = m_TempEmber.m_Palette[i * 256 / FinalRasW()][0];
-				p->g = m_TempEmber.m_Palette[i * 256 / FinalRasW()][1];
-				p->b = m_TempEmber.m_Palette[i * 256 / FinalRasW()][2];
-				p->a = 1;
+				auto pp = p + (i + j * FinalRasW());
+				pp->r = m_TempEmber.m_Palette[i * 256 / FinalRasW()][0];
+				pp->g = m_TempEmber.m_Palette[i * 256 / FinalRasW()][1];
+				pp->b = m_TempEmber.m_Palette[i * 256 / FinalRasW()][2];
+				pp->a = 1;
 			}
 		}
 	}

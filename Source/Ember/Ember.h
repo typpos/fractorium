@@ -998,17 +998,19 @@ public:
 	/// <param name="angle">The angle to rotate by</param>
 	void RotateAffines(T angle)
 	{
-		for (size_t i = 0; i < XformCount(); i++)//Only look at normal xforms, exclude final.
+		size_t i = 0;
+
+		while (auto xform = GetTotalXform(i++))//Flam3 only allowed animation with normal xforms. This has been changed to allow animations of final xforms.
 		{
 			//Don't rotate xforms with animate set to 0.
-			if (m_Xforms[i].m_Animate == 0)
+			if (xform->m_Animate == 0)
 				continue;
 
 			//Assume that if there are no variations, then it's a padding xform.
-			if (m_Xforms[i].Empty() && m_AffineInterp != eAffineInterp::AFFINE_INTERP_LOG)
+			if (xform->Empty() && m_AffineInterp != eAffineInterp::AFFINE_INTERP_LOG)
 				continue;
 
-			m_Xforms[i].m_Affine.Rotate(angle * DEG_2_RAD_T);
+			xform->m_Affine.Rotate(angle * DEG_2_RAD_T);
 			//Don't rotate post.
 		}
 	}

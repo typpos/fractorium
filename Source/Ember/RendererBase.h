@@ -164,6 +164,7 @@ public:
 	//Virtual render properties, getters and setters.
 	virtual size_t ThreadCount()   const;
 	virtual eRendererType RendererType() const;
+	virtual bool Shared() const;
 
 	//Abstract render properties, getters only.
 	virtual size_t TemporalSamples()			   const = 0;

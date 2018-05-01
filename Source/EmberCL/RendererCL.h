@@ -56,6 +56,7 @@ class EMBERCL_API RendererCL : public Renderer<T, bucketT>, public RendererCLBas
 	using EmberNs::Renderer<T, bucketT>::RendererBase::ItersPerTemporalSample;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::FuseCount;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::DensityFilterOffset;
+	using EmberNs::Renderer<T, bucketT>::RendererBase::PrepFinalAccumVector;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_ProgressParameter;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_YAxisUp;
 	using EmberNs::Renderer<T, bucketT>::RendererBase::m_LockAccum;

@@ -124,14 +124,22 @@ template <typename T>
 static bool InitPaletteList(const string& filename)
 {
 	auto paletteList = PaletteList<float>::Instance();
+#ifdef _WIN32
+	vector<char> fullpath;
+	fullpath.resize(2048);
+	GetModuleFileName(nullptr, fullpath.data(), fullpath.size());
+	string s = GetPath(string(fullpath.data()));
+#else
+	string s = "./";
+#endif
 	static vector<string> paths =
 	{
-		"./"
+		s
 #ifndef _WIN32
-		, "~",
-		"~/.config/fractorium",
-		"/usr/share/fractorium",
-		"/usr/local/share/fractorium"
+		, "~/",
+		"~/.config/fractorium/",
+		"/usr/share/fractorium/",
+		"/usr/local/share/fractorium/"
 #endif
 	};
 	bool added = false;
@@ -139,7 +147,7 @@ static bool InitPaletteList(const string& filename)
 	for (auto& p : paths)
 	{
 		if (!added)
-			added |= paletteList->Add(p + "/" + filename);
+			added |= paletteList->Add(p + filename);
 		else
 			break;
 	}

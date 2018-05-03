@@ -43,7 +43,7 @@ void SetDefaultTestValues(Ember<T>& ember)
 /// <param name="opt">A populated EmberOptions object which specifies all program options to be used</param>
 /// <returns>True if success, else false.</returns>
 template <typename T>
-bool EmberGenome(EmberOptions& opt)
+bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 {
 	auto info = OpenCLInfo::Instance();
 	std::cout.imbue(std::locale(""));
@@ -193,6 +193,7 @@ bool EmberGenome(EmberOptions& opt)
 	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(ISAAC_INT(t.Tic()), ISAAC_INT(t.Tic() * 2), ISAAC_INT(t.Tic() * 3));
 	vector<string> errorReport = emberReport.ErrorReport();
+	auto fullpath = GetExePath(argv[0]);
 	os.imbue(std::locale(""));
 	os2.imbue(std::locale(""));
 
@@ -205,7 +206,7 @@ bool EmberGenome(EmberOptions& opt)
 		return false;
 	}
 
-	if (!InitPaletteList<float>(opt.PalettePath()))
+	if (!InitPaletteList<float>(fullpath, opt.PalettePath()))
 		return false;
 
 	if (!opt.EmberCL())
@@ -870,10 +871,10 @@ int _tmain(int argc, _TCHAR* argv[])
 #ifdef DO_DOUBLE
 
 		if (!opt.Sp())
-			b = EmberGenome<double>(opt);
+			b = EmberGenome<double>(argc, argv, opt);
 		else
 #endif
-			b = EmberGenome<float>(opt);
+			b = EmberGenome<float>(argc, argv, opt);
 	}
 
 	return b ? 0 : 1;

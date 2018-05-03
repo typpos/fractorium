@@ -11,7 +11,7 @@ using namespace EmberCommon;
 /// <param name="opt">A populated EmberOptions object which specifies all program options to be used</param>
 /// <returns>True if success, else false.</returns>
 template <typename T>
-bool EmberAnimate(EmberOptions& opt)
+bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 {
 	auto info = OpenCLInfo::Instance();
 	std::cout.imbue(std::locale(""));
@@ -45,6 +45,7 @@ bool EmberAnimate(EmberOptions& opt)
 	vector<unique_ptr<Renderer<T, float>>> renderers;
 	vector<string> errorReport;
 	std::recursive_mutex verboseCs;
+	auto fullpath = GetExePath(argv[0]);
 
 	if (opt.EmberCL())
 	{
@@ -130,7 +131,7 @@ bool EmberAnimate(EmberOptions& opt)
 		renderers.push_back(std::move(tempRenderer));
 	}
 
-	if (!InitPaletteList<float>(opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
+	if (!InitPaletteList<float>(fullpath, opt.PalettePath())) //For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
 		return false;
 
 	cout << "Parsing ember file " << opt.Input() << "\n";
@@ -554,10 +555,10 @@ int _tmain(int argc, _TCHAR* argv[])
 #ifdef DO_DOUBLE
 
 		if (!opt.Sp())
-			b = EmberAnimate<double>(opt);
+			b = EmberAnimate<double>(argc, argv, opt);
 		else
 #endif
-			b = EmberAnimate<float>(opt);
+			b = EmberAnimate<float>(argc, argv, opt);
 	}
 
 	return b ? 0 : 1;

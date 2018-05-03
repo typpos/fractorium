@@ -100,13 +100,13 @@ static bool ParseEmberFile(XmlToEmber<T>& parser, const string& filename, vector
 {
 	if (!parser.Parse(filename.c_str(), embers, useDefaults))
 	{
-		cout << "Error parsing flame file " << filename << ", returning without executing.\n";
+		cerr << "Error parsing flame file " << filename << ", returning without executing.\n";
 		return false;
 	}
 
 	if (embers.empty())
 	{
-		cout << "Error: No data present in file " << filename << ". Aborting.\n";
+		cerr << "Error: No data present in file " << filename << ". Aborting.\n";
 		return false;
 	}
 
@@ -114,27 +114,49 @@ static bool ParseEmberFile(XmlToEmber<T>& parser, const string& filename, vector
 }
 
 /// <summary>
+/// Cross platform wrapper for getting the full path of the current executable.
+/// </summary>
+/// <param name="programPath">The value of argv[0] passed into main()</param>
+/// <returns>The full path of the executable as a string</returns>
+static string GetExePath(const char* argv0)
+{
+	string fullpath;
+#ifdef _WIN32
+	fullpath = argv0;
+#else
+	vector<char> v;
+	v.resize(2048);
+#if __APPLE__
+	uint32_t vs = uint32_t(v.size());
+
+	if (_NSGetExecutablePath(v.data(), &vs) == 0)
+		fullpath = string(v.data());
+	else
+		cerr << "Could not discern full path from executable.\n";
+
+#else
+	auto fullsize = readlink("/proc/self/exe", v.data(), v.size());
+	fullpath = string(v.data());
+#endif
+#endif
+	return GetPath(fullpath);
+}
+
+/// <summary>
 /// Wrapper for parsing palette Xml file and initializing it's private static members,
 /// and printing any errors that occurred.
 /// Template argument expected to be float or double.
 /// </summary>
+/// <param name="programPath">The full path of the folder the program is running in</param>
 /// <param name="filename">The full path and name of the file</param>
 /// <returns>True if success, else false.</returns>
 template <typename T>
-static bool InitPaletteList(const string& filename)
+static bool InitPaletteList(const string& programPath, const string& filename)
 {
 	auto paletteList = PaletteList<float>::Instance();
-#ifdef _WIN32
-	vector<char> fullpath;
-	fullpath.resize(2048);
-	GetModuleFileName(nullptr, fullpath.data(), fullpath.size());
-	string s = GetPath(string(fullpath.data()));
-#else
-	string s = "./";
-#endif
 	static vector<string> paths =
 	{
-		s
+		programPath
 #ifndef _WIN32
 		, "~/",
 		"~/.config/fractorium/",
@@ -146,15 +168,21 @@ static bool InitPaletteList(const string& filename)
 
 	for (auto& p : paths)
 	{
+		auto fullpath = p + filename;
+		//cout << "Trying: " << fullpath << endl;
+
 		if (!added)
-			added |= paletteList->Add(p + filename);
+		{
+			if (std::ifstream(fullpath))
+				added |= paletteList->Add(fullpath);
+		}
 		else
 			break;
 	}
 
 	if (!added || !paletteList->Size())
 	{
-		cout << "Error parsing palette file " << filename << ". Reason: \n"
+		cerr << "Error parsing palette file " << filename << ". Reason: \n"
 			 << paletteList->ErrorReportString() << "\nReturning without executing.\n";
 		return false;
 	}

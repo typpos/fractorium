@@ -20,6 +20,7 @@
 	#include <tchar.h>
 #else
 	#include <arpa/inet.h>
+	#include <unistd.h>
 	#define _TCHAR char
 	#define _tmain main
 	#define _T

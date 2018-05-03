@@ -11,7 +11,7 @@ using namespace EmberCommon;
 /// <param name="opt">A populated EmberOptions object which specifies all program options to be used</param>
 /// <returns>True if success, else false.</returns>
 template <typename T>
-bool EmberRender(EmberOptions& opt)
+bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 {
 	auto info = EmberCLns::OpenCLInfo::Instance();
 	std::cout.imbue(std::locale(""));
@@ -47,6 +47,7 @@ bool EmberRender(EmberOptions& opt)
 	auto progress = make_unique<RenderProgress<T>>();
 	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	vector<string> errorReport = emberReport.ErrorReport();
+	auto fullpath = GetExePath(argv[0]);
 
 	if (!errorReport.empty())
 		emberReport.DumpErrorReport();
@@ -60,7 +61,7 @@ bool EmberRender(EmberOptions& opt)
 	if (opt.EmberCL() && renderer->RendererType() != eRendererType::OPENCL_RENDERER)//OpenCL init failed, so fall back to CPU.
 		opt.EmberCL(false);
 
-	if (!InitPaletteList<float>(opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
+	if (!InitPaletteList<float>(fullpath, opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
 		return false;
 
 	if (!ParseEmberFile(parser, opt.Input(), embers))
@@ -432,10 +433,10 @@ int _tmain(int argc, _TCHAR* argv[])
 #ifdef DO_DOUBLE
 
 		if (!opt.Sp())
-			b = EmberRender<double>(opt);
+			b = EmberRender<double>(argc, argv, opt);
 		else
 #endif
-			b = EmberRender<float>(opt);
+			b = EmberRender<float>(argc, argv, opt);
 	}
 
 	return b ? 0 : 1;

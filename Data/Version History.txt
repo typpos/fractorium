@@ -1,5 +1,31 @@
 1.0.0.8 12/22/2017
 --User changes
+ -Change variation spin boxes to only show the precision needed, and also allow scientific notation.
+ -Added pixel_flow variation from user bezo97.
+ -Add two new variations, hypercrop and hypershift2.
+ -Add the ability to drag the rotation of the current palette via the palette preview table.
+ -Allow for pausing and resuming of final renders.
+ -Allow for animating final xforms.
+ -More detailed diagnostics when any action in the OpenCL renderer fails.
+ -Allow for creating an OpenCL renderer which does not share a texture with the main window, and instead manually copies its final output image from GPU to CPU then back to GPU.
+ -Allow running command line programs from outside of the folder the executable is in on Windows, by adding the install folder to the PATH variable. This was needed to properly find the palette file (even though it's mostly unneeded).
+
+--Bug fixes
+ -Fix a variety of very strange bugs when clicking around on palettes in different files in the palette editor.
+ -Fix bug where animate flag was not properly being set when checking the checkbox, and also did not work correctly when Apply All was checked.
+ -Text was not properly being copied out of the Info | Bounds text box.
+
+--Code changes
+ -Convert OpenGL drawing code to use GLSL.
+ -Always use double precision extension defines in OpenCL programs, even if DP is not selected. This is because elliptic now always uses DP.
+ -Only instantiate float version of Palette and PaletteList, no need for double since it's never used.
+ -Allow for FinalRenderDialog to be queried on whether it's currently rendering.
+ -Remove Renderer::AccumulatorToFinalImage(v4F* pixels, size_t finalOffset), it's no longer needed or makes sense.
+ -Controllers no longer keep track of shared status, it's kept inside the renderers.
+ -Make getter functions in FractoriumOptionsDialog be public.
+
+1.0.0.7 12/22/2017
+--User changes
  -Support 4k monitors, and in general, properly scale any monitor that is not HD.
  -Allow for a spatial filter of radius zero, which means do not use a spatial filter.
  -Add new variations: concentric, cpow3, helicoid, helix, rand_cubes, rays1, rays2, rays3, sphereblur.

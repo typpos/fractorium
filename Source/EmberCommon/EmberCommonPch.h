@@ -67,6 +67,7 @@
 	#include <OpenEXR/ImfRgbaFile.h>
 	#include <OpenEXR/ImfStringAttribute.h>
 	#include <OpenEXR/half.h>
+	#include <mach-o/dyld.h>
 #else
 	#include <ImfRgbaFile.h>
 	#include <ImfStringAttribute.h>

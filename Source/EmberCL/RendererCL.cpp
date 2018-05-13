@@ -997,6 +997,10 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 
 		while (b && (atomLaunchesRan.fetch_add(1) + 1 <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && !m_Abort)
 		{
+			//Check if the user wanted to suspend the process.
+			while (Paused())
+				std::this_thread::sleep_for(500ms);
+
 			cl_uint argIndex = 0;
 #ifdef TEST_CL
 			uint fuse = 0;

@@ -1,4 +1,8 @@
-1.0.0.8 12/22/2017
+1.0.0.9 5/13/2017
+--Bug fixes
+ -Pausing did not work when using OpenCL renderer.
+
+1.0.0.8 5/4/2018
 --User changes
  -Change variation spin boxes to only show the precision needed, and also allow scientific notation.
  -Added pixel_flow variation from user bezo97.

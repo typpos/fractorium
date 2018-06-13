@@ -211,9 +211,12 @@ public:
 	/// <param name="count">The number of xforms to add</param>
 	void AddXforms(size_t count)
 	{
+		auto oldsize = m_Xforms.size();
+
 		for (size_t i = 0; i < count; i++)
 		{
 			Xform<T> xform;
+			xform.m_ColorX = T((oldsize + i) & 1);
 			xform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 			AddXform(xform);
 		}
@@ -266,15 +269,18 @@ public:
 			if (UseFinalXform())//Caller wanted one and this ember has one.
 			{
 				ember.m_FinalXform = m_FinalXform;
+				ember.m_FinalXform.m_ColorX = T(XformCount() & 1);
 			}
 			else//Caller wanted one and this ember doesn't have one.
 			{
 				//Interpolated-against final xforms need animate & color speed set to 0 and motion elements cleared.
+				ember.m_FinalXform.m_Affine.MakeID();
+				ember.m_FinalXform.m_Post.MakeID();
 				ember.m_FinalXform.m_Animate = 0;
 				ember.m_FinalXform.m_ColorSpeed = 0;
 				ember.m_FinalXform.m_Motion.clear();
 				ember.m_FinalXform.ClearAndDeleteVariations();
-				ember.m_FinalXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR, 0));//Do this so it doesn't appear empty.
+				ember.m_FinalXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));//Do this so it doesn't appear empty.
 			}
 		}
 
@@ -797,6 +803,9 @@ public:
 		for (size_t i = 0; i < totalXformCount; i++)
 		{
 			auto thisXform = GetTotalXform(i);
+
+			//if (i == 10)
+			//	cout << i << endl;
 
 			if (size == 2 && stagger > 0 && thisXform != &m_FinalXform)
 			{

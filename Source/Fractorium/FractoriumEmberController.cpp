@@ -217,16 +217,18 @@ void FractoriumEmberController<T>::UpdateAll(std::function<void(Ember<T>& ember,
 /// If no xforms are selected via the checkboxes, and the update type is UPDATE_SELECTED, then the function will be called only on the currently selected xform.
 /// If the update type is UPDATE_CURRENT_AND_SELECTED, and the current is not among those selected, then the function will be called on the currently selected xform as well.
 /// </summary>
-/// <param name="func">The function to call</param>
+/// <param name="func">The function to call which will pass the xform under consideration, the absolute xform index, and the index within the selected xforms</param>
 /// <param name="updateType">Whether to apply this update operation on the current, all or selected xforms. Default: eXformUpdate::UPDATE_CURRENT.</param>
 /// <param name="updateRender">True to update renderer, else false. Default: true.</param>
 /// <param name="action">The action to add to the rendering queue. Default: eProcessAction::FULL_RENDER.</param>
 /// <param name="index">The xform index to use when action is eXformUpdate::UPDATE_SPECIFIC. Default: 0.</param>
 template <typename T>
-void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> func, eXformUpdate updateType, bool updateRender, eProcessAction action, size_t index)
+void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, size_t, size_t)> func, eXformUpdate updateType, bool updateRender, eProcessAction action, size_t index)
 {
 	int i = 0;
+	size_t selIndex = 0;
 	auto current = CurrentXform();
+	auto currentIndex = m_Fractorium->ui.CurrentXformCombo->currentIndex();
 	bool forceFinal = m_Fractorium->HaveFinal();
 	bool isCurrentFinal = m_Ember.IsFinalXform(current);
 	bool doFinal = updateType != eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL && updateType != eXformUpdate::UPDATE_ALL_EXCEPT_FINAL;
@@ -236,14 +238,14 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 		case eXformUpdate::UPDATE_SPECIFIC:
 		{
 			if (auto xform = m_Ember.GetTotalXform(index, forceFinal))
-				func(xform);
+				func(xform, index, 0);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_CURRENT:
 		{
 			if (current)
-				func(current);
+				func(current, currentIndex, 0);
 		}
 		break;
 
@@ -253,25 +255,19 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 			{
-				if (i < m_Fractorium->m_XformSelections.size())
+				if (m_Fractorium->IsXformSelected(i))
 				{
-					if (auto w = m_Fractorium->m_XformSelections[i])
-					{
-						if (w->isChecked())
-						{
-							func(xform);
+					func(xform, i, selIndex++);
 
-							if (xform == current)
-								currentDone = true;
-						}
-					}
+					if (xform == current)
+						currentDone = true;
 				}
 
 				i++;
 			}
 
 			if (!currentDone)//Current was not among those selected, so apply to it.
-				func(current);
+				func(current, currentIndex, selIndex);
 		}
 		break;
 
@@ -282,16 +278,10 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 
 			while (auto xform = (doFinal ? m_Ember.GetTotalXform(i, forceFinal) : m_Ember.GetXform(i)))
 			{
-				if (i < m_Fractorium->m_XformSelections.size())
+				if (m_Fractorium->IsXformSelected(i))
 				{
-					if (auto w = m_Fractorium->m_XformSelections[i])
-					{
-						if (w->isChecked())
-						{
-							func(xform);
-							anyUpdated = true;
-						}
-					}
+					func(xform, i, selIndex++);
+					anyUpdated = true;
 				}
 
 				i++;
@@ -300,22 +290,22 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*)> fu
 			if (!anyUpdated)//None were selected, so just apply to the current.
 				if (doFinal || !isCurrentFinal)//If do final, call func regardless. If not, only call if current is not final.
 					if (current)
-						func(current);
+						func(current, currentIndex, selIndex);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_ALL:
 		{
-			while (auto xform = m_Ember.GetTotalXform(i++, forceFinal))
-				func(xform);
+			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
+				func(xform, i++, selIndex++);
 		}
 		break;
 
 		case eXformUpdate::UPDATE_ALL_EXCEPT_FINAL:
 		default:
 		{
-			while (auto xform = m_Ember.GetXform(i++))
-				func(xform);
+			while (auto xform = m_Ember.GetXform(i))
+				func(xform, i++, selIndex++);
 		}
 		break;
 	}

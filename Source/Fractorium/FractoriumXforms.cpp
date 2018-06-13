@@ -139,7 +139,7 @@ void FractoriumEmberController<T>::AddLinkedXform()
 	Ember<T> ember = m_Ember;
 	m_Ember.Reserve(m_Ember.XformCount() + 1);//Doing this ahead of time ensures pointers remain valid.
 	auto iterCount = 0;
-	UpdateXform([&](Xform<T>* xform)
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		//Covers very strange case where final is selected, but initially not considered because final is excluded,
 		//but after adding the new xform, it thinks its selected index is non-final.
@@ -210,7 +210,7 @@ void FractoriumEmberController<T>::DuplicateXform()
 	bool forceFinal = m_Fractorium->HaveFinal();
 	vector<Xform<T>> vec;
 	vec.reserve(m_Ember.XformCount());
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		vec.push_back(*xform);
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
@@ -235,7 +235,7 @@ void Fractorium::OnDuplicateXformButtonClicked(bool checked) { m_Controller->Dup
 template <typename T>
 void FractoriumEmberController<T>::ClearXform()
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		xform->ClearAndDeleteVariations();//Note xaos is left alone.
 	}, eXformUpdate::UPDATE_SELECTED);
@@ -350,7 +350,7 @@ void Fractorium::OnAddFinalXformButtonClicked(bool checked) { m_Controller->AddF
 template <typename T>
 void FractoriumEmberController<T>::XformWeightChanged(double d)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		xform->m_Weight = d;
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL);
@@ -363,7 +363,7 @@ void Fractorium::OnXformWeightChanged(double d) { m_Controller->XformWeightChang
 template <typename T>
 void FractoriumEmberController<T>::EqualizeWeights()
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		m_Ember.EqualizeWeights();
 		m_Fractorium->m_XformWeightSpin->setValue(xform->m_Weight);//Will trigger an update, so pass false to updateRender below.
@@ -381,65 +381,70 @@ template <typename T>
 void FractoriumEmberController<T>::XformNameChanged(int row, int col)
 {
 	bool forceFinal = m_Fractorium->HaveFinal();
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
-		int index = m_Ember.GetTotalXformIndex(xform, forceFinal);
 		xform->m_Name = m_Fractorium->ui.XformWeightNameTable->item(row, col)->text().toStdString();
-		XformCheckboxAt(index, [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(index)); });
+		XformCheckboxAt(int(xfindex), [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(xfindex)); });
 	}, eXformUpdate::UPDATE_CURRENT, false);
 	FillSummary();//Manually update because this does not trigger a render, which is where this would normally be called.
 }
 void Fractorium::OnXformNameChanged(int row, int col) { m_Controller->XformNameChanged(row, col); }
 /// <summary>
-/// Set the animate field of the selected xforms.
+/// Set the animate field of the selected xforms, this allows excluding current if it's not checked, but applies only to it if none are checked.
 /// This has no effect on interactive rendering, it only sets a value
 /// that will later be saved to Xml when the user saves.
 /// This value is observed when creating sequences for animation.
+/// Applies to all embers if "Apply All" is checked.
 /// Called when the user toggles the animate xform checkbox.
 /// </summary>
 /// <param name="state">1 for checked, else false</param>
 template <typename T>
 void FractoriumEmberController<T>::XformAnimateChanged(int state)
 {
-	bool final = IsFinal(CurrentXform());
-	auto index = m_Fractorium->ui.CurrentXformCombo->currentIndex();
 	T animate = state > 0 ? 1 : 0;
-	UpdateAll([&](Ember<T>& ember, bool isMain)
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
-		if (final)//If the current xform was final, only apply to other embers which also have a final xform.
+		bool final = IsFinal(xform);
+		UpdateAll([&](Ember<T>& ember, bool isMain)
 		{
-			if (ember.UseFinalXform())
+			if (final)//If the current xform was final, only apply to other embers which also have a final xform.
 			{
-				auto xform = ember.NonConstFinalXform();
-				xform->m_Animate = animate;
-			}
-
-			if (!m_Fractorium->ApplyAll())
-				if (m_EmberFilePointer && m_EmberFilePointer->UseFinalXform())
-					m_EmberFilePointer->NonConstFinalXform()->m_Animate = animate;
-		}
-		else//Current was not final, so apply to other embers which have a non-final xform at this index.
-		{
-			if (auto xform = ember.GetXform(index))
-				xform->m_Animate = animate;
-
-			if (!m_Fractorium->ApplyAll() && m_EmberFilePointer)
-				if (auto xform = m_EmberFilePointer->GetXform(index))
+				if (ember.UseFinalXform())
+				{
+					auto xform = ember.NonConstFinalXform();
 					xform->m_Animate = animate;
-		}
-	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+				}
+
+				if (!m_Fractorium->ApplyAll())
+					if (m_EmberFilePointer && m_EmberFilePointer->UseFinalXform())
+						m_EmberFilePointer->NonConstFinalXform()->m_Animate = animate;
+			}
+			else//Current was not final, so apply to other embers which have a non-final xform at this index.
+			{
+				if (auto xform = ember.GetXform(xfindex))
+					xform->m_Animate = animate;
+
+				if (!m_Fractorium->ApplyAll() && m_EmberFilePointer)
+					if (auto xform = m_EmberFilePointer->GetXform(xfindex))
+						xform->m_Animate = animate;
+			}
+		}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+	}, eXformUpdate::UPDATE_SELECTED, false);
 }
 void Fractorium::OnXformAnimateCheckBoxStateChanged(int state) { m_Controller->XformAnimateChanged(state); }
+
 /// <summary>
 /// Fill all GUI widgets with values from the passed in xform.
 /// </summary>
 /// <param name="xform">The xform whose values will be used to populate the widgets</param>
 template <typename T>
-void FractoriumEmberController<T>::FillWithXform(Xform<T>* xform)//Need to see where all this is called from and sync with FillXform(). Maybe rename the latter.
+void FractoriumEmberController<T>::FillWithXform(Xform<T>* xform)
 {
 	m_Fractorium->m_XformWeightSpin->SetValueStealth(xform->m_Weight);
 	SetNormalizedWeightText(xform);
-	m_Fractorium->ui.AnimateXformCheckBox->setChecked(xform->m_Animate > 0 ? true : false);//Make a signal/slot to handle checking this.
+	m_Fractorium->ui.AnimateXformCheckBox->blockSignals(true);
+	m_Fractorium->ui.AnimateXformCheckBox->setChecked(xform->m_Animate > 0 ? true : false);
+	m_Fractorium->ui.AnimateXformCheckBox->blockSignals(false);
 
 	if (auto item = m_Fractorium->ui.XformWeightNameTable->item(0, 1))
 	{

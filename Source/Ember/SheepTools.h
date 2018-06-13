@@ -995,12 +995,13 @@ public:
 		{
 			m_EdgePrealign[si] = embers[si];
 
-			for (i = 0; i < embers[si].TotalXformCount(); i++)
+			for (i = 0; i < m_EdgePrealign[si].TotalXformCount(); i++)
 			{
 				auto xform = embers[si].GetTotalXform(i);
+				auto prealignxform = m_EdgePrealign[si].GetTotalXform(i);
 
 				if (!xform->m_Motion.empty())
-					xform->ApplyMotion(*(m_EdgePrealign[si].GetTotalXform(i)), blend);//Apply motion parameters to result.xform[i] using blend parameter.
+					prealignxform->ApplyMotion(*xform, blend);//Apply motion parameters to result.xform[i] using blend parameter.
 			}
 		}
 

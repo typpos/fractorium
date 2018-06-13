@@ -673,7 +673,7 @@ void FractoriumEmberController<T>::CopySelectedXforms()
 {
 	m_CopiedXforms.clear();
 	m_CopiedFinalXform.Clear();
-	UpdateXform([&](Xform<T>* xform)
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		if (m_Ember.IsFinalXform(xform))
 			m_CopiedFinalXform = *xform;

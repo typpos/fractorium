@@ -508,9 +508,7 @@ string EmberToXml<T>::ToString(Xform<T>& xform, size_t xformCount, bool isFinal,
 		string s = xform.m_Name;
 		std::replace(s.begin(), s.end(), ' ', '_');
 		os << "name=\"" << s << "\" ";//Flam3 didn't do this, but Apo does.
-
-		if (!isFinal)
-			os << "animate=\"" << xform.m_Animate << "\" ";
+		os << "animate=\"" << xform.m_Animate << "\" ";//Flam3 only did this for non-final. Ember supports animating final.
 	}
 
 	//Variation writing order differs slightly from the original to make it a bit more readable.

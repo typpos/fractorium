@@ -101,7 +101,6 @@ public:
 
 	//Geometry.
 	bool ApplyAll();
-	void SetCenter(float x, float y);
 	void SetRotation(double rot, bool stealth);
 	void SetScale(double scale);
 	void SetCoordinateStatus(int rasX, int rasY, float worldX, float worldY);
@@ -197,6 +196,8 @@ public slots:
 	void OnSequenceRandomRotationsMaxSpinBoxChanged(double d);
 	void OnSequenceBlendFramesSpinBoxChanged(int d);
 	void OnSequenceRandomBlendMaxFramesSpinBoxChanged(int d);
+	void OnSequenceRandomRotationsPerBlendSpinBoxChanged(int d);
+	void OnSequenceRandomRotationsPerBlendMaxSpinBoxChanged(int d);
 
 	//Params.
 	void OnBrightnessChanged(double d);//Color.

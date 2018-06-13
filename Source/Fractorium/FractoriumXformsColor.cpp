@@ -51,7 +51,7 @@ void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateR
 
 	if (updateRender)//False when just updating GUI in response to a change elsewhere, true when in response to a GUI change so update values and reset renderer.
 	{
-		UpdateXform([&](Xform<T>* xform)
+		UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 		{
 			xform->m_ColorX = Clamp<T>(d, 0, 1);
 		}, update, updateRender, eProcessAction::FULL_RENDER, index);
@@ -99,7 +99,7 @@ void Fractorium::OnXformScrollColorIndexChanged(int d)
 template <typename T>
 void FractoriumEmberController<T>::RandomColorIndicesButtonClicked()
 {
-	UpdateXform([&](Xform<T>* xform) { xform->m_ColorX = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL, false);//Don't update renderer here...
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorX = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL, false);//Don't update renderer here...
 	m_Fractorium->m_XformColorIndexSpin->setValue(CurrentXform()->m_ColorX);//...do it via GUI. This will set scrollbar value as well.
 }
 void Fractorium::OnRandomColorIndicesButtonClicked(bool b) { m_Controller->RandomColorIndicesButtonClicked(); }
@@ -113,7 +113,7 @@ template <typename T>
 void FractoriumEmberController<T>::ToggleColorIndicesButtonClicked()
 {
 	char ch = 1;
-	UpdateXform([&](Xform<T>* xform) { xform->m_ColorX = T(ch ^= 1); }, eXformUpdate::UPDATE_ALL, false);//Don't update renderer here...
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorX = T(ch ^= 1); }, eXformUpdate::UPDATE_ALL, false);//Don't update renderer here...
 	m_Fractorium->m_XformColorIndexSpin->setValue(CurrentXform()->m_ColorX);//...do it via GUI. This will set scrollbar value as well.
 }
 void Fractorium::OnToggleColorIndicesButtonClicked(bool b) { m_Controller->ToggleColorIndicesButtonClicked(); }
@@ -126,7 +126,7 @@ void Fractorium::OnToggleColorIndicesButtonClicked(bool b) { m_Controller->Toggl
 template <typename T>
 void FractoriumEmberController<T>::RandomColorSpeedButtonClicked()
 {
-	UpdateXform([&](Xform<T>* xform) { xform->m_ColorSpeed = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL);
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorSpeed = m_Rand.Frand01<T>(); }, eXformUpdate::UPDATE_ALL);
 	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(CurrentXform()->m_ColorSpeed);
 }
 void Fractorium::OnRandomColorSpeedButtonClicked(bool b) { m_Controller->RandomColorSpeedButtonClicked(); }
@@ -140,7 +140,7 @@ template <typename T>
 void FractoriumEmberController<T>::ToggleColorSpeedButtonClicked()
 {
 	char ch = 1;
-	UpdateXform([&](Xform<T>* xform) { xform->m_ColorSpeed = (T(ch ^= 1) ? 0.5 : 0.0); }, eXformUpdate::UPDATE_ALL);
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorSpeed = (T(ch ^= 1) ? 0.5 : 0.0); }, eXformUpdate::UPDATE_ALL);
 	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(CurrentXform()->m_ColorSpeed);
 }
 void Fractorium::OnToggleColorSpeedButtonClicked(bool b) { m_Controller->ToggleColorSpeedButtonClicked(); }
@@ -152,7 +152,7 @@ void Fractorium::OnToggleColorSpeedButtonClicked(bool b) { m_Controller->ToggleC
 /// </summary>
 /// <param name="d">The color speed, -1-1.</param>
 template <typename T>
-void FractoriumEmberController<T>::XformColorSpeedChanged(double d) { UpdateXform([&] (Xform<T>* xform) { xform->m_ColorSpeed = d; }, eXformUpdate::UPDATE_SELECTED); }
+void FractoriumEmberController<T>::XformColorSpeedChanged(double d) { UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorSpeed = d; }, eXformUpdate::UPDATE_SELECTED); }
 void Fractorium::OnXformColorSpeedChanged(double d) { m_Controller->XformColorSpeedChanged(d); }
 
 /// <summary>
@@ -162,7 +162,7 @@ void Fractorium::OnXformColorSpeedChanged(double d) { m_Controller->XformColorSp
 /// </summary>
 /// <param name="d">The opacity, 0-1.</param>
 template <typename T>
-void FractoriumEmberController<T>::XformOpacityChanged(double d) { UpdateXform([&] (Xform<T>* xform) { xform->m_Opacity = d; }, eXformUpdate::UPDATE_SELECTED); }
+void FractoriumEmberController<T>::XformOpacityChanged(double d) { UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_Opacity = d; }, eXformUpdate::UPDATE_SELECTED); }
 void Fractorium::OnXformOpacityChanged(double d) { m_Controller->XformOpacityChanged(d); }
 
 /// <summary>
@@ -173,7 +173,7 @@ void Fractorium::OnXformOpacityChanged(double d) { m_Controller->XformOpacityCha
 /// </summary>
 /// <param name="d">The direct color percentage, 0-1.</param>
 template <typename T>
-void FractoriumEmberController<T>::XformDirectColorChanged(double d) { UpdateXform([&] (Xform<T>* xform) { xform->m_DirectColor = d; }, eXformUpdate::UPDATE_SELECTED); }
+void FractoriumEmberController<T>::XformDirectColorChanged(double d) { UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_DirectColor = d; }, eXformUpdate::UPDATE_SELECTED); }
 void Fractorium::OnXformDirectColorChanged(double d) { m_Controller->XformDirectColorChanged(d); }
 
 /// <summary>

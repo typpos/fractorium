@@ -547,7 +547,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		//First parse out simple float reads.
 		if (ParseAndAssign(curAtt->name, attStr, "time", currentEmber.m_Time, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "scale", currentEmber.m_PixelsPerUnit, ret)) { currentEmber.m_OrigPixPerUnit = currentEmber.m_PixelsPerUnit; }
-		else if (ParseAndAssign(curAtt->name, attStr, "rotate", currentEmber.m_Rotate, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "rotate", currentEmber.m_Rotate, ret)) { currentEmber.m_Rotate = NormalizeDeg180<T>(currentEmber.m_Rotate); }
 		else if (ParseAndAssign(curAtt->name, attStr, "zoom", currentEmber.m_Zoom, ret)) { ClampGteRef<T>(currentEmber.m_Zoom, 0); }
 		else if (ParseAndAssign(curAtt->name, attStr, "cam_zoom", currentEmber.m_Zoom, ret)) { ClampGteRef<T>(currentEmber.m_Zoom, 0); }//JWildfire uses cam_zoom.
 		else if (ParseAndAssign(curAtt->name, attStr, "filter", currentEmber.m_SpatialFilterRadius, ret)) {}
@@ -884,6 +884,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 			if (!Compare(childNode->name, "finalxform"))
 			{
 				Xform<T> finalXform;
+				finalXform.m_Animate = 0;//Do not animate final by default.
 
 				if (!ParseXform(childNode, finalXform, false, fromEmber))
 				{

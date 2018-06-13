@@ -25,6 +25,25 @@ class EMBER_API Interpolater
 {
 public:
 	/// <summary>
+	/// Determine if the xform at a given index in an ember is a padding xform.
+	/// </summary>
+	/// <param name="ember">The ember whose xforms will be examined for padding</param>
+	/// <param name="xf">The index of the ember to examine</param>
+	/// <param name="isFinal">Whether the xform being examined is the final one</param>
+	/// <returns>True the xform at index xf is a padding one, else false.</returns>
+	static bool IsPadding(const Ember<T>& ember, size_t xf, bool isFinal)
+	{
+		if (!isFinal)//Either a final wasn't present in any ember, or if there was, this xform is a normal one, so do not include final in the index check.
+		{
+			return xf >= ember.XformCount();
+		}
+		else//There was a final present, and we are checking it, so just see if its presence differs.
+		{
+			return !ember.UseFinalXform();
+		}
+	}
+
+	/// <summary>
 	/// Aligns the specified array of embers and stores in the output array.
 	/// This is used to prepare embers before interpolating them.
 	/// Alignment means that every ember in a list will have the same number of xforms.
@@ -41,7 +60,7 @@ public:
 	static void Align(const Ember<T>* sourceEmbers, Ember<T>* destEmbers, size_t count)
 	{
 		bool aligned = true;
-		bool currentFinal, final = sourceEmbers[0].UseFinalXform();
+		bool currentFinal, hasFinal = sourceEmbers[0].UseFinalXform();
 		size_t i, xf, currentCount, maxCount = sourceEmbers[0].XformCount();
 		Xform<T>* destOtherXform;
 		auto variationList = VariationList<T>::Instance();
@@ -62,18 +81,18 @@ public:
 
 			currentFinal = sourceEmbers[i].UseFinalXform();
 
-			if (final != currentFinal)//Check if any used final.
+			if (hasFinal != currentFinal)//Check if any used final.
 			{
 				aligned = false;
-				final |= currentFinal;
+				hasFinal |= currentFinal;
 			}
 		}
 
 		//Copy them using the max xform count, and do final if any had final.
 		for (i = 0; i < count; i++)
-			destEmbers[i] = sourceEmbers[i].Copy(maxCount, final);
+			destEmbers[i] = sourceEmbers[i].Copy(maxCount, hasFinal);
 
-		if (final)
+		if (hasFinal)
 			maxCount++;
 
 		//Check to see if there's a parametric variation present in one xform
@@ -82,11 +101,13 @@ public:
 		//All embers will have the same number of xforms at this point.
 		for (i = 0; i < count; i++)
 		{
-			size_t ii;
+			intmax_t ii;
 
 			for (xf = 0; xf < maxCount; xf++)//This will include both normal xforms and the final.
 			{
-				auto destXform = destEmbers[i].GetTotalXform(xf, final);
+				bool isFinal = hasFinal && (xf == maxCount - 1);
+				auto destXform = destEmbers[i].GetTotalXform(xf, hasFinal);
+				Variation<T>* dummyvar = nullptr;
 
 				//Ensure every parametric variation contained in every xform at either position i - 1 or i + 1 is also contained in the dest xform.
 				if (i > 0)
@@ -104,9 +125,9 @@ public:
 				//rings2, fan2, blob, perspective, julian, juliascope, ngon, curl, super_shape, split
 				//If so, can use a better starting point for these.
 				//If the current xform index is greater than what the original xform count was for this ember, then it's a padding xform.
-				if (xf >= sourceEmbers[i].TotalXformCount() && !aligned)
+				if (IsPadding(sourceEmbers[i], xf, isFinal) && !aligned)
 				{
-					size_t found = 0;
+					intmax_t found = 0;
 					//Remove linear.
 					destXform->DeleteVariationById(eVariationId::VAR_LINEAR);
 
@@ -121,32 +142,36 @@ public:
 								continue;
 
 							//Skip if this is also padding.
-							if (xf >= sourceEmbers[i + ii].TotalXformCount())
+							if (IsPadding(sourceEmbers[i + ii], xf, isFinal))
 								continue;
 
-							destOtherXform = destEmbers[i + ii].GetTotalXform(xf);
-
-							//Spherical / Ngon (trumps all others due to holes)
-							//Interpolate these against a 180 degree rotated identity
-							//with weight -1.
-							//Added JULIAN/JULIASCOPE to get rid of black wedges.
-							if (destOtherXform->GetVariationById(eVariationId::VAR_SPHERICAL) ||
-									destOtherXform->GetVariationById(eVariationId::VAR_NGON) ||
-									destOtherXform->GetVariationById(eVariationId::VAR_JULIAN) ||
-									destOtherXform->GetVariationById(eVariationId::VAR_JULIASCOPE) ||
-									destOtherXform->GetVariationById(eVariationId::VAR_POLAR) ||
-									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_SPH) ||
-									destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_JULIA))
+							if (destOtherXform = destEmbers[i + ii].GetTotalXform(xf))
 							{
-								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_LINEAR, -1));
-								//Set the coefs appropriately.
-								destXform->m_Affine.A(-1);
-								destXform->m_Affine.D(0);
-								destXform->m_Affine.B(0);
-								destXform->m_Affine.E(-1);
-								destXform->m_Affine.C(0);
-								destXform->m_Affine.F(0);
-								found = -1;
+								//Spherical / Ngon (trumps all others due to holes)
+								//Interpolate these against a 180 degree rotated identity
+								//with weight -1.
+								//Added JULIAN/JULIASCOPE to get rid of black wedges.
+
+								//Testing for variation weight > 0 is to make the behavior match flam3 exactly, even though that doesn't really make sense in the modern era
+								//Because variations can use negative weights.
+								if (((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_SPHERICAL)  ) && dummyvar->m_Weight > 0) ||
+										((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_NGON)       ) && dummyvar->m_Weight > 0) ||
+										((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_JULIAN)     ) && dummyvar->m_Weight > 0) ||
+										((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_JULIASCOPE) ) && dummyvar->m_Weight > 0) ||
+										((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_POLAR)      ) && dummyvar->m_Weight > 0) ||
+										((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_SPH)  ) && dummyvar->m_Weight > 0) ||
+										((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_WEDGE_JULIA)) && dummyvar->m_Weight > 0))
+								{
+									destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_LINEAR, -1));
+									//Set the coefs appropriately.
+									destXform->m_Affine.A(-1);
+									destXform->m_Affine.D(0);
+									destXform->m_Affine.B(0);
+									destXform->m_Affine.E(-1);
+									destXform->m_Affine.C(0);
+									destXform->m_Affine.F(0);
+									found = -1;
+								}
 							}
 						}
 					}
@@ -160,79 +185,110 @@ public:
 								continue;
 
 							//Skip if this is also padding.
-							if (xf >= sourceEmbers[i + ii].TotalXformCount())
+							if (IsPadding(sourceEmbers[i + ii], xf, isFinal))
 								continue;
 
-							destOtherXform = destEmbers[i + ii].GetTotalXform(xf);
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_RECTANGLES))
+							if (destOtherXform = destEmbers[i + ii].GetTotalXform(xf))
 							{
-								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_RECTANGLES))
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_RECTANGLES)) && dummyvar->m_Weight > 0)
 								{
-									var->SetParamVal("rectangles_x", 0);
-									var->SetParamVal("rectangles_y", 0);
-									destXform->AddVariation(var);
+									destXform->DeleteVariationById(eVariationId::VAR_RECTANGLES);//In case it was there, remove it first so the add below succeeds.
+
+									if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_RECTANGLES))
+									{
+										var->SetParamVal("rectangles_x", 0);
+										var->SetParamVal("rectangles_y", 0);
+
+										if (!destXform->AddVariation(var))
+											delete var;
+									}
+
+									found++;
 								}
 
-								found++;
-							}
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS2))
-							{
-								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_RINGS2))
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_RINGS2)) && dummyvar->m_Weight > 0)
 								{
-									var->SetParamVal("rings2_val", 0);
-									destXform->AddVariation(var);
+									destXform->DeleteVariationById(eVariationId::VAR_RINGS2);
+
+									if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_RINGS2))
+									{
+										var->SetParamVal("rings2_val", 0);
+
+										if (!destXform->AddVariation(var))
+											delete var;
+									}
+
+									found++;
 								}
 
-								found++;
-							}
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN2))
-							{
-								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_FAN2));
-								found++;
-							}
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_BLOB))
-							{
-								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_BLOB))
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_FAN2)) && dummyvar->m_Weight > 0)
 								{
-									var->SetParamVal("blob_low", 1);
-									destXform->AddVariation(var);
+									destXform->DeleteVariationById(eVariationId::VAR_FAN2);
+
+									if (auto var = variationList->GetVariationCopy(eVariationId::VAR_FAN2))
+										if (!destXform->AddVariation(var))
+											delete var;
+
+									found++;
 								}
 
-								found++;
-							}
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_PERSPECTIVE))
-							{
-								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_PERSPECTIVE));
-								found++;
-							}
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_CURL))
-							{
-								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_CURL))
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_BLOB)) && dummyvar->m_Weight > 0)
 								{
-									var->SetParamVal("curl_c1", 0);
-									destXform->AddVariation(var);
+									destXform->DeleteVariationById(eVariationId::VAR_BLOB);
+
+									if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_BLOB))
+									{
+										var->SetParamVal("blob_low", 1);
+
+										if (!destXform->AddVariation(var))
+											delete var;
+									}
+
+									found++;
 								}
 
-								found++;
-							}
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_SUPER_SHAPE))
-							{
-								if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_SUPER_SHAPE))
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_PERSPECTIVE)) && dummyvar->m_Weight > 0)
 								{
-									var->SetParamVal("super_shape_n1", 2);
-									var->SetParamVal("super_shape_n2", 2);
-									var->SetParamVal("super_shape_n3", 2);
-									destXform->AddVariation(var);
+									destXform->DeleteVariationById(eVariationId::VAR_PERSPECTIVE);
+
+									if (auto var = variationList->GetVariationCopy(eVariationId::VAR_PERSPECTIVE))
+										if (!destXform->AddVariation(var))
+											delete var;
+
+									found++;
 								}
 
-								found++;
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_CURL)) && dummyvar->m_Weight > 0)
+								{
+									destXform->DeleteVariationById(eVariationId::VAR_CURL);
+
+									if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_CURL))
+									{
+										var->SetParamVal("curl_c1", 0);
+
+										if (!destXform->AddVariation(var))
+											delete var;
+									}
+
+									found++;
+								}
+
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_SUPER_SHAPE)) && dummyvar->m_Weight > 0)
+								{
+									destXform->DeleteVariationById(eVariationId::VAR_SUPER_SHAPE);
+
+									if (auto var = variationList->GetParametricVariationCopy(eVariationId::VAR_SUPER_SHAPE))
+									{
+										var->SetParamVal("super_shape_n1", 2);
+										var->SetParamVal("super_shape_n2", 2);
+										var->SetParamVal("super_shape_n3", 2);
+
+										if (!destXform->AddVariation(var))
+											delete var;
+									}
+
+									found++;
+								}
 							}
 						}
 					}
@@ -247,25 +303,36 @@ public:
 								continue;
 
 							//Skip if this is also padding.
-							if (xf >= sourceEmbers[i + ii].TotalXformCount())
+							if (IsPadding(sourceEmbers[i + ii], xf, isFinal))
 								continue;
 
-							destOtherXform = destEmbers[i + ii].GetTotalXform(xf);
-
-							if (destOtherXform->GetVariationById(eVariationId::VAR_FAN))
+							if (destOtherXform = destEmbers[i + ii].GetTotalXform(xf))
 							{
-								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_FAN));
-								found++;
-							}
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_FAN)) && dummyvar->m_Weight > 0)
+								{
+									destXform->DeleteVariationById(eVariationId::VAR_FAN);
 
-							if (destOtherXform->GetVariationById(eVariationId::VAR_RINGS))
-							{
-								destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_RINGS));
-								found++;
+									if (auto var = variationList->GetVariationCopy(eVariationId::VAR_FAN))
+										if (!destXform->AddVariation(var))
+											delete var;
+
+									found++;
+								}
+
+								if ((dummyvar = destOtherXform->GetVariationById(eVariationId::VAR_RINGS)) && dummyvar->m_Weight > 0)
+								{
+									destXform->DeleteVariationById(eVariationId::VAR_RINGS);
+
+									if (auto var = variationList->GetVariationCopy(eVariationId::VAR_RINGS))
+										if (!destXform->AddVariation(var))
+											delete var;
+
+									found++;
+								}
 							}
 						}
 
-						if (found > 0)
+						if (destXform && (found > 0))
 						{
 							//Set the coefs appropriately.
 							destXform->m_Affine.A(0);
@@ -278,14 +345,20 @@ public:
 					}
 
 					//If there still are no matches, switch back to linear.
-					if (found == 0)
+					if (destXform)
 					{
-						destXform->AddVariation(variationList->GetVariationCopy(eVariationId::VAR_LINEAR));
-					}
-					else if (found > 0)
-					{
-						//Otherwise, normalize the weights.
-						destXform->NormalizeVariationWeights();
+						if (found == 0)
+						{
+							destXform->DeleteVariationById(eVariationId::VAR_LINEAR);
+
+							if (auto var = variationList->GetVariationCopy(eVariationId::VAR_LINEAR))
+								if (!destXform->AddVariation(var))
+									delete var;
+						}
+						else if (found > 0)
+						{
+							destXform->NormalizeVariationWeights();//Otherwise, normalize the weights.
+						}
 					}
 				}
 			}//Xforms.
@@ -448,6 +521,8 @@ public:
 				Align(&embers[i1 - 1], &m_Embers[0], 4);//Should really be doing some sort of checking here to ensure the ember vectors have 4 elements.
 				smoothFlag = true;
 			}
+
+			//smoothFlag = true;
 		}
 
 		result.m_Time = time;
@@ -602,6 +677,8 @@ public:
 	/// <param name="cxTrn">The vec2 vector to store the polar translation values</param>
 	static void ConvertLinearToPolar(const Ember<T>* embers, size_t size, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
 	{
+		const auto LOCALEPS = T(1e-10);//Even though EPS is defined elsewhere, need this here for full compatibility with flam3.
+
 		if (size == cxAng.size() &&
 				size == cxMag.size() &&
 				size == cxTrn.size())
@@ -687,9 +764,9 @@ public:
 							d = cxAng[k][col] - cxAng[k - 1][col];
 
 							//Adjust to avoid the -pi/pi discontinuity.
-							if (d > M_PI + EPS)
+							if (d > M_PI + LOCALEPS)
 								cxAng[k][col] -= M_2PI;
-							else if (d < -(M_PI - EPS))//Forces clockwise rotation at 180.
+							else if (d < -(M_PI - LOCALEPS))//Forces clockwise rotation at 180.
 								cxAng[k][col] += M_2PI;
 						}
 					}
@@ -709,6 +786,7 @@ public:
 	/// <param name="count">The size of the embers array</param>
 	static void AsymmetricRefAngles(Ember<T>* embers, size_t count)
 	{
+		const auto LOCALEPS = T(1e-10);//Even though EPS is defined elsewhere, need this here for full compatibility with flam3.
 		size_t k, xfi;
 		T cxang[4][2], c1[2], d;
 
@@ -734,9 +812,9 @@ public:
 					d = cxang[k][col] - cxang[k - 1][col];
 
 					//Adjust to avoid the -pi/pi discontinuity.
-					if (d > T(M_PI + EPS))
+					if (d > T(M_PI + LOCALEPS))
 						cxang[k][col] -= 2 * T(M_PI);
-					else if (d < -T(M_PI - EPS) )
+					else if (d < -T(M_PI - LOCALEPS))
 						cxang[k][col] += 2 * T(M_PI);
 
 					//If this is an asymmetric case, store the NON-symmetric angle

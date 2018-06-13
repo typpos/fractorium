@@ -248,7 +248,7 @@ void Fractorium::OnPostAffineColDoubleClicked(int logicalIndex)
 template <typename T>
 void FractoriumEmberController<T>::AffineSetHelper(double d, int index, bool pre)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		AffineDoubleSpinBox** spinners = pre ? m_Fractorium->m_PreSpins : m_Fractorium->m_PostSpins;
@@ -330,7 +330,7 @@ void Fractorium::OnO2Changed(double d) { m_Controller->AffineSetHelper(d, 5, sen
 template <typename T>
 void FractoriumEmberController<T>::FlipXforms(bool horizontal, bool vertical, bool pre)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 
@@ -367,7 +367,7 @@ void Fractorium::OnFlipVerticalButtonClicked(bool checked) { m_Controller->FlipX
 template <typename T>
 void FractoriumEmberController<T>::RotateXformsByAngle(double angle, bool pre)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		affine.Rotate(angle * DEG_2_RAD_T);
@@ -428,7 +428,7 @@ void Fractorium::OnRotateCcButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::MoveXforms(double x, double y, bool pre)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		affine.C(affine.C() + x);
@@ -514,7 +514,7 @@ void Fractorium::OnMoveRightButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::ScaleXforms(double scale, bool pre)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		affine.A(affine.A() * scale);
@@ -567,7 +567,7 @@ void Fractorium::OnScaleUpButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::ResetXformsAffine(bool pre)
 {
-	UpdateXform([&] (Xform<T>* xform)
+	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		affine.MakeID();
@@ -585,7 +585,7 @@ void Fractorium::OnResetAffineButtonClicked(bool checked) { m_Controller->ResetX
 template <typename T>
 void FractoriumEmberController<T>::RandomXformsAffine(bool pre)
 {
-	UpdateXform([&](Xform<T>* xform)
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		auto& affine = pre ? xform->m_Affine : xform->m_Post;
 		affine.A(m_Rand.Frand11<T>());

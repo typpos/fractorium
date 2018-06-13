@@ -202,7 +202,7 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 
 	if (sender)
 	{
-		UpdateXform([&](Xform<T>* xform)
+		UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 		{
 			auto var = m_VariationList->GetVariation(sender->GetVariationId());//The variation attached to the sender, for reference only.
 			auto parVar = dynamic_cast<const ParametricVariation<T>*>(var);//The parametric cast of that variation.

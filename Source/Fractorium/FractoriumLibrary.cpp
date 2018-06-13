@@ -7,14 +7,6 @@
 void Fractorium::InitLibraryUI()
 {
 	ui.LibraryTree->SetMainWindow(this);
-	ui.SequenceStaggerSpinBox->setValue(m_Settings->Stagger());
-	ui.SequenceRandomStaggerMaxSpinBox->setValue(m_Settings->StaggerMax());
-	ui.SequenceFramesPerRotSpinBox->setValue(m_Settings->FramesPerRot());
-	ui.SequenceRandomFramesPerRotMaxSpinBox->setValue(m_Settings->FramesPerRotMax());
-	ui.SequenceRotationsSpinBox->setValue(m_Settings->Rotations());
-	ui.SequenceRandomRotationsMaxSpinBox->setValue(m_Settings->RotationsMax());
-	ui.SequenceBlendFramesSpinBox->setValue(m_Settings->BlendFrames());
-	ui.SequenceRandomBlendMaxFramesSpinBox->setValue(m_Settings->BlendFramesMax());
 	connect(ui.LibraryTree,  SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemChanged(QTreeWidgetItem*, int)),	    Qt::QueuedConnection);
 	connect(ui.LibraryTree,  SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
 	connect(ui.LibraryTree,  SIGNAL(itemActivated(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
@@ -41,6 +33,33 @@ void Fractorium::InitLibraryUI()
 	connect(ui.SequenceRandomRotationsMaxSpinBox,          SIGNAL(valueChanged(double)), this, SLOT(OnSequenceRandomRotationsMaxSpinBoxChanged(double)),            Qt::QueuedConnection);
 	connect(ui.SequenceBlendFramesSpinBox,                 SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceBlendFramesSpinBoxChanged(int)),                      Qt::QueuedConnection);
 	connect(ui.SequenceRandomBlendMaxFramesSpinBox,        SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomBlendMaxFramesSpinBoxChanged(int)),             Qt::QueuedConnection);
+	connect(ui.SequenceRotationsPerBlendSpinBox,           SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomRotationsPerBlendSpinBoxChanged(int)),          Qt::QueuedConnection);
+	connect(ui.SequenceRotationsPerBlendMaxSpinBox,        SIGNAL(valueChanged(int)),    this, SLOT(OnSequenceRandomRotationsPerBlendMaxSpinBoxChanged(int)),       Qt::QueuedConnection);
+	//Stagger
+	ui.SequenceStaggerSpinBox->setValue(m_Settings->Stagger());//Lower.
+	ui.SequenceStaggerSpinBox->setMaximum(std::numeric_limits<int>::max());//Lower max = upper.
+	ui.SequenceRandomStaggerMaxSpinBox->setValue(m_Settings->StaggerMax());//Upper.
+	ui.SequenceRandomStaggerMaxSpinBox->setMinimum(m_Settings->Stagger());//Upper min = lower max.
+	//Frames per rotation.
+	ui.SequenceFramesPerRotSpinBox->setValue(m_Settings->FramesPerRot());//Lower.
+	ui.SequenceFramesPerRotSpinBox->setMaximum(std::numeric_limits<int>::max());//Lower max = upper.
+	ui.SequenceRandomFramesPerRotMaxSpinBox->setValue(m_Settings->FramesPerRotMax());//Upper.
+	ui.SequenceRandomFramesPerRotMaxSpinBox->setMinimum(m_Settings->FramesPerRot());//Upper min = lower max.
+	//Rotations.
+	ui.SequenceRotationsSpinBox->setValue(m_Settings->Rotations());//Lower.
+	ui.SequenceRotationsSpinBox->setMaximum(std::numeric_limits<int>::max());//Lower max = upper.
+	ui.SequenceRandomRotationsMaxSpinBox->setValue(m_Settings->RotationsMax());//Upper.
+	ui.SequenceRandomRotationsMaxSpinBox->setMinimum(m_Settings->Rotations());//Upper min = lower max.
+	//Blend frames.
+	ui.SequenceBlendFramesSpinBox->setValue(m_Settings->BlendFrames());//Lower.
+	ui.SequenceBlendFramesSpinBox->setMaximum(std::numeric_limits<int>::max());//Lower max = upper.
+	ui.SequenceRandomBlendMaxFramesSpinBox->setValue(m_Settings->BlendFramesMax());//Upper.
+	ui.SequenceRandomBlendMaxFramesSpinBox->setMinimum(m_Settings->BlendFrames());//Upper min = lower max.
+	//Rotations per blend.
+	ui.SequenceRotationsPerBlendSpinBox->setValue(m_Settings->RotationsPerBlend());//Lower.
+	ui.SequenceRotationsPerBlendSpinBox->setMaximum(std::numeric_limits<int>::max());//Lower max = upper.
+	ui.SequenceRotationsPerBlendMaxSpinBox->setValue(m_Settings->RotationsPerBlendMax());//Upper.
+	ui.SequenceRotationsPerBlendMaxSpinBox->setMinimum(m_Settings->RotationsPerBlend());//Upper min = lower max.
 }
 
 /// <summary>
@@ -627,7 +646,8 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 		if (framesPerRot > 1 && !rots)//Because framesPerRot control has a min value of 1, check greater than 1. Also don't need to check the inverse like in EmberGenome.
 		{
 			QMessageBox::critical(m_Fractorium, "Animation sequence parameters error",
-								  "Frames per rot cannot be positive while Rotations is zero");
+								  "Frames per rot cannot be greater than one while Rotations is zero. Setting it to 1.");
+			ui.SequenceFramesPerRotSpinBox->setValue(1);
 			return;
 		}
 	}
@@ -713,6 +733,8 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 
 			for (frame = 0; frame < blendFrames; frame++)
 			{
+				//if (frame == 43)
+				//	cout << frame << endl;
 				bool seqFlag = frame == 0 || (frame == blendFrames - 1);
 				blend = frame / double(blendFrames);
 				result.Clear();
@@ -830,25 +852,59 @@ void FractoriumEmberController<T>::SequenceOpenButtonClicked()
 
 void Fractorium::OnSequenceOpenButtonClicked(bool checked) { m_Controller->SequenceOpenButtonClicked(); }
 
-void Fractorium::OnSequenceRandomizeStaggerCheckBoxStateChanged(int state) { ui.SequenceRandomStaggerMaxSpinBox->setEnabled(state); }
-void Fractorium::OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state) { ui.SequenceRandomFramesPerRotMaxSpinBox->setEnabled(state); }
-void Fractorium::OnSequenceRandomizeRotationsCheckBoxStateChanged(int state) { ui.SequenceRandomRotationsMaxSpinBox->setEnabled(state); }
-void Fractorium::OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state) { ui.SequenceRandomBlendMaxFramesSpinBox->setEnabled(state); }
-void Fractorium::OnSequenceRandomizeRotationsPerBlendCheckBoxStateChanged(int state) { ui.SequenceRotationsPerBlendMaxSpinBox->setEnabled(state); }
+/// <summary>
+/// Constrain all min/max spinboxes when the max spinboxes are enabled/disabled via the random checkbox.
+/// </summary>
+void Fractorium::OnSequenceRandomizeStaggerCheckBoxStateChanged(int state)
+{
+	ui.SequenceRandomStaggerMaxSpinBox->setMinimum(ui.SequenceStaggerSpinBox->value());
+	ui.SequenceStaggerSpinBox->setMaximum(state ? ui.SequenceRandomStaggerMaxSpinBox->value() : std::numeric_limits<int>::max());
+	ui.SequenceRandomStaggerMaxSpinBox->setEnabled(state);
+}
+
+void Fractorium::OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state)
+{
+	ui.SequenceRandomFramesPerRotMaxSpinBox->setMinimum(ui.SequenceFramesPerRotSpinBox->value());
+	ui.SequenceFramesPerRotSpinBox->setMaximum(state ? ui.SequenceRandomFramesPerRotMaxSpinBox->value() : std::numeric_limits<int>::max());
+	ui.SequenceRandomFramesPerRotMaxSpinBox->setEnabled(state);
+}
+
+void Fractorium::OnSequenceRandomizeRotationsCheckBoxStateChanged(int state)
+{
+	ui.SequenceRandomRotationsMaxSpinBox->setMinimum(ui.SequenceRotationsSpinBox->value());
+	ui.SequenceRotationsSpinBox->setMaximum(state ? ui.SequenceRandomRotationsMaxSpinBox->value() : std::numeric_limits<int>::max());
+	ui.SequenceRandomRotationsMaxSpinBox->setEnabled(state);
+}
+
+void Fractorium::OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state)
+{
+	ui.SequenceRandomBlendMaxFramesSpinBox->setMinimum(ui.SequenceBlendFramesSpinBox->value());
+	ui.SequenceBlendFramesSpinBox->setMaximum(state ? ui.SequenceRandomBlendMaxFramesSpinBox->value() : std::numeric_limits<int>::max());
+	ui.SequenceRandomBlendMaxFramesSpinBox->setEnabled(state);
+}
+
+void Fractorium::OnSequenceRandomizeRotationsPerBlendCheckBoxStateChanged(int state)
+{
+	ui.SequenceRotationsPerBlendMaxSpinBox->setMinimum(ui.SequenceRotationsPerBlendSpinBox->value());
+	ui.SequenceRotationsPerBlendSpinBox->setMaximum(state ? ui.SequenceRotationsPerBlendMaxSpinBox->value() : std::numeric_limits<int>::max());
+	ui.SequenceRotationsPerBlendMaxSpinBox->setEnabled(state);
+}
 
 /// <summary>
 /// Constrain all min/max spinboxes.
 /// </summary>
-void Fractorium::OnSequenceStaggerSpinBoxChanged(double d)            { if (ui.SequenceRandomizeStaggerCheckBox->isChecked()) ConstrainLow(ui.SequenceStaggerSpinBox, ui.SequenceRandomStaggerMaxSpinBox); }
-void Fractorium::OnSequenceRandomStaggerMaxSpinBoxChanged(double d)   { ConstrainHigh(ui.SequenceStaggerSpinBox, ui.SequenceRandomStaggerMaxSpinBox); }
-void Fractorium::OnSequenceStartFlameSpinBoxChanged(int d)            { ConstrainLow(ui.SequenceStartFlameSpinBox, ui.SequenceStopFlameSpinBox); }
-void Fractorium::OnSequenceStopFlameSpinBoxChanged(int d)             { ConstrainHigh(ui.SequenceStartFlameSpinBox, ui.SequenceStopFlameSpinBox); }
-void Fractorium::OnSequenceFramesPerRotSpinBoxChanged(int d)          { if (ui.SequenceRandomizeFramesPerRotCheckBox->isChecked()) ConstrainLow(ui.SequenceFramesPerRotSpinBox, ui.SequenceRandomFramesPerRotMaxSpinBox); }
-void Fractorium::OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int d) {	ConstrainHigh(ui.SequenceFramesPerRotSpinBox, ui.SequenceRandomFramesPerRotMaxSpinBox); }
-void Fractorium::OnSequenceRotationsSpinBoxChanged(double d)          { if (ui.SequenceRandomizeRotationsCheckBox->isChecked()) ConstrainLow(ui.SequenceRotationsSpinBox, ui.SequenceRandomRotationsMaxSpinBox); }
-void Fractorium::OnSequenceRandomRotationsMaxSpinBoxChanged(double d) {	ConstrainHigh(ui.SequenceRotationsSpinBox, ui.SequenceRandomRotationsMaxSpinBox); }
-void Fractorium::OnSequenceBlendFramesSpinBoxChanged(int d)           { if (ui.SequenceRandomizeBlendFramesCheckBox->isChecked()) ConstrainLow(ui.SequenceBlendFramesSpinBox, ui.SequenceRandomBlendMaxFramesSpinBox); }
-void Fractorium::OnSequenceRandomBlendMaxFramesSpinBoxChanged(int d)  { ConstrainHigh(ui.SequenceBlendFramesSpinBox, ui.SequenceRandomBlendMaxFramesSpinBox); }
+void Fractorium::OnSequenceStaggerSpinBoxChanged(double d)                 { if (ui.SequenceRandomizeStaggerCheckBox->isChecked()) ui.SequenceRandomStaggerMaxSpinBox->setMinimum(d);               }
+void Fractorium::OnSequenceRandomStaggerMaxSpinBoxChanged(double d)        { if (ui.SequenceRandomStaggerMaxSpinBox->hasFocus()) ui.SequenceStaggerSpinBox->setMaximum(d);                          }
+void Fractorium::OnSequenceStartFlameSpinBoxChanged(int d)                 { ui.SequenceStopFlameSpinBox->setMinimum(d);                                                                            }
+void Fractorium::OnSequenceStopFlameSpinBoxChanged(int d)                  { if (ui.SequenceStopFlameSpinBox->hasFocus()) ui.SequenceStartFlameSpinBox->setMaximum(d);                              }
+void Fractorium::OnSequenceFramesPerRotSpinBoxChanged(int d)               { if (ui.SequenceRandomizeFramesPerRotCheckBox->isChecked()) ui.SequenceRandomFramesPerRotMaxSpinBox->setMinimum(d);     }
+void Fractorium::OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int d)      { if (ui.SequenceRandomFramesPerRotMaxSpinBox->hasFocus()) ui.SequenceFramesPerRotSpinBox->setMaximum(d);                }
+void Fractorium::OnSequenceRotationsSpinBoxChanged(double d)               { if (ui.SequenceRandomizeRotationsCheckBox->isChecked()) ui.SequenceRandomRotationsMaxSpinBox->setMinimum(d);           }
+void Fractorium::OnSequenceRandomRotationsMaxSpinBoxChanged(double d)      { if (ui.SequenceRandomRotationsMaxSpinBox->hasFocus()) ui.SequenceRotationsSpinBox->setMaximum(d);                      }
+void Fractorium::OnSequenceBlendFramesSpinBoxChanged(int d)                { if (ui.SequenceRandomizeBlendFramesCheckBox->isChecked()) ui.SequenceRandomBlendMaxFramesSpinBox->setMinimum(d);       }
+void Fractorium::OnSequenceRandomBlendMaxFramesSpinBoxChanged(int d)       { if (ui.SequenceRandomBlendMaxFramesSpinBox->hasFocus()) ui.SequenceBlendFramesSpinBox->setMaximum(d);                  }
+void Fractorium::OnSequenceRandomRotationsPerBlendSpinBoxChanged(int d)    { if (ui.SequenceRandomizeRotationsPerBlendCheckBox->isChecked()) ui.SequenceRotationsPerBlendMaxSpinBox->setMinimum(d); }
+void Fractorium::OnSequenceRandomRotationsPerBlendMaxSpinBoxChanged(int d) { if (ui.SequenceRotationsPerBlendMaxSpinBox->hasFocus()) ui.SequenceRotationsPerBlendSpinBox->setMaximum(d);            }
 
 /// <summary>
 /// Save all sequence settings to match the values in the controls.
@@ -863,6 +919,8 @@ void Fractorium::SyncSequenceSettings()
 	m_Settings->RotationsMax(ui.SequenceRandomRotationsMaxSpinBox->value());
 	m_Settings->BlendFrames(ui.SequenceBlendFramesSpinBox->value());
 	m_Settings->BlendFramesMax(ui.SequenceRandomBlendMaxFramesSpinBox->value());
+	m_Settings->RotationsPerBlend(ui.SequenceRotationsPerBlendSpinBox->value());
+	m_Settings->RotationsPerBlendMax(ui.SequenceRotationsPerBlendMaxSpinBox->value());
 }
 
 template class FractoriumEmberController<float>;

@@ -574,7 +574,7 @@ public:
 
 			for (auto var : variations) norm += var->m_Weight;
 
-			for (auto var : variations) var->m_Weight /= norm;
+			for (auto var : variations) var->m_Weight /= Zeps(norm);//Ensure a divide by zero never happens.
 		});
 	}
 
@@ -708,10 +708,11 @@ public:
 		for (size_t i = 0; i < xform.m_Motion.size(); i++)
 		{
 			//Original only pulls these from the first motion xform which is a bug. Want to pull it from each one.
-			Xform<T>& currentMot = xform.m_Motion[i];
-			T freq = currentMot.m_MotionFreq;
-			eMotion func = currentMot.m_MotionFunc;
-			T offset = currentMot.m_MotionOffset;
+			auto& currentMot = xform.m_Motion[i];
+			auto freq = currentMot.m_MotionFreq;
+			auto func = currentMot.m_MotionFunc;
+			auto offset = currentMot.m_MotionOffset;
+			auto cleanOffset = offset != EMPTYFIELD ? offset : 0;
 			//Clamp these to the appropriate range after all are applied.
 			APPMOT(m_Weight);
 			APPMOT(m_ColorX);
@@ -730,13 +731,13 @@ public:
 				if (!var)//It wasn't present, so add it and set the weight.
 				{
 					Variation<T>* newVar = motVar->Copy();
-					newVar->m_Weight = motVar->m_Weight * Interpolater<T>::MotionFuncs(func, freq * (blend + offset));
+					newVar->m_Weight = motVar->m_Weight * Interpolater<T>::MotionFuncs(func, freq * (blend + cleanOffset));
 					AddVariation(newVar);
 					var = newVar;//Use this below for params.
 				}
 				else//It was present, so apply the motion func to the weight.
 				{
-					var->m_Weight += motVar->m_Weight * Interpolater<T>::MotionFuncs(func, freq * (blend + offset));
+					var->m_Weight += motVar->m_Weight * Interpolater<T>::MotionFuncs(func, freq * (blend + cleanOffset));
 				}
 
 				//At this point, we've added if needed, or just applied the motion func to the weight.
@@ -750,7 +751,7 @@ public:
 					for (size_t k = 0; k < motParVar->ParamCount(); k++)
 					{
 						if (!motParams[k].IsPrecalc())
-							*(params[k].Param()) += motParams[k].ParamVal() * Interpolater<T>::MotionFuncs(func, freq * (blend + offset));
+							*(params[k].Param()) += motParams[k].ParamVal() * Interpolater<T>::MotionFuncs(func, freq * (blend + cleanOffset));
 					}
 				}
 			}

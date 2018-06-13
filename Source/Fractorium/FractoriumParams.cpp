@@ -44,18 +44,18 @@ void Fractorium::InitParamsUI()
 	//Geometry.
 	row = 0;
 	table = ui.GeometryTable;
-	SetupSpinner<SpinBox, int>		   (table, this, row, 1, m_WidthSpin,		spinHeight,	   10,	  2048,		50, SIGNAL(valueChanged(int)),	  SLOT(OnWidthChanged(int)),		  true,  width(),  width(),  width());
-	SetupSpinner<SpinBox, int>		   (table, this, row, 1, m_HeightSpin,		spinHeight,	   10,	  2048,		50, SIGNAL(valueChanged(int)),	  SLOT(OnHeightChanged(int)),		  true, height(), height(), height());
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterXSpin,     spinHeight, -dmax,    dmax,   0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterXChanged(double)),     true,	  0,   0,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterYSpin,     spinHeight, -dmax,    dmax,   0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterYChanged(double)),     true,	  0,   0,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ScaleSpin,       spinHeight,    10,    dmax,     20, SIGNAL(valueChanged(double)), SLOT(OnScaleChanged(double)),	      true, 240, 240, 240);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,      25,    0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	      true,	  0,   0,	0);
+	SetupSpinner<SpinBox, int>		   (table, this, row, 1, m_WidthSpin,		spinHeight,	   10,	  2048,    50, SIGNAL(valueChanged(int)),	 SLOT(OnWidthChanged(int)),		     true,  width(),  width(),  width());
+	SetupSpinner<SpinBox, int>		   (table, this, row, 1, m_HeightSpin,		spinHeight,	   10,	  2048,	   50, SIGNAL(valueChanged(int)),	 SLOT(OnHeightChanged(int)),		 true, height(), height(), height());
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterXSpin,     spinHeight, -dmax,    dmax,  0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterXChanged(double)),     true,	  0,   0,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterYSpin,     spinHeight, -dmax,    dmax,  0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterYChanged(double)),     true,	  0,   0,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ScaleSpin,       spinHeight,    10,    dmax,    20, SIGNAL(valueChanged(double)), SLOT(OnScaleChanged(double)),	     true, 240, 240, 240);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,      25,   0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	     true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight,  -180,     180,     10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,      1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PerspectiveSpin, spinHeight,  -500,     500,   0.01, SIGNAL(valueChanged(double)), SLOT(OnPerspectiveChanged(double)), true,	  0,   1,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PitchSpin,       spinHeight,  -180,     180,      1, SIGNAL(valueChanged(double)), SLOT(OnPitchChanged(double)),       true,	  0,  45,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_YawSpin,         spinHeight,  -180,     180,      1, SIGNAL(valueChanged(double)), SLOT(OnYawChanged(double)),         true,	  0,  45,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DepthBlurSpin,   spinHeight,  -100,     100,   0.01, SIGNAL(valueChanged(double)), SLOT(OnDepthBlurChanged(double)),   true,	  0,   1,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,     1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PerspectiveSpin, spinHeight,  -500,     500,  0.01, SIGNAL(valueChanged(double)), SLOT(OnPerspectiveChanged(double)), true,	  0,   1,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PitchSpin,       spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnPitchChanged(double)),       true,	  0,  45,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_YawSpin,         spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnYawChanged(double)),         true,	  0,  45,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DepthBlurSpin,   spinHeight, -dmax,    dmax,  0.01, SIGNAL(valueChanged(double)), SLOT(OnDepthBlurChanged(double)),   true,	  0,   1,	0);
 	//Set w/h max values.
 	m_CenterXSpin->setDecimals(3);
 	m_CenterYSpin->setDecimals(3);
@@ -438,38 +438,6 @@ template <typename T> void FractoriumEmberController<T>::SpatialFilterTypeChange
 void Fractorium::OnSpatialFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->SpatialFilterTypeChanged(text); }
 
 /// <summary>
-/// Set the temporal filter width to be used with animation.
-/// Called when the temporal filter width spinner is changed.
-/// Does not reset anything because this is only used for animation.
-/// In the future, when animation is implemented, this will have an effect.
-/// </summary>
-/// <param name="d">The temporal filter width</param>
-template <typename T> void FractoriumEmberController<T>::TemporalFilterWidthChanged(double d)
-{
-	UpdateAll([&](Ember<T>& ember, bool isMain)
-	{
-		ember.m_TemporalFilterWidth = d;
-	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
-}
-void Fractorium::OnTemporalFilterWidthChanged(double d) { m_Controller->TemporalFilterWidthChanged(d); }
-
-/// <summary>
-/// Set the temporal filter type to be used with animation.
-/// Called when the temporal filter combo box index is changed.
-/// Does not reset anything because this is only used for animation.
-/// In the future, when animation is implemented, this will have an effect.
-/// </summary>
-/// <param name="text">The name of the temporal filter</param>
-template <typename T> void FractoriumEmberController<T>::TemporalFilterTypeChanged(const QString& text)
-{
-	UpdateAll([&](Ember<T>& ember, bool isMain)
-	{
-		ember.m_TemporalFilterType = TemporalFilterCreator<T>::FromString(text.toStdString());
-	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
-}
-void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->TemporalFilterTypeChanged(text); }
-
-/// <summary>
 /// Set the density estimation filter min radius value.
 /// Resets the rendering process to density filtering.
 /// </summary>
@@ -598,22 +566,6 @@ template <typename T> void FractoriumEmberController<T>::SupersampleChanged(int 
 void Fractorium::OnSupersampleChanged(int d) { m_Controller->SupersampleChanged(d); }
 
 /// <summary>
-/// Set the temporal samples to be used with animation.
-/// Called when the temporal samples spinner is changed.
-/// Does not reset anything because this is only used for animation.
-/// In the future, when animation is implemented, this will have an effect.
-/// </summary>
-/// <param name="d">The temporal samples value</param>
-template <typename T> void FractoriumEmberController<T>::TemporalSamplesChanged(int i)
-{
-	UpdateAll([&](Ember<T>& ember, bool isMain)
-	{
-		ember.m_TemporalSamples = i;
-	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
-}
-void Fractorium::OnTemporalSamplesChanged(int d) { m_Controller->TemporalSamplesChanged(d); }
-
-/// <summary>
 /// Set the affine interpolation type.
 /// Does not reset anything because this is only used for animation.
 /// In the future, when animation is implemented, this will have an effect.
@@ -625,13 +577,21 @@ void FractoriumEmberController<T>::AffineInterpTypeChanged(int i)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
+		eAffineInterp interp;
+
 		if (i == 0)
-			ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LINEAR;
+			interp = eAffineInterp::AFFINE_INTERP_LINEAR;
 		else if (i == 1)
-			ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
+			interp = eAffineInterp::AFFINE_INTERP_LOG;
 		else
-			ember.m_AffineInterp = eAffineInterp::AFFINE_INTERP_LINEAR;
-	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+			interp = eAffineInterp::AFFINE_INTERP_LINEAR;
+
+		ember.m_AffineInterp = interp;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_AffineInterp = interp;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnAffineInterpTypeComboCurrentIndexChanged(int index) { m_Controller->AffineInterpTypeChanged(index); }
@@ -639,7 +599,6 @@ void Fractorium::OnAffineInterpTypeComboCurrentIndexChanged(int index) { m_Contr
 /// <summary>
 /// Set the interpolation type.
 /// Does not reset anything because this is only used for animation.
-/// In the future, when animation is implemented, this will have an effect.
 /// Called when the interp type combo box index is changed.
 /// </summary>
 /// <param name="i">The index</param>
@@ -648,16 +607,85 @@ void FractoriumEmberController<T>::InterpTypeChanged(int i)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
-		if (i == 0)
-			ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
+		eInterp interp;
+
+		if (i == 0)//Need to make this work like animate flag where it sets the value but doesn't trigger and update.//TODO
+			interp = eInterp::EMBER_INTERP_LINEAR;
 		else if (i == 1)
-			ember.m_Interp = eInterp::EMBER_INTERP_SMOOTH;
+			interp = eInterp::EMBER_INTERP_SMOOTH;
 		else
-			ember.m_Interp = eInterp::EMBER_INTERP_LINEAR;
-	}, true, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+			interp = eInterp::EMBER_INTERP_LINEAR;
+
+		ember.m_Interp = interp;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_Interp = interp;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnInterpTypeComboCurrentIndexChanged(int index) { m_Controller->InterpTypeChanged(index); }
+
+/// <summary>
+/// Set the temporal samples to be used with animation.
+/// Called when the temporal samples spinner is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The temporal samples value</param>
+template <typename T>
+void FractoriumEmberController<T>::TemporalSamplesChanged(int i)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_TemporalSamples = i;//This will be reset on every render to trick the renderer into not thinking it's doing an animation. So setting this has no real effect. Users should set it in the final render dialog when animating.
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_TemporalSamples = i;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+}
+void Fractorium::OnTemporalSamplesChanged(int d) { m_Controller->TemporalSamplesChanged(d); }
+
+/// <summary>
+/// Set the temporal filter width to be used with animation.
+/// Called when the temporal filter width spinner is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The temporal filter width</param>
+template <typename T>
+void FractoriumEmberController<T>::TemporalFilterWidthChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_TemporalFilterWidth = d;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_TemporalFilterWidth = d;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+}
+void Fractorium::OnTemporalFilterWidthChanged(double d) { m_Controller->TemporalFilterWidthChanged(d); }
+
+/// <summary>
+/// Set the temporal filter type to be used with animation.
+/// Called when the temporal filter combo box index is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="text">The name of the temporal filter</param>
+template <typename T>
+void FractoriumEmberController<T>::TemporalFilterTypeChanged(const QString& text)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		auto filter = TemporalFilterCreator<T>::FromString(text.toStdString());
+		ember.m_TemporalFilterType = filter;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_TemporalFilterType = filter;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+}
+void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->TemporalFilterTypeChanged(text); }
 
 /// <summary>
 /// Set the center.

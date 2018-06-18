@@ -1,4 +1,32 @@
-1.0.0.9 5/13/2017
+1.0.0.10 6/17/2018
+--User changes
+ -No longer constrain pitch, yaw or depth spinners to -180 - 180.
+
+--Bug fixes
+ -Properly set color index on padded xforms.
+ -Adding a padding final xform included a linear variation with a weight of zero to not appear empty. Made it have a weight of 1.
+ -Always write animate tag on final xform when saving to Xml.
+ -Motion was being applied to the wrong flame in SheepTools::Edge(), so apply it to the correct one.
+ -Prevent divide by zero when normalizing variation weights.
+ -Was accidentally adding the placeholder value of -9999 for motion_offset to varation weights and parameters when applying motion. Set to zero if no value present.
+ -Clamp flame rotation values to -180 - 180 when reading a flame from Xml.
+ -Events were not properly wired for user changes in the random rotations per blend controls in the sequencer.
+ -Fix major UI bugs with sequencer min/max random controls which made it nearly impossible to hand type values.
+ -Values from rotations per blend and rotations per blend max were not being saved to file between program runs.
+ -Checking animate for an xform was not applied to all flames even if Apply All was checked.
+ -Changing interpolation type, temporal filter width, temporal type, and affine interpolation type were not actually saving to the flame when changed.
+ -Grid on the main window was not being drawn at the right scale initially due to some OpenGL initialization occurring in the wrong order.
+ -Severe bugs in sequence generation code:
+  --Improperly detected padding xforms.
+  --When looking for specific variations during xform aligning, only presence was detected, when it should have been presence plus a weight greater than zero.
+  --When adding specific variations during xform aligning, must first remove any variations of that type.
+  --Two variables were unsigned when they should have been signed. This prevented large blocks of code from ever executing.
+  --When interpolating affines, an EPS that was too small was used, causing affine values to interpolate incorrectly. Instead use 1e-10 to ensure results equal to flam3.
+
+--Code changes
+ -Modify FractoriumEmberController::UpdateXform() to pass the selected xform index as well as the absolute index to func().
+ 
+1.0.0.9 5/13/2018
 --Bug fixes
  -Pausing did not work when using OpenCL renderer.
 

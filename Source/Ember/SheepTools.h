@@ -846,8 +846,8 @@ public:
 		//Scale the image so that the total number of pixels is ~10,000.
 		pixTotal = ember.m_FinalRasW * ember.m_FinalRasH;
 		scalar = std::sqrt(T(10000) / pixTotal);
-		adjustedEmber.m_FinalRasW = static_cast<size_t>(ember.m_FinalRasW  * scalar);
-		adjustedEmber.m_FinalRasH = static_cast<size_t>(ember.m_FinalRasH  * scalar);
+		adjustedEmber.m_FinalRasW = static_cast<size_t>(std::ceil(ember.m_FinalRasW  * scalar));
+		adjustedEmber.m_FinalRasH = static_cast<size_t>(std::ceil(ember.m_FinalRasH  * scalar));
 		adjustedEmber.m_PixelsPerUnit *= scalar;
 		adjustedEmber.m_TemporalSamples = 1;
 		m_Renderer->SetEmber(adjustedEmber);
@@ -859,14 +859,15 @@ public:
 			return -1;
 		}
 
-		m_Hist.resize(res3);
+		m_Hist.resize(res + res + (res * res) + (res * res * res));//Add one extra res just to be safe.
 		Memset(m_Hist);
-		auto p = m_FinalImage.data();
 
-		for (i = 0; i < m_Renderer->FinalDimensions(); i++)
+		for (i = 0; i < m_FinalImage.size(); i++)
 		{
-			m_Hist[size_t((p->r * res) + (p->g * res) * res + (p->b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
-			p++;
+			auto& p = m_FinalImage[i];
+			m_Hist[size_t((p.r * res) +
+									  (p.g * res) * res +
+									  (p.b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
 		}
 
 		for (i = 0; i < res3; i++)

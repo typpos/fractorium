@@ -1,4 +1,4 @@
-#include "FractoriumPch.h"
+﻿#include "FractoriumPch.h"
 #include "Fractorium.h"
 #include "QssDialog.h"
 
@@ -89,6 +89,10 @@ Fractorium::Fractorium(QWidget* p)
 		pixmap.fill(m_XformComboColors[i]);
 		m_XformComboIcons[i] = QIcon(pixmap);
 	}
+    
+    //Set Default VariationTreeBgColor
+    m_VariationTreeBgColorNoneZero=QColor(200,200,200);
+    m_VariationTreeBgColorZero=QColor(255,255,255);
 
 	QPixmap pixmap(iconSize_, iconSize_);
 	pixmap.fill(m_FinalXformComboColor);

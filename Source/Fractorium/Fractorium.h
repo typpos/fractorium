@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ui_Fractorium.h"
 #include "FractoriumCommon.h"
@@ -63,7 +63,9 @@ template <typename T> class FinalRenderEmberController;
 class Fractorium : public QMainWindow
 {
 	Q_OBJECT
-
+    Q_PROPERTY(QColor VariationTreeBgColorNoneZero MEMBER m_VariationTreeBgColorNoneZero)
+    Q_PROPERTY(QColor VariationTreeBgColorZero MEMBER m_VariationTreeBgColorZero)
+    
 	friend GLWidget;
 	friend QssDialog;
 	friend LibraryTreeWidget;
@@ -559,6 +561,7 @@ private:
 	char m_CoordinateString[128];
 	QColor m_XformComboColors[XFORM_COLOR_COUNT], m_FinalXformComboColor;
 	QIcon m_XformComboIcons[XFORM_COLOR_COUNT], m_FinalXformComboIcon;
+    QColor m_VariationTreeBgColorNoneZero, m_VariationTreeBgColorZero;
 	vector<QDockWidget*> m_Docks;
 
 	int m_FontSize;
@@ -569,4 +572,7 @@ private:
 	shared_ptr<OpenCLInfo> m_Info;
 	unique_ptr<FractoriumEmberControllerBase> m_Controller;
 	Ui::FractoriumClass ui;
+    
+    
+
 };

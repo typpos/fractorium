@@ -1,4 +1,4 @@
-#include "FractoriumPch.h"
+﻿#include "FractoriumPch.h"
 #include "Fractorium.h"
 
 /// <summary>
@@ -15,14 +15,20 @@ void Fractorium::InitXformsUI()
 	connect(ui.AddFinalXformButton,  SIGNAL(clicked(bool)),			   this, SLOT(OnAddFinalXformButtonClicked(bool)),  Qt::QueuedConnection);
 	connect(ui.CurrentXformCombo,	 SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentXformComboChanged(int)),	    Qt::QueuedConnection);
 	connect(ui.AnimateXformCheckBox, SIGNAL(stateChanged(int)),        this, SLOT(OnXformAnimateCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	SetFixedTableHeader(ui.XformWeightNameTable->horizontalHeader());
+	SetFixedTableHeader(ui.XformWeightNameTable->horizontalHeader(),QHeaderView::ResizeToContents);
 	//Use SetupSpinner() just to create the spinner, but use col of -1 to prevent it from being added to the table.
 	SetupSpinner<DoubleSpinBox, double>(ui.XformWeightNameTable, this, row, -1, m_XformWeightSpin, spinHeight, 0, 1000, 0.05, SIGNAL(valueChanged(double)), SLOT(OnXformWeightChanged(double)), false, 0, 1, 0);
 	m_XformWeightSpin->setDecimals(3);
 	m_XformWeightSpin->SmallStep(0.001);
-	m_XformWeightSpinnerButtonWidget = new SpinnerButtonWidget(m_XformWeightSpin, "=", 20, 19, ui.XformWeightNameTable);
-	m_XformWeightSpinnerButtonWidget->m_Button->setToolTip("Equalize weights");
+    m_XformWeightSpin->setMinimumWidth(40);
+	m_XformWeightSpinnerButtonWidget = new SpinnerLabelButtonWidget(m_XformWeightSpin, "=", 20, 19, ui.XformWeightNameTable);
+    m_XformWeightSpinnerButtonWidget->m_SpinBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+    m_XformWeightSpinnerButtonWidget->m_Label->setStyleSheet("border: 0px;");
+    m_XformWeightSpinnerButtonWidget->m_Label->setAlignment(Qt::AlignRight| Qt::AlignVCenter);
+    m_XformWeightSpinnerButtonWidget->m_Label->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    m_XformWeightSpinnerButtonWidget->m_Button->setToolTip("Equalize weights");
 	m_XformWeightSpinnerButtonWidget->m_Button->setStyleSheet("text-align: center center");
+    m_XformWeightSpinnerButtonWidget->setMaximumWidth(130);
 	connect(m_XformWeightSpinnerButtonWidget->m_Button, SIGNAL(clicked(bool)), this, SLOT(OnEqualWeightButtonClicked(bool)), Qt::QueuedConnection);
 	ui.XformWeightNameTable->setCellWidget(0, 0, m_XformWeightSpinnerButtonWidget);
 	ui.XformWeightNameTable->setItem(0, 1, new QTableWidgetItem());
@@ -471,8 +477,9 @@ void FractoriumEmberController<T>::SetNormalizedWeightText(Xform<T>* xform)
 		m_Ember.CalcNormalizedWeights(m_NormalizedWeights);
 
 		if (index != -1 && index < m_NormalizedWeights.size())
-			m_Fractorium->m_XformWeightSpin->setSuffix(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
-	}
+			//m_Fractorium->m_XformWeightSpin->setSuffix(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
+            m_Fractorium->m_XformWeightSpinnerButtonWidget->m_Label->setText(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
+    }
 }
 /// <summary>
 /// Determine whether the specified xform is the final xform in the ember.

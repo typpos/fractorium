@@ -484,7 +484,7 @@ private:
 
 	//Xforms.
 	DoubleSpinBox* m_XformWeightSpin;
-	SpinnerButtonWidget* m_XformWeightSpinnerButtonWidget;
+	SpinnerLabelButtonWidget* m_XformWeightSpinnerButtonWidget;
 	QFormLayout* m_XformsSelectionLayout;
 	vector<QCheckBox*> m_XformSelections;
 

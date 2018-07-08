@@ -66,6 +66,11 @@ void SpinBox::DoubleClickLowVal(int val)
 	m_DoubleClickLowVal = val;
 }
 
+int SpinBox::DoubleClickLowVal()
+{
+	return m_DoubleClickLowVal;
+}
+
 /// <summary>
 /// Set the value to be used when the user double clicks the spinner while
 /// it contains zero.
@@ -76,6 +81,11 @@ void SpinBox::DoubleClickZero(int val)
 	m_DoubleClickZero = val;
 }
 
+int SpinBox::DoubleClickZero()
+{
+	return m_DoubleClickZero;
+}
+
 /// <summary>
 /// Set the value to be used when the user double clicks the spinner while
 /// it contains a non-zero value.
@@ -84,6 +94,11 @@ void SpinBox::DoubleClickZero(int val)
 void SpinBox::DoubleClickNonZero(int val)
 {
 	m_DoubleClickNonZero = val;
+}
+
+int SpinBox::DoubleClickNonZero()
+{
+	return m_DoubleClickNonZero;
 }
 
 /// <summary>
@@ -175,9 +190,15 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 				  (m_Settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
 		{
 			if (IsClose(m_DoubleClickLowVal, value()))
+			{
+				m_DoubleClickZeroEvent(this, m_DoubleClickZero);
 				setValue(m_DoubleClickZero);
+			}
 			else
+			{
+				m_DoubleClickNonZeroEvent(this, m_DoubleClickNonZero);
 				setValue(m_DoubleClickNonZero);
+			}
 		}
 	}
 	else

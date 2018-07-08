@@ -154,6 +154,7 @@ void Fractorium::OnActionDrawImage(bool checked)
 /// <param name="checked">Check state, show grid if true, else hide.</param>
 void Fractorium::OnActionDrawGrid(bool checked)
 {
+	m_Settings->ShowGrid(checked);
 	ui.GLDisplay->update();
 }
 

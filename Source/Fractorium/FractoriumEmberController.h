@@ -148,6 +148,7 @@ public:
 	virtual void PaletteModeChanged(uint i) { }
 	virtual void WidthChanged(uint i) { }
 	virtual void HeightChanged(uint i) { }
+	virtual void ResizeAndScale(int width, int height, eScaleType scaleType) { }
 	virtual void CenterXChanged(double d) { }
 	virtual void CenterYChanged(double d) { }
 	virtual void ScaleChanged(double d) { }
@@ -413,6 +414,7 @@ public:
 	virtual void PaletteModeChanged(uint i) override;
 	virtual void WidthChanged(uint i) override;
 	virtual void HeightChanged(uint i) override;
+	virtual void ResizeAndScale(int width, int height, eScaleType scaleType) override;
 	virtual void CenterXChanged(double d) override;
 	virtual void CenterYChanged(double d) override;
 	virtual void ScaleChanged(double d) override;

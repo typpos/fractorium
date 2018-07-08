@@ -23,10 +23,15 @@ public:
 	void SetValueStealth(size_t d);
 	void DoubleClick(bool b);
 	void DoubleClickLowVal(int val);
+	int DoubleClickLowVal();
 	void DoubleClickZero(int val);
+	int DoubleClickZero();
 	void DoubleClickNonZero(int val);
+	int DoubleClickNonZero();
 	void SmallStep(int step);
 	QLineEdit* lineEdit();
+	std::function<void(SpinBox*, int)> m_DoubleClickZeroEvent = [&](SpinBox*, int) {};
+	std::function<void(SpinBox*, int)> m_DoubleClickNonZeroEvent = [&](SpinBox*, int) {};
 
 public slots:
 	void onSpinBoxValueChanged(int i);

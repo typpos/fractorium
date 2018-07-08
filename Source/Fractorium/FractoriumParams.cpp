@@ -50,12 +50,22 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterYSpin,     spinHeight, -dmax,    dmax,  0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterYChanged(double)),     true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ScaleSpin,       spinHeight,    10,    dmax,    20, SIGNAL(valueChanged(double)), SLOT(OnScaleChanged(double)),	     true, 240, 240, 240);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,      25,   0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	     true,	  0,   0,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight,  -180,     180,     10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight,  -180,     180,    10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,     1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PerspectiveSpin, spinHeight,  -500,     500,  0.01, SIGNAL(valueChanged(double)), SLOT(OnPerspectiveChanged(double)), true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PitchSpin,       spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnPitchChanged(double)),       true,	  0,  45,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_YawSpin,         spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnYawChanged(double)),         true,	  0,  45,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DepthBlurSpin,   spinHeight, -dmax,    dmax,  0.01, SIGNAL(valueChanged(double)), SLOT(OnDepthBlurChanged(double)),   true,	  0,   1,	0);
+	m_WidthSpin->m_DoubleClickNonZeroEvent = [&](SpinBox * sb, int val)
+	{
+		m_Controller->ResizeAndScale(val, m_HeightSpin->DoubleClickNonZero(), eScaleType::SCALE_WIDTH);
+		m_HeightSpin->SetValueStealth(m_HeightSpin->DoubleClickNonZero());
+	};
+	m_HeightSpin->m_DoubleClickNonZeroEvent = [&](SpinBox * sb, int val)
+	{
+		m_Controller->ResizeAndScale(m_WidthSpin->DoubleClickNonZero(), val, eScaleType::SCALE_HEIGHT);
+		m_WidthSpin->SetValueStealth(m_WidthSpin->DoubleClickNonZero());
+	};
 	//Set w/h max values.
 	m_CenterXSpin->setDecimals(3);
 	m_CenterYSpin->setDecimals(3);
@@ -252,10 +262,11 @@ void Fractorium::OnPaletteModeComboCurrentIndexChanged(int index) { m_Controller
 /// </summary>
 
 /// <summary>
-/// Placeholder, do nothing.
-/// Dimensions are set automatically to match the dimensions of GLWidget.
+/// Set the width of the ember in pixels to the passed in value.
+/// Called when the width spinner is changed in a manner other than double clicking.
+/// Resets the rendering process.
 /// </summary>
-/// <param name="d">Ignored</param>
+/// <param name="i">The width value in pixels to set</param>
 template <typename T> void FractoriumEmberController<T>::WidthChanged(uint i)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -263,13 +274,15 @@ template <typename T> void FractoriumEmberController<T>::WidthChanged(uint i)
 		ember.m_FinalRasW = i;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
+
 void Fractorium::OnWidthChanged(int i) { m_Controller->WidthChanged(i); }
 
 /// <summary>
-/// Placeholder, do nothing.
-/// Dimensions are set automatically to match the dimensions of GLWidget.
+/// Set the height of the ember in pixels to the passed in value.
+/// Called when the height spinner is changed in a manner other than double clicking.
+/// Resets the rendering process.
 /// </summary>
-/// <param name="d">Ignored</param>
+/// <param name="i">The height value in pixels to set</param>
 template <typename T> void FractoriumEmberController<T>::HeightChanged(uint i)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -277,7 +290,30 @@ template <typename T> void FractoriumEmberController<T>::HeightChanged(uint i)
 		ember.m_FinalRasH = i;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
+
 void Fractorium::OnHeightChanged(int i) { m_Controller->HeightChanged(i); }
+
+/// <summary>
+/// Set the width and height of the ember in pixels to the passed in values.
+/// Called when either the width or height spinners are double clicked.
+/// Because this will change the scale value, the scale spinner gets a stealth update.
+/// For this reason, the affine scales are reset, even though they are not when doing a manual
+/// height or width adjustment.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="width">The width value in pixels to set</param>
+/// <param name="height">The height value in pixels to set</param>
+/// <param name="scaleType">The height value in pixels to set</param>
+template <typename T>
+void FractoriumEmberController<T>::ResizeAndScale(int width, int height, eScaleType scaleType)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		m_Ember.SetSizeAndAdjustScale(width, height, false, scaleType);
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+	m_Fractorium->m_ScaleSpin->SetValueStealth(m_Ember.m_PixelsPerUnit);
+	m_Fractorium->OnActionResetScale(true);
+}
 
 /// <summary>
 /// Set the x offset applied to the center of the image.

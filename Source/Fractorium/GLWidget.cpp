@@ -1077,7 +1077,10 @@ void GLEmberController<T>::Wheel(QWheelEvent* e)
 void GLWidget::wheelEvent(QWheelEvent* e)
 {
 	if (auto controller = GLController())
+	{
 		controller->Wheel(e);
+		e->accept();//Prevents it from being sent to the main scroll bars. Scrolling should only affect the scale parameter and affine display zooming.
+	}
 
 	//Do not call QOpenGLWidget::wheelEvent(e) because this should only affect the scale and not the position of the scroll bars.
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "EmberFile.h"
 #include "DoubleSpinBox.h"
@@ -183,6 +183,7 @@ public:
 	virtual void XformNameChanged(int row, int col) { }
 	virtual void XformAnimateChanged(int state) { }
 	virtual void FillXforms(int index = 0) { }
+    virtual void UpdateXformName(int index) { }
 
 	//Xforms Affine.
 	virtual void AffineSetHelper(double d, int index, bool pre) { }
@@ -448,6 +449,7 @@ public:
 	virtual void XformNameChanged(int row, int col) override;
 	virtual void XformAnimateChanged(int state) override;
 	virtual void FillXforms(int index = 0) override;
+    virtual void UpdateXformName(int index) override;
 	void FillWithXform(Xform<T>* xform);
 	Xform<T>* CurrentXform();
 	void UpdateXform(std::function<void(Xform<T>*, size_t, size_t)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, size_t index = 0);

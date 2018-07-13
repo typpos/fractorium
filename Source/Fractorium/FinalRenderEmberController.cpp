@@ -1,4 +1,4 @@
-#include "FractoriumPch.h"
+﻿#include "FractoriumPch.h"
 #include "FractoriumEmberController.h"
 #include "FinalRenderEmberController.h"
 #include "FinalRenderDialog.h"

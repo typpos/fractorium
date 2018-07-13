@@ -1,4 +1,4 @@
-#include "FractoriumPch.h"
+﻿#include "FractoriumPch.h"
 #include "Fractorium.h"
 
 /// <summary>
@@ -15,14 +15,20 @@ void Fractorium::InitXformsUI()
 	connect(ui.AddFinalXformButton,  SIGNAL(clicked(bool)),			   this, SLOT(OnAddFinalXformButtonClicked(bool)),  Qt::QueuedConnection);
 	connect(ui.CurrentXformCombo,	 SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentXformComboChanged(int)),	    Qt::QueuedConnection);
 	connect(ui.AnimateXformCheckBox, SIGNAL(stateChanged(int)),        this, SLOT(OnXformAnimateCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	SetFixedTableHeader(ui.XformWeightNameTable->horizontalHeader());
+	SetFixedTableHeader(ui.XformWeightNameTable->horizontalHeader(),QHeaderView::ResizeToContents);
 	//Use SetupSpinner() just to create the spinner, but use col of -1 to prevent it from being added to the table.
 	SetupSpinner<DoubleSpinBox, double>(ui.XformWeightNameTable, this, row, -1, m_XformWeightSpin, spinHeight, 0, 1000, 0.05, SIGNAL(valueChanged(double)), SLOT(OnXformWeightChanged(double)), false, 0, 1, 0);
 	m_XformWeightSpin->setDecimals(3);
 	m_XformWeightSpin->SmallStep(0.001);
-	m_XformWeightSpinnerButtonWidget = new SpinnerButtonWidget(m_XformWeightSpin, "=", 20, 19, ui.XformWeightNameTable);
-	m_XformWeightSpinnerButtonWidget->m_Button->setToolTip("Equalize weights");
+    m_XformWeightSpin->setMinimumWidth(40);
+	m_XformWeightSpinnerButtonWidget = new SpinnerLabelButtonWidget(m_XformWeightSpin, "=", 20, 19, ui.XformWeightNameTable);
+    m_XformWeightSpinnerButtonWidget->m_SpinBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+    m_XformWeightSpinnerButtonWidget->m_Label->setStyleSheet("border: 0px;");
+    m_XformWeightSpinnerButtonWidget->m_Label->setAlignment(Qt::AlignRight| Qt::AlignVCenter);
+    m_XformWeightSpinnerButtonWidget->m_Label->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    m_XformWeightSpinnerButtonWidget->m_Button->setToolTip("Equalize weights");
 	m_XformWeightSpinnerButtonWidget->m_Button->setStyleSheet("text-align: center center");
+    m_XformWeightSpinnerButtonWidget->setMaximumWidth(130);
 	connect(m_XformWeightSpinnerButtonWidget->m_Button, SIGNAL(clicked(bool)), this, SLOT(OnEqualWeightButtonClicked(bool)), Qt::QueuedConnection);
 	ui.XformWeightNameTable->setCellWidget(0, 0, m_XformWeightSpinnerButtonWidget);
 	ui.XformWeightNameTable->setItem(0, 1, new QTableWidgetItem());
@@ -57,9 +63,8 @@ Xform<T>* FractoriumEmberController<T>::CurrentXform()
 void Fractorium::CurrentXform(uint i)
 {
 	if (i < uint(ui.CurrentXformCombo->count()))
-		ui.CurrentXformCombo->setCurrentIndex(i);
+        ui.CurrentXformCombo->setCurrentIndex(i);
 }
-
 /// <summary>
 /// Set the current xform and populate all GUI widgets.
 /// Called when the current xform combo box index changes.
@@ -388,7 +393,11 @@ void FractoriumEmberController<T>::XformNameChanged(int row, int col)
 	}, eXformUpdate::UPDATE_CURRENT, false);
 	FillSummary();//Manually update because this does not trigger a render, which is where this would normally be called.
 }
-void Fractorium::OnXformNameChanged(int row, int col) { m_Controller->XformNameChanged(row, col); }
+void Fractorium::OnXformNameChanged(int row, int col)
+{
+    m_Controller->XformNameChanged(row, col);
+    m_Controller->UpdateXformName(ui.CurrentXformCombo->currentIndex());
+}
 /// <summary>
 /// Set the animate field of the selected xforms, this allows excluding current if it's not checked, but applies only to it if none are checked.
 /// This has no effect on interactive rendering, it only sets a value
@@ -471,8 +480,9 @@ void FractoriumEmberController<T>::SetNormalizedWeightText(Xform<T>* xform)
 		m_Ember.CalcNormalizedWeights(m_NormalizedWeights);
 
 		if (index != -1 && index < m_NormalizedWeights.size())
-			m_Fractorium->m_XformWeightSpin->setSuffix(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
-	}
+			//m_Fractorium->m_XformWeightSpin->setSuffix(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
+            m_Fractorium->m_XformWeightSpinnerButtonWidget->m_Label->setText(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
+    }
 }
 /// <summary>
 /// Determine whether the specified xform is the final xform in the ember.
@@ -507,6 +517,7 @@ void FractoriumEmberController<T>::FillXforms(int index)
 	{
 		combo->addItem(ToString(i + 1));
 		combo->setItemIcon(i, m_Fractorium->m_XformComboIcons[i % XFORM_COLOR_COUNT]);
+        UpdateXformName(i);
 	}
 
 	i = 0;
@@ -542,6 +553,7 @@ void FractoriumEmberController<T>::FillXforms(int index)
 		m_Fractorium->m_XformsSelectionLayout->addRow(cb, new QWidget(m_Fractorium));
 		combo->addItem("Final");
 		combo->setItemIcon(i, m_Fractorium->m_FinalXformComboIcon);
+        UpdateXformName(i);
 	}
 
 	m_Fractorium->m_XformsSelectionLayout->blockSignals(false);
@@ -552,7 +564,28 @@ void FractoriumEmberController<T>::FillXforms(int index)
 
 	m_Fractorium->FillXaosTable();
 	m_Fractorium->OnSoloXformCheckBoxStateChanged(Qt::Unchecked);
-	m_Fractorium->OnCurrentXformComboChanged(index);//Make sure the event gets called, because it won't if the zero index is already selected.
+    m_Fractorium->OnCurrentXformComboChanged(index);//Make sure the event gets called, because it won't if the zero index is already selected.
+}
+/// <summary>
+/// Update the text in xforms combo box to show the name of Xform.
+/// </summary>
+/// <param name="index">The index of the Xform to update.</param>
+/// 
+template<typename T>
+void FractoriumEmberController<T>::UpdateXformName(int index)
+{
+    bool forceFinal = m_Fractorium->HaveFinal();
+    bool isFinal = m_Ember.FinalXform() == m_Ember.GetTotalXform(index, forceFinal);
+    QString name = isFinal ? "Final" : QString::number(index + 1);
+    
+    if (auto xform = m_Ember.GetTotalXform(index, forceFinal))
+    {
+        if (!xform->m_Name.empty())
+        {
+            name += "    " + QString::fromStdString(xform->m_Name);
+        }
+        m_Fractorium->ui.CurrentXformCombo->setItemText(index,name);
+    }
 }
 template class FractoriumEmberController<float>;
 #ifdef DO_DOUBLE

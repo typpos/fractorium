@@ -19,9 +19,10 @@ class EMBERCL_API RendererCLBase
 {
 public:
 	virtual ~RendererCLBase() { }
-	virtual bool ReadFinal(v4F* pixels) = 0;
-	virtual bool ClearFinal() = 0;
-	virtual bool AnyNvidia() const = 0;
+	virtual bool ReadFinal(v4F* pixels) { return false; }
+	virtual bool ClearFinal() { return false; }
+	virtual bool AnyNvidia() const { return false; }
+	std::function<void(void)> m_CompileBegun;
 };
 
 /// <summary>

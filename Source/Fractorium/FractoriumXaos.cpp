@@ -22,6 +22,7 @@ void Fractorium::InitXaosUI()
 	connect(m_XaosSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnXaosChanged(double)), Qt::QueuedConnection);
 	connect(ui.ClearXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnClearXaosButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.RandomXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnRandomXaosButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.AddLayerButton, SIGNAL(clicked(bool)), this, SLOT(OnAddLayerButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.XaosTableView->verticalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnXaosRowDoubleClicked(int)), Qt::QueuedConnection);
 	connect(ui.XaosTableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnXaosColDoubleClicked(int)), Qt::QueuedConnection);
 }
@@ -164,6 +165,49 @@ void FractoriumEmberController<T>::RandomXaos()
 }
 
 void Fractorium::OnRandomXaosButtonClicked(bool checked) { m_Controller->RandomXaos(); }
+
+/// <summary>
+/// Add a layer using the specified number of xforms.
+/// A layer is defined as a new set of xforms whose xaos values are the following:
+/// From existing to existing: unchanged.
+/// From existing to new: 0.
+/// From new to existing: 0.
+/// From new to new: 1.
+/// </summary>
+/// <param name="xforms">The number of new xforms to add to create the layer</param>
+template <typename T>
+void FractoriumEmberController<T>::AddLayer(int xforms)
+{
+	Update([&]
+	{
+		auto origXformCount = m_Ember.XformCount();
+		m_Ember.AddXforms(xforms);
+
+		for (auto i = 0; i < m_Ember.XformCount(); i++)
+		{
+			auto xf = m_Ember.GetXform(i);
+
+			if (i < origXformCount)
+			{
+				for (auto j = 0; j < m_Ember.XformCount(); j++)
+					if (j >= origXformCount)
+						xf->SetXaos(j, 0);
+			}
+			else
+			{
+				for (auto j = 0; j < m_Ember.XformCount(); j++)
+					if (j < origXformCount)
+						xf->SetXaos(j, 0);
+					else
+						xf->SetXaos(j, 1);
+			}
+		}
+	});
+	FillXforms();
+	FillSummary();
+}
+
+void Fractorium::OnAddLayerButtonClicked(bool checked) { m_Controller->AddLayer(ui.AddLayerSpinBox->value()); }
 
 /// <summary>
 /// Toggle all xaos values in one row.

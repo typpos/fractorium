@@ -33,6 +33,7 @@ RendererCL<T, bucketT>::RendererCL(const vector<pair<size_t, size_t>>& devices, 
 	m_PaletteFormat.image_channel_data_type = CL_FLOAT;
 	m_FinalFormat.image_channel_order = CL_RGBA;
 	m_FinalFormat.image_channel_data_type = CL_FLOAT;
+	m_CompileBegun = [&]() { };
 	Init(devices, shared, outputTexID);
 }
 
@@ -903,6 +904,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 
 	if (b)
 	{
+		m_CompileBegun();
 		m_IterKernel = m_IterOpenCLKernelCreator.CreateIterKernelString(m_Ember, m_Params.first, m_GlobalShared.first, m_LockAccum, doAccum);
 		//cout << "Building: " << "\n" << iterProgram << "\n";
 		vector<std::thread> threads;

@@ -41,6 +41,9 @@
     <height>16</height>
    </size>
   </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::GroupedDragging</set>
   </property>
@@ -432,7 +435,7 @@
               <bool>false</bool>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
@@ -513,7 +516,7 @@
               <bool>false</bool>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
@@ -575,6 +578,9 @@
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
              <property name="frameShape">
               <enum>QFrame::Panel</enum>
              </property>
@@ -600,7 +606,7 @@
               <bool>false</bool>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
@@ -697,7 +703,7 @@
               <bool>false</bool>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
@@ -1587,7 +1593,7 @@
               <number>1</number>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
@@ -1886,6 +1892,48 @@
            </property>
            <property name="text">
             <string>Random Xaos</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout_4" rowminimumheight="0" columnminimumwidth="0,0">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="AddLayerButton">
+           <property name="toolTip">
+            <string>Add N new xforms with all to/from xaos values to each other set to 1, and the remainder set to 0</string>
+           </property>
+           <property name="text">
+            <string>Add Layer</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="SpinBox" name="AddLayerSpinBox">
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="suffix">
+            <string> Xforms</string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>9999999</number>
            </property>
           </widget>
          </item>
@@ -2805,6 +2853,9 @@
                <property name="maxVisibleItems">
                 <number>12</number>
                </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QComboBox::AdjustToContents</enum>
+               </property>
                <property name="iconSize">
                 <size>
                  <width>9</width>
@@ -3096,7 +3147,7 @@
               <number>2</number>
              </property>
              <attribute name="horizontalHeaderVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>110</number>
@@ -3179,7 +3230,7 @@
               <enum>QTabWidget::Triangular</enum>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>3</number>
              </property>
              <widget class="QWidget" name="XformColorTab">
               <property name="sizePolicy">
@@ -6924,6 +6975,8 @@
     <addaction name="separator"/>
     <addaction name="ActionCopySelectedXforms"/>
     <addaction name="ActionPasteSelectedXforms"/>
+    <addaction name="separator"/>
+    <addaction name="ActionCopyKernel"/>
    </widget>
    <widget class="QMenu" name="MenuView">
     <property name="title">
@@ -8286,6 +8339,17 @@
     <string>Reset Scale</string>
    </property>
   </action>
+  <action name="ActionCopyKernel">
+   <property name="text">
+    <string>Copy &amp;Kernel</string>
+   </property>
+   <property name="statusTip">
+    <string>Copy the OpenCL program to the clipboard for debugging.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -8309,6 +8373,11 @@
    <class>LibraryTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>LibraryTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>spinbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

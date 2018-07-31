@@ -4353,10 +4353,10 @@ public:
 		ss2 << "_" << XformIndexInEmber();
 		string stateIndex = ss2.str();
 		string prefix = Prefix();
-		ss << "\n\t\tvarState." << prefix << "smartcrop_x" << stateIndex << " = 0;";
-		ss << "\n\t\tvarState." << prefix << "smartcrop_y" << stateIndex << " = 0;";
-		ss << "\n\t\tvarState." << prefix << "smartcrop_z" << stateIndex << " = 0;";
-		ss << "\n\t\tvarState." << prefix << "smartcrop_c" << stateIndex << " = 0;";
+		ss << "\n\tvarState." << prefix << "smartcrop_x" << stateIndex << " = 0;";
+		ss << "\n\tvarState." << prefix << "smartcrop_y" << stateIndex << " = 0;";
+		ss << "\n\tvarState." << prefix << "smartcrop_z" << stateIndex << " = 0;";
+		ss << "\n\tvarState." << prefix << "smartcrop_c" << stateIndex << " = 0;";
 		return ss.str();
 	}
 

@@ -3678,9 +3678,9 @@ public:
 		string prefix = Prefix();
 		//CPU sets fycle and bcycle to 0 at the beginning in Precalc().
 		//Set to random in OpenCL since a value can't be set once and kept between kernel launches without writing it back to an OpenCL buffer.
-		ss << "\n\t\tvarState." << prefix << "hexaplay3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * 3.0);";
-		ss << "\n\t\tvarState." << prefix << "hexaplay3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 5.0);";
-		ss << "\n\t\tvarState." << prefix << "hexaplay3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 2.0);";
+		ss << "\n\tvarState." << prefix << "hexaplay3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * 3.0);";
+		ss << "\n\tvarState." << prefix << "hexaplay3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 5.0);";
+		ss << "\n\tvarState." << prefix << "hexaplay3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 2.0);";
 		return ss.str();
 	}
 
@@ -4068,9 +4068,9 @@ public:
 		string prefix = Prefix();
 		//CPU sets fycle and bcycle to 0 at the beginning in Precalc().
 		//Set to random in OpenCL since a value can't be set once and kept between kernel launches without writing it back to an OpenCL buffer.
-		ss << "\n\t\tvarState." << prefix << "hexnix3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * 3.0);";
-		ss << "\n\t\tvarState." << prefix << "hexnix3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 5.0);";
-		ss << "\n\t\tvarState." << prefix << "hexnix3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 2.0);";
+		ss << "\n\tvarState." << prefix << "hexnix3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * 3.0);";
+		ss << "\n\tvarState." << prefix << "hexnix3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 5.0);";
+		ss << "\n\tvarState." << prefix << "hexnix3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 2.0);";
 		return ss.str();
 	}
 

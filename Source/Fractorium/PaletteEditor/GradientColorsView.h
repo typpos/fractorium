@@ -35,6 +35,8 @@ class GradientColorsView : public QWidget
 
 public:
 	explicit GradientColorsView(QWidget* p = nullptr);
+	bool Blend();
+	void Blend(bool blend);
 	void SetFocus(float position);
 	void SetFocus(size_t position);
 	void SetFocusColor(const QColor& col);
@@ -74,6 +76,7 @@ private:
 	int RectHeight();
 	bool m_ArrowMoving = false;
 	bool m_ColorIndexArrowMoving = false;
+	bool m_Blend = true;
 	QPoint m_ViewRectSize;
 	QPoint m_ViewRectOffset = QPoint(5, 15);
 	QPoint m_ViewRectTranslate = QPoint(5, 5);

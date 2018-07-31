@@ -38,11 +38,12 @@ public slots:
 	void OnTimeout();
 
 protected:
-	bool eventFilter(QObject* o, QEvent* e);
-	virtual void focusInEvent(QFocusEvent* e);
-	virtual void focusOutEvent(QFocusEvent* e);
-	virtual void enterEvent(QEvent* e);
-	virtual void leaveEvent(QEvent* e);
+	virtual bool eventFilter(QObject* o, QEvent* e) override;
+	virtual void keyPressEvent(QKeyEvent* event) override;
+	virtual void focusInEvent(QFocusEvent* e) override;
+	virtual void focusOutEvent(QFocusEvent* e) override;
+	virtual void enterEvent(QEvent* e) override;
+	virtual void leaveEvent(QEvent* e) override;
 
 private:
 	void StartTimer();

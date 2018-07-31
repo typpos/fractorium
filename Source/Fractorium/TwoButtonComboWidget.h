@@ -34,7 +34,6 @@ public:
 		m_Button1 = new QPushButton(caption1, p);
 		m_Button2 = new QPushButton(caption2, p);
 		m_Combo = new QComboBox(p);
-
 		m_Combo->addItems(comboStrings);
 
 		if (w1 != -1)
@@ -55,14 +54,12 @@ public:
 		m_Button2->setMaximumHeight(h);
 		m_Combo->setMinimumHeight(h - 3);
 		m_Combo->setMaximumHeight(h - 3);
- 
 		l->addWidget(m_Combo);
 		l->addWidget(m_Button1);
 		l->addWidget(m_Button2);
 		l->setAlignment(Qt::AlignLeft);
 		l->setMargin(0);
 		l->setSpacing(2);
-
 		setLayout(l);
 	}
 
@@ -105,13 +102,11 @@ public:
 
 		m_Button->setMinimumHeight(h);
 		m_Button->setMaximumHeight(h);
- 
 		l->addWidget(spinBox);
 		l->addWidget(m_Button);
 		l->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		l->setMargin(0);
 		l->setSpacing(0);
-
 		setLayout(l);
 	}
 
@@ -125,8 +120,8 @@ class SpinnerLabelButtonWidget : public QWidget
 
 public:
 	/// <summary>
-	/// Constructor that passes the parent to the base, then creates a QLabel, 
-	/// then creates a QPushButton and sets up its caption and dimensions, then 
+	/// Constructor that passes the parent to the base, then creates a QLabel,
+	/// then creates a QPushButton and sets up its caption and dimensions, then
 	/// assigns the DoubleSpinBox.
 	/// </summary>
 	/// <param name="spinBox">The pre-created DoubleSpinBox</param>
@@ -139,12 +134,12 @@ public:
 	{
 		QHBoxLayout* l = new QHBoxLayout(this);
 		m_Button = new QPushButton(buttonCaption, p);
-        m_SpinBox = spinBox;
+		m_SpinBox = spinBox;
 		m_Label = new QLabel(p);
-        m_Label->setMinimumHeight(h);
-        m_Label->setMaximumHeight(h);
-        
-        if (w != -1)
+		m_Label->setMinimumHeight(h);
+		m_Label->setMaximumHeight(h);
+
+		if (w != -1)
 		{
 			m_Button->setMinimumWidth(w);
 			m_Button->setMaximumWidth(w);
@@ -152,9 +147,8 @@ public:
 
 		m_Button->setMinimumHeight(h);
 		m_Button->setMaximumHeight(h);
- 
 		l->addWidget(spinBox);
-        l->addWidget(m_Label);
+		l->addWidget(m_Label);
 		l->addWidget(m_Button);
 		l->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		l->setMargin(0);
@@ -164,5 +158,5 @@ public:
 
 	DoubleSpinBox* m_SpinBox;
 	QPushButton* m_Button;
-    QLabel* m_Label;
+	QLabel* m_Label;
 };

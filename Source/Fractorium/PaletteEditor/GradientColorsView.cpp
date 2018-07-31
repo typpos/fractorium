@@ -37,6 +37,24 @@ GradientColorsView::GradientColorsView(QWidget* p)
 }
 
 /// <summary>
+/// Get whether to interpolate color keys.
+/// </summary>
+/// <returns>True to interpolate (blend), false to do hard cuts.</returns>
+bool GradientColorsView::Blend()
+{
+	return m_Blend;
+}
+
+/// <summary>
+/// Set whether to interpolate color keys.
+/// </summary>
+/// <param name="blend">rue to interpolate (blend), false to do hard cuts.</param>
+void GradientColorsView::Blend(bool blend)
+{
+	m_Blend = blend;
+}
+
+/// <summary>
 /// Set the focus to the arrow at the given normalized position.
 /// </summary>
 /// <param name="position">The normalized position of the arrow to focus</param>
@@ -374,23 +392,37 @@ Palette<float>& GradientColorsView::GetPalette(int size)
 {
 	if (!m_Arrows.empty())
 	{
-		QPainter p;
 		QSize imageSize(size, 1);
 		QImage image(imageSize, QImage::Format_ARGB32_Premultiplied);
-		QLinearGradient grad(QPoint(0, 0), QPoint(imageSize.width(), imageSize.height()));
 		m_Palette.m_SourceColors.clear();
+		QPainter painter(&image);
+		float start = 0;
 
-		for (auto& it : m_Arrows)
+		if (Blend())
 		{
-			auto pos = it.first;
-			auto col = it.second.Color();
-			m_Palette.m_SourceColors[pos] = v4F(col.red() / 255.0f, col.green() / 255.0f, col.blue() / 255.0f, 1.0f);
-			grad.setColorAt(pos, col);
+			QLinearGradient grad(QPoint(0, 0), QPoint(imageSize.width(), imageSize.height()));
+
+			for (auto& it : m_Arrows)
+			{
+				auto col = it.second.Color();
+				m_Palette.m_SourceColors[it.first] = v4F(col.red() / 255.0f, col.green() / 255.0f, col.blue() / 255.0f, 1.0f);
+				grad.setColorAt(it.first, col);
+			}
+
+			painter.fillRect(image.rect(), grad);
+		}
+		else
+		{
+			for (auto& it : m_Arrows)
+			{
+				auto col = it.second.Color();
+				m_Palette.m_SourceColors[it.first] = v4F(col.red() / 255.0f, col.green() / 255.0f, col.blue() / 255.0f, 1.0f);
+				painter.setBrush(col);
+				painter.fillRect(start, 0, imageSize.width(), imageSize.height(), col);
+				start = std::ceil(it.first * imageSize.width());
+			}
 		}
 
-		p.begin(&image);
-		p.fillRect(image.rect(), grad);
-		p.end();
 		m_Palette.m_Entries.reserve(image.width());
 
 		for (int i = 0; i < image.width(); i++)
@@ -493,13 +525,25 @@ void GradientColorsView::paintEvent(QPaintEvent*)
 		QPoint gradStart = QPoint(m_ViewRect.topLeft().x(), m_ViewRect.bottomLeft().y() / 2);
 		QPoint gradStop = QPoint(m_ViewRect.topRight().x(), m_ViewRect.bottomRight().y() / 2);
 		QLinearGradient grad(gradStart, gradStop);
+		float start = m_ViewRect.x();
 
 		for (auto& it : m_Arrows)
 		{
 			GradientArrow& arrow = it.second;
-			grad.setColorAt(it.first, arrow.Color());
+			auto offset = std::ceil(it.first * RectWidth());
+
+			if (Blend())
+			{
+				grad.setColorAt(it.first, arrow.Color());
+			}
+			else
+			{
+				painter.fillRect(start, m_ViewRect.y(), m_ViewRect.right() - start, m_ViewRect.height(), arrow.Color());
+				start = m_ViewRect.x() + offset;
+			}
+
 			QPolygon arrowPolygon = arrow.Area();
-			int iPosX = it.first * RectWidth(),
+			int iPosX = offset,
 				iPosY = m_ViewRect.height() + m_ViewRect.top() + 3;
 			arrowPolygon.translate(iPosX, iPosY);
 			QPainterPath paintPath;
@@ -513,8 +557,11 @@ void GradientColorsView::paintEvent(QPaintEvent*)
 			painter.setBrush(QBrush(Qt::NoBrush));
 		}
 
-		QBrush brush(grad);
-		painter.fillRect(m_ViewRect, brush);
+		if (Blend())
+		{
+			painter.fillRect(m_ViewRect, grad);
+		}
+
 		painter.drawRect(m_ViewRect);
 	}
 	else
@@ -534,8 +581,6 @@ void GradientColorsView::paintEvent(QPaintEvent*)
 		//Draw text inside of the arrow.
 		painter.drawText(topArrowRect.x() + (topArrowRect.width() - (topArrow.Width() - 5)) / 2.0, topArrowRect.y() + (topArrowRect.height() - 5), topArrow.Text());
 	}
-
-	painter.end();
 }
 
 /// <summary>

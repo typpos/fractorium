@@ -54,6 +54,7 @@ private Q_SLOTS:
 	void OnColorPickerColorChanged(const QColor& col);
 	void OnArrowDoubleClicked(const GradientArrow& arrow);
 	void OnSyncCheckBoxStateChanged(int state);
+	void OnBlendCheckBoxStateChanged(int state);
 	void OnArrowMoved(qreal lastPos, const GradientArrow& arrow);
 	void OnColorIndexMove(size_t index, float value);
 	void OnPaletteFilenameComboChanged(const QString& text);

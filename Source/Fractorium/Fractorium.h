@@ -63,9 +63,11 @@ template <typename T> class FinalRenderEmberController;
 class Fractorium : public QMainWindow
 {
 	Q_OBJECT
-    Q_PROPERTY(QColor VariationTreeBgColorNoneZero MEMBER m_VariationTreeBgColorNoneZero)
-    Q_PROPERTY(QColor VariationTreeBgColorZero MEMBER m_VariationTreeBgColorZero)
-    
+	Q_PROPERTY(QColor VariationTreeColorNonZero MEMBER m_VariationTreeColorNonZero)
+	Q_PROPERTY(QColor VariationTreeColorZero MEMBER m_VariationTreeColorZero)
+	Q_PROPERTY(QColor VariationTreeBgColorNonZero MEMBER m_VariationTreeBgColorNonZero)
+	Q_PROPERTY(QColor VariationTreeBgColorZero MEMBER m_VariationTreeBgColorZero)
+
 	friend GLWidget;
 	friend QssDialog;
 	friend LibraryTreeWidget;
@@ -140,6 +142,7 @@ public slots:
 	void OnActionPasteXmlOver(bool checked);
 	void OnActionCopySelectedXforms(bool checked);
 	void OnActionPasteSelectedXforms(bool checked);
+	void OnActionCopyKernel(bool checked);
 
 	void OnActionResetWorkspace(bool checked);//View
 	void OnActionAlternateEditorImage(bool checked);
@@ -319,6 +322,7 @@ public slots:
 	void OnXaosChanged(double d);
 	void OnClearXaosButtonClicked(bool checked);
 	void OnRandomXaosButtonClicked(bool checked);
+	void OnAddLayerButtonClicked(bool checked);
 	void OnXaosRowDoubleClicked(int logicalIndex);
 	void OnXaosColDoubleClicked(int logicalIndex);
 	void OnXaosTableModelDataChanged(const QModelIndex& indexA, const QModelIndex& indexB);
@@ -561,7 +565,8 @@ private:
 	char m_CoordinateString[128];
 	QColor m_XformComboColors[XFORM_COLOR_COUNT], m_FinalXformComboColor;
 	QIcon m_XformComboIcons[XFORM_COLOR_COUNT], m_FinalXformComboIcon;
-    QColor m_VariationTreeBgColorNoneZero, m_VariationTreeBgColorZero;
+	QColor m_VariationTreeColorNonZero, m_VariationTreeColorZero;
+	QColor m_VariationTreeBgColorNonZero, m_VariationTreeBgColorZero;
 	vector<QDockWidget*> m_Docks;
 
 	int m_FontSize;
@@ -572,7 +577,7 @@ private:
 	shared_ptr<OpenCLInfo> m_Info;
 	unique_ptr<FractoriumEmberControllerBase> m_Controller;
 	Ui::FractoriumClass ui;
-    
-    
+
+
 
 };

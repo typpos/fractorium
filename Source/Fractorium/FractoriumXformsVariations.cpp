@@ -16,6 +16,11 @@ void Fractorium::InitXformsVariationsUI()
 	//Setting dimensions in the designer with a layout is futile, so must hard code here.
 	tree->setColumnWidth(0, 160);
 	tree->setColumnWidth(1, 23);
+	//Set Default variation tree text and background colors for zero and non zero cases.
+	m_VariationTreeColorNonZero = Qt::black;
+	m_VariationTreeColorZero = Qt::black;
+	m_VariationTreeBgColorNonZero = Qt::lightGray;
+	m_VariationTreeBgColorZero = Qt::white;
 }
 
 /// <summary>
@@ -226,8 +231,9 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 					if (xformVar)
 						xform->DeleteVariationById(var->VariationId());
 
-//					widgetItem->setBackgroundColor(0, QColor(255, 255, 255));//Ensure background is always white if weight goes to zero.
-                    widgetItem->setBackgroundColor(0, m_Fractorium->m_VariationTreeBgColorZero);				}
+					widgetItem->setTextColor(0, m_Fractorium->m_VariationTreeColorZero);
+					widgetItem->setBackgroundColor(0, m_Fractorium->m_VariationTreeBgColorZero);
+				}
 				else
 				{
 					if (xformVar)//The xform already contained this variation, which means they just went from a non-zero weight to another non-zero weight (the simple case).
@@ -241,8 +247,9 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 						auto newVar = var->Copy();//Create a new one with default values.
 						newVar->m_Weight = d;
 						xform->AddVariation(newVar);
-//						widgetItem->setBackgroundColor(0, QColor(200, 200, 200));//Set background to gray when a variation has non-zero weight in this xform.
-                        widgetItem->setBackgroundColor(0, m_Fractorium->m_VariationTreeBgColorNoneZero);
+						widgetItem->setTextColor(0, m_Fractorium->m_VariationTreeColorNonZero);
+						widgetItem->setBackgroundColor(0, m_Fractorium->m_VariationTreeBgColorNonZero);
+
 						//If they've added a new parametric variation, then grab the values currently in the spinners
 						//for the child parameters and assign them to the newly added variation.
 						if (parVar)
@@ -276,6 +283,15 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 void Fractorium::OnVariationSpinBoxValueChanged(double d) { m_Controller->VariationSpinBoxValueChanged(d); }
 
 /// <summary>
+/// Fill in the variations tree with the values from the current xform.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::FillVariationTreeWithCurrentXform()
+{
+	FillVariationTreeWithXform(CurrentXform());
+}
+
+/// <summary>
 /// Fill the variation tree values from passed in xform and apply the current sorting mode.
 /// Called when the currently selected xform changes.
 /// </summary>
@@ -300,9 +316,9 @@ void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 				item->setHidden(false);
 
 			spinBox->SetValueStealth(var ? var->m_Weight : 0);//If the variation was present, set the spin box to its weight, else zero.
-//			item->setBackgroundColor(0, var ? Qt::darkGray : Qt::lightGray);//Ensure background is always white if the value goes to zero, else gray if var present.
-//			item->setBackgroundColor(0, var ? QColor(200, 200, 200) : QColor(255, 255, 255));//Ensure background is always white if the value goes to zero, else gray if var present.
-            item->setBackgroundColor(0, var ? m_Fractorium->m_VariationTreeBgColorNoneZero :  m_Fractorium->m_VariationTreeBgColorZero);
+			item->setTextColor(0, var ? m_Fractorium->m_VariationTreeColorNonZero :  m_Fractorium->m_VariationTreeColorZero);
+			item->setBackgroundColor(0, var ? m_Fractorium->m_VariationTreeBgColorNonZero :  m_Fractorium->m_VariationTreeBgColorZero);
+
 			for (int j = 0; j < item->childCount(); j++)//Iterate through all of the children, which will be the params if it was a parametric variation.
 			{
 				T* param = nullptr;

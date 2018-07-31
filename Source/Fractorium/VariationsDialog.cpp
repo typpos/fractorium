@@ -194,10 +194,8 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 	static vector<string> dc{ "m_ColorX" };
 	static vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
 								  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };
-	//static vector<const Variation<T>*> excluded;
 	static std::set<eVariationId> excluded;
 	excluded.clear();
-	//excluded.reserve(size_t(eVariationId::LAST_VAR));
 
 	if (auto s = dynamic_cast<QCheckBox*>(sender()))
 	{

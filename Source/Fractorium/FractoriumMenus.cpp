@@ -25,6 +25,7 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionPasteXmlOver,		  SIGNAL(triggered(bool)), this, SLOT(OnActionPasteXmlOver(bool)),		  Qt::QueuedConnection);
 	connect(ui.ActionCopySelectedXforms,  SIGNAL(triggered(bool)), this, SLOT(OnActionCopySelectedXforms(bool)),  Qt::QueuedConnection);
 	connect(ui.ActionPasteSelectedXforms, SIGNAL(triggered(bool)), this, SLOT(OnActionPasteSelectedXforms(bool)), Qt::QueuedConnection);
+	connect(ui.ActionCopyKernel,          SIGNAL(triggered(bool)), this, SLOT(OnActionCopyKernel(bool)),          Qt::QueuedConnection);
 	ui.ActionPasteSelectedXforms->setEnabled(false);
 	//View menu.
 	connect(ui.ActionResetWorkspace,       SIGNAL(triggered(bool)), this, SLOT(OnActionResetWorkspace(bool)),       Qt::QueuedConnection);
@@ -471,10 +472,10 @@ void FractoriumEmberController<T>::Undo()
 		int index = m_Ember.GetTotalXformIndex(current, forceFinal);
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::max<size_t>(0u, m_UndoIndex - 1u);
-		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list...
+		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list.
 		m_EditState = eEditUndoState::UNDO_REDO;
 
-		if (index >= 0)
+		if (index >= 0 &&  index < m_Fractorium->ui.CurrentXformCombo->count())
 			m_Fractorium->CurrentXform(index);
 
 		m_Fractorium->ui.ActionUndo->setEnabled(m_UndoList.size() > 1 && (m_UndoIndex > 0));
@@ -497,10 +498,10 @@ void FractoriumEmberController<T>::Redo()
 		int index = m_Ember.GetTotalXformIndex(current, forceFinal);
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::min<size_t>(m_UndoIndex + 1, m_UndoList.size() - 1);
-		SetEmber(m_UndoList[m_UndoIndex], true, false);
+		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list.
 		m_EditState = eEditUndoState::UNDO_REDO;
 
-		if (index >= 0)
+		if (index >= 0 && index < m_Fractorium->ui.CurrentXformCombo->count())
 			m_Fractorium->CurrentXform(index);
 
 		m_Fractorium->ui.ActionUndo->setEnabled(m_UndoList.size() > 1 && (m_UndoIndex > 0));
@@ -714,6 +715,19 @@ void Fractorium::OnActionPasteSelectedXforms(bool checked)
 }
 
 /// <summary>
+/// Copy the text of the OpenCL iteration kernel to the clipboard.
+/// This performs no action if the renderer is not of type RendererCL.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::CopyKernel()
+{
+	if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get()))
+		QApplication::clipboard()->setText(QString::fromStdString(rendererCL->IterKernel()));
+}
+
+void Fractorium::OnActionCopyKernel(bool checked) {	m_Controller->CopyKernel(); }
+
+/// <summary>
 /// Reset dock widgets and tabs to their default position.
 /// Note that there is a bug in Qt, where it will only move them all to the left side if at least
 /// one is on the left side, or they are all floating. If one or more are docked right, and none are docked
@@ -837,7 +851,7 @@ void FractoriumEmberController<T>::Flatten()
 	{
 		ember.Flatten(XmlToEmber<T>::m_FlattenNames);
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
-	FillVariationTreeWithXform(CurrentXform());
+	FillVariationTreeWithCurrentXform();
 }
 void Fractorium::OnActionFlatten(bool checked) { m_Controller->Flatten(); }
 
@@ -852,7 +866,7 @@ void FractoriumEmberController<T>::Unflatten()
 	{
 		ember.Unflatten();
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
-	FillVariationTreeWithXform(CurrentXform());
+	FillVariationTreeWithCurrentXform();
 }
 void Fractorium::OnActionUnflatten(bool checked) { m_Controller->Unflatten(); }
 

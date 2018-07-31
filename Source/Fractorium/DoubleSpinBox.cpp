@@ -231,6 +231,47 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 }
 
 /// <summary>
+/// Override which is for handling specific key presses while this control is focused.
+/// In particular, + = and up arrow increase the value, equivalent to scrolling the mouse wheel up, while also observing shift/ctrl modifiers.
+/// Values are decreased in the same way by pressing - _ or down arrow.
+/// </summary>
+/// <param name="ke">The key event</param>
+void DoubleSpinBox::keyPressEvent(QKeyEvent* ke)
+{
+	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+
+	if (ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Equal || ke->key() == Qt::Key_Up)
+	{
+		if (shift)
+		{
+			setSingleStep(m_SmallStep);
+			setValue(value() + m_SmallStep);
+		}
+		else
+		{
+			setSingleStep(m_Step);
+			setValue(value() + (ctrl ? m_Step * 10 : m_Step));
+		}
+	}
+	else if (ke->key() == Qt::Key_Minus || ke->key() == Qt::Key_Underscore || ke->key() == Qt::Key_Down)
+	{
+		if (shift)
+		{
+			setSingleStep(m_SmallStep);
+			setValue(value() - m_SmallStep);
+		}
+		else
+		{
+			setSingleStep(m_Step);
+			setValue(value() - (ctrl ? m_Step * 10 : m_Step));
+		}
+	}
+	else
+		QDoubleSpinBox::keyPressEvent(ke);
+}
+
+/// <summary>
 /// Called when focus enters the spinner.
 /// </summary>
 /// <param name="e">The event</param>

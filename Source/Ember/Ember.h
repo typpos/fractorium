@@ -178,6 +178,7 @@ public:
 			m_Edits = xmlCopyDoc(ember.m_Edits, 1);
 
 		CopyCont(m_EmberMotionElements, ember.m_EmberMotionElements);
+		m_Solo = ember.m_Solo;
 		return *this;
 	}
 
@@ -1722,6 +1723,9 @@ public:
 
 	//The list of motion elements for the top-level flame params
 	vector<EmberMotion<T>> m_EmberMotionElements;
+
+	//Index of xform to have non-zero opacity, while all others have zero. This is an interactive rendering parameter and is not saved to Xml. -1 means solo is not used.
+	intmax_t m_Solo = -1;
 
 private:
 	/// <summary>

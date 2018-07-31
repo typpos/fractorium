@@ -346,7 +346,7 @@ bool FractoriumEmberController<T>::Render()
 	if (action != eProcessAction::NOTHING)
 	{
 		size_t i = 0;
-		int solo = m_Fractorium->ui.CurrentXformCombo->property("soloxform").toInt();
+		int solo = m_Ember.m_Solo;
 		bool forceFinal = m_Fractorium->HaveFinal();
 
 		if (solo != -1)
@@ -667,9 +667,11 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 	bool ok = true;
 	bool useOpenCL = m_Info->Ok() && m_Settings->OpenCL();
 	auto v = Devices(m_Settings->Devices());
+	bool doOpenCL = useOpenCL && !v.empty();
+	ui.ActionCopyKernel->setEnabled(doOpenCL);
 
 	//The most important option to process is what kind of renderer is desired, so do it first.
-	if (!m_Controller->CreateRenderer((useOpenCL && !v.empty()) ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v, updatePreviews, useOpenCL && m_Settings->SharedTexture()))
+	if (!m_Controller->CreateRenderer(doOpenCL ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, v, updatePreviews, doOpenCL && m_Settings->SharedTexture()))
 	{
 		//If using OpenCL, will only get here if creating RendererCL failed, but creating a backup CPU Renderer succeeded.
 		ShowCritical("Renderer Creation Error", "Error creating renderer, most likely a GPU problem. Using CPU instead.");
@@ -677,11 +679,20 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 		m_Settings->SharedTexture(false);
 		ui.ActionCpu->setChecked(true);
 		ui.ActionCL->setChecked(false);
+		ui.ActionCopyKernel->setEnabled(false);
 		m_OptionsDialog->ui.OpenCLCheckBox->setChecked(false);
 		m_OptionsDialog->ui.SharedTextureCheckBox->setChecked(false);
 		m_FinalRenderDialog->ui.FinalRenderOpenCLCheckBox->setChecked(false);
 		ok = false;
 	}
+
+	if (auto rendererCL = dynamic_cast<RendererCLBase*>(m_Controller->Renderer()))
+		rendererCL->m_CompileBegun = [&]()
+	{
+		m_RenderStatusLabel->setText("Compiling OpenCL kernel...");
+		m_RenderStatusLabel->repaint();
+		QApplication::processEvents();
+	};
 
 	return ok;
 }

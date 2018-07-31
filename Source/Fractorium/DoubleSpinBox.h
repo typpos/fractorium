@@ -38,10 +38,11 @@ public slots:
 
 protected:
 	virtual bool eventFilter(QObject* o, QEvent* e) override;
-	virtual void focusInEvent(QFocusEvent* e);
-	virtual void focusOutEvent(QFocusEvent* e);
-	virtual void enterEvent(QEvent* e);
-	virtual void leaveEvent(QEvent* e);
+	virtual void keyPressEvent(QKeyEvent* event) override;
+	virtual void focusInEvent(QFocusEvent* e) override;
+	virtual void focusOutEvent(QFocusEvent* e) override;
+	virtual void enterEvent(QEvent* e) override;
+	virtual void leaveEvent(QEvent* e) override;
 
 	bool m_DoubleClick;
 	shared_ptr<FractoriumSettings> m_Settings;

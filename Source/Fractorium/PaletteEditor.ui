@@ -70,11 +70,11 @@
          <height>16777215</height>
         </size>
        </property>
-			 <property name="font">
-			 	<font>
-			 		<kerning>true</kerning>
-			 	</font>
-			 </property>
+       <property name="font">
+        <font>
+         <kerning>true</kerning>
+        </font>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Panel</enum>
        </property>
@@ -213,17 +213,17 @@
         </property>
         <item>
          <layout class="QGridLayout" name="AdjustmentLeftGridLayout">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="SyncCheckBox">
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="AutoDistributeCheckBox">
             <property name="text">
-             <string>Sync</string>
+             <string>Auto Distribute</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QSpinBox" name="ArrowsSpinBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -251,10 +251,20 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="AutoDistributeCheckBox">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="SyncCheckBox">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
             <property name="text">
-             <string>Auto Distribute</string>
+             <string>Sync</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="BlendCheckBox">
+            <property name="text">
+             <string>Blend</string>
             </property>
             <property name="checked">
              <bool>true</bool>

@@ -109,6 +109,7 @@ public:
 	virtual void PasteXmlOver() { }
 	virtual void CopySelectedXforms() { }
 	virtual void PasteSelectedXforms() { }
+	virtual void CopyKernel() { }
 	virtual void AddReflectiveSymmetry() { }//Tools.
 	virtual void AddRotationalSymmetry() { }
 	virtual void AddBothSymmetry() { }
@@ -184,7 +185,7 @@ public:
 	virtual void XformNameChanged(int row, int col) { }
 	virtual void XformAnimateChanged(int state) { }
 	virtual void FillXforms(int index = 0) { }
-    virtual void UpdateXformName(int index) { }
+	virtual void UpdateXformName(int index) { }
 
 	//Xforms Affine.
 	virtual void AffineSetHelper(double d, int index, bool pre) { }
@@ -210,6 +211,7 @@ public:
 	virtual void XformColorSpeedChanged(double d) { }
 	virtual void XformOpacityChanged(double d) { }
 	virtual void XformDirectColorChanged(double d) { }
+	virtual void SoloXformCheckBoxStateChanged(int state, int index) { }
 	virtual QColor ColorIndexToQColor(double d) { return QColor(); }
 
 	//Xforms Variations.
@@ -218,6 +220,7 @@ public:
 	virtual void ClearVariationsTree() { }
 	virtual void VariationSpinBoxValueChanged(double d) { }
 	virtual void FilteredVariations() { }
+	virtual void FillVariationTreeWithCurrentXform() { }
 
 	//Xforms Selection.
 
@@ -226,6 +229,7 @@ public:
 	virtual void XaosChanged(int x, int y, double val) { }
 	virtual void ClearXaos() { }
 	virtual void RandomXaos() { }
+	virtual void AddLayer(int xforms) { }
 
 	//Palette.
 	virtual size_t InitPaletteList(const QString& s) { return 0; }
@@ -375,6 +379,7 @@ public:
 	virtual void PasteXmlOver() override;
 	virtual void CopySelectedXforms() override;
 	virtual void PasteSelectedXforms() override;
+	virtual void CopyKernel() override;
 	virtual void AddReflectiveSymmetry() override;
 	virtual void AddRotationalSymmetry() override;
 	virtual void AddBothSymmetry() override;
@@ -451,7 +456,7 @@ public:
 	virtual void XformNameChanged(int row, int col) override;
 	virtual void XformAnimateChanged(int state) override;
 	virtual void FillXforms(int index = 0) override;
-    virtual void UpdateXformName(int index) override;
+	virtual void UpdateXformName(int index) override;
 	void FillWithXform(Xform<T>* xform);
 	Xform<T>* CurrentXform();
 	void UpdateXform(std::function<void(Xform<T>*, size_t, size_t)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, size_t index = 0);
@@ -480,6 +485,7 @@ public:
 	virtual void XformColorSpeedChanged(double d) override;
 	virtual void XformOpacityChanged(double d) override;
 	virtual void XformDirectColorChanged(double d) override;
+	virtual void SoloXformCheckBoxStateChanged(int state, int index) override;
 	virtual QColor ColorIndexToQColor(double d) override;
 	void FillColorWithXform(Xform<T>* xform);
 
@@ -489,6 +495,7 @@ public:
 	virtual void ClearVariationsTree() override;
 	virtual void VariationSpinBoxValueChanged(double d) override;
 	virtual void FilteredVariations() override;
+	virtual void FillVariationTreeWithCurrentXform() override;
 	void FillVariationTreeWithXform(Xform<T>* xform);
 
 	//Xforms Xaos.
@@ -496,6 +503,7 @@ public:
 	virtual void XaosChanged(int x, int y, double val) override;
 	virtual void ClearXaos() override;
 	virtual void RandomXaos() override;
+	virtual void AddLayer(int xforms) override;
 
 	//Xforms Selection.
 	bool XformCheckboxAt(int i, std::function<void(QCheckBox*)> func);

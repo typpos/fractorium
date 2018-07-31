@@ -38,7 +38,6 @@ void Fractorium::InitPaletteUI()
 	palettePreviewTable->setItem(0, 0, previewNameCol);
 	auto previewPaletteItem = new QTableWidgetItem();
 	palettePreviewTable->setItem(0, 1, previewPaletteItem);
-	palettePreviewTable->installEventFilter(this);
 	connect(ui.PaletteFilterLineEdit,	 SIGNAL(textChanged(const QString&)), this, SLOT(OnPaletteFilterLineEditTextChanged(const QString&)));
 	connect(ui.PaletteFilterClearButton, SIGNAL(clicked(bool)),				  this, SLOT(OnPaletteFilterClearButtonClicked(bool)));
 	paletteTable->setColumnWidth(1, 260);//256 plus small margin on each side.
@@ -392,6 +391,7 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 	ed->SetColorIndices(colorIndices);
 	ed->SetPaletteFile(m_CurrentPaletteFilePath);
 
+	//ed->setpal
 	if (ed->exec() == QDialog::Accepted)
 	{
 		//Copy all just to be safe, because they may or may not have synced.

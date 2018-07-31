@@ -2,12 +2,19 @@
 		This is needed to deal with the large tabs in the fusion theme which is the default on Linux, and optional on Windows.
 		It's not needed for other themes.
 		You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/
-QTabBar::tab { height: 3ex; }
+QTabBar::tab { height: 4ex; }
 
 /*This is needed to give the labels on the status bar some padding.*/
 QStatusBar QLabel { padding-left: 2px; padding-right: 2px; }
 
 /*Specific styles below this line*/
+Fractorium
+{
+	qproperty-VariationTreeColorNonZero:black;
+	qproperty-VariationTreeColorZero:lightgray;
+	qproperty-VariationTreeBgColorNonZero:darkgray;
+	qproperty-VariationTreeBgColorZero:rgb(53, 53, 53);
+}
 
 QObject
 {
@@ -307,14 +314,13 @@ QTreeView
 {
 	border: 1px solid gray;
 	background-color: rgb(53, 53, 53);
-	font: 9pt "MS Shell Dlg";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
-/*Setting this gives a more consistent look, but removes the ability to gray variations that are included in the xform*/
+
+/*Setting this gives a more consistent look. Also, by omitting color and background color, it allows us to set it above with VariationTreeColorNonZero etc...*/
 QTreeView::item
 {
-	background-color: rgb(53, 53, 53);
-	color: darkgray;
 	outline: none;
 	margin-right: 1px;
 }
@@ -365,7 +371,7 @@ QTableView
 	color: darkgray;
 	selection-color: darkgray;
 	selection-background-color: rgb(53, 53, 53);
-    font: 9pt "MS Shell Dlg";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+    font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QTableView QTableCornerButton::section:enabled
@@ -629,4 +635,9 @@ QTableView#FinalRenderParamsTable QPushButton
 	margin-top: 1px;
 	margin-bottom: 2px;
 	padding: 0px;
+}
+
+QssDialog QssTextEdit#QssEdit
+{
+	background-color: #FFFCE1;
 }

@@ -66,8 +66,8 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* e) override;
 	virtual void wheelEvent(QWheelEvent* e) override;
 
-	void DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, GLfloat pointSize = 1.0f);
-	void DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, GLfloat pointSize = 1.0f);
+	void DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, bool dashed = false, GLfloat pointSize = 1.0f);
+	void DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, bool dashed = false, GLfloat pointSize = 1.0f);
 
 private:
 	void SetDimensions(int w, int h);

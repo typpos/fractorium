@@ -181,27 +181,31 @@ void Fractorium::OnXformDirectColorChanged(double d) { m_Controller->XformDirect
 /// If checked, current is solo, if unchecked, none are solo.
 /// Solo means that all other xforms will have their opacity temporarily
 /// set to zero while rendering so that only the effect of current xform is visible.
-/// This will not permanently alter the ember, as the temporary opacity values will be applied
+/// This will not permanently alter the opacities of ember, as the temporary opacity values will be applied
 /// right before rendering and reset right after.
 /// Called when solo xform check box is checked.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="state">The state of the checkbox</param>
-void Fractorium::OnSoloXformCheckBoxStateChanged(int state)
+/// <param name="index">The index which has been specified as the solo xform, -1 to specify none.</param>
+template <typename T>
+void FractoriumEmberController<T>::SoloXformCheckBoxStateChanged(int state, int index)
 {
 	if (state == Qt::Checked)
 	{
-		ui.CurrentXformCombo->setProperty("soloxform", ui.CurrentXformCombo->currentIndex());
-		ui.SoloXformCheckBox->setText("Solo (" + ToString(ui.CurrentXformCombo->currentIndex() + 1) + ")");
+		m_Ember.m_Solo = index;
+		m_Fractorium->ui.SoloXformCheckBox->setText("Solo (" + ToString(index + 1) + ")");
 	}
 	else if (state == Qt::Unchecked)
 	{
-		ui.CurrentXformCombo->setProperty("soloxform", -1);
-		ui.SoloXformCheckBox->setText("Solo");
+		m_Ember.m_Solo = -1;
+		m_Fractorium->ui.SoloXformCheckBox->setText("Solo");
 	}
 
-	m_Controller->UpdateRender();
+	UpdateRender();
 }
+
+void Fractorium::OnSoloXformCheckBoxStateChanged(int state) { m_Controller->SoloXformCheckBoxStateChanged(state, ui.CurrentXformCombo->currentIndex()); }
 
 /// <summary>
 /// Redraw the palette ref table.

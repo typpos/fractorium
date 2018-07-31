@@ -336,8 +336,6 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 
 	if (updatePointer && (typeid(T) == typeid(U)))
 		m_EmberFilePointer = (Ember<T>*)&ember;
-	else
-		m_EmberFilePointer = nullptr;
 
 	if (!verbatim)
 	{

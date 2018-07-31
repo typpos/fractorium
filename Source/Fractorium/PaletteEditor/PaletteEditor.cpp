@@ -34,9 +34,10 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 	connect(ui->RemoveColorButton,                 SIGNAL(clicked()),                                this, SLOT(OnRemoveColorButtonClicked()));
 	connect(ui->InvertColorsButton,                SIGNAL(clicked()),                                this, SLOT(OnInvertColorsButtonClicked()));
 	connect(ui->ResetColorsButton,                 SIGNAL(clicked()),                                this, SLOT(OnResetToDefaultButtonClicked()));
-	connect(ui->DistributeColorsButton,            SIGNAL(clicked()),                                this, SLOT(OnDistributeColorsButtonClicked()));
 	connect(ui->RandomColorsButton,                SIGNAL(clicked()),                                this, SLOT(OnRandomColorsButtonClicked()));
+	connect(ui->DistributeColorsButton,            SIGNAL(clicked()),                                this, SLOT(OnDistributeColorsButtonClicked()));
 	connect(ui->SyncCheckBox,                      SIGNAL(stateChanged(int)),                        this, SLOT(OnSyncCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui->BlendCheckBox,                     SIGNAL(stateChanged(int)),                        this, SLOT(OnBlendCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	connect(ui->PaletteFilenameCombo,              SIGNAL(currentIndexChanged(const QString&)),      this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
 	connect(ui->PaletteListTable,                  SIGNAL(cellClicked(int, int)),                    this, SLOT(OnPaletteCellClicked(int, int)), Qt::QueuedConnection);
 	connect(ui->PaletteListTable,                  SIGNAL(cellChanged(int, int)),                    this, SLOT(OnPaletteCellChanged(int, int)), Qt::QueuedConnection);
@@ -288,6 +289,18 @@ void PaletteEditor::OnSyncCheckBoxStateChanged(int state)
 {
 	EmitPaletteChanged();
 	EmitColorIndexChanged(std::numeric_limits<size_t>::max(), 0);//Pass special value to update all.
+}
+
+/// <summary>
+/// Change whether palette colors are blended between points, or instead do hard cuts.
+/// Called when the Blend checkbox is checked/unchecked.
+/// </summary>
+/// <param name="state">Ignored</param>
+void PaletteEditor::OnBlendCheckBoxStateChanged(int state)
+{
+	m_GradientColorView->Blend((bool)state);
+	m_GradientColorView->update();
+	EmitPaletteChanged();
 }
 
 /// <summary>
@@ -607,6 +620,7 @@ void PaletteEditor::EnablePaletteControls()
 	ui->AddColorButton->setEnabled(b);
 	ui->DistributeColorsButton->setEnabled(b);
 	ui->AutoDistributeCheckBox->setEnabled(b);
+	ui->BlendCheckBox->setEnabled(b);
 	ui->RandomColorsButton->setEnabled(b);
 	ui->RemoveColorButton->setEnabled(b);
 	ui->ResetColorsButton->setEnabled(b);

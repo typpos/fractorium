@@ -685,7 +685,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			GLfloat(m_DragHandlePos.x), GLfloat(m_DragHandlePos.y)
 		};
 		QVector4D col(1.0f, 1.0f, 0.5f, 1.0f);
-		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, 6.0f);
+		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, false, 6.0f);
 #endif
 	}
 	else if (m_DragState == eDragState::DragSelect)
@@ -733,7 +733,7 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			GLfloat(m_HoverHandlePos.x), GLfloat(m_HoverHandlePos.y)
 		};
 		QVector4D col(0.5f, 1.0f, 1.0f, 1.0f);
-		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, 6.0f);
+		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, false, 6.0f);
 #endif
 	}
 }
@@ -1091,10 +1091,11 @@ void GLWidget::wheelEvent(QWheelEvent* e)
 /// <param name="col">The color to draw with</param>
 /// <param name="vertices">The vertices to use</param>
 /// <param name="drawType">The type of primitive to draw, such as GL_POINT or GL_LINES</param>
+/// <param name="dashed">True to draw dashed lines, else solid</param>
 /// <param name="pointSize">The size in pixels of points, which is internally scaled by the device pixel ratio.</param>
-void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, GLfloat pointSize)
+void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, bool dashed, GLfloat pointSize)
 {
-	DrawPointOrLine(col, vertices.data(), int(vertices.size() / 2), drawType, pointSize);
+	DrawPointOrLine(col, vertices.data(), int(vertices.size() / 2), drawType, dashed, pointSize);
 }
 
 /// <summary>
@@ -1104,10 +1105,18 @@ void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& v
 /// <param name="vertices">The vertices to use</param>
 /// <param name="size">The number of verticies. This is usually the size of vertices / 2.</param>
 /// <param name="drawType">The type of primitive to draw, such as GL_POINT or GL_LINES</param>
+/// <param name="dashed">True to draw dashed lines, else solid</param>
 /// <param name="pointSize">The size in pixels of points, which is internally scaled by the device pixel ratio.</param>
-void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, GLfloat pointSize)
+void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, bool dashed, GLfloat pointSize)
 {
 #ifdef USE_GLSL
+
+	if (dashed && drawType == GL_LINES)
+	{
+		glLineStipple(1, 0XFF00);
+		glEnable(GL_LINE_STIPPLE);
+	}
+
 	m_ModelViewProjectionMatrix = m_ProjMatrix * m_ModelViewMatrix;
 	m_Program->setUniformValue(m_ColAttr, col);
 	m_Program->setUniformValue(m_PointSizeUniform, pointSize * GLfloat(devicePixelRatioF()));
@@ -1116,6 +1125,10 @@ void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, in
 	this->glEnableVertexAttribArray(0);
 	this->glDrawArrays(drawType, 0, size);
 	this->glDisableVertexAttribArray(0);
+
+	if (dashed && drawType == GL_LINES)
+		glDisable(GL_LINE_STIPPLE);
+
 #endif
 }
 
@@ -1509,7 +1522,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, 5.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, !pre, 5.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
 	//
 	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
 	m_Verts.clear();
@@ -1518,7 +1531,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
 	col = QVector4D(color.r, color.g, color.b, 1.0f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_LINES);
+	m_GL->DrawPointOrLine(col, m_Verts, GL_LINES, !pre);
 	//
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);
@@ -1528,7 +1541,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
 	col = QVector4D(1.0f, 1.0f, 1.0f, selected ? 1.0f : 0.5f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, 3.0f);//Draw smaller white points, to give a black outline effect.
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, false, 3.0f);//Draw smaller white points, to give a black outline effect.
 	m_GL->m_ModelViewMatrix.setToIdentity();
 #endif
 }
@@ -1628,7 +1641,7 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool pre, bool final, 
 		}
 	}
 
-	DrawPointOrLine(color, m_Verts, GL_LINES);
+	DrawPointOrLine(color, m_Verts, GL_LINES, !pre);
 
 	//Lines from center to circle.
 	if (!background)
@@ -1649,7 +1662,7 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool pre, bool final, 
 	m_Verts.push_back(0);
 	m_Verts.push_back(1);
 	m_Verts.push_back(0);
-	DrawPointOrLine(color, m_Verts, GL_LINES);
+	DrawPointOrLine(color, m_Verts, GL_LINES, !pre);
 
 	if (background)
 		color = QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
@@ -1659,7 +1672,7 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool pre, bool final, 
 	m_Verts.push_back(0);
 	m_Verts.push_back(0);
 	m_Verts.push_back(1);
-	DrawPointOrLine(color, m_Verts, GL_LINES);
+	DrawPointOrLine(color, m_Verts, GL_LINES, !pre);
 #endif
 }
 

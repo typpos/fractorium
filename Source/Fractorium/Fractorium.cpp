@@ -89,10 +89,6 @@ Fractorium::Fractorium(QWidget* p)
 		pixmap.fill(m_XformComboColors[i]);
 		m_XformComboIcons[i] = QIcon(pixmap);
 	}
-    
-    //Set Default VariationTreeBgColor
-    m_VariationTreeBgColorNoneZero=QColor(200,200,200);
-    m_VariationTreeBgColorZero=QColor(255,255,255);
 
 	QPixmap pixmap(iconSize_, iconSize_);
 	pixmap.fill(m_FinalXformComboColor);
@@ -348,6 +344,11 @@ void Fractorium::dockLocationChanged(Qt::DockWidgetArea area)
 /// <returns>false</returns>
 bool Fractorium::eventFilter(QObject* o, QEvent* e)
 {
+	static int fcount = 0;//Qt seems to deliver three events for every key press. So a count must be kept to only respond to the third event.
+	static int libdelcount = 0;//Note that if anything ever changes under the hood with Qt, this will likely stop working, so adjust as accordingly.
+	static int xfupcount = 0;
+	static int xfdncount = 0;
+
 	if (o == ui.GLParentScrollArea && e->type() == QEvent::Resize)
 	{
 		m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width() * ui.GLDisplay->devicePixelRatioF());
@@ -355,24 +356,79 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	}
 	else if (auto ke = dynamic_cast<QKeyEvent*>(e))
 	{
+		auto combo = ui.CurrentXformCombo;
 		bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
 
 		if (ke->key() >= Qt::Key_F1 && ke->key() <= Qt::Key_F32)
 		{
-			int val = ke->key() - (int)Qt::Key_F1;
+			fcount++;
 
-			if (val < ui.CurrentXformCombo->count())
-				ui.CurrentXformCombo->setCurrentIndex(val);
+			if (fcount >= 3)
+			{
+				int val = ke->key() - (int)Qt::Key_F1;
+
+				if (val < combo->count())
+					combo->setCurrentIndex(val);
+
+				fcount = 0;
+				qDebug() << "global function key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+			}
+
+			return true;
 		}
 		else if (o == ui.LibraryTree)
 		{
 			//Require shift for deleting to prevent it from triggering when the user enters delete in the edit box.
 			if (ke->key() == Qt::Key_Delete && e->type() == QEvent::KeyRelease && shift)
 			{
-				auto v = GetCurrentEmberIndex();
+				libdelcount++;
 
-				if (ui.LibraryTree->topLevelItem(0)->childCount() > 1)
-					OnDelete(v);
+				if (libdelcount >= 3)
+				{
+					auto v = GetCurrentEmberIndex();
+
+					if (ui.LibraryTree->topLevelItem(0)->childCount() > 1)
+						OnDelete(v);
+
+					libdelcount = 0;
+				}
+
+				return true;
+			}
+		}
+		else if (o == this)
+		{
+			unsigned int index = combo->currentIndex();
+
+			if (ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Equal)
+			{
+				xfupcount++;
+
+				if (xfupcount >= 3)
+				{
+					xfupcount = 0;
+					combo->setCurrentIndex((index + 1) % combo->count());
+					qDebug() << "global arrow plus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+				}
+
+				return true;
+			}
+			else if (ke->key() == Qt::Key_Minus || ke->key() == Qt::Key_Underscore)
+			{
+				xfdncount++;
+
+				if (xfdncount >= 3)
+				{
+					xfdncount = 0;
+
+					if (index == 0)
+						index = combo->count();
+
+					combo->setCurrentIndex((index - 1) % combo->count());
+					qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+				}
+
+				return true;
 			}
 		}
 	}
@@ -866,6 +922,10 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.WorldPivotRadio);
 	w = SetTabOrder(this, ui.VariationsFilterLineEdit, ui.VariationsFilterClearButton);//Xforms variation.
 	w = SetTabOrder(this, w, ui.VariationsTree);
+	w = SetTabOrder(this, w, ui.ClearXaosButton);
+	w = SetTabOrder(this, w, ui.RandomXaosButton);
+	w = SetTabOrder(this, w, ui.AddLayerButton);
+	w = SetTabOrder(this, w, ui.AddLayerSpinBox);
 	//Xforms xaos is done dynamically every time.
 	w = SetTabOrder(this, ui.PaletteFilenameCombo, m_PaletteHueSpin);//Palette.
 	w = SetTabOrder(this, w, m_PaletteContrastSpin);

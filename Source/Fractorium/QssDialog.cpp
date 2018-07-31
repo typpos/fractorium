@@ -315,6 +315,7 @@ void QssDialog::reject()
 		m_Parent->m_Settings->Theme(m_LastTheme->objectName());
 	}
 
+	m_Parent->m_Controller->FillVariationTreeWithCurrentXform();
 	QDialog::reject();
 }
 
@@ -466,6 +467,7 @@ void QssDialog::SlotApplyCss()
 		label->setText(tr("Valid Style Sheet"));
 		label->setStyleSheet(QStringLiteral("color: green"));
 		m_Parent->setStyleSheet(style);
+		m_Parent->m_Controller->FillVariationTreeWithCurrentXform();
 	}
 	else
 	{

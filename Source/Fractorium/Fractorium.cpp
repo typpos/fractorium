@@ -601,7 +601,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
 	m_FileDialog->setFileMode(QFileDialog::ExistingFiles);
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
-	m_FileDialog->setNameFilter("*.flam3;;*.flame;;*.xml");
+	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
 	m_FileDialog->setWindowTitle("Open Flame");
 	m_FileDialog->setDirectory(m_Settings->OpenFolder());
 	m_FileDialog->selectNameFilter(m_Settings->OpenXmlExt());
@@ -616,7 +616,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 
 #else
 	auto defaultFilter(m_Settings->OpenXmlExt());
-	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("Flame Files (*.flam3 *.flame *.xml)"), &defaultFilter);
+	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("Flam3(*.flam3);; Flame(*.flame);; Xml(*.xml)"), &defaultFilter);
 	m_Settings->OpenXmlExt(defaultFilter);
 
 	if (!filenames.empty())
@@ -655,7 +655,7 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 	//This is most likely a bug in QFileDialog.
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
 	m_FileDialog->selectFile(defaultFilename);
-	m_FileDialog->setNameFilter(".flam3;;.flame;;.xml");
+	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
 	m_FileDialog->setWindowTitle("Save flame as xml");
 	m_FileDialog->setDirectory(m_Settings->SaveFolder());
 	m_FileDialog->selectNameFilter(m_Settings->SaveXmlExt());

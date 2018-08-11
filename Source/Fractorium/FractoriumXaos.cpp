@@ -180,28 +180,9 @@ void FractoriumEmberController<T>::AddLayer(int xforms)
 {
 	Update([&]
 	{
-		auto origXformCount = m_Ember.XformCount();
-		m_Ember.AddXforms(xforms);
+		std::vector<Xform<T>> vec(xforms);
+		AddXformsWithXaos(m_Ember, vec, false);
 
-		for (auto i = 0; i < m_Ember.XformCount(); i++)
-		{
-			auto xf = m_Ember.GetXform(i);
-
-			if (i < origXformCount)
-			{
-				for (auto j = 0; j < m_Ember.XformCount(); j++)
-					if (j >= origXformCount)
-						xf->SetXaos(j, 0);
-			}
-			else
-			{
-				for (auto j = 0; j < m_Ember.XformCount(); j++)
-					if (j < origXformCount)
-						xf->SetXaos(j, 0);
-					else
-						xf->SetXaos(j, 1);
-			}
-		}
 	});
 	FillXforms();
 	FillSummary();
@@ -210,25 +191,35 @@ void FractoriumEmberController<T>::AddLayer(int xforms)
 void Fractorium::OnAddLayerButtonClicked(bool checked) { m_Controller->AddLayer(ui.AddLayerSpinBox->value()); }
 
 /// <summary>
-/// Toggle all xaos values in one row.
+/// Toggle all xaos values in one row on left mouse button double click and resize all cells to fit their data.
+/// Skip toggling and only refit on right mouse button double click.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="logicalIndex">The index of the row that was double clicked</param>
 void Fractorium::OnXaosRowDoubleClicked(int logicalIndex)
 {
-	ToggleTableRow(ui.XaosTableView, logicalIndex);
+	auto btn = QApplication::mouseButtons();
+
+	if (!btn.testFlag(Qt::RightButton))
+		ToggleTableRow(ui.XaosTableView, logicalIndex);
+
 	ui.XaosTableView->resizeRowsToContents();
 	ui.XaosTableView->resizeColumnsToContents();
 }
 
 /// <summary>
-/// Toggle all xaos values in one column.
+/// Toggle all xaos values in one column on left mouse button double click and resize all cells to fit their data.
+/// Skip toggling and only refit on right mouse button double click.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="logicalIndex">The index of the column that was double clicked</param>
 void Fractorium::OnXaosColDoubleClicked(int logicalIndex)
 {
-	ToggleTableCol(ui.XaosTableView, logicalIndex);
+	auto btn = QApplication::mouseButtons();
+
+	if (!btn.testFlag(Qt::RightButton))
+		ToggleTableCol(ui.XaosTableView, logicalIndex);
+
 	ui.XaosTableView->resizeRowsToContents();
 	ui.XaosTableView->resizeColumnsToContents();
 }

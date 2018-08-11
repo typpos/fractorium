@@ -29,6 +29,7 @@ SpinBox::SpinBox(QWidget* p, int h, int step)
 	setFocusPolicy(Qt::StrongFocus);
 	setMinimumHeight(h);//setGeometry() has no effect, so set both of these instead.
 	setMaximumHeight(h);
+	setContextMenuPolicy(Qt::PreventContextMenu);
 	lineEdit()->installEventFilter(this);
 	lineEdit()->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	connect(this, SIGNAL(valueChanged(int)), this, SLOT(onSpinBoxValueChanged(int)), Qt::QueuedConnection);
@@ -136,6 +137,7 @@ void SpinBox::OnTimeout()
 	int xdistance = m_MouseMovePoint.x() - m_MouseDownPoint.x();
 	int ydistance = m_MouseMovePoint.y() - m_MouseDownPoint.y();
 	int distance = abs(xdistance) > abs(ydistance) ? xdistance : ydistance;
+	distance = Sqr(distance) * (distance < 0 ? -1 : 1);
 	double scale, val;
 	int d = value();
 	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);

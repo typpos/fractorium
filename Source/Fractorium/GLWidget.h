@@ -55,6 +55,8 @@ public:
 	bool Drawing();
 	GLint MaxTexSize();
 	GLuint OutputTexID();
+	GLint TexWidth();
+	GLint TexHeight();
 
 protected:
 	virtual void initializeGL() override;

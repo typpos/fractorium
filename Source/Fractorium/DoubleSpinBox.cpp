@@ -146,6 +146,7 @@ void DoubleSpinBox::OnTimeout()
 	int xdistance = m_MouseMovePoint.x() - m_MouseDownPoint.x();
 	int ydistance = m_MouseMovePoint.y() - m_MouseDownPoint.y();
 	int distance = abs(xdistance) > abs(ydistance) ? xdistance : ydistance;
+	distance = Sqr(distance) * (distance < 0 ? -1 : 1);
 	double scale, val;
 	double d = value();
 	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);

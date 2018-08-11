@@ -793,6 +793,43 @@ static vector<const Variation<T>*> FindVarsWithout(const vector<const Variation<
 
 	return vec;
 }
+
+/// <summary>
+/// Add a vector of xforms to the passed in ember, and optionally preserve the xaos based on position.
+/// </summary>
+/// <param name="ember">The ember to add xforms to</param>
+/// <param name="xforms">The vector of xforms to add</param>
+/// <param name="preserveXaos">True to preserve xaos else false.</param>
+template <typename T>
+static void AddXformsWithXaos(Ember<T>& ember, std::vector<Xform<T>>& xforms, bool preserveXaos)
+{
+	auto origXformCount = ember.XformCount();
+
+	for (auto& it : xforms)
+		ember.AddXform(it);
+
+	for (auto i = 0; i < ember.XformCount(); i++)
+	{
+		auto xf = ember.GetXform(i);
+
+		if (i < origXformCount)
+		{
+			for (auto j = 0; j < ember.XformCount(); j++)
+				if (j >= origXformCount)
+					xf->SetXaos(j, 0);
+		}
+		else
+		{
+			for (auto j = 0; j < ember.XformCount(); j++)
+				if (j < origXformCount)
+					xf->SetXaos(j, 0);
+				else if (!preserveXaos)
+					xf->SetXaos(j, 1);
+				else if (i - origXformCount < xforms.size())//Should never be out of bounds, but just to be safe.
+					xf->SetXaos(j, xforms[i - origXformCount].Xaos(j - origXformCount));
+		}
+	}
+}
 }
 
 /// <summary>

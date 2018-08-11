@@ -61,6 +61,7 @@ public:
 	void ClearAlt();
 	void ClearShift();
 	void ClearControl();
+	eDragState DragState() { return m_DragState; }
 	virtual void DrawImage() { }
 	virtual void DrawAffines(bool pre, bool post) { }
 	virtual void ClearWindow() { }
@@ -111,6 +112,7 @@ public:
 
 	T CalcScale();
 	T CalcRotation();
+	v3T ScrolledCenter(bool toWorld = false);
 	void CalcDragXAxis();
 	void CalcDragYAxis();
 	void CalcDragTranslation();

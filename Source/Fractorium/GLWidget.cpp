@@ -416,6 +416,8 @@ bool GLWidget::Init() { return m_Init; }
 bool GLWidget::Drawing() { return m_Drawing; }
 GLint GLWidget::MaxTexSize() { return m_MaxTexSize; }
 GLuint GLWidget::OutputTexID() { return m_OutputTexID; }
+GLint GLWidget::TexWidth() { return m_TexWidth; }
+GLint GLWidget::TexHeight() { return m_TexHeight; }
 
 /// <summary>
 /// Initialize OpenGL, called once at startup after the main window constructor finishes.
@@ -622,12 +624,27 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 {
 	QueryVMP();//Resolves to float or double specialization function depending on T.
 
-	if (!m_Fractorium->DrawXforms() || (m_DragState == eDragState::DragRotateScale))
+	if (!m_Fractorium->DrawXforms())
 		return;
 
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	bool dragging = m_DragState == eDragState::DragDragging;
 	bool forceFinal = m_Fractorium->HaveFinal();
+
+	if (m_DragState == eDragState::DragRotateScale)
+	{
+		auto dprf = m_GL->devicePixelRatioF();
+		auto world = ScrolledCenter(true);
+
+		m_GL->glLineWidth(1.0f * dprf);
+		GLfloat vertices[] =
+		{
+			GLfloat(m_MouseWorldPos.x), GLfloat(m_MouseWorldPos.y),//Mouse position while dragging with right button down...
+			GLfloat(world.x), GLfloat(world.y)//...to center.
+		};
+		QVector4D col(0.0f, 1.0f, 1.0f, 1.0f);
+		m_GL->DrawPointOrLine(col, vertices, 2, GL_LINES);
+	}
 
 	//Draw grid if control key is pressed.
 	if ((m_GL->hasFocus() && GetControl()) || m_Fractorium->DrawGrid())
@@ -1003,7 +1020,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		T scale = CalcScale();
 		ember->m_Rotate = NormalizeDeg180<T>(m_RotationDown + rot);
 		m_Fractorium->SetRotation(ember->m_Rotate, true);
-		m_Fractorium->SetScale(m_ScaleDown + scale);//Will restart the rendering process.
+		m_Fractorium->SetScale(std::max(T(10), m_ScaleDown + scale));//Will restart the rendering process.
 	}
 	else
 	{
@@ -1532,6 +1549,14 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected)
 	m_Verts.push_back(1.0f);
 	col = QVector4D(color.r, color.g, color.b, 1.0f);
 	m_GL->DrawPointOrLine(col, m_Verts, GL_LINES, !pre);
+	//Line from x to y in the color of the xform combo, solid with no background to somewhat distinguish it.
+	m_Verts.clear();
+	m_Verts.push_back(0);
+	m_Verts.push_back(1);
+	m_Verts.push_back(1);
+	m_Verts.push_back(0);
+	auto qcol = final ? m_Fractorium->m_FinalXformComboColor : m_Fractorium->m_XformComboColors[index % XFORM_COLOR_COUNT];
+	m_GL->DrawPointOrLine(QVector4D(qcol.redF(), qcol.greenF(), qcol.blueF(), 1.0f), m_Verts, GL_LINES, !pre);
 	//
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);

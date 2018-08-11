@@ -224,9 +224,7 @@ void FractoriumEmberController<T>::DuplicateXform()
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
 	Update([&]()
 	{
-		for (auto& it : vec)
-			m_Ember.AddXform(it);
-
+		AddXformsWithXaos(m_Ember, vec, true);
 		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);//Handles xaos.
 	});
@@ -254,6 +252,7 @@ void Fractorium::OnClearXformButtonClicked(bool checked) { m_Controller->ClearXf
 
 /// <summary>
 /// Delete the selected xforms.
+/// Cache a copy of the final xform if it's been selected for removal.
 /// Will not delete the last remaining non-final xform.
 /// Called when the delete xform button is clicked.
 /// Resets the rendering process.
@@ -263,11 +262,12 @@ template <typename T>
 void FractoriumEmberController<T>::DeleteXforms()
 {
 	bool removed = false;
+	bool anyChecked = false;
 	bool haveFinal = m_Fractorium->HaveFinal();
 	auto combo = m_Fractorium->ui.CurrentXformCombo;
 	Xform<T>* finalXform = nullptr;
-	vector<Xform<T>> xforms;
-	xforms.reserve(m_Ember.TotalXformCount());
+	vector<Xform<T>> xformsToKeep;
+	xformsToKeep.reserve(m_Ember.TotalXformCount());
 	//Iterating over the checkboxes must be done instead of using UpdateXform() to iterate over xforms
 	//because xforms are being deleted inside the loop.
 	//Also manually calling UpdateRender() rather than using the usual Update() call because
@@ -280,37 +280,49 @@ void FractoriumEmberController<T>::DeleteXforms()
 			if (isFinal)
 				finalXform = m_Ember.NonConstFinalXform();
 			else if (auto xform = m_Ember.GetXform(i))
-				xforms.push_back(*xform);
+				xformsToKeep.push_back(*xform);
 		}
+		else
+			anyChecked = true;//At least one was selected for removal.
 	});
 	//They might not have selected any checkboxes, in which case just delete the current.
 	auto current = combo->currentIndex();
-	auto count = m_Ember.TotalXformCount();
-	bool anySelected = xforms.size() < m_Ember.XformCount();
-	bool finalSelected = !finalXform && haveFinal;
+	auto totalCount = m_Ember.TotalXformCount();
+	bool keepFinal = finalXform && haveFinal;
 
 	//Nothing was selected, so just delete current.
-	if (!anySelected && !finalSelected)
+	if (!anyChecked)
 	{
 		//Disallow deleting the only remaining non-final xform.
-		if (!(haveFinal && count <= 2 && current == 0) &&//One non-final, one final, disallow deleting non-final.
-				!(!haveFinal && count == 1))//One non-final, no final, disallow deleting.
+		if (!(haveFinal && totalCount <= 2 && current == 0) &&//One non-final, one final, disallow deleting non-final.
+				!(!haveFinal && totalCount == 1))//One non-final, no final, disallow deleting.
 		{
-			m_Ember.DeleteTotalXform(current, haveFinal);
+			if (haveFinal && m_Ember.IsFinalXform(CurrentXform()))//Is final the current?
+				m_Ember.m_CachedFinal = *m_Ember.FinalXform();//Keep a copy in case the user wants to re-add the final.
+
+			m_Ember.DeleteTotalXform(current, haveFinal);//Will cover the case of current either being final or non-final.
 			removed = true;
 		}
 	}
 	else
 	{
-		if (!xforms.empty() && (xforms.size() != m_Ember.XformCount()))//Remove if they requested to do so, but ensure it's not removing all.
+		if (!xformsToKeep.empty())//Remove if they requested to do so, but ensure it's not removing all.
 		{
 			removed = true;
-			m_Ember.ReplaceXforms(xforms);
+			m_Ember.ReplaceXforms(xformsToKeep);//Replace with only those they chose to keep (the inverse of what was checked).
+		}
+		else//They selected all to delete, which is not allowed, so just keep the first xform.
+		{
+			removed = true;
+
+			while (m_Ember.XformCount() > 1)
+				m_Ember.DeleteXform(m_Ember.XformCount() - 1);
 		}
 
-		if (finalSelected)
+		if (!keepFinal)//They selected final to delete.
 		{
 			removed = true;
+			m_Ember.m_CachedFinal = *m_Ember.FinalXform();//Keep a copy in case the user wants to re-add the final.
 			m_Ember.NonConstFinalXform()->Clear();
 		}
 	}
@@ -320,6 +332,7 @@ void FractoriumEmberController<T>::DeleteXforms()
 		int index = int(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final. Note final is requeried one last time.
 		FillXforms(index);
 		UpdateRender();
+		m_Fractorium->ui.GLDisplay->repaint();//Force update because for some reason it doesn't always happen.
 	}
 }
 
@@ -327,6 +340,7 @@ void Fractorium::OnDeleteXformButtonClicked(bool checked) { m_Controller->Delete
 /// <summary>
 /// Add a final xform to the ember and set it as the current xform.
 /// Will only take action if a final xform is not already present.
+/// Will re-add a copy of the last used final xform for the current ember if one had already been added then removed.
 /// Called when the add final xform button is clicked.
 /// Resets the rendering process.
 /// </summary>
@@ -339,9 +353,12 @@ void FractoriumEmberController<T>::AddFinalXform()
 	{
 		Update([&]()
 		{
-			Xform<T> final;
+			auto& final = m_Ember.m_CachedFinal;
 			final.m_Animate = 0;
-			final.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));//Just a placeholder so other parts of the code don't see it as being empty.
+
+			if (final.Empty())
+				final.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));//Just a placeholder so other parts of the code don't see it as being empty.
+
 			m_Ember.SetFinalXform(final);
 			int index = int(m_Ember.TotalXformCount() - 1);//Set index to the last item.
 			FillXforms(index);

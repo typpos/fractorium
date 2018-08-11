@@ -82,7 +82,7 @@ T GLEmberController<T>::CalcScale()
 {
 	//Can't operate using world coords here because every time scale changes, the world bounds change.
 	//So must instead calculate distance traveled based on window coords, which do not change outside of resize events.
-	v2T windowCenter(T(m_GL->width()) / T(2), T(m_GL->height()) / T(2));
+	auto windowCenter = ScrolledCenter(false);
 	v2T windowMousePosDistanceFromCenter(m_MousePos.x - windowCenter.x, m_MousePos.y - windowCenter.y);
 	v2T windowMouseDownDistanceFromCenter(m_MouseDownPos.x - windowCenter.x, m_MouseDownPos.y - windowCenter.y);
 	T lengthMousePosFromCenterInPixels = glm::length(windowMousePosDistanceFromCenter);
@@ -98,9 +98,41 @@ T GLEmberController<T>::CalcScale()
 template <typename T>
 T GLEmberController<T>::CalcRotation()
 {
-	T rotStart = NormalizeDeg180<T>(T(90) - (atan2(-m_MouseDownWorldPos.y, m_MouseDownWorldPos.x) * RAD_2_DEG_T));
-	T rot = NormalizeDeg180<T>(T(90) - (atan2(-m_MouseWorldPos.y, m_MouseWorldPos.x) * RAD_2_DEG_T));
+	auto scrolledWorldCenter = ScrolledCenter(true);
+	T rotStart = NormalizeDeg180<T>((std::atan2(m_MouseDownWorldPos.y - scrolledWorldCenter.y, m_MouseDownWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
+	T rot = NormalizeDeg180<T>((std::atan2(m_MouseWorldPos.y - scrolledWorldCenter.y, m_MouseWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
 	return rotStart - rot;
+}
+
+/// <summary>
+/// Return the window coordinates of the center of the viewable area.
+/// This is the middle of the parent scroll area plus the scroll bar offset, all scaled by the device pixel ratio.
+/// </summary>
+/// <param name="toWorld">True to return world coordinates, else return window coordinates.</param>
+/// <returns>The coordinates of the center of the viewable area in either window space or world space.</returns>
+template <typename T>
+v3T GLEmberController<T>::ScrolledCenter(bool toWorld)
+{
+	auto dprf = m_GL->devicePixelRatioF();
+	auto wpsa = m_Fractorium->ui.GLParentScrollArea->width();
+	auto hpsa = m_Fractorium->ui.GLParentScrollArea->height();
+	auto hpos = m_Fractorium->ui.GLParentScrollArea->horizontalScrollBar()->value();
+	auto vpos = m_Fractorium->ui.GLParentScrollArea->verticalScrollBar()->value();
+	v3T v;
+
+	if (!m_Fractorium->ui.GLParentScrollArea->horizontalScrollBar()->isVisible() && !m_Fractorium->ui.GLParentScrollArea->verticalScrollBar()->isVisible())
+		v = v3T(((m_GL->width() / 2)) * dprf,
+				((m_GL->height() / 2)) * dprf,
+				0);
+	else
+		v = v3T((hpos + (wpsa / 2)) * dprf,
+				(vpos + (hpsa / 2)) * dprf,
+				0);
+
+	if (toWorld)
+		return WindowToWorld(v, true);
+
+	return v;
 }
 
 /// <summary>

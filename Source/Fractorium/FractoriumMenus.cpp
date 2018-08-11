@@ -699,8 +699,7 @@ void FractoriumEmberController<T>::PasteSelectedXforms()
 {
 	Update([&]()
 	{
-		for (auto& it : m_CopiedXforms)
-			m_Ember.AddXform(it);
+		AddXformsWithXaos(m_Ember, m_CopiedXforms, true);
 
 		if (!m_CopiedFinalXform.Empty())
 			m_Ember.SetFinalXform(m_CopiedFinalXform);

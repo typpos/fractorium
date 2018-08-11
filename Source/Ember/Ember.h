@@ -179,6 +179,7 @@ public:
 
 		CopyCont(m_EmberMotionElements, ember.m_EmberMotionElements);
 		m_Solo = ember.m_Solo;
+		m_CachedFinal = ember.m_CachedFinal;
 		return *this;
 	}
 
@@ -1724,9 +1725,6 @@ public:
 	//The list of motion elements for the top-level flame params
 	vector<EmberMotion<T>> m_EmberMotionElements;
 
-	//Index of xform to have non-zero opacity, while all others have zero. This is an interactive rendering parameter and is not saved to Xml. -1 means solo is not used.
-	intmax_t m_Solo = -1;
-
 private:
 	/// <summary>
 	/// The type of scaling used when resizing.
@@ -1810,6 +1808,13 @@ private:
 		for (size_t k = 0; k < size; k++)
 			xform->*m += coefs[k] * embers[k].GetTotalXform(i)->*m;
 	}
+
+public:
+	//Index of xform to have non-zero opacity, while all others have zero. This is an interactive rendering parameter and is not saved to Xml. -1 means solo is not used.
+	intmax_t m_Solo = -1;
+
+	//Cached copy of the final xform which makes it easy to add and remove the final repeatedly during editing without losing information. Used only with interactive rendering.
+	Xform<T> m_CachedFinal;
 };
 
 /// <summary>

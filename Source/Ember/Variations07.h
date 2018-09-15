@@ -154,46 +154,46 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string freqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pwx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pwy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqx     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pwx       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pwy       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scalex    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaleinfx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaley    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaleinfy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string unity = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string jacok = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string six = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
-		string siy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string unity     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string jacok     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string six       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
+		string siy       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t CsX = 1;\n"
 		   << "\t\treal_t CsY = 1;\n"
 		   << "\t\treal_t jcbSn = 0, jcbCn, jcbDn;\n"
-		   << "\t\tCsX = SafeDivInv(" << unity << ", (" << unity << " + Sqr(vIn.x)));\n"
-		   << "\t\tCsX = CsX * " << six << " + " << scaleinfx << ";\n"
-		   << "\t\tCsY = SafeDivInv(" << unity << ", (" << unity << " + Sqr(vIn.y)));\n"
-		   << "\t\tCsY = CsY * " << siy << " + " << scaleinfy << ";\n"
+		   << "\t\tCsX = SafeDivInv(" << unity << ", fma(vIn.x, vIn.x, " << unity << "));\n"
+		   << "\t\tCsX = fma(CsX, " << six << ", " << scaleinfx << ");\n"
+		   << "\t\tCsY = SafeDivInv(" << unity << ", fma(vIn.y, vIn.y, " << unity << "));\n"
+		   << "\t\tCsY = fma(CsY, " << siy << ", " << scaleinfy << ");\n"
 		   << "\n"
 		   << "\t\tif (" << pwx << " >= 0 && " << pwx << " < 1e-4)\n"
 		   << "\t\t{\n"
 		   << "\t\t	JacobiElliptic(vIn.y * " << freqx << ", " << jacok << ", &jcbSn, &jcbCn, &jcbDn);\n"
-		   << "\t\t	vOut.x = " << weight << " * (vIn.x + CsX * jcbSn);\n"
+		   << "\t\t	vOut.x = " << weight << " * fma(CsX, jcbSn, vIn.x);\n"
 		   << "\t\t}\n"
 		   //<< "\t\telse if (" << pwx << " < 0 && " << pwx << " > -1e-4)\n"
 		   //<< "\t\t	vOut.x = " << weight << " * (vIn.x + CsX * _j1(vIn.y * " << freqx << "));\n"//This is not implemented in OpenCL.
 		   << "\t\telse\n"
-		   << "\t\t	vOut.x = " << weight << " * (vIn.x + CsX * sin(SignNz(vIn.y) * pow(Zeps(fabs(vIn.y)), " << pwx << ") * " << freqx << "));\n"
+		   << "\t\t	vOut.x = " << weight << " * fma(CsX, sin(SignNz(vIn.y) * pow(Zeps(fabs(vIn.y)), " << pwx << ") * " << freqx << "), vIn.x);\n"
 		   << "\n"
 		   << "\t\tif (" << pwy << " >= 0 && " << pwy << " < 1e-4)\n"
 		   << "\t\t{\n"
 		   << "\t\t	JacobiElliptic(vIn.x * " << freqy << ", " << jacok << ", &jcbSn, &jcbCn, &jcbDn);\n"
-		   << "\t\t	vOut.y = " << weight << " * (vIn.y + CsY * jcbSn);\n"
+		   << "\t\t	vOut.y = " << weight << " * fma(CsY, jcbSn, vIn.y);\n"
 		   << "\t\t}\n"
 		   //<< "\t\telse if (" << pwy << " < 0 && " << pwy << " > -1e-4)\n"
 		   //<< "\t\t	vOut.y = " << weight << " * (vIn.y + CsY * _j1(vIn.x * " << freqy << "));\n"//This is not implemented in OpenCL.
 		   << "\t\telse\n"
-		   << "\t\t	vOut.y = " << weight << " * (vIn.y + CsY * sin(SignNz(vIn.x) * pow(Zeps(fabs(vIn.x)), " << pwy << ") * " << freqy << "));\n"
+		   << "\t\t	vOut.y = " << weight << " * fma(CsY, sin(SignNz(vIn.x) * pow(Zeps(fabs(vIn.x)), " << pwy << ") * " << freqy << "), vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -291,7 +291,7 @@ public:
 		   << "\t\tJacobiElliptic(vIn.y, 1 - " << k << ", &sny, &cny, &dny);\n"
 		   << "\t\tnumX = cnx * cny;\n"
 		   << "\t\tnumY = -dnx * snx * dny * sny;\n"
-		   << "\t\tdenom = SQR(snx) * SQR(sny) * " << k << " + SQR(cny);\n"
+		   << "\t\tdenom = fma(SQR(snx) * SQR(sny), " << k << ", SQR(cny));\n"
 		   << "\t\tdenom = " << weight << " / Zeps(denom);\n"
 		   << "\t\tvOut.x = denom * numX;\n"
 		   << "\t\tvOut.y = denom * numY;\n"
@@ -363,7 +363,7 @@ public:
 		   << "\t\tJacobiElliptic(vIn.y, 1 - " << k << ", &sny, &cny, &dny);\n"
 		   << "\t\tnumX = dnx * cny * dny;\n"
 		   << "\t\tnumY = -cnx * snx * sny * " << k << ";\n"
-		   << "\t\tdenom = SQR(snx) * SQR(sny) * " << k << " + SQR(cny);\n"
+		   << "\t\tdenom = fma(SQR(snx) * SQR(sny), " << k << ", SQR(cny));\n"
 		   << "\t\tdenom = " << weight << " / Zeps(denom);\n"
 		   << "\t\tvOut.x = denom * numX;\n"
 		   << "\t\tvOut.y = denom * numY;\n"
@@ -435,7 +435,7 @@ public:
 		   << "\t\tJacobiElliptic(vIn.y, 1 - " << k << ", &sny, &cny, &dny);\n"
 		   << "\t\tnumX = snx * dny;\n"
 		   << "\t\tnumY = cnx * dnx * cny * sny;\n"
-		   << "\t\tdenom = SQR(snx) * SQR(sny) * " << k << " + SQR(cny);\n"
+		   << "\t\tdenom = fma(SQR(snx) * SQR(sny), " << k << ", SQR(cny));\n"
 		   << "\t\tdenom = " << weight << " / Zeps(denom);\n"
 		   << "\t\tvOut.x = denom * numX;\n"
 		   << "\t\tvOut.y = denom * numY;\n"
@@ -492,8 +492,8 @@ public:
 		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tvOut.x = " << weight << " * (vIn.x + (1 / Zeps(" << x << " * M_2PI)) * sin(" << x << " * M_2PI * vIn.x));\n"
-		   << "\t\tvOut.y = " << weight << " * (vIn.y + (1 / Zeps(" << y << " * M_2PI)) * sin(" << y << " * M_2PI * vIn.y));\n"
+		   << "\t\tvOut.x = " << weight << " * fma((1 / Zeps(" << x << " * M_2PI)), sin(" << x << " * M_2PI * vIn.x), vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma((1 / Zeps(" << y << " * M_2PI)), sin(" << y << " * M_2PI * vIn.y), vIn.y);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -651,33 +651,33 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string l = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string k = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string z1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string z2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string refSc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string opt = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string optSc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string opt3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string transp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string wagsc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string crvsc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string f = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string wigsc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string offset = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cycle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
-		string optDir = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string l          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string k          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string z1         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string z2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string refSc      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string opt        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string optSc      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string opt3       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string transp     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string wagsc      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string crvsc      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string f          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string wigsc      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string offset     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cycle      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
+		string optDir     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string petalsSign = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string numPetals = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string absOptSc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string smooth12 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string smooth3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string antiOpt1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ghost = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string wigScale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string numPetals  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string absOptSc   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string smooth12   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string smooth3    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string antiOpt1   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ghost      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string wigScale   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint posNeg = 1;\n"
 		   << "\t\treal_t th = 0;\n"
@@ -694,61 +694,64 @@ public:
 		   << "\t\t	posNeg = -1;\n"
 		   << "\n"
 		   << "\t\tpang = th / Zeps(" << cycle << ");\n"
-		   << "\t\twig = pang * " << freq << " * 0.5 + " << offset << " * " << cycle << ";\n"
+		   << "\t\twig = fma(pang, " << freq << " * 0.5, " << offset << " * " << cycle << ");\n"
+		   << "\t\treal_t rad04 = (real_t)(0.4) * rad;\n"
 		   << "\n"
 		   << "\t\tif (" << optDir << " < 0)\n"
 		   << "\t\t{\n"
-		   << "\t\t	wag = sin(curve1 * MPI * " << absOptSc << ") + " << wagsc << " * 0.4 * rad + " << crvsc << " * 0.5 * (sin(curveTwo * MPI));\n"
-		   << "\t\t	wag3 = sin(curve4 * MPI * " << absOptSc << ") + " << wagsc << " * SQR(rad) * 0.4 + " << crvsc << " * 0.5 * (cos(curve3 * MPI));\n"
+		   << "\t\t	wag  = sin(curve1* MPI * " << absOptSc << ") + fma(" << wagsc << ", rad04, " << crvsc << " * 0.5 * sin(curveTwo * MPI)); \n"
+		   << "\t\t	wag3 = sin(curve4* MPI * " << absOptSc << ") + fma(" << wagsc << ", SQR(rad) * (real_t)(0.4), " << crvsc << " * 0.5 * cos(curve3 * MPI)); \n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	wag = sin(curve1 * MPI * " << absOptSc << ") + " << wagsc << " * 0.4 * rad + " << crvsc << " * 0.5 * (cos(curve3 * MPI));\n"
-		   << "\t\t	wag3 = sin(curve4 * MPI * " << absOptSc << ") + " << wagsc << " * SQR(rad) * 0.4 + " << crvsc << " * 0.5 * (sin(curveTwo * MPI));\n"
+		   << "\t\t	wag  = sin(curve1* MPI * " << absOptSc << ") + fma(" << wagsc << ", rad04, " << crvsc << " * 0.5 * cos(curve3 * MPI)); \n"
+		   << "\t\t	wag3 = sin(curve4* MPI * " << absOptSc << ") + fma(" << wagsc << ", SQR(rad) * (real_t)(0.4), " << crvsc << " * 0.5 * sin(curveTwo * MPI)); \n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\twag2 = sin(curveTwo * MPI * " << absOptSc << ") + " << wagsc << " * 0.4 * rad + " << crvsc << " * 0.5 * (cos(curve3 * MPI));\n"
+		   << "\t\twag2 = sin(curveTwo * MPI * " << absOptSc << ") + fma(" << wagsc << ", rad04, " << crvsc << " * 0.5 * cos(curve3 * MPI)); \n"
 		   << "\n"
 		   << "\t\tif (" << smooth12 << " <= 1)\n"
-		   << "\t\t	wag12 = wag;\n"
+		   << "\t\t	wag12 = wag; \n"
 		   << "\t\telse if (" << smooth12 << " <= 2 && " << smooth12 << " > 1)\n"
-		   << "\t\t	wag12 = wag2 * (1 - " << antiOpt1 << ") + wag * " << antiOpt1 << ";\n"
+		   << "\t\t	wag12 = fma(wag2, (1 - " << antiOpt1 << "), wag * " << antiOpt1 << "); \n"
 		   << "\t\telse if (" << smooth12 << " > 2)\n"
-		   << "\t\t	wag12 = wag2;\n"
+		   << "\t\t	wag12 = wag2; \n"
 		   << "\n"
 		   << "\t\tif (" << smooth3 << " == 0)\n"
-		   << "\t\t	waggle = wag12;\n"
+		   << "\t\t	waggle = wag12; \n"
 		   << "\t\telse if (" << smooth3 << " > 0)\n"
-		   << "\t\t	waggle = wag12 * (1 - " << smooth3 << ") + wag3 * " << smooth3 << ";\n"
+		   << "\t\t	waggle = fma(wag12, (1 - " << smooth3 << "), wag3 * " << smooth3 << "); \n"
+		   << "\n"
+		   << "\t\treal_t cospetthcl = " << weight << " * (real_t)(0.5) * " << "cos(fma(" << numPetals << ", th, " << c << ")) * " << l << "; \n"
 		   << "\n"
 		   << "\t\tif (MwcNext01(mwc) < " << ghost << ")\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (posNeg < 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = " << weight << " * 0.5 * " << refSc << " * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * cth;\n"
-		   << "\t\t		vOut.y = " << weight << " * 0.5 * " << refSc << " * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * sth;\n"
-		   << "\t\t		vOut.z = " << weight << " * -0.5 * ((" << z2 << " * waggle + Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << ");\n"
+		   << "\t\t		vOut.x = " << refSc << "* cospetthcl * cth; \n"
+		   << "\t\t		vOut.y = " << refSc << "* cospetthcl * sth; \n"
+		   << "\t\t		vOut.z = " << weight << " * -0.5 * (fma(" << z2 << ", waggle, Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << "); \n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = " << weight << " * 0.5 * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * cth;\n"
-		   << "\t\t		vOut.y = " << weight << " * 0.5 * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * sth;\n"
-		   << "\t\t		vOut.z = " << weight << " * 0.5 * ((" << z1 << " * waggle + Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << ");\n"
+		   << "\t\t		vOut.x = cospetthcl * cth; \n"
+		   << "\t\t		vOut.y = cospetthcl * sth; \n"
+		   << "\t\t		vOut.z = " << weight << " * 0.5 * (fma(" << z1 << ", waggle, Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << "); \n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (posNeg < 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = " << weight << " * 0.5 * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * cth;\n"
-		   << "\t\t		vOut.y = " << weight << " * 0.5 * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * sth;\n"
-		   << "\t\t		vOut.z = " << weight << " * 0.5 * ((" << z1 << " * waggle + Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << ");\n"
+		   << "\t\t		vOut.x = cospetthcl * cth; \n"
+		   << "\t\t		vOut.y = cospetthcl * sth; \n"
+		   << "\t\t		vOut.z = " << weight << " * 0.5 * (fma(" << z1 << ", waggle, Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << "); \n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = " << weight << " * 0.5 * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * cth;\n"
-		   << "\t\t		vOut.y = " << weight << " * 0.5 * (" << l << " * cos(" << numPetals << " * th + " << c << ")) * sth;\n"
-		   << "\t\t		vOut.z = " << weight << " * 0.5 * ((" << z1 << " * waggle + Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << ");\n"
+		   << "\t\t		vOut.x = cospetthcl * cth; \n"
+		   << "\t\t		vOut.y = cospetthcl * sth; \n"
+		   << "\t\t		vOut.z = " << weight << " * 0.5 * (fma(" << z1 << ", waggle, Sqr(rad * 0.5) * sin(wig) * " << wigScale << ") + " << dist << "); \n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\t}\n";
@@ -1067,7 +1070,7 @@ public:
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (vIn.x / Zeps(sqrt(SQR(vIn.x) + (real_t)1.0)));\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x / Zeps(sqrt(fma(vIn.x, vIn.x, (real_t)1.0))));\n"
 		   << "\t\tvOut.y = " << weight << " * vIn.y;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -1248,15 +1251,15 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string exponent = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string arcWidth = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string seed = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exponent      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string arcWidth      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string finalexponent = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string oneOverEx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string seed2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rmax = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverEx     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string width         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rmax          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t modbase = 65535;\n"
 		   << "\t\treal_t multiplier = 32747;\n"
@@ -1297,10 +1300,10 @@ public:
 		   << "\t\t\t\txrand = Round(fabs(xrand)) * " << seed2 << ";\n"
 		   << "\t\t\t\tyrand = Round(fabs(yrand)) * " << seed2 << ";\n"
 		   << "\n"
-		   << "\t\t\t\treal_t niter = xrand + yrand + (xrand * yrand);\n"
+		   << "\t\t\t\treal_t niter = fma(xrand, yrand, xrand + yrand);\n"
 		   << "\t\t\t\treal_t randint = (" << seed << " + niter) * " << seed2 << " * ((real_t) 0.5);\n"
 		   << "\n"
-		   << "\t\t\t\trandint = fmod((randint * multiplier + offset), modbase);\n"
+		   << "\t\t\t\trandint = fmod(fma(randint, multiplier, offset), modbase);\n"
 		   << "\t\t\t\ttiletype = fmod(randint, 2);\n"
 		   << "\t\t\t}\n"
 		   << "\t\t}\n"
@@ -1428,11 +1431,11 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string freqX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scaleX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scaleY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string nullVar = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqX    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaleX   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqY    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaleY   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string nullVar  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string distance = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x0 = vIn.x;\n"
@@ -1442,8 +1445,8 @@ public:
 		   << "\t\treal_t factor = (dist < " << distance << ") ? (dist - " << nullVar << ") / Zeps(" << distance << "-" << nullVar << ") : (real_t)(1.0);\n"
 		   << "\t\tfactor = (dist < " << nullVar << ") ? (real_t) 0.0 : factor;\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (x0 + factor * sin(y0 * " << freqX << ") * " << scaleX << ");\n"
-		   << "\t\tvOut.y = " << weight << " * (y0 + factor * sin(x0 * " << freqY << ") * " << scaleY << ");\n"
+		   << "\t\tvOut.x = " << weight << " * fma(factor * " << scaleX << ", sin(y0 * " << freqX << "), x0);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(factor * " << scaleY << ", sin(x0 * " << freqY << "), y0);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1494,7 +1497,7 @@ public:
 		T aux = 1 / std::sqrt(helper.m_PrecalcSumSquares + 1);
 		T x1 = helper.m_TransX * aux;
 		T y1 = helper.m_TransY * aux;
-		aux = std::sqrt(x1 * x1 + y1 * y1);
+		aux = std::sqrt(x1 * x1 + SQR(y1));
 		helper.Out.x = m_Weight * std::atan2(x1, y1) * T(M_1_PI);
 		helper.Out.y = m_Weight * (aux - T(0.5));
 		helper.Out.z = DefaultZ(helper);
@@ -1511,7 +1514,7 @@ public:
 		   << "\t\treal_t aux = 1.0 / sqrt(precalcSumSquares + 1);\n"
 		   << "\t\treal_t x1 = transX * aux;\n"
 		   << "\t\treal_t y1 = transY * aux;\n"
-		   << "\t\taux = sqrt(x1 * x1 + y1 * y1);\n"
+		   << "\t\taux = sqrt(fma(x1, x1, SQR(y1)));\n"
 		   << "\t\tvOut.x = " << weight << " * atan2(x1, y1) * M1PI;\n"
 		   << "\t\tvOut.y = " << weight << " * (aux - 0.5);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -1538,7 +1541,7 @@ public:
 		T aux = 1 / (helper.m_PrecalcSqrtSumSquares + 1);
 		T x1 = helper.m_TransX * aux;
 		T y1 = helper.m_TransY * aux;
-		aux = std::sqrt(x1 * x1 + y1 * y1);
+		aux = std::sqrt(x1 * x1 + SQR(y1));
 		helper.Out.x = m_Weight * std::atan2(x1, y1) * T(M_1_PI);
 		helper.Out.y = m_Weight * (aux - T(0.5));
 		helper.Out.z = DefaultZ(helper);
@@ -1555,7 +1558,7 @@ public:
 		   << "\t\treal_t aux = 1.0 / (precalcSqrtSumSquares + 1);\n"
 		   << "\t\treal_t x1 = transX * aux;\n"
 		   << "\t\treal_t y1 = transY * aux;\n"
-		   << "\t\taux = sqrt(x1 * x1 + y1 * y1);\n"
+		   << "\t\taux = sqrt(fma(x1, x1, SQR(y1)));\n"
 		   << "\t\tvOut.x = " << weight << " * atan2(x1, y1) * M1PI;\n"
 		   << "\t\tvOut.y = " << weight << " * (aux - 0.5);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -1641,10 +1644,10 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string freq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string freq2pi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t temp = vIn.z * " << freq2pi << " + precalcAtanyx;\n"
+		   << "\t\treal_t temp = fma(vIn.z, " << freq2pi << ", precalcAtanyx);\n"
 		   << "\t\treal_t weightXdist = " << weight << " * precalcSqrtSumSquares;\n"
 		   << "\t\tvOut.x = weightXdist * cos(temp);\n"
 		   << "\t\tvOut.y = weightXdist * sin(temp);\n"
@@ -1701,13 +1704,13 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string freq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string width   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string freq2pi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t temp = vIn.z  * " << freq2pi << ";\n"
-		   << "\t\tvOut.x = " << weight << " * (vIn.x + cos(temp) * " << width << ");\n"
-		   << "\t\tvOut.y = " << weight << " * (vIn.y + sin(temp) * " << width << ");\n"
+		   << "\t\tvOut.x = " << weight << " * (fma(cos(temp), " << width << ", vIn.x));\n"
+		   << "\t\tvOut.y = " << weight << " * (fma(sin(temp), " << width << ", vIn.y));\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z ;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -1862,8 +1865,8 @@ public:
 		   << "\n"
 		   << "\t\ta += ((MwcNext(mwc) & 1) ? M_2PI : -M_2PI) * round(log(MwcNext01(mwc)) * " << coeff << ");\n"
 		   << "\t\treal_t lnr2 = log(precalcSumSquares);\n"
-		   << "\t\treal_t r = " << weight << " * exp(" << halfc << " * lnr2 - " << precalcd << " * a);\n"
-		   << "\t\treal_t temp = " << precalcc << " * a + " << halfd << " * lnr2 + " << ang << " * MwcNext(mwc);\n"
+		   << "\t\treal_t r = " << weight << " * exp(fma(" << halfc << ", lnr2, -(" << precalcd << " * a)));\n"
+		   << "\t\treal_t temp = fma(" << precalcc << ", a, fma(" << halfd << ", lnr2, " << ang << " * MwcNext(mwc)));\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
 		   << "\t\tvOut.y = r * sin(temp);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -1969,7 +1972,7 @@ public:
 		   << "\t\treal_t randr = lvl * " << radius << ";\n"
 		   << "\n"
 		   << "\t\tif (" << rblur << " != 0)\n"
-		   << "\t\t\trandr += (sqrt(MwcNext01(mwc)) * 2.0 - 1.0) * " << rblur << ";\n";
+		   << "\t\t\trandr += fma(sqrt(MwcNext01(mwc)), (real_t)(2.0), (real_t)(-1.0)) * " << rblur << ";\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
@@ -1983,7 +1986,7 @@ public:
 		   << "\t\treal_t zb = 0;\n"
 		   << "\n"
 		   << "\t\tif (" << zblur << " != 0)\n"
-		   << "\t\t\tzb = (MwcNext01(mwc) * 2.0 - 1.0) * " << zblur << ";\n"
+		   << "\t\t\tzb = fma(sqrt(MwcNext01(mwc)), (real_t)(2.0), (real_t)(-1.0)) * " << zblur << ";\n"
 		   << "\n"
 		   << "\t\tvOut.z = (-lvl + zb) * " << weight << ";\n"
 		   << "\t}\n";
@@ -2091,8 +2094,10 @@ public:
 		   << "\t\treal_t angle = floor(precalcAtanyx * " << coeff << ") / " << coeff << " + M_PI / " << n << ";\n"
 		   << "\t\treal_t x0 = cos(angle) * len;\n"
 		   << "\t\treal_t y0 = sin(angle) * len;\n"
+		   << "\t\treal_t xmx = vIn.x - x0;\n"
+		   << "\t\treal_t ymy = vIn.y - y0;\n"
 		   << "\n"
-		   << "\t\tif (sqrt(Sqr(vIn.x - x0) + Sqr(vIn.y - y0)) < d)\n"
+		   << "\t\tif (sqrt(fma(xmx, xmx, SQR(ymy))) < d)\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (" << zero << " > 1.5)\n"
 		   << "\t\t	{\n"
@@ -2111,8 +2116,8 @@ public:
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
 		   << "\t\t			real_t rangle = atan2(vIn.y - y0, vIn.x - x0);\n"
-		   << "\t\t			fx = x0 + cos(rangle) * d;\n"
-		   << "\t\t			fy = y0 + sin(rangle) * d;\n"
+		   << "\t\t			fx = fma(cos(rangle), d, x0);\n"
+		   << "\t\t			fy = fma(sin(rangle), d, y0);\n"
 		   << "\t\t			fz = 0;\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
@@ -2205,12 +2210,12 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t fx = vIn.x * " << scale2 << ";\n"
 		   << "\t\treal_t fy = vIn.y * " << scale2 << ";\n"
-		   << "\t\treal_t rad = 1 / Zeps(fx * fx + fy * fy);\n"
+		   << "\t\treal_t rad = 1 / Zeps(fma(fx, fx, SQR(fy)));\n"
 		   << "\t\treal_t x = rad * fx + " << shift << ";\n"
 		   << "\t\treal_t y = rad * fy;\n"
-		   << "\t\trad = " << weight << " * " << shift << " / Zeps(x * x + y * y);\n"
+		   << "\t\trad = " << weight << " * " << shift << " / Zeps(fma(x, x, SQR(y)));\n"
 		   << "\t\treal_t angle = ((MwcNext(mwc) % (int)" << p << ") * 2 + 1) * M_PI / " << p << ";\n"
-		   << "\t\treal_t X = rad * x + " << shift << ";\n"
+		   << "\t\treal_t X = fma(rad, x, " << shift << ");\n"
 		   << "\t\treal_t Y = rad * y;\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
 		   << "\t\treal_t sina = sin(angle);\n";
@@ -2218,8 +2223,8 @@ public:
 		if (m_VarType == eVariationType::VARTYPE_REG)
 			ss << "\t\toutPoint->m_X = outPoint->m_Y = outPoint->m_Z = 0;\n";
 
-		ss << "\t\tvOut.x = cosa * X - sina * Y;\n"
-		   << "\t\tvOut.y = sina * X + cosa * Y;\n"
+		ss << "\t\tvOut.x = fma(cosa, X, -(sina * Y));\n"
+		   << "\t\tvOut.y = fma(sina, X, cosa * Y);\n"
 		   << "\t\tvOut.z = vIn.z * rad;\n"
 		   << "\t}\n";
 		return ss.str();

@@ -1509,7 +1509,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t blockx = floor(log(MwcNext01(mwc)) * ((MwcNext(mwc) & 1) ? " << spread << " : -" << spread << "));\n"
 		   << "\t\treal_t blocky = floor(log(MwcNext01(mwc)) * ((MwcNext(mwc) & 1) ? " << spread << " : -" << spread << "));\n"
-		   << "\t\treal_t z = Hash(blockx * " << seed << ") + Hash(blockx + blocky * " << seed << ");\n";
+		   << "\t\treal_t z = Hash(blockx * " << seed << ") + Hash(fma(blocky, " << seed << ", blockx));\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
@@ -1518,8 +1518,8 @@ public:
 			   << "\t\toutPoint->m_Z = 0;\n";
 		}
 
-		ss << "\t\tvOut.x = (blockx * " << density << " + MwcNext01(mwc)) * " << blocksize << ";\n"
-		   << "\t\tvOut.y = (blocky * " << density << " + MwcNext01(mwc)) * " << blocksize << ";\n"
+		ss << "\t\tvOut.x = fma(blockx, " << density << ", MwcNext01(mwc)) * " << blocksize << ";\n"
+		   << "\t\tvOut.y = fma(blocky, " << density << ", MwcNext01(mwc)) * " << blocksize << ";\n"
 		   << "\t\tvOut.z = " << blockheight << " * z * pow(MwcNext01(mwc), 0.125);\n"
 		   << "\t\toutPoint->m_ColorX = z / 2;\n"
 		   << "\t}\n";
@@ -1592,19 +1592,19 @@ public:
 		string index = ss2.str();
 		string weight = WeightDefineString();
 		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string len = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string len   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string width = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string seed = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rad = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dc    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rad   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xl, yl;\n"
 		   << "\t\txl = sincos(" << rad << ", &yl);\n"
 		   << "\t\tint blockx = (int)floor(vIn.x * " << width << ");\n"
-		   << "\t\tblockx += (int)(2 - 4 * Hash((int)(blockx * " << seed << " + 1)));\n"
+		   << "\t\tblockx += (int)(2 - 4 * Hash((int)(blockx * (int)" << seed << " + 1)));\n"
 		   << "\t\tint blocky = (int)floor(vIn.y * " << width << ");\n"
-		   << "\t\tblocky += (int)(2 - 4 * Hash((int)(blocky * " << seed << " + 1)));\n"
-		   << "\t\treal_t fLen = (Hash((int)(blocky + blockx * -" << seed << ")) + Hash((int)(blockx + blocky * " << seed << " * (real_t)0.5))) * (real_t)0.5;\n"
+		   << "\t\tblocky += (int)(2 - 4 * Hash((int)(blocky * (int)" << seed << " + 1)));\n"
+		   << "\t\treal_t fLen = (Hash((int)(blocky + blockx * -(int)" << seed << ")) + Hash((int)(blockx + blocky * (int)" << seed << " * (real_t)0.5))) * (real_t)0.5;\n"
 		   << "\t\treal_t r01 = MwcNext01(mwc);\n"
 		   << "\t\treal_t fade = fLen * r01 * r01 * r01 * r01;\n"
 		   << "\t\tvOut.x = " << weight << " * " << len << " * xl * fade;\n"

@@ -37,6 +37,7 @@ public:
 	bool Png16Bit();
 	bool AutoUnique();
 	bool LoadLast();
+	bool RotateAndScale();
 	uint ThreadCount();
 	uint RandomCount();
 	uint CpuQuality();

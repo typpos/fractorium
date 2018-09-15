@@ -173,6 +173,9 @@ void FractoriumSettings::OpenClQuality(uint i)                   { setValue(OPEN
 bool FractoriumSettings::LoadLast()                              { return value(LOADLAST).toBool();        }
 void FractoriumSettings::LoadLast(bool b)                        { setValue(LOADLAST, b);                  }
 
+bool FractoriumSettings::RotateAndScale()                        { return value(ROTSCALE).toBool();        }
+void FractoriumSettings::RotateAndScale(bool b)                  { setValue(ROTSCALE, b);                  }
+
 /// <summary>
 /// Sequence generation settings.
 /// </summary>

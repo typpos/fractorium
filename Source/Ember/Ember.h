@@ -366,11 +366,11 @@ public:
 			return nullptr;
 	}
 
-/// <summary>
-/// Search the xforms, excluding final, to find which one's address matches the address of the specified xform.
-/// </summary>
-/// <param name="xform">A pointer to the xform to find</param>
-/// <returns>The index of the matched xform if found, else -1.</returns>
+	/// <summary>
+	/// Search the xforms, excluding final, to find which one's address matches the address of the specified xform.
+	/// </summary>
+	/// <param name="xform">A pointer to the xform to find</param>
+	/// <returns>The index of the matched xform if found, else -1.</returns>
 	intmax_t GetXformIndex(Xform<T>* xform) const
 	{
 		intmax_t index = -1;

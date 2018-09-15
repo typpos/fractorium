@@ -194,6 +194,8 @@ public:
 	virtual void MoveXforms(double x, double y, bool pre) { }
 	virtual void ScaleXforms(double scale, bool pre) { }
 	virtual void ResetXformsAffine(bool pre) { }
+	virtual void CopyXformsAffine(bool pre) { }
+	virtual void PasteXformsAffine(bool pre) { }
 	virtual void RandomXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
 	double LockedScale() { return m_LockedScale; }
@@ -223,6 +225,7 @@ public:
 	virtual void FillVariationTreeWithCurrentXform() { }
 
 	//Xforms Selection.
+	virtual QString MakeXformCaption(size_t i) { return ""; }
 
 	//Xaos.
 	virtual void FillXaos() { }
@@ -265,12 +268,12 @@ public:
 	vector<v4F>* FinalImage() { return &(m_FinalImage); }
 	vector<v4F>* PreviewFinalImage() { return &m_PreviewFinalImage; }
 	EmberStats Stats() { return m_Stats; }
+	eProcessState ProcessState() { return m_Renderer.get() ? m_Renderer->ProcessState() : eProcessState::NONE; }
 
 protected:
 	//Rendering/progress.
 	void AddProcessAction(eProcessAction action);
 	eProcessAction CondenseAndClearProcessActions();
-	eProcessState ProcessState() { return m_Renderer.get() ? m_Renderer->ProcessState() : eProcessState::NONE; }
 
 	//Non-templated members.
 	bool m_Rendering = false;
@@ -468,6 +471,8 @@ public:
 	virtual void MoveXforms(double x, double y, bool pre) override;
 	virtual void ScaleXforms(double scale, bool pre) override;
 	virtual void ResetXformsAffine(bool pre) override;
+	virtual void CopyXformsAffine(bool pre) override;
+	virtual void PasteXformsAffine(bool pre) override;
 	virtual void RandomXformsAffine(bool pre) override;
 	virtual void FillBothAffines() override;
 	virtual void InitLockedScale() override;
@@ -506,6 +511,7 @@ public:
 	virtual void AddLayer(int xforms) override;
 
 	//Xforms Selection.
+	virtual QString MakeXformCaption(size_t i) override;
 	bool XformCheckboxAt(int i, std::function<void(QCheckBox*)> func);
 	bool XformCheckboxAt(Xform<T>* xform, std::function<void(QCheckBox*)> func);
 
@@ -545,9 +551,6 @@ private:
 	//Xforms Color.
 	void FillCurvesControl();
 
-	//Xforms Selection.
-	QString MakeXformCaption(size_t i);
-
 	//Palette.
 	void UpdateAdjustedPaletteGUI(Palette<float>& palette);
 
@@ -567,6 +570,7 @@ private:
 	deque<Ember<T>> m_UndoList;
 	vector<Xform<T>> m_CopiedXforms;
 	Xform<T> m_CopiedFinalXform;
+	Affine2D<T> m_CopiedAffine;
 	shared_ptr<VariationList<T>> m_VariationList;
 	unique_ptr<SheepTools<T, float>> m_SheepTools;
 	unique_ptr<GLEmberController<T>> m_GLController;

@@ -645,7 +645,7 @@ void FractoriumEmberController<T>::InterpTypeChanged(int i)
 	{
 		eInterp interp;
 
-		if (i == 0)//Need to make this work like animate flag where it sets the value but doesn't trigger and update.//TODO
+		if (i == 0)
 			interp = eInterp::EMBER_INTERP_LINEAR;
 		else if (i == 1)
 			interp = eInterp::EMBER_INTERP_SMOOTH;

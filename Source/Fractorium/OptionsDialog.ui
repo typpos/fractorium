@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
-    <height>475</height>
+    <width>546</width>
+    <height>490</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -496,6 +496,16 @@ in interactive mode for each mouse movement</string>
          </property>
         </widget>
        </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="RotateAndScaleCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Checked: scale and rotate when dragging affines while holding shift.&lt;/p&gt;&lt;p&gt;Unchecked: only scale when dragging affines while holding shift.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Scale and Rotate With Shift</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="OptionsXmlSavingTab">
@@ -913,9 +923,15 @@ in interactive mode for each mouse movement</string>
  <tabstops>
   <tabstop>EarlyClipCheckBox</tabstop>
   <tabstop>OpenCLCheckBox</tabstop>
+  <tabstop>YAxisUpCheckBox</tabstop>
+  <tabstop>SharedTextureCheckBox</tabstop>
+  <tabstop>TransparencyCheckBox</tabstop>
   <tabstop>DoublePrecisionCheckBox</tabstop>
+  <tabstop>ContinuousUpdateCheckBox</tabstop>
   <tabstop>ShowAllXformsCheckBox</tabstop>
+  <tabstop>Png16BitCheckBox</tabstop>
   <tabstop>ToggleTypeCheckBox</tabstop>
+  <tabstop>RotateAndScaleCheckBox</tabstop>
   <tabstop>LoadLastOnStartCheckBox</tabstop>
   <tabstop>ThreadCountSpin</tabstop>
   <tabstop>CpuSubBatchSpin</tabstop>

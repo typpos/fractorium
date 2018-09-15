@@ -1058,6 +1058,42 @@ bool TestVarAssignVals()
 	return success;
 }
 
+void FindFmaCandidates()
+{
+	auto vlf(VariationList<float>::Instance());
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+		auto cl = var->OpenCLFuncsString() + "\n" + var->StateInitOpenCLString() + "\n" + var->OpenCLString();
+		auto splits = Split(cl, '\n');
+
+		for (auto& split : splits)
+		{
+			if ((split.find("*") != string::npos || split.find("SQR(") != string::npos || split.find("Sqr(") != string::npos) && split.find("+") != string::npos)
+				cout << "Variation " << var->Name() << " is a potential fma() candidate because of line:\n\t" << split << endl;
+		}
+	}
+}
+
+void FindFmaImplemented()
+{
+	auto vlf(VariationList<float>::Instance());
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+		auto cl = var->OpenCLFuncsString() + "\n" + var->StateInitOpenCLString() + "\n" + var->OpenCLString();
+		auto splits = Split(cl, '\n');
+
+		for (auto& split : splits)
+		{
+			if ((split.find("fma(") != string::npos))
+				cout << "Variation " << var->Name() << " has been implemented with fma():\n\t" << split << endl;
+		}
+	}
+}
+
 bool TestZepsFloor()
 {
 	bool success = true;
@@ -2041,25 +2077,25 @@ int _tmain(int argc, _TCHAR* argv[])
 	//int i;
 	bool b = true;
 	Timing t(4);
-	vector<Ember<float>> fv;
-	vector<Ember<double>> dv;
-	list<Ember<float>> fl;
-	list<Ember<double>> dl;
-	int w = 1000, h = 1000;
-	string filename = ".\\testexr.exr";
-	vector<Rgba> pixels;
-	pixels.resize(w * h);
+	/*  vector<Ember<float>> fv;
+	    vector<Ember<double>> dv;
+	    list<Ember<float>> fl;
+	    list<Ember<double>> dl;
+	    int w = 1000, h = 1000;
+	    string filename = ".\\testexr.exr";
+	    vector<Rgba> pixels;
+	    pixels.resize(w * h);
 
-	for (auto& pix : pixels)
-	{
+	    for (auto& pix : pixels)
+	    {
 		pix.r = 1.0;
 		pix.b = 0.0;
 		pix.a = 1.0;
 		//pix.r = std::numeric_limits<float>::max();
-	}
+	    }
 
-	writeRgba1(filename.c_str(), pixels.data(), w, h);
-	/*  TestFuncs();
+	    writeRgba1(filename.c_str(), pixels.data(), w, h);
+	    TestFuncs();
 	    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
 	    auto vec = Split(line, delim, true);
 
@@ -2086,6 +2122,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	    return 1;
 	*/
 	//MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
+	//cout << (10.0 / 2.0 * 5.0) << endl;
+	FindFmaCandidates();
+	//FindFmaImplemented();
+	//cout << 5 * 3 + 2 << endl;
+	//cout << 2 + 5 * 3 << endl;
 	return 0;
 	/*
 			    TestThreadedKernel();

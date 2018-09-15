@@ -14,8 +14,9 @@ void Fractorium::InitXformsVariationsUI()
 	connect(ui.VariationsFilterClearButton, SIGNAL(clicked(bool)),				 this, SLOT(OnVariationsFilterClearButtonClicked(bool)));
 	connect(ui.ActionVariationsDialog,		SIGNAL(triggered(bool)),			 this, SLOT(OnActionVariationsDialog(bool)), Qt::QueuedConnection);
 	//Setting dimensions in the designer with a layout is futile, so must hard code here.
-	tree->setColumnWidth(0, 160);
-	tree->setColumnWidth(1, 23);
+	tree->setColumnWidth(0, 170);
+	tree->setColumnWidth(1, 80);
+	tree->setColumnWidth(2, 20);
 	//Set Default variation tree text and background colors for zero and non zero cases.
 	m_VariationTreeColorNonZero = Qt::black;
 	m_VariationTreeColorZero = Qt::black;
@@ -106,11 +107,16 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 {
 	T fMin = TLOW;
 	T fMax = TMAX;
-	QSize hint0(75, 16);
-	QSize hint1(30, 16);
+	QSize hint0(170, 16);
+	QSize hint1(80, 16);
+	QSize hint2(20, 16);
+	static vector<string> dc{ "m_ColorX" };
+	static vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
+								  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };
 	auto tree = m_Fractorium->ui.VariationsTree;
 	tree->clear();
 	tree->blockSignals(true);
+	int iconSize_ = 20;
 
 	for (size_t i = 0; i < m_VariationList->Size(); i++)
 	{
@@ -122,6 +128,34 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 		item->setText(0, QString::fromStdString(var->Name()));
 		item->setSizeHint(0, hint0);
 		item->setSizeHint(1, hint1);
+		item->setSizeHint(2, hint2);
+		QPixmap pixmap(iconSize_ * 3, iconSize_);
+		auto mask = pixmap.createMaskFromColor(QColor("transparent"), Qt::MaskOutColor);
+		pixmap.setMask(mask);
+		QPainter paint(&pixmap);
+		paint.fillRect(QRect(0, 0, iconSize_ * 3, iconSize_), QColor(0, 0, 0, 0));
+
+		if (var->VarType() == eVariationType::VARTYPE_REG)
+		{
+			if (SearchVar(var, assign, false))
+				paint.fillRect(QRect(0, 0, iconSize_, iconSize_), QColor(255, 0, 0));
+		}
+		else if (var->VarType() == eVariationType::VARTYPE_PRE || var->VarType() == eVariationType::VARTYPE_POST)
+		{
+			if (var->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
+				paint.fillRect(QRect(0, 0, iconSize_, iconSize_), QColor(255, 0, 0));
+		}
+
+		bool isDc = SearchVar(var, dc, false);
+
+		if (isDc)
+			paint.fillRect(QRect(iconSize_, 0, iconSize_, iconSize_), QColor(0, 255, 0));
+
+		if (!var->StateOpenCLString().empty())
+			paint.fillRect(QRect(iconSize_ * 2, 0, iconSize_, iconSize_), QColor(0, 0, 255));
+
+		QIcon qi(pixmap);
+		item->setIcon(2, qi);
 		spinBox->setRange(fMin, fMax);
 		spinBox->DoubleClick(true);
 		spinBox->DoubleClickZero(1);
@@ -358,11 +392,14 @@ void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 /// <param name="logicalIndex">Column index of the header clicked. Sort by name if 0, sort by weight if 1.</param>
 void Fractorium::OnTreeHeaderSectionClicked(int logicalIndex)
 {
-	m_VarSortMode = logicalIndex;
-	ui.VariationsTree->sortItems(m_VarSortMode, m_VarSortMode == 0 ? Qt::AscendingOrder : Qt::DescendingOrder);
+	if (logicalIndex <= 1)
+	{
+		m_VarSortMode = logicalIndex;
+		ui.VariationsTree->sortItems(m_VarSortMode, m_VarSortMode == 0 ? Qt::AscendingOrder : Qt::DescendingOrder);
 
-	if (m_VarSortMode == 1)
-		ui.VariationsTree->scrollToTop();
+		if (m_VarSortMode == 1)
+			ui.VariationsTree->scrollToTop();
+	}
 }
 
 /// <summary>

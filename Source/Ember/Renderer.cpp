@@ -12,6 +12,11 @@ Renderer<T, bucketT>::Renderer()
 	//Use a very large number regardless of the size of the output pixels. This should be sufficient granularity, even though
 	//it's technically less than the number of distinct values representable by a 32-bit float.
 	m_Csa.resize(size_t(CURVES_LENGTH));
+	//Ensure the renderer at least has sane values for the camera upon startup.
+	//This is needed because due to timing/threading disconnects, the GUI can use the camera
+	//values before the render has started, which will lead to corrupt values.
+	Ember<T> ember;
+	SetEmber(ember, eProcessAction::NOTHING, true);
 }
 
 /// <summary>

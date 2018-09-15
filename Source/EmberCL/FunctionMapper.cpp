@@ -59,7 +59,7 @@ FunctionMapper::FunctionMapper()
 		s_GlobalMap["Hypot"] =
 			"inline real_t Hypot(real_t x, real_t y)\n"
 			"{\n"
-			"	return sqrt(SQR(x) + SQR(y));\n"
+			"	return sqrt(fma(x, x, SQR(y)));\n"
 			"}\n";
 		s_GlobalMap["Spread"] =
 			"inline real_t Spread(real_t x, real_t y)\n"
@@ -79,12 +79,12 @@ FunctionMapper::FunctionMapper()
 		s_GlobalMap["Zeps"] =
 			"inline real_t Zeps(real_t x)\n"
 			"{\n"
-			"	return x == 0.0 ? EPS : x;\n"
+			"	return x != 0.0 ? x : EPS;\n"
 			"}\n";
 		s_GlobalMap["Lerp"] =
 			"inline real_t Lerp(real_t a, real_t b, real_t p)\n"
 			"{\n"
-			"	return a + (b - a) * p;\n"
+			"	return fma(p, (b - a), a);\n"
 			"}\n";
 		s_GlobalMap["Fabsmod"] =
 			"inline real_t Fabsmod(real_t v)\n"
@@ -96,7 +96,7 @@ FunctionMapper::FunctionMapper()
 		s_GlobalMap["Fosc"] =
 			"inline real_t Fosc(real_t p, real_t amp, real_t ph)\n"
 			"{\n"
-			"	return 0.5 - cos(p * amp + ph) * 0.5;\n"
+			"	return 0.5 - cos(fma(p, amp, ph)) * 0.5;\n"
 			"}\n";
 		s_GlobalMap["Foscn"] =
 			"inline real_t Foscn(real_t p, real_t ph)\n"
@@ -154,7 +154,8 @@ FunctionMapper::FunctionMapper()
 			"\n"
 			"	for (i = 0; i < n; i++)\n"
 			"	{\n"
-			"		d2 = Sqr(p[i].x - (*u).x) + Sqr(p[i].y - (*u).y);\n"
+			"		real_t pxmx = p[i].x - (*u).x;\n"
+			"		d2 = fma(pxmx, pxmx, Sqr(p[i].y - (*u).y));\n"
 			"\n"
 			"		if (d2 < d2min)\n"
 			"		{\n"
@@ -357,7 +358,7 @@ FunctionMapper::FunctionMapper()
 			"				a = c / b;\n"
 			"			}\n"
 			"\n"
-			"			a = 1 / sqrt(c * c + 1);\n"
+			"			a = 1 / sqrt(fma(c, c, (real_t)(1.0)));\n"
 			"\n"
 			"			if (*sn < 0)\n"
 			"				*sn = -a;\n"

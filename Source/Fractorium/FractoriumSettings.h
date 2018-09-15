@@ -28,6 +28,7 @@
 #define CPUQUALITY           "render/cpuquality"
 #define OPENCLQUALITY        "render/openclquality"
 #define LOADLAST             "render/loadlastonstart"
+#define ROTSCALE             "render/rotateandscale"
 
 #define STAGGER		         "sequence/stagger"
 #define STAGGERMAX		     "sequence/staggermax"
@@ -170,6 +171,9 @@ public:
 
 	bool LoadLast();
 	void LoadLast(bool b);
+
+	bool RotateAndScale();
+	void RotateAndScale(bool b);
 
 	double Stagger();
 	void Stagger(double i);

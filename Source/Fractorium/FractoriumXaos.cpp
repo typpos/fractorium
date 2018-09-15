@@ -92,7 +92,7 @@ void Fractorium::FillXaosTable()
 {
 	int count = int(m_Controller->XformCount());
 	QStringList hl, vl;
-	auto oldModel = m_XaosTableModel;
+	auto oldModel = std::make_unique<QStandardItemModel>(m_XaosTableModel);
 	hl.reserve(count);
 	vl.reserve(count);
 	m_XaosTableModel = new QStandardItemModel(count, count, this);
@@ -101,7 +101,7 @@ void Fractorium::FillXaosTable()
 
 	for (int i = 0; i < count; i++)
 	{
-		auto s = QString::number(i + 1);
+		auto s = m_Controller->MakeXformCaption(i);
 		hl.push_back("F" + s);
 		vl.push_back("T" + s);
 	}
@@ -113,10 +113,6 @@ void Fractorium::FillXaosTable()
 	SetTabOrder(this, ui.ClearXaosButton, ui.RandomXaosButton);
 	m_Controller->FillXaos();
 	ui.XaosTableView->blockSignals(false);
-
-	if (oldModel)
-		delete oldModel;
-
 	//Needed to get the dark stylesheet to correctly color the top left corner button.
 	auto widgetList = ui.XaosTableView->findChildren<QAbstractButton*>();
 

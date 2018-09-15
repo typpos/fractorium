@@ -159,13 +159,13 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 			{
 				vector<byte> rgba8Image(size * 4);
 				Rgba32ToRgba8(data, rgba8Image.data(), width, height, transparency);
-				b = WritePng(s.c_str(), rgba8Image.data(), width, height, 1, true, comments, id, url, nick);//Put an opt here for 1 or 2 bytes.//TODO
+				b = WritePng(s.c_str(), rgba8Image.data(), width, height, 1, true, comments, id, url, nick);
 			}
 			else
 			{
 				vector<glm::uint16> rgba16Image(size * 4);
 				Rgba32ToRgba16(data, rgba16Image.data(), width, height, transparency);
-				b = WritePng(s.c_str(), (byte*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);//Put an opt here for 1 or 2 bytes.//TODO
+				b = WritePng(s.c_str(), (byte*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);
 			}
 		}
 		else if (suffix.endsWith("exr", Qt::CaseInsensitive))

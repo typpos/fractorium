@@ -214,17 +214,17 @@ public:
 		   << "\t\t		lx *= " << g2 << ";\n"
 		   << "\t\t		ly *= " << g2 << ";\n"
 		   << "\n"
-		   << "\t\t		real_t r = " << rfactor << " / Zeps((SQR(lx) + SQR(ly)) / 4 + 1);\n"
+		   << "\t\t		real_t r = " << rfactor << " / Zeps(fma(lx, lx, SQR(ly)) / 4 + 1);\n"
 		   << "\n"
 		   << "\t\t		lx *= r;\n"
 		   << "\t\t		ly *= r;\n"
-		   << "\t\t		r = (SQR(lx) + SQR(ly)) / " << r2 << ";\n"
+		   << "\t\t		r = fma(lx, lx, SQR(ly)) / " << r2 << ";\n"
 		   << "\n"
-		   << "\t\t		real_t theta = " << bwrapsInnerTwist << " * (1 - r) + " << bwrapsOuterTwist << " * r;\n"
+		   << "\t\t		real_t theta = fma(" << bwrapsInnerTwist << ", (1 - r), " << bwrapsOuterTwist << " * r);\n"
 		   << "\t\t		real_t s = sin(theta);\n"
 		   << "\t\t		real_t c = cos(theta);\n"
 		   << "\n"
-		   << "\t\t		vx = cx + c * lx + s * ly;\n"
+		   << "\t\t		vx = fma(s, ly, fma(c, lx, cx));\n"
 		   << "\t\t		vy = cy - s * lx + c * ly;\n"
 		   << "\n"
 		   << "\t\t		vOut.x = " << weight << " * vx;\n"
@@ -344,8 +344,8 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		ss << "\t{\n"
-		   << "\t\treal_t x = 2 * MwcNext01(mwc) - 1;\n"
-		   << "\t\treal_t y = 2 * MwcNext01(mwc) - 1;\n"
+		   << "\t\treal_t x = fma((real_t)(2.0), MwcNext01(mwc), -(real_t)(1.0));\n"
+		   << "\t\treal_t y = fma((real_t)(2.0), MwcNext01(mwc), -(real_t)(1.0));\n"
 		   << "\t\treal_t absx = x;\n"
 		   << "\t\treal_t absy = y;\n"
 		   << "\t\treal_t side, perimeter;\n"
@@ -361,16 +361,16 @@ public:
 		   << "\t\t	if (x >= absy)\n"
 		   << "\t\t		perimeter = absx + y;\n"
 		   << "\t\t	else\n"
-		   << "\t\t		perimeter = 5 * absx - y;\n"
+		   << "\t\t		perimeter = fma((real_t)(5.0), absx, -y);\n"
 		   << "\n"
 		   << "\t\t	side = absx;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (y >= absx)\n"
-		   << "\t\t		perimeter = 3 * absy - x;\n"
+		   << "\t\t		perimeter = fma((real_t)(3.0), absy, -x);\n"
 		   << "\t\t	else\n"
-		   << "\t\t		perimeter = 7 * absy + x;\n"
+		   << "\t\t		perimeter = fma((real_t)(7.0), absy, x);\n"
 		   << "\n"
 		   << "\t\t	side = absy;\n"
 		   << "\t\t}\n"
@@ -421,10 +421,10 @@ public:
 		string blurZoomX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string blurZoomY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t z = 1 + " << blurZoomLength << " * MwcNext01(mwc);\n"
+		   << "\t\treal_t z = fma(" << blurZoomLength << ", MwcNext01(mwc), 1);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * ((vIn.x - " << blurZoomX << ") * z + " << blurZoomX << ");\n"
-		   << "\t\tvOut.y = " << weight << " * ((vIn.y - " << blurZoomY << ") * z - " << blurZoomY << ");\n"
+		   << "\t\tvOut.x = " << weight << " * fma((vIn.x - " << blurZoomX << "), z, " << blurZoomX << ");\n"
+		   << "\t\tvOut.y = " << weight << " * fma((vIn.y - " << blurZoomY << "), z, -" << blurZoomY << ");\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -484,8 +484,8 @@ public:
 		   << "\t\treal_t x = floor(vIn.x * " << invSize << ");\n"
 		   << "\t\treal_t y = floor(vIn.y * " << invSize << ");\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << v << " * (x + " << blurPixelizeScale << " * (MwcNext01(mwc) - (real_t)(0.5)) + (real_t)(0.5));\n"
-		   << "\t\tvOut.y = " << v << " * (y + " << blurPixelizeScale << " * (MwcNext01(mwc) - (real_t)(0.5)) + (real_t)(0.5));\n"
+		   << "\t\tvOut.x = " << v << " * fma(" << blurPixelizeScale << ", (MwcNext01(mwc) - (real_t)(0.5)), x + (real_t)(0.5));\n"
+		   << "\t\tvOut.y = " << v << " * fma(" << blurPixelizeScale << ", (MwcNext01(mwc) - (real_t)(0.5)), y + (real_t)(0.5));\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -588,12 +588,12 @@ public:
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (x < " << x0_ << ")\n"
-		   << "\t\t		x = " << x0_ << " + MwcNext01(mwc) * " << w << ";\n"
+		   << "\t\t		x = fma(MwcNext01(mwc), " << w << ", " << x0_ << ");\n"
 		   << "\t\t	else if (x > " << x1_ << ")\n"
 		   << "\t\t		x = " << x1_ << " - MwcNext01(mwc) * " << w << ";\n"
 		   << "\t\t\n"
 		   << "\t\t	if (y < " << y0_ << ")\n"
-		   << "\t\t		y = " << y0_ << " + MwcNext01(mwc) * " << h << ";\n"
+		   << "\t\t		y = fma(MwcNext01(mwc), " << h << ", " << y0_ << ");\n"
 		   << "\t\t	else if (y > " << y1_ << ")\n"
 		   << "\t\t		y = " << y1_ << " - MwcNext01(mwc) * " << h << ";\n"
 		   << "\t\t}\n"
@@ -727,7 +727,7 @@ public:
 		   << "\n"
 		   << "\t\treal_t x = vIn.x * " << scale << ";\n"
 		   << "\t\treal_t y = vIn.y * " << scale << ";\n"
-		   << "\t\treal_t r = sqrt(SQR(x) + SQR(y));\n"
+		   << "\t\treal_t r = sqrt(fma(x, x, SQR(y)));\n"
 		   << "\n"
 		   << "\t\tif (r <= 1)\n"
 		   << "\t\t{\n"
@@ -739,7 +739,7 @@ public:
 		   << "\t\t	if (" << bcbw << " != 0)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		real_t ang = atan2(y, x);\n"
-		   << "\t\t		real_t omega = ((real_t)(0.2) * " << bcbw << " * MwcNext01(mwc)) + 1;\n"
+		   << "\t\t		real_t omega = fma((real_t)(0.2) * " << bcbw << ", MwcNext01(mwc), (real_t)(1.0));\n"
 		   << "\t\t		real_t px = omega * cos(ang);\n"
 		   << "\t\t		real_t py = omega * sin(ang);\n"
 		   << "\n"
@@ -810,8 +810,8 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t r = " << blurLinearLength << " * MwcNext01(mwc);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (vIn.x + r * " << c << ");\n"
-		   << "\t\tvOut.y = " << weight << " * (vIn.y + r * " << s << ");\n"
+		   << "\t\tvOut.x = " << weight << " * fma(r, " << c << ", vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(r, " << s << ", vIn.y);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1162,7 +1162,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\treal_t r2 = " << weight << " / Zeps(precalcSumSquares + SQR(vIn.z));\n"
+		   << "\t\treal_t r2 = " << weight << " / Zeps(fma(vIn.z, vIn.z, precalcSumSquares));\n"
 		   << "\n"
 		   << "\t\tvOut.x = r2 * vIn.x;\n"
 		   << "\t\tvOut.y = r2 * vIn.y;\n"
@@ -1215,12 +1215,12 @@ public:
 		string c2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t r2 = precalcSumSquares + SQR(vIn.z);\n"
+		   << "\t\treal_t r2 = fma(vIn.z, vIn.z, precalcSumSquares);\n"
 		   << "\t\treal_t r = " << weight << " / Zeps(r2 * " << c2 << " + " << c2x << " * vIn.x - " << c2y << " * vIn.y + " << c2z << " * vIn.z + (real_t)(1.0));\n"
 		   << "\n"
-		   << "\t\tvOut.x = r * (vIn.x + " << cx << " * r2);\n"
+		   << "\t\tvOut.x = r * fma(" << cx << ", r2, vIn.x);\n"
 		   << "\t\tvOut.y = r * (vIn.y - " << cy << " * r2);\n"
-		   << "\t\tvOut.z = r * (vIn.z + " << cz << " * r2);\n"
+		   << "\t\tvOut.z = r * fma(" << cz << ", r2, vIn.z);\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1407,8 +1407,8 @@ public:
 		   << "\n"
 		   << "\t\tif (MwcNext01(mwc) >= " << cr << ")\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = " << weight << " * (offsetX * " << absc << " + roundX);\n"
-		   << "\t\t	vOut.y = " << weight << " * (offsetY * " << absc << " + roundY);\n"
+		   << "\t\t	vOut.x = " << weight << " * fma(offsetX, " << absc << ", roundX);\n"
+		   << "\t\t	vOut.y = " << weight << " * fma(offsetY, " << absc << ", roundY);\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -1416,26 +1416,26 @@ public:
 		   << "\t\t	{\n"
 		   << "\t\t		if (offsetX >= 0)\n"
 		   << "\t\t		{\n"
-		   << "\t\t			vOut.x = " << weight << " * (offsetX * " << absc << " + roundX + " << cl << ");\n"
-		   << "\t\t			vOut.y = " << weight << " * (offsetY * " << absc << " + roundY + " << cl << " * offsetY / offsetX);\n"
+		   << "\t\t			vOut.x = " << weight << " * fma(offsetX, " << absc << ", roundX + " << cl << ");\n"
+		   << "\t\t			vOut.y = " << weight << " * (fma(offsetY, " << absc << ", roundY) + " << cl << " * offsetY / offsetX);\n"
 		   << "\t\t		}\n"
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
-		   << "\t\t			vOut.x = " << weight << " * (offsetX * " << absc << " + roundX - " << cl << ");\n"
-		   << "\t\t			vOut.y = " << weight << " * (offsetY * " << absc << " + roundY - " << cl << " * offsetY / offsetX);\n"
+		   << "\t\t			vOut.x = " << weight << " * fma(offsetX, " << absc << ", roundX - " << cl << ");\n"
+		   << "\t\t			vOut.y = " << weight << " * (fma(offsetY, " << absc << ", roundY) - " << cl << " * offsetY / offsetX);\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
 		   << "\t\t		if(offsetY >= 0)\n"
 		   << "\t\t		{\n"
-		   << "\t\t			vOut.y = " << weight << " * (offsetY * " << absc << " + roundY + " << cl << ");\n"
-		   << "\t\t			vOut.x = " << weight << " * (offsetX * " << absc << " + roundX + offsetX / offsetY * " << cl << ");\n"
+		   << "\t\t			vOut.y = " << weight << " * fma(offsetY, " << absc << ", roundY + " << cl << ");\n"
+		   << "\t\t			vOut.x = " << weight << " * (fma(offsetX, " << absc << ", roundX) + offsetX / offsetY * " << cl << ");\n"
 		   << "\t\t		}\n"
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
-		   << "\t\t			vOut.y = " << weight << " * (offsetY * " << absc << " + roundY - " << cl << ");\n"
-		   << "\t\t			vOut.x = " << weight << " * (offsetX * " << absc << " + roundX - offsetX / offsetY * " << cl << ");\n"
+		   << "\t\t			vOut.y = " << weight << " * fma(offsetY, " << absc << ", roundY - " << cl << ");\n"
+		   << "\t\t			vOut.x = " << weight << " * (fma(offsetX, " << absc << ", roundX) - offsetX / offsetY * " << cl << ");\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
@@ -1717,21 +1717,21 @@ public:
 		   << "\t\t	if (vIn.x >= absy)\n"
 		   << "\t\t		perimeter = absx + vIn.y;\n"
 		   << "\t\t	else\n"
-		   << "\t\t		perimeter = 5 * absx - vIn.y;\n"
+		   << "\t\t		perimeter = fma((real_t)(5.0), absx, -vIn.y);\n"
 		   << "\n"
 		   << "\t\t	side = absx;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (vIn.y >= absx)\n"
-		   << "\t\t		perimeter = 3 * absy - vIn.x;\n"
+		   << "\t\t		perimeter = fma((real_t)(3.0), absy, -vIn.x);\n"
 		   << "\t\t	else\n"
-		   << "\t\t		perimeter = 7 * absy + vIn.x;\n"
+		   << "\t\t		perimeter = fma((real_t)(7.0), absy, vIn.x);\n"
 		   << "\n"
 		   << "\t\t	side = absy;\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\treal_t r = " << vvar4pi << " * side + " << hole << ";\n"
+		   << "\t\treal_t r = fma(" << vvar4pi << ", side, " << hole << ");\n"
 		   << "\t\treal_t val = MPI4 * perimeter / side - MPI4;\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(val);\n"
@@ -1826,16 +1826,16 @@ public:
 		   << "\t\t	if (vIn.x >= absy)\n"
 		   << "\t\t		perimeter = absx + vIn.y;\n"
 		   << "\t\t	else\n"
-		   << "\t\t		perimeter = 5 * absx - vIn.y;\n"
+		   << "\t\t		perimeter = fma((real_t)(5.0), absx, -vIn.y);\n"
 		   << "\n"
 		   << "\t\t	side = absx;\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (vIn.y >= absx)\n"
-		   << "\t\t		perimeter = 3 * absy - vIn.x;\n"
+		   << "\t\t		perimeter = fma((real_t)(3.0), absy, -vIn.x);\n"
 		   << "\t\t	else\n"
-		   << "\t\t		perimeter = 7 * absy + vIn.x;\n"
+		   << "\t\t		perimeter = fma((real_t)(7.0), absy, vIn.x);\n"
 		   << "\n"
 		   << "\t\t	side = absy;\n"
 		   << "\t\t}\n"
@@ -1908,8 +1908,8 @@ public:
 		string fr = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string vv2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x = (real_t)(0.5) * vIn.x + (real_t)(0.5);\n"
-		   << "\t\treal_t y = (real_t)(0.5) * vIn.y + (real_t)(0.5);\n"
+		   << "\t\treal_t x = fma((real_t)(0.5), vIn.x, (real_t)(0.5));\n"
+		   << "\t\treal_t y = fma((real_t)(0.5), vIn.y, (real_t)(0.5));\n"
 		   << "\t\treal_t bx = Fabsmod(" << fr << " * x);\n"
 		   << "\t\treal_t by = Fabsmod(" << fr << " * y);\n"
 		   << "\t\treal_t oscnapx = Foscn(" << amountX << ", " << px << ");\n"
@@ -1986,7 +1986,7 @@ public:
 	{
 		T s, c;
 		T avgr = m_Weight * (std::sqrt(SQR(helper.In.y) + SQR(helper.In.x + 1)) / std::sqrt(SQR(helper.In.y) + SQR(helper.In.x - 1)));
-		T avga = (atan2(helper.In.y, helper.In.x - 1) - std::atan2(helper.In.y, helper.In.x + 1)) / 2;
+		T avga = (std::atan2(helper.In.y, helper.In.x - 1) - std::atan2(helper.In.y, helper.In.x + 1)) / 2;
 		sincos(avga, &s, &c);
 		helper.Out.x = avgr * c;
 		helper.Out.y = avgr * s;
@@ -1999,8 +1999,10 @@ public:
 		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\treal_t avgr = " << weight << " * (sqrt(SQR(vIn.y) + SQR(vIn.x + 1)) / sqrt(SQR(vIn.y) + SQR(vIn.x - 1)));\n"
-		   << "\t\treal_t avga = (atan2(vIn.y, vIn.x - 1) - atan2(vIn.y, vIn.x + 1)) / 2;\n"
+		   << "\t\treal_t xp1 = vIn.x + (real_t)(1.0);\n"
+		   << "\t\treal_t xm1 = vIn.x - (real_t)(1.0);\n"
+		   << "\t\treal_t avgr = " << weight << " * (sqrt(fma(vIn.y, vIn.y, SQR(xp1))) / sqrt(fma(vIn.y, vIn.y, SQR(xm1))));\n"
+		   << "\t\treal_t avga = (atan2(vIn.y, xm1) - atan2(vIn.y, xp1)) / 2;\n"
 		   << "\t\treal_t s = sin(avga);\n"
 		   << "\t\treal_t c = cos(avga);\n"
 		   << "\n"
@@ -2049,8 +2051,8 @@ public:
 		string k = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string t = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t expor = exp(vIn.x * " << k << " - vIn.y * " << t << ");\n"
-		   << "\t\treal_t temp = vIn.x * " << t << " + vIn.y * " << k << ";\n"
+		   << "\t\treal_t expor = exp(fma(vIn.x, " << k << ", -(vIn.y * " << t << ")));\n"
+		   << "\t\treal_t temp = fma(vIn.x, " << t << ", (vIn.y * " << k << "));\n"
 		   << "\t\treal_t snv = sin(temp);\n"
 		   << "\t\treal_t csv = cos(temp);\n"
 		   << "\n"
@@ -2199,7 +2201,7 @@ public:
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t a = M_2PI / (precalcSqrtSumSquares + 1);\n"
-		   << "\t\treal_t r = (precalcAtanyx * M1PI + 1) * (real_t)(0.5);\n"
+		   << "\t\treal_t r = fma(precalcAtanyx, M1PI, (real_t)(1.0)) * (real_t)(0.5);\n"
 		   << "\t\treal_t s = sin(a);\n"
 		   << "\t\treal_t c = cos(a);\n"
 		   << "\n"
@@ -2252,11 +2254,11 @@ public:
 		   << "\t\treal_t temp = vIn.y * " << natLog << ";\n"
 		   << "\t\treal_t snum1 = sin(temp);\n"
 		   << "\t\treal_t cnum1 = cos(temp);\n"
-		   << "\t\ttemp = (vIn.x * MPI + vIn.y * " << natLog << ") * -(real_t)(1.0);\n"
+		   << "\t\ttemp = fma(vIn.x, MPI, vIn.y * " << natLog << ") * -(real_t)(1.0);\n"
 		   << "\t\treal_t snum2 = sin(temp);\n"
 		   << "\t\treal_t cnum2 = cos(temp);\n"
 		   << "\t\treal_t eradius1 = exp(vIn.x * " << natLog << ");\n"
-		   << "\t\treal_t eradius2 = exp((vIn.x * " << natLog << " - vIn.y * MPI) * -(real_t)(1.0));\n"
+		   << "\t\treal_t eradius2 = exp(fma(vIn.x, " << natLog << ", -(vIn.y * MPI)) * -(real_t)(1.0));\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * (eradius1 * cnum1 - eradius2 * cnum2) * " << five << ";\n"
 		   << "\t\tvOut.y = " << weight << " * (eradius1 * snum1 - eradius2 * snum2) * " << five << ";\n"
@@ -2328,14 +2330,14 @@ public:
 		   << "\t\treal_t temp = vIn.y * " << natLog << ";\n"
 		   << "\t\treal_t snum1 = sin(temp);\n"
 		   << "\t\treal_t cnum1 = cos(temp);\n"
-		   << "\t\ttemp = (vIn.x * MPI + vIn.y * " << natLog << ") * -1;\n"
+		   << "\t\ttemp = fma(vIn.x, MPI, vIn.y * " << natLog << ") * -1;\n"
 		   << "\t\treal_t snum2 = sin(temp);\n"
 		   << "\t\treal_t cnum2 = cos(temp);\n"
 		   << "\t\treal_t eradius1 = " << sc << " * exp(" << sc2 << " * (vIn.x * " << natLog << "));\n"
-		   << "\t\treal_t eradius2 = " << sc << " * exp(" << sc2 << " * ((vIn.x * " << natLog << " - vIn.y * MPI) * -1));\n"
+		   << "\t\treal_t eradius2 = " << sc << " * exp(" << sc2 << " * (fma(vIn.x, " << natLog << ", -(vIn.y * MPI)) * -1));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (eradius1 * cnum1 - eradius2 * cnum2) * " << five << ";\n"
-		   << "\t\tvOut.y = " << weight << " * (eradius1 * snum1 - eradius2 * snum2) * " << five << ";\n"
+		   << "\t\tvOut.x = " << weight << " * fma(eradius1, cnum1, -(eradius2 * cnum2)) * " << five << ";\n"
+		   << "\t\tvOut.y = " << weight << " * fma(eradius1, snum1, -(eradius2 * snum2)) * " << five << ";\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2403,14 +2405,14 @@ public:
 		{
 			if (rand.Frand01<T>() > T(0.5))
 			{
-				d = std::sqrt(r + helper.In.x);
+				d = Zeps(std::sqrt(r + helper.In.x));
 				helper.Out.x = -(m_V2 * d);
 				helper.Out.y = -(m_V2 / d * helper.In.y);
 			}
 			else
 			{
 				d = r + helper.In.x;
-				r = m_Weight / std::sqrt(r * (SQR(helper.In.y) + SQR(d)));
+				r = m_Weight / Zeps(std::sqrt(r * (SQR(helper.In.y) + SQR(d))));
 				helper.Out.x = -(r * d);
 				helper.Out.y = r * helper.In.y;
 			}
@@ -2441,7 +2443,7 @@ public:
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
 		   << "\t\t		d = r + vIn.x;\n"
-		   << "\t\t		r = " << weight << " / sqrt(r * (SQR(vIn.y) + SQR(d)));\n"
+		   << "\t\t		r = " << weight << " / sqrt(r * fma(vIn.y, vIn.y, SQR(d)));\n"
 		   << "\t\t		vOut.x = r * d;\n"
 		   << "\t\t		vOut.y = r * vIn.y;\n"
 		   << "\t\t	}\n"
@@ -2457,7 +2459,7 @@ public:
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
 		   << "\t\t		d = r + vIn.x;\n"
-		   << "\t\t		r = " << weight << " / sqrt(r * (SQR(vIn.y) + SQR(d)));\n"
+		   << "\t\t		r = " << weight << " / sqrt(r * fma(vIn.y, vIn.y, SQR(d)));\n"
 		   << "\t\t		vOut.x = -(r * d);\n"
 		   << "\t\t		vOut.y = r * vIn.y;\n"
 		   << "\t\t	}\n"
@@ -2471,6 +2473,11 @@ public:
 	virtual void Precalc() override
 	{
 		m_V2 = m_Weight * std::sqrt(T(2)) / 2;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -2685,7 +2692,7 @@ public:
 		   << "\t\tif (" << inside << " != 0)\n"
 		   << "\t\t	r = " << weight << " * delta / (precalcSqrtSumSquares + delta);\n"
 		   << "\t\telse\n"
-		   << "\t\t	r = " << weight << " * precalcSqrtSumSquares + delta;\n"
+		   << "\t\t	r = fma(" << weight << ", precalcSqrtSumSquares, delta);\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * precalcCosa;\n"
 		   << "\t\tvOut.y = r * precalcSina;\n"
@@ -2741,20 +2748,20 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string p = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string q = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string q    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string real = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string imag = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = vIn.x + " << real << ";\n"
 		   << "\t\treal_t b = vIn.y - " << imag << ";\n"
-		   << "\t\treal_t c = " << real << " * vIn.x - " << imag << " * vIn.y + 1;\n"
-		   << "\t\treal_t d = " << real << " * vIn.y + " << imag << " * vIn.x;\n"
-		   << "\t\treal_t vr = " << weight << " / (SQR(c) + SQR(d));\n"
+		   << "\t\treal_t c = fma(" << real << ", vIn.x, -(" << imag << " * vIn.y)) + 1;\n"
+		   << "\t\treal_t d = fma(" << real << ", vIn.y, " << imag << " * vIn.x);\n"
+		   << "\t\treal_t vr = " << weight << " / fma(c, c, SQR(d));\n"
 		   << "\n"
-		   << "\t\tvOut.x = vr * (a * c + b * d);\n"
-		   << "\t\tvOut.y = vr * (b * c - a * d);\n"
+		   << "\t\tvOut.x = vr * fma(a, c, b * d);\n"
+		   << "\t\tvOut.y = vr * fma(b, c, -(a * d));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2834,10 +2841,10 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string p = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string q = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string q  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string pa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string r = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string r  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t temp = MwcNext(mwc) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
@@ -2846,12 +2853,12 @@ public:
 		   << "\t\treal_t im = " << r << " * sina;\n"
 		   << "\t\treal_t a = vIn.x + re;\n"
 		   << "\t\treal_t b = vIn.y - im;\n"
-		   << "\t\treal_t c = re * vIn.x - im * vIn.y + 1;\n"
-		   << "\t\treal_t d = re * vIn.y + im * vIn.x;\n"
-		   << "\t\treal_t vr = " << weight << " / (SQR(c) + SQR(d));\n"
+		   << "\t\treal_t c = fma(re, vIn.x, -(im * vIn.y)) + 1;\n"
+		   << "\t\treal_t d = fma(re, vIn.y, im * vIn.x);\n"
+		   << "\t\treal_t vr = " << weight << " / fma(c, c, SQR(d));\n"
 		   << "\n"
-		   << "\t\tvOut.x = vr * (a * c + b * d);\n"
-		   << "\t\tvOut.y = vr * (b * c - a * d);\n"
+		   << "\t\tvOut.x = vr * fma(a, c, b * d);\n"
+		   << "\t\tvOut.y = vr * fma(b, c, -(a * d));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -2935,15 +2942,15 @@ public:
 		   << "\t\treal_t b = vIn.y;\n"
 		   << "\t\treal_t c = " << r << " * vIn.x + 1;\n"
 		   << "\t\treal_t d = " << r << " * vIn.y;\n"
-		   << "\t\treal_t x = (a * c + b * d);\n"
-		   << "\t\treal_t y = (b * c - a * d);\n"
-		   << "\t\treal_t vr = " << weight << " / (SQR(c) + SQR(d));\n"
+		   << "\t\treal_t x = fma(a, c, b * d);\n"
+		   << "\t\treal_t y = fma(b, c, -(a * d));\n"
+		   << "\t\treal_t vr = " << weight << " / fma(c, c, SQR(d));\n"
 		   << "\t\treal_t temp = MwcNext(mwc) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\n"
-		   << "\t\tvOut.x = vr * (x * cosa + y * sina);\n"
-		   << "\t\tvOut.y = vr * (y * cosa - x * sina);\n"
+		   << "\t\tvOut.x = vr * fma(x, cosa, y * sina);\n"
+		   << "\t\tvOut.y = vr * fma(y, cosa, -(x * sina));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3012,27 +3019,27 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string p = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string q = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cz = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string q   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cz  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t r2 = precalcSumSquares + vIn.z;\n"
 		   << "\t\treal_t x2cx = " << c2x << " * vIn.x;\n"
 		   << "\t\treal_t y2cy = " << c2y << " * vIn.y;\n"
-		   << "\t\treal_t d = " << weight << " / Zeps(" << c2 << " * r2 + x2cx - y2cy + 1);\n"
+		   << "\t\treal_t d = " << weight << " / Zeps(fma(" << c2 << ", r2, (x2cx - y2cy) + 1));\n"
 		   << "\n"
-		   << "\t\tvOut.x = d * (vIn.x * " << s2x << " - " << cx << "* ( y2cy - r2 - 1));\n"
-		   << "\t\tvOut.y = d * (vIn.y * " << s2y << " + " << cy << "* (-x2cx - r2 - 1));\n"
+		   << "\t\tvOut.x = d * fma(vIn.x, " << s2x << ", -(" << cx << " * (y2cy - r2 - 1)));\n"
+		   << "\t\tvOut.y = d * fma(vIn.y, " << s2y << ", " << cy << " * (-x2cx - r2 - 1));\n"
 		   << "\t\tvOut.z = d * (vIn.z * " << s2z << ");\n"
 		   << "\t}\n";
 		return ss.str();
@@ -3138,25 +3145,25 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string p = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string q = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string r = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string q   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pa  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string r   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t temp = MwcNext(mwc) * " << pa << ";\n"
 		   << "\t\treal_t cx = " << r << " * cos(temp);\n"
 		   << "\t\treal_t cy = " << r << " * sin(temp);\n"
-		   << "\t\treal_t s2x = 1 + SQR(cx) - SQR(cy);\n"
-		   << "\t\treal_t s2y = 1 + SQR(cy) - SQR(cx);\n"
+		   << "\t\treal_t s2x = fma(cx, cx, (real_t)(1.0)) - SQR(cy);\n"
+		   << "\t\treal_t s2y = fma(cy, cy, (real_t)(1.0)) - SQR(cx);\n"
 		   << "\t\treal_t r2 = precalcSumSquares + SQR(vIn.z);\n"
 		   << "\t\treal_t x2cx = 2 * cx * vIn.x;\n"
 		   << "\t\treal_t y2cy = 2 * cy * vIn.x;\n"
-		   << "\t\treal_t d = " << weight << " / Zeps(" << c2 << " * r2 + x2cx - y2cy + 1);\n"
+		   << "\t\treal_t d = " << weight << " / Zeps(fma(" << c2 << ", r2, (x2cx - y2cy) + 1)); \n"
 		   << "\n"
-		   << "\t\tvOut.x = d * (vIn.x * s2x - cx * ( y2cy - r2 - 1));\n"
-		   << "\t\tvOut.y = d * (vIn.y * s2y + cy * (-x2cx - r2 - 1));\n"
+		   << "\t\tvOut.x = d * fma(vIn.x, s2x, -(cx * (y2cy - r2 - 1)));\n"
+		   << "\t\tvOut.y = d * fma(vIn.y, s2y, cy * (-x2cx - r2 - 1));\n"
 		   << "\t\tvOut.z = d * (vIn.z * " << s2z << ");\n"
 		   << "\t}\n";
 		return ss.str();
@@ -3242,11 +3249,11 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string p = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string q = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string q   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pa  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -3254,15 +3261,15 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t r2 = precalcSumSquares + SQR(vIn.z);\n"
 		   << "\t\treal_t x2cx = " << c2x << " * vIn.x;\n"
-		   << "\t\treal_t x = vIn.x * " << s2x << " - " << cx << " * (-r2 - 1);\n"
+		   << "\t\treal_t x = fma(vIn.x, " << s2x << ", -(" << cx << " * (-r2 - 1)));\n"
 		   << "\t\treal_t y = vIn.y * " << s2y << ";\n"
-		   << "\t\treal_t vr = " << weight << " / (" << c2 << " * r2 + x2cx + 1);\n"
+		   << "\t\treal_t vr = " << weight << " / fma(" << c2 << ", r2, x2cx + 1);\n"
 		   << "\t\treal_t temp = MwcNext(mwc) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\n"
-		   << "\t\tvOut.x = vr * (x * cosa + y * sina);\n"
-		   << "\t\tvOut.y = vr * (y * cosa - x * sina);\n"
+		   << "\t\tvOut.x = vr * fma(x, cosa, y * sina);\n"
+		   << "\t\tvOut.y = vr * fma(y, cosa, -(x * sina));\n"
 		   << "\t\tvOut.z = vr * (vIn.z * " << s2z << ");\n"
 		   << "\t}\n";
 		return ss.str();
@@ -3397,7 +3404,7 @@ public:
 	{
 		T x = m_A * helper.In.x + m_B * helper.In.y + m_E;
 		T y = m_C * helper.In.x + m_D * helper.In.y + m_F;
-		T angle = (atan2(y, x) + M_2PI * rand.Rand(int(m_AbsN))) / m_Power;
+		T angle = (std::atan2(y, x) + M_2PI * rand.Rand(int(m_AbsN))) / m_Power;
 		T sina = std::sin(angle);
 		T cosa = std::cos(angle);
 		T r = m_Weight * std::pow(SQR(x) + SQR(y), m_Cn);
@@ -3413,23 +3420,23 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string e = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string f = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string d     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string e     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string f     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string absn  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x = " << a << " * vIn.x + " << b << " * vIn.y + " << e << ";\n"
-		   << "\t\treal_t y = " << c << " * vIn.x + " << d << " * vIn.y + " << f << ";\n"
-		   << "\t\treal_t angle = (atan2(y, x) + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) / " << power << ";\n"
+		   << "\t\treal_t x = fma(" << a << ", vIn.x, fma(" << b << ", vIn.y, " << e << "));\n"
+		   << "\t\treal_t y = fma(" << c << ", vIn.x, fma(" << d << ", vIn.y, " << f << "));\n"
+		   << "\t\treal_t angle = fma(M_2PI, (real_t)MwcNextRange(mwc, (uint)" << absn << "), atan2(y, x)) / " << power << ";\n"
 		   << "\t\treal_t sina = sin(angle);\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
-		   << "\t\treal_t r = " << weight << " * pow(SQR(x) + SQR(y), " << cn << ");\n"
+		   << "\t\treal_t r = " << weight << " * pow(fma(x, x, SQR(y)), " << cn << ");\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cosa;\n"
 		   << "\t\tvOut.y = r * sina;\n"
@@ -3509,13 +3516,13 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string divisor = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string divisor      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string halfInvPower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invPower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invPower2Pi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invPower     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invPower2Pi  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t a = precalcAtanyx * " << invPower << " + MwcNext(mwc) * " << invPower2Pi << ";\n"
+		   << "\t\treal_t a = fma(precalcAtanyx, " << invPower << ", MwcNext(mwc) * " << invPower2Pi << ");\n"
 		   << "\t\treal_t sina = sin(a);\n"
 		   << "\t\treal_t cosa = cos(a);\n"
 		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << halfInvPower << ");\n"
@@ -3599,12 +3606,12 @@ public:
 		   << "\t\treal_t sina = sin(angle);\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
 		   << "\t\treal_t r = " << cp << " * pow(precalcSumSquares, " << p2 << ");\n"
-		   << "\t\treal_t re = r * cosa + 1;\n"
+		   << "\t\treal_t re = fma(r, cosa, (real_t)(1.0));\n"
 		   << "\t\treal_t im = r * sina;\n"
-		   << "\t\treal_t r1 = " << vp << " / (SQR(re) + SQR(im));\n"
+		   << "\t\treal_t r1 = " << vp << " / fma(re, re, SQR(im));\n"
 		   << "\n"
-		   << "\t\tvOut.x = r1 * (vIn.x * re + vIn.y * im);\n"
-		   << "\t\tvOut.y = r1 * (vIn.y * re - vIn.x * im);\n"
+		   << "\t\tvOut.x = r1 * fma(vIn.x, re, vIn.y * im);\n"
+		   << "\t\tvOut.y = r1 * fma(vIn.y, re, -(vIn.x * im));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3693,10 +3700,10 @@ public:
 		   << "\t\treal_t sina = sin(angle);\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
 		   << "\t\treal_t r = " << c << " * pow(precalcSumSquares, " << p2 << ");\n"
-		   << "\t\treal_t re = r * cosa + 1;\n"
+		   << "\t\treal_t re = fma(r, cosa, (real_t)(1.0));\n"
 		   << "\t\treal_t im = r * sina;\n"
 		   << "\n"
-		   << "\t\tr = pow(SQR(re) + SQR(im), " << invp << ");\n"
+		   << "\t\tr = pow(fma(re, re, SQR(im)), " << invp << ");\n"
 		   << "\t\tangle = atan2(im, re) * " << invp2 << ";\n"
 		   << "\t\tsina = sin(angle);\n"
 		   << "\t\tcosa = cos(angle);\n"
@@ -3705,8 +3712,8 @@ public:
 		   << "\n"
 		   << "\t\treal_t r1 = " << vp << " / SQR(r);\n"
 		   << "\n"
-		   << "\t\tvOut.x = r1 * (vIn.x * re + vIn.y * im);\n"
-		   << "\t\tvOut.y = r1 * (vIn.y * re - vIn.x * im);\n"
+		   << "\t\tvOut.x = r1 * fma(vIn.x, re, vIn.y * im);\n"
+		   << "\t\tvOut.y = r1 * fma(vIn.y, re, -(vIn.x * im));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3783,22 +3790,22 @@ public:
 		string index = ss2.str();
 		string weight = WeightDefineString();
 		string parity = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string nnz = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string vvar = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string vvar2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string isOdd = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string nnz    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vvar   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vvar2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string absn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cn     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string isOdd  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t x = (" << isOdd << " != 0) ? vIn.x : " << vvar << " * precalcAtanxy;\n"
 		   << "\t\treal_t y = (" << isOdd << " != 0) ? vIn.y : " << vvar2 << " * log(precalcSumSquares);\n"
-		   << "\t\treal_t angle = (atan2(y, x) + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) / " << nnz << ";\n"
-		   << "\t\treal_t r = " << weight << " * pow(SQR(x) + SQR(y), " << cn << ") * ((" << isOdd << " == 0) ? 1 : " << parity << ");\n"
+		   << "\t\treal_t angle = fma(M_2PI, MwcNextRange(mwc, (uint)" << absn << "), atan2(y, x)) / " << nnz << ";\n"
+		   << "\t\treal_t r = " << weight << " * pow(fma(x, x, SQR(y)), " << cn << ") * ((" << isOdd << " == 0) ? 1 : " << parity << ");\n"
 		   << "\t\treal_t sina = sin(angle) * r;\n"
 		   << "\t\treal_t cosa = cos(angle) * r;\n"
 		   << "\n"
-		   << "\t\tx = (" << isOdd << " != 0) ? cosa : (" << vvar2 << " * log(SQR(cosa) + SQR(sina)));\n"
+		   << "\t\tx = (" << isOdd << " != 0) ? cosa : (" << vvar2 << " * log(fma(cosa, cosa, SQR(sina))));\n"
 		   << "\t\ty = (" << isOdd << " != 0) ? sina : (" << vvar << " * atan2(cosa, sina));\n"
 		   << "\t\tvOut.x = x;\n"
 		   << "\t\tvOut.y = y;\n"
@@ -3872,7 +3879,7 @@ public:
 			if (helper.In.x >= 0)
 			{
 				xo = (r + 1) / Zeps(2 * helper.In.x);
-				ro = std::sqrt(SQR(helper.In.x - xo) + SQR(helper.In.y));
+				ro = std::sqrt(Sqr(helper.In.x - xo) + SQR(helper.In.y));
 				theta = std::atan2(T(1), ro);
 				a = fmod(m_In * theta + std::atan2(helper.In.y, xo - helper.In.x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
@@ -3882,7 +3889,7 @@ public:
 			else
 			{
 				xo = -(r + 1) / (2 * helper.In.x);
-				ro = std::sqrt(SQR(-helper.In.x - xo) + SQR(helper.In.y));
+				ro = std::sqrt(Sqr(-helper.In.x - xo) + SQR(helper.In.y));
 				theta = std::atan2(T(1), ro);
 				a = fmod(m_In * theta + std::atan2(helper.In.y, xo + helper.In.x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
@@ -3901,7 +3908,7 @@ public:
 			if (x >= 0)
 			{
 				xo = (SQR(x) + SQR(y) + 1) / Zeps(2 * x);
-				ro = std::sqrt(SQR(x - xo) + SQR(y));
+				ro = std::sqrt(Sqr(x - xo) + SQR(y));
 				theta = std::atan2(T(1), ro);
 				a = fmod(m_Out * theta + std::atan2(y, xo - x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
@@ -3916,7 +3923,7 @@ public:
 			else
 			{
 				xo = -(SQR(x) + SQR(y) + 1) / (2 * x);
-				ro = std::sqrt(SQR(-x - xo) + SQR(y));
+				ro = std::sqrt(Sqr(-x - xo) + SQR(y));
 				theta = std::atan2(T(1), ro);
 				a = fmod(m_Out * theta + std::atan2(y, xo + x) + theta, 2 * theta) - theta;
 				sincos(a, &s, &c);
@@ -3954,12 +3961,14 @@ public:
 		   << "\n"
 		   << "\t\tif (r < 1)\n"
 		   << "\t\t{\n"
+		   << "\t\t	real_t y2 = SQR(vIn.y);\n"
 		   << "\t\t	if (vIn.x >= 0)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		xo = (r + 1) / Zeps(2 * vIn.x);\n"
-		   << "\t\t		ro = sqrt(SQR(vIn.x - xo) + SQR(vIn.y));\n"
+		   << "\t\t		real_t xmx = vIn.x - xo;\n"
+		   << "\t\t		ro = sqrt(fma(xmx, xmx, y2));\n"
 		   << "\t\t		theta = atan2(1, ro);\n"
-		   << "\t\t		a = fmod(" << in << " * theta + atan2(vIn.y, xo - vIn.x) + theta, 2 * theta) - theta;\n"
+		   << "\t\t		a = fmod(fma(" << in << ", theta, atan2(vIn.y, xo - vIn.x) + theta), 2 * theta) - theta;\n"
 		   << "\t\t		s = sin(a);\n"
 		   << "\t\t		c = cos(a);\n"
 		   << "\n"
@@ -3969,9 +3978,10 @@ public:
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
 		   << "\t\t		xo = - (r + 1) / (2 * vIn.x);\n"
-		   << "\t\t		ro = sqrt(SQR(-vIn.x - xo) + SQR(vIn.y));\n"
+		   << "\t\t		real_t mxmx = -vIn.x - xo;\n"
+		   << "\t\t		ro = sqrt(fma(mxmx, mxmx, y2));\n"
 		   << "\t\t		theta = atan2(1 , ro);\n"
-		   << "\t\t		a = fmod(" << in << " * theta + atan2(vIn.y, xo + vIn.x) + theta, 2 * theta) - theta;\n"
+		   << "\t\t		a = fmod(fma(" << in << ", theta, atan2(vIn.y, xo + vIn.x) + theta), 2 * theta) - theta;\n"
 		   << "\t\t		s = sin(a);\n"
 		   << "\t\t		c = cos(a);\n"
 		   << "\n"
@@ -3986,13 +3996,17 @@ public:
 		   << "\t\t	tc = cos(precalcAtanyx);\n"
 		   << "\t\t	x = r * tc;\n"
 		   << "\t\t	y = r * ts;\n"
+		   << "\t\t	real_t x2 = SQR(x);\n"
+		   << "\t\t	real_t y2 = SQR(y);\n"
+		   << "\t\t	real_t x2y2 = x2 + y2;\n"
 		   << "\n"
 		   << "\t\t	if (x >= 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		xo = (SQR(x) + SQR(y) + 1) / Zeps(2 * x);\n"
-		   << "\t\t		ro = sqrt(SQR(x - xo) + SQR(y));\n"
-		   << "\t\t		theta = atan2(1 , ro);\n"
-		   << "\t\t		a = fmod(" << out << " * theta + atan2(y, xo - x) + theta, 2 * theta) - theta;\n"
+		   << "\t\t		xo = (x2y2 + 1) / Zeps(2 * x);\n"
+		   << "\t\t		real_t xmx = x - xo;\n"
+		   << "\t\t		ro = sqrt(fma(xmx, xmx, y2));\n"
+		   << "\t\t		theta = atan2(1, ro);\n"
+		   << "\t\t		a = fmod(fma(" << out << ", theta, atan2(y, xo - x) + theta), 2 * theta) - theta;\n"
 		   << "\t\t		s = sin(a);\n"
 		   << "\t\t		c = cos(a);\n"
 		   << "\n"
@@ -4001,17 +4015,18 @@ public:
 		   << "\t\t		theta = atan2(y, x);\n"
 		   << "\t\t		ts = sin(theta);\n"
 		   << "\t\t		tc = cos(theta);\n"
-		   << "\t\t		r = 1 / sqrt(SQR(x) + SQR(y));\n"
+		   << "\t\t		r = 1 / sqrt(fma(x, x, SQR(y)));\n"
 		   << "\n"
 		   << "\t\t		vOut.x = " << weight << " * r * tc;\n"
 		   << "\t\t		vOut.y = " << weight << " * r * ts;\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		xo = - (SQR(x) + SQR(y) + 1) / (2 * x);\n"
-		   << "\t\t		ro = sqrt(SQR(-x - xo) + SQR(y));\n"
+		   << "\t\t		xo = -(x2y2 + 1) / (2 * x);\n"
+		   << "\t\t		real_t mxmx = -x - xo;\n"
+		   << "\t\t		ro = sqrt(fma(mxmx, mxmx, y2));\n"
 		   << "\t\t		theta = atan2(1 , ro);\n"
-		   << "\t\t		a = fmod(" << out << " * theta + atan2(y, xo + x) + theta, 2 * theta) - theta;\n"
+		   << "\t\t		a = fmod(fma(" << out << ", theta, atan2(y, xo + x) + theta), 2 * theta) - theta;\n"
 		   << "\t\t		s = sin(a);\n"
 		   << "\t\t		c = cos(a);\n"
 		   << "\n"
@@ -4020,7 +4035,7 @@ public:
 		   << "\t\t		theta = atan2(y, x);\n"
 		   << "\t\t		ts = sin(theta);\n"
 		   << "\t\t		tc = cos(theta);\n"
-		   << "\t\t		r = 1 / sqrt(SQR(x) + SQR(y));\n"
+		   << "\t\t		r = 1 / sqrt(fma(x, x, SQR(y)));\n"
 		   << "\n"
 		   << "\t\t		vOut.x = -(" << weight << " * r * tc);\n"
 		   << "\t\t		vOut.y = " << weight << " * r * ts;\n"
@@ -4067,10 +4082,18 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x = m_C1x + (SQR(m_C1r) * (helper.In.x - m_C1x)) / Zeps(Sqr(helper.In.x - m_C1x) + Sqr(helper.In.y - m_C1y));
-		T y = m_C1y + (SQR(m_C1r) * (helper.In.y - m_C1y)) / Zeps(Sqr(helper.In.x - m_C1x) + Sqr(helper.In.y - m_C1y));
-		helper.Out.x = m_C2x + (SQR(m_C2r) * (x - m_C2x)) / Zeps(Sqr(x - m_C2x) + Sqr(y - m_C2y));
-		helper.Out.y = m_C2y + (SQR(m_C2r) * (y - m_C2y)) / Zeps(Sqr(x - m_C2x) + Sqr(y - m_C2y));
+		T xmc1x = helper.In.x - m_C1x;
+		T ymc1y = helper.In.y - m_C1y;
+		T den = Zeps(SQR(xmc1x) + SQR(ymc1y));
+		T c1r2 = SQR(m_C1r);
+		T x = m_C1x + (c1r2 * xmc1x) / den;
+		T y = m_C1y + (c1r2 * ymc1y) / den;
+		T xmc2x = x - m_C2x;
+		T ymc2y = y - m_C2y;
+		T c2r2 = SQR(m_C2r);
+		den = Zeps(SQR(xmc2x) + SQR(ymc2y));
+		helper.Out.x = m_C2x + (c2r2 * xmc2x) / den;
+		helper.Out.y = m_C2y + (c2r2 * ymc2y) / den;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -4092,11 +4115,19 @@ public:
 		string c1d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x = " << c1x << " + (SQR(" << c1r << ") * (vIn.x - " << c1x << ")) / Zeps(Sqr(vIn.x - " << c1x << ") + Sqr(vIn.y - " << c1y << "));\n"
-		   << "\t\treal_t y = " << c1y << " + (SQR(" << c1r << ") * (vIn.y - " << c1y << ")) / Zeps(Sqr(vIn.x - " << c1x << ") + Sqr(vIn.y - " << c1y << "));\n"
+		   << "\t\treal_t xmc1x = vIn.x - " << c1x << ";\n"
+		   << "\t\treal_t ymc1y = vIn.y - " << c1y << ";\n"
+		   << "\t\treal_t den = Zeps(fma(xmc1x, xmc1x, SQR(ymc1y)));\n"
+		   << "\t\treal_t c1r2 = SQR(" << c1r << ");\n"
+		   << "\t\treal_t x = " << c1x << " + (c1r2 * xmc1x) / den;\n"
+		   << "\t\treal_t y = " << c1y << " + (c1r2 * ymc1y) / den;\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << c2x << " + (SQR(" << c2r << ") * (x - " << c2x << ")) / Zeps(Sqr(x - " << c2x << ") + Sqr(y - " << c2y << "));\n"
-		   << "\t\tvOut.y = " << c2y << " + (SQR(" << c2r << ") * (y - " << c2y << ")) / Zeps(Sqr(x - " << c2x << ") + Sqr(y - " << c2y << "));\n"
+		   << "\t\treal_t xmc2x = x - " << c2x << ";\n"
+		   << "\t\treal_t ymc2y = y - " << c2y << ";\n"
+		   << "\t\treal_t c2r2 = SQR(" << c2r << ");\n"
+		   << "\t\tden = Zeps(fma(xmc2x, xmc2x, SQR(ymc2y)));\n"
+		   << "\t\tvOut.x = " << c2x << " + (c2r2 * xmc2x) / den;\n"
+		   << "\t\tvOut.y = " << c2y << " + (c2r2 * ymc2y) / den;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4181,13 +4212,13 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string r = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cz = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string r   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cz  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string c2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -4195,16 +4226,16 @@ public:
 		string s2y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t r2 = precalcSumSquares + SQR(vIn.z);\n"
+		   << "\t\treal_t r2 = fma(vIn.z, vIn.z, precalcSumSquares);\n"
 		   << "\t\treal_t x2cx = " << c2x << " * vIn.x;\n"
 		   << "\t\treal_t y2cy = " << c2y << " * vIn.y;\n"
 		   << "\t\treal_t z2cz = " << c2z << " * vIn.z;\n"
 		   << "\t\treal_t val = Zeps(" << c2 << " * r2 - x2cx - y2cy - z2cz + (real_t)(1.0));\n"
 		   << "\t\treal_t d = " << weight << " / val;\n"
 		   << "\n"
-		   << "\t\tvOut.x = d * (vIn.x * " << s2x << " + " << cx << " * (y2cy + z2cz - r2 - (real_t)(1.0)));\n"
-		   << "\t\tvOut.y = d * (vIn.y * " << s2y << " + " << cy << " * (x2cx + z2cz - r2 - (real_t)(1.0)));\n"
-		   << "\t\tvOut.z = d * (vIn.z * " << s2z << " + " << cz << " * (y2cy + x2cx - r2 - (real_t)(1.0)));\n"
+		   << "\t\tvOut.x = d * fma(vIn.x, " << s2x << ", " << cx << " * (y2cy + z2cz - r2 - (real_t)(1.0)));\n"
+		   << "\t\tvOut.y = d * fma(vIn.y, " << s2y << ", " << cy << " * (x2cx + z2cz - r2 - (real_t)(1.0)));\n"
+		   << "\t\tvOut.z = d * fma(vIn.z, " << s2z << ", " << cz << " * (y2cy + x2cx - r2 - (real_t)(1.0)));\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -4296,17 +4327,17 @@ public:
 		string weight = WeightDefineString();
 		string powx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lcx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lcy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lcx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lcy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xp = pow(fabs(" << weight << ") * fabs(vIn.x), " << powx << ");\n"
 		   << "\t\treal_t yp = pow(fabs(" << weight << ") * fabs(vIn.y), " << powy << ");\n"
 		   << "\t\treal_t zp = " << weight << " * vIn.z;\n"
 		   << "\n"
-		   << "\t\tvOut.x = xp * Sign(vIn.x) + " << lcx << " * vIn.x + " << scx << ";\n"
-		   << "\t\tvOut.y = yp * Sign(vIn.y) + " << lcy << " * vIn.y + " << scy << ";\n"
+		   << "\t\tvOut.x = fma(xp, Sign(vIn.x), fma(" << lcx << ", vIn.x, " << scx << "));\n"
+		   << "\t\tvOut.y = fma(yp, Sign(vIn.y), fma(" << lcy << ", vIn.y, " << scy << "));\n"
 		   << "\t\tvOut.z = zp;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -4460,16 +4491,16 @@ public:
 		   << "\t\treal_t xcb  = vIn.x * vIn.x * vIn.x;\n"
 		   << "\t\treal_t ycb  = vIn.y * vIn.y * vIn.y;\n"
 		   << "\n"
-		   << "\t\treal_t tr = " << t3 << " * (xcb - 3 * vIn.x * ysqr) + " << t2 << " * (xsqr - ysqr) + " << t1 << " * vIn.x + " << tc << ";\n"
-		   << "\t\treal_t ti = " << t3 << " * (3 * xsqr * vIn.y - ycb) + " << t2 << " * 2 * vIn.x * vIn.y + " << t1 << " * vIn.y;\n"
+		   << "\t\treal_t tr = fma(" << t3 << ", (xcb - 3 * vIn.x * ysqr), fma(" << t2 << ", (xsqr - ysqr), fma(" << t1 << ", vIn.x, " << tc << ")));\n"
+		   << "\t\treal_t ti = fma(" << t3 << ", (3 * xsqr * vIn.y - ycb), fma(" << t2 << " * 2, vIn.x * vIn.y, " << t1 << " * vIn.y));\n"
 		   << "\n"
-		   << "\t\treal_t br = " << b3 << " * (xcb - 3 * vIn.x * ysqr) + " << b2 << " * (xsqr - ysqr) + " << b1 << " * vIn.x + " << bc << ";\n"
-		   << "\t\treal_t bi = " << b3 << " * (3 * xsqr * vIn.y - ycb) + " << b2 << " * 2 * vIn.x * vIn.y + " << b1 << " * vIn.y;\n"
+		   << "\t\treal_t br = fma(" << b3 << ", (xcb - 3 * vIn.x * ysqr), fma(" << b2 << ", (xsqr - ysqr), fma(" << b1 << ", vIn.x, " << bc << ")));\n"
+		   << "\t\treal_t bi = fma(" << b3 << ", (3 * xsqr * vIn.y - ycb), fma(" << b2 << ", 2 * vIn.x * vIn.y, " << b1 << " * vIn.y));\n"
 		   << "\n"
-		   << "\t\treal_t r3den = 1 / Zeps(br * br + bi * bi);\n"
+		   << "\t\treal_t r3den = 1 / Zeps(fma(br, br, bi * bi));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (tr * br + ti * bi) * r3den;\n"
-		   << "\t\tvOut.y = " << weight << " * (ti * br - tr * bi) * r3den;\n"
+		   << "\t\tvOut.x = " << weight << " * fma(tr, br, ti * bi) * r3den;\n"
+		   << "\t\tvOut.y = " << weight << " * fma(ti, br, -(tr * bi)) * r3den;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4556,38 +4587,38 @@ public:
 		string index = ss2.str();
 		string weight = WeightDefineString();
 		string frequency = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string velocity = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string velocity  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string amplitude = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string centerx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string centery = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string phase = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string f = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string p = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string s = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string is = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string vxp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pxa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string pixa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string centerx   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string centery   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phase     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string f         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string p         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string s         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string is        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vxp       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pxa       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pixa      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x = (vIn.x * " << s << ") - " << centerx << ";\n"
-		   << "\t\treal_t y = (vIn.y * " << s << ") + " << centery << ";\n"
+		   << "\t\treal_t x = fma(vIn.x, " << s << ", -" << centerx << ");\n"
+		   << "\t\treal_t y = fma(vIn.y, " << s << ", " << centery << ");\n"
 		   << "\n"
 		   << "\t\treal_t d = max(EPS, sqrt(SQR(x) * SQR(y)));\n"
 		   << "\n"
 		   << "\t\treal_t nx = x / d;\n"
 		   << "\t\treal_t ny = y / d;\n"
 		   << "\n"
-		   << "\t\treal_t wave = cos(" << f << " * d - " << vxp << ");\n"
+		   << "\t\treal_t wave = cos(fma(" << f << ", d, -" << vxp << "));\n"
 		   << "\n"
-		   << "\t\treal_t d1 = wave * " << pxa << " + d;\n"
-		   << "\t\treal_t d2 = wave * " << pixa << " + d;\n"
+		   << "\t\treal_t d1 = fma(wave, " << pxa  << ", d);\n"
+		   << "\t\treal_t d2 = fma(wave, " << pixa << ", d);\n"
 		   << "\n"
-		   << "\t\treal_t u1 = " << centerx << "  + nx * d1;\n"
-		   << "\t\treal_t v1 = -" << centery << " + ny * d1;\n"
-		   << "\t\treal_t u2 = " << centerx << "  + nx * d2;\n"
-		   << "\t\treal_t v2 = -" << centery << " + ny * d2;\n"
+		   << "\t\treal_t u1 = fma(nx, d1, " << centerx << ");\n"
+		   << "\t\treal_t v1 = fma(ny, d1, -" << centery << ");\n"
+		   << "\t\treal_t u2 = fma(nx, d2, " << centerx << ");\n"
+		   << "\t\treal_t v2 = fma(ny, d2, -" << centery << ");\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * Lerp(u1, u2, " << p << ") * " << is << ";\n"
 		   << "\t\tvOut.y = " << weight << " * Lerp(v1, v2, " << p << ") * " << is << ";\n"
@@ -4932,8 +4963,8 @@ public:
 		   << "\n"
 		   << "\t\tresult /= divident;\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * vIn.x + result;\n"
-		   << "\t\tvOut.y = " << weight << " * vIn.y + result;\n"
+		   << "\t\tvOut.x = fma(" << weight << ", vIn.x, result);\n"
+		   << "\t\tvOut.y = fma(" << weight << ", vIn.y, result);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -5092,17 +5123,17 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string freqX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqX  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqY  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaleX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaleY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string incX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string incY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string absn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cn = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string incX   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string incY   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string absn   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cn     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t angle = (precalcAtanyx + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) / " << power << ";\n"
+		   << "\t\treal_t angle = fma(M_2PI, (real_t)MwcNextRange(mwc, (uint)" << absn << "), precalcAtanyx) / " << power << ";\n"
 		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
 		   << "\t\treal_t sina = sin(angle);\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
@@ -5110,8 +5141,8 @@ public:
 		   << "\t\treal_t yn = r * sina;\n"
 		   << "\t\treal_t siny = sin(" << freqX << " * yn);\n"
 		   << "\t\treal_t sinx = sin(" << freqY << " * xn);\n"
-		   << "\t\treal_t dx = xn + (real_t)(0.5) * (" << scaleX << " * siny + fabs(xn) * " << incX << " * siny);\n"
-		   << "\t\treal_t dy = yn + (real_t)(0.5) * (" << scaleY << " * sinx + fabs(yn) * " << incY << " * sinx);\n"
+		   << "\t\treal_t dx = fma((real_t)(0.5), fma(" << scaleX << ", siny, fabs(xn) * " << incX << " * siny), xn);\n"
+		   << "\t\treal_t dy = fma((real_t)(0.5), fma(" << scaleY << ", sinx, fabs(yn) * " << incY << " * sinx), yn);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * dx;\n"
 		   << "\t\tvOut.y = " << weight << " * dy;\n"
@@ -5206,9 +5237,9 @@ public:
 		string weight = WeightDefineString();
 		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ratio = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cosa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string sina = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rat = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosa  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sina  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rat   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t r2_4 = precalcSumSquares + 4;\n"
 		   << "\n"
@@ -5217,8 +5248,10 @@ public:
 		   << "\n"
 		   << "\t\treal_t bx = 4 / r2_4;\n"
 		   << "\t\treal_t by = " << rat << " / r2_4;\n"
-		   << "\t\treal_t x = " << cosa << " * (bx * vIn.x) - " << sina << " * (by * vIn.y);\n"
-		   << "\t\treal_t y = " << sina << " * (bx * vIn.x) + " << cosa << " * (by * vIn.y);\n"
+		   << "\t\treal_t bxx = bx * vIn.x;\n"
+		   << "\t\treal_t byy = by * vIn.y;\n"
+		   << "\t\treal_t x = fma(" << cosa << ", bxx, -(" << sina << " * byy));\n"
+		   << "\t\treal_t y = fma(" << sina << ", bxx, " << cosa << " * byy);\n"
 		   << "\n"
 		   << "\t\tif (x > 0)\n"
 		   << "\t\t{\n"
@@ -5311,16 +5344,16 @@ public:
 		string c = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string d = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t dot00 = SQR(" << a << ") + SQR(" << b << ");\n"
-		   << "\t\treal_t dot01 = " << a << " * " << c << " + " << b << " * " << d << ";\n"
-		   << "\t\treal_t dot02 = " << a << " * vIn.x + " << b << " * vIn.y;\n"
-		   << "\t\treal_t dot11 = SQR(" << c << ") + SQR(" << d << ");\n"
-		   << "\t\treal_t dot12 = " << c << " * vIn.x + " << d << " * vIn.y;\n"
-		   << "\t\treal_t invDenom = (real_t)(1.0) / Zeps(dot00 * dot11 - dot01 * dot01);\n"
-		   << "\t\treal_t u = (dot11 * dot02 - dot01 * dot12) * invDenom;\n"
-		   << "\t\treal_t v = (dot00 * dot12 - dot01 * dot02) * invDenom;\n"
-		   << "\t\treal_t um = sqrt(SQR(u) + SQR(vIn.x)) * Sign(u);\n"
-		   << "\t\treal_t vm = sqrt(SQR(v) + SQR(vIn.y)) * Sign(v);\n"
+		   << "\t\treal_t dot00 = fma(" << a << ", " << a << ", SQR(" << b << "));\n"
+		   << "\t\treal_t dot01 = fma(" << a << ", " << c << ", " << b << " * " << d << ");\n"
+		   << "\t\treal_t dot02 = fma(" << a << ", vIn.x, " << b << " * vIn.y);\n"
+		   << "\t\treal_t dot11 = fma(" << c << ", " << c << ", SQR(" << d << "));\n"
+		   << "\t\treal_t dot12 = fma(" << c << ", vIn.x, " << d << " * vIn.y);\n"
+		   << "\t\treal_t invDenom = (real_t)(1.0) / Zeps(fma(dot00, dot11, -(dot01 * dot01)));\n"
+		   << "\t\treal_t u = fma(dot11, dot02, -(dot01 * dot12)) * invDenom;\n"
+		   << "\t\treal_t v = fma(dot00, dot12, -(dot01 * dot02)) * invDenom;\n"
+		   << "\t\treal_t um = sqrt(fma(u, u, SQR(vIn.x))) * Sign(u);\n"
+		   << "\t\treal_t vm = sqrt(fma(v, v, SQR(vIn.y))) * Sign(v);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * um;\n"
 		   << "\t\tvOut.y = " << weight << " * vm;\n"
@@ -5566,8 +5599,8 @@ public:
 		   << "\t\t	a -= " << fullSpread << ";\n"
 		   << "\n"
 		   << "\t\treal_t lnr2 = log(precalcSumSquares);\n"
-		   << "\t\treal_t r = " << weight << " * exp(" << halfC << " * lnr2 - " << d << " * a);\n"
-		   << "\t\treal_t temp = " << c << " * a + " << halfD << " * lnr2 + " << ang << " * MwcNext(mwc);\n"
+		   << "\t\treal_t r = " << weight << " * exp(fma(" << halfC << ", lnr2, -(" << d << " * a)));\n"
+		   << "\t\treal_t temp = fma(" << c << ", a, fma(" << halfD << ", lnr2, " << ang << " * MwcNext(mwc)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
 		   << "\t\tvOut.y = r * sin(temp);\n"

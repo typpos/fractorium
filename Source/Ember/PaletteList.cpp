@@ -547,7 +547,7 @@ bool PaletteList<T>::Save(const string& filename)
 						os << " source_colors=\"";
 
 						for (auto& sc : pal.m_SourceColors)//Need to clamp these each from 0 to 1. Use our custom clamp funcs.//TODO
-							os << sc.first << "," << sc.second.r << "," << sc.second.g << "," << sc.second.b << " ";
+							os << Clamp<T>(sc.first, 0, 1) << "," << Clamp<T>(sc.second.r, 0, 1) << "," << Clamp<T>(sc.second.g, 0, 1) << "," << Clamp<T>(sc.second.b, 0, 1) << " ";
 
 						os << "\"";
 					}

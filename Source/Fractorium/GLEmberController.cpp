@@ -175,7 +175,7 @@ typename v3T GLEmberController<T>::SnapToNormalizedAngle(v3T& vec, uint division
 {
 	T rsq, theta;
 	T bestRsq = numeric_limits<T>::max();
-	v3T c, best;
+	v3T c(0, 0, 0), best;
 	best.x = 1;
 	best.y = 0;
 

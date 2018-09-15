@@ -412,6 +412,7 @@ void FractoriumEmberController<T>::XformNameChanged(int row, int col)
 		XformCheckboxAt(int(xfindex), [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(xfindex)); });
 	}, eXformUpdate::UPDATE_CURRENT, false);
 	FillSummary();//Manually update because this does not trigger a render, which is where this would normally be called.
+	m_Fractorium->FillXaosTable();
 }
 
 void Fractorium::OnXformNameChanged(int row, int col)
@@ -570,6 +571,7 @@ void FractoriumEmberController<T>::FillXforms(int index)
 	if (UseFinalXform())
 	{
 		auto cb = new QCheckBox(MakeXformCaption(i), m_Fractorium);
+		QObject::connect(cb, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });
 		m_Fractorium->m_XformSelections.push_back(cb);
 		m_Fractorium->m_XformsSelectionLayout->addRow(cb, new QWidget(m_Fractorium));
 		combo->addItem("Final");
@@ -600,7 +602,6 @@ void FractoriumEmberController<T>::FillXforms(int index)
 /// Update the text in xforms combo box to show the name of Xform.
 /// </summary>
 /// <param name="index">The index of the Xform to update.</param>
-///
 template<typename T>
 void FractoriumEmberController<T>::UpdateXformName(int index)
 {

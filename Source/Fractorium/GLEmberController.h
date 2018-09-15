@@ -118,7 +118,7 @@ public:
 	void CalcDragTranslation();
 	void SetSelectedXform(Xform<T>* xform);
 	void DrawGrid();
-	void DrawAffine(Xform<T>* xform, bool pre, bool selected);
+	void DrawAffine(Xform<T>* xform, bool pre, bool selected, bool hovered);
 	int UpdateHover(v3T& glCoords);
 	bool CheckXformHover(Xform<T>* xform, v3T& glCoords, T& bestDist, bool pre, bool post);
 

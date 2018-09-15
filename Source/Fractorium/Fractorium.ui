@@ -3233,7 +3233,7 @@
               <enum>QTabWidget::Triangular</enum>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="XformColorTab">
               <property name="sizePolicy">
@@ -4572,6 +4572,50 @@
                       </property>
                      </widget>
                     </item>
+                    <item row="0" column="0">
+                     <widget class="QPushButton" name="PreCopyButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>41</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Copy the pre affine values, which can then be pasted into other pre/post affines&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                      <property name="text">
+                       <string>Copy</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="4">
+                     <widget class="QPushButton" name="PrePasteButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>41</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Paste the pre/post affine values which were previously copied&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                      <property name="text">
+                       <string>Paste</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </item>
                   <item>
@@ -4614,6 +4658,13 @@
                       <widget class="QRadioButton" name="ShowPreAffineCurrentRadio">
                        <property name="text">
                         <string>Current</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="ShowPreAffineSelectedRadio">
+                       <property name="text">
+                        <string>Selected</string>
                        </property>
                       </widget>
                      </item>
@@ -5402,6 +5453,50 @@
                       </property>
                      </widget>
                     </item>
+                    <item row="0" column="0">
+                     <widget class="QPushButton" name="PostCopyButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>41</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Copy the post affine values, which can then be pasted into other pre/post affines&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                      <property name="text">
+                       <string>Copy</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="4">
+                     <widget class="QPushButton" name="PostPasteButton">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>41</width>
+                        <height>24</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Paste the pre/post affine values which were previously copied&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                      <property name="text">
+                       <string>Paste</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </item>
                   <item>
@@ -5441,6 +5536,13 @@
                        </property>
                        <property name="checked">
                         <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="ShowPostAffineSelectedRadio">
+                       <property name="text">
+                        <string>Selected</string>
                        </property>
                       </widget>
                      </item>
@@ -5675,7 +5777,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="columnCount">
-                  <number>2</number>
+                  <number>3</number>
                  </property>
                  <attribute name="headerDefaultSectionSize">
                   <number>70</number>
@@ -5700,6 +5802,14 @@
                  <column>
                   <property name="text">
                    <string>Weight</string>
+                  </property>
+                 </column>
+                 <column>
+                  <property name="text">
+                   <string>Type</string>
+                  </property>
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red: Uses non-standard assignment which means direct assignment for regular variations, sum for pre/post.&lt;/p&gt;&lt;p&gt;Green: Uses direct color.&lt;/p&gt;&lt;p&gt;Blue: Uses an internal variation state.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </column>
                  <item>

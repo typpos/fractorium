@@ -61,41 +61,47 @@ void Fractorium::InitXformsAffineUI()
 	moveList.append(ToString(0.01));
 	ui.PreMoveCombo->addItems(moveList);
 	ui.PostMoveCombo->addItems(moveList);
-	connect(ui.PreFlipHorizontalButton,    SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PreFlipVerticalButton,      SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PreRotate90CButton,         SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreRotate90CcButton,        SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreRotateCButton,           SIGNAL(clicked(bool)),     this, SLOT(OnRotateCButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PreRotateCcButton,          SIGNAL(clicked(bool)),     this, SLOT(OnRotateCcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreMoveUpButton,            SIGNAL(clicked(bool)),     this, SLOT(OnMoveUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PreMoveDownButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreMoveLeftButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveLeftButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreMoveRightButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveRightButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreScaleDownButton,         SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreScaleUpButton,           SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PreResetButton,             SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PreRandomButton,            SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
-	connect(ui.PostFlipHorizontalButton,   SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PostFlipVerticalButton,     SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			  Qt::QueuedConnection);
-	connect(ui.PostRotate90CcButton,       SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostRotateCcButton,         SIGNAL(clicked(bool)),     this, SLOT(OnRotateCcButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostRotateCButton,          SIGNAL(clicked(bool)),     this, SLOT(OnRotateCButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PostRotate90CButton,        SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostMoveUpButton,           SIGNAL(clicked(bool)),     this, SLOT(OnMoveUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PostMoveDownButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostMoveLeftButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveLeftButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostMoveRightButton,        SIGNAL(clicked(bool)),     this, SLOT(OnMoveRightButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostScaleDownButton,        SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostScaleUpButton,          SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),					  Qt::QueuedConnection);
-	connect(ui.PostResetButton,            SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostRandomButton,           SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
-	connect(ui.PreAffineGroupBox,		   SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
-	connect(ui.PostAffineGroupBox,		   SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				  Qt::QueuedConnection);
-	connect(ui.ShowPreAffineAllRadio,      SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPreAffineCurrentRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineAllRadio,     SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineCurrentRadio, SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.PolarAffineCheckBox,        SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)),		  Qt::QueuedConnection);
+	connect(ui.PreFlipHorizontalButton,     SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PreFlipVerticalButton,       SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PreRotate90CButton,          SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreRotate90CcButton,         SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreRotateCButton,            SIGNAL(clicked(bool)),     this, SLOT(OnRotateCButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreRotateCcButton,           SIGNAL(clicked(bool)),     this, SLOT(OnRotateCcButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreMoveUpButton,             SIGNAL(clicked(bool)),     this, SLOT(OnMoveUpButtonClicked(bool)),					   Qt::QueuedConnection);
+	connect(ui.PreMoveDownButton,           SIGNAL(clicked(bool)),     this, SLOT(OnMoveDownButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreMoveLeftButton,           SIGNAL(clicked(bool)),     this, SLOT(OnMoveLeftButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreMoveRightButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveRightButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreScaleDownButton,          SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreScaleUpButton,            SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PreResetButton,              SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PreCopyButton,               SIGNAL(clicked(bool)),     this, SLOT(OnCopyAffineButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PrePasteButton,              SIGNAL(clicked(bool)),     this, SLOT(OnPasteAffineButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PreRandomButton,             SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
+	connect(ui.PostFlipHorizontalButton,    SIGNAL(clicked(bool)),     this, SLOT(OnFlipHorizontalButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PostFlipVerticalButton,      SIGNAL(clicked(bool)),     this, SLOT(OnFlipVerticalButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PostRotate90CcButton,        SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CcButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostRotateCcButton,          SIGNAL(clicked(bool)),     this, SLOT(OnRotateCcButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostRotateCButton,           SIGNAL(clicked(bool)),     this, SLOT(OnRotateCButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostRotate90CButton,         SIGNAL(clicked(bool)),     this, SLOT(OnRotate90CButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostMoveUpButton,            SIGNAL(clicked(bool)),     this, SLOT(OnMoveUpButtonClicked(bool)),					   Qt::QueuedConnection);
+	connect(ui.PostMoveDownButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveDownButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostMoveLeftButton,          SIGNAL(clicked(bool)),     this, SLOT(OnMoveLeftButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostMoveRightButton,         SIGNAL(clicked(bool)),     this, SLOT(OnMoveRightButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostScaleDownButton,         SIGNAL(clicked(bool)),     this, SLOT(OnScaleDownButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostScaleUpButton,           SIGNAL(clicked(bool)),     this, SLOT(OnScaleUpButtonClicked(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostResetButton,             SIGNAL(clicked(bool)),     this, SLOT(OnResetAffineButtonClicked(bool)),			   Qt::QueuedConnection);
+	connect(ui.PostCopyButton,              SIGNAL(clicked(bool)),     this, SLOT(OnCopyAffineButtonClicked(bool)),                Qt::QueuedConnection);
+	connect(ui.PostPasteButton,             SIGNAL(clicked(bool)),     this, SLOT(OnPasteAffineButtonClicked(bool)),               Qt::QueuedConnection);
+	connect(ui.PostRandomButton,            SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
+	connect(ui.PreAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
+	connect(ui.PostAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
+	connect(ui.ShowPreAffineAllRadio,       SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPreAffineCurrentRadio,   SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPreAffineSelectedRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPostAffineAllRadio,      SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPostAffineCurrentRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.ShowPostAffineSelectedRadio, SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
+	connect(ui.PolarAffineCheckBox,         SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)),		   Qt::QueuedConnection);
 #ifndef _WIN32
 	//For some reason linux makes these 24x24, even though the designer explicitly says 16x16.
 	//Also, in order to get 4 pixels of spacing between elements in the grid layout, 0 must be specified.
@@ -564,6 +570,7 @@ void Fractorium::OnScaleUpButtonClicked(bool checked)
 /// Called when reset pre/post affine buttons are clicked.
 /// Resets the rendering process.
 /// </summary>
+/// <param name="pre">True for pre affine, false for post.</param>
 template <typename T>
 void FractoriumEmberController<T>::ResetXformsAffine(bool pre)
 {
@@ -576,6 +583,42 @@ void FractoriumEmberController<T>::ResetXformsAffine(bool pre)
 }
 
 void Fractorium::OnResetAffineButtonClicked(bool checked) { m_Controller->ResetXformsAffine(sender() == ui.PreResetButton); }
+
+/// <summary>
+/// Copy the pre or post affine transform values from the current xform.
+/// </summary>
+/// <param name="pre">True for pre affine, false for post.</param>
+template <typename T>
+void FractoriumEmberController<T>::CopyXformsAffine(bool pre)
+{
+	if (auto xform = CurrentXform())
+		m_CopiedAffine = pre ? xform->m_Affine : xform->m_Post;
+}
+
+void Fractorium::OnCopyAffineButtonClicked(bool checked)
+{
+	m_Controller->CopyXformsAffine(sender() == ui.PreCopyButton);
+}
+
+/// <summary>
+/// Paste the last copied affine transform values to the pre or post affine values in the current xform.
+/// </summary>
+/// <param name="pre">True for pre affine, false for post.</param>
+template <typename T>
+void FractoriumEmberController<T>::PasteXformsAffine(bool pre)
+{
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
+	{
+		auto& affine = pre ? xform->m_Affine : xform->m_Post;
+		affine = m_CopiedAffine;
+	}, eXformUpdate::UPDATE_CURRENT);
+	FillAffineWithXform(CurrentXform(), pre);
+}
+
+void Fractorium::OnPasteAffineButtonClicked(bool checked)
+{
+	m_Controller->PasteXformsAffine(sender() == ui.PrePasteButton);
+}
 
 /// <summary>
 /// Randomize all values in selected pre/post affines to a range of -1 to 1.
@@ -731,7 +774,11 @@ void Fractorium::SetupAffineSpinner(QTableWidget* table, const QObject* receiver
 /// GUI wrapper functions, getters only.
 /// </summary>
 
+bool Fractorium::DrawCurrentPre() { return !DrawAllPre() && !DrawSelectedPre(); }
+bool Fractorium::DrawSelectedPre()  { return ui.ShowPreAffineSelectedRadio->isChecked();  }
 bool Fractorium::DrawAllPre()  { return ui.ShowPreAffineAllRadio->isChecked();  }
+bool Fractorium::DrawCurrentPost() { return !DrawAllPost() && !DrawSelectedPost(); }
+bool Fractorium::DrawSelectedPost()  { return ui.ShowPostAffineSelectedRadio->isChecked();  }
 bool Fractorium::DrawAllPost() { return ui.ShowPostAffineAllRadio->isChecked(); }
 bool Fractorium::LocalPivot()  { return ui.LocalPivotRadio->isChecked();        }
 

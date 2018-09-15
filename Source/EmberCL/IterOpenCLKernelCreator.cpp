@@ -102,9 +102,19 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		}
 		else
 		{
+			/*  if (xform->m_Affine.IsID())
+			    {
+				xformFuncs <<
+						   "	transX = inPoint->m_X;\n" <<
+						   "	transY = inPoint->m_Y;\n";
+			    }
+			    else*/
+			{
+				xformFuncs <<
+						   "	transX = fma(xform->m_A, inPoint->m_X, fma(xform->m_B, inPoint->m_Y, xform->m_C));\n" <<
+						   "	transY = fma(xform->m_D, inPoint->m_X, fma(xform->m_E, inPoint->m_Y, xform->m_F));\n";
+			}
 			xformFuncs <<
-					   "	transX = (xform->m_A * inPoint->m_X) + (xform->m_B * inPoint->m_Y) + xform->m_C;\n" <<
-					   "	transY = (xform->m_D * inPoint->m_X) + (xform->m_E * inPoint->m_Y) + xform->m_F;\n" <<
 					   "	transZ = inPoint->m_Z;\n";
 			varCount = xform->PreVariationCount();
 
@@ -198,8 +208,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 					   "\n\t//Apply post affine transform.\n"
 					   "\treal_t tempX = outPoint->m_X;\n"
 					   "\n"
-					   "\toutPoint->m_X = (xform->m_PostA * tempX) + (xform->m_PostB * outPoint->m_Y) + xform->m_PostC;\n" <<
-					   "\toutPoint->m_Y = (xform->m_PostD * tempX) + (xform->m_PostE * outPoint->m_Y) + xform->m_PostF;\n";
+					   "\toutPoint->m_X = fma(xform->m_PostA, tempX, fma(xform->m_PostB, outPoint->m_Y, xform->m_PostC));\n" <<
+					   "\toutPoint->m_Y = fma(xform->m_PostD, tempX, fma(xform->m_PostE, outPoint->m_Y, xform->m_PostF));\n";
 		}
 
 		xformFuncs << "\toutPoint->m_ColorX = tempColor + xform->m_DirectColor * (outPoint->m_ColorX - tempColor);\n";
@@ -440,8 +450,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		os <<
 		   "		p00 = secondPoint.m_X - ember->m_CenterX;\n"
 		   "		p01 = secondPoint.m_Y - ember->m_CenterY;\n"
-		   "		tempPoint.m_X = (p00 * ember->m_RotA) + (p01 * ember->m_RotB) + ember->m_CenterX;\n"
-		   "		tempPoint.m_Y = (p00 * ember->m_RotD) + (p01 * ember->m_RotE) + ember->m_CenterY;\n"
+		   "		tempPoint.m_X = fma(p00, ember->m_RotA, fma(p01, ember->m_RotB, ember->m_CenterX));\n"
+		   "		tempPoint.m_Y = fma(p00, ember->m_RotD, fma(p01, ember->m_RotE, ember->m_CenterY));\n"
 		   "\n"
 		   //Add this point to the appropriate location in the histogram.
 		   "		if (CarToRasInBounds(carToRas, &tempPoint))\n"
@@ -481,7 +491,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 			   "				palColor1 = read_imagef(palette, paletteSampler, iPaletteCoord);\n"
 			   "				iPaletteCoord.x += 1;\n"
 			   "				palColor2 = read_imagef(palette, paletteSampler, iPaletteCoord);\n"
-			   "				palColor1 = (palColor1 * (1.0f - (float)colorIndexFrac)) + (palColor2 * (float)colorIndexFrac);\n";//The 1.0f here *must* have the 'f' suffix at the end to compile.
+			   "				palColor1 = fma(palColor2, (float)colorIndexFrac, palColor1 * (1.0f - (float)colorIndexFrac));\n";//The 1.0f here *must* have the 'f' suffix at the end to compile.
 		}
 		else if (ember.m_PaletteMode == ePaletteMode::PALETTE_STEP)
 		{
@@ -820,6 +830,9 @@ bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const E
 		auto xform2 = ember2.GetTotalXform(i);
 		auto varCount = xform1->TotalVariationCount();
 
+		//if (xform1->m_Affine.IsID() != xform2->m_Affine.IsID())
+		//	return true;
+
 		if (xform1->HasPost() != xform2->HasPost())
 			return true;
 
@@ -912,10 +925,10 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 				   "		real_t dsin, dcos;\n"
 				   "		real_t t = MwcNext01(&mwc) * M_2PI;\n"
 				   "		real_t z = secondPoint.m_Z - ember->m_CamZPos;\n"
-				   "		real_t x = ember->m_C00 * secondPoint.m_X + ember->m_C10 * secondPoint.m_Y;\n"
-				   "		real_t y = ember->m_C01 * secondPoint.m_X + ember->m_C11 * secondPoint.m_Y + ember->m_C21 * z;\n"
+				   "		real_t x = fma(ember->m_C00, secondPoint.m_X, ember->m_C10 * secondPoint.m_Y);\n"
+				   "		real_t y = fma(ember->m_C01, secondPoint.m_X, fma(ember->m_C11, secondPoint.m_Y, ember->m_C21 * z));\n"
 				   "\n"
-				   "		z = ember->m_C02 * secondPoint.m_X + ember->m_C12 * secondPoint.m_Y + ember->m_C22 * z;\n"
+				   "		z = fma(ember->m_C02, secondPoint.m_X, fma(ember->m_C12, secondPoint.m_Y, ember->m_C22 * z));\n"
 				   "\n"
 				   "		real_t zr = Zeps(1 - ember->m_CamPerspective * z);\n"
 				   "		real_t dr = MwcNext01(&mwc) * ember->m_BlurCoef * z;\n"
@@ -923,8 +936,8 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 				   "		dsin = sin(t);\n"
 				   "		dcos = cos(t);\n"
 				   "\n"
-				   "		secondPoint.m_X  = (x + dr * dcos) / zr;\n"
-				   "		secondPoint.m_Y  = (y + dr * dsin) / zr;\n"
+				   "		secondPoint.m_X  = fma(dr, dcos, x) / zr;\n"
+				   "		secondPoint.m_Y  = fma(dr, dsin, y) / zr;\n"
 				   "		secondPoint.m_Z -= ember->m_CamZPos;\n";
 			}
 			else
@@ -935,8 +948,8 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 				   "		real_t t = MwcNext01(&mwc) * M_2PI;\n"
 				   "\n"
 				   "		z = secondPoint.m_Z - ember->m_CamZPos;\n"
-				   "		y = ember->m_C11 * secondPoint.m_Y + ember->m_C21 * z;\n"
-				   "		z = ember->m_C12 * secondPoint.m_Y + ember->m_C22 * z;\n"
+				   "		y = fma(ember->m_C11, secondPoint.m_Y, ember->m_C21 * z);\n"
+				   "		z = fma(ember->m_C12, secondPoint.m_Y, ember->m_C22 * z);\n"
 				   "		zr = Zeps(1 - ember->m_CamPerspective * z);\n"
 				   "\n"
 				   "		dsin = sin(t);\n"
@@ -944,8 +957,8 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 				   "\n"
 				   "		real_t dr = MwcNext01(&mwc) * ember->m_BlurCoef * z;\n"
 				   "\n"
-				   "		secondPoint.m_X = (secondPoint.m_X + dr * dcos) / zr;\n"
-				   "		secondPoint.m_Y = (y + dr * dsin) / zr;\n"
+				   "		secondPoint.m_X = fma(dr, dcos, secondPoint.m_X) / zr;\n"
+				   "		secondPoint.m_Y = fma(dr, dsin, y) / zr;\n"
 				   "		secondPoint.m_Z -= ember->m_CamZPos;\n";
 			}
 		}
@@ -955,9 +968,9 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 			{
 				os <<
 				   "		real_t z  = secondPoint.m_Z - ember->m_CamZPos;\n"
-				   "		real_t x  = ember->m_C00 * secondPoint.m_X + ember->m_C10 * secondPoint.m_Y;\n"
-				   "		real_t y  = ember->m_C01 * secondPoint.m_X + ember->m_C11 * secondPoint.m_Y + ember->m_C21 * z;\n"
-				   "		real_t zr = Zeps(1 - ember->m_CamPerspective * (ember->m_C02 * secondPoint.m_X + ember->m_C12 * secondPoint.m_Y + ember->m_C22 * z));\n"
+				   "		real_t x  = fma(ember->m_C00, secondPoint.m_X, ember->m_C10 * secondPoint.m_Y);\n"
+				   "		real_t y  = fma(ember->m_C01, secondPoint.m_X, fma(ember->m_C11, secondPoint.m_Y, ember->m_C21 * z));\n"
+				   "		real_t zr = Zeps(1 - ember->m_CamPerspective * fma(ember->m_C02, secondPoint.m_X, fma(ember->m_C12, secondPoint.m_Y, ember->m_C22 * z)));\n"
 				   "\n"
 				   "		secondPoint.m_X = x / zr;\n"
 				   "		secondPoint.m_Y = y / zr;\n"
@@ -967,8 +980,8 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 			{
 				os <<
 				   "		real_t z  = secondPoint.m_Z - ember->m_CamZPos;\n"
-				   "		real_t y  = ember->m_C11 * secondPoint.m_Y + ember->m_C21 * z;\n"
-				   "		real_t zr = Zeps(1 - ember->m_CamPerspective * (ember->m_C12 * secondPoint.m_Y + ember->m_C22 * z));\n"
+				   "		real_t y  = fma(ember->m_C11, secondPoint.m_Y, ember->m_C21 * z);\n"
+				   "		real_t zr = Zeps(1 - ember->m_CamPerspective * fma(ember->m_C12, secondPoint.m_Y, ember->m_C22 * z));\n"
 				   "\n"
 				   "		secondPoint.m_X /= zr;\n"
 				   "		secondPoint.m_Y  = y / zr;\n"

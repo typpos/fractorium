@@ -114,7 +114,11 @@ public:
 	void CurrentXform(uint i);
 
 	//Xforms Affine.
+	bool DrawCurrentPre();
+	bool DrawSelectedPre();
 	bool DrawAllPre();
+	bool DrawCurrentPost();
+	bool DrawSelectedPost();
 	bool DrawAllPost();
 	bool LocalPivot();
 
@@ -279,6 +283,8 @@ public slots:
 	void OnScaleDownButtonClicked(bool checked);
 	void OnScaleUpButtonClicked(bool checked);
 	void OnResetAffineButtonClicked(bool checked);
+	void OnCopyAffineButtonClicked(bool checked);
+	void OnPasteAffineButtonClicked(bool checked);
 	void OnRandomAffineButtonClicked(bool checked);
 
 	void OnAffineGroupBoxToggled(bool on);

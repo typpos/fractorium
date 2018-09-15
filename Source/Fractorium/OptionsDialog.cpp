@@ -76,6 +76,7 @@ bool FractoriumOptionsDialog::ToggleType() { return ui.ToggleTypeCheckBox->isChe
 bool FractoriumOptionsDialog::Png16Bit() { return ui.Png16BitCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::AutoUnique() { return ui.AutoUniqueCheckBox->isChecked(); }
 bool FractoriumOptionsDialog::LoadLast() { return ui.LoadLastOnStartCheckBox->isChecked(); }
+bool FractoriumOptionsDialog::RotateAndScale() { return ui.RotateAndScaleCheckBox->isChecked(); }
 uint FractoriumOptionsDialog::ThreadCount() { return ui.ThreadCountSpin->value(); }
 uint FractoriumOptionsDialog::RandomCount() { return ui.RandomCountSpin->value(); }
 uint FractoriumOptionsDialog::CpuQuality() { return ui.CpuQualitySpin->value(); }
@@ -192,6 +193,7 @@ void FractoriumOptionsDialog::GuiToData()
 	m_Settings->ThreadCount(ThreadCount());
 	m_Settings->RandomCount(RandomCount());
 	m_Settings->LoadLast(LoadLast());
+	m_Settings->RotateAndScale(RotateAndScale());
 	m_Settings->CpuQuality(CpuQuality());
 	m_Settings->OpenClQuality(OpenClQuality());
 	m_Settings->CpuSubBatch(ui.CpuSubBatchSpin->value());
@@ -230,6 +232,7 @@ void FractoriumOptionsDialog::DataToGui()
 	ui.ThreadCountSpin->setValue(m_Settings->ThreadCount());
 	ui.RandomCountSpin->setValue(m_Settings->RandomCount());
 	ui.LoadLastOnStartCheckBox->setChecked(m_Settings->LoadLast());
+	ui.RotateAndScaleCheckBox->setChecked(m_Settings->RotateAndScale());
 	ui.CpuQualitySpin->setValue(m_Settings->CpuQuality());
 	ui.OpenCLQualitySpin->setValue(m_Settings->OpenClQuality());
 	ui.CpuSubBatchSpin->setValue(m_Settings->CpuSubBatch());

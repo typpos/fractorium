@@ -77,7 +77,7 @@ private:
 	bool Deallocate();
 	void SetViewport();
 	void DrawUnitSquare();
-	void DrawAffineHelper(int index, bool selected, bool pre, bool final, bool background);
+	void DrawAffineHelper(int index, bool selected, bool hovered, bool pre, bool final, bool background);
 	GLEmberControllerBase* GLController();
 
 	bool m_Init = false;

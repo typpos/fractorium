@@ -145,11 +145,11 @@ public:
 		string index = ss2.str();
 		string weight = WeightDefineString();
 		string cellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rotsin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rotcos = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rotate   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rotsin   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rotcos   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint i, j;\n"
 		   << "\t\treal_t di, dj;\n"
@@ -170,15 +170,15 @@ public:
 		   << "\t\tU.x = vIn.x;\n"
 		   << "\t\tU.y = vIn.y;\n"
 		   << "\n"
-		   << "\t\tXCh = floor((AXhXo * U.x + AXhYo * U.y) / s);\n"
-		   << "\t\tYCh = floor((AYhXo * U.x + AYhYo * U.y) / s);\n"
+		   << "\t\tXCh = floor(fma(AXhXo, U.x, AXhYo * U.y) / s);\n"
+		   << "\t\tYCh = floor(fma(AYhXo, U.x, AYhYo * U.y) / s);\n"
 		   << "\n"
 		   << "\t\tfor (i = 0, di = XCh; i < 2; di += 1, i++)\n"
 		   << "\t\t{\n"
 		   << "\t\t	for (j = 0, dj = YCh; j < 2; dj += 1, j++)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		P[(i * 2) + j].x = (AXoXh * di + AXoYh * dj) * s;\n"
-		   << "\t\t		P[(i * 2) + j].y = (AYoXh * di + AYoYh * dj) * s;\n"
+		   << "\t\t		P[(i * 2) + j].x = fma(AXoXh, di, AXoYh * dj) * s;\n"
+		   << "\t\t		P[(i * 2) + j].y = fma(AYoXh, di, AYoYh * dj) * s;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
@@ -187,8 +187,8 @@ public:
 		   << "\t\tXCh += offset[q].x;\n"
 		   << "\t\tYCh += offset[q].y;\n"
 		   << "\n"
-		   << "\t\tXCo = (AXoXh * XCh + AXoYh * YCh) * s;\n"
-		   << "\t\tYCo = (AYoXh * XCh + AYoYh * YCh) * s;\n"
+		   << "\t\tXCo = fma(AXoXh, XCh, AXoYh * YCh) * s;\n"
+		   << "\t\tYCo = fma(AYoXh, XCh, AYoYh * YCh) * s;\n"
 		   << "\t\tP[0].x = XCo;\n"
 		   << "\t\tP[0].y = YCo;\n"
 		   << "\n"
@@ -212,8 +212,8 @@ public:
 		   << "\n"
 		   << "\t\ttrgL = pow(fabs(L1), " << power << ") * " << scale << ";\n"
 		   << "\n"
-		   << "\t\tVx = DXo * " << rotcos << " + DYo * " << rotsin << ";\n"
-		   << "\t\tVy = -DXo * " << rotsin << " + DYo * " << rotcos << ";\n"
+		   << "\t\tVx = fma( DXo, " << rotcos << ", DYo * " << rotsin << ");\n"
+		   << "\t\tVy = fma(-DXo, " << rotsin << ", DYo * " << rotcos << ");\n"
 		   << "\n"
 		   << "\t\tU.x = Vx + P[0].x;\n"
 		   << "\t\tU.y = Vy + P[0].y;\n"
@@ -229,7 +229,7 @@ public:
 		   << "\t\t	if (L > 0.8)\n"
 		   << "\t\t		R = trgL / L2;\n"
 		   << "\t\t	else\n"
-		   << "\t\t		R = ((trgL / L1) * (0.8 - L) + (trgL / L2) * (L - 0.5)) / 0.3;\n"
+		   << "\t\t		R = fma(trgL / L1, (real_t)(0.8) - L, (trgL / L2) * (L - 0.5)) / 0.3;\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tVx *= R;\n"
@@ -383,31 +383,31 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string numEdges = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string numStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ratioStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ratioHole = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string circumCircle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string adjustToLinear = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string equalBlur = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string exactCalc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string highlightEdges = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string numEdges        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string numStripes      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ratioStripes    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ratioHole       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string circumCircle    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string adjustToLinear  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string equalBlur       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exactCalc       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string highlightEdges  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ratioComplement = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
-		string midAngle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angStart = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hasStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string negStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string maxStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string absStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string sina = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cosa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string tan90M2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string arcTan1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string arcTan2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string speedCalc1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string speedCalc2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string adjustedWeight = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string midAngle        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angStart        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angStripes      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hasStripes      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string negStripes      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string maxStripes      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string absStripes      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sina            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosa            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tan90M2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string arcTan1         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string arcTan2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string speedCalc1      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string speedCalc2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string adjustedWeight  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xTmp, yTmp;\n"
 		   << "\t\tRandXyParams params;\n"
@@ -444,8 +444,8 @@ public:
 		   << "\t\txTmp = params.X;\n"
 		   << "\t\tyTmp = params.Y;\n"
 		   << "\n"
-		   << "\t\tparams.X = " << cosa << " * xTmp - " << sina << " * yTmp;\n"
-		   << "\t\tparams.Y = " << sina << " * xTmp + " << cosa << " * yTmp;\n"
+		   << "\t\tparams.X = fma(" << cosa << ", xTmp, -(" << sina << " * yTmp));\n"
+		   << "\t\tparams.Y = fma(" << sina << ", xTmp, " << cosa << " * yTmp);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << adjustedWeight << " * params.X;\n"
 		   << "\t\tvOut.y = " << adjustedWeight << " * params.Y;\n"
@@ -686,7 +686,7 @@ public:
 			"\n"
 			"	xTmp = params->Tan90M2 / (params->Tan90M2 - tan(angXY));\n"
 			"	yTmp = xTmp * tan(angXY);\n"
-			"	params->LenOuterEdges = sqrt(SQR(xTmp) + SQR(yTmp));\n"
+			"	params->LenOuterEdges = sqrt(fma(xTmp, xTmp, SQR(yTmp)));\n"
 			"\n"
 			"	if (params->ExactCalc == 1)\n"
 			"	{\n"
@@ -722,23 +722,23 @@ public:
 			"			if (params->CircumCircle == 1)\n"
 			"			{\n"
 			"				if (params->EqualBlur == 1)\n"
-			"					ranTmp = params->LenInnerEdges + sqrt(MwcNext01(mwc)) * (1 - params->LenInnerEdges + EPS);\n"
+			"					ranTmp = fma(sqrt(MwcNext01(mwc)), (1 - params->LenInnerEdges + EPS), params->LenInnerEdges);\n"
 			"				else\n"
-			"					ranTmp = params->LenInnerEdges + MwcNext01(mwc) * (1 - params->LenInnerEdges + EPS);\n"
+			"					ranTmp = fma(MwcNext01(mwc), (1 - params->LenInnerEdges + EPS), params->LenInnerEdges);\n"
 			"			}\n"
 			"			else\n"
 			"			{\n"
 			"				if (params->EqualBlur == 1)\n"
-			"					ranTmp = params->LenInnerEdges + sqrt(MwcNext01(mwc)) * (params->LenOuterEdges - params->LenInnerEdges);\n"
+			"					ranTmp = fma(sqrt(MwcNext01(mwc)), (params->LenOuterEdges - params->LenInnerEdges), params->LenInnerEdges);\n"
 			"				else\n"
-			"					ranTmp = params->LenInnerEdges + MwcNext01(mwc) * (params->LenOuterEdges - params->LenInnerEdges);\n"
+			"					ranTmp = fma(MwcNext01(mwc), (params->LenOuterEdges - params->LenInnerEdges), params->LenInnerEdges);\n"
 			"			}\n"
 			"		}\n"
 			"	}\n"
 			"\n"
 			"	params->X *= ranTmp;\n"
 			"	params->Y *= ranTmp;\n"
-			"	params->LenXY = sqrt(SQR(params->X) + SQR(params->Y));\n"
+			"	params->LenXY = sqrt(fma(params->X, params->X, SQR(params->Y)));\n"
 			"}\n\n"
 			;
 	}
@@ -1207,13 +1207,13 @@ public:
 		string index = ss2.str() + "]";
 		string stateIndex = ss2.str();
 		string polarweight = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string s = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string t = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string tempRad = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string abss = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string abst = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string st = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string s           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string t           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tempRad     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string abss        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string abst        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string st          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string axStartIndex = ToUpper(m_Params[i].Name()) + stateIndex; i += 2;
 		string bxStartIndex = ToUpper(m_Params[i].Name()) + stateIndex; i += 2;
 		string cxStartIndex = ToUpper(m_Params[i].Name()) + stateIndex; i += 2;
@@ -1289,8 +1289,8 @@ public:
 		ss
 				<< "\t\t}\n"
 				<< "\n"
-				<< "\t\tvOut.x = tempOut.x + (" << weight << " * x);\n"
-				<< "\t\tvOut.y = tempOut.y + (" << weight << " * y);\n"
+				<< "\t\tvOut.x = fma(" << weight << ", x, tempOut.x);\n"
+				<< "\t\tvOut.y = fma(" << weight << ", y, tempOut.y);\n"
 				<< "\t\tvOut.z = " << weight << " * z;\n"
 				<< "\t}\n";
 		return ss.str();
@@ -1319,7 +1319,7 @@ public:
 			"	if (radius == 0)\n"
 			"		return 1;\n"
 			"\n"
-			"	*r = sqrt(SQR((*p).x) + SQR((*p).y));\n"
+			"	*r = sqrt(fma((*p).x, (*p).x, SQR((*p).y)));\n"
 			"	return (*r <= radius);\n"
 			"}\n"
 			"\n"
@@ -1333,12 +1333,12 @@ public:
 			"	real_t d02 = dot(v0, v2);\n"
 			"	real_t d11 = dot(v1, v1);\n"
 			"	real_t d12 = dot(v1, v2);\n"
-			"	real_t denom = (d00 * d11 - d01 * d01);\n"
+			"	real_t denom = fma(d00, d11, -(d01 * d01));\n"
 			"\n"
 			"	if (denom != 0)\n"
 			"	{\n"
-			"		*u = (d11 * d02 - d01 * d12) / denom;\n"
-			"		*v = (d00 * d12 - d01 * d02) / denom;\n"
+			"		*u = fma(d11, d02, -(d01 * d12)) / denom;\n"
+			"		*v = fma(d00, d12, -(d01 * d02)) / denom;\n"
 			"	}\n"
 			"	else\n"
 			"		*u = *v = 0;\n"
@@ -1610,7 +1610,7 @@ public:
 				<< "\t\t		{\n"
 				<< "\t\t			do\n"
 				<< "\t\t			{\n"
-				<< "\t\t				yTmp = " << top << " + MwcNext01(mwc) * " << yInt2 << ";\n"
+				<< "\t\t				yTmp = fma(MwcNext01(mwc), " << yInt2 << ", " << top << ");\n"
 				<< "\t\t				xTmp = " << right << " - pow(MwcNext01(mwc), " << directBlur << ") * " << ratioBlur << " * " << minInt2 << ";\n"
 				<< "\t\t			} while ((yTmp - " << y0c << ") / Zeps(xTmp - " << x0c << ") < -1);\n"
 				<< "\n"
@@ -2004,22 +2004,22 @@ public:
 		ss2 << "_" << XformIndexInEmber();
 		string weight = WeightDefineString();
 		string index = ss2.str() + "]";
-		string numberStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ratioStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angleHole = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string exponentZ = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string symmetryZ = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string modusBlur = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string numberStripes    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ratioStripes     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angleHole        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exponentZ        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string symmetryZ        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string modusBlur        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string absNumberStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angHoleTemp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angStrip = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angStrip1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angStrip2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invStripes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string angHoleComp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invHole = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string c = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string s = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angHoleTemp      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angStrip         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angStrip1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angStrip2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invStripes       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angHoleComp      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invHole          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c                = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string s                = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   "\t\treal_t x = vIn.x, y = vIn.y, z = vIn.z;\n"
 		   "\t\treal_t xTmp, yTmp, angTmp, angRot, fac;\n"
@@ -2052,8 +2052,8 @@ public:
 		   "\t\t			{\n"
 		   "\t\t				if (" << ratioStripes << " == 1)\n"
 		   "\t\t				{\n"
-		   "\t\t					xTmp = " << c << " * x - " << s << " * y;\n"
-		   "\t\t					yTmp = " << s << " * x + " << c << " * y;\n"
+		   "\t\t					xTmp = fma(" << c << ", x, -(" << s << " * y));\n"
+		   "\t\t					yTmp = fma(" << s << ", x, " << c << " * y);\n"
 		   "\t\t					x = xTmp;\n"
 		   "\t\t					y = yTmp;\n"
 		   "\t\t				}\n"
@@ -2062,8 +2062,8 @@ public:
 		   "\t\t					angRot = (angXY - " << angStrip1 << ") / Zeps(" << angStrip2 << " - " << angStrip1 << ");\n"
 		   "\t\t					angRot = angXY - angRot * " << angStrip1 << ";\n"
 		   "\t\t					s = sincos(angRot, &c);\n"
-		   "\t\t					xTmp = c * x - s * y;\n"
-		   "\t\t					yTmp = s * x + c * y;\n"
+		   "\t\t					xTmp = fma(c, x, -(s * y));\n"
+		   "\t\t					yTmp = fma(s, x, c * y);\n"
 		   "\t\t					x = xTmp;\n"
 		   "\t\t					y = yTmp;\n"
 		   "\t\t				}\n"
@@ -2083,8 +2083,8 @@ public:
 		   "\t\t			{\n"
 		   "\t\t				if (" << absNumberStripes << " == 1)\n"
 		   "\t\t				{\n"
-		   "\t\t					xTmp = " << c << " * x - " << s << " * y;\n"
-		   "\t\t					yTmp = " << s << " * x + " << c << " * y;\n"
+		   "\t\t					xTmp = fma(" << c << ", x, -(" << s << " * y));\n"
+		   "\t\t					yTmp = fma(" << s << ", x, " << c << " * y);\n"
 		   "\t\t					x = xTmp;\n"
 		   "\t\t					y = yTmp;\n"
 		   "\t\t				}\n"
@@ -2093,8 +2093,8 @@ public:
 		   "\t\t					angRot = (angXY - " << angStrip1 << ") / " << angStrip1 << ";\n"
 		   "\t\t					angRot = angXY - angRot * (" << angStrip2 << " - " << angStrip1 << ");\n"
 		   "\t\t					s = sincos(angRot, &c);\n"
-		   "\t\t					xTmp = c * x - s * y;\n"
-		   "\t\t					yTmp = s * x + c * y;\n"
+		   "\t\t					xTmp = fma(c, x, -(s * y));\n"
+		   "\t\t					yTmp = fma(s, x, c * y);\n"
 		   "\t\t					x = xTmp;\n"
 		   "\t\t					y = yTmp;\n"
 		   "\t\t				}\n"
@@ -2111,9 +2111,9 @@ public:
 		   "\t\t	z = 2 / pow(rad, " << exponentZ << ") - 1;\n"
 		   "\t\t\n"
 		   "\t\t	if (" << exponentZ << " <= 2)\n"
-		   "\t\t		angZ = MPI - acos((z / (SQR(x) + SQR(y) + SQR(z))));\n"
+		   "\t\t		angZ = MPI - acos((z / fma(x, x, fma(y, y, SQR(z)))));\n"
 		   "\t\t	else\n"
-		   "\t\t		angZ = MPI - atan2(Sqr(SQR(x) + SQR(y)), z);\n"
+		   "\t\t		angZ = MPI - atan2(Sqr(fma(x, x, SQR(y))), z);\n"
 		   "\t\t}\n"
 		   "\t\telse\n"
 		   "\t\t{\n"
@@ -2135,7 +2135,7 @@ public:
 		   "\t\t			}\n"
 		   "\t\t			else\n"
 		   "\t\t			{\n"
-		   "\t\t				angTmp = (MPI - angZ) / Zeps(" << angHoleComp << " * " << angHoleTemp << " - MPI2);\n"
+		   "\t\t				angTmp = (MPI - angZ) / Zeps(fma(" << angHoleComp << ", " << angHoleTemp << ", -MPI2));\n"
 		   "\t\t				angZ -= MPI2;\n"
 		   "\t\t				fac = cos(angTmp) / cos(angZ);\n"
 		   "\t\t				x *= fac;\n"
@@ -2156,7 +2156,7 @@ public:
 		   "\t\t			}\n"
 		   "\t\t			else\n"
 		   "\t\t			{\n"
-		   "\t\t				angTmp = MPI - angZ / Zeps(" << angHoleComp << " * " << angHoleTemp << " - MPI2);\n"
+		   "\t\t				angTmp = MPI - angZ / Zeps(fma(" << angHoleComp << ", " << angHoleTemp << ", -MPI2));\n"
 		   "\t\t				angZ -= MPI2;\n"
 		   "\t\t				fac = cos(angTmp) / cos(angZ);\n"
 		   "\t\t				x *= fac;\n"
@@ -2757,40 +2757,40 @@ public:
 		ss2 << "_" << XformIndexInEmber();
 		string weight = WeightDefineString();
 		string index = ss2.str() + "]";
-		string synthA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthMode = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthPower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthMix = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthA      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthMode   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthPower  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthMix    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string synthSmooth = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthB = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthBType = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthBSkew = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthBFrq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthBPhs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthB      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthBType  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthBSkew  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthBFrq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthBPhs   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string synthBLayer = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthC = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthCType = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthCSkew = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthCFrq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthCPhs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthC      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthCType  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthCSkew  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthCFrq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthCPhs   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string synthCLayer = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthDType = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthDSkew = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthDFrq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthDPhs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthDType  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthDSkew  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthDFrq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthDPhs   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string synthDLayer = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthE = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthEType = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthESkew = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthEFrq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthEPhs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthE      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthEType  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthESkew  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthEFrq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthEPhs   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string synthELayer = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthF = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthFType = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthFSkew = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthFFrq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string synthFPhs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthF      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthFType  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthFSkew  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthFFrq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string synthFPhs   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string synthFLayer = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t Vx, Vy, radius, theta;\n"
@@ -2860,8 +2860,8 @@ public:
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_BLUR_LEGACY:\n"
-		   << "\t\t	radius = (MwcNext01(mwc) + MwcNext01(mwc) + 0.002 * MwcNext01(mwc)) / 2.002;\n"
-		   << "\t\t	theta = M_2PI * MwcNext01(mwc) - MPI;\n"
+		   << "\t\t	radius = fma((real_t)(0.002), MwcNext01(mwc), MwcNext01(mwc) + MwcNext01(mwc)) / 2.002;\n"
+		   << "\t\t	theta = fma(M_2PI, MwcNext01(mwc), -MPI);\n"
 		   << "\t\t	Vx = radius * sin(theta);\n"
 		   << "\t\t	Vy = radius * cos(theta);\n"
 		   << "\t\t	radius = pow(Zeps(radius * radius), " << synthPower << " / 2);\n"
@@ -2873,7 +2873,7 @@ public:
 		   << "\n"
 		   << "\t\tcase MODE_BLUR_NEW:\n"
 		   << "\t\t	radius = 0.5 * (MwcNext01(mwc) + MwcNext01(mwc));\n"
-		   << "\t\t	theta = M_2PI * MwcNext01(mwc) - MPI;\n"
+		   << "\t\t	theta = fma(M_2PI, MwcNext01(mwc), -MPI);\n"
 		   << "\t\t	radius = pow(Zeps(SQR(radius)), -" << synthPower << " / 2);\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
 		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
@@ -2883,7 +2883,7 @@ public:
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_BLUR_ZIGZAG:\n"
-		   << "\t\t	Vy = 1 + 0.1 * (MwcNext01(mwc) + MwcNext01(mwc) - 1) * " << synthPower << ";\n"
+		   << "\t\t	Vy = fma((real_t)(0.1), (MwcNext01(mwc) + MwcNext01(mwc) - 1) * " << synthPower << ", (real_t)(1.0));\n"
 		   << "\t\t	theta = 2 * asin((MwcNext01(mwc) - 0.5) * 2);\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
 		   << "\t\t	Vy = Interpolate(Vy, thetaFactor, synthSmooth);\n"
@@ -2950,8 +2950,8 @@ public:
 		   << "\t\tcase MODE_SINUSOIDAL:\n"
 		   << "\t\t	Vx = vIn.x;\n"
 		   << "\t\t	Vy = vIn.y;\n"
-		   << "\t\t	vOut.x = " << weight << " * (SynthValue(&synth, Vx) - 1 + (1 - " << synthMix << ") * sin(Vx));\n"
-		   << "\t\t	vOut.y = " << weight << " * (SynthValue(&synth, Vy) - 1 + (1 - " << synthMix << ") * sin(Vy));\n"
+		   << "\t\t	vOut.x = " << weight << " * fma((real_t)(1.0) - " << synthMix << ", sin(Vx), SynthValue(&synth, Vx) - (real_t)(1.0));\n"
+		   << "\t\t	vOut.y = " << weight << " * fma((real_t)(1.0) - " << synthMix << ", sin(Vy), SynthValue(&synth, Vy) - (real_t)(1.0));\n"
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_SWIRL:\n"
@@ -2959,8 +2959,8 @@ public:
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	radius = pow(Zeps(precalcSumSquares), " << synthPower << " / 2);\n"
 		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthSmooth);\n"
-		   << "\t\t	vOut.x = " << weight << " * (s * Vx - c * Vy);\n"
-		   << "\t\t	vOut.y = " << weight << " * (c * Vx + s * Vy);\n"
+		   << "\t\t	vOut.x = " << weight << " * fma(s, Vx, -(c * Vy));\n"
+		   << "\t\t	vOut.y = " << weight << " * fma(c, Vx, s * Vy);\n"
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_HYPERBOLIC:\n"
@@ -3003,7 +3003,7 @@ public:
 		   << "\t\t	radius = precalcSqrtSumSquares;\n"
 		   << "\t\t	theta = precalcAtanxy;\n"
 		   << "\t\t	mu = Zeps(SQR(" << synthPower << "));\n"
-		   << "\t\t	radius += -2 * mu * (int)((radius + mu) / (2 * mu)) + radius * (1 - mu);\n"
+		   << "\t\t	radius += fma((real_t)(-2.0) * mu, (real_t)(int)((radius + mu) / (2 * mu)), radius * ((real_t)(1.0) - mu));\n"
 		   << "\t\t	SynthSinCos(&synth, radius, &s, &c, synthSmooth);\n"
 		   << "\t\t	vOut.x = " << weight << " * s * theta;\n"
 		   << "\t\t	vOut.y = " << weight << " * c * theta;\n"
@@ -3019,7 +3019,7 @@ public:
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_BLUR_RING:\n"
-		   << "\t\t	radius = 1 + 0.1 * (MwcNext01(mwc) + MwcNext01(mwc) - 1) * " << synthPower << ";\n"
+		   << "\t\t	radius = fma((real_t)(0.1) * " << synthPower << ", MwcNext01(mwc) + MwcNext01(mwc) - (real_t)(1.0), (real_t)(1.0));\n"
 		   << "\t\t	theta = M_2PI * MwcNext01(mwc) - MPI;\n"
 		   << "\t\t	thetaFactor = SynthValue(&synth, theta);\n"
 		   << "\t\t	radius = Interpolate(radius, thetaFactor, synthSmooth);\n"
@@ -3029,9 +3029,9 @@ public:
 		   << "\t\t	break;\n"
 		   << "\n"
 		   << "\t\tcase MODE_BLUR_RING2:\n"
-		   << "\t\t	theta = M_2PI * MwcNext01(mwc) - MPI;\n"
+		   << "\t\t	theta = fma(M_2PI, MwcNext01(mwc), -MPI);\n"
 		   << "\t\t	radius = pow(Zeps(MwcNext01(mwc)), " << synthPower << ");\n"
-		   << "\t\t	radius = SynthValue(&synth, theta) + 0.1 * radius;\n"
+		   << "\t\t	radius = fma((real_t)(0.1), radius, SynthValue(&synth, theta));\n"
 		   << "\t\t	s = sincos(theta, &c);\n"
 		   << "\t\t	vOut.x = " << weight << " * radius * s;\n"
 		   << "\t\t	vOut.y = " << weight << " * radius * c;\n"
@@ -3072,7 +3072,7 @@ public:
 		   << "\t\t	Vx = vIn.x;\n"
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	mu = SynthValue(&synth, Vx) - 1;\n"
-		   << "\t\t	Vy = 2 * mu - Vy;\n"
+		   << "\t\t	Vy = fma((real_t)(2.0), mu, -Vy);\n"
 		   << "\t\t	vOut.x = " << weight << " * Vx;\n"
 		   << "\t\t	vOut.y = " << weight << " * Vy;\n"
 		   << "\t\t	break;\n"
@@ -3082,8 +3082,8 @@ public:
 		   << "\t\t	Vy = vIn.y;\n"
 		   << "\t\t	mu = SynthValue(&synth, Vx) - 1;\n"
 		   << "\t\t	radius = SynthValue(&synth, Vy) - 1;\n"
-		   << "\t\t	Vy = 2 * mu - Vy;\n"
-		   << "\t\t	Vx = 2 * radius - Vx;\n"
+		   << "\t\t	Vy = fma((real_t)(2.0), mu, -Vy);\n"
+		   << "\t\t	Vx = fma((real_t)(2.0), radius, -Vx);\n"
 		   << "\t\t	vOut.x = " << weight << " * Vx;\n"
 		   << "\t\t	vOut.y = " << weight << " * Vy;\n"
 		   << "\t\t	break;\n"
@@ -3110,7 +3110,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Zeps" };
+		return vector<string> { "Zeps", "Sqr" };
 	}
 
 	virtual string OpenCLFuncsString() const override
@@ -3201,16 +3201,16 @@ public:
 			"{\n"
 			"	if (*synth != 0)\n"
 			"	{\n"
-			"		*z = *phs + theta * *frq;\n"
+			"		*z = fma(theta, *frq, *phs);\n"
 			"		*y = *z / M_2PI;\n"
 			"		*y -= floor(*y);\n"
 			"\n"
 			"		if (*skew != 0)\n"
 			"		{\n"
-			"			*z = 0.5 + 0.5 * *skew;\n"
+			"			*z = fma(0.5, *skew, 0.5);\n"
 			"\n"
 			"			if (*y > *z)\n"
-			"				*y = 0.5 + 0.5 * (*y - *z) / Zeps(1 - *z);\n"
+			"				*y = fma((real_t)(0.5), (*y - *z) / Zeps(1 - *z), (real_t)(0.5));\n"
 			"			else\n"
 			"				*y = 0.5 - 0.5 * (*z - *y) / Zeps(*z);\n"
 			"		}\n"
@@ -3230,13 +3230,13 @@ public:
 			"				*x = 1 - 2 * *y;\n"
 			"				break;\n"
 			"			case WAVE_TRIANGLE:\n"
-			"				*x = *y > 0.5 ? 3 - 4 * *y : 2 * *y - 1;\n"
+			"				*x = *y > 0.5 ? 3 - 4 * *y : fma((real_t)(2.0), *y, -1);\n"
 			"				break;\n"
 			"			case WAVE_CONCAVE:\n"
-			"				*x = 8 * (*y - 0.5) * (*y - 0.5) - 1;\n"
+			"				*x = fma((real_t)(8.0), Sqr(*y - 0.5), (real_t)(-1.0));\n"
 			"				break;\n"
 			"			case WAVE_CONVEX:\n"
-			"				*x = 2 * sqrt(*y) - 1;\n"
+			"				*x = fma((real_t)(2.0), sqrt(*y), (real_t)(-1.0));\n"
 			"				break;\n"
 			"			case WAVE_NGON:\n"
 			"				*y -= 0.5;\n"
@@ -3257,14 +3257,14 @@ public:
 			"				*thetaFactor += *synth * *x;\n"
 			"				break;\n"
 			"			case LAYER_MULT:\n"
-			"				*thetaFactor *= (1 + *synth * *x);\n"
+			"				*thetaFactor *= fma(*synth, *x, (real_t)(1.0));\n"
 			"				break;\n"
 			"			case LAYER_MAX:\n"
-			"				*z = *synthA + *synth * *x;\n"
+			"				*z = fma(*synth, *x, *synthA);\n"
 			"				*thetaFactor = (*thetaFactor > *z ? *thetaFactor : *z);\n"
 			"				break;\n"
 			"			case LAYER_MIN:\n"
-			"				*z = *synthA + *synth * *x;\n"
+			"				*z = fma(*synth, *x, *synthA);\n"
 			"				*thetaFactor = (*thetaFactor < *z ? *thetaFactor : *z);\n"
 			"				break;\n"
 			"		}\n"
@@ -3282,7 +3282,7 @@ public:
 			"	SynthValueProc(&(s->SynthA), &thetaFactor, theta, &(s->SynthE), &(s->SynthEPhs), &(s->SynthEFrq), &(s->SynthESkew), &x, &y, &z, &(s->SynthEType), &(s->SynthELayer));\n"
 			"	SynthValueProc(&(s->SynthA), &thetaFactor, theta, &(s->SynthF), &(s->SynthFPhs), &(s->SynthFFrq), &(s->SynthFSkew), &x, &y, &z, &(s->SynthFType), &(s->SynthFLayer));\n"
 			"\n"
-			"	return thetaFactor * s->SynthMix + (1 - s->SynthMix);\n"
+			"	return fma(thetaFactor, s->SynthMix, (1 - s->SynthMix));\n"
 			"}\n"
 			"\n"
 			"static real_t BezierQuadMap(real_t x, real_t m)\n"
@@ -3308,9 +3308,9 @@ public:
 			"		t = x;\n"
 			"\n"
 			"		if (fabs(m - 0.5) > 1e-10)\n"
-			"			t = (-1 * m + sqrt(m * m + (1 - 2 * m) * x)) / (1 - 2 * m);\n"
+			"			t = fma((real_t)(-1.0), m, sqrt(fma(m, m, (1 - 2 * m) * x))) / (1 - 2 * m);\n"
 			"\n"
-			"		return a * (x + (m - 1) * t * t);\n"
+			"		return a * fma(m - (real_t)(1.0), SQR(t), x);\n"
 			"	}\n"
 			"\n"
 			"	if ((1 < m) && (x <= 1))\n"
@@ -3318,19 +3318,19 @@ public:
 			"		t = x;\n"
 			"\n"
 			"		if (fabs(m - 2) > 1e-10)\n"
-			"			t = (-1 * iM + sqrt(iM * iM + (1 - 2 * iM) * x)) / (1 - 2 * iM);\n"
+			"			t = fma((real_t)(-1.0), iM, sqrt(fma(iM, iM, (1 - 2 * iM) * x))) / (1 - 2 * iM);\n"
 			"\n"
-			"		return a * (x + (m - 1) * t * t);\n"
+			"		return a * fma(m - (real_t)(1.0), SQR(t), x);\n"
 			"	}\n"
 			"\n"
 			"	if (m < 1)\n"
 			"	{\n"
 			"		t = sqrt((x - 1) / (L - 1));\n"
-			"		return a * (x + (m - 1) * t * t + 2 * (1 - m) * t + (m - 1));\n"
+			"		return a * fma((m - 1), t * t, x + fma((real_t)(2.0), (1 - m) * t, (m - 1)));\n"
 			"	}\n"
 			"\n"
-			"	t = (1 - m) + sqrt((m - 1) * (m - 1) + (x - 1));\n"
-			"	return a * (x + (m - 1) * t * t - 2 * (m - 1) *  t + (m - 1));\n"
+			"	t = (1 - m) + sqrt(fma((m - 1), (m - 1), (x - 1)));\n"
+			"	return a * fma((m - 1), t * t, x - fma((real_t)(2.0), (m - 1) *  t, (m - 1)));\n"
 			"}\n"
 			"\n"
 			"static real_t Interpolate(real_t x, real_t m, int lerpType)\n"
@@ -3357,8 +3357,8 @@ public:
 			"			*c = *c * SynthValue(synth, theta + MPI / 2);\n"
 			"			break;\n"
 			"		case SINCOS_MIXIN:\n"
-			"			*s = (1 - synth->SynthMix) * *s + (SynthValue(synth, theta) - 1);\n"
-			"			*c = (1 - synth->SynthMix) * *c + (SynthValue(synth, theta + MPI / 2) - 1);\n"
+			"			*s = fma(((real_t)(1.0) - synth->SynthMix), *s, (SynthValue(synth, theta) - 1));\n"
+			"			*c = fma(((real_t)(1.0) - synth->SynthMix), *c, (SynthValue(synth, theta + MPI / 2) - 1));\n"
 			"			break;\n"
 			"	}\n"
 			"\n"
@@ -3789,11 +3789,11 @@ public:
 		   "		e.x = x * 2.5;\n"
 		   "		e.y = y * 2.5;\n"
 		   "		e.z = z * 2.5;\n"
-		   "		f.x = y * 2.5 + 30.2;\n"
-		   "		f.y = x * 2.5 - 12.1;\n"
-		   "		f.z = z * 2.5 + 19.8;\n"
-		   "		(*v).x = (x + d * SimplexNoise3D(&e, p, grad)) * s;\n"
-		   "		(*v).y = (y + d * SimplexNoise3D(&f, p, grad)) * s;\n"
+		   "		f.x = fma((real_t)y, (real_t)(2.5), (real_t)( 30.2));\n"
+		   "		f.y = fma((real_t)x, (real_t)(2.5), (real_t)(-12.1));\n"
+		   "		f.z = fma(z, (real_t)(2.5), (real_t)(19.8));\n"
+		   "		(*v).x = fma(d, SimplexNoise3D(&e, p, grad), (real_t)y) * s;\n"
+		   "		(*v).y = fma(d, SimplexNoise3D(&f, p, grad), (real_t)x) * s;\n"
 		   "	}\n"
 		   "}\n"
 		   "\n";
@@ -4492,7 +4492,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\treal_t r2 = Sqr(sqrt(precalcSumSquares + SQR(vIn.z)));\n"
+		   << "\t\treal_t r2 = Sqr(sqrt(fma(vIn.z, vIn.z, precalcSumSquares)));\n"
 		   << "\t\tvOut.x = " << weight << " * (fabs(vIn.x) >= 2 ? vIn.x / r2 : erf(vIn.x));\n"
 		   << "\t\tvOut.y = " << weight << " * (fabs(vIn.y) >= 2 ? vIn.y / r2 : erf(vIn.y));\n"
 		   << "\t\tvOut.z = " << weight << " * (fabs(vIn.z) >= 2 ? vIn.z / r2 : erf(vIn.z));\n"
@@ -4623,24 +4623,24 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergon = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonR = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string star = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituus = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string super = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invLituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
-		string tanStarSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM4th = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
@@ -4669,14 +4669,14 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(fma(" << hypergonD << ", " << hypergonD << ", -temp2))) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << star << "!= 0)\n"
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), (real_t)M_2PI / " << starN << ") - MPI / " << starN << "));\n"
-		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * fma(temp1, temp1, (real_t)(1.0)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << lituus << " != 0)\n"
@@ -4696,7 +4696,8 @@ public:
 		   << "\t\t	if (" << hypergon << " != 0.0)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		temp1 = fmod(fabs(a2), (real_t)M_2PI / " << hypergonN << ") - MPI / " << hypergonN << ";\n"
-		   << "\t\t		temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\t\t		real_t tantemp = tan(temp1);\n"
+		   << "\t\t		temp2 = fma(tantemp, tantemp, (real_t)(1.0));\n"
 		   << "\n"
 		   << "\t\t		if (temp2 >= Sqr(" << hypergonD << "))\n"
 		   << "\t\t		{\n"
@@ -4704,14 +4705,14 @@ public:
 		   << "\t\t		}\n"
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
-		   << "\t\t			total2 += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t			total2 += " << hypergon << " * (" << hypergonD << " - sqrt(fma(" << hypergonD << ", " << hypergonD << ", -temp2))) / sqrt(temp2);\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
 		   << "\n"
 		   << "\t\t	if (" << star << " != 0)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		temp1 = tan(fabs(fmod(fabs(a2), (real_t)M_2PI / " << starN << ") - MPI / " << starN << "));\n"
-		   << "\t\t		total2 += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t		total2 += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * fma(temp1, temp1, (real_t)(1.0)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t	}\n"
 		   << "\n"
 		   << "\t\t	if (" << lituus << " != 0)\n"
@@ -4875,23 +4876,23 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string hypergon = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonR = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string star = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituus = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string super = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invLituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
-		string tanStarSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM4th = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
@@ -4903,7 +4904,8 @@ public:
 		   << "\t\tif (" << hypergon << " != 0)\n"
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - MPI / " << hypergonN << ";\n"
-		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\t\treal_t tantemp = tan(temp1);\n"
+		   << "\t\t	temp2 = fma(tantemp, tantemp, (real_t)(1.0));\n"
 		   << "\n"
 		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
 		   << "\t\t	{\n"
@@ -4911,14 +4913,14 @@ public:
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(fma(" << hypergonD << ", " << hypergonD << ", -temp2))) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << star << " != 0)\n"
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - MPI / " << starN << "));\n"
-		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * fma(temp1, temp1, (real_t)(1.0)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << lituus << " != 0)\n"
@@ -4933,7 +4935,7 @@ public:
 		   << "\t\t	total += " << super << " * pow(pow(fabs(c), " << superN2 << ") + pow(fabs(s), " << superN3 << "), " << oneOverSuperN1 << ");\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tr = " << weight << " * sqrt(precalcSumSquares + Sqr(total));\n"
+		   << "\t\tr = " << weight << " * sqrt(fma(total, total, precalcSumSquares));\n"
 		   << "\t\ts = sincos(a, &c);\n"
 		   << "\t\tvOut.x = r * c;\n"
 		   << "\t\tvOut.y = r * s;\n"
@@ -5030,14 +5032,15 @@ public:
 		{
 			temp1 = fmod(std::abs(a), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
 			temp2 = Sqr(std::tan(temp1)) + 1;
+			auto hd2 = SQR(m_HypergonD);
 
-			if (temp2 >= Sqr(m_HypergonD))
+			if (temp2 >= hd2)
 			{
 				total += m_Hypergon;
 			}
 			else
 			{
-				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+				total += m_Hypergon * (m_HypergonD - std::sqrt(hd2 - temp2)) / std::sqrt(temp2);
 			}
 		}
 
@@ -5073,23 +5076,23 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string hypergon = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonR = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string star = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituus = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string super = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invLituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
-		string tanStarSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM4th = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
@@ -5102,21 +5105,22 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - MPI / " << hypergonN << ";\n"
 		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\t\t	real_t hd2 = SQR(" << hypergonD << ");\n"
 		   << "\n"
-		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t	if (temp2 >= hd2)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		total += " << hypergon << ";\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(hd2 - temp2)) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << star << " != 0)\n"
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - MPI / " << starN << "));\n"
-		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * fma(temp1, temp1, (real_t)(1.0)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << lituus << " != 0)\n"
@@ -5228,14 +5232,15 @@ public:
 		{
 			temp1 = fmod(std::abs(a), M_2PI / m_HypergonN) - T(M_PI) / m_HypergonN;
 			temp2 = Sqr(std::tan(temp1)) + 1;
+			auto hd2 = SQR(m_HypergonD);
 
-			if (temp2 >= Sqr(m_HypergonD))
+			if (temp2 >= hd2)
 			{
 				total += m_Hypergon;
 			}
 			else
 			{
-				total += m_Hypergon * (m_HypergonD - std::sqrt(Sqr(m_HypergonD) - temp2)) / std::sqrt(temp2);
+				total += m_Hypergon * (m_HypergonD - std::sqrt(hd2 - temp2)) / std::sqrt(temp2);
 			}
 		}
 
@@ -5271,23 +5276,23 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string hypergon = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonR = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string star = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starN = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string starSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituus = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string lituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string super = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superN3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invLituusA = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
-		string tanStarSlope = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string hypergonD = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string superM4th = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergon       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonR      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string star           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starN          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string starSlope      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituus         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string lituusA        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string super          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN1        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superN3        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invLituusA     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc
+		string tanStarSlope   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hypergonD      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string superM4th      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string oneOverSuperN1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
@@ -5301,21 +5306,22 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = fmod(fabs(a), M_2PI / " << hypergonN << ") - MPI / " << hypergonN << ";\n"
 		   << "\t\t	temp2 = Sqr(tan(temp1)) + 1;\n"
+		   << "\t\t	real_t hd2 = SQR(" << hypergonD << ");\n"
 		   << "\n"
-		   << "\t\t	if (temp2 >= Sqr(" << hypergonD << "))\n"
+		   << "\t\t	if (temp2 >= hd2)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		total += " << hypergon << ";\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(Sqr(" << hypergonD << ") - temp2)) / sqrt(temp2);\n"
+		   << "\t\t		total += " << hypergon << " * (" << hypergonD << " - sqrt(hd2 - temp2)) / sqrt(temp2);\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << star << " != 0)\n"
 		   << "\t\t{\n"
 		   << "\t\t	temp1 = tan(fabs(fmod(fabs(a), M_2PI / " << starN << ") - MPI / " << starN << "));\n"
-		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * (1 + Sqr(temp1)) / Sqr(temp1 + " << tanStarSlope << "));\n"
+		   << "\t\t	total += " << star << " * sqrt(Sqr(" << tanStarSlope << ") * fma(temp1, temp1, (real_t)(1.0)) / Sqr(temp1 + " << tanStarSlope << "));\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << lituus << " != 0)\n"

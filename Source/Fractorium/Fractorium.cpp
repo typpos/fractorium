@@ -873,7 +873,9 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PreO1Spin);
 	w = SetTabOrder(this, w, m_PreO2Spin);
 	w = SetTabOrder(this, w, ui.PreFlipVerticalButton);
+	w = SetTabOrder(this, w, ui.PreCopyButton);
 	w = SetTabOrder(this, w, ui.PreResetButton);
+	w = SetTabOrder(this, w, ui.PrePasteButton);
 	w = SetTabOrder(this, w, ui.PreFlipHorizontalButton);
 	w = SetTabOrder(this, w, ui.PreRotate90CcButton);
 	w = SetTabOrder(this, w, ui.PreRotateCcButton);
@@ -899,7 +901,9 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PostO1Spin);
 	w = SetTabOrder(this, w, m_PostO2Spin);
 	w = SetTabOrder(this, w, ui.PostFlipVerticalButton);
+	w = SetTabOrder(this, w, ui.PostCopyButton);
 	w = SetTabOrder(this, w, ui.PostResetButton);
+	w = SetTabOrder(this, w, ui.PostPasteButton);
 	w = SetTabOrder(this, w, ui.PostFlipHorizontalButton);
 	w = SetTabOrder(this, w, ui.PostRotate90CcButton);
 	w = SetTabOrder(this, w, ui.PostRotateCcButton);

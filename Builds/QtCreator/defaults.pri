@@ -85,9 +85,9 @@ else {
         LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/tbb.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/Half.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmImf.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/Half-2_3.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-2_3.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmImf-2_3.lib
 }
 
 !win32 {
@@ -253,23 +253,23 @@ win32 {
 	INSTALLS += tbb
 
     half.path = $$BIN_INSTALL_DIR
-    half.files = $$absolute_path($$EMBER_ROOT/Deps/Half.dll)
+    half.files = $$absolute_path($$EMBER_ROOT/Deps/Half-2_3.dll)
     INSTALLS += half
 
     iex.path = $$BIN_INSTALL_DIR
-    iex.files = $$absolute_path($$EMBER_ROOT/Deps/Iex-2_2.dll)
+    iex.files = $$absolute_path($$EMBER_ROOT/Deps/Iex-2_3.dll)
     INSTALLS += iex
 
     imath.path = $$BIN_INSTALL_DIR
-    imath.files = $$absolute_path($$EMBER_ROOT/Deps/Imath-2_2.dll)
+    imath.files = $$absolute_path($$EMBER_ROOT/Deps/Imath-2_3.dll)
     INSTALLS += imath
 
     ilmthread.path = $$BIN_INSTALL_DIR
-    ilmthread.files = $$absolute_path($$EMBER_ROOT/Deps/IlmThread-2_2.dll)
+    ilmthread.files = $$absolute_path($$EMBER_ROOT/Deps/IlmThread-2_3.dll)
     INSTALLS += ilmthread
 
     ilmimf.path = $$BIN_INSTALL_DIR
-    ilmimf.files = $$absolute_path($$EMBER_ROOT/Deps/IlmImf-2_2.dll)
+    ilmimf.files = $$absolute_path($$EMBER_ROOT/Deps/IlmImf-2_3.dll)
     INSTALLS += ilmimf
 }
 

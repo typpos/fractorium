@@ -255,3 +255,5 @@ Builds/include/GL
 *last.flame
 /Source/Fractorium/Fractorium - Copy.ui
 /.vs/slnx.sqlite
+/Deps/Include/OpenEXR
+/main.pro.user.294b646

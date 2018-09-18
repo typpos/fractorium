@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6547D5FA-64CE-44BA-9D3C-B6E217456445}</ProjectGuid>
     <Keyword>Qt4VSv1.0</Keyword>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -82,7 +82,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(QTDIR)\lib;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Half.lib;Iex.lib;IlmImf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgetsd.lib;Qt5Xmld.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Half-2_3.lib;Iex-2_3.lib;IlmImf-2_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
@@ -139,7 +139,7 @@ xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)\platform
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(QTDIR)\lib;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgets.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Half.lib;Iex.lib;IlmImf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;opencl.lib;Qt5Widgets.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Half-2_3.lib;Iex-2_3.lib;IlmImf-2_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Version>0.1</Version>
     </Link>
     <PostBuildEvent>

@@ -79,7 +79,9 @@
 
 //glm is what's used for matrix math.
 #include <glm/glm.hpp>
-#include <glm/detail/type_int.hpp>
+#if GLM_VERSION <= 990
+	#include <glm/detail/type_int.hpp>
+#endif
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>

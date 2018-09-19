@@ -2088,10 +2088,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	    for (auto& pix : pixels)
 	    {
-		pix.r = 1.0;
-		pix.b = 0.0;
-		pix.a = 1.0;
-		//pix.r = std::numeric_limits<float>::max();
+	    pix.r = 1.0;
+	    pix.b = 0.0;
+	    pix.a = 1.0;
+	    //pix.r = std::numeric_limits<float>::max();
 	    }
 
 	    writeRgba1(filename.c_str(), pixels.data(), w, h);
@@ -2123,12 +2123,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	*/
 	//MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
 	//cout << (10.0 / 2.0 * 5.0) << endl;
-	FindFmaCandidates();
+	//FindFmaCandidates();
 	//FindFmaImplemented();
 	//cout << 5 * 3 + 2 << endl;
 	//cout << 2 + 5 * 3 << endl;
-	return 0;
-	/*
+	/*  return 0;
+
 			    TestThreadedKernel();
 
 			    auto palf = PaletteList<float>::Instance();

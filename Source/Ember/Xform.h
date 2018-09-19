@@ -88,6 +88,7 @@ public:
 		m_Post.D(pd);
 		m_Post.E(pe);
 		m_Post.F(pf);
+		m_HasPre = !m_Affine.IsID();
 		m_HasPost = !m_Post.IsID();
 		m_HasPreOrRegularVars = PreVariationCount() > 0 || VariationCount() > 0;
 		CacheColorVals();//Init already called this, but must call again since color was assigned above.
@@ -155,6 +156,7 @@ public:
 		m_Animate = T(xform.m_Animate);
 		m_Opacity = T(xform.m_Opacity);
 		CacheColorVals();
+		m_HasPre = xform.HasPre();
 		m_HasPost = xform.HasPost();
 		m_HasPreOrRegularVars = xform.PreVariationCount() > 0 || xform.VariationCount() > 0;
 		m_Wind[0] = T(xform.m_Wind[0]);
@@ -262,6 +264,7 @@ public:
 		m_NeedPrecalcAngles = false;
 		m_NeedPrecalcAtanXY = false;
 		m_NeedPrecalcAtanYX = false;
+		m_HasPre = false;
 		m_HasPost = false;
 		m_HasPreOrRegularVars = false;
 		m_ParentEmber = nullptr;
@@ -605,8 +608,17 @@ public:
 			//Compute the pre affine portion of the transform.
 			//These x, y values are what get passed to the variations below.
 			//Note that they are not changed after this, except in the case of pre_ variations.
-			iterHelper.m_TransX = (m_Affine.A() * inPoint->m_X) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
-			iterHelper.m_TransY = (m_Affine.D() * inPoint->m_X) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
+			if (m_HasPre)
+			{
+				iterHelper.m_TransX = (m_Affine.A() * inPoint->m_X) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
+				iterHelper.m_TransY = (m_Affine.D() * inPoint->m_X) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
+			}
+			else
+			{
+				iterHelper.m_TransX = inPoint->m_X;
+				iterHelper.m_TransY = inPoint->m_Y;
+			}
+
 			iterHelper.m_TransZ = inPoint->m_Z;
 
 			//Apply pre_ variations, these don't affect outPoint, only iterHelper.m_TransX, Y, Z.
@@ -786,6 +798,7 @@ public:
 	inline bool NeedPrecalcAtanXY()         const { return m_NeedPrecalcAtanXY; }
 	inline bool NeedPrecalcAtanYX()         const { return m_NeedPrecalcAtanYX; }
 	inline bool NeedAnyPrecalc()            const { return NeedPrecalcSumSquares() || NeedPrecalcSqrtSumSquares() || NeedPrecalcAngles() || NeedPrecalcAtanXY() || NeedPrecalcAtanYX(); }
+	bool HasPre() const { return m_HasPre; }
 	bool HasPost() const { return m_HasPost; }
 	size_t PreVariationCount()   const { return m_PreVariations.size(); }
 	size_t VariationCount()      const { return m_Variations.size(); }
@@ -812,6 +825,7 @@ public:
 		m_NeedPrecalcAngles = false;
 		m_NeedPrecalcAtanXY = false;
 		m_NeedPrecalcAtanYX = false;
+		m_HasPre = !m_Affine.IsID();
 		m_HasPost = !m_Post.IsID();
 		m_HasPreOrRegularVars = PreVariationCount() > 0 || VariationCount() > 0;
 
@@ -1184,6 +1198,7 @@ public:
 private:
 	vector<Variation<T>*> m_PreVariations;//The list of pre variations to call when applying this xform.
 	vector<Variation<T>*> m_Variations;//The list of variations to call when applying this xform.
+	bool m_HasPre;//Whether a pre affine transform is present.
 	bool m_HasPost;//Whether a post affine transform is present.
 
 public:

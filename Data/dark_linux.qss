@@ -81,6 +81,14 @@ QLineEdit, QTextEdit
 	selection-background-color: darkgray;
 }
 
+QTextEdit#CreditsTextBrowser
+{
+	border: 1px solid gray;
+	color: darkgray;
+	background-color: #FFFCE1;
+	selection-background-color: darkgray;
+}
+
 QToolTip
 {
 	background-color: darkgray;

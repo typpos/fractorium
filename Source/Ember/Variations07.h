@@ -2214,7 +2214,7 @@ public:
 		   << "\t\treal_t x = rad * fx + " << shift << ";\n"
 		   << "\t\treal_t y = rad * fy;\n"
 		   << "\t\trad = " << weight << " * " << shift << " / Zeps(fma(x, x, SQR(y)));\n"
-		   << "\t\treal_t angle = ((MwcNext(mwc) % (int)" << p << ") * 2 + 1) * M_PI / " << p << ";\n"
+		   << "\t\treal_t angle = (MwcNextRange(mwc, (int)" << p << ") * 2 + 1) * M_PI / " << p << ";\n"
 		   << "\t\treal_t X = fma(rad, x, " << shift << ");\n"
 		   << "\t\treal_t Y = rad * y;\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
@@ -2287,9 +2287,9 @@ MAKEPREPOSTVAR(Panorama2, panorama2, PANORAMA2)
 //MAKEPREPOSTPARVAR(Arcsinh, arcsinh, ARCSINH)
 MAKEPREPOSTPARVAR(Helicoid, helicoid, HELICOID)
 MAKEPREPOSTPARVAR(Helix, helix, HELIX)
-MAKEPREPOSTPARVAR(Sphereblur, sphereblur, SPHEREBLUR)
+MAKEPREPOSTPARVARASSIGN(Sphereblur, sphereblur, SPHEREBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Cpow3, cpow3, CPOW3)
-MAKEPREPOSTPARVAR(Concentric, concentric, CONCENTRIC)
+MAKEPREPOSTPARVARASSIGN(Concentric, concentric, CONCENTRIC, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Hypercrop, hypercrop, HYPERCROP)
 MAKEPREPOSTPARVAR(Hypershift2, hypershift2, HYPERSHIFT2)
 }

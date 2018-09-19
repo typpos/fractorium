@@ -16,4 +16,6 @@ FractoriumAboutDialog::FractoriumAboutDialog(QWidget* p, Qt::WindowFlags f)
 	setMaximumHeight(height());
 	setMinimumWidth(width());
 	setMaximumWidth(width());
+	ui.CreditsTextBrowser->setOpenLinks(true);
+	ui.CreditsTextBrowser->setOpenExternalLinks(true);
 }

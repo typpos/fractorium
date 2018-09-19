@@ -4515,8 +4515,8 @@ public:
 		string cy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t oscX = GdoffsFosc(" << dx << ", 1);\n"
-		   << "\t\treal_t oscY = GdoffsFosc(" << dy << ", 1);\n"
+		   << "\t\treal_t oscX = GdoffsFosc_(" << dx << ", 1);\n"
+		   << "\t\treal_t oscY = GdoffsFosc_(" << dy << ", 1);\n"
 		   << "\t\treal_t inX = vIn.x + " << cx << ";\n"
 		   << "\t\treal_t inY = vIn.y + " << cy << ";\n"
 		   << "\t\treal_t outX;\n"
@@ -4524,13 +4524,13 @@ public:
 		   << "\n"
 		   << "\t\tif (" << square << " != 0)\n"
 		   << "\t\t{\n"
-		   << "\t\t	outX = GdoffsFlip(GdoffsFlip(inX, GdoffsFosc(inX, 4), oscX), GdoffsFosc(GdoffsFclp(" << b << " * inX), 4), oscX);\n"
-		   << "\t\t	outY = GdoffsFlip(GdoffsFlip(inY, GdoffsFosc(inY, 4), oscX), GdoffsFosc(GdoffsFclp(" << b << " * inY), 4), oscX);\n"
+		   << "\t\t	outX = GdoffsFlip(GdoffsFlip(inX, GdoffsFosc_(inX, 4), oscX), GdoffsFosc_(GdoffsFclp(" << b << " * inX), 4), oscX);\n"
+		   << "\t\t	outY = GdoffsFlip(GdoffsFlip(inY, GdoffsFosc_(inY, 4), oscX), GdoffsFosc_(GdoffsFclp(" << b << " * inY), 4), oscX);\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	outX = GdoffsFlip(GdoffsFlip(inX, GdoffsFosc(inX, 4), oscX), GdoffsFosc(GdoffsFclp(" << b << " * inX), 4), oscX);\n"
-		   << "\t\t	outY = GdoffsFlip(GdoffsFlip(inY, GdoffsFosc(inY, 4), oscY), GdoffsFosc(GdoffsFclp(" << b << " * inY), 4), oscY);\n"
+		   << "\t\t	outX = GdoffsFlip(GdoffsFlip(inX, GdoffsFosc_(inX, 4), oscX), GdoffsFosc_(GdoffsFclp(" << b << " * inX), 4), oscX);\n"
+		   << "\t\t	outY = GdoffsFlip(GdoffsFlip(inY, GdoffsFosc_(inY, 4), oscY), GdoffsFosc_(GdoffsFclp(" << b << " * inY), 4), oscY);\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * outX;\n"
@@ -4546,7 +4546,7 @@ public:
 			"inline real_t GdoffsFcip(real_t a) { return (real_t)((a < 0) ? -((int)(fabs(a)) + 1) : 0) + ((a > 1) ? ((int)(a)) : 0); }\n"
 			"inline real_t GdoffsFclp(real_t a) { return ((a < 0) ? -(fmod(fabs(a), 1)) : fmod(fabs(a), 1)); }\n"
 			"inline real_t GdoffsFscl(real_t a) { return GdoffsFclp((a + 1) / 2); }\n"
-			"inline real_t GdoffsFosc(real_t p, real_t a) { return GdoffsFscl(-1 * cos(p * a * M_2PI)); }\n"
+			"inline real_t GdoffsFosc_(real_t p, real_t a) { return GdoffsFscl(-1 * cos(p * a * M_2PI)); }\n"//Underscore added to name to prevent false detection with the global function Fosc() in TestGlobalFuncs() in EmberTester.
 			"inline real_t GdoffsFlip(real_t a, real_t b, real_t c) { return fma(c, (b - a), a); }\n"
 			"\n";
 	}

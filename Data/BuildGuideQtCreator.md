@@ -21,6 +21,10 @@ Add system environment variable named `QTPATH` and point it to the location of t
 
 To build the installer, you must have Wix installed. If you are unconcerned with it, you can skip this step and just dismiss the warning that shows when opening the solution later. It's recommended you ignore the installer since official builds are provided on this page.
 
+###CMake
+
+Install [CMake](https://cmake.org/download/) and be sure to check the option to add it to the system path.
+
 ##Obtaining source
 
 ###This project
@@ -37,19 +41,16 @@ Create a new folder in your development area named fractorium:
 
 ###Prerequisites
 
-There are six prerequisite dependencies. Two of them must be downloaded manually:
+There are six prerequisite dependencies. One of them must be downloaded manually:
 
-[libjpeg](http://www.ijg.org/)
+Download the zip file here: [libjpeg](http://www.ijg.org/).
 
-[tbb](https://www.threadingbuildingblocks.org/download) (Intel provides executable only releases in addition to open source releases. You must get the open source release)
-
-Extract them into the folder you created such that they are arranged like so:
+Extract the source contents into the folder you created such that it is arranged like so:
 
 ```
 [fractorium]
 │  
 ├─libjpeg
-├─tbb
 ```
 
 Go into the fractorium folder and run this script which will get the rest of the prerequisites from git and build them:
@@ -58,7 +59,7 @@ Go into the fractorium folder and run this script which will get the rest of the
 
 `makedeps.bat`
 
-This will download and build `glm libopenexr libpng libxml zlib`. You will have a folder structure like this:
+This will download and build `glm libopenexr libpng libxml tbb zlib`. You will have a folder structure like this:
 
 ```
 [fractorium]
@@ -86,20 +87,20 @@ This will download and build `glm libopenexr libpng libxml zlib`. You will have 
         ├─tbb.dll
         ├─tbb.lib
         ├─zlib.lib
-        ├─Half.lib
-        ├─Iex.lib
-        ├─IexMath.lib
-        ├─IlmImf.lib
-        ├─IlmImfUtil.lib
-        ├─IlmThread.lib
-        ├─Imath.lib
-        ├─Half.dll
-        ├─Iex-2_2.dll
-        ├─IexMath-2_2.dll
-        ├─IlmImf-2_2.dll
-        ├─IlmImfUtil-2_2.dll
-        ├─IlmThread-2_2.dll
-        ├─Imath-2_2.dll
+        ├─Half-2_3.lib
+        ├─Iex-2_3.lib
+        ├─IexMath-2_3.lib
+        ├─IlmImf-2_3.lib
+        ├─IlmImfUtil-2_3.lib
+        ├─IlmThread-2_3.lib
+        ├─Imath-2_3.lib
+        ├─Half-2_3.dll
+        ├─Iex-2_3.dll
+        ├─IexMath-2_3.dll
+        ├─IlmImf-2_3.dll
+        ├─IlmImfUtil-2_3.dll
+        ├─IlmThread-2_3.dll
+        ├─Imath-2_3.dll
 ```
 
 ##Building with Qt Creator or Visual Studio
@@ -174,12 +175,12 @@ fardareismai_pack_04_hoard.gradient
 flam3-palettes.xml
 fractaldesire_pack_01.gradient
 fractorium.exe
-half.dll
-iex-2_2.dll
-iexmath-2_2.dll
-ilmimf-2_2.dll
-ilmthread-2_2.dll
-imath-2_2.dll
+half-2_3.dll
+iex-2_3.dll
+iexmath-2_3.dll
+ilmimf-2_3.dll
+ilmthread-2_3.dll
+imath-2_3.dll
 libxml2.dll
 Qt5Core.dll
 Qt5Gui.dll
@@ -228,12 +229,12 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  ├─ flam3-palettes.xml
  ├─ fractaldesire_pack_01.gradient
  ├─ fractorium.exe
- ├─ half.dll
- ├─ iex-2_2.dll
- ├─ iexmath-2_2.dll
- ├─ ilmimf-2_2.dll
- ├─ ilmthread-2_2.dll
- ├─ imath-2_2.dll
+ ├─ half-2_3.dll
+ ├─ iex-2_3.dll
+ ├─ iexmath-2_3.dll
+ ├─ ilmimf-2_3.dll
+ ├─ ilmthread-2_3.dll
+ ├─ imath-2_3.dll
  ├─ libxml2.dll
  ├─ Qt5Core.dll
  ├─ Qt5Gui.dll

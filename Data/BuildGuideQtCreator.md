@@ -43,9 +43,9 @@ Create a new folder in your development area named fractorium:
 
 There are six prerequisite dependencies. One of them must be downloaded manually:
 
-[libjpeg](http://www.ijg.org/)
+Download the zip file here: [libjpeg](http://www.ijg.org/).
 
-Extract it into the folder you created such that it is arranged like so:
+Extract the source contents into the folder you created such that it is arranged like so:
 
 ```
 [fractorium]

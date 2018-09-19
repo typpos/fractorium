@@ -90,4 +90,7 @@ copy %current%\OpenEXR\IlmImf\Release\IlmImf-2_3.dll %current%\..\fractorium\Dep
 xcopy %current%\output\Include %current%\..\fractorium\Deps\Include\ /S /Y
 xcopy %current%\output\bin\*.dll %current%\..\fractorium\Deps\ /Y
 
+REM IlmImfUtil is not needed.
+del ..\fractorium\Deps\IlmImfUtil-2_3.dll
+
 cd ..\fractorium

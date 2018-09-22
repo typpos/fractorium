@@ -155,6 +155,8 @@ and Visual Studio will place its outputs in:
 The output contents will be:
 
 ```
+Amphibole_Supergroup.ugr
+Apatite_Supergroup.ugr
 boxtail_pack_02.gradient
 boxtail_pack_03_triangle.gradient
 boxtail_pack_04_mineshack.gradient
@@ -172,6 +174,7 @@ fardareismai_pack_01_variety_number_128.gradient
 fardareismai_pack_02_b_sides.gradient
 fardareismai_pack_03_old_and_new.gradient
 fardareismai_pack_04_hoard.gradient
+Feldspar_Group.ugr
 flam3-palettes.xml
 fractaldesire_pack_01.gradient
 fractorium.exe
@@ -182,9 +185,11 @@ ilmimf-2_3.dll
 ilmthread-2_3.dll
 imath-2_3.dll
 libxml2.dll
+Mica_Group.ugr
 Qt5Core.dll
 Qt5Gui.dll
 Qt5Widgets.dll
+Quartz_Varieties.ugr
 rce_ordinary_pack_01_colornation.gradient
 tatasz_pack_01.gradient
 tatasz_pack_02_colder.gradient
@@ -213,6 +218,8 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
 ```
 [YOUR FOLDER]
  │
+ ├─ Amphibole_Supergroup.ugr
+ ├─ Apatite_Supergroup.ugr
  ├─ boxtail_pack_02.gradient
  ├─ boxtail_pack_03_triangle.gradient
  ├─ boxtail_pack_04_mineshack.gradient
@@ -226,6 +233,7 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  ├─ fardareismai_pack_02_b_sides.gradient
  ├─ fardareismai_pack_03_old_and_new.gradient
  ├─ fardareismai_pack_04_hoard.gradient
+ ├─ Feldspar_Group.ugr
  ├─ flam3-palettes.xml
  ├─ fractaldesire_pack_01.gradient
  ├─ fractorium.exe
@@ -236,9 +244,11 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  ├─ ilmthread-2_3.dll
  ├─ imath-2_3.dll
  ├─ libxml2.dll
+ ├─ Mica_Group.ugr
  ├─ Qt5Core.dll
  ├─ Qt5Gui.dll
  ├─ Qt5Widgets.dll
+ ├─ Quartz_Varieties.ugr
  ├─ rce_ordinary_pack_01_colornation.gradient
  ├─ tatasz_pack_01.gradient
  ├─ tatasz_pack_02_colder.gradient

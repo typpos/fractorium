@@ -798,7 +798,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 		ConvertCarToRas(CoordMap());
 
 		//Rebuilding is expensive, so only do it if it's required.
-		if (IterOpenCLKernelCreator<T>::IsBuildRequired(m_Ember, m_LastBuiltEmber))
+		if (IterOpenCLKernelCreator<T>::IsBuildRequired(m_Ember, m_LastBuiltEmber, m_OptAffine))
 			b = BuildIterProgramForEmber(true);
 
 		if (b)
@@ -905,7 +905,7 @@ bool RendererCL<T, bucketT>::BuildIterProgramForEmber(bool doAccum)
 	if (b)
 	{
 		m_CompileBegun();
-		m_IterKernel = m_IterOpenCLKernelCreator.CreateIterKernelString(m_Ember, m_Params.first, m_GlobalShared.first, m_LockAccum, doAccum);
+		m_IterKernel = m_IterOpenCLKernelCreator.CreateIterKernelString(m_Ember, m_Params.first, m_GlobalShared.first, m_OptAffine, m_LockAccum, doAccum);
 		//cout << "Building: " << "\n" << iterProgram << "\n";
 		vector<std::thread> threads;
 		std::function<void(RendererClDevice*)> func = [&](RendererClDevice * dev)
@@ -962,6 +962,9 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, size_t& itersRan)
 {
 	//Timing t;//, t2(4);
+	if (iterCount == 0)//In rare cases this can happen in the interactive renderer, so just assume it's finished iterating to avoid dividing by zero below.
+		return true;
+
 	bool success = !m_Devices.empty();
 	uint histSuperSize = uint(SuperSize());
 	size_t launches = size_t(ceil(double(iterCount) / IterCountPerGrid()));

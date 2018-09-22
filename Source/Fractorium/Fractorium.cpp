@@ -371,7 +371,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					combo->setCurrentIndex(val);
 
 				fcount = 0;
-				qDebug() << "global function key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+				//qDebug() << "global function key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
 			}
 
 			return true;
@@ -408,7 +408,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					xfupcount = 0;
 					combo->setCurrentIndex((index + 1) % combo->count());
-					qDebug() << "global arrow plus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+					//qDebug() << "global arrow plus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
 				}
 
 				return true;
@@ -425,7 +425,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 						index = combo->count();
 
 					combo->setCurrentIndex((index - 1) % combo->count());
-					qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+					//qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
 				}
 
 				return true;

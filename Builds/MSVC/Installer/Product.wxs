@@ -238,6 +238,26 @@
 			<Component Id="tatasz_pack_03.gradient" Guid="7e5b5ef3-45be-4807-a88f-a8b773663e77">
 				<File Id="tatasz_pack_03.gradient" Source="$(var.SolutionDir)..\..\..\Data\tatasz_pack_03.gradient" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
+
+			<Component Id="Quartz_Varieties.ugr" Guid="b319cfb3-9037-490f-a7bc-608c4fc51361">
+				<File Id="Quartz_Varieties.ugr" Source="$(var.SolutionDir)..\..\..\Data\Quartz_Varieties.ugr" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="Amphibole_Supergroup.ugr" Guid="17f19f07-bf1a-441f-8547-cf76ac5d146d">
+				<File Id="Amphibole_Supergroup.ugr" Source="$(var.SolutionDir)..\..\..\Data\Amphibole_Supergroup.ugr" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="Apatite_Supergroup.ugr" Guid="98355dc3-d06c-4182-8948-0ff17557b041">
+				<File Id="Apatite_Supergroup.ugr" Source="$(var.SolutionDir)..\..\..\Data\Apatite_Supergroup.ugr" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="Feldspar_Group.ugr" Guid="5bb329fe-c8ea-475e-988b-2108f64b2228">
+				<File Id="Feldspar_Group.ugr" Source="$(var.SolutionDir)..\..\..\Data\Feldspar_Group.ugr" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="Mica_Group.ugr" Guid="d907fead-c39a-4a97-9574-ed886d43c6ca">
+				<File Id="Mica_Group.ugr" Source="$(var.SolutionDir)..\..\..\Data\Mica_Group.ugr" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
 			
 			<Component Id="dark_windows.qss" Guid="c120ace3-5fab-416f-b7f1-a8d9e3e0f061">
 				<File Id="dark_windows.qss" Source="$(var.SolutionDir)..\..\..\Data\dark_windows.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>

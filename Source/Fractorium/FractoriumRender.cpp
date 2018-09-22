@@ -687,12 +687,14 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 	}
 
 	if (auto rendererCL = dynamic_cast<RendererCLBase*>(m_Controller->Renderer()))
-		rendererCL->m_CompileBegun = [&]()
 	{
-		m_RenderStatusLabel->setText("Compiling OpenCL kernel...");
-		m_RenderStatusLabel->repaint();
-		QApplication::processEvents();
-	};
+		rendererCL->m_CompileBegun = [&]()
+		{
+			m_RenderStatusLabel->setText("Compiling OpenCL kernel...");
+			m_RenderStatusLabel->repaint();
+			QApplication::processEvents();
+		};
+	}
 
 	return ok;
 }

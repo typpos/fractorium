@@ -150,12 +150,12 @@ void Affine2D<T>::MakeID()
 template <typename T>
 bool Affine2D<T>::IsID() const
 {
-	return (IsClose<T>(A(), 1)) &&
-		   (IsClose<T>(B(), 0)) &&
-		   (IsClose<T>(C(), 0)) &&
-		   (IsClose<T>(D(), 0)) &&
-		   (IsClose<T>(E(), 1)) &&
-		   (IsClose<T>(F(), 0));
+	return (A() == 1) &&
+		   (B() == 0) &&
+		   (C() == 0) &&
+		   (D() == 0) &&
+		   (E() == 1) &&
+		   (F() == 0);
 }
 
 /// <summary>
@@ -165,12 +165,12 @@ bool Affine2D<T>::IsID() const
 template <typename T>
 bool Affine2D<T>::IsZero() const
 {
-	return (IsClose<T>(A(), 0)) &&
-		   (IsClose<T>(B(), 0)) &&
-		   (IsClose<T>(C(), 0)) &&
-		   (IsClose<T>(D(), 0)) &&
-		   (IsClose<T>(E(), 0)) &&
-		   (IsClose<T>(F(), 0));
+	return (A() == 0) &&
+		   (B() == 0) &&
+		   (C() == 0) &&
+		   (D() == 0) &&
+		   (E() == 0) &&
+		   (F() == 0);
 }
 
 /// <summary>

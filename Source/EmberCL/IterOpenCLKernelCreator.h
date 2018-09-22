@@ -30,13 +30,13 @@ public:
 	const string& SumHistKernel() const;
 	const string& SumHistEntryPoint() const;
 	const string& IterEntryPoint() const;
-	string CreateIterKernelString(const Ember<T>& ember, const string& parVarDefines, const string& globalSharedDefines, bool lockAccum = false, bool doAccum = true);
+	string CreateIterKernelString(const Ember<T>& ember, const string& parVarDefines, const string& globalSharedDefines, bool optAffine, bool lockAccum = false, bool doAccum = true);
 	string GlobalFunctionsString(const Ember<T>& ember);
 	static void ParVarIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals = true, bool doString = true);
 	static void SharedDataIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals = true, bool doString = true);
 	static string VariationStateString(const Ember<T>& ember);
 	static string VariationStateInitString(const Ember<T>& ember);
-	static bool IsBuildRequired(const Ember<T>& ember1, const Ember<T>& ember2);
+	static bool IsBuildRequired(const Ember<T>& ember1, const Ember<T>& ember2, bool optAffine);
 
 private:
 	string CreateZeroizeKernelString() const;

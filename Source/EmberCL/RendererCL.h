@@ -22,7 +22,13 @@ public:
 	virtual bool ReadFinal(v4F* pixels) { return false; }
 	virtual bool ClearFinal() { return false; }
 	virtual bool AnyNvidia() const { return false; }
+	bool OptAffine() const { return m_OptAffine; }
+	void OptAffine(bool optAffine) { m_OptAffine = optAffine; }
+
 	std::function<void(void)> m_CompileBegun;
+
+protected:
+	bool m_OptAffine = false;
 };
 
 /// <summary>

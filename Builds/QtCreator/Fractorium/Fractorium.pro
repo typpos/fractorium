@@ -67,7 +67,12 @@ $$ASSETS_DIR/tatasz_pack_01.gradient \
 $$ASSETS_DIR/tatasz_pack_02_colder.gradient \
 $$ASSETS_DIR/tatasz_pack_02_dark.gradient \
 $$ASSETS_DIR/tatasz_pack_02_warmer.gradient \
-$$ASSETS_DIR/tatasz_pack_03.gradient
+$$ASSETS_DIR/tatasz_pack_03.gradient \
+$$ASSETS_DIR/Amphibole_Supergroup.ugr \
+$$ASSETS_DIR/Apatite_Supergroup.ugr \
+$$ASSETS_DIR/Feldspar_Group.ugr \
+$$ASSETS_DIR/Mica_Group.ugr \
+$$ASSETS_DIR/Quartz_Varieties.ugr
 
 #message(PALETTE INSTALL SOURCE: $$palettes.files)
 INSTALLS += palettes

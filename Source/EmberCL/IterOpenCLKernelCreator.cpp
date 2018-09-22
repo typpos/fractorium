@@ -32,10 +32,12 @@ template <typename T> const string& IterOpenCLKernelCreator<T>::IterEntryPoint()
 /// </summary>
 /// <param name="ember">The ember to create the kernel string for</param>
 /// <param name="params">The parametric variation #define string</param>
+/// <param name="optAffine">True to optimize with a simple assignment when the pre affine transform is empty, else false. True is better for final renders, false for interactive to reduce repeated compilations.</param>
+/// <param name="lockAccum">Whether to lock when accumulating to the histogram. This is only for debugging. Default: false.</param>
 /// <param name="doAccum">Debugging parameter to include or omit accumulating to the histogram. Default: true.</param>
 /// <returns>The kernel string</returns>
 template <typename T>
-string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember, const string& parVarDefines, const string& globalSharedDefines, bool lockAccum, bool doAccum)
+string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember, const string& parVarDefines, const string& globalSharedDefines, bool optAffine, bool lockAccum, bool doAccum)
 {
 	bool doublePrecision = typeid(T) == typeid(double);
 	size_t i = 0, v, varIndex, varCount;
@@ -102,18 +104,19 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		}
 		else
 		{
-			/*  if (xform->m_Affine.IsID())
-			    {
+			if (optAffine && xform->m_Affine.IsID())
+			{
 				xformFuncs <<
 						   "	transX = inPoint->m_X;\n" <<
 						   "	transY = inPoint->m_Y;\n";
-			    }
-			    else*/
+			}
+			else
 			{
 				xformFuncs <<
 						   "	transX = fma(xform->m_A, inPoint->m_X, fma(xform->m_B, inPoint->m_Y, xform->m_C));\n" <<
 						   "	transY = fma(xform->m_D, inPoint->m_X, fma(xform->m_E, inPoint->m_Y, xform->m_F));\n";
 			}
+
 			xformFuncs <<
 					   "	transZ = inPoint->m_Z;\n";
 			varCount = xform->PreVariationCount();
@@ -375,7 +378,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	os <<
 	   "\n"
 	   "			ok = !BadVal(secondPoint.m_X) && !BadVal(secondPoint.m_Y);\n"
-	   //"			ok = !BadVal(secondPoint.m_X) && !BadVal(secondPoint.m_Y) && !BadVal(secondPoint.m_Z);\n"
+	   //"			ok = !BadVal(secondPoint.m_X) && !BadVal(secondPoint.m_Y) && !isnan(secondPoint.m_Z);\n"
 	   "\n"
 	   "			if (!ok)\n"
 	   "			{\n"
@@ -803,9 +806,10 @@ string IterOpenCLKernelCreator<T>::VariationStateInitString(const Ember<T>& embe
 /// </summary>
 /// <param name="ember1">The first ember to compare</param>
 /// <param name="ember2">The second ember to compare</param>
+/// <param name="optAffine">True to optimize with a simple assignment when the pre affine transform is empty, else false. True is better for final renders, false for interactive to reduce repeated compilations.</param>
 /// <returns>True if a rebuild is required, else false</returns>
 template <typename T>
-bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const Ember<T>& ember2)
+bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const Ember<T>& ember2, bool optAffine)
 {
 	size_t i, j, xformCount = ember1.TotalXformCount();
 
@@ -830,8 +834,8 @@ bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const E
 		auto xform2 = ember2.GetTotalXform(i);
 		auto varCount = xform1->TotalVariationCount();
 
-		//if (xform1->m_Affine.IsID() != xform2->m_Affine.IsID())
-		//	return true;
+		if (optAffine && (xform1->m_Affine.IsID() != xform2->m_Affine.IsID()))
+			return true;
 
 		if (xform1->HasPost() != xform2->HasPost())
 			return true;

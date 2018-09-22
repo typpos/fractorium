@@ -2316,9 +2316,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	//t.Tic();
 	//TestCpuGpuResults<float>();
 	//t.Toc("TestCpuGpuResults<float>()");
-	t.Tic();
-	b = TestAllVarsCLBuild<float>(0, 0, true);
-	t.Toc("TestAllVarsCLBuild<float>()");
+	//t.Tic();
+	//b = TestAllVarsCLBuild<float>(0, 0, true);
+	//t.Toc("TestAllVarsCLBuild<float>()");
 
 	if (b)
 	{
@@ -2336,10 +2336,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	//t.Toc("TestCpuGpuResults<double>()");
 	if (b)
 	{
-		t.Tic();
-		b = TestAllVarsCLBuild<double>(0, 0, true);
-		t.Toc("TestAllVarsCLBuild<double>()");
-
+		//t.Tic();
+		//b = TestAllVarsCLBuild<double>(0, 0, true);
+		//t.Toc("TestAllVarsCLBuild<double>()");
 		if (b)
 		{
 #ifdef DO_NVIDIA

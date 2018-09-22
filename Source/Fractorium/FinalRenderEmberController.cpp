@@ -444,11 +444,18 @@ bool FinalRenderEmberController<T>::CreateRenderer(eRendererType renderType, con
 		{
 			m_Renderer.reset();
 			m_Renderers = ::CreateRenderers<T>(renderType, m_Devices, shared, m_OutputTexID, emberReport);
+
+			for (auto& renderer : m_Renderers)
+				if (auto rendererCL = dynamic_cast<RendererCLBase*>(renderer.get()))
+					rendererCL->OptAffine(true);//Optimize empty affines for final renderers, this is normally false for the interactive renderer.
 		}
 		else
 		{
 			m_Renderers.clear();
 			m_Renderer = unique_ptr<EmberNs::RendererBase>(::CreateRenderer<T>(renderType, m_Devices, shared, m_OutputTexID, emberReport));
+
+			if (auto rendererCL = dynamic_cast<RendererCLBase*>(m_Renderer.get()))
+				rendererCL->OptAffine(true);//Optimize empty affines for final renderers, this is normally false for the interactive renderer.
 		}
 
 		errorReport = emberReport.ErrorReport();

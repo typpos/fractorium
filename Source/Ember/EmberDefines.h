@@ -60,7 +60,7 @@ namespace EmberNs
 #define XC(c) (reinterpret_cast<const xmlChar*>(c))
 #define CX(c) (reinterpret_cast<char*>(c))
 #define CCX(c) (reinterpret_cast<const char*>(c))
-#define BadVal(x) (((x) != (x)) || ((x) > 1e20) || ((x) < -1e20))
+#define BadVal(x) (std::isnan(x))
 #define Vlen(x) (sizeof(x) / sizeof(*x))
 #define SQR(x) ((x) * (x))
 #define CUBE(x) ((x) * (x) * (x))

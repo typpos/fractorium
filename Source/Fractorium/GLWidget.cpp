@@ -1587,7 +1587,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, !pre, 5.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, !pre, 6.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
 	//
 	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
 	m_Verts.clear();
@@ -1607,14 +1607,20 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 	m_GL->DrawPointOrLine(QVector4D(qcol.redF(), qcol.greenF(), qcol.blueF(), 1.0f), m_Verts, GL_LINES, !pre);
 	//
 	m_Verts.clear();
+	m_Verts.push_back(0.0f);//Center.
 	m_Verts.push_back(0.0f);
-	m_Verts.push_back(0.0f);
-	m_Verts.push_back(1.0f);
-	m_Verts.push_back(0.0f);
-	m_Verts.push_back(0.0f);
-	m_Verts.push_back(1.0f);
 	col = QVector4D(1.0f, 1.0f, 1.0f, selected ? 1.0f : 0.5f);
-	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, false, 3.0f);//Draw smaller white points, to give a black outline effect.
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, false, 5.0f);//Draw smaller white point, to give a black outline effect.
+	m_Verts.clear();
+	m_Verts.push_back(1.0f);//X axis.
+	m_Verts.push_back(0.0f);
+	col = QVector4D(0.0f, 1.0f, 0.0f, selected ? 1.0f : 0.5f);
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, false, 5.0f);//Draw smaller green point, to give a black outline effect.
+	m_Verts.clear();
+	m_Verts.push_back(0.0f);//Y axis.
+	m_Verts.push_back(1.0f);
+	col = QVector4D(1.0f, 0.0f, 1.0f, selected ? 1.0f : 0.5f);
+	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, false, 5.0f);//Draw smaller purple point, to give a black outline effect.
 	m_GL->m_ModelViewMatrix.setToIdentity();
 #endif
 }

@@ -1575,10 +1575,8 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 	m4T mat = (affine * m_FractoriumEmberController->AffineScaleCurrentToLocked()).ToMat4ColMajor();
 	glm::tmat4x4<float, glm::defaultp> tempmat4 = mat;
 	m_GL->m_ModelViewMatrix = QMatrix4x4(glm::value_ptr(tempmat4));
-	m_GL->glLineWidth(3.0f * m_GL->devicePixelRatioF());//One 3px wide, colored black, except green on x axis for post affine.
-	m_GL->DrawAffineHelper(index, selected, hovered, pre, final, true);
-	m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());//Again 1px wide, colored white, to give a white middle with black outline effect.
-	m_GL->DrawAffineHelper(index, selected, hovered, pre, final, false);
+	m_GL->DrawAffineHelper(index, 1.0, 3.0, selected, hovered, pre, final, true);//Circle line width is thinner than the line width for the axes, just to distinguish it.
+	m_GL->DrawAffineHelper(index, 0.5, 2.0, selected, hovered, pre, final, false);
 	QVector4D col(0.0f, 0.0f, 0.0f, selected ? 1.0f : 0.5f);
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);
@@ -1588,8 +1586,8 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(1.0f);
 	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, !pre, 6.0f);//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
-	//
-	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
+	//Somewhat of a hack, since it's drawing over the Y axis line it just drew.
+	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, using the color of the selected xform.
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);
 	m_Verts.push_back(0.0f);
@@ -1597,7 +1595,8 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 	m_Verts.push_back(1.0f);
 	col = QVector4D(color.r, color.g, color.b, 1.0f);
 	m_GL->DrawPointOrLine(col, m_Verts, GL_LINES, !pre);
-	//Line from x to y in the color of the xform combo, solid with no background to somewhat distinguish it.
+	//Line from x to y in the color of the xform combo, thinner and solid with no background to somewhat distinguish it.
+	m_GL->glLineWidth(0.5f * m_GL->devicePixelRatioF());
 	m_Verts.clear();
 	m_Verts.push_back(0);
 	m_Verts.push_back(1);
@@ -1606,6 +1605,7 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 	auto qcol = final ? m_Fractorium->m_FinalXformComboColor : m_Fractorium->m_XformComboColors[index % XFORM_COLOR_COUNT];
 	m_GL->DrawPointOrLine(QVector4D(qcol.redF(), qcol.greenF(), qcol.blueF(), 1.0f), m_Verts, GL_LINES, !pre);
 	//
+	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());
 	m_Verts.clear();
 	m_Verts.push_back(0.0f);//Center.
 	m_Verts.push_back(0.0f);
@@ -1630,12 +1630,14 @@ void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, 
 /// of an affine transform.
 /// </summary>
 /// <param name="index"></param>
+/// <param name="circleWidth"></param>
+/// <param name="lineWidth"></param>
 /// <param name="selected">True if selected (draw enclosing circle), else false (only draw axes).</param>
 /// <param name="hovered">True if the xform is being hovered over (draw tansparent disc), else false (no disc).</param>
 /// <param name="pre"></param>
 /// <param name="final"></param>
 /// <param name="background"></param>
-void GLWidget::DrawAffineHelper(int index, bool selected, bool hovered, bool pre, bool final, bool background)
+void GLWidget::DrawAffineHelper(int index, float circleWidth, float lineWidth, bool selected, bool hovered, bool pre, bool final, bool background)
 {
 	float px = 1.0f;
 	float py = 0.0f;
@@ -1704,6 +1706,7 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool hovered, bool pre
 	}
 
 	m_Verts.clear();
+	glLineWidth(circleWidth * devicePixelRatioF());//One thinner, colored black, except green on x axis for post affine.
 
 	if (selected || hovered)
 	{
@@ -1718,6 +1721,8 @@ void GLWidget::DrawAffineHelper(int index, bool selected, bool hovered, bool pre
 
 		DrawPointOrLine(color, m_Verts, hovered ? GL_TRIANGLE_FAN : GL_LINE_LOOP, !pre);
 	}
+
+	glLineWidth(lineWidth * devicePixelRatioF());//One thicker, colored black, except green on x axis for post affine.
 
 	//Lines from center to circle.
 	if (!background)

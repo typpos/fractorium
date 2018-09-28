@@ -115,6 +115,11 @@ tar --exclude='package-linux.sh' \
 	./Data/tatasz_pack_02_dark.gradient \
 	./Data/tatasz_pack_02_warmer.gradient \
 	./Data/tatasz_pack_03.gradient \
+	./Data/Amphibole_Supergroup.ugr \
+	./Data/Apatite_Supergroup.ugr \
+	./Data/Feldspar_Group.ugr \
+	./Data/Mica_Group.ugr \
+	./Data/Quartz_Varieties.ugr \
 	./Data/dark_linux.qss \
 	.
 

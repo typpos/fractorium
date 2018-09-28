@@ -51,6 +51,7 @@ cd ../Data
 cp dark_mac.qss $FRACTORIUM_FINAL_ROOT
 cp flam3-palettes.xml $FRACTORIUM_FINAL_ROOT
 cp *.gradient $FRACTORIUM_FINAL_ROOT
+cp *.ugr $FRACTORIUM_FINAL_ROOT
 cp Info.plist $FRACTORIUM_FINAL_ROOT/../
 
 cd $FRACTORIUM_RELEASE_ROOT

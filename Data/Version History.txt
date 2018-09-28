@@ -1,3 +1,77 @@
+1.0.0.11 9/27/2018
+--User changes
+ -Double clicking on width or height spinner now resizes both, but scales to the one double clicked.
+ -Make variation tree background colors for zero and non-zero be theme-able.
+ -Give tabs a height of 4px in the qss files. Looks a little large on 4k screens, but just right on HD screens which are much more common.
+ -Allow for toggling whether to interpolate between colors in the palette editor, or to do hard cuts between colors.
+ -Allow for adjusting spinner values with the + = or up arrow keys to increase, and - _ or down arrow keys to decrease.
+ -Allow for responding to global presses of + = and - _ to cycle up or down to specify which xform is set as the current one.
+ -Allow for adding "layers" via xaos which will add a user-specified number of xforms, and set certain xaos values to 0 or 1.
+ -Add a new menu item under the Edit menu to copy the OpenCL iteration kernel source to the clipboard.
+ -Show text on the status bar which indicates that an OpenCL kernel compilation is taking place.
+ -Show xform name on xform combo box when expanded. Adjust size to fit all names.
+ -Prevent QSS dialog from styling its editor, which makes it easier to see text when creating styles which have custom colors for text boxes.
+ -Attempt to preserve xaos when adding xform copies. Note this is not an exact copy, but just a preservation of some values based on position.
+ -Add some acceleration to the changing of spinner values when dragging the right mouse button to adjust.
+ -Make the pivot be the center of the viewable area when doing drag/rotate/scale with the right mouse button.
+ --Clamp minimum scale to 10
+ --Draw a line from the mouse position to the pivot.
+ -Keep a cache of the last added final xform with each flame so that it can be quickly added, removed, then added back for testing its effect.
+ --This is not saved with the xml file and is solely for interactive editing.
+ -Add buttons to copy and paste affine transforms.
+ -Show xform names on the column headers of the xaos table.
+ -Add a color-coded third column to the variations tree which shows any properties of each variation which are non-standard. The column header has a tooltip which describes what the colors mean.
+ -Use a green dot for the x axis and purple dot for the y axis when drawing affines to help distinguish them more easily.
+ -Change the thickness of some of the lines used to draw the affine..
+ -Draw post affine circles using dashed lines.
+ -Draw a transparent circle over hovered xforms.
+ -Change how xforms respond to dragging. Rotate only is now the default, and scale will only happen with shift.
+ --Optionally do scale and rotate when holding shift, via a setting in the options dialog.
+ -Make the About box more presentable.
+ -Change qss files to make the text box in the About box be the same color as the one in the style dialog, so the link text is easier to see.
+ --This requires reloading the qss file.
+ -Add new palettes from user Rubydeva.
+
+--Bug fixes
+ -Fix out of bounds crash in EmberGenome.
+ -Show grid setting was not being preserved during program run, only on close.
+ -Zooming with the mouse wheel was broken for images whose size is greater than the screen area.
+ -Manually typing xform weight when the xform had a name kept getting interrupted.
+ -Fix up some table layouts which seemed to have regressed/decayed over time for reasons unknown.
+ -Using undo/redo would create a new flame in the library every time.
+ -Solo was not being preserved when using undo/redo.
+ -File filtering in open and save dialogs was broken.
+ -Right clicking on integer spin boxes was causing the context menu to pop up, when it should be suppressed just like in double spin boxes.
+ -Deleting xforms was still broken.
+ -Snapping when dragging and holding ctrl was wrong sometimes.
+ -The program would very rarely crash on startup due to some values being in an uninitialized state.
+ -Pre/post assign method was wrong for Sphereblur, Concentric, RandCubes and PixelFlow.
+ -Avoid an occasional divide by zero in the OpenCL renderer when using the interactive editor.
+
+--Code changes
+ -Update dependencies build script to use the latest version of openexr and other libraries.
+ -Update windows platform version.
+ -Make the solo flag be a part of the flame data now.
+ -Fix some tabification in the OpenCL code for EllipticVariation.
+ -Fix tabification in the varState code for OpenCL.
+ -Add an event called m_CompileBegun to RendererCL that is called right before an OpenCL compile is begun.
+ --This required making RendererCLBase not a pure virtual base class. Member functions just return defaults.
+ -Filter key presses on main window to only process the third one. This is due to Qt triggering three events for every key press.
+ -The palette preview table was installing an event filter for seemingly no reason. Remove it.
+ -Mark certain virtual functions as override in SpinBox and DoubleSpinBox.
+ -Refactor the code for adding and pasting xforms into a single global static function called AddXformsWithXaos().
+ -Change almost every variation to use fma() in OpenCL when doing computations of the form a * b + c. This provides a slight speedup, mostly in double precision mode.
+ -Also apply fma() to affine calculations.
+ -Cleanup of OpenGL affine drawing code.
+ -Separate the concept of hovering and selecting xforms.
+ -Update dependencies build script to use the latest version of openexr and other libraries.
+ -Update windows platform version.
+ -Make Hypershift2 use MwcNextRange() instead of MwcNext() %.
+ -Add m_HasPre to Xform similar to m_HasPost, to skip application of the affine if it's the ID matrix (in this case just assign the input x and y points). This gives a 5% speedup.
+ -Only treat NaN as a bad point. Previously anything too close to zero or too close to infinity was considered a bad value. Only testing for NaN allows for infinity to be processed. Denormals are still flushed to zero.
+ -Use exact comparisons in IsID() and IsZero() in Affine2D.
+ -For rendering with OpenCL on the command line and in the final render dialog, use an optimized kernel that does a direct assignment for any affines which are ID.
+
 1.0.0.10 6/17/2018
 --User changes
  -No longer constrain pitch, yaw or depth spinners to -180 - 180.

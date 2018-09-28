@@ -16,7 +16,12 @@ Renderer<T, bucketT>::Renderer()
 	//This is needed because due to timing/threading disconnects, the GUI can use the camera
 	//values before the render has started, which will lead to corrupt values.
 	Ember<T> ember;
-	SetEmber(ember, eProcessAction::NOTHING, true);
+	SetEmber(ember, eProcessAction::NOTHING, false);
+	//Manually call these instead of passing true to SetEmber() because it would have created the spatial filter
+	//which we don't want to do until rendering starts (this is so the derived RendererCL can properly create the needed buffers).
+	ComputeBounds();
+	ComputeQuality();
+	ComputeCamera();
 }
 
 /// <summary>

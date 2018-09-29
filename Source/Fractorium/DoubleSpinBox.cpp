@@ -214,16 +214,37 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 	{
 		if (e->type() == QEvent::Wheel)
 		{
-			//Take special action for shift to reduce the scroll amount. Control already
-			//increases it automatically.
 			if (QWheelEvent* we = dynamic_cast<QWheelEvent*>(e))
 			{
-				Qt::KeyboardModifiers mod = we->modifiers();
+				bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+				bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
-				if (mod.testFlag(Qt::ShiftModifier))
-					setSingleStep(m_SmallStep);
+				if (we->angleDelta().ry() > 0)
+				{
+					if (shift)
+					{
+						setSingleStep(m_SmallStep);
+						setValue(value() + m_SmallStep);
+					}
+					else
+					{
+						setSingleStep(m_Step);
+						setValue(value() + (ctrl ? m_Step * 10 : m_Step));
+					}
+				}
 				else
-					setSingleStep(m_Step);
+				{
+					if (shift)
+					{
+						setSingleStep(m_SmallStep);
+						setValue(value() - m_SmallStep);
+					}
+					else
+					{
+						setSingleStep(m_Step);
+						setValue(value() - (ctrl ? m_Step * 10 : m_Step));
+					}
+				}
 			}
 		}
 	}

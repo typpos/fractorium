@@ -398,37 +398,42 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 		}
 		else if (o == this)
 		{
-			unsigned int index = combo->currentIndex();
+			auto focusedctrl = dynamic_cast<QSpinBox*>(this->focusWidget());
 
-			if (ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Equal)
+			if (!focusedctrl)//Doesn't seem to matter, but just to be safe.
 			{
-				xfupcount++;
+				unsigned int index = combo->currentIndex();
 
-				if (xfupcount >= 3)
+				if (ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Equal)
 				{
-					xfupcount = 0;
-					combo->setCurrentIndex((index + 1) % combo->count());
-					//qDebug() << "global arrow plus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+					xfupcount++;
+
+					if (xfupcount >= 3)
+					{
+						xfupcount = 0;
+						combo->setCurrentIndex((index + 1) % combo->count());
+						//qDebug() << "global arrow plus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+					}
+
+					return true;
 				}
-
-				return true;
-			}
-			else if (ke->key() == Qt::Key_Minus || ke->key() == Qt::Key_Underscore)
-			{
-				xfdncount++;
-
-				if (xfdncount >= 3)
+				else if (ke->key() == Qt::Key_Minus || ke->key() == Qt::Key_Underscore)
 				{
-					xfdncount = 0;
+					xfdncount++;
 
-					if (index == 0)
-						index = combo->count();
+					if (xfdncount >= 3)
+					{
+						xfdncount = 0;
 
-					combo->setCurrentIndex((index - 1) % combo->count());
-					//qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+						if (index == 0)
+							index = combo->count();
+
+						combo->setCurrentIndex((index - 1) % combo->count());
+						//qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
+					}
+
+					return true;
 				}
-
-				return true;
 			}
 		}
 	}
@@ -594,6 +599,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 	{
 		m_FileDialog = new QFileDialog(this);
 		m_FileDialog->setViewMode(QFileDialog::List);
+		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 	}
 
 	QStringList filenames;
@@ -642,6 +648,7 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 	{
 		m_FileDialog = new QFileDialog(this);
 		m_FileDialog->setViewMode(QFileDialog::List);
+		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 	}
 
 	QString filename;
@@ -687,6 +694,7 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 	{
 		m_FileDialog = new QFileDialog(this);
 		m_FileDialog->setViewMode(QFileDialog::List);
+		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 	}
 
 	QString filename;
@@ -702,7 +710,6 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 	m_FileDialog->selectFile(defaultFilename);
 	m_FileDialog->setFileMode(QFileDialog::AnyFile);
 	m_FileDialog->setOption(QFileDialog::ShowDirsOnly, false);
-	m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, false);
 #ifdef _WIN32
 	m_FileDialog->setNameFilter(".bmp;;.jpg;;.png;;.exr");
 #else
@@ -738,6 +745,7 @@ QString Fractorium::SetupSaveFolderDialog()
 	{
 		m_FolderDialog = new QFileDialog(this);
 		m_FolderDialog->setViewMode(QFileDialog::List);
+		m_FolderDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 	}
 
 	QString filename;
@@ -893,6 +901,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PreRandomButton);
 	w = SetTabOrder(this, w, ui.ShowPreAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineAllRadio);
+	w = SetTabOrder(this, w, ui.SwapAffinesButton);
 	w = SetTabOrder(this, w, ui.PostAffineGroupBox);
 	w = SetTabOrder(this, w, m_PostX1Spin);
 	w = SetTabOrder(this, w, m_PostX2Spin);

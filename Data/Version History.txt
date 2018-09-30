@@ -1,3 +1,17 @@
+1.0.0.12 9/30/2018
+--User changes
+ -Add a button to swap the pre and post affine values for all selected xforms.
+
+--Bug fixes
+ -Remove the ability to change spinner values with +=-=, it was conflicting with other things and added no real value.
+ -All file dialog opening in Linux would freeze. No longer using native file dialogs, they are broken.
+ -Set default open path to the desktop if there is no settings file present, which will be the case on the first run.
+ -Amphibole_Supergroup.ugr palette had an invalid character in two of the palette names.
+
+--Code changes
+ -Change some table header padding styles to work with new Qt. Qss reload is required.
+ -Ensure the open folder path setting always has a valid string in it before opening a folder.
+
 1.0.0.11 9/27/2018
 --User changes
  -Double clicking on width or height spinner now resizes both, but scales to the one double clicked.

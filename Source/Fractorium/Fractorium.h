@@ -286,6 +286,7 @@ public slots:
 	void OnCopyAffineButtonClicked(bool checked);
 	void OnPasteAffineButtonClicked(bool checked);
 	void OnRandomAffineButtonClicked(bool checked);
+	void OnSwapAffinesButtonClicked(bool checked);
 
 	void OnAffineGroupBoxToggled(bool on);
 	void OnAffineDrawAllCurrentRadioButtonToggled(bool checked);

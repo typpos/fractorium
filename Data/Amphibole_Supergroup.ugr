@@ -4976,9 +4976,9 @@ gradient:
 
 }
  
-Ferro-ferri-nybøite {
+Ferro-ferri-nyboite {
 gradient:
- title="Ferro-ferri-nybøite" smooth=no
+ title="Ferro-ferri-nyboite" smooth=no
  index=0 color=3032133
  index=2 color=2372156
  index=3 color=2239542
@@ -14670,9 +14670,9 @@ gradient:
 
 }
  
-Raw_Nybøite {
+Raw_Nyboite {
 gradient:
- title="Raw_Nybøite" smooth=no
+ title="Raw_Nyboite" smooth=no
  index=0 color=5076103
  index=2 color=3825246
  index=3 color=2970712

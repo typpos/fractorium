@@ -101,7 +101,7 @@ QDoubleSpinBox
 	padding-right: 0px;
 	color: darkgray;
 	selection-background-color: darkgray;
-	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QCheckBox
@@ -322,7 +322,7 @@ QTreeView
 {
 	border: 1px solid gray;
 	background-color: rgb(53, 53, 53);
-	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 
@@ -379,7 +379,7 @@ QTableView
 	color: darkgray;
 	selection-color: darkgray;
 	selection-background-color: rgb(53, 53, 53);
-    font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+    font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QTableView QTableCornerButton::section:enabled
@@ -410,8 +410,9 @@ QHeaderView::section::vertical:enabled
 	background-color: gray;
 	border: none;
 	border-bottom: 1px solid gray;
-	padding: 4px;
-	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	padding-left: 5px;
+	padding-right: 0px;
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QHeaderView::section::horizontal:enabled
@@ -420,8 +421,10 @@ QHeaderView::section::horizontal:enabled
 	background-color: darkgray;
 	border: 0px solid darkgray;
 	border-right: 1px solid gray;
-	padding: 4px;
-	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 3px;
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QHeaderView::section::vertical:disabled
@@ -430,8 +433,9 @@ QHeaderView::section::vertical:disabled
 	background-color: rgb(53, 53, 53);
 	border: 0px none darkgray;
 	border-bottom: 1px solid rgb(53, 53, 53);
-	padding: 4px;
-	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	padding-left: 5px;
+	padding-right: 0px;
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QHeaderView::section::horizontal:disabled
@@ -440,8 +444,10 @@ QHeaderView::section::horizontal:disabled
 	background-color: rgb(53, 53, 53);
 	border: 0px none darkgray;
 	border-right: 1px solid rgb(53, 53, 53);
-	padding: 4px;
-	font: 9pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 3px;
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QScrollBar::vertical

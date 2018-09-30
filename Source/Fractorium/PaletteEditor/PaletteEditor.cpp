@@ -510,6 +510,7 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 		m_FileDialog->setViewMode(QFileDialog::List);
 		m_FileDialog->setFileMode(QFileDialog::ExistingFile);
 		m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
+		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 #ifdef _WIN32
 		m_FileDialog->setNameFilter("Image Files (*.png *.jpg *.bmp)");
 #else

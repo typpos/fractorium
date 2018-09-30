@@ -85,8 +85,19 @@ void FractoriumSettings::EnsureDefaults()
 	   )
 		FinalExt("png");
 
-	auto s = SaveFolder();
+	auto s = OpenFolder();
 	QDir dir(s);
+
+	if (s.isEmpty() || !dir.exists())
+	{
+		QStringList paths = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
+
+		if (!paths.empty())
+			OpenFolder(paths[0]);
+	}
+
+	s = SaveFolder();
+	dir = QDir(s);
 
 	if (s.isEmpty() || !dir.exists())
 	{

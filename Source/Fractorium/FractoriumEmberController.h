@@ -198,6 +198,7 @@ public:
 	virtual void PasteXformsAffine(bool pre) { }
 	virtual void RandomXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
+	virtual void SwapAffines() { }
 	double LockedScale() { return m_LockedScale; }
 	double LockedX() { return m_LockedX; }
 	double LockedY() { return m_LockedY; }
@@ -475,6 +476,7 @@ public:
 	virtual void PasteXformsAffine(bool pre) override;
 	virtual void RandomXformsAffine(bool pre) override;
 	virtual void FillBothAffines() override;
+	virtual void SwapAffines() override;
 	virtual void InitLockedScale() override;
 	void FillAffineWithXform(Xform<T>* xform, bool pre);
 	void ChangeLockedScale(T value);

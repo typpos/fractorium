@@ -242,6 +242,10 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 					}
 				}
 			}
+			else if (dynamic_cast<QKeyEvent*>(e))
+			{
+				return true;
+			}
 		}
 	}
 
@@ -259,7 +263,7 @@ void SpinBox::keyPressEvent(QKeyEvent* ke)
 	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
 	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
-	if (ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Equal || ke->key() == Qt::Key_Up)
+	if (ke->key() == Qt::Key_Up)
 	{
 		if (shift)
 		{
@@ -271,8 +275,10 @@ void SpinBox::keyPressEvent(QKeyEvent* ke)
 			setSingleStep(m_Step);
 			setValue(value() + (ctrl ? m_Step * 10 : m_Step));
 		}
+
+		ke->accept();
 	}
-	else if (ke->key() == Qt::Key_Minus || ke->key() == Qt::Key_Underscore || ke->key() == Qt::Key_Down)
+	else if (ke->key() == Qt::Key_Down)
 	{
 		if (shift)
 		{
@@ -284,6 +290,8 @@ void SpinBox::keyPressEvent(QKeyEvent* ke)
 			setSingleStep(m_Step);
 			setValue(value() - (ctrl ? m_Step * 10 : m_Step));
 		}
+
+		ke->accept();
 	}
 	else
 		QSpinBox::keyPressEvent(ke);

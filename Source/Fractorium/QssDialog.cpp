@@ -636,8 +636,9 @@ void QssDialog::SetupFileDialog()
 	if (!m_FileDialog)
 	{
 		m_FileDialog = new QFileDialog(this);
-		m_FileDialog->setDirectory(m_Parent->m_SettingsPath);
 		m_FileDialog->setViewMode(QFileDialog::List);
+		m_FileDialog->setDirectory(m_Parent->m_SettingsPath);
+		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 	}
 
 #endif

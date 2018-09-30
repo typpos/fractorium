@@ -1,3 +1,9 @@
+fractorium (1.0.0.12-0ubuntu1) cosmic; urgency=low
+
+  * release 1.0.0.12
+
+ -- Matt Feemster <matt.feemster@gmail.com>  Sun, 30 Sep 2018 10:35:26 -0700
+ 
 fractorium (1.0.0.11d-0ubuntu1) cosmic; urgency=low
 
   * release 1.0.0.11

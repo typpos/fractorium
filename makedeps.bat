@@ -14,7 +14,7 @@ REM libjpeg
 copy fractorium\Builds\MSVC\WIN32.MAK libjpeg
 cd libjpeg
 nmake /f makefile.vc setup-v15 CPU=i386
-nmake nodebug=1 /f makefile.vc all CPU=i386
+nmake nodebug=1 /f makefile.vc libjpeg.lib CPU=i386
 copy libjpeg.lib ..\fractorium\Deps
 cd ..
 

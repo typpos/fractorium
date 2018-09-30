@@ -95,6 +95,7 @@ void Fractorium::InitXformsAffineUI()
 	connect(ui.PostRandomButton,            SIGNAL(clicked(bool)),     this, SLOT(OnRandomAffineButtonClicked(bool)),              Qt::QueuedConnection);
 	connect(ui.PreAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
 	connect(ui.PostAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
+	connect(ui.SwapAffinesButton,           SIGNAL(clicked(bool)),     this, SLOT(OnSwapAffinesButtonClicked(bool)),              Qt::QueuedConnection);
 	connect(ui.ShowPreAffineAllRadio,       SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.ShowPreAffineCurrentRadio,   SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.ShowPreAffineSelectedRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
@@ -702,6 +703,27 @@ void Fractorium::OnAffineGroupBoxToggled(bool on)
 		it->setEnabled(on);
 
 	ui.GLDisplay->update();
+}
+
+/// <summary>
+/// Swap the values of the pre and post affines for the selected xforms.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::SwapAffines()
+{
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
+	{
+		auto pre = xform->m_Affine;
+		auto post = xform->m_Post;
+		xform->m_Affine = post;
+		xform->m_Post = pre;
+	}, eXformUpdate::UPDATE_SELECTED);
+	FillBothAffines();
+}
+
+void Fractorium::OnSwapAffinesButtonClicked(bool checked)
+{
+	m_Controller->SwapAffines();
 }
 
 /// <summary>

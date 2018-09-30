@@ -262,14 +262,6 @@
 			<Component Id="dark_windows.qss" Guid="c120ace3-5fab-416f-b7f1-a8d9e3e0f061">
 				<File Id="dark_windows.qss" Source="$(var.SolutionDir)..\..\..\Data\dark_windows.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
-			
-			<Component Id="dark_linux.qss" Guid="65384f40-50cd-4064-ad4d-dbe5365a8deb">
-				<File Id="dark_linux.qss" Source="$(var.SolutionDir)..\..\..\Data\dark_linux.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
-			</Component>
-			
-			<Component Id="dark_mac.qss" Guid="561e3a5d-c330-45b0-ab65-32d7ea2ed6d2">
-				<File Id="dark_mac.qss" Source="$(var.SolutionDir)..\..\..\Data\dark_mac.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
-			</Component>
 				
 			<Component Id="VersionHistory.txt" Guid="8b031217-9e7d-4700-9ab8-2593a4e002b6">
 				<File Id="VersionHistory.txt" Source="$(var.SolutionDir)..\..\..\Data\Version History.txt" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>

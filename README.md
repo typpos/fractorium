@@ -39,7 +39,7 @@ Download: [fractorium_1.0.0.12b-0ubuntu1_amd64.deb](https://launchpad.net/~fract
 
 ```
 cd ~/Downloads
-sudo dpkg -i fractorium_1.0.0.9-0ubuntu1_amd64.deb
+sudo dpkg -i fractorium_1.0.0.12b-0ubuntu1_amd64.deb
 ```
 
 # Building from git

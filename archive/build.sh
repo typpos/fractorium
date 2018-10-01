@@ -2,8 +2,8 @@
 
 OSX_BUILD_PATH=$PWD
 FRACTORIUM_RELEASE_ROOT=$PWD/../Bin/release
-# replace 5.9 by your QT version, and check if the instation path is the same
-QT_MACDEPLOY=~/Qt/5.9.3/clang_64/bin/macdeployqt
+# replace 5.11.2 by your QT version, and check if the instation path is the same
+QT_MACDEPLOY=~/Qt/5.11.2/clang_64/bin/macdeployqt
 
 cd $FRACTORIUM_RELEASE_ROOT
 

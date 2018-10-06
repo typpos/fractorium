@@ -787,9 +787,9 @@ eRenderStatus RendererCL<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixel
 template <typename T, typename bucketT>
 EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample)
 {
-	bool b = true;
 	EmberStats stats;//Do not record bad vals with with GPU. If the user needs to investigate bad vals, use the CPU.
 	static std::string loc = __FUNCTION__;
+	bool& b = stats.m_Success;
 
 	//Only need to do this once on the beginning of a new render. Last iter will always be 0 at the beginning of a full render or temporal sample.
 	if (m_LastIter == 0)
@@ -868,15 +868,10 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 				dev->m_Calls = 0;
 
 		b = RunIter(iterCount, temporalSample, stats.m_Iters);
-
-		if (!b || stats.m_Iters == 0)//If no iters were executed, something went catastrophically wrong.
-			m_Abort = true;
-
 		stats.m_IterMs = m_IterTimer.Toc();
 	}
 	else
 	{
-		m_Abort = true;
 		ErrorStr(loc, "Iiteration failed", nullptr);
 	}
 
@@ -1000,7 +995,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 		auto& wrapper = m_Devices[dev]->m_Wrapper;
 		intmax_t itersRemaining = 0;
 
-		while (b && (atomLaunchesRan.fetch_add(1) + 1 <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && !m_Abort)
+		while (b && (atomLaunchesRan.fetch_add(1) + 1 <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && success && !m_Abort)
 		{
 			//Check if the user wanted to suspend the process.
 			while (Paused())
@@ -1053,7 +1048,6 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 											 1)))
 			{
 				success = false;
-				m_Abort = true;
 				ErrorStr(loc, "Error running iteration program", m_Devices[dev].get());
 				atomLaunchesRan.fetch_sub(1);
 				break;
@@ -1117,7 +1111,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	Join(threadVec);
 	itersRan = atomItersRan.load();
 
-	if (m_Devices.size() > 1)//Determine whether/when to sum histograms of secondary devices with the primary.
+	if (success && m_Devices.size() > 1)//Determine whether/when to sum histograms of secondary devices with the primary.
 	{
 		if (((TemporalSamples() == 1) || (temporalSample == TemporalSamples() - 1)) &&//If there are no temporal samples (not animating), or the current one is the last... (probably doesn't matter anymore since we never use multiple renders for a single frame when animating, instead each frame gets its own renderer).
 				((m_LastIter + itersRan) >= ItersPerTemporalSample()))//...and the required number of iters for that sample have completed...
@@ -1270,7 +1264,6 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 				//t2.Tic();
 				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, chunkSizeW, chunkSizeH, colChunkPass, rowChunkPass)))
 				{
-					m_Abort = true;
 					ErrorStr(loc, "Running DE filter program for row chunk "s + std::to_string(rowChunkPass) + ", col chunk "s + std::to_string(colChunkPass) + " failed", m_Devices[0].get());
 				}
 

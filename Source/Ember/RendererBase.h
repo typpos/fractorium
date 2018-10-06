@@ -61,6 +61,7 @@ public:
 
 	void Clear()
 	{
+		m_Success = true;
 		m_Iters = 0;
 		m_Badvals = 0;
 		m_IterMs = 0;
@@ -69,6 +70,7 @@ public:
 
 	EmberStats& operator += (const EmberStats& stats)
 	{
+		m_Success &= stats.m_Success;
 		m_Iters += stats.m_Iters;
 		m_Badvals += stats.m_Badvals;
 		m_IterMs += stats.m_IterMs;
@@ -76,6 +78,7 @@ public:
 		return *this;
 	}
 
+	bool m_Success = true;
 	size_t m_Iters, m_Badvals;
 	double m_IterMs, m_RenderMs;
 };

@@ -528,18 +528,19 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 		sampleItersToDo = std::min<size_t>(sampleItersToDo, itersPerTemporalSample - m_LastIter);
 		EmberStats stats = Iterate(sampleItersToDo, temporalSample);//The heavy work is done here.
 
+		//Abort does not indicate an error, it just means the process was interrupted, most likely by the user on the GUI.
+		if (m_Abort)
+		{
+			success = eRenderStatus::RENDER_ABORT;
+			goto Finish;
+		}
+
 		//If no iters were executed, something went catastrophically wrong.
-		if (stats.m_Iters == 0)
+		if (!stats.m_Success && stats.m_Iters == 0)
 		{
 			AddToReport("Zero iterations ran, rendering failed, aborting.\n");
 			success = eRenderStatus::RENDER_ERROR;
 			Abort();
-			goto Finish;
-		}
-
-		if (m_Abort)
-		{
-			success = eRenderStatus::RENDER_ABORT;
 			goto Finish;
 		}
 

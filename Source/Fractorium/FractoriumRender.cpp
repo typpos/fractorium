@@ -394,8 +394,9 @@ bool FractoriumEmberController<T>::Render()
 	{
 		//if (m_Renderer->Run(m_FinalImage, 0) == RENDER_OK)//Full, non-incremental render for debugging.
 		bool update = iterBegin || m_Fractorium->m_Settings->ContinuousUpdate();
+		eRenderStatus result;
 
-		if (m_Renderer->Run(m_FinalImage, 0, m_SubBatchCount, update) == eRenderStatus::RENDER_OK)//Force output on iterBegin or if the settings specify to always do it.
+		if ((result = m_Renderer->Run(m_FinalImage, 0, m_SubBatchCount, update)) == eRenderStatus::RENDER_OK)//Force output on iterBegin or if the settings specify to always do it.
 		{
 			//The amount to increment sub batch while rendering proceeds is purely empirical.
 			//Change later if better values can be derived/observed.
@@ -491,7 +492,7 @@ bool FractoriumEmberController<T>::Render()
 				//}
 			}
 		}
-		else//Something went very wrong, show error report.
+		else if (result != eRenderStatus::RENDER_ABORT)//If error was returned, something went very wrong, show error report.
 		{
 			auto errors = m_Renderer->ErrorReport();
 			success = false;

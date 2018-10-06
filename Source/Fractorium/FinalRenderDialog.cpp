@@ -700,6 +700,8 @@ void FractoriumFinalRenderDialog::Pause(bool paused)
 		m_Controller->Pause(false);
 		ui.FinalRenderPauseButton->setText("Pause");
 	}
+
+	ui.FinalRenderStartButton->setEnabled(!paused);
 }
 
 /// <summary>

@@ -1,3 +1,13 @@
+1.0.0.13 10/9/2018
+--User changes
+ -Disable Start button in final render dialog when Pause is clicked.
+
+--Bug fixes
+ -Rapidly changing spinner values was causing the OpenCL renderer to report a failure, when it was really just aborting.
+
+--Code changes
+ -Renderers never internally set abort to true due to a failure. Abort is only set to true by the calling code.
+
 1.0.0.12 9/30/2018
 --User changes
  -Add a button to swap the pre and post affine values for all selected xforms.

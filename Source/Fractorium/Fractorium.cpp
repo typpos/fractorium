@@ -595,26 +595,25 @@ QStringList Fractorium::SetupOpenXmlDialog()
 #ifndef __APPLE__
 
 	//Lazy instantiate since it takes a long time.
-	if (!m_FileDialog)
+	if (!m_OpenFileDialog)
 	{
-		m_FileDialog = new QFileDialog(this);
-		m_FileDialog->setViewMode(QFileDialog::List);
-		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		m_OpenFileDialog = new QFileDialog(this);
+		m_OpenFileDialog->setViewMode(QFileDialog::List);
+		m_OpenFileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		connect(m_OpenFileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
+		m_OpenFileDialog->setFileMode(QFileDialog::ExistingFiles);
+		m_OpenFileDialog->setAcceptMode(QFileDialog::AcceptOpen);
+		m_OpenFileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)");
+		m_OpenFileDialog->setWindowTitle("Open Flame");
 	}
 
 	QStringList filenames;
-	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
-	m_FileDialog->setFileMode(QFileDialog::ExistingFiles);
-	m_FileDialog->setAcceptMode(QFileDialog::AcceptOpen);
-	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
-	m_FileDialog->setWindowTitle("Open Flame");
-	m_FileDialog->setDirectory(m_Settings->OpenFolder());
-	m_FileDialog->selectNameFilter(m_Settings->OpenXmlExt());
+	m_OpenFileDialog->setDirectory(m_Settings->OpenFolder());
+	m_OpenFileDialog->selectNameFilter(m_Settings->OpenXmlExt());
 
-	if (m_FileDialog->exec() == QDialog::Accepted)
+	if (m_OpenFileDialog->exec() == QDialog::Accepted)
 	{
-		filenames = m_FileDialog->selectedFiles();
+		filenames = m_OpenFileDialog->selectedFiles();
 
 		if (!filenames.empty())
 			m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
@@ -622,7 +621,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 
 #else
 	auto defaultFilter(m_Settings->OpenXmlExt());
-	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("Flam3(*.flam3);; Flame(*.flame);; Xml(*.xml)"), &defaultFilter);
+	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; fml(*.xml)"), &defaultFilter);
 	m_Settings->OpenXmlExt(defaultFilter);
 
 	if (!filenames.empty())
@@ -644,41 +643,41 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 
 	//Lazy instantiate since it takes a long time.
 	//QS
-	if (!m_FileDialog)
+	if (!m_SaveFileDialog)
 	{
-		m_FileDialog = new QFileDialog(this);
-		m_FileDialog->setViewMode(QFileDialog::List);
-		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		m_SaveFileDialog = new QFileDialog(this);
+		m_SaveFileDialog->setViewMode(QFileDialog::List);
+		m_SaveFileDialog->setFileMode(QFileDialog::FileMode::AnyFile);
+		m_SaveFileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		//This must be done once here because clears various internal states which allow the file text to be properly set.
+		//This is most likely a bug in QFileDialog.
+		m_SaveFileDialog->setAcceptMode(QFileDialog::AcceptSave);
+		connect(m_SaveFileDialog, &QFileDialog::filterSelected, [&](const QString & filter)
+		{
+			m_Settings->SaveXmlExt(filter);
+			m_SaveFileDialog->setDefaultSuffix(filter);
+		});
+		m_SaveFileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)");
+		m_SaveFileDialog->setWindowTitle("Save flame as xml");
 	}
 
 	QString filename;
-	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter)
-	{
-		m_Settings->SaveXmlExt(filter);
-		m_FileDialog->setDefaultSuffix(filter);
-	});
-	//This must come first because it clears various internal states which allow the file text to be properly set.
-	//This is most likely a bug in QFileDialog.
-	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
-	m_FileDialog->selectFile(defaultFilename);
-	m_FileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)");
-	m_FileDialog->setWindowTitle("Save flame as xml");
-	m_FileDialog->setDirectory(m_Settings->SaveFolder());
-	m_FileDialog->selectNameFilter(m_Settings->SaveXmlExt());
-	m_FileDialog->setDefaultSuffix(m_Settings->SaveXmlExt());
+	m_SaveFileDialog->selectFile(defaultFilename);
+	m_SaveFileDialog->setDirectory(m_Settings->SaveFolder());
+	m_SaveFileDialog->selectNameFilter(m_Settings->SaveXmlExt());
+	m_SaveFileDialog->setDefaultSuffix(m_Settings->SaveXmlExt());
 
-	if (m_FileDialog->exec() == QDialog::Accepted)
+	if (m_SaveFileDialog->exec() == QDialog::Accepted)
 	{
-		filename = m_FileDialog->selectedFiles().value(0);
+		filename = m_SaveFileDialog->selectedFiles().value(0);
 		auto filenames = filename.split(" (*");//This is a total hack, but Qt has the unfortunate behavior of including the description with the extension. It's probably a bug.
 		filename = filenames[0];
-		m_Settings->SaveXmlExt(m_FileDialog->selectedNameFilter());
+		m_Settings->SaveXmlExt(m_SaveFileDialog->selectedNameFilter());
 	}
 
 #else
 	auto defaultFilter(m_Settings->SaveXmlExt());
-	auto filename = QFileDialog::getSaveFileName(this, tr("Save flame as xml"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)"), &defaultFilter);
+	auto filename = QFileDialog::getSaveFileName(this, tr("Save flame as xml"), m_Settings->SaveFolder() + "/" + defaultFilename, tr("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)"), &defaultFilter);
 	m_Settings->SaveXmlExt(defaultFilter);
 #endif
 	return filename;
@@ -695,38 +694,36 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 #ifndef __APPLE__
 
 	//Lazy instantiate since it takes a long time.
-	if (!m_FileDialog)
+	if (!m_SaveImageDialog)
 	{
-		m_FileDialog = new QFileDialog(this);
-		m_FileDialog->setViewMode(QFileDialog::List);
-		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		m_SaveImageDialog = new QFileDialog(this);
+		m_SaveImageDialog->setViewMode(QFileDialog::List);
+		m_SaveImageDialog->setFileMode(QFileDialog::FileMode::AnyFile);
+		m_SaveImageDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		//This must be done once here because clears various internal states which allow the file text to be properly set.
+		//This is most likely a bug in QFileDialog.
+		m_SaveImageDialog->setAcceptMode(QFileDialog::AcceptSave);
+		connect(m_SaveImageDialog, &QFileDialog::filterSelected, [&](const QString & filter)
+		{
+			m_Settings->SaveImageExt(filter);
+			m_SaveImageDialog->setDefaultSuffix(filter);
+		});
+#ifdef _WIN32
+		m_SaveImageDialog->setNameFilter(".bmp;;.jpg;;.png;;.exr");
+#else
+		m_SaveImageDialog->setNameFilter(".jpg;;.png;;.exr");
+#endif
+		m_SaveImageDialog->setWindowTitle("Save image");
 	}
 
 	QString filename;
-	m_FileDialog->disconnect(SIGNAL(filterSelected(const QString&)));
-	connect(m_FileDialog, &QFileDialog::filterSelected, [&](const QString & filter)
-	{
-		m_Settings->SaveImageExt(filter);
-		m_FileDialog->setDefaultSuffix(filter);
-	});
-	//This must come first because it clears various internal states which allow the file text to be properly set.
-	//This is most likely a bug in QFileDialog.
-	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
-	m_FileDialog->selectFile(defaultFilename);
-	m_FileDialog->setFileMode(QFileDialog::AnyFile);
-	m_FileDialog->setOption(QFileDialog::ShowDirsOnly, false);
-#ifdef _WIN32
-	m_FileDialog->setNameFilter(".bmp;;.jpg;;.png;;.exr");
-#else
-	m_FileDialog->setNameFilter(".jpg;;.png;;.exr");
-#endif
-	m_FileDialog->setWindowTitle("Save image");
-	m_FileDialog->setDirectory(m_Settings->SaveFolder());
-	m_FileDialog->selectNameFilter(m_Settings->SaveImageExt());
-	m_FileDialog->setDefaultSuffix(m_Settings->SaveImageExt());
+	m_SaveImageDialog->selectFile(defaultFilename);
+	m_SaveImageDialog->setDirectory(m_Settings->SaveFolder());
+	m_SaveImageDialog->selectNameFilter(m_Settings->SaveImageExt());
+	m_SaveImageDialog->setDefaultSuffix(m_Settings->SaveImageExt());
 
-	if (m_FileDialog->exec() == QDialog::Accepted)
-		filename = m_FileDialog->selectedFiles().value(0);
+	if (m_SaveImageDialog->exec() == QDialog::Accepted)
+		filename = m_SaveImageDialog->selectedFiles().value(0);
 
 #else
 	auto defaultFilter(m_Settings->SaveImageExt());
@@ -751,17 +748,16 @@ QString Fractorium::SetupSaveFolderDialog()
 		m_FolderDialog = new QFileDialog(this);
 		m_FolderDialog->setViewMode(QFileDialog::List);
 		m_FolderDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		//This must come first because it clears various internal states which allow the file text to be properly set.
+		//This is most likely a bug in QFileDialog.
+		m_FolderDialog->setAcceptMode(QFileDialog::AcceptSave);
+		m_FolderDialog->setFileMode(QFileDialog::Directory);
+		m_FolderDialog->setOption(QFileDialog::ShowDirsOnly, true);
+		m_FolderDialog->setWindowTitle("Save to folder");
 	}
 
 	QString filename;
-	//This must come first because it clears various internal states which allow the file text to be properly set.
-	//This is most likely a bug in QFileDialog.
-	m_FolderDialog->setAcceptMode(QFileDialog::AcceptSave);
-	m_FolderDialog->setFileMode(QFileDialog::Directory);
-	m_FolderDialog->setOption(QFileDialog::ShowDirsOnly, true);
-	m_FolderDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 	m_FolderDialog->selectFile("");
-	m_FolderDialog->setWindowTitle("Save to folder");
 	m_FolderDialog->setDirectory(m_Settings->SaveFolder());
 
 	if (m_FolderDialog->exec() == QDialog::Accepted)

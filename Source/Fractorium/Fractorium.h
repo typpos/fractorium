@@ -554,7 +554,9 @@ private:
 
 	//Files.
 #ifndef __APPLE__
-	QFileDialog* m_FileDialog = nullptr;
+	QFileDialog* m_SaveFileDialog = nullptr;
+	QFileDialog* m_SaveImageDialog = nullptr;
+	QFileDialog* m_OpenFileDialog = nullptr;
 	QFileDialog* m_FolderDialog = nullptr;
 #endif
 	QssDialog* m_QssDialog = nullptr;

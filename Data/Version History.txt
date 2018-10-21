@@ -1,3 +1,7 @@
+1.0.0.14 10/20/2018
+--Bug fixes
+ -File saving was broken.
+
 1.0.0.13 10/9/2018
 --User changes
  -Disable Start button in final render dialog when Pause is clicked.

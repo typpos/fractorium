@@ -662,14 +662,19 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 	//This is most likely a bug in QFileDialog.
 	m_FileDialog->setAcceptMode(QFileDialog::AcceptSave);
 	m_FileDialog->selectFile(defaultFilename);
-	m_FileDialog->setNameFilter("Flam3 (*.flam3);;Flame (*.flame);;Xml (*.xml)");
+	m_FileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)");
 	m_FileDialog->setWindowTitle("Save flame as xml");
 	m_FileDialog->setDirectory(m_Settings->SaveFolder());
 	m_FileDialog->selectNameFilter(m_Settings->SaveXmlExt());
 	m_FileDialog->setDefaultSuffix(m_Settings->SaveXmlExt());
 
 	if (m_FileDialog->exec() == QDialog::Accepted)
+	{
 		filename = m_FileDialog->selectedFiles().value(0);
+		auto filenames = filename.split(" (*");//This is a total hack, but Qt has the unfortunate behavior of including the description with the extension. It's probably a bug.
+		filename = filenames[0];
+		m_Settings->SaveXmlExt(m_FileDialog->selectedNameFilter());
+	}
 
 #else
 	auto defaultFilter(m_Settings->SaveXmlExt());

@@ -15,7 +15,7 @@ Download: [Fractorium_1.0.0.14.msi](https://drive.google.com/open?id=1qBkG4_h8ly
 
 Download: [Fractorium_1.0.0.14.dmg](https://drive.google.com/open?id=1rVMd0X5kEKL0xH6XlU24H-_frnu6wQR8)
 
-## Linux - Only bonic builds of ubuntu are supported.
+## Linux - Only bionic builds of ubuntu are supported.
 
 ### Install from PPA
 

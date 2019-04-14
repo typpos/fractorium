@@ -91,13 +91,13 @@ $fileOne = $benchprefix + "tatasz_springcrown_manysimplexforms.flame"
 BenchAllForFile $fileOne
 
 $fileOne = $benchprefix + "tyrantwave_flippeddisc_normal.flame"
-#BenchAllForFile $fileOne
+BenchAllForFile $fileOne
 
 $fileOne = $benchprefix + "golubaja_rippingfrominside_complexcode.flame"
 BenchAllForFile $fileOne
 
 $fileOne = $benchprefix + "zy0rg_six_bigcomplexcode.flame"
-#BenchAllForFile $fileOne
+BenchAllForFile $fileOne
 
 $Script:totalOutput | Out-File -FilePath benchout.txt
 $table | Export-Csv -Path ".\benchout.csv" -Force -NoTypeInformation

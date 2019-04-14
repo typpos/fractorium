@@ -258,30 +258,39 @@ bool PaletteList<T>::Add(const string& filename, bool force)
 
 /// <summary>
 /// Get the palette at a random index in a random file in the map.
+/// Attempt to avoid selecting a palette which is all black.
 /// </summary>
 /// <returns>A pointer to a random palette in a random file if successful, else nullptr.</returns>
 template <typename T>
 Palette<T>* PaletteList<T>::GetRandomPalette()
 {
-	auto p = s_Palettes.begin();
-	size_t i = 0, paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % Size();
+	size_t attempts = 0;
 
-	//Move p forward i elements.
-	while (i < paletteFileIndex && p != s_Palettes.end())
+	while (attempts < Size() * 10)
 	{
-		++i;
-		++p;
+		auto p = s_Palettes.begin();
+		auto paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % Size();
+		size_t i = 0;
+
+		//Move p forward i elements.
+		while (i < paletteFileIndex && p != s_Palettes.end())
+		{
+			++i;
+			++p;
+		}
+
+		if (i < Size())
+		{
+			size_t paletteIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % p->second.size();
+
+			if (paletteIndex < p->second.size() && !p->second[paletteIndex].IsEmpty())
+				return &p->second[paletteIndex];
+		}
+
+		attempts++;
 	}
 
-	if (i < Size())
-	{
-		size_t paletteIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % p->second.size();
-
-		if (paletteIndex < p->second.size())
-			return &p->second[paletteIndex];
-	}
-
-	return nullptr;
+	return Size() ? &s_Palettes[0][0] : nullptr;
 }
 
 /// <summary>

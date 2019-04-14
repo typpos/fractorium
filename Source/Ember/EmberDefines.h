@@ -37,7 +37,7 @@ static void sincos(float x, float* s, float* c)
 
 namespace EmberNs
 {
-#define EMBER_VERSION "1.0.0.14"
+#define EMBER_VERSION "1.0.0.15"
 #define EPS6 T(1e-6)
 #define EPS std::numeric_limits<T>::epsilon()//Apoplugin.h uses -20, but it's more mathematically correct to do it this way.
 #define ISAAC_SIZE 4
@@ -106,6 +106,7 @@ static inline size_t NowMs() { return duration_cast<milliseconds>(Clock::now().t
 	#define v2T  glm::tvec2<T, glm::defaultp>
 	#define v3T  glm::tvec3<T, glm::defaultp>
 	#define v4T  glm::tvec4<T, glm::defaultp>
+	#define v2F  glm::tvec2<float, glm::defaultp>
 	#define v4F  glm::tvec4<float, glm::defaultp>
 	#define v4D  glm::tvec4<double, glm::defaultp>
 	#define v4bT glm::tvec4<bucketT, glm::defaultp>
@@ -118,6 +119,7 @@ static inline size_t NowMs() { return duration_cast<milliseconds>(Clock::now().t
 	#define v2T  glm::detail::tvec2<T, glm::defaultp>
 	#define v3T  glm::detail::tvec3<T, glm::defaultp>
 	#define v4T  glm::detail::tvec4<T, glm::defaultp>
+	#define v2F  glm::detail::tvec2<float, glm::defaultp>
 	#define v4F  glm::detail::tvec4<float, glm::defaultp>
 	#define v4D  glm::detail::tvec4<double, glm::defaultp>
 	#define v4bT glm::detail::tvec4<bucketT, glm::defaultp>
@@ -154,6 +156,8 @@ enum class eEmberMotionParam : et//These must remain in this order forever.
 	FLAME_MOTION_GAMMA,
 	FLAME_MOTION_GAMMA_THRESH,
 	FLAME_MOTION_HIGHLIGHT_POWER,
+	FLAME_MOTION_K2,
+	FLAME_MOTION_RAND_RANGE,
 	FLAME_MOTION_BACKGROUND_R,
 	FLAME_MOTION_BACKGROUND_G,
 	FLAME_MOTION_BACKGROUND_B,

@@ -419,9 +419,55 @@
           </widget>
          </item>
          <item>
+          <widget class="QDoubleSpinBox" name="FinalRenderOpenCLSubBatchPctSpin">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>220</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The percentage of a sub batch to execute on each thread per kernel call when using OpenCL. Default: 0.025 (256 iters).&lt;/p&gt;&lt;p&gt;Increase this number for slightly faster render times.&lt;/p&gt;&lt;p&gt;Note that this can cause a crash and subsequent restart of the graphics driver if each kernel call takes too long. So reduce the value if you encounter such a problem.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>OpenCL Sub Batch Percent Per Thread </string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.250000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Preferred</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -692,7 +738,7 @@
         </widget>
        </item>
        <item>
-        <widget class="TableWidget" name="FinalRenderParamsTable">
+        <widget class="QTableWidget" name="FinalRenderParamsTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -890,6 +936,9 @@
           <property name="text">
            <string>Strips</string>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of sections to split rendering into. The first number is the value desired, and the second number in parentheses is the value actually used because it must divide evenly into the final image height.&lt;/p&gt;&lt;p&gt;Use this if you do not have enough memory to render a given size and supersample. You will know you are memory limited when you see a warning in the text box below.&lt;/p&gt;&lt;p&gt;Use this sparingly since the number of iterations required are scaled by the value in this field.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
          </item>
          <item row="3" column="1">
           <property name="text">
@@ -912,6 +961,9 @@
          <item row="5" column="0">
           <property name="text">
            <string>Iterations</string>
+          </property>
+          <property name="toolTip">
+           <string>The total number of iterations that will be done to complete a single image</string>
           </property>
          </item>
          <item row="5" column="1">
@@ -1203,13 +1255,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header>TableWidget.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>FinalRenderEarlyClipCheckBox</tabstop>
   <tabstop>FinalRenderDoublePrecisionCheckBox</tabstop>
@@ -1221,13 +1266,18 @@
   <tabstop>FinalRenderDoSequenceCheckBox</tabstop>
   <tabstop>FinalRenderPng16BitCheckBox</tabstop>
   <tabstop>FinalRenderCurrentSpin</tabstop>
-  <tabstop>FinalRenderStopButton</tabstop>
-  <tabstop>FinalRenderStartButton</tabstop>
+  <tabstop>FinalRenderThreadCountSpin</tabstop>
+  <tabstop>FinalRenderThreadPriorityComboBox</tabstop>
+  <tabstop>FinalRenderOpenCLSubBatchPctSpin</tabstop>
+  <tabstop>FinalRenderApplyToAllCheckBox</tabstop>
+  <tabstop>FinalRenderKeepAspectCheckBox</tabstop>
+  <tabstop>FinalRenderScaleNoneRadioButton</tabstop>
   <tabstop>FinalRenderScaleWidthRadioButton</tabstop>
   <tabstop>FinalRenderScaleHeightRadioButton</tabstop>
-  <tabstop>FinalRenderScaleNoneRadioButton</tabstop>
-  <tabstop>FinalRenderKeepAspectCheckBox</tabstop>
   <tabstop>FinalRenderTextOutput</tabstop>
+  <tabstop>FinalRenderStartButton</tabstop>
+  <tabstop>FinalRenderPauseButton</tabstop>
+  <tabstop>FinalRenderStopButton</tabstop>
   <tabstop>FinalRenderCloseButton</tabstop>
  </tabstops>
  <resources/>

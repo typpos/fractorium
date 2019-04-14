@@ -49,6 +49,7 @@ FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 		ui.OpenCLCheckBox->setEnabled(false);
 		ui.SharedTextureCheckBox->setChecked(false);
 		ui.SharedTextureCheckBox->setEnabled(false);
+		ui.OpenCLSubBatchPctSpin->setEnabled(false);
 		ui.OpenCLSubBatchSpin->setEnabled(false);
 		ui.OpenCLQualitySpin->setEnabled(false);
 		ui.OpenCLFilteringDERadioButton->setEnabled(false);
@@ -132,6 +133,7 @@ void FractoriumOptionsDialog::OnOpenCLCheckBoxStateChanged(int state)
 	ui.ThreadCountSpin->setEnabled(!checked);
 	ui.CpuSubBatchSpin->setEnabled(!checked);
 	ui.SharedTextureCheckBox->setEnabled(checked);
+	ui.OpenCLSubBatchPctSpin->setEnabled(checked);
 	ui.OpenCLSubBatchSpin->setEnabled(checked);
 	ui.OpenCLQualitySpin->setEnabled(checked);
 	ui.CpuQualitySpin->setEnabled(!checked);
@@ -197,6 +199,7 @@ void FractoriumOptionsDialog::GuiToData()
 	m_Settings->CpuQuality(CpuQuality());
 	m_Settings->OpenClQuality(OpenClQuality());
 	m_Settings->CpuSubBatch(ui.CpuSubBatchSpin->value());
+	m_Settings->OpenCLSubBatchPct(ui.OpenCLSubBatchPctSpin->value());
 	m_Settings->OpenCLSubBatch(ui.OpenCLSubBatchSpin->value());
 	m_Settings->CpuDEFilter(ui.CpuFilteringDERadioButton->isChecked());
 	m_Settings->OpenCLDEFilter(ui.OpenCLFilteringDERadioButton->isChecked());
@@ -236,6 +239,7 @@ void FractoriumOptionsDialog::DataToGui()
 	ui.CpuQualitySpin->setValue(m_Settings->CpuQuality());
 	ui.OpenCLQualitySpin->setValue(m_Settings->OpenClQuality());
 	ui.CpuSubBatchSpin->setValue(m_Settings->CpuSubBatch());
+	ui.OpenCLSubBatchPctSpin->setValue(m_Settings->OpenCLSubBatchPct());
 	ui.OpenCLSubBatchSpin->setValue(m_Settings->OpenCLSubBatch());
 	SettingsToDeviceTable(ui.DeviceTable, devices);
 

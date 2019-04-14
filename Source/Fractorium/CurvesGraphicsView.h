@@ -37,34 +37,36 @@ public:
 	void PointChanged(int curveIndex, int pointIndex, const QPointF& point);
 	QPointF Get(int curveIndex, int pointIndex);
 	void Set(int curveIndex, int pointIndex, const QPointF& point);
+	void Set(Curves<float>& curves);
 	void SetTop(CurveIndex curveIndex);
 
 Q_SIGNALS:
 	void PointChangedSignal(int curveIndex, int pointIndex, const QPointF& point);
+	void PointAddedSignal(size_t curveIndex, const QPointF& point);
+	void PointRemovedSignal(size_t curveIndex, int pointIndex);
 
 protected:
 	virtual void paintEvent(QPaintEvent* e) override;
+	virtual void mousePressEvent(QMouseEvent* e) override;
 
+	size_t m_Index = 0;
 	QPen m_APen;
 	QPen m_RPen;
 	QPen m_GPen;
 	QPen m_BPen;
 	QPen m_AxisPen;
-	EllipseItem* m_AllP1;
-	EllipseItem* m_AllP2;
-	EllipseItem* m_RedP1;
-	EllipseItem* m_RedP2;
-	EllipseItem* m_GrnP1;
-	EllipseItem* m_GrnP2;
-	EllipseItem* m_BluP1;
-	EllipseItem* m_BluP2;
+	std::vector<EllipseItem*> m_AllP;
+	std::vector<EllipseItem*> m_RedP;
+	std::vector<EllipseItem*> m_GrnP;
+	std::vector<EllipseItem*> m_BluP;
 	QGraphicsLineItem* m_XLine;
 	QGraphicsLineItem* m_YLine;
-	QPen* m_Pens[4];
+	std::array<QPen*, 4> m_Pens;
 	QGraphicsScene m_Scene;
 	QRectF m_OriginalRect;
-	std::pair<EllipseItem*, EllipseItem*> m_Points[4];
+	std::array<std::vector<EllipseItem*>, 4> m_Points;
 };
+
 
 /// <summary>
 /// Derivation for draggable points needed to trigger an event whenever the item is changed.
@@ -116,7 +118,7 @@ protected:
 
 	/// <summary>
 	/// Overridden itemChange event to notify the parent control that it has moved.
-	/// Movement is also restriced to the scene rect.
+	/// Movement is also restricted to the scene rect.
 	/// </summary>
 	/// <param name="change">Action is only taken if this value equals ItemPositionChange</param>
 	/// <param name="value">The new position. This will be clamped to the scene rect.</param>

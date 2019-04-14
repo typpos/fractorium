@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<?define ProductVersion="1.0.0.14" ?>
+	<?define ProductVersion="1.0.0.15" ?>
 	<?define ProductName="Fractorium $(var.ProductVersion) ($(var.GpuType))" ?>
 	<?define UpgradeCode="{4714cd15-bfba-44f6-8059-9e1466ebfa6e}"?>
 	<?define Manufacturer="Fractorium"?>
@@ -13,7 +13,7 @@
 	<!--
 	Change this for every release.
 	-->
-	<?define ProductCode="{F303D411-E358-403E-9F59-03BB35813D8B}"?>
+	<?define ProductCode="{4B40B3EC-7FE5-41DE-824E-EEC006B9D614}"?>
 	
 	<Product Id="$(var.ProductCode)" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package
@@ -51,6 +51,7 @@
 			<ComponentGroupRef Id="ProductComponents" />
 			<ComponentGroupRef Id="BenchComponents" />
 			<ComponentGroupRef Id="PlatformComponents" />
+			<ComponentGroupRef Id="ImageFormatComponents" />
 			<ComponentRef Id="FractoriumStartMenuShortcut"/>
 			<ComponentRef Id="FractoriumDesktopShortcut"/>
 		</Feature>
@@ -84,6 +85,7 @@
 				<Directory Id="INSTALLFOLDER" Name="Fractorium" >
 					<Directory Id="INSTALLFOLDERBENCH" Name="Bench" />
 					<Directory Id="INSTALLFOLDERPLATFORMS" Name="platforms" />
+					<Directory Id="INSTALLFOLDERIMAGEFORMATS" Name="imageformats" />
 				</Directory>
 			</Directory>
 			
@@ -313,6 +315,14 @@
 		<ComponentGroup Id="PlatformComponents" Directory="INSTALLFOLDERPLATFORMS">
 			<Component Id="qwindows.dll" Guid="627b7f5a-8fa6-4c78-a6b7-81fcdd8fdd63">
 				<File Id="qwindows.dll" Source="$(env.QTDIR)\plugins\platforms\qwindows.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ImageFormatComponents" Directory="INSTALLFOLDERIMAGEFORMATS">
+			<Component Id="qjpeg.dll" Guid="da079a2d-1ab7-443c-a21e-4434ef58c6cc">
+				<File Id="qjpeg.dll" Source="$(env.QTDIR)\plugins\imageformats\qjpeg.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
 		</ComponentGroup>
 	</Fragment>

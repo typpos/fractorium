@@ -231,8 +231,11 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="frame">
+             <bool>true</bool>
+            </property>
             <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::NoButtons</enum>
+             <enum>QAbstractSpinBox::UpDownArrows</enum>
             </property>
             <property name="suffix">
              <string/>

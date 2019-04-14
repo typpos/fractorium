@@ -51,6 +51,16 @@ public:
 	}
 
 	/// <summary>
+	/// Return the fractional part of a real number.
+	/// </summary>
+	/// <param name="v">The real number whose fractional part will be returned</param>
+	/// <returns>The fractional part of the value passed in</returns>
+	static inline T Fract(T x)
+	{
+		return x - T(Floor(x));
+	}
+
+	/// <summary>
 	/// Unsure.
 	/// </summary>
 	/// <param name="p">Unsure.</param>
@@ -191,7 +201,7 @@ public:
 	/// </summary>
 	/// <param name="a">The value to hash</param>
 	/// <returns>The hashed value</returns>
-	static T Hash(int a)
+	static inline T Hash(int a)
 	{
 		a = (a ^ 61) ^ (a >> 16);
 		a = a + (a << 3);
@@ -199,6 +209,128 @@ public:
 		a = a * 0x27d4eb2d;
 		a = a ^ (a >> 15);
 		return (T)a / std::numeric_limits<int>::max();
+	}
+
+	/// <summary>
+	/// Hash function gotten from Chaotica, which takes an x,y pair and hashes it.
+	/// Written by Thomas Ludwig and Tatyana Zabanova.
+	/// </summary>
+	/// <param name="x">The x value to hash</param>
+	/// <param name="y">The y value to hash</param>
+	/// <param name="seed">The seed to hash with</param>
+	/// <returns>The hashed value</returns>
+	static inline T HashShadertoy(T x, T y, T seed)
+	{
+		return Fract(std::sin(x * T(12.9898) + y * T(78.233) + seed) * T(43758.5453));
+	}
+
+	/// <summary>
+	/// For the vibration2 variation.
+	/// </summary>
+	/// <returns>T</returns>
+	static inline T Modulate(T amp, T freq, T x)
+	{
+		return amp * std::cos(x * freq * M_2PI);
+	}
+
+	/// <summary>
+	/// Divide real by complex.
+	/// </summary>
+	/// <param name="x">The real number</param>
+	/// <param name="a">The complex number</param>
+	/// <returns>x / a</returns>
+	static v2T RealDivComplex(T x, v2T a)
+	{
+		T s = x / Zeps(a.x * a.x + a.y * a.y);
+		return v2T(a.x * s, -a.y * s);
+	}
+
+	/// <summary>
+	/// Divide complex by complex.
+	/// </summary>
+	/// <param name="x">The first complex number</param>
+	/// <param name="a">The secondcomplex number</param>
+	/// <returns>a / b</returns>
+	static v2T ComplexDivComplex(v2T a, v2T b)
+	{
+		T s = T(1.0) / Zeps(b.x * b.x + b.y * b.y);
+		return v2T(a.x * b.x + a.y * b.y, a.y * b.x - a.x * b.y) * s;
+	}
+
+	/// <summary>
+	/// Multiple complex by real.
+	/// </summary>
+	/// <param name="a">The complex number</param>
+	/// <param name="x">The real number</param>
+	/// <returns>a * x</returns>
+	static v2T ComplexMultReal(v2T a, T x)
+	{
+		return v2T(a.x * x, a.y * x);
+	}
+
+	/// <summary>
+	/// Multiply complex by complex.
+	/// </summary>
+	/// <param name="a">The first complex number</param>
+	/// <param name="b">The second complex number</param>
+	/// <returns>a * b</returns>
+	static v2T ComplexMultComplex(v2T a, v2T b)
+	{
+		return v2T(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+	}
+
+	/// <summary>
+	/// Add complex to complex.
+	/// </summary>
+	/// <param name="a">The first complex number</param>
+	/// <param name="b">The second complex number</param>
+	/// <returns>a + b</returns>
+	static v2T ComplexPlusComplex(v2T a, v2T b)
+	{
+		return v2T(a.x + b.x, a.y + b.y);
+	}
+
+	/// <summary>
+	/// Add complex to real.
+	/// </summary>
+	/// <param name="a">The complex number</param>
+	/// <param name="x">The real number</param>
+	/// <returns>a + x</returns>
+	static v2T ComplexPlusReal(v2T a, T x)
+	{
+		return v2T(a.x + x, a.y);
+	}
+
+	/// <summary>
+	/// Subtract real from complex.
+	/// </summary>
+	/// <param name="a">The complex number</param>
+	/// <param name="x">The real number</param>
+	/// <returns>a - x</returns>
+	static v2T ComplexMinusReal(v2T a, T x)
+	{
+		return v2T(a.x - x, a.y);
+	}
+
+	/// <summary>
+	/// Compute the square root of a complex number.
+	/// </summary>
+	/// <param name="a">The complex number</param>
+	/// <returns>sqrt(a)</returns>
+	static v2T ComplexSqrt(v2T a)
+	{
+		T mag = Hypot(a.x, a.y);
+		return ComplexMultReal(v2T(std::sqrt(mag + a.x), Sign(a.y) * std::sqrt(mag - a.x)), T(0.5) * std::sqrt(T(2.0)));
+	}
+
+	/// <summary>
+	/// Compute the natural logarithm of a complex number.
+	/// </summary>
+	/// <param name="a">The complex number</param>
+	/// <returns>log(a)</returns>
+	static v2T ComplexLog(v2T a)
+	{
+		return v2T(T(0.5) * std::log(a.x * a.x + a.y * a.y), std::atan2(a.y, a.x));
 	}
 
 	/// <summary>
@@ -567,9 +699,25 @@ private:
 		m_P = InitInts();
 		m_Grad = InitGrad();
 		m_Offsets = InitOffsets();
+		m_P1 = InitP1();
+		m_Q1 = InitQ1();
+		m_P2 = InitP2();
+		m_Q2 = InitQ2();
+		m_PC = InitPC();
+		m_QC = InitQC();
+		m_PS = InitPS();
+		m_QS = InitQS();
 		m_GlobalMap["NOISE_INDEX"] = make_pair(m_PFloats.data(), m_PFloats.size());
 		m_GlobalMap["NOISE_POINTS"] = make_pair(static_cast<T*>(&(m_Grad[0].x)), SizeOf(m_Grad) / sizeof(T));
 		m_GlobalMap["OFFSETS"] = make_pair(static_cast<T*>(&(m_Offsets[0].x)), SizeOf(m_Offsets) / sizeof(T));
+		m_GlobalMap["P1"] = make_pair(m_P1.data(), m_P1.size());
+		m_GlobalMap["Q1"] = make_pair(m_Q1.data(), m_Q1.size());
+		m_GlobalMap["P2"] = make_pair(m_P2.data(), m_P2.size());
+		m_GlobalMap["Q2"] = make_pair(m_Q2.data(), m_Q2.size());
+		m_GlobalMap["PC"] = make_pair(m_PC.data(), m_PC.size());
+		m_GlobalMap["QC"] = make_pair(m_QC.data(), m_QC.size());
+		m_GlobalMap["PS"] = make_pair(m_PS.data(), m_PS.size());
+		m_GlobalMap["QS"] = make_pair(m_QS.data(), m_QS.size());
 	}
 
 	/// <summary>
@@ -993,8 +1141,179 @@ private:
 		return g;
 	}
 
+	/// <summary>
+	/// Initializes the P1 vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitP1()
+	{
+		std::vector<T> v =
+		{
+			T(-1.4258509801366645672e+11),
+			T(6.6781041261492395835e+09 ),
+			T(-1.1548696764841276794e+08),
+			T(9.8062904098958257677e+05 ),
+			T(-4.4615792982775076130e+03),
+			T(1.0650724020080236441e+01 ),
+			T(-1.0767857011487300348e-02)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the Q1 vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitQ1()
+	{
+		std::vector<T> v =
+		{
+			T(4.1868604460820175290e+12),
+			T(4.2091902282580133541e+10),
+			T(2.0228375140097033958e+08),
+			T(5.9117614494174794095e+05),
+			T(1.0742272239517380498e+03),
+			T(1.0),
+			T(0.0)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the P2 vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitP2()
+	{
+		std::vector<T> v =
+		{
+			T(-1.7527881995806511112e+16),
+			T(1.6608531731299018674e+15 ),
+			T(-3.6658018905416665164e+13),
+			T(3.5580665670910619166e+11 ),
+			T(-1.8113931269860667829e+09),
+			T(5.0793266148011179143e+06 ),
+			T(-7.5023342220781607561e+03),
+			T(4.6179191852758252278e+00)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the Q2 vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitQ2()
+	{
+		std::vector<T> v =
+		{
+			T(1.7253905888447681194e+18),
+			T(1.7128800897135812012e+16),
+			T(8.4899346165481429307e+13),
+			T(2.7622777286244082666e+11),
+			T(6.4872502899596389593e+08),
+			T(1.1267125065029138050e+06),
+			T(1.3886978985861357615e+03),
+			T(1.0)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the PC vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitPC()
+	{
+		std::vector<T> v =
+		{
+			T(-4.4357578167941278571e+06),
+			T(-9.9422465050776411957e+06),
+			T(-6.6033732483649391093e+06),
+			T(-1.5235293511811373833e+06),
+			T(-1.0982405543459346727e+05),
+			T(-1.6116166443246101165e+03),
+			T(0.0)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the QC vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitQC()
+	{
+		std::vector<T> v =
+		{
+			T(-4.4357578167941278568e+06),
+			T(-9.9341243899345856590e+06),
+			T(-6.5853394797230870728e+06),
+			T(-1.5118095066341608816e+06),
+			T(-1.0726385991103820119e+05),
+			T(-1.4550094401904961825e+03),
+			T(1.0)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the PS vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitPS()
+	{
+		std::vector<T> v =
+		{
+			T(3.3220913409857223519e+04),
+			T(8.5145160675335701966e+04),
+			T(6.6178836581270835179e+04),
+			T(1.8494262873223866797e+04),
+			T(1.7063754290207680021e+03),
+			T(3.5265133846636032186e+01),
+			T(0.0)
+		};
+		return v;
+	}
+
+	/// <summary>
+	/// Initializes the QS vector used in J1().
+	/// Note J1() comes with std in C++, but needed to be manually implemented in OpenCL.
+	/// </summary>
+	/// <returns>A copy of the locally declared vector</returns>
+	std::vector<T> InitQS()
+	{
+		std::vector<T> v =
+		{
+			T(7.0871281941028743574e+05),
+			T(1.8194580422439972989e+06),
+			T(1.4194606696037208929e+06),
+			T(4.0029443582266975117e+05),
+			T(3.7890229745772202641e+04),
+			T(8.6383677696049909675e+02),
+			T(1.0)
+
+		};
+		return v;
+	}
+
 	std::vector<int> m_P;
 	std::vector<T> m_PFloats;
+	std::vector<T> m_P1;
+	std::vector<T> m_Q1;
+	std::vector<T> m_P2;
+	std::vector<T> m_Q2;
+	std::vector<T> m_PC;
+	std::vector<T> m_QC;
+	std::vector<T> m_PS;
+	std::vector<T> m_QS;
 	std::vector<v2T> m_Offsets;
 	std::vector<v3T> m_Grad;
 	std::unordered_map<string, pair<const T*, size_t>> m_GlobalMap;

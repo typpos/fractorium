@@ -289,11 +289,11 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	{\n"
 	   "		fuse = true;\n"
 	   "		itersToDo = fuseCount;\n"
-	   //Calling MwcNextNeg1Pos1() twice is deliberate. The first call to mwc is not very random since it just does
+	   //Calling MwcNextFRange() twice is deliberate. The first call to mwc is not very random since it just does
 	   //an xor. So it must be called twice to get it in a good random state.
-	   "		firstPoint.m_X = MwcNextNeg1Pos1(&mwc);\n"
-	   "		firstPoint.m_X = MwcNextNeg1Pos1(&mwc);\n"
-	   "		firstPoint.m_Y = MwcNextNeg1Pos1(&mwc);\n"
+	   "		firstPoint.m_X = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
+	   "		firstPoint.m_X = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
+	   "		firstPoint.m_Y = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "		firstPoint.m_Z = 0.0;\n"
 	   "		firstPoint.m_ColorX = MwcNext01(&mwc);\n"
 	   "		firstPoint.m_LastXfUsed = 0 - 1;\n"//This ensures the first iteration chooses from the unweighted distribution array, all subsequent will choose from the weighted ones.
@@ -382,8 +382,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "\n"
 	   "			if (!ok)\n"
 	   "			{\n"
-	   "				firstPoint.m_X = MwcNextNeg1Pos1(&mwc);\n"
-	   "				firstPoint.m_Y = MwcNextNeg1Pos1(&mwc);\n"
+	   "				firstPoint.m_X = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
+	   "				firstPoint.m_Y = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "				firstPoint.m_Z = 0.0;\n"
 	   "				firstPoint.m_ColorX = secondPoint.m_ColorX;\n"
 	   "				consec++;\n"
@@ -394,8 +394,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "\n"
 	   "		if (!ok)\n"
 	   "		{\n"
-	   "			secondPoint.m_X = MwcNextNeg1Pos1(&mwc);\n"
-	   "			secondPoint.m_Y = MwcNextNeg1Pos1(&mwc);\n"
+	   "			secondPoint.m_X = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
+	   "			secondPoint.m_Y = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "			secondPoint.m_Z = 0.0;\n"
 	   "		}\n"
 #ifndef STRAIGHT_RAND

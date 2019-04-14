@@ -180,8 +180,8 @@ public:
 		   << "\t\t	JacobiElliptic(vIn.y * " << freqx << ", " << jacok << ", &jcbSn, &jcbCn, &jcbDn);\n"
 		   << "\t\t	vOut.x = " << weight << " * fma(CsX, jcbSn, vIn.x);\n"
 		   << "\t\t}\n"
-		   //<< "\t\telse if (" << pwx << " < 0 && " << pwx << " > -1e-4)\n"
-		   //<< "\t\t	vOut.x = " << weight << " * (vIn.x + CsX * _j1(vIn.y * " << freqx << "));\n"//This is not implemented in OpenCL.
+		   << "\t\telse if (" << pwx << " < 0 && " << pwx << " > -1e-4)\n"
+		   << "\t\t	vOut.x = " << weight << " * (vIn.x + CsX * J1(vIn.y * " << freqx << ", globalShared + P1, globalShared + Q1, globalShared + P2, globalShared + Q2, globalShared + PC, globalShared + QC, globalShared + PS, globalShared + QS));\n"//J1 is manually implemented in OpenCL.
 		   << "\t\telse\n"
 		   << "\t\t	vOut.x = " << weight << " * fma(CsX, sin(SignNz(vIn.y) * pow(Zeps(fabs(vIn.y)), " << pwx << ") * " << freqx << "), vIn.x);\n"
 		   << "\n"
@@ -190,8 +190,8 @@ public:
 		   << "\t\t	JacobiElliptic(vIn.x * " << freqy << ", " << jacok << ", &jcbSn, &jcbCn, &jcbDn);\n"
 		   << "\t\t	vOut.y = " << weight << " * fma(CsY, jcbSn, vIn.y);\n"
 		   << "\t\t}\n"
-		   //<< "\t\telse if (" << pwy << " < 0 && " << pwy << " > -1e-4)\n"
-		   //<< "\t\t	vOut.y = " << weight << " * (vIn.y + CsY * _j1(vIn.x * " << freqy << "));\n"//This is not implemented in OpenCL.
+		   << "\t\telse if (" << pwy << " < 0 && " << pwy << " > -1e-4)\n"
+		   << "\t\t	vOut.y = " << weight << " * (vIn.y + CsY * J1(vIn.x * " << freqy << ", globalShared + P1, globalShared + Q1, globalShared + P2, globalShared + Q2, globalShared + PC, globalShared + QC, globalShared + PS, globalShared + QS));\n"//J1 is manually implemented in OpenCL.
 		   << "\t\telse\n"
 		   << "\t\t	vOut.y = " << weight << " * fma(CsY, sin(SignNz(vIn.x) * pow(Zeps(fabs(vIn.x)), " << pwy << ") * " << freqy << "), vIn.y);\n"
 		   << "\n"
@@ -202,7 +202,12 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Zeps", "Sqr", "SignNz", "SafeDivInv", "JacobiElliptic" };
+		return vector<string> { "Zeps", "Sqr", "SignNz", "SafeDivInv", "JacobiElliptic", "EvalRational", "J1" };
+	}
+
+	virtual vector<string> OpenCLGlobalDataNames() const override
+	{
+		return vector<string> { "P1", "Q1", "P2", "Q2", "PC", "QC", "PS", "QS" };
 	}
 
 	virtual void Precalc() override
@@ -216,16 +221,16 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Freqx, prefix + "waves2b_freqx", 2));
-		m_Params.push_back(ParamWithName<T>(&m_Freqy, prefix + "waves2b_freqy", 2));
-		m_Params.push_back(ParamWithName<T>(&m_Pwx, prefix + "waves2b_pwx", 1, eParamType::REAL, -10, 10));
-		m_Params.push_back(ParamWithName<T>(&m_Pwy, prefix + "waves2b_pwy", 1, eParamType::REAL, -10, 10));
-		m_Params.push_back(ParamWithName<T>(&m_Scalex, prefix + "waves2b_scalex", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,     prefix + "waves2b_freqx", 2));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,     prefix + "waves2b_freqy", 2));
+		m_Params.push_back(ParamWithName<T>(&m_Pwx,       prefix + "waves2b_pwx", 1, eParamType::REAL, -10, 10));
+		m_Params.push_back(ParamWithName<T>(&m_Pwy,       prefix + "waves2b_pwy", 1, eParamType::REAL, -10, 10));
+		m_Params.push_back(ParamWithName<T>(&m_Scalex,    prefix + "waves2b_scalex", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Scaleinfx, prefix + "waves2b_scaleinfx", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves2b_scaley", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Scaley,    prefix + "waves2b_scaley", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Scaleinfy, prefix + "waves2b_scaleinfy", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Unity, prefix + "waves2b_unity", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Jacok, prefix + "waves2b_jacok", T(0.25), eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Unity,     prefix + "waves2b_unity", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Jacok,     prefix + "waves2b_jacok", T(0.25), eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Six, prefix + "waves2b_six"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Siy, prefix + "waves2b_siy"));
 	}
@@ -862,7 +867,7 @@ private:
 
 /// <summary>
 /// log_db.
-/// By DarkBeam, taken from JWildfire.
+/// By dark-beam, taken from JWildfire.
 /// http://jwildfire.org/forum/viewtopic.php?f=23&t=1450&p=2692#p2692
 /// </summary>
 template <typename T>
@@ -1084,9 +1089,86 @@ public:
 };
 
 /// <summary>
+/// tile_hlp.
+/// By zy0rg.
+/// </summary>
+template <typename T>
+class TileHlpVariation : public ParametricVariation<T>
+{
+public:
+	TileHlpVariation(T weight = 1.0) : ParametricVariation<T>("tile_hlp", eVariationId::VAR_TILE_HLP, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(TileHlpVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T temp, x = helper.In.x / m_Width;
+		bool pos = x > 0;
+
+		if (std::cos((pos ? x - (int)x : x + (int)x) * M_PI) < rand.Frand01<T>() * 2 - 1)
+			temp = pos ? -m_Vwidth : m_Vwidth;
+		else
+			temp = 0;
+
+		helper.Out.x = m_Weight * helper.In.x + temp;
+		helper.Out.y = m_Weight * helper.In.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string width  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vwidth = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t temp, x = vIn.x / Zeps(" << width << ");\n"
+		   << "\t\tbool pos = x > 0;\n"
+		   << "\n"
+		   << "\t\tif (cos((pos ? x - (int)x : x + (int)x) * MPI) < MwcNext01(mwc) * 2 - 1)\n"
+		   << "\t\t	temp = pos ? -" << vwidth << " : " << vwidth << ";\n"
+		   << "\t\telse\n"
+		   << "\t\t	temp = 0;\n"
+		   << "\t\tvOut.x = fma(" << weight << ", vIn.x, temp);\n"
+		   << "\t\tvOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_Vwidth = m_Width * m_Weight;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Width,        prefix + "tile_hlp_width", 1, eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(true, &m_Vwidth, prefix + "tile_hlp_v_width"));//Precalc.
+	}
+
+private:
+	T m_Width;
+	T m_Vwidth;//Precalc.
+};
+
+/// <summary>
 /// tile_log.
 /// By zy0rg.
-/// http://zy0rg.deviantart.com
 /// </summary>
 template <typename T>
 class TileLogVariation : public ParametricVariation<T>
@@ -1364,7 +1446,7 @@ public:
 		m_OneOverEx = T(1) / m_FinalExponent;
 		m_Width = m_ArcWidth > T(1) ? T(1) : (m_ArcWidth < T(0.001) ? T(0.001) : m_ArcWidth);
 		m_Seed2 = std::sqrt(m_Seed * T(1.5)) / Zeps(m_Seed * T(0.5)) * T(0.25);
-		m_Rmax = T(0.5) * (std::pow(T(2), m_OneOverEx) - T(1)) * m_Width;
+		m_Rmax = Zeps(T(0.5) * (std::pow(T(2), m_OneOverEx) - T(1)) * m_Width);
 		m_Scale = T(1) / m_Weight;
 	}
 
@@ -1373,15 +1455,15 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Exponent, prefix + "Truchet_fill_exponent", 2, eParamType::REAL_CYCLIC, T(0.001), 2));
-		m_Params.push_back(ParamWithName<T>(&m_ArcWidth, prefix + "Truchet_fill_arc_width", T(0.5), eParamType::REAL_CYCLIC, T(0.001), 1));
-		m_Params.push_back(ParamWithName<T>(&m_Seed, prefix + "Truchet_fill_seed"));
+		m_Params.push_back(ParamWithName<T>(&m_Exponent,            prefix + "Truchet_fill_exponent", 2, eParamType::REAL_CYCLIC, T(0.001), 2));
+		m_Params.push_back(ParamWithName<T>(&m_ArcWidth,            prefix + "Truchet_fill_arc_width", T(0.5), eParamType::REAL_CYCLIC, T(0.001), 1));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,                prefix + "Truchet_fill_seed"));
 		m_Params.push_back(ParamWithName<T>(true, &m_FinalExponent, prefix + "Truchet_fill_final_exponent"));//Precalc
-		m_Params.push_back(ParamWithName<T>(true, &m_OneOverEx, prefix + "Truchet_fill_oneoverex"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Width, prefix + "Truchet_fill_width"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Seed2, prefix + "Truchet_fill_seed2"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Rmax, prefix + "Truchet_fill_rmax"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Scale, prefix + "Truchet_fill_scale"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverEx,     prefix + "Truchet_fill_oneoverex"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Width,         prefix + "Truchet_fill_width"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Seed2,         prefix + "Truchet_fill_seed2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rmax,          prefix + "Truchet_fill_rmax"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale,         prefix + "Truchet_fill_scale"));
 	}
 
 private:
@@ -1568,53 +1650,6 @@ public:
 };
 
 /// <summary>
-/// arcsinh.
-/// </summary>
-/*
-	template <typename T>
-	class ArcsinhVariation : public ParametricVariation<T>
-	{
-	public:
-	ArcsinhVariation(T weight = 1.0) : ParametricVariation<T>("arcsinh", eVariationId::VAR_ARCSINH, weight, false, false, false, false, false)
-	{
-	}
-
-	PARVARCOPY(ArcsinhVariation)
-
-	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
-	{
-	std::complex<T> z(helper.m_TransX, helper.m_TransY);
-	std::complex<T> result = m_Vpi * std::log(z + std::sqrt(z * z + 1.0));
-	helper.Out.x = result.real();
-	helper.Out.y = result.imag();
-	helper.Out.z = DefaultZ(helper);
-	}
-
-	virtual string OpenCLString() const override//Hold off on this for now, opencl doesn't have support for complex.
-	{
-	ostringstream ss, ss2;
-
-	return ss.str();
-	}
-
-	virtual void Precalc() override
-	{
-	m_Vpi = m_Weight * M_2_PI;
-	}
-
-	protected:
-	void Init()
-	{
-	string prefix = Prefix();
-	m_Params.clear();
-	m_Params.push_back(ParamWithName<T>(true, &m_Vpi, prefix + "arcsinh_vpi"));//Precalc.
-	}
-
-	private:
-	T m_Vpi;//Precalc.
-	};*/
-
-/// <summary>
 /// helicoid.
 /// </summary>
 template <typename T>
@@ -1776,7 +1811,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t ang = MwcNext01(mwc) * M_2PI;\n"
 		   << "\t\treal_t angz = acos(MwcNext01(mwc) * 2 - 1);\n"
-		   << "\t\treal_t r = " << weight << " * exp(log(acos((" << power << " == 1.0 ? MwcNext01(mwc) : exp(log(MwcNext01(mwc)) * " << power << ")) * 2 - 1) / M_PI) / 1.5);\n"
+		   << "\t\treal_t r = " << weight << " * exp(log(acos((" << power << " == 1.0 ? MwcNext01(mwc) : exp(log(MwcNext01(mwc)) * " << power << ")) * 2 - 1) / MPI) / 1.5);\n"
 		   << "\t\treal_t s = sin(ang);\n"
 		   << "\t\treal_t c = cos(ang);\n"
 		   << "\t\treal_t sz = sin(angz);\n"
@@ -2088,10 +2123,10 @@ public:
 		   << "\t\treal_t fx = vIn.x;\n"
 		   << "\t\treal_t fy = vIn.y;\n"
 		   << "\t\treal_t fz = vIn.z;\n"
-		   << "\t\treal_t a0 = M_PI / " << n << ";\n"
+		   << "\t\treal_t a0 = MPI / " << n << ";\n"
 		   << "\t\treal_t len = 1 / Zeps(cos(a0));\n"
 		   << "\t\treal_t d = " << rad << " * sin(a0) * len;\n"
-		   << "\t\treal_t angle = floor(precalcAtanyx * " << coeff << ") / " << coeff << " + M_PI / " << n << ";\n"
+		   << "\t\treal_t angle = floor(precalcAtanyx * " << coeff << ") / " << coeff << " + MPI / " << n << ";\n"
 		   << "\t\treal_t x0 = cos(angle) * len;\n"
 		   << "\t\treal_t y0 = sin(angle) * len;\n"
 		   << "\t\treal_t xmx = vIn.x - x0;\n"
@@ -2160,6 +2195,84 @@ private:
 };
 
 /// <summary>
+/// hypershift.
+/// </summary>
+template <typename T>
+class HypershiftVariation : public ParametricVariation<T>
+{
+public:
+	HypershiftVariation(T weight = 1.0) : ParametricVariation<T>("hypershift", eVariationId::VAR_HYPERSHIFT, weight, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(HypershiftVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T rad = 1 / Zeps(helper.m_PrecalcSumSquares);
+		T x = rad * helper.In.x + m_Shift;
+		T y = rad * helper.In.y;
+		rad = m_Weight * m_Scale / Zeps(x * x + y * y);
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			outPoint.m_X = outPoint.m_Y = outPoint.m_Z = 0;//This variation assigns, instead of summing, so order will matter.
+
+		helper.Out.x = rad * x + m_Shift;
+		helper.Out.y = rad * y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t rad = 1 / Zeps(precalcSumSquares);\n"
+		   << "\t\treal_t x = fma(rad, vIn.x, " << shift << ");\n"
+		   << "\t\treal_t y = rad * vIn.y;\n"
+		   << "\t\trad = " << weight << " * " << scale << " / Zeps(fma(x, x, SQR(y)));\n";
+
+		if (m_VarType == eVariationType::VARTYPE_REG)
+			ss << "\t\toutPoint->m_X = outPoint->m_Y = outPoint->m_Z = 0;\n";
+
+		ss << "\t\tvOut.x = fma(rad, x, " << shift << ");\n"
+		   << "\t\tvOut.y = rad * y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Scale = 1 - SQR(m_Shift);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Shift,       prefix + "hypershift_shift", T(0.01)));
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale, prefix + "hypershift_scale"));//Precalc.
+	}
+
+private:
+	T m_Shift;
+	T m_Scale;//Precalc.
+};
+
+/// <summary>
 /// hypershift2.
 /// </summary>
 template <typename T>
@@ -2214,7 +2327,7 @@ public:
 		   << "\t\treal_t x = rad * fx + " << shift << ";\n"
 		   << "\t\treal_t y = rad * fy;\n"
 		   << "\t\trad = " << weight << " * " << shift << " / Zeps(fma(x, x, SQR(y)));\n"
-		   << "\t\treal_t angle = (MwcNextRange(mwc, (int)" << p << ") * 2 + 1) * M_PI / " << p << ";\n"
+		   << "\t\treal_t angle = (MwcNextRange(mwc, (int)" << p << ") * 2 + 1) * MPI / " << p << ";\n"
 		   << "\t\treal_t X = fma(rad, x, " << shift << ");\n"
 		   << "\t\treal_t Y = rad * y;\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
@@ -2240,7 +2353,7 @@ public:
 		m_Shift = m_Shift / std::sqrt(1 - Sqr(spq) - Sqr(spp));
 		m_Scale2 = 1 / std::sqrt(Sqr(sin(T(M_PI) / 2 + pp)) / Sqr(spq) - 1);
 		m_Scale2 = m_Scale2 * (std::sin(T(M_PI) / 2 + pp) / spq - 1);
-		m_Scale = 1 - m_Shift * m_Shift;
+		m_Scale = 1 - SQR(m_Shift);
 	}
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
@@ -2268,6 +2381,4237 @@ private:
 	T m_Scale2;
 };
 
+/// <summary>
+/// lens.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class LensVariation : public Variation<T>
+{
+public:
+	LensVariation(T weight = 1.0) : Variation<T>("lens", eVariationId::VAR_LENS, weight)
+	{
+	}
+
+	VARCOPY(LensVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.x = T(0.5) * (SQR(helper.In.x) - SQR(helper.In.y)) * m_Weight;
+		helper.Out.y = helper.In.x * helper.In.y * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		string weight = WeightDefineString();
+		ss << "\t{\n"
+		   << "\t\tvOut.x = (real_t)0.5 * fma(vIn.x, vIn.x, -SQR(vIn.y)) * " << weight << ";\n"
+		   << "\t\tvOut.y = vIn.x * vIn.y * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
+/// <summary>
+/// projective.
+/// By eralex61.
+/// </summary>
+template <typename T>
+class ProjectiveVariation : public ParametricVariation<T>
+{
+public:
+	ProjectiveVariation(T weight = 1.0) : ParametricVariation<T>("projective", eVariationId::VAR_PROJECTIVE, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ProjectiveVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T s = m_Weight / Zeps(m_A * helper.In.x + m_B * helper.In.y + m_C);
+		helper.Out.x = (m_A1 * helper.In.x + m_B1 * helper.In.y + m_C1) * s;
+		helper.Out.y = (m_A2 * helper.In.x + m_B2 * helper.In.y + m_C2) * s;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string a  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t s = " << weight << " / Zeps(fma(" << a << ", vIn.x, fma(" << b << ", vIn.y, " << c << ")));\n"
+		   << "\t\tvOut.x = fma(" << a1 << ", vIn.x, fma(" << b1 << ", vIn.y, " << c1 << ")) * s;\n"
+		   << "\t\tvOut.y = fma(" << a2 << ", vIn.x, fma(" << b2 << ", vIn.y, " << c2 << ")) * s;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix  + "projective_A"));
+		m_Params.push_back(ParamWithName<T>(&m_B, prefix  + "projective_B"));
+		m_Params.push_back(ParamWithName<T>(&m_C, prefix  + "projective_C", 1));
+		m_Params.push_back(ParamWithName<T>(&m_A1, prefix + "projective_A1", 1));
+		m_Params.push_back(ParamWithName<T>(&m_B1, prefix + "projective_B1"));
+		m_Params.push_back(ParamWithName<T>(&m_C1, prefix + "projective_C1"));
+		m_Params.push_back(ParamWithName<T>(&m_A2, prefix + "projective_A2"));
+		m_Params.push_back(ParamWithName<T>(&m_B2, prefix + "projective_B2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_C2, prefix + "projective_C2"));
+	}
+
+private:
+	T m_A;
+	T m_B;
+	T m_C;
+	T m_A1;
+	T m_B1;
+	T m_C1;
+	T m_A2;
+	T m_B2;
+	T m_C2;
+};
+
+/// <summary>
+/// depth_blur.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthBlurVariation : public ParametricVariation<T>
+{
+public:
+	DepthBlurVariation(T weight = 1.0) : ParametricVariation<T>("depth_blur", eVariationId::VAR_DEPTH_BLUR, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthBlurVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = helper.m_PrecalcSqrtSumSquares;
+
+		if (rad > m_Radius)
+		{
+			T f = rand.Frand01<T>() * m_Power2;
+			T int_angle = std::trunc(f);
+			f = f - int_angle;
+			T x = f * m_Length;
+			T z = std::sqrt(1 + SQR(x) - 2 * x * m_CosAlpha);
+
+			if (!(((int)int_angle) & 1))
+				int_angle = m_2piOverPower * (((int)int_angle) / 2) + std::asin(m_SinAlpha * x / Zeps(z));
+			else
+				int_angle = m_2piOverPower * (((int)int_angle) / 2) - std::asin(m_SinAlpha * x / Zeps(z));
+
+			z *= std::sqrt(rand.Frand01<T>());
+			by = std::sin(int_angle - T(M_PI_2));
+			bx = std::cos(int_angle - T(M_PI_2));
+			T aux = z * m_BlurOver10 * (rad - m_Radius);
+			by = aux * by;
+			bx = aux * bx;
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string range          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string length         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string twopioverpower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinalpha       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosalpha       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t f = MwcNext01(mwc) * " << power2 << ";\n"
+		   << "\t\t	real_t int_angle = trunc(f);\n"
+		   << "\t\t	f = f - int_angle;\n"
+		   << "\t\t	real_t x = f * " << length << ";\n"
+		   << "\t\t	real_t z = sqrt(1 + SQR(x) - 2 * x * " << cosalpha << ");\n"
+		   << "\n"
+		   << "\t\t	if (!(((int)int_angle) & 1))\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) + asin(" << sinalpha << " * x / Zeps(z));\n"
+		   << "\t\t	else\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) - asin(" << sinalpha << " * x / Zeps(z));\n"
+		   << "\n"
+		   << "\t\t	z *= sqrt(MwcNext01(mwc));\n"
+		   << "\t\t	by = sin(int_angle - MPI2);\n"
+		   << "\t\t	bx = cos(int_angle - MPI2);\n"
+		   << "\t\t	real_t aux = z * " << blurover10 << " * (rad - " << radius << ");\n"
+		   << "\t\t	by = aux * by;\n"
+		   << "\t\t	bx = aux * bx;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		T alpha = T(M_PI) / Zeps(m_Power);
+		m_Length = T(std::sqrt(1 + SQR(m_Range) - 2 * m_Range * std::cos(alpha)));
+		m_Alpha = std::asin(std::sin(alpha) * m_Range / Zeps(m_Length));
+		m_BlurOver10 = m_Blur / 10;
+		m_Power2 = m_Power * 2;
+		m_2piOverPower = M_2PI / Zeps(m_Power);
+		m_SinAlpha = std::sin(m_Alpha);
+		m_CosAlpha = std::cos(m_Alpha);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,              prefix  + "depth_blur_power", 5));
+		m_Params.push_back(ParamWithName<T>(&m_Range,              prefix  + "depth_blur_range", T(0.401623)));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,               prefix  + "depth_blur_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,             prefix + "depth_blur_radius", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,        prefix + "depth_blur_alpha"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Length,       prefix + "depth_blur_length"));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10,   prefix + "depth_blur_blur_over_10"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Power2,       prefix + "depth_blur_power2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_2piOverPower, prefix + "depth_blur_2pi_over_power"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinAlpha,     prefix + "depth_blur_sin_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosAlpha,     prefix + "depth_blur_cos_alpha"));
+	}
+
+private:
+	T m_Power;
+	T m_Range;
+	T m_Blur;
+	T m_Radius;
+	T m_Alpha;//Precalc.
+	T m_Length;
+	T m_BlurOver10;
+	T m_Power2;
+	T m_2piOverPower;
+	T m_SinAlpha;
+	T m_CosAlpha;
+
+};
+
+/// <summary>
+/// depth_blur2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthBlur2Variation : public ParametricVariation<T>
+{
+public:
+	DepthBlur2Variation(T weight = 1.0) : ParametricVariation<T>("depth_blur2", eVariationId::VAR_DEPTH_BLUR2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthBlur2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = std::sqrt(Sqr((helper.In.x - m_X0) / m_OneOverMulXSq) + Sqr((helper.In.y - m_Y0) / m_OneOverMulYSq));
+
+		if (rad > m_Radius)
+		{
+			T f = rand.Frand01<T>() * m_Power2;
+			T int_angle = std::trunc(f);
+			f = f - int_angle;
+			T x = f * m_Length;
+			T z = std::sqrt(1 + SQR(x) - 2 * x * std::cos(m_Alpha));
+
+			if (!(((int)int_angle) & 1))
+				int_angle = m_2piOverPower * (((int)int_angle) / 2) + std::asin(std::sin(m_Alpha) * x / Zeps(z));
+			else
+				int_angle = m_2piOverPower * (((int)int_angle) / 2) - std::asin(std::sin(m_Alpha) * x / Zeps(z));
+
+			z *= std::sqrt(rand.Frand01<T>());
+			by = std::sin(int_angle - T(M_PI_2));
+			bx = std::cos(int_angle - T(M_PI_2));
+			T aux = z * m_BlurOver10 * std::exp(std::log(rad - m_Radius) * m_Exp);
+			by = aux * by;
+			bx = aux * bx;
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string range          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x0             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y0             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulx           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string muly           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exp            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string length         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string twopioverpower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << oneovermulsqx << ") + Sqr((vIn.y - " << y0 << ") / " << oneovermulsqy << "));\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t f = MwcNext01(mwc) * " << power2 << ";\n"
+		   << "\t\t	real_t int_angle = trunc(f);\n"
+		   << "\t\t	f = f - int_angle;\n"
+		   << "\t\t	real_t x = f * " << length << ";\n"
+		   << "\t\t	real_t z = sqrt(1 + SQR(x) - 2 * x * cos(" << alpha << "));\n"
+		   << "\n"
+		   << "\t\t	if (!(((int)int_angle) & 1))\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) + asin(sin(" << alpha << ") * x / Zeps(z));\n"
+		   << "\t\t	else\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) - asin(sin(" << alpha << ") * x / Zeps(z));\n"
+		   << "\n"
+		   << "\t\t	z *= sqrt(MwcNext01(mwc));\n"
+		   << "\t\t	by = sin(int_angle - MPI2);\n"
+		   << "\t\t	bx = cos(int_angle - MPI2);\n"
+		   << "\t\t	real_t aux = z * " << blurover10 << " * exp(log(rad - " << radius << ") * " << exp << ");\n"
+		   << "\t\t	by = aux * by;\n"
+		   << "\t\t	bx = aux * bx;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Alpha = T(M_PI) / Zeps(m_Power);
+		m_Length = T(std::sqrt(1 + SQR(m_Range) - 2 * m_Range * std::cos(m_Alpha)));
+		m_Alpha = std::asin(std::sin(m_Alpha) * m_Range / Zeps(m_Length));
+		m_BlurOver10 = m_Blur / 10;
+		m_Power2 = m_Power * 2;
+		m_2piOverPower = M_2PI / Zeps(m_Power);
+		m_OneOverMulXSq = 1 / Zeps(SQR(m_MulX));
+		m_OneOverMulYSq = 1 / Zeps(SQR(m_MulY));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,               prefix + "depth_blur2_power", 5));
+		m_Params.push_back(ParamWithName<T>(&m_Range,               prefix + "depth_blur2_range", T(0.401623)));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,                prefix + "depth_blur2_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,              prefix + "depth_blur2_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_X0,                  prefix + "depth_blur2_x0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_Y0,                  prefix + "depth_blur2_y0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,                prefix + "depth_blur2_mulx", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,                prefix + "depth_blur2_muly", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Exp,                 prefix + "depth_blur2_exp", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,         prefix + "depth_blur2_alpha"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Length,        prefix + "depth_blur2_length"));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10,    prefix + "depth_blur2_blur_over_10"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Power2,        prefix + "depth_blur2_power2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_2piOverPower,  prefix + "depth_blur2_2pi_over_power"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulXSq, prefix + "depth_blur2_one_over_mulx_sq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulYSq, prefix + "depth_blur2_one_over_muly_sq"));
+	}
+
+private:
+	T m_Power;
+	T m_Range;
+	T m_Blur;
+	T m_Radius;
+	T m_X0;
+	T m_Y0;
+	T m_MulX;
+	T m_MulY;
+	T m_Exp;
+	T m_Alpha;//Precalc.
+	T m_Length;
+	T m_BlurOver10;
+	T m_Power2;
+	T m_2piOverPower;
+	T m_OneOverMulXSq;
+	T m_OneOverMulYSq;
+};
+
+/// <summary>
+/// depth_gaussian.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthGaussianVariation : public ParametricVariation<T>
+{
+public:
+	DepthGaussianVariation(T weight = 1.0) : ParametricVariation<T>("depth_gaussian", eVariationId::VAR_DEPTH_GAUSSIAN, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthGaussianVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = helper.m_PrecalcSqrtSumSquares;
+
+		if (rad > m_Radius)
+		{
+			T r = std::sqrt(-2 * log(rand.Frand01<T>()));
+			T ang = rand.Frand01<T>() * M_2PI;
+			bx = std::cos(ang);
+			by = std::sin(ang);
+			T aux = (r * m_BlurOver10 * (rad - m_Radius));
+			by = aux * by;
+			bx = aux * bx;
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string blur       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t r = sqrt(-2 * log(MwcNext01(mwc)));\n"
+		   << "\t\t	real_t ang = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\t	bx = cos(ang);\n"
+		   << "\t\t	by = sin(ang);\n"
+		   << "\t\t	real_t aux = (r * " << blurover10 << " * (rad - " << radius << "));\n"
+		   << "\t\t	by = aux * by;\n"
+		   << "\t\t	bx = aux * bx;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_BlurOver10 = m_Blur / 10;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Blur,             prefix + "depth_gaussian_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,           prefix + "depth_gaussian_radius", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10, prefix + "depth_gaussian_blur_over_10"));//Precalc.
+	}
+
+private:
+	T m_Blur;
+	T m_Radius;
+	T m_BlurOver10;//Precalc.
+};
+
+/// <summary>
+/// depth_gaussian2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthGaussian2Variation : public ParametricVariation<T>
+{
+public:
+	DepthGaussian2Variation(T weight = 1.0) : ParametricVariation<T>("depth_gaussian2", eVariationId::VAR_DEPTH_GAUSSIAN2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthGaussian2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = std::sqrt(Sqr((helper.In.x - m_X0) / m_OneOverMulXSq) + Sqr((helper.In.y - m_Y0) / m_OneOverMulYSq));
+
+		if (rad > m_Radius)
+		{
+			T r = std::sqrt(-2 * std::log(rand.Frand01<T>()));
+			T ang = rand.Frand01<T>() * M_2PI;
+			bx = std::cos(ang);
+			by = std::sin(ang);
+			T aux = r * m_BlurOver10 * std::exp(std::log(rad - m_Radius) * m_Exp);
+			by = aux * by;
+			bx = aux * bx;
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string blur          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x0            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y0            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulx          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string muly          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exp           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << oneovermulsqx << ") + Sqr((vIn.y - " << y0 << ") / " << oneovermulsqy << "));\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t r = sqrt(-2 * log(MwcNext01(mwc)));\n"
+		   << "\t\t	real_t ang = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\t	bx = cos(ang);\n"
+		   << "\t\t	by = sin(ang);\n"
+		   << "\t\t	real_t aux = r * " << blurover10 << " * exp(log(rad - " << radius << ") * " << exp << ");\n"
+		   << "\t\t	by = aux * by;\n"
+		   << "\t\t	bx = aux * bx;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_BlurOver10 = m_Blur / 10;
+		m_OneOverMulXSq = 1 / Zeps(SQR(m_MulX));
+		m_OneOverMulYSq = 1 / Zeps(SQR(m_MulY));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Blur,                prefix + "depth_gaussian2_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,              prefix + "depth_gaussian2_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_X0,                  prefix + "depth_gaussian2_x0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_Y0,                  prefix + "depth_gaussian2_y0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,                prefix + "depth_gaussian2_mulx", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,                prefix + "depth_gaussian2_muly", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Exp,                 prefix + "depth_gaussian2_exp", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10,    prefix + "depth_gaussian2_blur_over_10"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulXSq, prefix + "depth_gaussian2_one_over_mulx_sq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulYSq, prefix + "depth_gaussian2_one_over_muly_sq"));
+	}
+
+private:
+	T m_Blur;
+	T m_Radius;
+	T m_X0;
+	T m_Y0;
+	T m_MulX;
+	T m_MulY;
+	T m_Exp;
+	T m_BlurOver10;//Precalc.
+	T m_OneOverMulXSq;
+	T m_OneOverMulYSq;
+};
+
+/// <summary>
+/// depth_ngon.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthNgonVariation : public ParametricVariation<T>
+{
+public:
+	DepthNgonVariation(T weight = 1.0) : ParametricVariation<T>("depth_ngon", eVariationId::VAR_DEPTH_NGON, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthNgonVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = helper.m_PrecalcSqrtSumSquares;
+
+		if (rad > m_Radius)
+		{
+			T ang = rand.Frand01<T>() * M_2PI;
+			T phi = ang - m_Side * Floor(ang / Zeps(m_Side));
+
+			if (phi > m_HalfSide)
+				phi -= m_Side;
+
+			phi = 1 / Zeps(std::cos(phi));
+			T aux = phi * m_BlurOver10 * (rad - m_Radius);
+			bx = aux * std::cos(ang);
+			by = aux * std::sin(ang);
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string side       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfside   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t ang = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\t	real_t phi = ang - " << side << " * floor(ang / Zeps(" << side << "));\n"
+		   << "\n"
+		   << "\t\t	if (phi > " << halfside << ")\n"
+		   << "\t\t		phi -= " << side << ";\n"
+		   << "\n"
+		   << "\t\t	phi = 1 / Zeps(cos(phi));\n"
+		   << "\t\t	real_t aux = phi * " << blurover10 << " * (rad - " << radius << ");\n"
+		   << "\t\t	bx = aux * cos(ang);\n"
+		   << "\t\t	by = aux * sin(ang);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Side = M_2PI / Zeps(m_Power);
+		m_HalfSide = m_Side / 2;
+		m_BlurOver10 = m_Blur / 10;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,            prefix + "depth_ngon_power", 5));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,             prefix + "depth_ngon_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,           prefix + "depth_ngon_radius", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Side,       prefix + "depth_ngon_side"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfSide,   prefix + "depth_ngon_half_side"));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10, prefix + "depth_ngon_blur_over_10"));
+	}
+
+private:
+	T m_Power;
+	T m_Blur;
+	T m_Radius;
+	T m_Side;//Precalc.
+	T m_HalfSide;
+	T m_BlurOver10;
+};
+
+/// <summary>
+/// depth_ngon2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthNgon2Variation : public ParametricVariation<T>
+{
+public:
+	DepthNgon2Variation(T weight = 1.0) : ParametricVariation<T>("depth_ngon2", eVariationId::VAR_DEPTH_NGON2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthNgon2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = std::sqrt(Sqr((helper.In.x - m_X0) / m_OneOverMulXSq) + Sqr((helper.In.y - m_Y0) / m_OneOverMulYSq));
+
+		if (rad > m_Radius)
+		{
+			T ang = rand.Frand01<T>() * M_2PI;
+			T phi = ang - m_Side * Floor(ang / Zeps(m_Side));
+
+			if (phi > m_HalfSide)
+				phi -= m_Side;
+
+			phi = 1 / Zeps(std::cos(phi));
+			T aux = phi * m_BlurOver10 * std::exp(std::log(rad - m_Radius) * m_Exp);
+			bx = aux * std::cos(ang);
+			by = aux * std::sin(ang);
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x0            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y0            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulx          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string muly          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exp           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string side          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfside      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << oneovermulsqx << ") + Sqr((vIn.y - " << y0 << ") / " << oneovermulsqy << "));\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t ang = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\t	real_t phi = ang - " << side << " * floor(ang / Zeps(" << side << "));\n"
+		   << "\n"
+		   << "\t\t	if (phi > " << halfside << ")\n"
+		   << "\t\t		phi -= " << side << ";\n"
+		   << "\n"
+		   << "\t\t	phi = 1 / Zeps(cos(phi));\n"
+		   << "\t\t	real_t aux = phi * " << blurover10 << " * exp(log(rad - " << radius << ") * " << exp << ");\n"
+		   << "\t\t	bx = aux * cos(ang);\n"
+		   << "\t\t	by = aux * sin(ang);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Side = M_2PI / Zeps(m_Power);
+		m_HalfSide = m_Side / 2;
+		m_BlurOver10 = m_Blur / 10;
+		m_OneOverMulXSq = 1 / Zeps(SQR(m_MulX));
+		m_OneOverMulYSq = 1 / Zeps(SQR(m_MulY));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,               prefix + "depth_ngon2_power", 5));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,                prefix + "depth_ngon2_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,              prefix + "depth_ngon2_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_X0,                  prefix + "depth_ngon2_x0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_Y0,                  prefix + "depth_ngon2_y0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,                prefix + "depth_ngon2_mulx", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,                prefix + "depth_ngon2_muly", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Exp,                 prefix + "depth_ngon2_exp", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Side,          prefix + "depth_ngon2_side"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfSide,      prefix + "depth_ngon2_half_side"));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10,    prefix + "depth_ngon2_blur_over_10"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulXSq, prefix + "depth_ngon2_one_over_mulx_sq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulYSq, prefix + "depth_ngon2_one_over_muly_sq"));
+	}
+
+private:
+	T m_Power;
+	T m_Blur;
+	T m_Radius;
+	T m_X0;
+	T m_Y0;
+	T m_MulX;
+	T m_MulY;
+	T m_Exp;
+	T m_Side;//Precalc.
+	T m_HalfSide;
+	T m_BlurOver10;
+	T m_OneOverMulXSq;
+	T m_OneOverMulYSq;
+};
+
+/// <summary>
+/// depth_sine.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthSineVariation : public ParametricVariation<T>
+{
+public:
+	DepthSineVariation(T weight = 1.0) : ParametricVariation<T>("depth_sine", eVariationId::VAR_DEPTH_SINE, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthSineVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = helper.m_PrecalcSqrtSumSquares;
+
+		if (rad > m_Radius)
+		{
+			T ang = rand.Frand01<T>() * M_2PI;
+			T r = (m_Power == 1 ? std::acos(rand.Frand01<T>() * 2 - 1) / T(M_PI) : std::acos(std::exp(std::log(1 - rand.Frand01<T>()) * m_Power) * 2 - 1) / T(M_PI));
+			T aux = r * m_BlurOver10 * (rad - m_Radius);
+			bx = aux * std::cos(ang);
+			by = aux * std::sin(ang);
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t ang = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\t	real_t r = (" << power << " == 1 ? acos(fma(MwcNext01(mwc), 2, -1.0)) / MPI : acos(exp(log(1 - MwcNext01(mwc)) * " << power << ") * 2 - 1) / MPI);\n"
+		   << "\t\t	real_t aux = r * " << blurover10 << " * (rad - " << radius << ");\n"
+		   << "\t\t	bx = aux * cos(ang);\n"
+		   << "\t\t	by = aux * sin(ang);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_BlurOver10 = m_Blur / 10;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,            prefix + "depth_sine_power", 1, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,             prefix + "depth_sine_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,           prefix + "depth_sine_radius", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10, prefix + "depth_sine_blur_over_10"));//Precalc.
+	}
+
+private:
+	T m_Power;
+	T m_Blur;
+	T m_Radius;
+	T m_BlurOver10;//Precalc.
+};
+
+/// <summary>
+/// depth_sine2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DepthSine2Variation : public ParametricVariation<T>
+{
+public:
+	DepthSine2Variation(T weight = 1.0) : ParametricVariation<T>("depth_sine2", eVariationId::VAR_DEPTH_SINE2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DepthSine2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T bx = 0;
+		T by = 0;
+		T rad = std::sqrt(Sqr((helper.In.x - m_X0) / m_OneOverMulXSq) + Sqr((helper.In.y - m_Y0) / m_OneOverMulYSq));
+
+		if (rad > m_Radius)
+		{
+			T ang = rand.Frand01<T>() * M_2PI;
+			T r = (m_Power == 1 ? std::acos(rand.Frand01<T>() * 2 - 1) / T(M_PI) : std::acos(std::exp(std::log(1 - rand.Frand01<T>()) * m_Power) * 2 - 1) / T(M_PI));
+			T aux = r * m_BlurOver10 * std::exp(std::log(rad - m_Radius) * m_Exp);
+			bx = aux * std::cos(ang);
+			by = aux * std::sin(ang);
+		}
+
+		helper.Out.x = m_Weight * (helper.In.x + bx);
+		helper.Out.y = m_Weight * (helper.In.y + by);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x0            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y0            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulx          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string muly          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string exp           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blurover10    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulsqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t bx = 0;\n"
+		   << "\t\treal_t by = 0;\n"
+		   << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << oneovermulsqx << ") + Sqr((vIn.y - " << y0 << ") / " << oneovermulsqy << "));\n"
+		   << "\n"
+		   << "\t\tif (rad > " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t ang = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\t	real_t r = (" << power << " == 1 ? acos(fma(MwcNext01(mwc), 2, -1.0)) / MPI : acos(exp(log(1 - MwcNext01(mwc)) * " << power << ") * 2 - 1) / MPI);\n"
+		   << "\t\t	real_t aux = r * " << blurover10 << " * exp(log(rad - " << radius << ") * " << exp << ");\n"
+		   << "\t\t	bx = aux * cos(ang);\n"
+		   << "\t\t	by = aux * sin(ang);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + bx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + by);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_BlurOver10 = m_Blur / 10;
+		m_OneOverMulXSq = 1 / Zeps(SQR(m_MulX));
+		m_OneOverMulYSq = 1 / Zeps(SQR(m_MulY));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,               prefix + "depth_sine2_power", 1, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Blur,                prefix + "depth_sine2_blur", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius,              prefix + "depth_sine2_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_X0,                  prefix + "depth_sine2_x0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_Y0,                  prefix + "depth_sine2_y0", 0));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,                prefix + "depth_sine2_mulx", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,                prefix + "depth_sine2_muly", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Exp,                 prefix + "depth_sine2_exp", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10,    prefix + "depth_sine2_blur_over_10"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulXSq, prefix + "depth_sine2_one_over_mulx_sq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulYSq, prefix + "depth_sine2_one_over_muly_sq"));
+	}
+
+private:
+	T m_Power;
+	T m_Blur;
+	T m_Radius;
+	T m_X0;
+	T m_Y0;
+	T m_MulX;
+	T m_MulY;
+	T m_Exp;
+	T m_BlurOver10;//Precalc.
+	T m_OneOverMulXSq;
+	T m_OneOverMulYSq;
+};
+
+/// <summary>
+/// coth_spiral.
+/// </summary>
+template <typename T>
+class CothSpiralVariation : public ParametricVariation<T>
+{
+public:
+	CothSpiralVariation(T weight = 1.0) : ParametricVariation<T>("coth_spiral", eVariationId::VAR_COTH_SPIRAL, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(CothSpiralVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T t2 = (rand.Frand01<T>() - T(0.5)) * M_2PI;
+		T aux = Zeps(std::cos(m_A * t2) - std::cosh(t2));
+		helper.Out.x = m_Weight * (-std::sinh(t2) / aux);
+		helper.Out.y = m_Weight * (std::sin(m_A * t2) / aux);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t t2 = (MwcNext01(mwc) - 0.5) * M_2PI;\n"
+		   << "\t\treal_t aux = Zeps(cos(" << a << " * t2) - cosh(t2));\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (-sinh(t2) / aux);\n"
+		   << "\t\tvOut.y = " << weight << " * (sin(" << a << " * t2) / aux);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "coth_spiral_a", 4));
+	}
+
+private:
+	T m_A;
+};
+
+/// <summary>
+/// dust.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DustVariation : public ParametricVariation<T>
+{
+public:
+	DustVariation(T weight = 1.0) : ParametricVariation<T>("dust", eVariationId::VAR_DUST, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DustVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T X = std::fmod(T(Floor(helper.In.x)), m_Zdens) / m_Zdens;
+		T Y = std::fmod(T(Floor(helper.In.y)), m_Zdens) / m_Zdens;
+		T random_x = VarFuncs<T>::HashShadertoy(X, Y, 0);
+		T random_y = VarFuncs<T>::HashShadertoy(Y, X, 0);
+		T a = (X + random_x * m_Dist) * M_2PI;
+		T r = std::exp(std::log(Y + random_y * m_Dist) * m_Power);
+		helper.Out.x = m_Weight * std::cos(a) * r;
+		helper.Out.y = m_Weight * std::sin(a) * r;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string dens  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zdens = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t X = fmod(floor(vIn.x), " << zdens << ") / " << zdens << ";\n"
+		   << "\t\treal_t Y = fmod(floor(vIn.y), " << zdens << ") / " << zdens << ";\n"
+		   << "\t\treal_t random_x = HashShadertoy(X, Y, 0.0);\n"
+		   << "\t\treal_t random_y = HashShadertoy(Y, X, 0.0);\n"
+		   << "\t\treal_t a = fma(random_x, " << dist << ", X) * M_2PI;\n"
+		   << "\t\treal_t r = exp(log(fma(random_y, " << dist << ", Y)) * " << power << ");\n"
+		   << "\t\tvOut.x = " << weight << " * cos(a) * r;\n"
+		   << "\t\tvOut.y = " << weight << " * sin(a) * r;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Zdens = Zeps(m_Density);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Density,     prefix + "dust_density", 5, eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Dist,        prefix + "dust_distortion", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Power,       prefix + "dust_power", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Zdens, prefix + "dust_zdens"));//Precalc.
+	}
+
+private:
+	T m_Density;
+	T m_Dist;
+	T m_Power;
+	T m_Zdens;//Precalc.
+};
+
+/// <summary>
+/// asteria.
+/// By dark-beam.
+/// </summary>
+template <typename T>
+class AsteriaVariation : public ParametricVariation<T>
+{
+public:
+	AsteriaVariation(T weight = 1.0) : ParametricVariation<T>("asteria", eVariationId::VAR_ASTERIA, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(AsteriaVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T x0 = m_Weight * helper.In.x;
+		T y0 = m_Weight * helper.In.y;
+		T xx = x0;
+		T yy = y0;
+		T r = SQR(xx) + SQR(yy);
+		xx = Sqr(std::abs(xx) - 1);
+		yy = Sqr(std::abs(yy) - 1);
+		T r2 = std::sqrt(yy + xx);
+		bool in1 = r < 1;
+		bool out2 = r2 < 1;
+
+		if (in1 && out2)
+			in1 = (rand.Frand01<T>() > 0.35);
+		else
+			in1 = !in1;
+
+		if (in1)
+		{
+			helper.Out.x = x0;
+			helper.Out.y = y0;
+		}
+		else
+		{
+			xx = x0 * m_CosAlpha - y0 * m_SinAlpha;
+			yy = x0 * m_SinAlpha + y0 * m_CosAlpha;
+			T nx = xx / std::sqrt(1 - SQR(yy)) * (1 - std::sqrt(1 - Sqr(-std::abs(yy) + 1)));
+			xx =  nx * m_CosAlpha + yy * m_SinAlpha;
+			yy = -nx * m_SinAlpha + yy * m_CosAlpha;
+			helper.Out.x = xx;
+			helper.Out.y = yy;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sina  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosa  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t x0 = " << weight << " * vIn.x;\n"
+		   << "\t\treal_t y0 = " << weight << " * vIn.y;\n"
+		   << "\t\treal_t xx = x0;\n"
+		   << "\t\treal_t yy = y0;\n"
+		   << "\t\treal_t r = SQR(xx) + SQR(yy);\n"
+		   << "\t\txx = Sqr(fabs(xx) - 1);\n"
+		   << "\t\tyy = Sqr(fabs(yy) - 1);\n"
+		   << "\t\treal_t r2 = sqrt(yy + xx);\n"
+		   << "\t\tbool in1 = r < 1;\n"
+		   << "\t\tbool out2 = r2 < 1;\n"
+		   << "\n"
+		   << "\t\tif (in1 && out2)\n"
+		   << "\t\t	in1 = MwcNext01(mwc) > 0.35;\n"
+		   << "\t\telse\n"
+		   << "\t\t	in1 = !in1;\n"
+		   << "\n"
+		   << "\t\tif (in1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = x0;\n"
+		   << "\t\t	vOut.y = y0;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	xx = x0 * " << cosa << " - y0 * " << sina << ";\n"
+		   << "\t\t	yy = x0 * " << sina << " + y0 * " << cosa << ";\n"
+		   << "\t\t	real_t nx = xx / sqrt(1 - SQR(yy)) * (1 - sqrt(1 - Sqr(-fabs(yy) + 1)));\n"
+		   << "\t\t	xx = nx * " << cosa << " + yy * " << sina << ";\n"
+		   << "\t\t	yy = -nx * " << sina << " + yy * " << cosa << ";\n"
+		   << "\t\t	vOut.x = xx;\n"
+		   << "\t\t	vOut.y = yy;\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_SinAlpha = T(std::sin(M_PI * m_Alpha));
+		m_CosAlpha = T(std::cos(M_PI * m_Alpha));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Alpha,          prefix + "asteria_alpha", 0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinAlpha, prefix + "asteria_sin_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosAlpha, prefix + "asteria_cos_alpha"));
+	}
+
+private:
+	T m_Alpha;
+	T m_SinAlpha;//Precalc.
+	T m_CosAlpha;
+};
+
+/// <summary>
+/// pulse.
+/// By FarDareisMai.
+/// </summary>
+template <typename T>
+class PulseVariation : public ParametricVariation<T>
+{
+public:
+	PulseVariation(T weight = 1.0) : ParametricVariation<T>("pulse", eVariationId::VAR_PULSE, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(PulseVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.x = m_Weight * (helper.In.x + m_ScaleX * std::sin(helper.In.x * m_FreqX));
+		helper.Out.y = m_Weight * (helper.In.y + m_ScaleY * std::sin(helper.In.y * m_FreqY));
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string freqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tvOut.x = " << weight << " * fma(" << scalex << ", sin(vIn.x * " << freqx << "), vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(" << scaley << ", sin(vIn.y * " << freqy << "), vIn.y);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_FreqX,  prefix + "pulse_freqx",  2));
+		m_Params.push_back(ParamWithName<T>(&m_FreqY,  prefix + "pulse_freqy",  2));
+		m_Params.push_back(ParamWithName<T>(&m_ScaleX, prefix + "pulse_scalex", 1));
+		m_Params.push_back(ParamWithName<T>(&m_ScaleY, prefix + "pulse_scaley", 1));
+	}
+
+private:
+	T m_FreqX;
+	T m_FreqY;
+	T m_ScaleX;
+	T m_ScaleY;
+};
+
+/// <summary>
+/// excinis.
+/// </summary>
+template <typename T>
+class ExcinisVariation : public ParametricVariation<T>
+{
+public:
+	ExcinisVariation(T weight = 1.0) : ParametricVariation<T>("excinis", eVariationId::VAR_EXCINIS, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ExcinisVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T r_prior = helper.m_PrecalcSqrtSumSquares * m_LengthScalar;
+		T r_sign = T(r_prior >= 0 ? 1 : -1);
+		T r_eps = std::abs(r_prior) > m_Eps ? 0 : r_sign * m_Eps;
+		T r = m_Weight / Zeps(r_prior + r_eps);
+		T r_func;
+
+		if (m_RadiusFunc < 1)
+			r_func = r;
+		else if (m_RadiusFunc < 2)
+			r_func = std::cos(r);
+		else if (m_RadiusFunc < 3)
+			r_func = std::exp(r);
+		else if (m_RadiusFunc < 4)
+			r_func = std::log(std::abs(r) + std::abs(r_eps));
+		else
+			r_func = 1 / Zeps(r + r_eps);
+
+		helper.Out.x = (helper.In.x - helper.In.y) * (helper.In.x + helper.In.y) * r_func;
+		helper.Out.y = 2 * helper.In.x * helper.In.y * r_func;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string lengthscalar = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radiusfunc   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string eps          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t r_prior = precalcSqrtSumSquares * " << lengthscalar << ";\n"
+		   << "\t\treal_t r_sign = r_prior >= 0.0 ? 1.0 : -1.0;\n"
+		   << "\t\treal_t r_eps = fabs(r_prior) > " << eps << " ? 0 : r_sign * " << eps << ";\n"
+		   << "\t\treal_t r = " << weight << " / Zeps(r_prior + r_eps);\n"
+		   << "\t\treal_t r_func;\n"
+		   << "\n"
+		   << "\t\tif (" << radiusfunc << " < 1)\n"
+		   << "\t\t	r_func = r;\n"
+		   << "\t\telse if (" << radiusfunc << " < 2)\n"
+		   << "\t\t	r_func = cos(r);\n"
+		   << "\t\telse if (" << radiusfunc << " < 3)\n"
+		   << "\t\t	r_func = exp(r);\n"
+		   << "\t\telse if (" << radiusfunc << " < 4)\n"
+		   << "\t\t	r_func = log(fabs(r) + fabs(r_eps));\n"
+		   << "\t\telse\n"
+		   << "\t\t	r_func = 1 / Zeps(r + r_eps);\n"
+		   << "\n"
+		   << "\t\tvOut.x = (vIn.x - vIn.y) * (vIn.x + vIn.y) * r_func;\n"
+		   << "\t\tvOut.y = 2 * vIn.x * vIn.y * r_func;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_LengthScalar, prefix + "excinis_lengthscalar", 1));
+		m_Params.push_back(ParamWithName<T>(&m_RadiusFunc,   prefix + "excinis_radiusFunc", 0, eParamType::INTEGER, 0, 5));
+		m_Params.push_back(ParamWithName<T>(&m_Eps,          prefix + "excinis_eps", T(0.1)));
+	}
+
+private:
+	T m_LengthScalar;
+	T m_RadiusFunc;
+	T m_Eps;
+};
+
+/// <summary>
+/// vibration.
+/// By FarDareisMai.
+/// </summary>
+template <typename T>
+class VibrationVariation : public ParametricVariation<T>
+{
+public:
+	VibrationVariation(T weight = 1.0) : ParametricVariation<T>("vibration", eVariationId::VAR_VIBRATION, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(VibrationVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T d_along_dir = helper.In.x * m_CosDir + helper.In.y * m_SinDir;
+		T local_amp = m_Amp * std::sin((d_along_dir * m_ScaledFreq) + m_PhaseShift);
+		T x = helper.In.x + local_amp * m_CosTot;
+		T y = helper.In.y + local_amp * m_SinTot;
+		d_along_dir = helper.In.x * m_CosDir2 + helper.In.y * m_SinDir2;
+		local_amp = m_Amp2 * std::sin((d_along_dir * m_ScaledFreq2) + m_PhaseShift2);
+		x += local_amp * m_CosTot2;
+		y += local_amp * m_SinTot2;
+		helper.Out.x = m_Weight * x;
+		helper.Out.y = m_Weight * y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string dir         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amp         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phase       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dir2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq2       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amp2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phase2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosdir      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sindir      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string costot      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sintot      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaledfreq  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phaseshift  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosdir2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sindir2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string costot2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sintot2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaledfreq2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phaseshift2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t d_along_dir = fma(vIn.x, " << cosdir << ", vIn.y * " << sindir << ");\n"
+		   << "\t\treal_t local_amp = " << amp << " * sin(fma(d_along_dir, " << scaledfreq << ", " << phaseshift << "));\n"
+		   << "\t\treal_t x = fma(local_amp, " << costot << ", vIn.x);\n"
+		   << "\t\treal_t y = fma(local_amp, " << sintot << ", vIn.y);\n"
+		   << "\t\td_along_dir = fma(vIn.x, " << cosdir2 << ", vIn.y * " << sindir2 << ");\n"
+		   << "\t\tlocal_amp = " << amp2 << " * sin(fma(d_along_dir, " << scaledfreq2 << ", " << phaseshift2 << "));\n"
+		   << "\t\tx += local_amp * " << costot2 << ";\n"
+		   << "\t\ty += local_amp * " << sintot2 << ";\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * x;\n"
+		   << "\t\tvOut.y = " << weight << " * y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		T totalangle = m_Angle + m_Dir;
+		m_CosDir = std::cos(m_Dir);
+		m_SinDir = std::sin(m_Dir);
+		m_CosTot = std::cos(totalangle);
+		m_SinTot = std::sin(totalangle);
+		m_ScaledFreq = m_Freq * M_2PI;
+		m_PhaseShift = M_2PI * m_Phase / Zeps(m_Freq);
+		T totalangle2 = m_Angle2 + m_Dir2;
+		m_CosDir2 = std::cos(m_Dir2);
+		m_SinDir2 = std::sin(m_Dir2);
+		m_CosTot2 = std::cos(totalangle2);
+		m_SinTot2 = std::sin(totalangle2);
+		m_ScaledFreq2 = m_Freq2 * M_2PI;
+		m_PhaseShift2 = M_2PI * m_Phase2 / Zeps(m_Freq2);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Dir,               prefix + "vibration_dir", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Angle,             prefix + "vibration_angle", T(M_PI_2), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Freq,              prefix + "vibration_freq", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Amp,               prefix + "vibration_amp", T(0.25)));
+		m_Params.push_back(ParamWithName<T>(&m_Phase,             prefix + "vibration_phase", 0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Dir2,              prefix + "vibration_dir2", T(M_PI_2), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Angle2,            prefix + "vibration_angle2", T(M_PI_2), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Freq2,             prefix + "vibration_freq2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Amp2,              prefix + "vibration_amp2", T(0.25)));
+		m_Params.push_back(ParamWithName<T>(&m_Phase2,            prefix + "vibration_phase2", 0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosDir,      prefix + "vibration_cos_dir"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinDir,      prefix + "vibration_sin_dir"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosTot,      prefix + "vibration_cos_tot"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinTot,      prefix + "vibration_sin_tot"));
+		m_Params.push_back(ParamWithName<T>(true, &m_ScaledFreq,  prefix + "vibration_scaled_freq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_PhaseShift,  prefix + "vibration_phase_shift"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosDir2,     prefix + "vibration_cos_dir2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinDir2,     prefix + "vibration_sin_dir2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosTot2,     prefix + "vibration_cos_tot2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinTot2,     prefix + "vibration_sin_tot2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_ScaledFreq2, prefix + "vibration_scaled_freq2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_PhaseShift2, prefix + "vibration_phase_shift2"));
+	}
+
+private:
+	T m_Dir;
+	T m_Angle;
+	T m_Freq;
+	T m_Amp;
+	T m_Phase;
+	T m_Dir2;
+	T m_Angle2;
+	T m_Freq2;
+	T m_Amp2;
+	T m_Phase2;
+	T m_CosDir;
+	T m_SinDir;
+	T m_CosTot;
+	T m_SinTot;
+	T m_ScaledFreq;
+	T m_PhaseShift;
+	T m_CosDir2;
+	T m_SinDir2;
+	T m_CosTot2;
+	T m_SinTot2;
+	T m_ScaledFreq2;
+	T m_PhaseShift2;
+};
+
+/// <summary>
+/// vibration2.
+/// By FarDareisMai.
+/// </summary>
+template <typename T>
+class Vibration2Variation : public ParametricVariation<T>
+{
+public:
+	Vibration2Variation(T weight = 1.0) : ParametricVariation<T>("vibration2", eVariationId::VAR_VIBRATION2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Vibration2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T d_along_dir = helper.In.x * m_CosDir + helper.In.y * m_SinDir;
+		T dirL = m_Dir + VarFuncs<T>::Modulate(m_Dm, m_Dmfreq, d_along_dir);
+		T angleL = m_Angle + VarFuncs<T>::Modulate(m_Tm, m_Tmfreq, d_along_dir);
+		T freqL = VarFuncs<T>::Modulate(m_Fm, m_Fmfreq, d_along_dir) / Zeps(m_Freq);
+		T ampL = m_Amp + m_Amp * VarFuncs<T>::Modulate(m_Am, m_Amfreq, d_along_dir);
+		T total_angle = angleL + dirL;
+		T cos_dir = std::cos(dirL);
+		T sin_dir = std::sin(dirL);
+		T cos_tot = std::cos(total_angle);
+		T sin_tot = std::sin(total_angle);
+		d_along_dir = helper.In.x * cos_dir + helper.In.y * sin_dir;
+		T local_amp = ampL * std::sin((d_along_dir * m_ScaledFreq) + freqL + m_PhaseShift);
+		T x = helper.In.x + local_amp * cos_tot;
+		T y = helper.In.y + local_amp * sin_tot;
+		d_along_dir = helper.In.x * m_CosDir2 + helper.In.y * m_SinDir2;
+		dirL = m_Dir2 + VarFuncs<T>::Modulate(m_D2m, m_D2mfreq, d_along_dir);
+		angleL = m_Angle2 + VarFuncs<T>::Modulate(m_T2m, m_T2mfreq, d_along_dir);
+		freqL = VarFuncs<T>::Modulate(m_F2m, m_F2mfreq, d_along_dir) / Zeps(m_Freq2);
+		ampL = m_Amp2 + m_Amp2 * VarFuncs<T>::Modulate(m_A2m, m_A2mfreq, d_along_dir);
+		total_angle = angleL + dirL;
+		cos_dir = std::cos(dirL);
+		sin_dir = std::sin(dirL);
+		cos_tot = std::cos(total_angle);
+		sin_tot = std::sin(total_angle);
+		d_along_dir = helper.In.x * cos_dir + helper.In.y * sin_dir;
+		local_amp = ampL * std::sin((d_along_dir * m_ScaledFreq2) + freqL + m_PhaseShift2);
+		x += local_amp * cos_tot;
+		y += local_amp * sin_tot;
+		helper.Out.x = m_Weight * x;
+		helper.Out.y = m_Weight * y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string dir         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amp         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phase       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dir2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq2       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amp2        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phase2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dm          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dmfreq      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tm          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tmfreq      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string fm          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string fmfreq      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string am          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amfreq      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string d2m         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string d2mfreq     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string t2m         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string t2mfreq     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string f2m         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string f2mfreq     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a2m         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a2mfreq     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosdir      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sindir      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaledfreq  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phaseshift  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosdir2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sindir2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scaledfreq2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string phaseshift2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t d_along_dir = fma(vIn.x, " << cosdir << ", vIn.y * " << sindir << ");\n"
+		   << "\t\treal_t dirL = " << dir << " + Modulate(" << dm << ", " << dmfreq << ", d_along_dir);\n"
+		   << "\t\treal_t angleL = " << angle << " + Modulate(" << tm << ", " << tmfreq << ", d_along_dir);\n"
+		   << "\t\treal_t freqL = Modulate(" << fm << ", " << fmfreq << ", d_along_dir) / Zeps(" << freq << ");\n"
+		   << "\t\treal_t ampL = fma(" << amp << ", Modulate(" << am << ", " << amfreq << ", d_along_dir), " << amp << ");\n"
+		   << "\t\treal_t total_angle = angleL + dirL;\n"
+		   << "\t\treal_t cos_dir = cos(dirL);\n"
+		   << "\t\treal_t sin_dir = sin(dirL);\n"
+		   << "\t\treal_t cos_tot = cos(total_angle);\n"
+		   << "\t\treal_t sin_tot = sin(total_angle);\n"
+		   << "\t\td_along_dir = fma(vIn.x, cos_dir, vIn.y * sin_dir);\n"
+		   << "\t\treal_t local_amp = ampL * sin(fma(d_along_dir, " << scaledfreq << ", freqL + " << phaseshift << "));\n"
+		   << "\t\treal_t x = fma(local_amp, cos_tot, vIn.x);\n"
+		   << "\t\treal_t y = fma(local_amp, sin_tot, vIn.y);\n"
+		   << "\t\td_along_dir = fma(vIn.x, " << cosdir2 << ", vIn.y * " << sindir2 << ");\n"
+		   << "\t\tdirL = " << dir2 << " + Modulate(" << d2m << ", " << d2mfreq << ", d_along_dir);\n"
+		   << "\t\tangleL = " << angle2 << " + Modulate(" << t2m << ", " << t2mfreq << ", d_along_dir);\n"
+		   << "\t\tfreqL = Modulate(" << f2m << ", " << f2mfreq << ", d_along_dir) / Zeps(" << freq2 << ");\n"
+		   << "\t\tampL = fma(" << amp2 << ", Modulate(" << a2m << ", " << a2mfreq << ", d_along_dir), " << amp2 << ");\n"
+		   << "\t\ttotal_angle = angleL + dirL;\n"
+		   << "\t\tcos_dir = cos(dirL);\n"
+		   << "\t\tsin_dir = sin(dirL);\n"
+		   << "\t\tcos_tot = cos(total_angle);\n"
+		   << "\t\tsin_tot = sin(total_angle);\n"
+		   << "\t\td_along_dir = fma(vIn.x, cos_dir, vIn.y * sin_dir);\n"
+		   << "\t\tlocal_amp = ampL * sin(fma(d_along_dir, " << scaledfreq2 << ", freqL + " << phaseshift2 << "));\n"
+		   << "\t\tx += local_amp * cos_tot;\n"
+		   << "\t\ty += local_amp * sin_tot;\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * x;\n"
+		   << "\t\tvOut.y = " << weight << " * y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_CosDir = std::cos(m_Dir);
+		m_SinDir = std::sin(m_Dir);
+		m_ScaledFreq = m_Freq * M_2PI;
+		m_PhaseShift = M_2PI * m_Phase / Zeps(m_Freq);
+		m_CosDir2 = std::cos(m_Dir2);
+		m_SinDir2 = std::sin(m_Dir2);
+		m_ScaledFreq2 = m_Freq2 * M_2PI;
+		m_PhaseShift2 = M_2PI * m_Phase2 / Zeps(m_Freq2);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sqr", "Modulate" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Dir,               prefix + "vibration2_dir", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Angle,             prefix + "vibration2_angle", T(M_PI_2), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Freq,              prefix + "vibration2_freq", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Amp,               prefix + "vibration2_amp", T(0.25)));
+		m_Params.push_back(ParamWithName<T>(&m_Phase,             prefix + "vibration2_phase", 0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Dir2,              prefix + "vibration2_dir2", T(M_PI_2), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Angle2,            prefix + "vibration2_angle2", T(M_PI_2), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Freq2,             prefix + "vibration2_freq2", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Amp2,              prefix + "vibration2_amp2", T(0.25)));
+		m_Params.push_back(ParamWithName<T>(&m_Phase2,            prefix + "vibration2_phase2", 0, eParamType::REAL_CYCLIC, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Dm,                prefix + "vibration2_dm"));
+		m_Params.push_back(ParamWithName<T>(&m_Dmfreq,            prefix + "vibration2_dmfreq"));
+		m_Params.push_back(ParamWithName<T>(&m_Tm	,             prefix + "vibration2_tm"));
+		m_Params.push_back(ParamWithName<T>(&m_Tmfreq,            prefix + "vibration2_tmfreq"));
+		m_Params.push_back(ParamWithName<T>(&m_Fm	,             prefix + "vibration2_fm"));
+		m_Params.push_back(ParamWithName<T>(&m_Fmfreq,            prefix + "vibration2_fmfreq"));
+		m_Params.push_back(ParamWithName<T>(&m_Am	,             prefix + "vibration2_am"));
+		m_Params.push_back(ParamWithName<T>(&m_Amfreq,            prefix + "vibration2_amfreq"));
+		m_Params.push_back(ParamWithName<T>(&m_D2m	,             prefix + "vibration2_dm2"));
+		m_Params.push_back(ParamWithName<T>(&m_D2mfreq,           prefix + "vibration2_dmfreq2"));
+		m_Params.push_back(ParamWithName<T>(&m_T2m	,             prefix + "vibration2_tm2"));
+		m_Params.push_back(ParamWithName<T>(&m_T2mfreq,           prefix + "vibration2_tmfreq2"));
+		m_Params.push_back(ParamWithName<T>(&m_F2m	,             prefix + "vibration2_fm2"));
+		m_Params.push_back(ParamWithName<T>(&m_F2mfreq,           prefix + "vibration2_fmfreq2"));
+		m_Params.push_back(ParamWithName<T>(&m_A2m	,             prefix + "vibration2_am2"));
+		m_Params.push_back(ParamWithName<T>(&m_A2mfreq,           prefix + "vibration2_amfreq2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosDir,      prefix + "vibration2_cos_dir"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinDir,      prefix + "vibration2_sin_dir"));
+		m_Params.push_back(ParamWithName<T>(true, &m_ScaledFreq,  prefix + "vibration2_scaled_freq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_PhaseShift,  prefix + "vibration2_phase_shift"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosDir2,     prefix + "vibration2_cos_dir2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinDir2,     prefix + "vibration2_sin_dir2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_ScaledFreq2, prefix + "vibration2_scaled_freq2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_PhaseShift2, prefix + "vibration2_phase_shift2"));
+	}
+
+private:
+	T m_Dir;
+	T m_Angle;
+	T m_Freq;
+	T m_Amp;
+	T m_Phase;
+	T m_Dir2;
+	T m_Angle2;
+	T m_Freq2;
+	T m_Amp2;
+	T m_Phase2;
+	T m_Dm;
+	T m_Dmfreq;
+	T m_Tm;
+	T m_Tmfreq;
+	T m_Fm;
+	T m_Fmfreq;
+	T m_Am;
+	T m_Amfreq;
+	T m_D2m;
+	T m_D2mfreq;
+	T m_T2m;
+	T m_T2mfreq;
+	T m_F2m;
+	T m_F2mfreq;
+	T m_A2m;
+	T m_A2mfreq;
+	T m_CosDir;
+	T m_SinDir;
+	T m_ScaledFreq;
+	T m_PhaseShift;
+	T m_CosDir2;
+	T m_SinDir2;
+	T m_ScaledFreq2;
+	T m_PhaseShift2;
+};
+
+/// <summary>
+/// arcsech.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class ArcsechVariation : public ParametricVariation<T>
+{
+public:
+	ArcsechVariation(T weight = 1.0) : ParametricVariation<T>("arcsech", eVariationId::VAR_ARCSECH, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ArcsechVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		v2T z1(helper.In.x, helper.In.y);
+		v2T z = VarFuncs<T>::RealDivComplex(1.0, z1);
+		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexPlusComplex(z, VarFuncs<T>::ComplexMultComplex(VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexPlusReal(z, 1.0)), VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexMinusReal(z, 1.0))))), m_WeightInvPi);
+		helper.Out.x = result.x;
+		helper.Out.y = result.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string weightinvpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal2 z1 = (real2)(vIn.x, vIn.y);\n"
+		   << "\t\treal2 z = RealDivComplex(1.0, z1);\n"
+		   << "\t\treal2 result = ComplexMultReal(ComplexLog(ComplexPlusComplex(z,ComplexMultComplex(ComplexSqrt(ComplexPlusReal(z, 1.0)), ComplexSqrt(ComplexMinusReal(z, 1.0))))), " << weightinvpi << ");\n"
+		   << "\n"
+		   << "\t\tvOut.x = result.x;\n"
+		   << "\t\tvOut.y = result.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_WeightInvPi = m_Weight * T(M_1_PI);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sign", "Hypot", "ComplexMultReal", "ComplexLog", "ComplexPlusReal", "ComplexPlusComplex", "ComplexMultComplex", "ComplexSqrt", "ComplexMinusReal", "RealDivComplex" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(true, &m_WeightInvPi, prefix + "arcsech_weight_inv_pi"));//Precalc.
+	}
+
+private:
+	T m_WeightInvPi;//Precalc only.
+};
+
+/// <summary>
+/// arcsech2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class Arcsech2Variation : public ParametricVariation<T>
+{
+public:
+	Arcsech2Variation(T weight = 1.0) : ParametricVariation<T>("arcsech2", eVariationId::VAR_ARCSECH2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Arcsech2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		v2T z1(helper.In.x, helper.In.y);
+		v2T z = VarFuncs<T>::RealDivComplex(1.0, z1);
+		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexPlusComplex(z, VarFuncs<T>::ComplexMultComplex(VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexPlusReal(z, 1.0)), VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexMinusReal(z, 1.0))))), m_WeightInvPi);
+
+		if (result.y < 0)
+		{
+			helper.Out.x = result.x;
+			helper.Out.y = result.y + 1;
+		}
+		else
+		{
+			helper.Out.x = -result.x;
+			helper.Out.y = result.y - 1;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string weightinvpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal2 z1 = (real2)(vIn.x, vIn.y);\n"
+		   << "\t\treal2 z = RealDivComplex(1.0, z1);\n"
+		   << "\t\treal2 result = ComplexMultReal(ComplexLog(ComplexPlusComplex(z,ComplexMultComplex(ComplexSqrt(ComplexPlusReal(z, 1.0)), ComplexSqrt(ComplexMinusReal(z, 1.0))))), " << weightinvpi << ");\n"
+		   << "\n"
+		   << "\t\tif (result.y < 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = result.x;\n"
+		   << "\t\t	vOut.y = result.y + 1;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = -result.x;\n"
+		   << "\t\t	vOut.y = result.y - 1;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_WeightInvPi = m_Weight * T(M_1_PI) * 2;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Sign", "Hypot", "ComplexMultReal", "ComplexLog", "ComplexPlusReal", "ComplexPlusComplex", "ComplexMultComplex", "ComplexSqrt", "ComplexMinusReal", "RealDivComplex" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(true, &m_WeightInvPi, prefix + "arcsech2_weight_inv_pi"));//Precalc.
+	}
+
+private:
+	T m_WeightInvPi;//Precalc only.
+};
+
+/// <summary>
+/// arcsinh.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class ArcsinhVariation : public ParametricVariation<T>
+{
+public:
+	ArcsinhVariation(T weight = 1.0) : ParametricVariation<T>("arcsinh", eVariationId::VAR_ARCSINH, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ArcsinhVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		v2T z(helper.In.x, helper.In.y);
+		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexPlusComplex(z, VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexPlusReal(VarFuncs<T>::ComplexMultComplex(z, z), 1.0)))), m_WeightInvPi);
+		helper.Out.x = result.x;
+		helper.Out.y = result.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string weightinvpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal2 z = (real2)(vIn.x, vIn.y);\n"
+		   << "\t\treal2 result = ComplexMultReal(ComplexLog(ComplexPlusComplex(z, ComplexSqrt(ComplexPlusReal(ComplexMultComplex(z, z), 1.0)))), " << weightinvpi << ");\n"
+		   << "\n"
+		   << "\t\tvOut.x = result.x;\n"
+		   << "\t\tvOut.y = result.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_WeightInvPi = m_Weight * T(M_2_PI);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sign", "Hypot", "ComplexMultReal", "ComplexLog", "ComplexPlusReal", "ComplexPlusComplex", "ComplexMultComplex", "ComplexSqrt" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(true, &m_WeightInvPi, prefix + "arcsinh_weight_inv_pi"));//Precalc.
+	}
+
+private:
+	T m_WeightInvPi;//Precalc only.
+};
+
+/// <summary>
+/// arctanh.
+/// </summary>
+template <typename T>
+class ArctanhVariation : public ParametricVariation<T>
+{
+public:
+	ArctanhVariation(T weight = 1.0) : ParametricVariation<T>("arctanh", eVariationId::VAR_ARCTANH, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ArctanhVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		v2T z(helper.In.x, helper.In.y);
+		v2T zm(-helper.In.x, -helper.In.y);
+		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexDivComplex(VarFuncs<T>::ComplexPlusReal(z, 1.0), VarFuncs<T>::ComplexPlusReal(zm, 1.0))), m_WeightInvPi);
+		helper.Out.x = result.x;
+		helper.Out.y = result.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string weightinvpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal2 z = (real2)(vIn.x, vIn.y);\n"
+		   << "\t\treal2 zm = (real2)(-vIn.x, -vIn.y);\n"
+		   << "\t\treal2 result = ComplexMultReal(ComplexLog(ComplexDivComplex(ComplexPlusReal(z, 1.0), ComplexPlusReal(zm, 1.0))), " << weightinvpi << ");\n"
+		   << "\n"
+		   << "\t\tvOut.x = result.x;\n"
+		   << "\t\tvOut.y = result.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_WeightInvPi = m_Weight * T(M_1_PI);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Sign", "Zeps", "ComplexMultReal", "ComplexLog", "ComplexPlusReal", "ComplexDivComplex" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(true, &m_WeightInvPi, prefix + "arctanh_weight_inv_pi"));//Precalc.
+	}
+
+private:
+	T m_WeightInvPi;//Precalc only.
+};
+
+/// <summary>
+/// hex_truchet.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class HexTruchetVariation : public ParametricVariation<T>
+{
+public:
+	HexTruchetVariation(T weight = 1.0) : ParametricVariation<T>("hex_truchet", eVariationId::VAR_HEX_TRUCHET, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(HexTruchetVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T angle = rand.Frand01<T>() * M_2PI;
+		T r = std::sqrt(rand.Frand01<T>() * m_MaxmMin + m_Min);
+		v2T xy;
+
+		if (angle < 2.0943)
+		{
+			xy = v2T(1, T(0.5773));
+		}
+		else
+		{
+			if (angle < 4.1887)
+				xy = v2T(-1, T(0.5773));
+			else
+				xy = v2T(0, T(-1.1547));
+		}
+
+		T a = angle + T(2.6179);
+		T X = 2 * (Floor<T>(rand.Frand01<T>() * m_Sidem2p1) - m_Side);
+		T Y = 2 * (Floor<T>(rand.Frand01<T>() * m_Sidem2p1) - m_Side);
+		T xfinal = X + T(0.5) * Y;
+		T yfinal = T(0.8660) * Y;
+		T random = VarFuncs<T>::HashShadertoy(X, Y, m_Seed);
+		T rotation = random < T(0.5) ? 0 : T(1.0471);
+		T a_final = a - rotation;
+		T cosa = std::cos(rotation);
+		T sina = std::sin(rotation);
+		v2T xy_final(xy.x * cosa + xy.y * sina, -xy.x * sina + xy.y * cosa);
+		helper.Out.x = (std::cos(a_final) * r + xy_final.x + xfinal) * m_Weight;
+		helper.Out.y = (std::sin(a_final) * r + xy_final.y + yfinal) * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string size     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string side     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string onemsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mn       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string maxmmin  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sidem2p1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t angle = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\treal_t r = sqrt(fma(MwcNext01(mwc), " << maxmmin << ", " << mn << "));\n"
+		   << "\t\treal2 xy;\n"
+		   << "\n"
+		   << "\t\tif (angle < 2.0943)\n"
+		   << "\t\t{\n"
+		   << "\t\t	xy = (real2)(1.0, 0.5773);\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (angle < 4.1887)\n"
+		   << "\t\t		xy = (real2)(-1.0, 0.5773);\n"
+		   << "\t\t	else\n"
+		   << "\t\t		xy = (real2)(0.0, -1.1547);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\treal_t a = angle + 2.6179;\n"
+		   << "\t\treal_t X = 2.0 * (floor(MwcNext01(mwc) * " << sidem2p1 << ") - " << side << ");\n"
+		   << "\t\treal_t Y = 2.0 * (floor(MwcNext01(mwc) * " << sidem2p1 << ") - " << side << ");\n"
+		   << "\t\treal_t xfinal = fma(0.5, Y, X);\n"
+		   << "\t\treal_t yfinal = 0.8660 * Y;\n"
+		   << "\t\treal_t random = HashShadertoy(X, Y, " << seed << ");\n"
+		   << "\t\treal_t rotation = random < 0.5 ? 0.0 : 1.0471;\n"
+		   << "\t\treal_t a_final = a - rotation;\n"
+		   << "\t\treal_t cosa = cos(rotation);\n"
+		   << "\t\treal_t sina = sin(rotation);\n"
+		   << "\t\treal2 xy_final = (real2)(fma(xy.x, cosa, xy.y * sina), fma(-xy.x, sina, xy.y * cosa));\n"
+		   << "\n"
+		   << "\t\tvOut.x = fma(cos(a_final), r, xy_final.x + xfinal) * " << weight << ";\n"
+		   << "\t\tvOut.y = fma(sin(a_final), r, xy_final.y + yfinal) * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_OnemSize = (1 - m_Size) * T(0.85);
+		m_Min = Sqr(T(0.15) + m_OnemSize * T(0.5));
+		T mx = Sqr(1 - m_OnemSize * T(0.5));
+		m_MaxmMin = mx - m_Min;
+		m_Sidem2p1 = m_Side * 2 + 1;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Size,           prefix + "hex_truchet_size", 1, eParamType::REAL, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Side,           prefix + "hex_truchet_side", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,           prefix + "hex_truchet_seed", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_OnemSize, prefix + "hex_truchet_onemsize"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Min,      prefix + "hex_truchet_min"));
+		m_Params.push_back(ParamWithName<T>(true, &m_MaxmMin,  prefix + "hex_truchet_maxmmin"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Sidem2p1, prefix + "hex_truchet_sidem2p1"));
+	}
+
+private:
+	T m_Size;
+	T m_Side;
+	T m_Seed;
+	T m_OnemSize;//Precalc only.
+	T m_Min;
+	T m_MaxmMin;
+	T m_Sidem2p1;
+};
+
+/// <summary>
+/// hex_rand.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class HexRandVariation : public ParametricVariation<T>
+{
+public:
+	HexRandVariation(T weight = 1.0) : ParametricVariation<T>("hex_rand", eVariationId::VAR_HEX_RAND, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(HexRandVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T k = rand.Frand01<T>() * 6;
+		auto int_angle = Floor<T>(k);
+		T x = k - int_angle;
+		T z = std::sqrt(1 + x * x - x);
+		T angle_sign = T((int_angle - Floor<T>(k / 2) * 2) == 1 ? 1 : -1);
+		T final_angle = T(2.0943951023931954923084289221863) * (int_angle / 2) + angle_sign * std::asin(T(0.86602540378443864676372317075294) * x / z) - T(M_PI_2);
+		T X = (floor(rand.Frand01<T>() * m_X * 2) - m_X);
+		T Y = (floor(rand.Frand01<T>() * m_Y * 2) - m_Y);
+		T xfinal = X + T(0.5) * Y;
+		T yfinal = Y * T(0.86602540378443864676372317075294);
+		T N = VarFuncs<T>::HashShadertoy(yfinal, xfinal, m_Seed);
+
+		if (N < m_Density)
+		{
+			T z_scaled = z * std::sqrt(rand.Frand01<T>()) * T(1.1547005383792515290182975610039);//2 / sqrt(3)
+			T n = VarFuncs<T>::HashShadertoy(xfinal, yfinal, m_Seed);
+			T R = m_SizeOver2 * z_scaled * std::pow(n, m_Power);
+			helper.Out.x = std::cos(final_angle) * R + xfinal * m_Weight;
+			helper.Out.y = std::sin(final_angle) * R + yfinal * m_Weight;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string x         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string density   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sizeover2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t k = MwcNext01(mwc) * 6;\n"
+		   << "\t\tint int_angle = (int)floor(k);\n"
+		   << "\t\treal_t x = k - int_angle;\n"
+		   << "\t\treal_t z = sqrt(1 + x * x - x);\n"
+		   << "\t\treal_t angle_sign = (int_angle - floor(k / 2) * 2) == 1 ? 1.0 : -1.0;\n"
+		   << "\t\treal_t final_angle = 2.0943951023931954923084289221863 * (int_angle / 2) + angle_sign * asin(0.86602540378443864676372317075294 * x / z) - MPI2;\n"
+		   << "\t\treal_t X = (floor(MwcNext01(mwc) * " << x << " * 2) - " << x << ");\n"
+		   << "\t\treal_t Y = (floor(MwcNext01(mwc) * " << y << " * 2) - " << y << ");\n"
+		   << "\t\treal_t xfinal = fma(0.5, Y, X);\n"
+		   << "\t\treal_t yfinal = Y * 0.86602540378443864676372317075294;\n"
+		   << "\t\treal_t N = HashShadertoy(yfinal, xfinal, " << seed << ");\n"
+		   << "\n"
+		   << "\t\tif (N < " << density << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t z_scaled = z * sqrt(MwcNext01(mwc)) * 1.1547005383792515290182975610039;\n"
+		   << "\t\t	real_t n = HashShadertoy(xfinal, yfinal, " << seed << ");\n"
+		   << "\t\t	real_t R = " << sizeover2 << " * z_scaled * pow(n, " << power << ");\n"
+		   << "\t\t	vOut.x = fma(cos(final_angle), R, xfinal) * " << weight << ";\n"
+		   << "\t\t	vOut.y = fma(sin(final_angle), R, yfinal) * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_SizeOver2 = m_Size * T(0.5);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_X,               prefix + "hex_rand_x", 10));
+		m_Params.push_back(ParamWithName<T>(&m_Y,               prefix + "hex_rand_y", 10));
+		m_Params.push_back(ParamWithName<T>(&m_Size,            prefix + "hex_rand_size", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Power,           prefix + "hex_rand_power", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Density,         prefix + "hex_rand_density", 1, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,            prefix + "hex_rand_seed", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_SizeOver2, prefix + "hex_rand_size_over_2"));
+	}
+
+private:
+	T m_X;
+	T m_Y;
+	T m_Size;
+	T m_Power;
+	T m_Density;
+	T m_Seed;
+	T m_SizeOver2;//Precalc.
+};
+
+/// <summary>
+/// smartshape.
+/// By Zy0rg.
+/// </summary>
+template <typename T>
+class SmartshapeVariation : public ParametricVariation<T>
+{
+public:
+	SmartshapeVariation(T weight = 1.0) : ParametricVariation<T>("smartshape", eVariationId::VAR_SMARTSHAPE, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(SmartshapeVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T dang = (helper.m_PrecalcAtanyx + T(M_PI)) / m_Alpha;
+		T rad = helper.m_PrecalcSqrtSumSquares;
+		T zang1 = T(Floor<T>(dang));
+		T xang1 = dang - zang1;
+		T xang2 = xang1 > 0.5 ? 1 - xang1 : xang1;
+		T zang = xang1 > 0.5 ? zang1 + 1 : zang1;
+		T sign = T(xang1 > 0.5 ? -1 : 1);
+		T xang;
+
+		if (m_Comp == 1 && m_Distortion >= 1)
+			xang = std::atan(xang2 * m_AlphaCoeff) / m_Alpha;
+		else
+			xang = xang2;
+
+		T coeff_1;
+
+		if (m_Distortion == 0)
+		{
+			coeff_1 = 1;
+		}
+		else
+		{
+			T coeff0 = 1 / std::cos(xang * m_Alpha);
+
+			if (m_Roundstr != 0)
+			{
+				T wwidth;
+
+				if (m_Roundwidth != 1)
+					wwidth = std::exp(std::log(xang * 2) * m_Roundwidth) * m_RoundCoeff;
+				else
+					wwidth = xang * 2 * m_RoundCoeff;
+
+				coeff_1 = std::abs((1 - wwidth) * coeff0 + wwidth);
+			}
+			else
+				coeff_1 = coeff0;
+		}
+
+		T coeff;
+
+		//for negative distortion and small values of coeff_1
+		//this expression is numerically unstable
+		//double precision strongly recommended
+		if (m_Distortion != 1)
+			coeff = std::exp(std::log(coeff_1) * m_Distortion);
+		else
+			coeff = coeff_1;
+
+		T ang = (zang + sign * xang) * m_Alpha - T(M_PI);
+		T temp = m_Weight * coeff * rad;
+		helper.Out.x = std::cos(ang) * temp;
+		helper.Out.y = std::sin(ang) * temp;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string roundstr     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string roundwidth   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string distortion   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string compensation = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alphacoeff   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string roundcoeff   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string comp         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t dang = (precalcAtanyx + MPI) / " << alpha << ";\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\t\treal_t zang1 = floor(dang);\n"
+		   << "\t\treal_t xang1 = dang - zang1;\n"
+		   << "\t\treal_t xang2 = xang1 > 0.5 ? 1.0 - xang1 : xang1;\n"
+		   << "\t\treal_t zang = xang1 > 0.5 ? zang1 + 1.0 : zang1;\n"
+		   << "\t\treal_t sign = xang1 > 0.5 ? -1.0 : 1.0;\n"
+		   << "\t\treal_t xang;\n"
+		   << "\n"
+		   << "\t\tif (" << comp << " == 1.0 && " << distortion << " >= 1.0)\n"
+		   << "\t\t	xang = atan(xang2 * " << alphacoeff << ") / " << alpha << ";\n"
+		   << "\t\telse\n"
+		   << "\t\t	xang = xang2;\n"
+		   << "\n"
+		   << "\t\treal_t coeff_1;\n"
+		   << "\n"
+		   << "\t\tif (" << distortion << " == 0.0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	coeff_1 = 1.0;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t coeff0 = 1.0 / cos(xang * " << alpha << ");\n"
+		   << "\n"
+		   << "\t\t	if (" << roundstr << " != 0.0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t wwidth;\n"
+		   << "\t\t		if (" << roundwidth << " != 1.0)\n"
+		   << "\t\t			wwidth = exp(log(xang * 2) * " << roundwidth << ") * " << roundcoeff << ";\n"
+		   << "\t\t		else\n"
+		   << "\t\t			wwidth = xang * 2 * " << roundcoeff << ";\n"
+		   << "\n"
+		   << "\t\t		coeff_1 = fabs(fma(1.0 - wwidth, coeff0, wwidth));\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t		coeff_1 = coeff0;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\treal_t coeff;\n"
+		   << "\n"
+		   << "\t\tif (" << distortion << " != 1.0)\n"
+		   << "\t\t	coeff = exp(log(coeff_1) * " << distortion << ");\n"
+		   << "\t\telse\n"
+		   << "\t\t	coeff = coeff_1;\n"
+		   << "\n"
+		   << "\t\treal_t ang = fma(sign, xang, zang) * " << alpha << " - MPI;\n"
+		   << "\t\treal_t temp = " << weight << " * coeff * rad;\n"
+		   << "\t\tvOut.x = cos(ang) * temp;\n"
+		   << "\t\tvOut.y = sin(ang) * temp;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Alpha = T(M_2PI) / m_Power;
+		m_AlphaCoeff = std::tan(m_Alpha * T(0.5)) * 2;
+		m_RoundCoeff = m_Roundstr / std::sin(m_Alpha * T(0.5)) / m_Power * 2;
+		m_Comp = m_Compensation <= 0 ? T(0) : T(1);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,            prefix + "smartshape_power", 4, eParamType::REAL, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Roundstr,         prefix + "smartshape_roundstr"));
+		m_Params.push_back(ParamWithName<T>(&m_Roundwidth,       prefix + "smartshape_roundwidth", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Distortion,       prefix + "smartshape_distortion", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Compensation,     prefix + "smartshape_compensation", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,      prefix + "smartshape_alpha"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_AlphaCoeff, prefix + "smartshape_alphacoeff"));
+		m_Params.push_back(ParamWithName<T>(true, &m_RoundCoeff, prefix + "smartshape_roundcoeff"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Comp,       prefix + "smartshape_comp"));
+	}
+
+private:
+	T m_Power;
+	T m_Roundstr;
+	T m_Roundwidth;
+	T m_Distortion;
+	T m_Compensation;
+	T m_Alpha;//Precalc.
+	T m_AlphaCoeff;
+	T m_RoundCoeff;
+	T m_Comp;
+};
+
+/// <summary>
+/// squares.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class SquaresVariation : public ParametricVariation<T>
+{
+public:
+	SquaresVariation(T weight = 1.0) : ParametricVariation<T>("squares", eVariationId::VAR_SQUARES, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(SquaresVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		if (m_CellSize == 0)
+		{
+			helper.Out.x = helper.In.x * m_Weight;
+			helper.Out.y = helper.In.y * m_Weight;
+		}
+		else
+		{
+			T Cx = (Floor<T>(helper.In.x / m_CellSize) + T(0.5)) * m_CellSize;
+			T Cy = (Floor<T>(helper.In.y / m_CellSize) + T(0.5)) * m_CellSize;
+			T Lx = helper.In.x - Cx;
+			T Ly = helper.In.y - Cy;
+			T aLx = std::abs(T(Floor<T>(Lx * m_Num * 2 / m_CellSize + T(0.5))));
+			T aLy = std::abs(T(Floor<T>(Ly * m_Num * 2 / m_CellSize + T(0.5))));
+			T m = std::max(aLx, aLy);
+			T maxi = m_Max + Floor<T>(VarFuncs<T>::HashShadertoy(SQR(Cx), SQR(Cy), m_Seed) * (m_Num - m_Max));
+			T level;
+
+			if (m > maxi)
+				level = 0;
+			else if (m < m_Min)
+				level = 0;
+			else
+				level = m - m_Min;
+
+			T angle;
+
+			if (VarFuncs<T>::HashShadertoy(SQR(Cx), SQR(Cy), m_ZeroSeed) < m_Zero)
+				angle = 0;
+			else
+				angle = level * T(M_PI_2);
+
+			T c = std::cos(angle);
+			T s = std::sin(angle);
+			helper.Out.x = (Cx + Lx * c - Ly * s) * m_Weight;
+			helper.Out.y = (Cy + Lx * s + Ly * c) * m_Weight;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string cellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mn       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mx       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string num      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zero     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zeroseed = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tif (" << cellsize << " == 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = vIn.x * " << weight << ";\n"
+		   << "\t\t	vOut.y = vIn.y * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t Cx = (floor(vIn.x / " << cellsize << ") + 0.5) * " << cellsize << ";\n"
+		   << "\t\t	real_t Cy = (floor(vIn.y / " << cellsize << ") + 0.5) * " << cellsize << ";\n"
+		   << "\t\t	real_t Lx = vIn.x - Cx;\n"
+		   << "\t\t	real_t Ly = vIn.y - Cy;\n"
+		   << "\t\t	real_t aLx = fabs(floor(Lx * " << num << " * 2.0 / " << cellsize << " + 0.5));\n"
+		   << "\t\t	real_t aLy = fabs(floor(Ly * " << num << " * 2.0 / " << cellsize << " + 0.5));\n"
+		   << "\t\t	real_t m = max(aLx, aLy);\n"
+		   << "\t\t	real_t maxi = " << mx << " + floor(HashShadertoy(SQR(Cx), SQR(Cy), " << seed << ") * (" << num << " - " << mx << "));\n"
+		   << "\t\t	real_t level;\n"
+		   << "\n"
+		   << "\t\t	if (m > maxi)\n"
+		   << "\t\t		level = 0.0;\n"
+		   << "\t\t	else if (m < " << mn << ")\n"
+		   << "\t\t		level = 0.0;\n"
+		   << "\t\t	else\n"
+		   << "\t\t		level = m - " << mn << ";\n"
+		   << "\n"
+		   << "\t\t	real_t angle;\n"
+		   << "\n"
+		   << "\t\t	if (HashShadertoy(SQR(Cx), SQR(Cy), " << zeroseed << ") < " << zero << ")\n"
+		   << "\t\t		angle = 0.0;\n"
+		   << "\t\t	else\n"
+		   << "\t\t		angle = level * MPI2;\n"
+		   << "\n"
+		   << "\t\t	real_t c = cos(angle);\n"
+		   << "\t\t	real_t s = sin(angle);\n"
+		   << "\n"
+		   << "\t\t	vOut.x = (Cx + Lx * c - Ly * s) * " << weight << ";\n"
+		   << "\t\t	vOut.y = (Cy + Lx * s + Ly * c) * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_CellSize, prefix + "squares_cellsize"));
+		m_Params.push_back(ParamWithName<T>(&m_Min,      prefix + "squares_min", 0, eParamType::INTEGER, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Max,      prefix + "squares_max", 10, eParamType::INTEGER, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Num,      prefix + "squares_num", 10));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,     prefix + "squares_seed", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero,     prefix + "squares_zero", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_ZeroSeed, prefix + "squares_zero_seed", 1));
+	}
+
+private:
+	T m_CellSize;
+	T m_Min;
+	T m_Max;
+	T m_Num;
+	T m_Seed;
+	T m_Zero;
+	T m_ZeroSeed;
+};
+
+/// <summary>
+/// starblur2.
+/// By Zy0rg.
+/// </summary>
+template <typename T>
+class Starblur2Variation : public ParametricVariation<T>
+{
+public:
+	Starblur2Variation(T weight = 1.0) : ParametricVariation<T>("starblur2", eVariationId::VAR_STARBLUR2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Starblur2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T k = rand.Frand01<T>() * m_Power2;
+		auto int_angle = Floor<T>(k);
+		T f = k - int_angle;
+		T ff;
+
+		if (m_Stripes > 0)
+		{
+			T fs = std::trunc(f * m_Stripes);
+			T dif;
+
+			if (std::fmod(int_angle, T(2)) == 0)
+				dif = m_Width * (f * m_Stripes - fs);
+			else
+				dif = 1 - m_Width * (f * m_Stripes - fs);
+
+			ff = (dif + fs) / m_Stripes;
+		}
+		else
+			ff = f;
+
+		T x = ff * m_Length;
+		T z = std::sqrt(1 + x * x - 2 * x * m_CosAlpha);
+		T angle_sign = (int_angle - Floor<T>(k / 2) * 2) == 1 ? T(1) : T(-1);
+		T final_angle = m_TwopiPower * int_angle + angle_sign * std::asin(m_SinAlpha * x / z) - T(M_PI_2);
+		T z_scaled = z * std::sqrt(rand.Frand01<T>() * m_OnemHoleSq + m_HoleSq);
+		helper.Out.x = std::cos(final_angle) * z_scaled * m_Weight;
+		helper.Out.y = std::sin(final_angle) * z_scaled * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string range      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string hole       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string stripes    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string width      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string length     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string holesq     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string onemholesq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string twopipower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinalpha   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cosalpha   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t k = MwcNext01(mwc) * " << power2 << ";\n"
+		   << "\t\treal_t int_angle = floor(k);\n"
+		   << "\t\treal_t f = k - int_angle;\n"
+		   << "\t\treal_t ff;\n"
+		   << "\n"
+		   << "\t\tif (" << stripes << " > 0.0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t fs = trunc(f * " << stripes << ");\n"
+		   << "\t\t	real_t dif;\n"
+		   << "\n"
+		   << "\t\t	if (fmod(int_angle, 2.0) == 0)\n"
+		   << "\t\t		dif = " << width << " * fma(f, " << stripes << ", -fs);\n"
+		   << "\t\t	else\n"
+		   << "\t\t		dif = 1 - " << width << " * fma(f, " << stripes << ", -fs);\n"
+		   << "\n"
+		   << "\t\t	ff = (dif + fs) / " << stripes << ";\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t	ff = f;\n"
+		   << "\n"
+		   << "\t\treal_t x = ff * " << length << ";\n"
+		   << "\t\treal_t z = sqrt(1 + x * x - 2.0 * x * " << cosalpha << ");\n"
+		   << "\t\treal_t angle_sign = (int_angle - floor(k/2) * 2) == 1.0 ? 1.0 : -1.0;\n"
+		   << "\t\treal_t final_angle = " << twopipower << " * int_angle + angle_sign * asin(" << sinalpha << " * x / z) - MPI2;\n"
+		   << "\t\treal_t z_scaled = z * sqrt(fma(MwcNext01(mwc), " << onemholesq << ", " << holesq << "));\n"
+		   << "\t\tvOut.x = cos(final_angle) * z_scaled * " << weight << ";\n"
+		   << "\t\tvOut.y = sin(final_angle) * z_scaled * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		T alpha = T(M_PI) / m_Power;
+		m_Length = std::sqrt(1 + m_Range * m_Range - 2 * m_Range * std::cos(alpha));
+		m_Alpha = std::asin(std::sin(alpha) * m_Range / Zeps(m_Length));
+		m_HoleSq = SQR(m_Hole);
+		m_OnemHoleSq = 1 - m_HoleSq;
+		m_TwopiPower = (M_2PI / m_Power) * T(0.5);
+		m_Power2 = m_Power * 2;
+		m_SinAlpha = std::sin(m_Alpha);
+		m_CosAlpha = std::cos(m_Alpha);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power,            prefix + "starblur2_power", 5));
+		m_Params.push_back(ParamWithName<T>(&m_Range,            prefix + "starblur2_range", T(0.40162283177245455973959534526548)));
+		m_Params.push_back(ParamWithName<T>(&m_Hole,             prefix + "starblur2_hole", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Stripes,          prefix + "starblur2_stripes", 5, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Width,            prefix + "starblur2_width", T(0.2)));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,      prefix + "starblur2_alpha"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Length,     prefix + "starblur2_length"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HoleSq,     prefix + "starblur2_holesq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OnemHoleSq, prefix + "starblur2_onem_holesq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_TwopiPower, prefix + "starblur2_twopi_power"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Power2,     prefix + "starblur2_power2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinAlpha,   prefix + "starblur2_sin_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosAlpha,   prefix + "starblur2_cos_alpha"));
+	}
+
+private:
+	T m_Power;
+	T m_Range;
+	T m_Hole;
+	T m_Stripes;
+	T m_Width;
+	T m_Alpha;//Precalc.
+	T m_Length;
+	T m_HoleSq;
+	T m_OnemHoleSq;
+	T m_TwopiPower;
+	T m_Power2;
+	T m_SinAlpha;
+	T m_CosAlpha;
+};
+
+/// <summary>
+/// unicorngaloshen.
+/// By tatasz and chaosfissure.
+/// </summary>
+template <typename T>
+class UnicornGaloshenVariation : public ParametricVariation<T>
+{
+public:
+	UnicornGaloshenVariation(T weight = 1.0) : ParametricVariation<T>("unicorngaloshen", eVariationId::VAR_UNICORNGALOSHEN, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(UnicornGaloshenVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T r = m_Weight / Zeps(std::sqrt((SQR(helper.In.y) * m_MultY) + (m_MultX * SQR(helper.In.x))));
+		v2T factor;
+
+		if (m_Sine <= 0)
+		{
+			factor.x = m_SinXAmp;
+			factor.y = m_SinYAmp;
+		}
+		else
+		{
+			v2T tmp_vec(1, 2);
+			v2T scalar_xy;
+
+			if (m_Mode <= 0)
+				scalar_xy = v2T(helper.In.x, helper.In.y);
+			else if (m_Mode <= 1)
+				scalar_xy = v2T(std::exp(-helper.In.x), std::exp(-helper.In.y));
+			else if (m_Mode <= 2)
+				scalar_xy = v2T(1 / Zeps(helper.In.x), 1 / Zeps(helper.In.y));
+			else if (m_Mode <= 3)
+				scalar_xy = v2T(std::log(std::abs(helper.In.x)), m_SinYAmp * std::log(std::abs(helper.In.y)));
+			else
+				scalar_xy = v2T(std::atan2(helper.In.x, helper.In.y), std::atan2(helper.In.y, helper.In.x));
+
+			factor = tmp_vec + v2T(m_SinXAmp * std::sin(scalar_xy.x * m_SinXFreqPi), m_SinYAmp * std::sin(scalar_xy.y * m_SinYFreqPi));;
+		}
+
+		helper.Out.x = factor.x * (helper.In.x - helper.In.y) * (helper.In.x + m_MultY * helper.In.y) * r;
+		helper.Out.y = factor.y * helper.In.x * helper.In.y * r;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string multx      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string multy      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sine       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinxamp    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinxfreq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinyamp    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinyfreq   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mode       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinxfreqpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinyfreqpi = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t r = " << weight << " / Zeps(sqrt((SQR(vIn.y) * " << multy << ") + (" << multx << " * SQR(vIn.x))));\n"
+		   << "\t\treal2 factor;\n"
+		   << "\n"
+		   << "\t\tif (" << sine << " <= 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	factor.x = " << sinxamp << ";\n"
+		   << "\t\t	factor.y = " << sinyamp << ";\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real2 tmp_vec = (real2)(1, 2);\n"
+		   << "\t\t	real2 scalar_xy;\n"
+		   << "\n"
+		   << "\t\t	if (" << mode << " <= 0)\n"
+		   << "\t\t		scalar_xy = (real2)(vIn.x, vIn.y);\n"
+		   << "\t\t	else if (" << mode << " <= 1)\n"
+		   << "\t\t		scalar_xy = (real2)(exp(-vIn.x), exp(-vIn.y));\n"
+		   << "\t\t	else if (" << mode << " <= 2)\n"
+		   << "\t\t		scalar_xy = (real2)(1 / Zeps(vIn.x), 1 / Zeps(vIn.y));\n"
+		   << "\t\t	else if (" << mode << " <= 3)\n"
+		   << "\t\t		scalar_xy = (real2)(log(fabs(vIn.x)), " << sinyamp << " * log(fabs(vIn.y)));\n"
+		   << "\t\t	else\n"
+		   << "\t\t		scalar_xy = (real2)(atan2(vIn.x, vIn.y), atan2(vIn.y, vIn.x));\n"
+		   << "\n"
+		   << "\t\t	factor = tmp_vec + (real2)(" << sinxamp << " * sin(scalar_xy.x * " << sinxfreqpi << "), " << sinyamp << " * sin(scalar_xy.y * " << sinyfreqpi << "));\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.x = factor.x * (vIn.x - vIn.y) * fma(" << multy << ", vIn.y, vIn.x) * r;\n"
+		   << "\t\tvOut.y = factor.y * vIn.x * vIn.y * r;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		T m_SinXFreqPi = T(M_PI) * m_SinXFreq;
+		T m_SinYFreqPi = T(M_PI) * m_SinYFreq;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_MultX,            prefix + "unicorngaloshen_mult_x", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MultY,            prefix + "unicorngaloshen_mult_y", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Sine,             prefix + "unicorngaloshen_sine"));
+		m_Params.push_back(ParamWithName<T>(&m_SinXAmp,          prefix + "unicorngaloshen_sin_x_amplitude", 1));
+		m_Params.push_back(ParamWithName<T>(&m_SinXFreq,         prefix + "unicorngaloshen_sin_x_freq", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_SinYAmp,          prefix + "unicorngaloshen_sin_y_amplitude", 2));
+		m_Params.push_back(ParamWithName<T>(&m_SinYFreq,         prefix + "unicorngaloshen_sin_y_freq", T(0.2)));
+		m_Params.push_back(ParamWithName<T>(&m_Mode,             prefix + "unicorngaloshen_mode", 0, eParamType::INTEGER, 0, 4));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinXFreqPi, prefix + "unicorngaloshen_sin_x_freq_pi"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinYFreqPi, prefix + "unicorngaloshen_sin_y_freq_pi"));
+	}
+
+private:
+	T m_MultX;
+	T m_MultY;
+	T m_Sine;
+	T m_SinXAmp;
+	T m_SinXFreq;
+	T m_SinYAmp;
+	T m_SinYFreq;
+	T m_Mode;
+	T m_SinXFreqPi;//Precalc.
+	T m_SinYFreqPi;
+};
+
+/// <summary>
+/// dragonfire.
+/// By tatasz and chaosfissure.
+/// </summary>
+template <typename T>
+class DragonfireVariation : public ParametricVariation<T>
+{
+public:
+	DragonfireVariation(T weight = 1.0) : ParametricVariation<T>("dragonfire", eVariationId::VAR_DRAGONFIRE, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DragonfireVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T exp_x = std::exp(helper.In.x) * m_C1;
+		T exp_nx = m_C2 / Zeps(exp_x);
+		T cos_y = std::cos(helper.In.y);
+		T sin_y = std::sin(helper.In.y);
+		T r = m_Weight / Zeps(exp_x + exp_nx - cos_y);
+		T newFX = (exp_x - exp_nx) * r;
+		T newFY = sin_y * r;
+
+		if (m_FuzzyMode < 1)
+		{
+			helper.Out.x = newFX;
+			helper.Out.y = newFY;
+		}
+		else
+		{
+			T fuzzyX = std::cos(m_LogScalarFuzzy / Zeps(std::log(std::abs(newFX))));
+			T fuzzyY = std::cos(m_LogScalarFuzzy / Zeps(std::log(std::abs(newFY))));
+			v2T newXY;
+
+			if (m_FuzzyMode < 2)
+			{
+				newXY.x = newFX + fuzzyX;
+				newXY.y = newFY + fuzzyY;
+			}
+			else if (m_FuzzyMode < 3)
+			{
+				T sinfx = std::sin(fuzzyX);//Duped in 2 and 3.
+				T sinfy = std::sin(fuzzyY);
+				newXY.x = newFX * sinfx;
+				newXY.y = newFY * sinfy;
+			}
+			else if (m_FuzzyMode < 4)
+			{
+				T sinfx = std::sin(fuzzyX);
+				T sinfy = std::sin(fuzzyY);
+				newXY.x = newFX * std::exp(sinfx);
+				newXY.y = newFY * std::exp(sinfy);
+			}
+			else if (m_FuzzyMode < 5)
+			{
+				T dirX = T(fuzzyX < 0 ? -1 : 1);//Duped in 4, 5, and 6.
+				T dirY = T(fuzzyY < 0 ? -1 : 1);
+				T fuzzyX1 = dirX * m_FuzzyRadius;
+				T fuzzyY1 = dirY * m_FuzzyRadius;
+				newXY.x = newFX + fuzzyX1;
+				newXY.y = newFY + fuzzyY1;
+			}
+			else if (m_FuzzyMode < 6)
+			{
+				T dirX = T(fuzzyX < 0 ? -1 : 1);
+				T dirY = T(fuzzyY < 0 ? -1 : 1);
+				T fuzzyX1 = dirX * m_FuzzyRadius;
+				T fuzzyY1 = dirY * m_FuzzyRadius;
+				newXY.x = newFX + std::exp(fuzzyX1);
+				newXY.y = newFY + std::exp(fuzzyY1);
+			}
+			else
+			{
+				T dirX = T(fuzzyX < 0 ? -1 : 1);
+				T dirY = T(fuzzyY < 0 ? -1 : 1);
+				T fuzzyX1 = dirX * m_FuzzyRadius;
+				T fuzzyY1 = dirY * m_FuzzyRadius;
+				newXY.x = newFX + std::exp(std::sin(fuzzyX1));
+				newXY.y = newFY + std::exp(std::cos(fuzzyY1));
+			}
+
+			if (m_FuzzyInterpolationMode < 1)
+			{
+				helper.Out.x = newXY.x;
+				helper.Out.y = newXY.y;
+			}
+			else
+			{
+				helper.Out.x = newFX * m_1mVal + newXY.x * m_Val;
+				helper.Out.y = newFY * m_1mVal + newXY.y * m_Val;
+			}
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string c1             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mode           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string interpmode     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string interppos      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string logscalar      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string adjustedscalar = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string val            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string onemval        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t exp_x = exp(vIn.x) * " << c1 << ";\n"
+		   << "\t\treal_t exp_nx = " << c2 << " / Zeps(exp_x);\n"
+		   << "\t\treal_t cos_y = cos(vIn.y);\n"
+		   << "\t\treal_t sin_y = sin(vIn.y);\n"
+		   << "\t\treal_t r = " << weight << " / Zeps(exp_x + exp_nx - cos_y);\n"
+		   << "\t\treal_t newFX = (exp_x - exp_nx) * r;\n"
+		   << "\t\treal_t newFY = sin_y * r;\n"
+		   << "\n"
+		   << "\t\tif (" << mode << " < 1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = newFX;\n"
+		   << "\t\t	vOut.y = newFY;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t fuzzyX = cos(" << logscalar << " / Zeps(log(fabs(newFX))));\n"
+		   << "\t\t	real_t fuzzyY = cos(" << logscalar << " / Zeps(log(fabs(newFY))));\n"
+		   << "\t\t	real2 newXY;\n"
+		   << "\n"
+		   << "\t\t	if (" << mode << " < 2)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		newXY.x = newFX + fuzzyX;\n"
+		   << "\t\t		newXY.y = newFY + fuzzyY;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else if (" << mode << " < 3)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t sinfx = sin(fuzzyX);\n"
+		   << "\t\t		real_t sinfy = sin(fuzzyY);\n"
+		   << "\t\t		newXY.x = newFX * sinfx;\n"
+		   << "\t\t		newXY.y = newFY * sinfy;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else if (" << mode << " < 4)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t sinfx = sin(fuzzyX);\n"
+		   << "\t\t		real_t sinfy = sin(fuzzyY);\n"
+		   << "\t\t		newXY.x = newFX * exp(sinfx);\n"
+		   << "\t\t		newXY.y = newFY * exp(sinfy);\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else if (" << mode << " < 5)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t dirX = fuzzyX < 0.0 ? -1.0 : 1.0;\n"
+		   << "\t\t		real_t dirY = fuzzyY < 0.0 ? -1.0 : 1.0;\n"
+		   << "\t\t		real_t fuzzyX1 = dirX * " << radius << ";\n"
+		   << "\t\t		real_t fuzzyY1 = dirY * " << radius << ";\n"
+		   << "\t\t		newXY.x = newFX + fuzzyX1;\n"
+		   << "\t\t		newXY.y = newFY + fuzzyY1;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else if (" << mode << " < 6)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t dirX = fuzzyX < 0.0 ? -1.0 : 1.0;\n"
+		   << "\t\t		real_t dirY = fuzzyY < 0.0 ? -1.0 : 1.0;\n"
+		   << "\t\t		real_t fuzzyX1 = dirX * " << radius << ";\n"
+		   << "\t\t		real_t fuzzyY1 = dirY * " << radius << ";\n"
+		   << "\t\t		newXY.x = newFX + exp(fuzzyX1);\n"
+		   << "\t\t		newXY.y = newFY + exp(fuzzyY1);\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		real_t dirX = fuzzyX < 0.0 ? -1.0 : 1.0;\n"
+		   << "\t\t		real_t dirY = fuzzyY < 0.0 ? -1.0 : 1.0;\n"
+		   << "\t\t		real_t fuzzyX1 = dirX * " << radius << ";\n"
+		   << "\t\t		real_t fuzzyY1 = dirY * " << radius << ";\n"
+		   << "\t\t		newXY.x = newFX + exp(sin(fuzzyX1));\n"
+		   << "\t\t		newXY.y = newFY + exp(cos(fuzzyY1));\n"
+		   << "\t\t	}\n"
+		   << "\n"
+		   << "\t\t	if (" << interpmode << " < 1)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = newXY.x;\n"
+		   << "\t\t		vOut.y = newXY.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = fma(newFX, " << onemval << ", newXY.x * " << val << ");\n"
+		   << "\t\t		vOut.y = fma(newFY, " << onemval << ", newXY.y * " << val << ");\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		T pos_mpi = m_FuzzyInterpolationPosition * T(M_PI);
+
+		if (m_FuzzyInterpolationMode < 2)
+		{
+			m_Val = m_FuzzyInterpolationPosition;
+		}
+		else
+		{
+			T trigPos;
+
+			if (m_FuzzyInterpolationMode < 3)
+				trigPos = std::cos(pos_mpi);
+			else if (m_FuzzyInterpolationMode < 4)
+				trigPos = std::tan(pos_mpi);
+			else if (m_FuzzyInterpolationMode < 5)
+				trigPos = std::sinh(pos_mpi);
+			else
+				trigPos = std::asinh(pos_mpi);
+
+			m_Val = (1 - trigPos) * m_AdjustedFuzzyScalar;
+		}
+
+		m_1mVal = 1 - m_Val;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_C1,                         prefix + "dragonfire_c1", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_C2,                         prefix + "dragonfire_c2", T(0.25)));
+		m_Params.push_back(ParamWithName<T>(&m_FuzzyMode,                  prefix + "dragonfire_fuzzyMode", 0, eParamType::INTEGER, 0, 7));
+		m_Params.push_back(ParamWithName<T>(&m_FuzzyRadius,                prefix + "dragonfire_fuzzyRadius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_FuzzyInterpolationMode,     prefix + "dragonfire_fuzzyInterpolationMode", 0, eParamType::INTEGER, 0, 6));
+		m_Params.push_back(ParamWithName<T>(&m_FuzzyInterpolationPosition, prefix + "dragonfire_fuzzyInterpolationPosition", 1));
+		m_Params.push_back(ParamWithName<T>(&m_LogScalarFuzzy,             prefix + "dragonfire_logScalarFuzzy", M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_AdjustedFuzzyScalar,        prefix + "dragonfire_adjustedFuzzyScalar", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(true, &m_Val,                  prefix + "dragonfire_val"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_1mVal,                prefix + "dragonfire_1m_val"));
+	}
+
+private:
+	T m_C1;
+	T m_C2;
+	T m_FuzzyMode;
+	T m_FuzzyRadius;
+	T m_FuzzyInterpolationMode;
+	T m_FuzzyInterpolationPosition;
+	T m_LogScalarFuzzy;
+	T m_AdjustedFuzzyScalar;
+	T m_Val;//Precalc.
+	T m_1mVal;
+};
+
+/// <summary>
+/// truchet_glyph.
+/// By tatasz and tyrantwave.
+/// </summary>
+template <typename T>
+class TruchetGlyphVariation : public ParametricVariation<T>
+{
+public:
+	TruchetGlyphVariation(T weight = 1.0) : ParametricVariation<T>("Truchet_glyph", eVariationId::VAR_TRUCHET_GLYPH, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(TruchetGlyphVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T x1 = helper.In.x * m_Scale;
+		T y1 = helper.In.y * m_Scale;
+		T intx = T(Floor<T>(x1 + T(0.5)));
+		T inty = T(Floor<T>(y1 + T(0.5)));
+		T r_x = x1 - intx;
+		T x = r_x < 0 ? 1 + r_x : r_x;
+		T r_y = y1 - inty;
+		T y = r_y < 0 ? 1 + r_y : r_y;
+		T tiletype;
+
+		if (m_Seed == 0)
+		{
+			tiletype = 0;
+		}
+		else if (m_Seed == 1)
+		{
+			tiletype = 1;
+		}
+		else
+		{
+			T xrand = T(Floor<T>(std::abs(helper.In.x) + T(0.5)));
+			T yrand = T(Floor<T>(std::abs(helper.In.y) + T(0.5)));
+			T randint0 = VarFuncs<T>::HashShadertoy(xrand, yrand, m_Seed);
+			T randint = fmod(randint0 * T(32747) + T(12345), T(65535));
+			tiletype = fmod(randint, T(2));
+		}
+
+		v2T R;
+		T xval1 = tiletype < 1 ? x : x - 1;
+		T xval2 = tiletype < 1 ? x - 1 : x;
+		R = v2T(std::pow(std::pow(std::abs(xval1), m_N) + std::pow(std::abs(y), m_N), m_OneN), std::pow(std::pow(std::abs(xval2), m_N) + std::pow(std::abs(y - 1), m_N), m_OneN));
+		T r00 = std::abs(R.x - T(0.5)) / m_Rmax;
+		T r11 = std::abs(R.y - T(0.5)) / m_Rmax;
+		v2T xy;
+
+		if (r00 < 1)
+			xy = v2T(x + Floor<T>(helper.In.x) * 2, y + Floor<T>(helper.In.y) * 2);
+		else
+			xy = v2T(0, 0);
+
+		T cost = std::cos(m_Rads);
+		T sint = std::sin(m_Rads);
+		T roundx = (Floor<T>(helper.In.x / m_Amp) + T(0.5)) * m_Amp;
+		T roundy = (Floor<T>(helper.In.y / m_Amp) + T(0.5)) * m_Amp;
+		T vx = helper.In.x - roundx;
+		T vy = helper.In.y - roundy;
+		T newx = cost * vx + sint * vy;
+		T newy = -sint * vx + cost * vy;
+
+		if (std::abs(newx) + std::abs(newy) < m_HalfAmpMax)
+		{
+			if (r11 < 1)
+			{
+				helper.Out.x = xy.x + (x + Floor<T>(helper.In.x) * 2) - helper.In.x;
+				helper.Out.y = xy.y + (y + Floor<T>(helper.In.y) * 2) - helper.In.y;
+			}
+			else
+			{
+				helper.Out.x = xy.x - helper.In.x;
+				helper.Out.y = xy.y - helper.In.y;
+			}
+		}
+		else
+		{
+			helper.Out.x = helper.In.x;
+			helper.Out.y = helper.In.y;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string exponent   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string arcwidth   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amp        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string max        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rmax       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string onen       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rads       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfampmax = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t x1 = vIn.x * " << scale << ";\n"
+		   << "\t\treal_t y1 = vIn.y * " << scale << ";\n"
+		   << "\t\treal_t intx = floor(x1 + 0.5);\n"
+		   << "\t\treal_t inty = floor(y1 + 0.5);\n"
+		   << "\t\treal_t r_x = x1 - intx;\n"
+		   << "\t\treal_t x = r_x < 0 ? 1 + r_x : r_x;\n"
+		   << "\t\treal_t r_y = y1 - inty;\n"
+		   << "\t\treal_t y = r_y < 0 ? 1 + r_y : r_y;\n"
+		   << "\t\treal_t tiletype;\n"
+		   << "\n"
+		   << "\t\tif (" << seed << " == 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	tiletype = 0;\n"
+		   << "\t\t}\n"
+		   << "\t\telse if (" << seed << " == 1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	tiletype = 1;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t xrand = floor(fabs(vIn.x) + 0.5);\n"
+		   << "\t\t	real_t yrand = floor(fabs(vIn.y) + 0.5);\n"
+		   << "\t\t	real_t randint0 = HashShadertoy(xrand, yrand, " << seed << ");\n"
+		   << "\t\t	real_t randint = fmod(fma(randint0, 32747.0, 12345.0), 65535.0);\n"
+		   << "\t\t	tiletype = fmod(randint, 2.0);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\treal_t xval1 = tiletype < 1 ? x : x - 1;\n"
+		   << "\t\treal_t xval2 = tiletype < 1 ? x - 1 : x;\n"
+		   << "\t\treal2 R = (real2)(pow(pow(fabs(xval1), " << n << ") + pow(fabs(y), " << n << "), " << onen << "), pow(pow(fabs(xval2), " << n << ") + pow(fabs(y - 1), " << n << "), " << onen << "));\n"
+		   << "\t\treal_t r00 = fabs(R.x - 0.5) / " << rmax << ";\n"
+		   << "\t\treal_t r11 = fabs(R.y - 0.5) / " << rmax << ";\n"
+		   << "\t\treal2 xy;\n"
+		   << "\n"
+		   << "\t\tif (r00 < 1)\n"
+		   << "\t\t	xy = (real2)(fma(floor(vIn.x), 2.0, x), fma(floor(vIn.y), 2.0, y));\n"
+		   << "\t\telse\n"
+		   << "\t\t	xy = (real2)(0.0, 0.0);\n"
+		   << "\n"
+		   << "\t\treal_t cost = cos(" << rads << ");\n"
+		   << "\t\treal_t sint = sin(" << rads << ");\n"
+		   << "\t\treal_t roundx = (floor(vIn.x / " << amp << ") + 0.5) * " << amp << ";\n"
+		   << "\t\treal_t roundy = (floor(vIn.y / " << amp << ") + 0.5) * " << amp << ";\n"
+		   << "\t\treal_t vx = vIn.x - roundx;\n"
+		   << "\t\treal_t vy = vIn.y - roundy;\n"
+		   << "\t\treal_t newx = fma(cost, vx, sint * vy);\n"
+		   << "\t\treal_t newy = fma(-sint, vx, cost * vy);\n"
+		   << "\n"
+		   << "\t\tif (fabs(newx) + fabs(newy) < " << halfampmax << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (r11 < 1)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = xy.x + fma(floor(vIn.x), 2.0, x) - vIn.x;\n"
+		   << "\t\t		vOut.y = xy.y + fma(floor(vIn.y), 2.0, y) - vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = xy.x - vIn.x;\n"
+		   << "\t\t		vOut.y = xy.y - vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = vIn.x;\n"
+		   << "\t\t	vOut.y = vIn.y;\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_N = Clamp<T>(m_Exponent, T(0.001), T(2));
+		T width = Clamp<T>(m_ArcWidth, T(0.001), T(1));
+		m_OneN = 1 / Zeps(m_N);
+		m_Rmax = Zeps(T(0.5) * (std::pow(T(2.0), m_OneN) - 1) * width);
+		m_Scale = 1 / m_Weight;
+		m_Rads = m_Angle * DEG_2_RAD_T;
+		m_HalfAmpMax = m_Amp * T(0.5) * m_Max;
+		m_Amp = Zeps(m_Amp);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Exponent,         prefix + "Truchet_glyph_exponent", 2, eParamType::REAL, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_ArcWidth,         prefix + "Truchet_glyph_arc_width", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Amp,              prefix + "Truchet_glyph_amp", 6, eParamType::REAL_NONZERO, EPS));
+		m_Params.push_back(ParamWithName<T>(&m_Max,              prefix + "Truchet_glyph_max", T(0.9), eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Angle,            prefix + "Truchet_glyph_angle", 45));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,             prefix + "Truchet_glyph_seed", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rmax,       prefix + "Truchet_glyph_rmax"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_N,          prefix + "Truchet_glyph_n"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneN,       prefix + "Truchet_glyph_onen"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale,      prefix + "Truchet_glyph_scale"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rads,       prefix + "Truchet_glyph_rads"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfAmpMax, prefix + "Truchet_glyph_half_amp_max"));
+	}
+
+private:
+	T m_Exponent;
+	T m_ArcWidth;
+	T m_Amp;
+	T m_Max;
+	T m_Angle;
+	T m_Seed;
+	T m_Rmax;//Precalc.
+	T m_N;
+	T m_OneN;
+	T m_Scale;
+	T m_Rads;
+	T m_HalfAmpMax;
+};
+
+/// <summary>
+/// truchet_inv.
+/// By tatasz and tyrantwave.
+/// </summary>
+template <typename T>
+class TruchetInvVariation : public ParametricVariation<T>
+{
+public:
+	TruchetInvVariation(T weight = 1.0) : ParametricVariation<T>("Truchet_inv", eVariationId::VAR_TRUCHET_INV, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(TruchetInvVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T x1 = helper.In.x * m_Scale;
+		T y1 = helper.In.y * m_Scale;
+		T intx = T(Floor<T>(x1 + T(0.5)));
+		T inty = T(Floor<T>(y1 + T(0.5)));
+		T r_x = x1 - intx;
+		T x = r_x < 0 ? 1 + r_x : r_x;
+		T r_y = y1 - inty;
+		T y = r_y < 0 ? 1 + r_y : r_y;
+		T tiletype;
+
+		if (m_Seed == 0)
+		{
+			tiletype = 0;
+		}
+		else if (m_Seed == 1)
+		{
+			tiletype = 1;
+		}
+		else
+		{
+			T xrand = Floor<T>(helper.In.x + T(0.5)) * m_Seed2;
+			T yrand = Floor<T>(helper.In.y + T(0.5)) * m_Seed2;
+			T niter = xrand + yrand + xrand * yrand;
+			T randint0 = (niter + m_Seed) * m_Seed2Half;
+			T randint = fmod(randint0 * 32747 + 12345, T(65535));
+			tiletype = fmod(randint, T(2));
+		}
+
+		T xval1 = tiletype < 1 ? x : x - 1;
+		T xval2 = tiletype < 1 ? x - 1 : x;
+		v2T R(std::pow(std::pow(std::abs(xval1), m_N) + std::pow(std::abs(y), m_N), m_OneN), std::pow(std::pow(std::abs(xval2), m_N) + std::pow(std::abs(y - 1), m_N), m_OneN));
+		T r00 = std::abs(R.x - T(0.5)) / m_Rmax;
+		T r11 = std::abs(R.y - T(0.5)) / m_Rmax;
+
+		if (r00 > 1 && r11 > 1)
+		{
+			helper.Out.x = (x + Floor<T>(helper.In.x)) * m_Size;
+			helper.Out.y = (y + Floor<T>(helper.In.y)) * m_Size;
+		}
+		else
+		{
+			helper.Out.x = 0;
+			helper.Out.y = 0;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string exponent  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string arcwidth  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rot       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rmax      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string onen      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed2half = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t x1 = vIn.x * " << scale << ";\n"
+		   << "\t\treal_t y1 = vIn.y * " << scale << ";\n"
+		   << "\t\treal_t intx = floor(x1 + 0.5);\n"
+		   << "\t\treal_t inty = floor(y1 + 0.5);\n"
+		   << "\t\treal_t r_x = x1 - intx;\n"
+		   << "\t\treal_t x = r_x < 0 ? 1 + r_x : r_x;\n"
+		   << "\t\treal_t r_y = y1 - inty;\n"
+		   << "\t\treal_t y = r_y < 0 ? 1 + r_y : r_y;\n"
+		   << "\t\treal_t tiletype;\n"
+		   << "\n"
+		   << "\t\tif (" << seed << " == 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	tiletype = 0;\n"
+		   << "\t\t}\n"
+		   << "\t\telse if (" << seed << " == 1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	tiletype = 1;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\treal_t xrand = floor(vIn.x + 0.5) * " << seed2 << ";\n"
+		   << "\t\treal_t yrand = floor(vIn.y + 0.5) * " << seed2 << ";\n"
+		   << "\t\treal_t niter = xrand + yrand + xrand * yrand;\n"
+		   << "\t\treal_t randint0 = (niter + " << seed << ") * " << seed2half << ";\n"
+		   << "\t\treal_t randint = fmod(fma(randint0, 32747.0, 12345.0), 65535.0);\n"
+		   << "\t\t	tiletype = fmod(randint, 2.0);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\treal_t xval1 = tiletype < 1 ? x : x - 1;\n"
+		   << "\t\treal_t xval2 = tiletype < 1 ? x - 1 : x;\n"
+		   << "\t\treal2 R = (real2)(pow(pow(fabs(xval1), " << n << ") + pow(fabs(y), " << n << "), " << onen << "), pow(pow(fabs(xval2), " << n << ") + pow(fabs(y - 1), " << n << "), " << onen << "));\n"
+		   << "\t\treal_t r00 = fabs(R.x - 0.5) / " << rmax << ";\n"
+		   << "\t\treal_t r11 = fabs(R.y - 0.5) / " << rmax << ";\n"
+		   << "\t\tif (r00 > 1 && r11 > 1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = (x + floor(vIn.x)) * " << size << ";\n"
+		   << "\t\t	vOut.y = (y + floor(vIn.y)) * " << size << ";\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = 0;\n"
+		   << "\t\t	vOut.y = 0;\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_N = Clamp<T>(m_Exponent, T(0.001), T(2));
+		T width = Clamp<T>(m_ArcWidth, T(0.001), T(1));
+		m_Seed2 = std::sqrt(m_Seed * T(1.5)) / Zeps(m_Seed * T(0.5)) * T(0.25);
+		m_Seed2Half = m_Seed2 * T(0.5);
+		m_OneN = 1 / Zeps(m_N);
+		m_Rmax = Zeps(T(0.5) * (std::pow(T(2.0), m_OneN) - 1) * width);
+		m_Scale = (std::cos(m_Rot) + std::sin(m_Rot)) / m_Weight;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Exponent,        prefix + "Truchet_inv_exponent", 2, eParamType::REAL, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_ArcWidth,        prefix + "Truchet_inv_arc_width", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Rot,             prefix + "Truchet_inv_rotation"));
+		m_Params.push_back(ParamWithName<T>(&m_Size,            prefix + "Truchet_inv_size", 1, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,            prefix + "Truchet_inv_seed", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rmax,      prefix + "Truchet_inv_rmax"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_N,         prefix + "Truchet_inv_n"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneN,      prefix + "Truchet_inv_onen"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Seed2,     prefix + "Truchet_inv_seed2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Seed2Half, prefix + "Truchet_inv_seed2_half"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Scale,     prefix + "Truchet_inv_scale"));
+	}
+
+private:
+	T m_Exponent;
+	T m_ArcWidth;
+	T m_Rot;
+	T m_Size;
+	T m_Seed;
+	T m_Rmax;//Precalc.
+	T m_N;
+	T m_OneN;
+	T m_Width;
+	T m_Seed2;
+	T m_Seed2Half;
+	T m_Scale;
+};
+
+/// <summary>
+/// henon.
+/// By tyrantwave.
+/// </summary>
+template <typename T>
+class HenonVariation : public ParametricVariation<T>
+{
+public:
+	HenonVariation(T weight = 1.0) : ParametricVariation<T>("henon", eVariationId::VAR_HENON, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(HenonVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.x = (1 - (m_A * SQR(helper.In.x)) + helper.In.y) * m_Weight;
+		helper.Out.y = m_B * helper.In.x * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tvOut.x = (1 - (" << a << " * SQR(vIn.x)) + vIn.y) * " << weight << ";\n"
+		   << "\t\tvOut.y = " << b << " * vIn.x * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "henon_a", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_B, prefix + "henon_b", 1));
+	}
+
+private:
+	T m_A;
+	T m_B;
+};
+
+/// <summary>
+/// lozi.
+/// By tyrantwave.
+/// </summary>
+template <typename T>
+class LoziVariation : public ParametricVariation<T>
+{
+public:
+	LoziVariation(T weight = 1.0) : ParametricVariation<T>("lozi", eVariationId::VAR_LOZI, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(LoziVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.x = (1 - (m_A * std::abs(helper.In.x)) + helper.In.y) * m_Weight;
+		helper.Out.y = m_B * helper.In.x * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string b = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tvOut.x = (1 - (" << a << " * fabs(vIn.x)) + vIn.y) * " << weight << ";\n"
+		   << "\t\tvOut.y = " << b << " * vIn.x * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "lozi_a", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_B, prefix + "lozi_b", 1));
+	}
+
+private:
+	T m_A;
+	T m_B;
+};
+
+/// <summary>
+/// point_symmetry.
+/// By Fractalthew.
+/// </summary>
+template <typename T>
+class PointSymmetryVariation : public ParametricVariation<T>
+{
+public:
+	PointSymmetryVariation(T weight = 1.0) : ParametricVariation<T>("point_symmetry", eVariationId::VAR_POINT_SYMMETRY, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(PointSymmetryVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T angle = Floor<T>(rand.Frand01<T>() * m_Order) * m_TwoPiDivOrder;
+		T dx = (helper.In.x - m_X) * m_Weight;
+		T dy = (helper.In.y - m_Y) * m_Weight;
+		T cosa = std::cos(angle);
+		T sina = std::sin(angle);
+		helper.Out.x = m_X + dx * cosa + dy * sina;
+		helper.Out.y = m_Y + dy * cosa - dx * sina;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string x             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string order         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string twopidivorder = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t angle = floor(MwcNext01(mwc) * " << order << ") * " << twopidivorder << ";\n"
+		   << "\t\treal_t dx = (vIn.x - " << x << ") * " << weight << ";\n"
+		   << "\t\treal_t dy = (vIn.y - " << y << ") * " << weight << ";\n"
+		   << "\t\treal_t cosa = cos(angle);\n"
+		   << "\t\treal_t sina = sin(angle);\n"
+		   << "\t\tvOut.x = " << x << " + dx * cosa + dy * sina;\n"
+		   << "\t\tvOut.y = " << y << " + dy * cosa - dx * sina;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_TwoPiDivOrder = M_2PI / Zeps(m_Order);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_X,                   prefix + "point_symmetry_centre_x", T(0.15)));
+		m_Params.push_back(ParamWithName<T>(&m_Y,                   prefix + "point_symmetry_centre_y", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Order,               prefix + "point_symmetry_order", 3));
+		m_Params.push_back(ParamWithName<T>(true, &m_TwoPiDivOrder, prefix + "point_symmetry_two_pi_div_order"));//Precalc.
+	}
+
+private:
+	T m_X;
+	T m_Y;
+	T m_Order;
+	T m_TwoPiDivOrder;//Precalc.
+};
+
+/// <summary>
+/// d_spherical.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class DSphericalVariation : public ParametricVariation<T>
+{
+public:
+	DSphericalVariation(T weight = 1.0) : ParametricVariation<T>("d_spherical", eVariationId::VAR_D_SPHERICAL, weight, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(DSphericalVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		if (rand.Frand01<T>() < m_SphericalWeight)
+		{
+			T r = m_Weight / Zeps(helper.m_PrecalcSumSquares);
+			helper.Out.x = helper.In.x * r;
+			helper.Out.y = helper.In.y * r;
+		}
+		else
+		{
+			helper.Out.x = helper.In.x * m_Weight;
+			helper.Out.y = helper.In.y * m_Weight;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string sphericalweight = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tif (MwcNext01(mwc) < " << sphericalweight << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t r = " << weight << " / Zeps(precalcSumSquares);\n"
+		   << "\t\t	vOut.x = vIn.x * r;\n"
+		   << "\t\t	vOut.y = vIn.y * r;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = vIn.x * " << weight << ";\n"
+		   << "\t\t	vOut.y = vIn.y * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_SphericalWeight, prefix + "d_spherical_weight", T(0.5)));
+	}
+
+private:
+	T m_SphericalWeight;
+};
+
+/// <summary>
+/// modulusx.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class ModulusxVariation : public ParametricVariation<T>
+{
+public:
+	ModulusxVariation(T weight = 1.0) : ParametricVariation<T>("modulusx", eVariationId::VAR_MODULUSX, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ModulusxVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T fx = std::fmod(helper.In.x + m_X + m_Shift, 2 * m_X);
+
+		if (fx >= 0)
+			helper.Out.x = m_Weight * (fx - m_X);
+		else
+			helper.Out.x = m_Weight * (fx + m_X);
+
+		helper.Out.y = m_Weight * helper.In.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string x     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t fx = fmod(vIn.x + " << x << " + " << shift << ", 2 * " << x << ");\n"
+		   << "\n"
+		   << "\t\tif (fx >= 0)\n"
+		   << "\t\t	vOut.x = " << weight << " * (fx - " << x << ");\n"
+		   << "\t\telse\n"
+		   << "\t\t	vOut.x = " << weight << " * (fx + " << x << ");\n"
+		   << "\n"
+		   << "\t\tvOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_X,     prefix + "modulusx_x", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "modulusx_shift"));
+	}
+
+private:
+	T m_X;
+	T m_Shift;
+};
+
+/// <summary>
+/// modulusy.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class ModulusyVariation : public ParametricVariation<T>
+{
+public:
+	ModulusyVariation(T weight = 1.0) : ParametricVariation<T>("modulusy", eVariationId::VAR_MODULUSY, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ModulusyVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T fy = std::fmod(helper.In.y + m_Y + m_Shift, 2 * m_Y);
+
+		if (fy >= 0)
+			helper.Out.y = m_Weight * (fy - m_Y);
+		else
+			helper.Out.y = m_Weight * (fy + m_Y);
+
+		helper.Out.x = m_Weight * helper.In.x;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string y     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t fy = fmod(vIn.y + " << y << " + " << shift << ", 2 * " << y << ");\n"
+		   << "\n"
+		   << "\t\tif (fy >= 0)\n"
+		   << "\t\t	vOut.y = " << weight << " * (fy - " << y << ");\n"
+		   << "\t\telse\n"
+		   << "\t\t	vOut.y = " << weight << " * (fy + " << y << ");\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Y,     prefix + "modulusy_y", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "modulusy_shift"));
+	}
+
+private:
+	T m_Y;
+	T m_Shift;
+};
+
+/// <summary>
+/// rotate.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class RotateVariation : public ParametricVariation<T>
+{
+public:
+	RotateVariation(T weight = 1.0) : ParametricVariation<T>("rotate", eVariationId::VAR_ROTATE, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(RotateVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T sn = std::sin(m_AngleRad);
+		T cs = std::cos(m_AngleRad);
+		helper.Out.x = m_Weight * (helper.In.x * cs - helper.In.y * sn);
+		helper.Out.y = m_Weight * (helper.In.x * sn + helper.In.y * cs);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string angle    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string anglerad = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t sn = sin(" << anglerad << ");\n"
+		   << "\t\treal_t cs = cos(" << anglerad << ");\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x * cs - vIn.y * sn);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.x * sn + vIn.y * cs);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_AngleRad = m_Angle / 180 * T(M_PI);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Angle,          prefix + "rotate_angle"));
+		m_Params.push_back(ParamWithName<T>(true, &m_AngleRad, prefix + "rotate_angle_rad"));
+	}
+
+private:
+	T m_Angle;
+	T m_AngleRad;//Precalc.
+};
+
+/// <summary>
+/// shift.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class ShiftVariation : public ParametricVariation<T>
+{
+public:
+	ShiftVariation(T weight = 1.0) : ParametricVariation<T>("shift", eVariationId::VAR_SHIFT, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(ShiftVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T sn = std::sin(m_AngleRad);
+		T cs = std::cos(m_AngleRad);
+		helper.Out.x = m_Weight * (helper.In.x + cs * m_X - sn * m_Y);
+		helper.Out.y = m_Weight * (helper.In.y - cs * m_Y - sn * m_X);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string x        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string angle    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string anglerad = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t sn = sin(" << anglerad << ");\n"
+		   << "\t\treal_t cs = cos(" << anglerad << ");\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + cs * " << x << " - sn * " << y << ");\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y - cs * " << y << " - sn * " << x << ");\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_AngleRad = m_Angle / 180 * T(M_PI);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_X,              prefix + "shift_x"));
+		m_Params.push_back(ParamWithName<T>(&m_Y,              prefix + "shift_y"));
+		m_Params.push_back(ParamWithName<T>(&m_Angle,          prefix + "shift_angle"));
+		m_Params.push_back(ParamWithName<T>(true, &m_AngleRad, prefix + "shift_angle_rad"));
+	}
+
+private:
+	T m_X;
+	T m_Y;
+	T m_Angle;
+	T m_AngleRad;//Precalc.
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -2280,16 +6624,55 @@ MAKEPREPOSTPARVAR(LogDB, log_db, LOG_DB)
 MAKEPREPOSTPARVAR(CircleSplit, circlesplit, CIRCLESPLIT)
 MAKEPREPOSTVAR(Cylinder2, cylinder2, CYLINDER2)
 MAKEPREPOSTPARVAR(TileLog, tile_log, TILE_LOG)
+MAKEPREPOSTPARVAR(TileHlp, tile_hlp, TILE_HLP)
 MAKEPREPOSTPARVAR(TruchetFill, Truchet_fill, TRUCHET_FILL)
 MAKEPREPOSTPARVAR(Waves2Radial, waves2_radial, WAVES2_RADIAL)
 MAKEPREPOSTVAR(Panorama1, panorama1, PANORAMA1)
 MAKEPREPOSTVAR(Panorama2, panorama2, PANORAMA2)
-//MAKEPREPOSTPARVAR(Arcsinh, arcsinh, ARCSINH)
 MAKEPREPOSTPARVAR(Helicoid, helicoid, HELICOID)
 MAKEPREPOSTPARVAR(Helix, helix, HELIX)
 MAKEPREPOSTPARVARASSIGN(Sphereblur, sphereblur, SPHEREBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Cpow3, cpow3, CPOW3)
 MAKEPREPOSTPARVARASSIGN(Concentric, concentric, CONCENTRIC, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Hypercrop, hypercrop, HYPERCROP)
+MAKEPREPOSTPARVAR(Hypershift, hypershift, HYPERSHIFT)
 MAKEPREPOSTPARVAR(Hypershift2, hypershift2, HYPERSHIFT2)
+MAKEPREPOSTVAR(Lens, lens, LENS)
+MAKEPREPOSTPARVAR(Projective, projective, PROJECTIVE)
+MAKEPREPOSTPARVAR(DepthBlur, depth_blur, DEPTH_BLUR)
+MAKEPREPOSTPARVAR(DepthBlur2, depth_blur2, DEPTH_BLUR2)
+MAKEPREPOSTPARVAR(DepthGaussian, depth_gaussian, DEPTH_GAUSSIAN)
+MAKEPREPOSTPARVAR(DepthGaussian2, depth_gaussian2, DEPTH_GAUSSIAN2)
+MAKEPREPOSTPARVAR(DepthNgon, depth_ngon, DEPTH_NGON)
+MAKEPREPOSTPARVAR(DepthNgon2, depth_ngon2, DEPTH_NGON2)
+MAKEPREPOSTPARVAR(DepthSine, depth_sine, DEPTH_SINE)
+MAKEPREPOSTPARVAR(DepthSine2, depth_sine2, DEPTH_SINE2)
+MAKEPREPOSTPARVAR(CothSpiral, coth_spiral, COTH_SPIRAL)
+MAKEPREPOSTPARVAR(Dust, dust, DUST)
+MAKEPREPOSTPARVAR(Asteria, asteria, ASTERIA)
+MAKEPREPOSTPARVAR(Pulse, pulse, PULSE)
+MAKEPREPOSTPARVAR(Excinis, excinis, EXCINIS)
+MAKEPREPOSTPARVAR(Vibration, vibration, VIBRATION)
+MAKEPREPOSTPARVAR(Vibration2, vibration2, VIBRATION2)
+MAKEPREPOSTPARVAR(Arcsech, arcsech, ARCSECH)
+MAKEPREPOSTPARVAR(Arcsech2, arcsech2, ARCSECH2)
+MAKEPREPOSTPARVAR(Arcsinh, arcsinh, ARCSINH)
+MAKEPREPOSTPARVAR(Arctanh, arctanh, ARCTANH)
+MAKEPREPOSTPARVAR(HexTruchet, hex_truchet, HEX_TRUCHET)
+MAKEPREPOSTPARVAR(HexRand, hex_rand, HEX_RAND)
+MAKEPREPOSTPARVAR(Smartshape, smartshape, SMARTSHAPE)
+MAKEPREPOSTPARVAR(Squares, squares, SQUARES)
+MAKEPREPOSTPARVAR(Starblur2, starblur2, STARBLUR2)
+MAKEPREPOSTPARVAR(UnicornGaloshen, unicorngaloshen, UNICORNGALOSHEN)
+MAKEPREPOSTPARVAR(Dragonfire, dragonfire, DRAGONFIRE)
+MAKEPREPOSTPARVAR(TruchetGlyph, Truchet_glyph, TRUCHET_GLYPH)
+MAKEPREPOSTPARVAR(TruchetInv, Truchet_inv, TRUCHET_INV)
+MAKEPREPOSTPARVAR(Henon, henon, HENON)
+MAKEPREPOSTPARVAR(Lozi, lozi, LOZI)
+MAKEPREPOSTPARVAR(PointSymmetry, point_symmetry, POINT_SYMMETRY)
+MAKEPREPOSTPARVAR(DSpherical, d_spherical, D_SPHERICAL)
+MAKEPREPOSTPARVAR(Modulusx, modulusx, MODULUSX)
+MAKEPREPOSTPARVAR(Modulusy, modulusy, MODULUSY)
+MAKEPREPOSTPARVAR(Rotate, rotate, ROTATE)
+MAKEPREPOSTPARVAR(Shift, shift, SHIFT)
 }

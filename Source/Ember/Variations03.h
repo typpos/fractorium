@@ -721,7 +721,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "GlynnSim2_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "GlynnSim2_radius", 1, eParamType::REAL, 0));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim2_thickness", T(0.1), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Contrast, prefix + "GlynnSim2_contrast", T(0.5), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Pow, prefix + "GlynnSim2_pow", T(1.5)));
@@ -917,6 +917,219 @@ private:
 	T m_Radius1;//Precalc.
 	T m_Radius2;
 	T m_Gamma;
+};
+
+/// <summary>
+/// GlynnSim4.
+/// </summary>
+template <typename T>
+class GlynnSim4Variation : public ParametricVariation<T>
+{
+public:
+	GlynnSim4Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim4", eVariationId::VAR_GLYNNSIM4, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(GlynnSim4Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		if (helper.m_PrecalcSqrtSumSquares < m_Radius)
+		{
+			helper.Out.x = m_Weight * m_X;
+			helper.Out.y = m_Weight * m_Y;
+		}
+		else
+		{
+			T alpha = std::abs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));
+
+			if (rand.Frand01<T>() > m_Contrast * std::pow(alpha, m_Pow))
+			{
+				helper.Out.x = m_Weight * helper.In.x;
+				helper.Out.y = m_Weight * helper.In.y;
+			}
+			else
+			{
+				helper.Out.x = m_Weight * SQR(alpha) * helper.In.x;
+				helper.Out.y = m_Weight * SQR(alpha) * helper.In.y;
+			}
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string radius   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string contrast = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pow      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tif (precalcSqrtSumSquares < " << radius << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = " << weight << " * " << x << ";\n"
+		   << "\t\t	vOut.y = " << weight << " * " << y << ";\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t alpha = fabs(" << radius << " / Zeps(precalcSqrtSumSquares));\n"
+		   << "\n"
+		   << "\t\t	if (MwcNext01(mwc) > " << contrast << " * pow(alpha, " << pow << "))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = " << weight << " * SQR(alpha) * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * SQR(alpha) * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Radius,   prefix + "GlynnSim4_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast, prefix + "GlynnSim4_contrast", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Pow,      prefix + "GlynnSim4_pow", T(1.5)));
+		m_Params.push_back(ParamWithName<T>(&m_X,        prefix + "GlynnSim4_X"));
+		m_Params.push_back(ParamWithName<T>(&m_Y,        prefix + "GlynnSim4_Y"));
+	}
+
+private:
+	T m_Radius;//Params.
+	T m_Contrast;
+	T m_Pow;
+	T m_X;
+	T m_Y;
+};
+
+/// <summary>
+/// GlynnSim5.
+/// </summary>
+template <typename T>
+class GlynnSim5Variation : public ParametricVariation<T>
+{
+public:
+	GlynnSim5Variation(T weight = 1.0) : ParametricVariation<T>("GlynnSim5", eVariationId::VAR_GLYNNSIM5, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(GlynnSim5Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		if (helper.m_PrecalcSqrtSumSquares < m_Radius1)
+		{
+			helper.Out.x = 0;
+			helper.Out.y = 0;
+		}
+		else
+		{
+			T alpha = std::abs(m_Radius / Zeps(helper.m_PrecalcSqrtSumSquares));
+
+			if (rand.Frand01<T>() > m_Contrast * std::pow(alpha, m_Pow))
+			{
+				helper.Out.x = m_Weight * helper.In.x;
+				helper.Out.y = m_Weight * helper.In.y;
+			}
+			else
+			{
+				helper.Out.x = m_Weight * SQR(alpha);
+				helper.Out.y = m_Weight * SQR(alpha);
+			}
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string contrast = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pow = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tif (precalcSqrtSumSquares < " << radius1 << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = 0;\n"
+		   << "\t\t	vOut.y = 0;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t alpha = fabs(" << radius << " / Zeps(precalcSqrtSumSquares));\n"
+		   << "\n"
+		   << "\t\t	if (MwcNext01(mwc) > " << contrast << " * pow(alpha, " << pow << "))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = " << weight << " * SQR(alpha);\n"
+		   << "\t\t		vOut.y = " << weight << " * SQR(alpha);\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_Radius1 = m_Radius + m_Thickness;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "GlynnSim5_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "GlynnSim5_thickness", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Contrast, prefix + "GlynnSim5_contrast", T(0.5), eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Pow, prefix + "GlynnSim5_pow", T(1.5)));
+		m_Params.push_back(ParamWithName<T>(true, &m_Radius1, prefix + "GlynnSim5_radius1"));//Precalc.
+	}
+
+private:
+	T m_Radius;//Params.
+	T m_Thickness;
+	T m_Contrast;
+	T m_Pow;
+	T m_Radius1;//Precalc.
 };
 
 /// <summary>
@@ -1983,6 +2196,80 @@ public:
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
 		return vector<string> { "Cube" };
+	}
+};
+
+/// <summary>
+/// Spher.
+/// </summary>
+template <typename T>
+class SpherVariation : public Variation<T>
+{
+public:
+	SpherVariation(T weight = 1.0) : Variation<T>("spher", eVariationId::VAR_SPHER, weight, true) { }
+
+	VARCOPY(SpherVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T r2 = Zeps(helper.m_PrecalcSumSquares);
+
+		if (r2 > 1)
+		{
+			if (rand.Frand01<T>() < 0.5)
+			{
+				helper.Out.x = (m_Weight / r2) * helper.In.x;
+				helper.Out.y = (m_Weight / r2) * helper.In.y;
+			}
+			else
+			{
+				helper.Out.x = m_Weight * helper.In.x;
+				helper.Out.y = m_Weight * helper.In.y;
+			}
+		}
+		else
+		{
+			helper.Out.x = 0;
+			helper.Out.y = 0;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
+		ss << "\t{\n"
+		   << "\t\treal_t r2 = Zeps(precalcSumSquares);\n"
+		   << "\n"
+		   << "\t\tif (r2 > 1)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (MwcNext01(mwc) < 0.5)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = (" << weight << " / r2) * vIn.x;\n"
+		   << "\t\t		vOut.y = (" << weight << " / r2) * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t		vOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = 0;\n"
+		   << "\t\t	vOut.y = 0;\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 };
 
@@ -3055,9 +3342,9 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Even, prefix + "target_even", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
-		m_Params.push_back(ParamWithName<T>(&m_Odd, prefix + "target_odd", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
-		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "target_size", 1, eParamType::REAL, EPS, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Even,           prefix + "target_even", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Odd,            prefix + "target_odd", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Size,           prefix + "target_size", 1, eParamType::REAL, EPS, TMAX));
 		m_Params.push_back(ParamWithName<T>(true, &m_SizeDiv2, prefix + "target_size_2"));//Precalc.
 	}
 
@@ -3065,6 +3352,191 @@ private:
 	T m_Even;
 	T m_Odd;
 	T m_Size;
+	T m_SizeDiv2;//Precalc.
+};
+
+/// <summary>
+/// target0.
+/// By Mark Faber.
+/// </summary>
+template <typename T>
+class Target0Variation : public ParametricVariation<T>
+{
+public:
+	Target0Variation(T weight = 1.0) : ParametricVariation<T>("target0", eVariationId::VAR_TARGET0, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Target0Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = helper.m_PrecalcAtanyx;
+		T t = std::log(helper.m_PrecalcSqrtSumSquares);
+
+		if (t < 0)
+			t -= m_SizeDiv2;
+
+		t = fmod(std::abs(t), m_Size);
+
+		if (t < m_SizeDiv2)
+			a += m_Even;
+		else
+			a += m_Odd;
+
+		helper.Out.x = helper.m_PrecalcSqrtSumSquares * std::cos(a) * m_Weight;
+		helper.Out.y = helper.m_PrecalcSqrtSumSquares * std::sin(a) * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0;
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string even     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string odd      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sizeDiv2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t t = log(precalcSqrtSumSquares);\n"
+		   << "\n"
+		   << "\t\tif (t < (real_t)(0.0))\n"
+		   << "\t\t	t -= " << sizeDiv2 << ";\n"
+		   << "\n"
+		   << "\t\tt = fmod(fabs(t), " << size << ");\n"
+		   << "\n"
+		   << "\t\tif (t < " << sizeDiv2 << ")\n"
+		   << "\t\t	a += " << even << ";\n"
+		   << "\t\telse\n"
+		   << "\t\t	a += " << odd << ";\n"
+		   << "\n"
+		   << "\t\tvOut.x = precalcSqrtSumSquares * cos(a) * " << weight << ";\n"
+		   << "\t\tvOut.y = precalcSqrtSumSquares * sin(a) * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_SizeDiv2 = m_Size * T(0.5);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Even,           prefix + "target0_even", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Odd,            prefix + "target0_odd", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Size,           prefix + "target0_size", 0, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(true, &m_SizeDiv2, prefix + "target0_size_2"));//Precalc.
+	}
+
+private:
+	T m_Even;
+	T m_Odd;
+	T m_Size;
+	T m_SizeDiv2;//Precalc.
+};
+
+/// <summary>
+/// target2.
+/// By Mark Faber.
+/// </summary>
+template <typename T>
+class Target2Variation : public ParametricVariation<T>
+{
+public:
+	Target2Variation(T weight = 1.0) : ParametricVariation<T>("target2", eVariationId::VAR_TARGET2, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Target2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = helper.m_PrecalcAtanyx;
+		T t = std::log(helper.m_PrecalcSqrtSumSquares);
+		t = m_Tightness * std::log(helper.m_PrecalcSqrtSumSquares) + T(M_1_PI) * (a + T(M_PI));
+
+		if (t < 0)
+			t -= m_SizeDiv2;
+
+		t = fmod(std::abs(t), m_Size);
+
+		if (t < m_SizeDiv2)
+			a += m_Even;
+		else
+			a += m_Odd;
+
+		helper.Out.x = helper.m_PrecalcSqrtSumSquares * std::cos(a) * m_Weight;
+		helper.Out.y = helper.m_PrecalcSqrtSumSquares * std::sin(a) * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0;
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string even       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string odd        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string thightness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sizeDiv2   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t t = log(precalcSqrtSumSquares);\n"
+		   << "\t\tt = fma(" << thightness << ", log(precalcSqrtSumSquares), M1PI * (a + MPI));\n"
+		   << "\n"
+		   << "\t\tif (t < (real_t)(0.0))\n"
+		   << "\t\t	t -= " << sizeDiv2 << ";\n"
+		   << "\n"
+		   << "\t\tt = fmod(fabs(t), " << size << ");\n"
+		   << "\n"
+		   << "\t\tif (t < " << sizeDiv2 << ")\n"
+		   << "\t\t	a += " << even << ";\n"
+		   << "\t\telse\n"
+		   << "\t\t	a += " << odd << ";\n"
+		   << "\n"
+		   << "\t\tvOut.x = precalcSqrtSumSquares * cos(a) * " << weight << ";\n"
+		   << "\t\tvOut.y = precalcSqrtSumSquares * sin(a) * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_SizeDiv2 = m_Size * T(0.5);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Even,      prefix + "target2_even", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Odd,       prefix + "target2_odd", 0, eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Size,      prefix + "target2_size", 1, eParamType::REAL, EPS, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_Tightness, prefix + "target2_thightness"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SizeDiv2, prefix + "target2_size_2"));//Precalc.
+	}
+
+private:
+	T m_Even;
+	T m_Odd;
+	T m_Size;
+	T m_Tightness;
 	T m_SizeDiv2;//Precalc.
 };
 
@@ -3778,6 +4250,49 @@ protected:
 
 private:
 	T m_WeightSquared;
+};
+
+/// <summary>
+/// flipx.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class FlipXVariation : public Variation<T>
+{
+public:
+	FlipXVariation(T weight = 1.0) : Variation<T>("flipx", eVariationId::VAR_FLIP_X, weight) { }
+
+	VARCOPY(FlipXVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		helper.Out.y = m_Weight * helper.In.y;
+
+		if (helper.In.y > 0)
+			helper.Out.x = -(m_Weight * helper.In.x);
+		else
+			helper.Out.x = m_Weight * helper.In.x;
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
+		ss << "\t{\n"
+		   << "\t\tvOut.y = " << weight << " * vIn.y;\n"
+		   << "\n"
+		   << "\t\tif (vIn.y > 0)\n"
+		   << "\t\t	vOut.x = -(" << weight << " * vIn.x);\n"
+		   << "\t\telse\n"
+		   << "\t\t	vOut.x = " << weight << " * vIn.x;\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
 };
 
 /// <summary>
@@ -4558,6 +5073,8 @@ MAKEPREPOSTPARVAR(Kaleidoscope, Kaleidoscope, KALEIDOSCOPE)
 MAKEPREPOSTPARVAR(GlynnSim1, GlynnSim1, GLYNNSIM1)
 MAKEPREPOSTPARVAR(GlynnSim2, GlynnSim2, GLYNNSIM2)
 MAKEPREPOSTPARVAR(GlynnSim3, GlynnSim3, GLYNNSIM3)
+MAKEPREPOSTPARVAR(GlynnSim4, GlynnSim4, GLYNNSIM4)
+MAKEPREPOSTPARVAR(GlynnSim5, GlynnSim5, GLYNNSIM5)
 MAKEPREPOSTPARVARASSIGN(Starblur, starblur, STARBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVARASSIGN(Sineblur, sineblur, SINEBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVARASSIGN(Circleblur, circleblur, CIRCLEBLUR, eVariationAssignType::ASSIGNTYPE_SUM)
@@ -4573,6 +5090,7 @@ MAKEPREPOSTPARVAR(Ovoid, ovoid, OVOID)
 MAKEPREPOSTPARVAR(Ovoid3D, ovoid3d, OVOID3D)
 MAKEPREPOSTPARVARASSIGN(Spirograph, Spirograph, SPIROGRAPH, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVAR(Petal, petal, PETAL)
+MAKEPREPOSTVAR(Spher, spher, SPHER)
 MAKEPREPOSTVAR(RoundSpher, roundspher, ROUNDSPHER)
 MAKEPREPOSTVAR(RoundSpher3D, roundspher3D, ROUNDSPHER3D)
 MAKEPREPOSTVAR(SpiralWing, spiralwing, SPIRAL_WING)
@@ -4585,6 +5103,8 @@ MAKEPREPOSTPARVAR(MobiusStrip, mobius_strip, MOBIUS_STRIP)
 MAKEPREPOSTPARVARASSIGN(Lissajous, Lissajous, LISSAJOUS, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Svf, svf, SVF)
 MAKEPREPOSTPARVAR(Target, target, TARGET)
+MAKEPREPOSTPARVAR(Target0, target0, TARGET0)
+MAKEPREPOSTPARVAR(Target2, target2, TARGET2)
 MAKEPREPOSTPARVAR(Taurus, taurus, TAURUS)
 MAKEPREPOSTPARVAR(Collideoscope, collideoscope, COLLIDEOSCOPE)
 MAKEPREPOSTPARVAR(BMod, bMod, BMOD)
@@ -4593,6 +5113,7 @@ MAKEPREPOSTPARVAR(BTransform, bTransform, BTRANSFORM)
 MAKEPREPOSTPARVAR(BCollide, bCollide, BCOLLIDE)
 MAKEPREPOSTPARVAR(Eclipse, eclipse, ECLIPSE)
 MAKEPREPOSTPARVAR(FlipCircle, flipcircle, FLIP_CIRCLE)
+MAKEPREPOSTVAR(FlipX, flipx, FLIP_X)
 MAKEPREPOSTVAR(FlipY, flipy, FLIP_Y)
 MAKEPREPOSTPARVAR(ECollide, eCollide, ECOLLIDE)
 MAKEPREPOSTPARVAR(EJulia, eJulia, EJULIA)

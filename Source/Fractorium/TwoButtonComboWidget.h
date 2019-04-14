@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "FractoriumPch.h"
+#include "SpinBox.h"
 #include "DoubleSpinBox.h"
 
 /// <summary>
@@ -114,7 +115,42 @@ public:
 	QPushButton* m_Button;
 };
 
-class SpinnerLabelButtonWidget : public QWidget
+class SpinnerLabelWidget : public QWidget
+{
+	Q_OBJECT
+
+public:
+	/// <summary>
+	/// Constructor that passes the parent to the base, then creates a QLabel,
+	/// then creates a QPushButton and sets up its caption and dimensions, then
+	/// assigns the DoubleSpinBox.
+	/// </summary>
+	/// <param name="spinBox">The pre-created DoubleSpinBox</param>
+	/// <param name="h">The height of the label</param>
+	/// <param name="p">The parent widget</param>
+	SpinnerLabelWidget(DoubleSpinBox* spinBox, int h, QWidget* p)
+		: QWidget(p)
+	{
+		m_L = new QHBoxLayout(this);
+		m_SpinBox = spinBox;
+		m_Label = new QLabel(p);
+		m_Label->setMinimumHeight(h);
+		m_Label->setMaximumHeight(h);
+		m_L->addWidget(spinBox);
+		m_L->addWidget(m_Label);
+		m_L->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		m_L->setMargin(0);
+		m_L->setSpacing(0);
+		setLayout(m_L);
+	}
+	DoubleSpinBox* m_SpinBox;
+	QLabel* m_Label;
+
+protected:
+	QHBoxLayout* m_L;
+};
+
+class SpinnerLabelButtonWidget : public SpinnerLabelWidget
 {
 	Q_OBJECT
 
@@ -130,14 +166,9 @@ public:
 	/// <param name="h">The height of the button</param>
 	/// <param name="p">The parent widget</param>
 	SpinnerLabelButtonWidget(DoubleSpinBox* spinBox, QString buttonCaption, int w, int h, QWidget* p)
-		: QWidget(p)
+		: SpinnerLabelWidget(spinBox, h, p)
 	{
-		QHBoxLayout* l = new QHBoxLayout(this);
 		m_Button = new QPushButton(buttonCaption, p);
-		m_SpinBox = spinBox;
-		m_Label = new QLabel(p);
-		m_Label->setMinimumHeight(h);
-		m_Label->setMaximumHeight(h);
 
 		if (w != -1)
 		{
@@ -147,16 +178,41 @@ public:
 
 		m_Button->setMinimumHeight(h);
 		m_Button->setMaximumHeight(h);
-		l->addWidget(spinBox);
-		l->addWidget(m_Label);
-		l->addWidget(m_Button);
-		l->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		l->setMargin(0);
-		l->setSpacing(0);
-		setLayout(l);
+		m_L->addWidget(m_Button);
 	}
 
-	DoubleSpinBox* m_SpinBox;
 	QPushButton* m_Button;
-	QLabel* m_Label;
+};
+
+
+class DoubleIntSpinnerWidget : public QWidget
+{
+	Q_OBJECT
+
+public:
+	/// <summary>
+	/// Constructor that passes the parent to the base, then creates a QHBoxLayout,
+	/// and adds the passed in DoubleSpinBox and SpinBox to the layout.
+	/// </summary>
+	/// <param name="doubleSpinBox">The pre-created DoubleSpinBox</param>
+	/// <param name="spinBox">The pre-created SpinBox</param>
+	/// <param name="p">The parent widget</param>
+	DoubleIntSpinnerWidget(DoubleSpinBox* doubleSpinBox, SpinBox* spinBox, QWidget* p)
+		: QWidget(p)
+	{
+		m_L = new QHBoxLayout(this);
+		m_DoubleSpinBox = doubleSpinBox;
+		m_SpinBox = spinBox;
+		m_L->addWidget(doubleSpinBox);
+		m_L->addWidget(spinBox);
+		m_L->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		m_L->setMargin(0);
+		m_L->setSpacing(0);
+		setLayout(m_L);
+	}
+	DoubleSpinBox* m_DoubleSpinBox;
+	SpinBox* m_SpinBox;
+
+protected:
+	QHBoxLayout* m_L;
 };

@@ -146,6 +146,7 @@ public:
 	virtual void GammaThresholdChanged(double d) { }
 	virtual void VibrancyChanged(double d) { }
 	virtual void HighlightPowerChanged(double d) { }
+	virtual void K2Changed(double d) { }
 	virtual void PaletteModeChanged(uint i) { }
 	virtual void WidthChanged(uint i) { }
 	virtual void HeightChanged(uint i) { }
@@ -169,14 +170,16 @@ public:
 	virtual void DEFilterCurveWidthChanged(double d) { }
 	virtual void SbsChanged(int d) { }
 	virtual void FuseChanged(int d) { }
+	virtual void RandRangeChanged(double d) { }
 	virtual void QualityChanged(double d) { }
 	virtual void SupersampleChanged(int d) { }
-	virtual void TemporalSamplesChanged(int d) { }
 	virtual void AffineInterpTypeChanged(int i) { }
 	virtual void InterpTypeChanged(int i) { }
 	virtual void BackgroundChanged(const QColor& color) { }
 	virtual void ClearColorCurves(int i) { }
 	virtual void ColorCurveChanged(int curveIndex, int pointInxed, const QPointF& point) { }
+	virtual void ColorCurvesPointAdded(size_t curveIndex, const QPointF& point) { }
+	virtual void ColorCurvesPointRemoved(size_t curveIndex, int pointIndex) { }
 
 	//Xforms.
 	virtual void CurrentXformComboChanged(int index) { }
@@ -210,7 +213,7 @@ public:
 	virtual void RandomColorIndicesButtonClicked() { }
 	virtual void ToggleColorIndicesButtonClicked() { }
 	virtual void RandomColorSpeedButtonClicked() { }
-	virtual void ToggleColorSpeedButtonClicked() { }
+	virtual void ToggleColorSpeedsButtonClicked() { }
 	virtual void XformColorSpeedChanged(double d) { }
 	virtual void XformOpacityChanged(double d) { }
 	virtual void XformDirectColorChanged(double d) { }
@@ -230,10 +233,12 @@ public:
 
 	//Xaos.
 	virtual void FillXaos() { }
+	virtual void FillAppliedXaos() { }
 	virtual void XaosChanged(int x, int y, double val) { }
 	virtual void ClearXaos() { }
 	virtual void RandomXaos() { }
 	virtual void AddLayer(int xforms) { }
+	virtual void TransposeXaos() { }
 
 	//Palette.
 	virtual size_t InitPaletteList(const QString& s) { return 0; }
@@ -421,6 +426,7 @@ public:
 	virtual void GammaThresholdChanged(double d) override;
 	virtual void VibrancyChanged(double d) override;
 	virtual void HighlightPowerChanged(double d) override;
+	virtual void K2Changed(double d) override;
 	virtual void PaletteModeChanged(uint i) override;
 	virtual void WidthChanged(uint i) override;
 	virtual void HeightChanged(uint i) override;
@@ -444,14 +450,16 @@ public:
 	virtual void DEFilterCurveWidthChanged(double d) override;
 	virtual void SbsChanged(int d) override;
 	virtual void FuseChanged(int d) override;
+	virtual void RandRangeChanged(double d) override;
 	virtual void QualityChanged(double d) override;
 	virtual void SupersampleChanged(int d) override;
-	virtual void TemporalSamplesChanged(int d) override;
 	virtual void AffineInterpTypeChanged(int index) override;
 	virtual void InterpTypeChanged(int index) override;
 	virtual void BackgroundChanged(const QColor& col) override;
 	virtual void ClearColorCurves(int i) override;
 	virtual void ColorCurveChanged(int curveIndex, int pointInxed, const QPointF& point) override;
+	virtual void ColorCurvesPointAdded(size_t curveIndex, const QPointF& point) override;
+	virtual void ColorCurvesPointRemoved(size_t curveIndex, int pointIndex) override;
 
 	//Xforms.
 	virtual void CurrentXformComboChanged(int index) override;
@@ -488,7 +496,7 @@ public:
 	virtual void RandomColorIndicesButtonClicked() override;
 	virtual void ToggleColorIndicesButtonClicked() override;
 	virtual void RandomColorSpeedButtonClicked() override;
-	virtual void ToggleColorSpeedButtonClicked() override;
+	virtual void ToggleColorSpeedsButtonClicked() override;
 	virtual void XformColorSpeedChanged(double d) override;
 	virtual void XformOpacityChanged(double d) override;
 	virtual void XformDirectColorChanged(double d) override;
@@ -507,10 +515,12 @@ public:
 
 	//Xforms Xaos.
 	virtual void FillXaos() override;
+	virtual void FillAppliedXaos() override;
 	virtual void XaosChanged(int x, int y, double val) override;
 	virtual void ClearXaos() override;
 	virtual void RandomXaos() override;
 	virtual void AddLayer(int xforms) override;
+	virtual void TransposeXaos() override;
 
 	//Xforms Selection.
 	virtual QString MakeXformCaption(size_t i) override;
@@ -612,9 +622,7 @@ public:
 		m_PreviewRun = false;
 		m_PreviewRenderer.Abort();
 		m_PreviewResult.cancel();
-
-		while (m_PreviewResult.isRunning())
-			QApplication::processEvents();
+		m_PreviewResult.waitForFinished();
 	}
 
 	bool EarlyClip()

@@ -24,6 +24,7 @@
 #define OPENCLDEFILTER       "render/opencldefilter"
 #define CPUSUBBATCH		     "render/cpusubbatch"
 #define OPENCLSUBBATCH	     "render/openclsubbatch"
+#define OPENCLSUBBATCHPCT    "render/openclsubbatchpct"
 #define RANDOMCOUNT			 "render/randomcount"
 #define CPUQUALITY           "render/cpuquality"
 #define OPENCLQUALITY        "render/openclquality"
@@ -50,25 +51,26 @@
 #define VARFILTERPARAM       "varfilter/paramcheckbox"
 #define VARFILTERNONPARAM    "varfilter/nonparamcheckbox"
 
-#define FINALEARLYCLIP       "finalrender/earlyclip"
-#define FINALYAXISUP         "finalrender/finalyaxisup"
-#define FINALTRANSPARENCY    "finalrender/transparency"
-#define FINALOPENCL          "finalrender/opencl"
-#define FINALDOUBLEPRECISION "finalrender/dp64"
-#define FINALSAVEXML		 "finalrender/savexml"
-#define FINALDOALL		     "finalrender/doall"
-#define FINALDOSEQUENCE	     "finalrender/dosequence"
-#define FINALPNG16BIT        "finalrender/png16bit"
-#define FINALKEEPASPECT		 "finalrender/keepaspect"
-#define FINALSCALE			 "finalrender/scale"
-#define FINALEXT			 "finalrender/ext"
-#define FINALDEVICES		 "finalrender/devices"
-#define FINALTHREADCOUNT     "finalrender/threadcount"
-#define FINALTHREADPRIORITY  "finalrender/threadpriority"
-#define FINALQUALITY	     "finalrender/quality"
-#define FINALTEMPORALSAMPLES "finalrender/temporalsamples"
-#define FINALSUPERSAMPLE     "finalrender/supersample"
-#define FINALSTRIPS		     "finalrender/strips"
+#define FINALEARLYCLIP         "finalrender/earlyclip"
+#define FINALYAXISUP           "finalrender/finalyaxisup"
+#define FINALTRANSPARENCY      "finalrender/transparency"
+#define FINALOPENCL            "finalrender/opencl"
+#define FINALDOUBLEPRECISION   "finalrender/dp64"
+#define FINALSAVEXML		   "finalrender/savexml"
+#define FINALDOALL		       "finalrender/doall"
+#define FINALDOSEQUENCE	       "finalrender/dosequence"
+#define FINALPNG16BIT          "finalrender/png16bit"
+#define FINALKEEPASPECT		   "finalrender/keepaspect"
+#define FINALSCALE			   "finalrender/scale"
+#define FINALEXT			   "finalrender/ext"
+#define FINALDEVICES		   "finalrender/devices"
+#define FINALTHREADCOUNT       "finalrender/threadcount"
+#define FINALTHREADPRIORITY    "finalrender/threadpriority"
+#define FINALOPENCLSUBBATCHPCT "finalrender/openclsubbatchpct"
+#define FINALQUALITY	       "finalrender/quality"
+#define FINALTEMPORALSAMPLES   "finalrender/temporalsamples"
+#define FINALSUPERSAMPLE       "finalrender/supersample"
+#define FINALSTRIPS		       "finalrender/strips"
 
 #define XMLWIDTH			 "xml/width"
 #define XMLHEIGHT			 "xml/height"
@@ -156,6 +158,9 @@ public:
 
 	uint CpuSubBatch();
 	void CpuSubBatch(uint i);
+
+	double OpenCLSubBatchPct();
+	void OpenCLSubBatchPct(double d);
 
 	uint OpenCLSubBatch();
 	void OpenCLSubBatch(uint i);
@@ -273,6 +278,9 @@ public:
 
 	int FinalThreadPriority();
 	void FinalThreadPriority(int b);
+
+	double FinalOpenCLSubBatchPct();
+	void FinalOpenCLSubBatchPct(double d);
 
 	uint FinalQuality();
 	void FinalQuality(uint i);

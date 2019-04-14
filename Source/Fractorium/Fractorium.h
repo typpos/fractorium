@@ -99,6 +99,7 @@ public:
 	bool DrawXforms();
 	bool DrawImage();
 	bool DrawGrid();
+	QList<QUrl> Urls();
 
 	//Library.
 	void SyncFileCountToSequenceCount();
@@ -214,6 +215,7 @@ public slots:
 	void OnGammaThresholdChanged(double d);
 	void OnVibrancyChanged(double d);
 	void OnHighlightPowerChanged(double d);
+	void OnK2Changed(double d);
 	void OnBackgroundColorButtonClicked(bool checked);
 	void OnColorSelected(const QColor& color);
 	void OnPaletteModeComboCurrentIndexChanged(int index);
@@ -238,9 +240,9 @@ public slots:
 	void OnDEFilterCurveWidthChanged(double d);
 	void OnSbsChanged(int d);//Iteration.
 	void OnFuseChanged(int d);
+	void OnRandRangeChanged(double d);
 	void OnQualityChanged(double d);
 	void OnSupersampleChanged(int d);
-	void OnTemporalSamplesChanged(int d);
 	void OnAffineInterpTypeComboCurrentIndexChanged(int index);
 	void OnInterpTypeComboCurrentIndexChanged(int index);
 
@@ -299,7 +301,7 @@ public slots:
 	void OnRandomColorIndicesButtonClicked(bool b);
 	void OnToggleColorIndicesButtonClicked(bool b);
 	void OnRandomColorSpeedButtonClicked(bool b);
-	void OnToggleColorSpeedButtonClicked(bool b);
+	void OnToggleColorSpeedsButtonClicked(bool b);
 
 	void OnXformColorSpeedChanged(double d);
 	void OnXformOpacityChanged(double d);
@@ -308,6 +310,8 @@ public slots:
 	void OnXformRefPaletteResized(int logicalIndex, int oldSize, int newSize);
 	void OnResetCurvesButtonClicked(bool checked);
 	void OnCurvesPointChanged(int curveIndex, int pointIndex, const QPointF& point);
+	void OnCurvesPointAdded(size_t curveIndex, const QPointF& point);
+	void OnCurvesPointRemoved(size_t curveIndex, int pointIndex);
 	void OnCurvesAllRadioButtonToggled(bool checked);
 	void OnCurvesRedRadioButtonToggled(bool checked);
 	void OnCurvesGreenRadioButtonToggled(bool checked);
@@ -330,8 +334,11 @@ public slots:
 	void OnClearXaosButtonClicked(bool checked);
 	void OnRandomXaosButtonClicked(bool checked);
 	void OnAddLayerButtonClicked(bool checked);
+	void OnTransposeXaosButtonClicked(bool checked);
 	void OnXaosRowDoubleClicked(int logicalIndex);
 	void OnXaosColDoubleClicked(int logicalIndex);
+	void OnXaosHScrollValueChanged(int value);
+	void OnXaosVScrollValueChanged(int value);
 	void OnXaosTableModelDataChanged(const QModelIndex& indexA, const QModelIndex& indexB);
 
 	//Palette.
@@ -464,6 +471,7 @@ private:
 	DoubleSpinBox* m_GammaThresholdSpin;
 	DoubleSpinBox* m_VibrancySpin;
 	DoubleSpinBox* m_HighlightSpin;
+	DoubleSpinBox* m_K2Spin;
 	QPushButton* m_BackgroundColorButton;
 	StealthComboBox* m_PaletteModeCombo;
 	SpinBox* m_WidthSpin;//Geometry.
@@ -487,9 +495,9 @@ private:
 	DoubleSpinBox* m_DECurveSpin;
 	SpinBox* m_SbsSpin;//Iteration.
 	SpinBox* m_FuseSpin;
+	DoubleSpinBox* m_RandRangeSpin;
 	DoubleSpinBox* m_QualitySpin;
 	SpinBox* m_SupersampleSpin;
-	SpinBox* m_TemporalSamplesSpin;
 	StealthComboBox* m_AffineInterpTypeCombo;
 	StealthComboBox* m_InterpTypeCombo;
 
@@ -528,6 +536,7 @@ private:
 	//Xaos.
 	DoubleSpinBox* m_XaosSpinBox;
 	QStandardItemModel* m_XaosTableModel;
+	QStandardItemModel* m_AppliedXaosTableModel;
 	DoubleSpinBoxTableItemDelegate* m_XaosTableItemDelegate;
 
 	//Palette.
@@ -553,6 +562,7 @@ private:
 	QTableWidgetItem* m_InfoFinalXformItem;
 
 	//Files.
+	QList<QUrl> m_Urls;
 #ifndef __APPLE__
 	QFileDialog* m_SaveFileDialog = nullptr;
 	QFileDialog* m_SaveImageDialog = nullptr;
@@ -582,6 +592,7 @@ private:
 	int m_VarSortMode;
 	int m_PaletteSortMode;
 	int m_PreviousPaletteRow;
+	int m_BgRow;
 	vector<byte> m_PreviewVec;
 	shared_ptr<OpenCLInfo> m_Info;
 	unique_ptr<FractoriumEmberControllerBase> m_Controller;

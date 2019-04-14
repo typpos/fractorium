@@ -165,7 +165,7 @@ string DEOpenCLKernelCreator::CreateLogScaleAssignDEKernelString()
 		"\n"
 		"		if (histogram[index].w != 0)\n"
 		"		{\n"
-		"			real_bucket_t logScale = (logFilter->m_K1 * log(1.0 + histogram[index].w * logFilter->m_K2)) / histogram[index].w;\n"
+		"			real_bucket_t logScale = (logFilter->m_K1 * log((real_bucket_t)fma(histogram[index].w, logFilter->m_K2, (real_bucket_t)1.0))) / histogram[index].w;\n"
 		"\n"
 		"			accumulator[index] = histogram[index] * logScale;\n"//Using a single real4 vector operation doubles the speed from doing each component individually.
 		"		}\n"
@@ -336,7 +336,7 @@ string DEOpenCLKernelCreator::CreateGaussianDEKernel(size_t ss)
 	   "\n"
 	   "		if (bucket.w != 0)\n"
 	   "		{\n"
-	   "			cacheLog = (densityFilter->m_K1 * log(1.0 + bucket.w * densityFilter->m_K2)) / bucket.w;\n";
+	   "			cacheLog = (densityFilter->m_K1 * log((real_bucket_t)fma(bucket.w, densityFilter->m_K2, (real_bucket_t)1.0))) / bucket.w;\n";
 
 	if (doSS)
 	{
@@ -513,7 +513,7 @@ string DEOpenCLKernelCreator::CreateGaussianDEKernelNoLocalCache(size_t ss)
 	   "\n"
 	   "		if (bucket.w != 0)\n"
 	   "		{\n"
-	   "			cacheLog = (densityFilter->m_K1 * log(1.0 + bucket.w * densityFilter->m_K2)) / bucket.w;\n";
+	   "			cacheLog = (densityFilter->m_K1 * log((real_bucket_t)fma(bucket.w, densityFilter->m_K2, (real_bucket_t)1.0))) / bucket.w;\n";
 
 	if (doSS)
 	{

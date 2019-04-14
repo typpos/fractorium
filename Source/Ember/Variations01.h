@@ -169,6 +169,157 @@ public:
 };
 
 /// <summary>
+/// swirl3.
+/// By Zy0rg.
+/// </summary>
+template <typename T>
+class Swirl3Variation : public ParametricVariation<T>
+{
+public:
+	Swirl3Variation(T weight = 1.0) : ParametricVariation<T>("swirl3", eVariationId::VAR_SWIRL3, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Swirl3Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T rad = helper.m_PrecalcSqrtSumSquares;
+		T ang = helper.m_PrecalcAtanyx + std::log(rad) * m_Shift;
+		helper.Out.x = m_Weight * rad * std::cos(ang);
+		helper.Out.y = m_Weight * rad * std::sin(ang);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\t\treal_t ang = fma(log(rad), " << shift << ", precalcAtanyx);\n"
+		   << "\t\tvOut.x = " << weight << " * rad * cos(ang);\n"
+		   << "\t\tvOut.y = " << weight << " * rad * sin(ang);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "swirl3_shift", T(0.5)));
+	}
+
+private:
+	T m_Shift;
+};
+
+/// <summary>
+/// swirl3r.
+/// By Zy0rg.
+/// </summary>
+template <typename T>
+class Swirl3rVariation : public ParametricVariation<T>
+{
+public:
+	Swirl3rVariation(T weight = 1.0) : ParametricVariation<T>("swirl3r", eVariationId::VAR_SWIRL3R, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Swirl3rVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T rad = helper.m_PrecalcSqrtSumSquares;
+		T ang = helper.m_PrecalcAtanyx;
+		T ang2;
+
+		if (rad < m_Minr)
+			ang2 = ang + m_Mina;
+		else if (rad > m_Maxr)
+			ang2 = ang + m_Maxa;
+		else
+			ang2 = ang + std::log(rad) * m_Shift;
+
+		helper.Out.x = m_Weight * rad * std::cos(ang2);
+		helper.Out.y = m_Weight * rad * std::sin(ang2);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string shift = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mmin  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mmax  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string minr  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string maxr  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mina  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string maxa  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\t\treal_t ang2, ang = precalcAtanyx;\n"
+		   << "\n"
+		   << "\t\tif (rad < " << minr << ")\n"
+		   << "\t\t	   ang2 = ang + " << mina << ";\n"
+		   << "\t\telse if (rad > " << maxr << ")\n"
+		   << "\t\t	ang2 = ang + " << maxa << ";\n"
+		   << "\t\telse\n"
+		   << "\t\t	ang2 = ang + log(rad) * " << shift << ";\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * rad * cos(ang);\n"
+		   << "\t\tvOut.y = " << weight << " * rad * sin(ang);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Minr = std::min(m_Min, m_Max);
+		m_Maxr = std::max(m_Min, m_Max);
+		m_Mina = m_Minr > 0 ? std::log(m_Minr) * m_Shift : 0;
+		m_Maxa = m_Maxr > 0 ? std::log(m_Maxr) * m_Shift : 0;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "swirl3r_shift", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Min, prefix + "swirl3r_min", T(0.5), eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Max, prefix + "swirl3r_max", 1, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(true, &m_Minr, prefix + "swirl3r_minr"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Maxr, prefix + "swirl3r_maxr"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Mina, prefix + "swirl3r_mina"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Maxa, prefix + "swirl3r_maxa"));
+	}
+
+private:
+	T m_Shift;
+	T m_Min;
+	T m_Max;
+	T m_Minr;//Precalc.
+	T m_Maxr;
+	T m_Mina;
+	T m_Maxa;
+};
+
+/// <summary>
 /// Horseshoe:
 /// a = atan2(tx, ty);
 /// c1 = sin(a);
@@ -1919,6 +2070,43 @@ public:
 };
 
 /// <summary>
+/// Gaussian.
+/// </summary>
+template <typename T>
+class GaussianVariation : public Variation<T>
+{
+public:
+	GaussianVariation(T weight = 1.0) : Variation<T>("gaussian", eVariationId::VAR_GAUSSIAN, weight) { }
+
+	VARCOPY(GaussianVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T angle = rand.Frand01<T>() * M_2PI;
+		T r = m_Weight * (rand.Frand01<T>() + rand.Frand01<T>() + rand.Frand01<T>() + rand.Frand01<T>() - 2);
+		helper.Out.x = r * std::cos(angle) + helper.In.x;
+		helper.Out.y = r * std::sin(angle) + helper.In.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		string weight = WeightDefineString();
+		intmax_t varIndex = IndexInXform();
+		ss << "\t{\n"
+		   << "\t\treal_t angle = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\treal_t r = " << weight << " * (MwcNext01(mwc) + MwcNext01(mwc) + MwcNext01(mwc) + MwcNext01(mwc) - (real_t)(2.0));\n"
+		   << "\n"
+		   << "\t\tvOut.x = fma(r, cos(angle), vIn.x);\n"
+		   << "\t\tvOut.y = fma(r, sin(angle), vIn.y);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
+/// <summary>
 /// Radial blur.
 /// </summary>
 template <typename T>
@@ -2512,7 +2700,7 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t u = fma(" << weight << ", SQR(M_2_PI), 1 / Zeps(tan(precalcSqrtSumSquares)));\n";
+		   << "\t\treal_t u = fma(" << weight << ", SQR(M2PI), 1 / Zeps(tan(precalcSqrtSumSquares)));\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 			ss << "\t\toutPoint->m_X = outPoint->m_Y = 0;\n";
@@ -3064,6 +3252,77 @@ protected:
 private:
 	T m_Petals;
 	T m_Holes;
+};
+
+/// <summary>
+/// flowerdb.
+/// By dark-beam.
+/// </summary>
+template <typename T>
+class FlowerDbVariation : public ParametricVariation<T>
+{
+public:
+	FlowerDbVariation(T weight = 1.0) : ParametricVariation<T>("flowerdb", eVariationId::VAR_FLOWER_DB, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(FlowerDbVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T r = m_Weight * helper.m_PrecalcSqrtSumSquares;
+		T t = helper.m_PrecalcAtanyx;
+		T r2 = r * (std::abs((m_Spread + std::sin(m_Petals * t)) * cos(m_PetalsSplit * t)));
+		helper.Out.x = r2 * std::cos(t);
+		helper.Out.y = r2 * std::sin(t);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string petals      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string split       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string spread      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string petalssplit = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t r = " << weight << " * precalcSqrtSumSquares;\n"
+		   << "\t\treal_t t = precalcAtanyx;\n"
+		   << "\t\treal_t r2 = r * (fabs((" << spread << " + sin(" << petals << " * t)) * cos(" << petalssplit << " * t)));\n"
+		   << "\n"
+		   << "\t\tvOut.x = r * cos(t);\n"
+		   << "\t\tvOut.y = r * sin(t);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_PetalsSplit = m_Petals * m_Split;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Petals,            prefix + "flowerdb_petals", 6));
+		m_Params.push_back(ParamWithName<T>(&m_Split,             prefix + "flowerdb_petal_split"));
+		m_Params.push_back(ParamWithName<T>(&m_Spread,            prefix + "flowerdb_petal_spread", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_PetalsSplit, prefix + "flowerdb_petal_split_petals"));//Precalc.
+	}
+
+private:
+	T m_Petals;
+	T m_Split;
+	T m_Spread;
+	T m_PetalsSplit;//Precalc.
 };
 
 /// <summary>
@@ -3985,20 +4244,52 @@ public:
 	//For this to be correct, it must always use double. So there is no point in switching precisions when using this variation.
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		double x2 = 2 * helper.In.x;
-		double u = helper.m_PrecalcSumSquares + x2;
-		double v = helper.m_PrecalcSumSquares - x2;
-		double xmaxm1 = 0.5 * (Sqrt1pm1(u) + Sqrt1pm1(v));
-		double a = helper.In.x / (1 + xmaxm1);
-		double ssx = xmaxm1 < 0 ? 0 : std::sqrt(xmaxm1);
-		helper.Out.x = T(m_WeightDivPiDiv2 * std::asin(Clamp(a, -1.0, 1.0)));
+		if (typeid(T) == typeid(float))
+		{
+			T tmp = helper.m_PrecalcSumSquares + 1;
+			T x2 = 2 * helper.In.x;
+			T xmax = T(0.5) * (std::sqrt(tmp + x2) + std::sqrt(tmp - x2));
+			T a = helper.In.x / xmax;
+			T b = 1 - a * a;
+			T ssx = xmax - 1;
+			const T w = m_WeightDivPiDiv2;
 
-		if (helper.In.y > 0)
-			helper.Out.y = T(m_WeightDivPiDiv2 * std::log1p(xmaxm1 + ssx));
+			if (b < 0)
+				b = 0;
+			else
+				b = std::sqrt(b);
+
+			if (ssx < 0)
+				ssx = 0;
+			else
+				ssx = std::sqrt(ssx);
+
+			helper.Out.x = w * std::atan2(a, b);
+
+			if (helper.In.y > 0)
+				helper.Out.y = w * std::log(xmax + ssx);
+			else
+				helper.Out.y = -(w * std::log(xmax + ssx));
+
+			helper.Out.z = DefaultZ(helper);
+		}
 		else
-			helper.Out.y = T(-(m_WeightDivPiDiv2 * std::log1p(xmaxm1 + ssx)));
+		{
+			double x2 = 2 * helper.In.x;
+			double u = helper.m_PrecalcSumSquares + x2;
+			double v = helper.m_PrecalcSumSquares - x2;
+			double xmaxm1 = 0.5 * (Sqrt1pm1(u) + Sqrt1pm1(v));
+			double a = helper.In.x / (1 + xmaxm1);
+			double ssx = xmaxm1 < 0 ? 0 : std::sqrt(xmaxm1);
+			helper.Out.x = T(m_WeightDivPiDiv2 * std::asin(Clamp(a, -1.0, 1.0)));
 
-		helper.Out.z = DefaultZ(helper);
+			if (helper.In.y > 0)
+				helper.Out.y = T(m_WeightDivPiDiv2 * std::log1p(xmaxm1 + ssx));
+			else
+				helper.Out.y = T(-(m_WeightDivPiDiv2 * std::log1p(xmaxm1 + ssx)));
+
+			helper.Out.z = DefaultZ(helper);
+		}
 	}
 
 	virtual string OpenCLString() const override
@@ -4009,22 +4300,58 @@ public:
 		string index = ss2.str();
 		string weight = WeightDefineString();
 		string weightDivPiDiv2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		ss << "\t{\n"
-		   << "\t\tdouble x2 = 2.0 * vIn.x;\n"
-		   << "\t\tdouble u = precalcSumSquares + x2;\n"
-		   << "\t\tdouble v = precalcSumSquares - x2;\n"
-		   << "\t\tdouble xmaxm1 = 0.5 * (Sqrt1pm1(u) + Sqrt1pm1(v));\n"
-		   << "\t\tdouble a = vIn.x / (1 + xmaxm1);\n"
-		   << "\t\tdouble ssx = xmaxm1 < 0 ? 0.0 : sqrt(xmaxm1);\n"
-		   << "\t\tvOut.x = (" << weightDivPiDiv2 << " * asin(clamp(a, (double)-1.0, (double)1.0)));\n"
-		   << "\n"
-		   << "\t\tif (vIn.y > 0)\n"
-		   << "\t\t\tvOut.y = " << weightDivPiDiv2 << " * log1p(xmaxm1 + ssx);\n"
-		   << "\t\telse\n"
-		   << "\t\t\tvOut.y = -(" << weightDivPiDiv2 << " * log1p(xmaxm1 + ssx));\n"
-		   << "\n"
-		   << "\t\tvOut.z = " << DefaultZCl()
-		   << "\t}\n";
+
+		if (typeid(T) == typeid(float))
+		{
+			ss << "\t{\n"
+			   << "\t\treal_t tmp = precalcSumSquares + (real_t)(1.0);\n"
+			   << "\t\treal_t x2 = (real_t)(2.0) * vIn.x;\n"
+			   << "\t\treal_t xmax = (real_t)(0.5) * (sqrt(tmp + x2) + sqrt(tmp - x2));\n"
+			   << "\t\treal_t a = vIn.x / xmax;\n"
+			   << "\t\treal_t b = (real_t)(1.0) - a * a;\n"
+			   << "\t\treal_t ssx = xmax - (real_t)(1.0);\n"
+			   << "\t\tconst real_t w = " << weightDivPiDiv2 << ";\n"
+			   << "\n"
+			   << "\t\tif (b < 0)\n"
+			   << "\t\t	b = 0;\n"
+			   << "\t\telse\n"
+			   << "\t\t	b = sqrt(b);\n"
+			   << "\n"
+			   << "\t\tif (ssx < 0)\n"
+			   << "\t\t	ssx = 0;\n"
+			   << "\t\telse\n"
+			   << "\t\t	ssx = sqrt(ssx);\n"
+			   << "\n"
+			   << "\t\tvOut.x = w * atan2(a, b);\n"
+			   << "\n"
+			   << "\t\tif (vIn.y > 0)\n"
+			   << "\t\t	vOut.y = w * log(xmax + ssx);\n"
+			   << "\t\telse\n"
+			   << "\t\t	vOut.y = -(w * log(xmax + ssx));\n"
+			   << "\n"
+			   << "\t\tvOut.z = " << DefaultZCl()
+			   << "\t}\n";
+		}
+		else
+		{
+			ss << "\t{\n"
+			   << "\t\tdouble x2 = 2.0 * vIn.x;\n"
+			   << "\t\tdouble u = precalcSumSquares + x2;\n"
+			   << "\t\tdouble v = precalcSumSquares - x2;\n"
+			   << "\t\tdouble xmaxm1 = 0.5 * (Sqrt1pm1(u) + Sqrt1pm1(v));\n"
+			   << "\t\tdouble a = vIn.x / (1 + xmaxm1);\n"
+			   << "\t\tdouble ssx = xmaxm1 < 0 ? 0.0 : sqrt(xmaxm1);\n"
+			   << "\t\tvOut.x = (" << weightDivPiDiv2 << " * asin(clamp(a, (double)-1.0, (double)1.0)));\n"
+			   << "\n"
+			   << "\t\tif (vIn.y > 0)\n"
+			   << "\t\t\tvOut.y = " << weightDivPiDiv2 << " * log1p(xmaxm1 + ssx);\n"
+			   << "\t\telse\n"
+			   << "\t\t\tvOut.y = -(" << weightDivPiDiv2 << " * log1p(xmaxm1 + ssx));\n"
+			   << "\n"
+			   << "\t\tvOut.z = " << DefaultZCl()
+			   << "\t}\n";
+		}
+
 		return ss.str();
 	}
 
@@ -4631,10 +4958,10 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Separation, prefix + "oscilloscope_separation", 1));//Params.
-		m_Params.push_back(ParamWithName<T>(&m_Frequency, prefix + "oscilloscope_frequency", T(M_PI)));
-		m_Params.push_back(ParamWithName<T>(&m_Amplitude, prefix + "oscilloscope_amplitude", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Damping, prefix + "oscilloscope_damping"));
+		m_Params.push_back(ParamWithName<T>(&m_Separation,    prefix + "oscilloscope_separation", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Frequency,     prefix + "oscilloscope_frequency", T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_Amplitude,     prefix + "oscilloscope_amplitude", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Damping,       prefix + "oscilloscope_damping"));
 		m_Params.push_back(ParamWithName<T>(true, &m_2PiFreq, prefix + "oscilloscope_2pifreq"));//Precalc.
 	}
 
@@ -4644,6 +4971,117 @@ private:
 	T m_Amplitude;
 	T m_Damping;
 	T m_2PiFreq;//Precalc.
+};
+
+/// <summary>
+/// Oscilloscope2.
+/// By dark-beam.
+/// </summary>
+template <typename T>
+class Oscilloscope2Variation : public ParametricVariation<T>
+{
+public:
+	Oscilloscope2Variation(T weight = 1.0) : ParametricVariation<T>("oscilloscope2", eVariationId::VAR_OSCILLOSCOPE2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Oscilloscope2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T t;
+		T pt = m_Perturbation * std::sin(m_Tpf2 * helper.In.y);
+
+		if (!m_Damping)
+			t = m_Amplitude * std::cos(m_Tpf * helper.In.x + pt) + m_Separation;
+		else
+			t = m_Amplitude * std::exp(-std::abs(helper.In.x) * m_Damping) * std::cos(m_Tpf * helper.In.x + pt) + m_Separation;
+
+		if (std::abs(helper.In.y) <= t)
+		{
+			helper.Out.x = -(m_Weight * helper.In.x);
+			helper.Out.y = -(m_Weight * helper.In.y);
+		}
+		else
+		{
+			helper.Out.x = m_Weight * helper.In.x;
+			helper.Out.y = m_Weight * helper.In.y;
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string separation   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string frequencyx   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string frequencyy   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string amplitude    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string perturbation = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string damping      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tpf          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string tpf2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t t;\n"
+		   << "\t\treal_t pt = " << perturbation << " * sin(" << tpf2 << " * vIn.y);\n"
+		   << "\n"
+		   << "\t\tif (!" << damping << ")\n"
+		   << "\t\t	t = fma(" << amplitude << ", cos(fma(" << tpf << ", vIn.x, pt)), " << separation << ");\n"
+		   << "\t\telse\n"
+		   << "\t\t	t = fma(" << amplitude << ", exp(-fabs(vIn.x) * " << damping << ") * cos(fma(" << tpf << ", vIn.x, pt)), " << separation << ");\n"
+		   << "\n"
+		   << "\t\tif (fabs(vIn.y) <= t)\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = -(" << weight << " * vIn.x);\n"
+		   << "\t\t	vOut.y = -(" << weight << " * vIn.y);\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = " << weight << " * vIn.x;\n"
+		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Tpf = M_2PI * m_FrequencyX;
+		m_Tpf2 = M_2PI * m_FrequencyY;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Separation,   prefix + "oscilloscope2_separation", 1, eParamType::REAL, 0));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_FrequencyX,   prefix + "oscilloscope2_frequencyx", T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_FrequencyY,   prefix + "oscilloscope2_frequencyy", T(M_PI)));
+		m_Params.push_back(ParamWithName<T>(&m_Amplitude,    prefix + "oscilloscope2_amplitude", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Perturbation, prefix + "oscilloscope2_perturbation", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Damping,      prefix + "oscilloscope2_damping", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_Tpf,    prefix + "oscilloscope2_tpf"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Tpf2,   prefix + "oscilloscope2_tpf2"));
+	}
+
+private:
+	T m_Separation;//Params.
+	T m_FrequencyX;
+	T m_FrequencyY;
+	T m_Amplitude;
+	T m_Perturbation;
+	T m_Damping;
+	T m_Tpf;//Precalc.
+	T m_Tpf2;
 };
 
 /// <summary>
@@ -4831,6 +5269,97 @@ protected:
 
 private:
 	T m_InvWeight;//Precalcs only, no params.
+};
+
+/// <summary>
+/// scry2.
+/// By dark-beam, modified by tatasz to increase the speed.
+/// </summary>
+template <typename T>
+class Scry2Variation : public ParametricVariation<T>
+{
+public:
+	Scry2Variation(T weight = 1.0) : ParametricVariation<T>("scry2", eVariationId::VAR_SCRY2, weight, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Scry2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T r2 = helper.m_PrecalcSumSquares;
+		T s = 1 / Zeps(std::sqrt(r2) * (r2 + 1));
+		T newX = helper.In.x * s;
+		T newY = helper.In.y * s;
+		T dang = (std::atan2(newY, newX) + T(M_PI)) / m_2PiOverPower;
+		T rad = std::sqrt(SQR(newX) + SQR(newY));
+		T zang1 = T(Floor<T>(dang));
+		T xang1 = dang - zang1;
+		T xang2 = xang1 > 0.5 ? 1 - xang1 : xang1;
+		T zang = xang1 > 0.5 ? zang1 + 1 : zang1;
+		T sign = T(xang1 > 0.5 ? -1 : 1);
+		T xang = std::atan(xang2 * std::tan(m_2PiOverPower * T(0.5)) * 2) / m_2PiOverPower;
+		T coeff = 1 / std::cos(xang * m_2PiOverPower);
+		T ang = (zang + sign * xang) * m_2PiOverPower - T(M_PI);
+		helper.Out.x = m_Weight * coeff * rad * std::cos(ang);
+		helper.Out.y = m_Weight * coeff * rad * std::sin(ang);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		int i = 0;
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string power          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string twopioverpower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t r2 = precalcSumSquares;\n"
+		   << "\t\treal_t s = 1 / Zeps(sqrt(r2) * (r2 + 1));\n"
+		   << "\t\treal_t newX = vIn.x * s;\n"
+		   << "\t\treal_t newY = vIn.y * s;\n"
+		   << "\t\treal_t dang = (atan2(newY, newX) + MPI) / " << twopioverpower << ";\n"
+		   << "\t\treal_t rad = sqrt(SQR(newX) + SQR(newY));\n"
+		   << "\t\treal_t zang1 = floor(dang);\n"
+		   << "\t\treal_t xang1 = dang - zang1;\n"
+		   << "\t\treal_t xang2 = xang1 > 0.5 ? 1 - xang1 : xang1;\n"
+		   << "\t\treal_t zang = xang1 > 0.5 ? zang1 + 1 : zang1;\n"
+		   << "\t\treal_t sign = xang1 > 0.5 ? -1.0 : 1.0;\n"
+		   << "\t\treal_t xang = atan(xang2 * tan(" << twopioverpower << " * 0.5) * 2) / " << twopioverpower << ";\n"
+		   << "\t\treal_t coeff = 1 / cos(xang * " << twopioverpower << ");\n"
+		   << "\t\treal_t ang = (zang + sign * xang) * " << twopioverpower << " - MPI;\n"
+		   << "\t\tvOut.x = " << weight << " * coeff * rad * cos(ang);\n"
+		   << "\t\tvOut.y = " << weight << " * coeff * rad * sin(ang);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_2PiOverPower = M_2PI / Zeps(m_Power);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "scry2_power", 4));
+		m_Params.push_back(ParamWithName<T>(true, &m_2PiOverPower, prefix + "scry2_2pi_over_power"));//Precalc.
+	}
+
+private:
+	T m_Power;
+	T m_2PiOverPower;//Precalc.
 };
 
 /// <summary>
@@ -5597,12 +6126,48 @@ public:
 	{
 		ostringstream ss;
 		string weight = WeightDefineString();
-		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\treal_t expe = " << weight << " * exp(vIn.x);\n"
 		   << "\n"
 		   << "\t\tvOut.x = expe * cos(vIn.y);\n"
 		   << "\t\tvOut.y = expe * sin(vIn.y);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
+/// <summary>
+/// Exp2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class Exp2Variation : public Variation<T>
+{
+public:
+	Exp2Variation(T weight = 1.0) : Variation<T>("exp2", eVariationId::VAR_EXP2, weight) { }
+
+	VARCOPY(Exp2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T ypi = helper.In.y * T(M_PI);
+		T expe = m_Weight * std::exp(helper.In.x * T(M_PI));
+		helper.Out.x = expe * std::cos(ypi);
+		helper.Out.y = expe * std::sin(ypi);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		string weight = WeightDefineString();
+		ss << "\t{\n"
+		   << "\t\treal_t ypi = vIn.y * MPI;\n"
+		   << "\t\treal_t expe = " << weight << " * exp(vIn.x * MPI);\n"
+		   << "\n"
+		   << "\t\tvOut.x = expe * cos(ypi);\n"
+		   << "\t\tvOut.y = expe * sin(ypi);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6054,6 +6619,65 @@ public:
 };
 
 /// <summary>
+/// tanh_spiral.
+/// </summary>
+template <typename T>
+class TanhSpiralVariation : public ParametricVariation<T>
+{
+public:
+	TanhSpiralVariation(T weight = 1.0) : ParametricVariation<T>("tanh_spiral", eVariationId::VAR_TANH_SPIRAL, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(TanhSpiralVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T t2 = (rand.Frand01<T>() - T(0.5)) * M_2PI;
+		T aux = Zeps(std::cos(m_A * t2) + std::cosh(t2));
+		helper.Out.x = m_Weight * (std::sinh(t2) / aux);
+		helper.Out.y = m_Weight * (std::sin(m_A * t2) / aux);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t t2 = (MwcNext01(mwc) - 0.5) * M_2PI;\n"
+		   << "\t\treal_t aux = Zeps(cos(" << a << " * t2) + cosh(t2));\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (sinh(t2) / aux);\n"
+		   << "\t\tvOut.y = " << weight << " * (sin(" << a << " * t2) / aux);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "tanh_spiral_a", 4));
+	}
+
+private:
+	T m_A;
+};
+
+/// <summary>
 /// Sech
 /// </summary>
 template <typename T>
@@ -6364,6 +6988,8 @@ MAKEPREPOSTVAR(Linear, linear, LINEAR)
 MAKEPREPOSTVAR(Sinusoidal, sinusoidal, SINUSOIDAL)
 MAKEPREPOSTVAR(Spherical, spherical, SPHERICAL)
 MAKEPREPOSTVAR(Swirl, swirl, SWIRL)
+MAKEPREPOSTPARVAR(Swirl3, swirl3, SWIRL3)
+MAKEPREPOSTPARVAR(Swirl3r, swirl3r, SWIRL3R)
 MAKEPREPOSTVAR(Horseshoe, horseshoe, HORSESHOE)
 MAKEPREPOSTVAR(Polar, polar, POLAR)
 MAKEPREPOSTVAR(Handkerchief, handkerchief, HANDKERCHIEF)
@@ -6396,7 +7022,9 @@ MAKEPREPOSTPARVAR(JuliaNGeneric, julian, JULIAN)
 MAKEPREPOSTPARVAR(JuliaScope, juliascope, JULIASCOPE)
 MAKEPREPOSTVARASSIGN(Blur, blur, BLUR, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTVARASSIGN(GaussianBlur, gaussian_blur, GAUSSIAN_BLUR, eVariationAssignType::ASSIGNTYPE_SUM)
+MAKEPREPOSTVAR(Gaussian, gaussian, GAUSSIAN)
 MAKEPREPOSTPARVAR(RadialBlur, radial_blur, RADIAL_BLUR)
+//MAKEPREPOSTPARVAR(RadialGaussian, radial_gaussian, RADIAL_GAUSSIAN)
 MAKEPREPOSTPARVARASSIGN(Pie, pie, PIE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Ngon, ngon, NGON)
 MAKEPREPOSTPARVAR(Curl, curl, CURL)
@@ -6415,6 +7043,7 @@ MAKEPREPOSTVAR(Cross, cross, CROSS)
 MAKEPREPOSTPARVAR(Disc2, disc2, DISC2)
 MAKEPREPOSTPARVAR(SuperShape, super_shape, SUPER_SHAPE)
 MAKEPREPOSTPARVAR(Flower, flower, FLOWER)
+MAKEPREPOSTPARVAR(FlowerDb, flowerdb, FLOWER_DB)
 MAKEPREPOSTPARVAR(Conic, conic, CONIC)
 MAKEPREPOSTPARVAR(Parabola, parabola, PARABOLA)
 MAKEPREPOSTPARVAR(Bent2, bent2, BENT2)
@@ -6432,9 +7061,11 @@ MAKEPREPOSTPARVAR(LazySusan, lazysusan, LAZYSUSAN)
 MAKEPREPOSTPARVAR(Loonie, loonie, LOONIE)
 MAKEPREPOSTPARVAR(Modulus, modulus, MODULUS)
 MAKEPREPOSTPARVAR(Oscilloscope, oscilloscope, OSCILLOSCOPE)
+MAKEPREPOSTPARVAR(Oscilloscope2, oscilloscope2, OSCILLOSCOPE2)
 MAKEPREPOSTPARVAR(Polar2, polar2, POLAR2)
 MAKEPREPOSTPARVAR(Popcorn2, popcorn2, POPCORN2)
 MAKEPREPOSTPARVAR(Scry, scry, SCRY)
+MAKEPREPOSTPARVAR(Scry2, scry2, SCRY2)
 MAKEPREPOSTPARVAR(Separation, separation, SEPARATION)
 MAKEPREPOSTPARVAR(Split, split, SPLIT)
 MAKEPREPOSTPARVAR(Splits, splits, SPLITS)
@@ -6445,6 +7076,7 @@ MAKEPREPOSTPARVAR(WedgeSph, wedge_sph, WEDGE_SPH)
 MAKEPREPOSTPARVAR(Whorl, whorl, WHORL)
 MAKEPREPOSTPARVAR(Waves2, waves2, WAVES2)
 MAKEPREPOSTVAR(Exp, exp, EXP)
+MAKEPREPOSTVAR(Exp2, exp2, EXP2)
 MAKEPREPOSTPARVAR(Log, log, LOG)
 MAKEPREPOSTVAR(Sin, sin, SIN)
 MAKEPREPOSTVAR(Cos, cos, COS)
@@ -6455,6 +7087,7 @@ MAKEPREPOSTVAR(Cot, cot, COT)
 MAKEPREPOSTVAR(Sinh, sinh, SINH)
 MAKEPREPOSTVAR(Cosh, cosh, COSH)
 MAKEPREPOSTVAR(Tanh, tanh, TANH)
+MAKEPREPOSTPARVAR(TanhSpiral, tanh_spiral, TANH_SPIRAL)
 MAKEPREPOSTVAR(Sech, sech, SECH)
 MAKEPREPOSTVAR(Csch, csch, CSCH)
 MAKEPREPOSTVAR(Coth, coth, COTH)

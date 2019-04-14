@@ -42,7 +42,7 @@ using namespace Imath;
 using namespace EmberNs;
 using namespace EmberCommon;
 
-//#define DO_NVIDIA 1
+#define DO_NVIDIA 1
 
 void writeRgba1(const char filename[],
 				const Rgba* pixels,
@@ -1124,6 +1124,10 @@ bool TestConstants()
 	stringVec.push_back("2*M_PI");
 	stringVec.push_back("M_PI*2");
 	stringVec.push_back("M_PI * 2");
+	stringVec.push_back("2 * MPI");
+	stringVec.push_back("2*MPI");
+	stringVec.push_back("MPI*2");
+	stringVec.push_back("MPI * 2");
 
 	for (size_t i = 0; i < vlf->Size(); i++)
 	{
@@ -1132,6 +1136,97 @@ bool TestConstants()
 		if (SearchVar(var, stringVec, false))
 		{
 			cout << "Variation " << var->Name() << " should be using M_2PI." << endl;
+			success = false;
+		}
+	}
+
+	stringVec.clear();
+	stringVec.push_back("3 * M_PI");
+	stringVec.push_back("3*M_PI");
+	stringVec.push_back("M_PI*3");
+	stringVec.push_back("M_PI * 3");
+	//stringVec.push_back("3 * MPI");//Gives a false positive for prose3d.
+	stringVec.push_back("3*MPI");
+	stringVec.push_back("MPI*3");
+	stringVec.push_back("MPI * 3");
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << "Variation " << var->Name() << " should be using M_3PI." << endl;
+			success = false;
+		}
+	}
+
+	stringVec.clear();
+	stringVec.push_back("M_PI");
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << "Variation " << var->Name() << " is using M_PI, but should be using MPI." << endl;
+			success = false;
+		}
+	}
+
+	stringVec.clear();
+	stringVec.push_back("M_2_PI");
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << "Variation " << var->Name() << " is using M_2_PI, but should be using M2PI." << endl;
+			success = false;
+		}
+	}
+
+	stringVec.clear();
+	stringVec.push_back("M_1_PI");
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << "Variation " << var->Name() << " is using M_1_PI, but should be using M1PI." << endl;
+			success = false;
+		}
+	}
+
+	stringVec.clear();
+	stringVec.push_back("M_PI_4");
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << "Variation " << var->Name() << " is using M_PI_4, but should be using MPI4." << endl;
+			success = false;
+		}
+	}
+
+	stringVec.clear();
+	stringVec.push_back("M_PI_2");
+
+	for (size_t i = 0; i < vlf->Size(); i++)
+	{
+		auto var = vlf->GetVariation(i);
+
+		if (SearchVar(var, stringVec, false))
+		{
+			cout << "Variation " << var->Name() << " is using M_PI_2, but should be using MPI2." << endl;
 			success = false;
 		}
 	}

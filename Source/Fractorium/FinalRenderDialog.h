@@ -73,6 +73,7 @@ public:
 	uint Current();
 	uint ThreadCount();
 	int ThreadPriority();
+	double OpenCLSubBatchPct();
 	double WidthScale();
 	double HeightScale();
 	double Quality();
@@ -94,7 +95,9 @@ public slots:
 	void OnCurrentSpinChanged(int d);
 	void OnApplyAllCheckBoxStateChanged(int state);
 	void OnWidthScaleChanged(double d);
+	void OnWidthChanged(int d);
 	void OnHeightScaleChanged(double d);
+	void OnHeightChanged(int d);
 	void OnKeepAspectCheckBoxStateChanged(int state);
 	void OnScaleRadioButtonChanged(bool checked);
 	void OnDeviceTableCellChanged(int row, int col);
@@ -127,7 +130,11 @@ private:
 	int m_PathCellIndex;
 	Timing m_RenderTimer;
 	DoubleSpinBox* m_WidthScaleSpin;
+	SpinBox* m_WidthSpin;
 	DoubleSpinBox* m_HeightScaleSpin;
+	SpinBox* m_HeightSpin;
+	DoubleIntSpinnerWidget* m_WidthSpinnerWidget;
+	DoubleIntSpinnerWidget* m_HeightSpinnerWidget;
 	DoubleSpinBox* m_QualitySpin;
 	SpinBox* m_TemporalSamplesSpin;
 	SpinBox* m_SupersampleSpin;

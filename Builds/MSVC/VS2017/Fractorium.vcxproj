@@ -87,30 +87,14 @@
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
-
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\boxtail_pack_02.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\boxtail_pack_03_triangle.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\boxtail_pack_04_mineshack.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_01_variety_number_128.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_02_b_sides.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_03_old_and_new.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_04_hoard.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fractaldesire_pack_01.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\rce_ordinary_pack_01_colornation.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_01.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_colder.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_dark.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_warmer.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_03.gradient" "$(OutDir)"
-
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\*.gradient" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\*.ugr" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark_windows.qss" "$(OutDir)"
-
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Cored.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Guid.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Widgetsd.dll" "$(OutDir)"
-
 xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)\platforms\"
-</Command>
+xcopy /F /Y /R /D "$(QTDIR)\plugins\imageformats\qjpegd.dll" "$(OutDir)\imageformats\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,29 +129,14 @@ xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(OutDir)\platform
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
-
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\boxtail_pack_02.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\boxtail_pack_03_triangle.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\boxtail_pack_04_mineshack.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_01_variety_number_128.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_02_b_sides.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_03_old_and_new.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fardareismai_pack_04_hoard.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\fractaldesire_pack_01.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\rce_ordinary_pack_01_colornation.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_01.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_colder.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_dark.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_02_warmer.gradient" "$(OutDir)"
-xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\tatasz_pack_03.gradient" "$(OutDir)"
-
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\*.gradient" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\*.ugr" "$(OutDir)"
 xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\dark_windows.qss" "$(OutDir)"
-
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Core.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Gui.dll" "$(OutDir)"
 xcopy /F /Y /R /D "$(QTDIR)\bin\Qt5Widgets.dll" "$(OutDir)"
-
-xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindows.dll" "$(OutDir)\platforms\"</Command>
+xcopy /F /Y /R /D "$(QTDIR)\plugins\platforms\qwindows.dll" "$(OutDir)\platforms\"
+xcopy /F /Y /R /D "$(QTDIR)\plugins\imageformats\qjpeg.dll" "$(OutDir)\imageformats\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -62,8 +62,11 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		}
 
 		for (auto& renderer : renderers)
-			if (auto rendererCL = dynamic_cast<RendererCLBase*>(renderer.get()))
+			if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get()))
+			{
 				rendererCL->OptAffine(true);//Optimize empty affines for final renderers, this is normally false for the interactive renderer.
+				rendererCL->SubBatchPercentPerThread(float(opt.SBPctPerTh()));
+			}
 
 		if (opt.DoProgress())
 			renderers[0]->Callback(progress.get());

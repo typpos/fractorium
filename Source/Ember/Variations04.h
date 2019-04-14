@@ -88,6 +88,246 @@ private:
 };
 
 /// <summary>
+/// lazyjess.
+/// By FarDareisMai.
+/// </summary>
+template <typename T>
+class LazyJessVariation : public ParametricVariation<T>
+{
+public:
+	LazyJessVariation(T weight = 1.0) : ParametricVariation<T>("lazyjess", eVariationId::VAR_LAZYJESS, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(LazyJessVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T theta, sina, cosa;
+		T x = helper.In.x;
+		T y = helper.In.y;
+		T modulus = helper.m_PrecalcSqrtSumSquares;
+
+		// n==2 requires a special case
+		if (m_N == T(2))
+		{
+			if (std::abs(x) < m_Weight) // If the input point falls inside the designated area...
+			{
+				//	// ...then rotate it.
+				theta = std::atan2(y, x) + m_Spin;
+				sina = std::sin(theta);
+				cosa = std::cos(theta);
+				x = m_Weight * modulus * cosa;
+				y = m_Weight * modulus * sina;
+
+				if (std::abs(x) < m_Weight)
+				{
+					helper.Out.x = x;
+					helper.Out.y = y;
+				}
+				else // If it is now part of a corner that falls outside the designated area...
+				{
+					// ...then flip and rotate into place.
+					theta = std::atan2(y, x) - m_Spin + m_CornerRotation;
+					sina = std::sin(theta);
+					cosa = std::cos(theta);
+					helper.Out.x = m_Weight * modulus * cosa;
+					helper.Out.y = -(m_Weight * modulus * sina);
+				}
+			}
+			else
+			{
+				modulus = 1 + m_Space / Zeps(modulus);
+				helper.Out.x = m_Weight * modulus * x;
+				helper.Out.y = m_Weight * modulus * y;
+			}
+		}
+		else
+		{
+			// Calculate the distance r from origin to the edge of the polygon at the angle of the input point.
+			theta = std::atan2(y, x) + M_2PI;
+			T theta_diff = std::fmod(theta + m_HalfSlice, m_PieSlice);
+			T r = m_Weight * T(M_SQRT2) * m_SinVertex / Zeps(std::sin(T(M_PI) - theta_diff - m_Vertex));
+
+			if (modulus < r)
+			{
+				// Again, rotating points within designated area.
+				theta = std::atan2(y, x) + m_Spin + M_2PI;
+				sina = std::sin(theta);
+				cosa = std::cos(theta);
+				x = m_Weight * modulus * cosa;
+				y = m_Weight * modulus * sina;
+				// Calculating r and modulus for our rotated point.
+				theta_diff = std::fmod(theta + m_HalfSlice, m_PieSlice);
+				r = m_Weight * T(M_SQRT2) * m_SinVertex / Zeps(std::sin(T(M_PI) - theta_diff - m_Vertex));
+				modulus = VarFuncs<T>::Hypot(x, y);
+
+				if (modulus < r)
+				{
+					helper.Out.x = x;
+					helper.Out.y = y;
+				}
+				else
+				{
+					// Again, flipping and rotating corners that fall outside the designated area.
+					theta = std::atan2(y, x) - m_Spin + m_CornerRotation + M_2PI;
+					sina = std::sin(theta);
+					cosa = std::cos(theta);
+					helper.Out.x = m_Weight * modulus * cosa;
+					helper.Out.y = -(m_Weight * modulus * sina);
+				}
+			}
+			else
+			{
+				modulus = 1 + m_Space / Zeps(modulus);
+				helper.Out.x = m_Weight * modulus * x;
+				helper.Out.y = m_Weight * modulus * y;
+			}
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string n              = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string spin           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string space          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string corner         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string vertex         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sinvertex      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string pieslice       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfslice      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cornerrotation = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t theta, sina, cosa;\n"
+		   << "\t\treal_t x = vIn.x;\n"
+		   << "\t\treal_t y = vIn.y;\n"
+		   << "\t\treal_t modulus = precalcSqrtSumSquares;\n"
+		   << "\n"
+		   << "\t\tif (" << n << " == 2.0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (fabs(x) < " << weight << ")\n"
+		   << "\t\t	{\n"
+		   << "\t\t		theta = atan2(y, x) + " << spin << ";\n"
+		   << "\t\t		sina = sin(theta);\n"
+		   << "\t\t		cosa = cos(theta);\n"
+		   << "\t\t		x = " << weight << " * modulus * cosa;\n"
+		   << "\t\t		y = " << weight << " * modulus * sina;\n"
+		   << "\n"
+		   << "\t\t		if (fabs(x) < " << weight << ")\n"
+		   << "\t\t		{\n"
+		   << "\t\t			vOut.x = x;\n"
+		   << "\t\t			vOut.y = y;\n"
+		   << "\t\t		}\n"
+		   << "\t\t		else\n"
+		   << "\t\t		{\n"
+		   << "\t\t			theta = atan2(y, x) - " << spin << " + " << cornerrotation << ";\n"
+		   << "\t\t			sina = sin(theta);\n"
+		   << "\t\t			cosa = cos(theta);\n"
+		   << "\t\t			vOut.x = " << weight << " * modulus * cosa;\n"
+		   << "\t\t			vOut.y = -(" << weight << " * modulus * sina);\n"
+		   << "\t\t		}\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		modulus = 1 + " << space << " / Zeps(modulus);\n"
+		   << "\t\t		vOut.x = " << weight << " * modulus * x;\n"
+		   << "\t\t		vOut.y = " << weight << " * modulus * y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	theta = atan2(y, x) + M_2PI;\n"
+		   << "\t\t	real_t theta_diff = fmod(theta + " << halfslice << ", " << pieslice << ");\n"
+		   << "\t\t	real_t r = " << weight << " * M_SQRT2 * " << sinvertex << " / Zeps(sin(MPI - theta_diff - " << vertex << "));\n"
+		   << "\n"
+		   << "\t\t	if (modulus < r)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		theta = atan2(y, x) + " << spin << " + M_2PI;\n"
+		   << "\t\t		sina = sin(theta);\n"
+		   << "\t\t		cosa = cos(theta);\n"
+		   << "\t\t		x = " << weight << " * modulus * cosa;\n"
+		   << "\t\t		y = " << weight << " * modulus * sina;\n"
+		   << "\t\t		theta_diff = fmod(theta + " << halfslice << ", " << pieslice << ");\n"
+		   << "\t\t		r = " << weight << " * M_SQRT2 * " << sinvertex << " / Zeps(sin(MPI - theta_diff - " << vertex << "));\n"
+		   << "\t\t		modulus = Hypot(x, y);\n"
+		   << "\n"
+		   << "\t\t		if (modulus < r)\n"
+		   << "\t\t		{\n"
+		   << "\t\t			vOut.x = x;\n"
+		   << "\t\t			vOut.y = y;\n"
+		   << "\t\t		}\n"
+		   << "\t\t		else\n"
+		   << "\t\t		{\n"
+		   << "\t\t			theta = atan2(y, x) - " << spin << " + " << cornerrotation << " + M_2PI;\n"
+		   << "\t\t			sina = sin(theta);\n"
+		   << "\t\t			cosa = cos(theta);\n"
+		   << "\t\t			vOut.x = " << weight << " * modulus * cosa;\n"
+		   << "\t\t			vOut.y = -(" << weight << " * modulus * sina);\n"
+		   << "\t\t		}\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		modulus = 1 + " << space << " / Zeps(modulus);\n"
+		   << "\t\t		vOut.x = " << weight << " * modulus * x;\n"
+		   << "\t\t		vOut.y = " << weight << " * modulus * y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Vertex = T(M_PI) * (m_N - 2) / Zeps(2 * m_N);
+		m_SinVertex = std::sin(m_Vertex);
+		m_PieSlice = M_2PI / Zeps(m_N);
+		m_HalfSlice = m_PieSlice / 2;
+		m_CornerRotation = (m_Corner - 1) * m_PieSlice;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Hypot" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_N,                    prefix + "lazyjess_n", 4, eParamType::INTEGER_NONZERO, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Spin,                 prefix + "lazyjess_spin", T(M_PI), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_Space,                prefix + "lazyjess_space"));
+		m_Params.push_back(ParamWithName<T>(&m_Corner,               prefix + "lazyjess_corner", 1, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(true, &m_Vertex,         prefix + "lazyjess_vertex"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_SinVertex,      prefix + "lazyjess_sin_vertex"));
+		m_Params.push_back(ParamWithName<T>(true, &m_PieSlice,       prefix + "lazyjess_pie_slice"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfSlice,      prefix + "lazyjess_half_slice"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CornerRotation, prefix + "lazyjess_corner_rotation"));
+	}
+
+private:
+	T m_N;
+	T m_Spin;
+	T m_Space;
+	T m_Corner;
+	T m_Vertex;//Precalc.
+	T m_SinVertex;
+	T m_PieSlice;
+	T m_HalfSlice;
+	T m_CornerRotation;
+};
+
+/// <summary>
 /// lazyTravis.
 /// </summary>
 template <typename T>
@@ -2104,6 +2344,116 @@ private:
 	T m_ScatterArea;
 	T m_Zero;
 	T m_Ca;//Precalc.
+};
+
+/// <summary>
+/// circlecrop2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class Circlecrop2Variation : public ParametricVariation<T>
+{
+public:
+	Circlecrop2Variation(T weight = 1.0) : ParametricVariation<T>("circlecrop2", eVariationId::VAR_CIRCLECROP2, weight, true, true, false, false, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Circlecrop2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T rad = helper.m_PrecalcSqrtSumSquares;
+		T ang = helper.m_PrecalcAtanyx;
+		T s = 0;
+		T c = 0;
+
+		if (rad > m_Out || rad < m_In)
+		{
+			if (!m_Zero)
+			{
+				s = std::sin(ang) * m_OutWeight;
+				c = std::cos(ang) * m_OutWeight;
+			}
+		}
+		else
+		{
+			s = helper.In.x * m_Weight;
+			c = helper.In.y * m_Weight;
+		}
+
+		helper.Out.x = s;
+		helper.Out.y = c;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string inner       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string outer       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zero        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string in          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string out         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string outweight   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t rad = precalcSqrtSumSquares;\n"
+		   << "\t\treal_t ang = precalcAtanyx;\n"
+		   << "\t\treal_t s = 0;\n"
+		   << "\t\treal_t c = 0;\n"
+		   << "\n"
+		   << "\t\tif (rad > " << out << " || rad < " << in << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (!" << zero << ")\n"
+		   << "\t\t	{\n"
+		   << "\t\t		s = sin(ang) * " << outweight << ";\n"
+		   << "\t\t		c = cos(ang) * " << outweight << ";\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	s = vIn.x * " << weight << ";\n"
+		   << "\t\t	c = vIn.y * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = s;\n"
+		   << "\t\tvOut.y = c;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_In  = std::min(m_Inner, m_Outer);
+		m_Out = std::max(m_Inner, m_Outer);
+		m_OutWeight = m_Out * m_Weight;
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Inner,           prefix + "circlecrop2_inner", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Outer,           prefix + "circlecrop2_outer", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero,            prefix + "circlecrop2_zero", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_In,        prefix + "circlecrop2_in"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Out,       prefix + "circlecrop2_out"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OutWeight, prefix + "circlecrop2_out_weight"));
+	}
+
+private:
+	T m_Inner;
+	T m_Outer;
+	T m_Zero;
+	T m_In;//Precalc.
+	T m_Out;
+	T m_OutWeight;
 };
 
 /// <summary>
@@ -4454,6 +4804,80 @@ private:
 };
 
 /// <summary>
+/// truchet_knot.
+/// </summary>
+template <typename T>
+class TruchetKnotVariation : public Variation<T>
+{
+public:
+	TruchetKnotVariation(T weight = 1.0) : Variation<T>("truchet_knot", eVariationId::VAR_TRUCHET_KNOT, weight) { }
+
+	VARCOPY(TruchetKnotVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T wd = T(0.5);
+		T space = T(0.1);
+		T cellx = T(Floor<T>(helper.In.x));
+		T celly = T(Floor<T>(helper.In.y));
+		T xy0x = (rand.Frand01<T>() - T(0.5)) * wd;
+		T xy0y = (rand.Frand01<T>() * 2 - 1) * (1 - space - wd * T(0.5));
+		T dir0 = std::abs(cellx + celly);
+		T dir1 = dir0 - 2 * Floor<T>(dir0 * T(0.5));
+		T xyx, xyy;
+
+		if (dir1 < 0.5)
+		{
+			xyx = xy0x;
+			xyy = xy0y;
+		}
+		else
+		{
+			xyx = -xy0y;//y and x intentionally flipped.
+			xyy = xy0x;
+		}
+
+		helper.Out.x = m_Weight * (cellx + xyx);
+		helper.Out.y = m_Weight * (celly + xyy);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss;
+		intmax_t varIndex = IndexInXform();
+		string weight = WeightDefineString();
+		ss << "\t{\n"
+		   << "\t\treal_t wd = 0.5;\n"
+		   << "\t\treal_t space = 0.1;\n"
+		   << "\t\treal_t cellx = floor(vIn.x);\n"
+		   << "\t\treal_t celly = floor(vIn.y);\n"
+		   << "\t\treal_t xy0x = (MwcNext01(mwc) - 0.5) * wd;\n"
+		   << "\t\treal_t xy0y = fma(MwcNext01(mwc), 2.0, -1.0) * (1.0 - space - wd * 0.5);\n"
+		   << "\t\treal_t dir0 = fabs(cellx + celly);\n"
+		   << "\t\treal_t dir1 = dir0 - 2.0 * floor(dir0 / 2.0);\n"
+		   << "\t\treal_t xyx, xyy;\n"
+		   << "\n"
+		   << "\t\tif (dir1 < 0.5)\n"
+		   << "\t\t{\n"
+		   << "\t\t	xyx = xy0x;\n"
+		   << "\t\t	xyy = xy0y;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	xyx = -xy0y;//y and x intentionally flipped.\n"
+		   << "\t\t	xyy = xy0x;\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * (cellx + xyx);\n"
+		   << "\t\tvOut.y = " << weight << " * (celly + xyy);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+};
+
+/// <summary>
 /// gdoffs.
 /// </summary>
 template <typename T>
@@ -5193,7 +5617,86 @@ private:
 	T m_Vy;
 };
 
+/// <summary>
+/// block.
+/// By TyrantWave.
+/// </summary>
+template <typename T>
+class BlockVariation : public ParametricVariation<T>
+{
+public:
+	BlockVariation(T weight = 1.0) : ParametricVariation<T>("block", eVariationId::VAR_BLOCK, weight, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(BlockVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T tmp = helper.m_PrecalcSumSquares + 1;
+		T x2 = 2 * helper.In.x;
+		T y2 = 2 * helper.In.y;
+		T xmax = T(0.5) * (std::sqrt(tmp + x2) + std::sqrt(tmp - x2));
+		T ymax = T(0.5) * (std::sqrt(tmp + y2) + std::sqrt(tmp - y2));
+		T a = helper.In.x / Zeps(xmax);
+		T b = VarFuncs<T>::SafeSqrt(1 - SQR(a));
+		helper.Out.x = m_WightDivPiOver2 * std::atan2(a, b);
+		a = helper.In.y / Zeps(ymax);
+		b = VarFuncs<T>::SafeSqrt(1 - SQR(a));
+		helper.Out.y = m_WightDivPiOver2 * std::atan2(a, b);
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		int i = 0;
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string wdpio2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalcs only, no params.
+		ss << "\t{\n"
+		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
+		   << "\t\treal_t x2 = 2 * vIn.x;\n"
+		   << "\t\treal_t y2 = 2 * vIn.y;\n"
+		   << "\t\treal_t xmax = 0.5 * (sqrt(tmp + x2) + sqrt(tmp - x2));\n"
+		   << "\t\treal_t ymax = 0.5 * (sqrt(tmp + y2) + sqrt(tmp - y2));\n"
+		   << "\t\treal_t a = vIn.x / Zeps(xmax);\n"
+		   << "\t\treal_t b = SafeSqrt(1 - SQR(a));\n"
+		   << "\t\tvOut.x = " << wdpio2 << " * atan2(a, b);\n"
+		   << "\t\ta = vIn.y / Zeps(ymax);\n"
+		   << "\t\tb = SafeSqrt(1 - SQR(a));\n"
+		   << "\t\tvOut.y = " << wdpio2 << " * atan2(a, b);\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "SafeSqrt", "Zeps" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_WightDivPiOver2 = m_Weight * T(M_2_PI);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(true, &m_WightDivPiOver2, prefix + "block_weightdivpiover2"));//Precalcs only, no params.
+	}
+
+private:
+	T m_WightDivPiOver2;
+};
+
 MAKEPREPOSTPARVAR(ESwirl, eSwirl, ESWIRL)
+MAKEPREPOSTPARVAR(LazyJess, lazyjess, LAZYJESS)
 MAKEPREPOSTPARVAR(LazyTravis, lazyTravis, LAZY_TRAVIS)
 MAKEPREPOSTPARVAR(Squish, squish, SQUISH)
 MAKEPREPOSTPARVAR(Circus, circus, CIRCUS)
@@ -5214,6 +5717,7 @@ MAKEPREPOSTVARASSIGN(Square3D, square3D, SQUARE3D, eVariationAssignType::ASSIGNT
 MAKEPREPOSTPARVARASSIGN(SuperShape3D, SuperShape3D, SUPER_SHAPE3D, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Sphyp3D, sphyp3D, SPHYP3D)
 MAKEPREPOSTPARVAR(Circlecrop, circlecrop, CIRCLECROP)
+MAKEPREPOSTPARVAR(Circlecrop2, circlecrop2, CIRCLECROP2)
 MAKEPREPOSTPARVAR(Julian3Dx, julian3Dx, JULIAN3DX)
 MAKEPREPOSTPARVAR(Fourth, fourth, FOURTH)
 MAKEPREPOSTPARVAR(Mobiq, mobiq, MOBIQ)
@@ -5240,6 +5744,7 @@ MAKEPREPOSTVAR(Curvature, curvature, CURVATURE)
 MAKEPREPOSTPARVAR(Qode, q_ode, Q_ODE)
 MAKEPREPOSTPARVARASSIGN(BlurHeart, blur_heart, BLUR_HEART, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(Truchet, Truchet, TRUCHET)
+MAKEPREPOSTVAR(TruchetKnot, truchet_knot, TRUCHET_KNOT)
 MAKEPREPOSTPARVAR(Gdoffs, gdoffs, GDOFFS)
 MAKEPREPOSTPARVAR(Octagon, octagon, OCTAGON)
 MAKEPREPOSTPARVAR(Trade, trade, TRADE)
@@ -5247,6 +5752,7 @@ MAKEPREPOSTPARVAR(Juliac, Juliac, JULIAC)
 MAKEPREPOSTVAR(Blade3D, blade3D, BLADE3D)
 MAKEPREPOSTPARVAR(Blob3D, blob3D, BLOB3D)
 MAKEPREPOSTPARVAR(Blocky, blocky, BLOCKY)
+MAKEPREPOSTPARVAR(Block, block, BLOCK)
 
 
 ///// <summary>

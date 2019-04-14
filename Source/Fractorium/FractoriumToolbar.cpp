@@ -128,6 +128,8 @@ void Fractorium::OnActionStartStopRenderer(bool checked)
 /// <param name="checked">Check state, show editor if true, else hide.</param>
 void Fractorium::OnActionDrawXforms(bool checked)
 {
+	m_Settings->ShowXforms(checked);
+
 	if (!ui.ActionDrawImage->isChecked() && !ui.ActionDrawXforms->isChecked())
 		ui.ActionDrawImage->setChecked(true);
 

@@ -248,7 +248,7 @@
        </item>
        <item row="16" column="0" colspan="2">
         <layout class="QGridLayout" name="InteractiveRenderingTabGridLayout">
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QGroupBox" name="InteraciveGpuFilteringGroupBox">
            <property name="title">
             <string>OpenCL Filtering</string>
@@ -292,7 +292,42 @@
            </layout>
           </widget>
          </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="OpenCLQualitySpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default quality per device to use for the interactive renderer when using OpenCL.&lt;/p&gt;&lt;p&gt;30 is a good number for this, but you can use a larger value if you have a faster GPU.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>OpenCL Quality </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>30</number>
+           </property>
+          </widget>
+         </item>
          <item row="3" column="0">
+          <widget class="QSpinBox" name="OpenCLSubBatchSpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of ~8M iteration chunks ran using OpenCL in interactive mode for each mouse movement.&lt;/p&gt;&lt;p&gt;Increase this number for a higher quality image on each mouse movement, at the expense of responsiveness.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>OpenCL Chunks per Mouse Movement </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
           <widget class="QGroupBox" name="InteraciveCpuFilteringGroupBox">
            <property name="title">
             <string>CPU Filtering</string>
@@ -339,75 +374,35 @@
            </layout>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QSpinBox" name="OpenCLSubBatchSpin">
-           <property name="toolTip">
-            <string>The number of ~8M iteration chunks ran using OpenCL
-in interactive mode for each mouse movement</string>
-           </property>
-           <property name="prefix">
-            <string>OpenCL Sub Batch </string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="OpenCLQualitySpin">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default quality to use for the interactive renderer when using OpenCL.&lt;/p&gt;&lt;p&gt;30 is a good number for this, but you can use a larger value if you have a faster GPU.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="prefix">
-            <string>OpenCL Quality </string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="value">
-            <number>30</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QSpinBox" name="CpuQualitySpin">
-           <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default quality to use for the interactive renderer when using the CPU.&lt;/p&gt;&lt;p&gt;10 is a good number for this, but you can use a larger value if you have a faster system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="prefix">
-            <string>CPU Quality </string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>99999</number>
-           </property>
-           <property name="value">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="1">
           <widget class="QSpinBox" name="CpuSubBatchSpin">
            <property name="toolTip">
-            <string>The number of 10,000 iteration chunks ran per thread on the CPU
-in interactive mode for each mouse movement</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of ~10,000 iteration chunks ran per thread on the CPU in interactive mode for each mouse movement.&lt;/p&gt;&lt;p&gt;Increase this number for a higher quality image on each mouse movement, at the expense of responsiveness.&lt;/p&gt;&lt;p&gt;The number of iterations done in each chunk is controlled by the Sub Batch Size field in the Flame tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="prefix">
-            <string>CPU Sub Batch </string>
+            <string>CPU Chunks per Mouse Movement </string>
            </property>
            <property name="minimum">
             <number>1</number>
            </property>
            <property name="maximum">
             <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="ThreadCountSpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of threads to use with CPU rendering.&lt;/p&gt;&lt;p&gt;Decrease for more responsive editing, increase for better performance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>Threads </string>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>64</number>
            </property>
           </widget>
          </item>
@@ -427,19 +422,47 @@ in interactive mode for each mouse movement</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QSpinBox" name="ThreadCountSpin">
+         <item row="2" column="0">
+          <widget class="QDoubleSpinBox" name="OpenCLSubBatchPctSpin">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of threads to use with CPU rendering.&lt;/p&gt;&lt;p&gt;Decrease for more responsive editing, increase for better performance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The percentage of a sub batch to execute on each thread per kernel call when using OpenCL in interactive mode. Default: 0.025 (256 iters).&lt;/p&gt;&lt;p&gt;Increase this number for a higher quality image on each mouse movement, at the expense of responsiveness.&lt;/p&gt;&lt;p&gt;Note that this can cause a crash and subsequent restart of the graphics driver if each kernel call takes too long. So reduce the value if you encounter such a problem.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="prefix">
-            <string>Threads </string>
+            <string>OpenCL Sub Batch Percent Per Thread </string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.025000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="CpuQualitySpin">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The default quality to use for the interactive renderer when using the CPU.&lt;/p&gt;&lt;p&gt;10 is a good number for this, but you can use a larger value if you have a faster system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="prefix">
+            <string>CPU Quality </string>
            </property>
            <property name="minimum">
             <number>1</number>
            </property>
            <property name="maximum">
-            <number>64</number>
+            <number>99999</number>
+           </property>
+           <property name="value">
+            <number>10</number>
            </property>
           </widget>
          </item>
@@ -538,7 +561,7 @@ in interactive mode for each mouse movement</string>
         <number>6</number>
        </property>
        <item row="0" column="0" colspan="2">
-        <widget class="TableWidget" name="OptionsXmlSavingTable">
+        <widget class="QTableWidget" name="OptionsXmlSavingTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -731,7 +754,7 @@ in interactive mode for each mouse movement</string>
         <number>6</number>
        </property>
        <item row="0" column="0" colspan="2">
-        <widget class="TableWidget" name="OptionsIdentityTable">
+        <widget class="QTableWidget" name="OptionsIdentityTable">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -922,13 +945,6 @@ in interactive mode for each mouse movement</string>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header>TableWidget.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>EarlyClipCheckBox</tabstop>
   <tabstop>OpenCLCheckBox</tabstop>
@@ -946,8 +962,9 @@ in interactive mode for each mouse movement</string>
   <tabstop>CpuSubBatchSpin</tabstop>
   <tabstop>RandomCountSpin</tabstop>
   <tabstop>OpenCLQualitySpin</tabstop>
-  <tabstop>OpenCLSubBatchSpin</tabstop>
+  <tabstop>OpenCLSubBatchPctSpin</tabstop>
   <tabstop>CpuQualitySpin</tabstop>
+  <tabstop>OpenCLSubBatchSpin</tabstop>
   <tabstop>CpuFilteringLogRadioButton</tabstop>
   <tabstop>CpuFilteringDERadioButton</tabstop>
   <tabstop>OpenCLFilteringLogRadioButton</tabstop>

@@ -667,9 +667,9 @@ void FractoriumEmberController<T>::FillAffineWithXform(Xform<T>* xform, bool pre
 
 	if (m_Fractorium->ui.PolarAffineCheckBox->isChecked())
 	{
-		spinners[0]->SetValueStealth(RAD_2_DEG * std::atan2(affine.D(), affine.A()));
-		spinners[1]->SetValueStealth(RAD_2_DEG * std::atan2(affine.E(), affine.B()));
-		spinners[2]->SetValueStealth(RAD_2_DEG * std::atan2(affine.F(), affine.C()));
+		spinners[0]->SetValueStealth(NormalizeDeg360(RAD_2_DEG * std::atan2(affine.D(), affine.A())));
+		spinners[1]->SetValueStealth(NormalizeDeg360(RAD_2_DEG * std::atan2(affine.E(), affine.B())));
+		spinners[2]->SetValueStealth(NormalizeDeg360(RAD_2_DEG * std::atan2(affine.F(), affine.C())));
 		spinners[3]->SetValueStealth(VarFuncs<T>::Hypot(affine.D(), affine.A()));
 		spinners[4]->SetValueStealth(VarFuncs<T>::Hypot(affine.E(), affine.B()));
 		spinners[5]->SetValueStealth(VarFuncs<T>::Hypot(affine.F(), affine.C()));

@@ -61,8 +61,11 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 	if (opt.EmberCL() && renderer->RendererType() != eRendererType::OPENCL_RENDERER)//OpenCL init failed, so fall back to CPU.
 		opt.EmberCL(false);
 
-	if (auto rendererCL = dynamic_cast<RendererCLBase*>(renderer.get()))
+	if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get()))
+	{
 		rendererCL->OptAffine(true);//Optimize empty affines for final renderers, this is normally false for the interactive renderer.
+		rendererCL->SubBatchPercentPerThread(float(opt.SBPctPerTh()));
+	}
 
 	if (!InitPaletteList<float>(fullpath, opt.PalettePath()))//For any modern flames, the palette isn't used. This is for legacy purposes and should be removed.
 		return false;

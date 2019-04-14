@@ -100,6 +100,7 @@ enum class eOptionIDs : et
 	OPT_QUALITY,
 	OPT_DE_MIN,
 	OPT_DE_MAX,
+	OPT_SBPKTH,
 	OPT_PIXEL_ASPECT,
 	OPT_STAGGER,
 	OPT_AVG_THRESH,
@@ -400,17 +401,18 @@ public:
 		INITUINTOPTION(StartCount,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_START_COUNT,      _T("--startcount"),           0,                    SO_REQ_SEP, "   --startcount=<val>        The number to add to each flame name when generating a sequence. Useful for programs like ffmpeg which require numerically increasing filenames [default: 0].\n"));
 		INITUINTOPTION(Padding,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PADDING,          _T("--padding"),              0,                    SO_REQ_SEP, "   --padding=<val>           Override the amount of zero padding added to each flame name when generating a sequence. Useful for programs like ffmpeg which require fixed width filenames [default: 0 (auto calculate padding)].\n"));
 		//Double.
-		INITDOUBLEOPTION(SizeScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1.0,                   SO_REQ_SEP,  "   --ss=<val>                Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(WidthScale,   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_WS,               _T("--ws"),                   1.0,                   SO_REQ_SEP,  "   --ws=<val>                Width scale. The width is scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(HeightScale,  Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_HS,               _T("--hs"),                   1.0,                   SO_REQ_SEP,  "   --hs=<val>                Height scale. The height is scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(QualityScale, Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1.0,                   SO_REQ_SEP,  "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(Quality,	   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		  _T("--quality"),				0.0,                   SO_REQ_SEP,  "   --quality=<val>           Override the quality of the flame if not 0 [default: 0].\n"));
-		INITDOUBLEOPTION(DeMin,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,			  _T("--demin"),			   -1.0,                   SO_REQ_SEP,  "   --demin=<val>             Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
-		INITDOUBLEOPTION(DeMax,		   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MAX,			  _T("--demax"),			   -1.0,                   SO_REQ_SEP,  "   --demax=<val>             Override the maximum size of the density estimator filter radius if not -1 [default: -1].\n"));
-		INITDOUBLEOPTION(AspectRatio,  Eod(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PIXEL_ASPECT,     _T("--pixel_aspect"),         1.0,                   SO_REQ_SEP,  "   --pixel_aspect=<val>      Aspect ratio of pixels (width over height), eg. 0.90909 for NTSC [default: 1.0].\n"));
-		INITDOUBLEOPTION(Stagger,      Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STAGGER,          _T("--stagger"),              0.0,                   SO_REQ_SEP,  "   --stagger=<val>           Affects simultaneity of xform interpolation during flame interpolation.\n"
-										   "\t                         Represents how 'separate' the xforms are interpolated. Set to 1 for each\n"
-										   "\t                         xform to be interpolated individually, fractions control interpolation overlap [default: 0].\n"));
+		INITDOUBLEOPTION(SizeScale,     Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1.0,                  SO_REQ_SEP, "   --ss=<val>                Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(WidthScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_WS,               _T("--ws"),                   1.0,                  SO_REQ_SEP, "   --ws=<val>                Width scale. The width is scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(HeightScale,   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_HS,               _T("--hs"),                   1.0,                  SO_REQ_SEP, "   --hs=<val>                Height scale. The height is scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(QualityScale,  Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1.0,                  SO_REQ_SEP, "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(Quality,	    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		   _T("--quality"),				 0.0,                  SO_REQ_SEP, "   --quality=<val>           Override the quality of the flame if not 0 [default: 0].\n"));
+		INITDOUBLEOPTION(SBPctPerTh,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SBPKTH,           _T("--sbpctth"),              0.025,                SO_REQ_SEP, "   --sbpctth=<val>           The percentage of a sub batch from 0.01 to 1.0 to complete per thread per kernel launch done in OpenCL rendering. This is for performance tuning with OpenCL and does not apply to CPU rendering [default: 0.025 (256 iters)].\n"));
+		INITDOUBLEOPTION(DeMin,		    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,		   _T("--demin"),			    -1.0,                  SO_REQ_SEP, "   --demin=<val>             Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
+		INITDOUBLEOPTION(DeMax,		    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MAX,		   _T("--demax"),			    -1.0,                  SO_REQ_SEP, "   --demax=<val>             Override the maximum size of the density estimator filter radius if not -1 [default: -1].\n"));
+		INITDOUBLEOPTION(AspectRatio,   Eod(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PIXEL_ASPECT,     _T("--pixel_aspect"),         1.0,                  SO_REQ_SEP, "   --pixel_aspect=<val>      Aspect ratio of pixels (width over height), eg. 0.90909 for NTSC [default: 1.0].\n"));
+		INITDOUBLEOPTION(Stagger,       Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_STAGGER,          _T("--stagger"),              0.0,                  SO_REQ_SEP, "   --stagger=<val>           Affects simultaneity of xform interpolation during flame interpolation.\n"
+											"\t                         Represents how 'separate' the xforms are interpolated. Set to 1 for each\n"
+											"\t                         xform to be interpolated individually, fractions control interpolation overlap [default: 0].\n"));
 		INITDOUBLEOPTION(AvgThresh,    Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_AVG_THRESH,       _T("--avg"),                  20.0,                 SO_REQ_SEP,  "   --avg=<val>               Minimum average pixel channel sum (r + g + b) threshold from 0 - 765. Ignored if sequence, inter or rotate were specified [default: 20].\n"));
 		INITDOUBLEOPTION(BlackThresh,  Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_BLACK_THRESH,     _T("--black"),                0.01,                 SO_REQ_SEP,  "   --black=<val>             Minimum number of allowed black pixels as a percentage from 0 - 1. Ignored if sequence, inter or rotate were specified [default: 0.01].\n"));
 		INITDOUBLEOPTION(WhiteLimit,   Eod(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_WHITE_LIMIT,      _T("--white"),                0.05,                 SO_REQ_SEP,  "   --white=<val>             Maximum number of allowed white pixels as a percentage from 0 - 1. Ignored if sequence, inter or rotate were specified [default: 0.05].\n"));
@@ -556,6 +558,7 @@ public:
 					PARSEOPTION(eOptionIDs::OPT_HS, HeightScale);
 					PARSEOPTION(eOptionIDs::OPT_QS, QualityScale);
 					PARSEOPTION(eOptionIDs::OPT_QUALITY, Quality);
+					PARSEOPTION(eOptionIDs::OPT_SBPKTH, SBPctPerTh);
 					PARSEOPTION(eOptionIDs::OPT_DE_MIN, DeMin);
 					PARSEOPTION(eOptionIDs::OPT_DE_MAX, DeMax);
 					PARSEOPTION(eOptionIDs::OPT_PIXEL_ASPECT, AspectRatio);
@@ -848,6 +851,7 @@ public:
 	Eod Quality;
 	Eod DeMin;
 	Eod DeMax;
+	Eod SBPctPerTh;
 	Eod AspectRatio;
 	Eod Stagger;
 	Eod AvgThresh;

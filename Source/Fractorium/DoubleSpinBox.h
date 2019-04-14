@@ -75,6 +75,8 @@ public:
 	virtual ~SpecialDoubleSpinBox() { }
 
 protected:
+	virtual void enterEvent(QEvent* e) override;
+	virtual void leaveEvent(QEvent* e) override;
 	virtual bool eventFilter(QObject* o, QEvent* e) override;
 };
 

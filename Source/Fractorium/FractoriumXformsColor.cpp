@@ -16,10 +16,10 @@ void Fractorium::InitXformsColorUI()
 	ui.XformPaletteRefTable->setItem(0, 0, m_PaletteRefItem);
 	ui.XformPaletteRefTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	connect(ui.XformPaletteRefTable->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this, SLOT(OnXformRefPaletteResized(int, int, int)), Qt::QueuedConnection);
-	connect(ui.RandomColorIndicesButton, SIGNAL(clicked(bool)), this, SLOT(OnRandomColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
-	connect(ui.ToggleColorIndicesButton, SIGNAL(clicked(bool)), this, SLOT(OnToggleColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
-	connect(ui.RandomColorSpeedButton,   SIGNAL(clicked(bool)), this, SLOT(OnRandomColorSpeedButtonClicked(bool)),   Qt::QueuedConnection);
-	connect(ui.ToggleColorSpeedButton,   SIGNAL(clicked(bool)), this, SLOT(OnToggleColorSpeedButtonClicked(bool)),   Qt::QueuedConnection);
+	connect(ui.RandomColorIndicesButton, SIGNAL(clicked(bool)),  this, SLOT(OnRandomColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.ToggleColorIndicesButton, SIGNAL(clicked(bool)),  this, SLOT(OnToggleColorIndicesButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.RandomColorSpeedButton,   SIGNAL(clicked(bool)),  this, SLOT(OnRandomColorSpeedButtonClicked(bool)),   Qt::QueuedConnection);
+	connect(ui.ToggleColorSpeedsButton,   SIGNAL(clicked(bool)), this, SLOT(OnToggleColorSpeedsButtonClicked(bool)),  Qt::QueuedConnection);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorIndexTable,  this, row, 1, m_XformColorIndexSpin,  spinHeight,  0, 1, 0.01, SIGNAL(valueChanged(double)), SLOT(OnXformColorIndexChanged(double)),  false,   0,   1, 0);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorValuesTable, this, row, 1, m_XformColorSpeedSpin,  spinHeight, -1, 1,  0.1, SIGNAL(valueChanged(double)), SLOT(OnXformColorSpeedChanged(double)),   true, 0.5, 0.5, 0);
 	SetupSpinner<DoubleSpinBox, double>(ui.XformColorValuesTable, this, row, 1, m_XformOpacitySpin,	    spinHeight,  0, 1,  0.1, SIGNAL(valueChanged(double)), SLOT(OnXformOpacityChanged(double)),	     true,   1,   1, 0);
@@ -137,13 +137,13 @@ void Fractorium::OnRandomColorSpeedButtonClicked(bool b) { m_Controller->RandomC
 /// Resets the rendering process.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::ToggleColorSpeedButtonClicked()
+void FractoriumEmberController<T>::ToggleColorSpeedsButtonClicked()
 {
 	char ch = 1;
 	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorSpeed = (T(ch ^= 1) ? 0.5 : 0.0); }, eXformUpdate::UPDATE_ALL);
 	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(CurrentXform()->m_ColorSpeed);
 }
-void Fractorium::OnToggleColorSpeedButtonClicked(bool b) { m_Controller->ToggleColorSpeedButtonClicked(); }
+void Fractorium::OnToggleColorSpeedsButtonClicked(bool b) { m_Controller->ToggleColorSpeedsButtonClicked(); }
 
 /// <summary>
 /// Set the color speed of the selected xforms.

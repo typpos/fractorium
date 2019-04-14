@@ -141,6 +141,8 @@ public:
 #ifdef TEST_CL
 	bool WriteRandomPoints(size_t device);
 #endif
+	void SubBatchPercentPerThread(float f);
+	float SubBatchPercentPerThread() const;
 	const string& IterKernel() const;
 	const string& DEKernel() const;
 	const string& FinalAccumKernel() const;
@@ -205,6 +207,7 @@ private:
 	bool m_Init = false;
 	bool m_Shared = false;
 	bool m_DoublePrecision = typeid(T) == typeid(double);
+	float m_SubBatchPercentPerThread = 0.025f;//0.025 * 10,240 gives a default value of 256 iters per thread for the default sub batch size of 10,240 which almost all flames will use.
 	//It's critical that these numbers never change. They are
 	//based on the cuburn model of each kernel launch containing
 	//256 threads. 32 wide by 8 high. Everything done in the OpenCL

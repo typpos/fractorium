@@ -7,20 +7,8 @@
 /// </summary>
 
 /// <summary>
-/// The entire purpose for this subclass is to overcome a glaring flaw
-/// in the way Qt handles table drawing.
-/// For most of the tables Fractorium uses, it draw the grid lines. Qt draws them
-/// in a very naive manner, whereby it draws lines above the first row and below
-/// the last row. It also draws to the left of the first column and to the right
-/// of the last column. This has the effect of putting an additional border inside
-/// of the specified border. This extra border becomes very noticeable when changing
-/// the background color of a cell.
-/// The workaround is to scrunch the size of the table up by one pixel. However,
-/// since the viewable area is then smaller than the size of the table, it will scroll
-/// by one pixel if the mouse is hovered over the table and the user moves the mouse wheel.
-/// This subclass is done solely to filter out the mouse wheel event.
-/// Note that this filtering only applies to the table as a whole, which means
-/// mouse wheel events still get properly routed to spinners.
+/// The purpose of this subclass is to allow for dragging the contents of a table cell.
+/// It's used in the palette preview table.
 /// </summary>
 class TableWidget : public QTableWidget
 {
@@ -45,20 +33,15 @@ signals:
 protected:
 
 	/// <summary>
-	/// Event filter to ignore mouse wheel events and also handle others such as mouse move and mouse button release.
+	/// Event filter to handle dragging and releasing the mouse.
 	/// Sadly, QTableWidget makes these hard to get to, so we must handle them here.
 	/// </summary>
 	/// <param name="obj">The object sending the event</param>
 	/// <param name="e">The event</param>
-	/// <returns>True if mouse wheel, else return the result of calling the base fucntion.</returns>
+	/// <returns>The result of calling the base fucntion.</returns>
 	bool eventFilter(QObject* obj, QEvent* e)
 	{
-		if (e->type() == QEvent::Wheel)
-		{
-			e->ignore();
-			return true;
-		}
-		else if (e->type() == QEvent::MouseMove)
+		if (e->type() == QEvent::MouseMove)
 		{
 			if (auto me = dynamic_cast<QMouseEvent*>(e))
 			{

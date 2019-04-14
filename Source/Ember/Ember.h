@@ -106,6 +106,7 @@ public:
 		m_OrigFinalRasW		  = ember.m_OrigFinalRasW;
 		m_OrigFinalRasH		  = ember.m_OrigFinalRasH;
 		m_OrigPixPerUnit	  = T(ember.m_OrigPixPerUnit);
+		m_RandPointRange      = T(ember.m_RandPointRange);
 		m_SubBatchSize		  = ember.m_SubBatchSize;
 		m_FuseCount			  = ember.m_FuseCount;
 		m_Supersample		  = ember.m_Supersample;
@@ -129,6 +130,7 @@ public:
 		m_Vibrancy			  = T(ember.m_Vibrancy);
 		m_GammaThresh		  = T(ember.m_GammaThresh);
 		m_HighlightPower	  = T(ember.m_HighlightPower);
+		m_K2                  = T(ember.m_K2);
 		m_Time				  = T(ember.m_Time);
 		m_Background		  = ember.m_Background;
 		m_Interp			  = ember.m_Interp;
@@ -530,6 +532,7 @@ public:
 	/// <param name="width">New width</param>
 	/// <param name="height">New height</param>
 	/// <param name="onlyScaleIfNewIsSmaller">True to only scale if the new dimensions are smaller than the original, else always scale.</param>
+	/// <param name="scaleType">Scale type used to specify how the image should be zoomed using the scale variable with respect to the new size. Possible scaling modes are: width, height, none.</param>
 	void SetSizeAndAdjustScale(size_t width, size_t height, bool onlyScaleIfNewIsSmaller, eScaleType scaleType)
 	{
 		if ((onlyScaleIfNewIsSmaller && (width < m_OrigFinalRasW || height < m_OrigFinalRasH)) || !onlyScaleIfNewIsSmaller)
@@ -538,6 +541,8 @@ public:
 				m_PixelsPerUnit = m_OrigPixPerUnit * (T(width) / T(m_OrigFinalRasW));
 			else if (scaleType == eScaleType::SCALE_HEIGHT)
 				m_PixelsPerUnit = m_OrigPixPerUnit * (T(height) / T(m_OrigFinalRasH));
+			else
+				m_PixelsPerUnit = m_OrigPixPerUnit;
 		}
 
 		m_ScaleType = scaleType;
@@ -744,6 +749,7 @@ public:
 		InterpI<&Ember<T>::m_FinalRasW>(embers, coefs, size);
 		InterpI<&Ember<T>::m_FinalRasH>(embers, coefs, size);
 		InterpI<&Ember<T>::m_SubBatchSize>(embers, coefs, size);
+		InterpT<&Ember<T>::m_RandPointRange>(embers, coefs, size);
 		InterpI<&Ember<T>::m_FuseCount>(embers, coefs, size);
 		InterpI<&Ember<T>::m_Supersample>(embers, coefs, size);
 		InterpI<&Ember<T>::m_TemporalSamples>(embers, coefs, size);
@@ -765,6 +771,7 @@ public:
 		InterpT<&Ember<T>::m_Vibrancy>(embers, coefs, size);
 		InterpT<&Ember<T>::m_GammaThresh>(embers, coefs, size);
 		InterpT<&Ember<T>::m_HighlightPower>(embers, coefs, size);
+		InterpT<&Ember<T>::m_K2>(embers, coefs, size);
 		InterpX<Color<T>, &Ember<T>::m_Background>(embers, coefs, size); m_Background.a = bgAlphaSave;//Don't interp alpha.
 		InterpT<&Ember<T>::m_TemporalFilterExp>(embers, coefs, size);
 		InterpT<&Ember<T>::m_TemporalFilterWidth>(embers, coefs, size);
@@ -1309,6 +1316,14 @@ public:
 						APP_FMP(m_HighlightPower);
 						break;
 
+					case eEmberMotionParam::FLAME_MOTION_K2:
+						APP_FMP(m_K2);
+						break;
+
+					case eEmberMotionParam::FLAME_MOTION_RAND_RANGE:
+						APP_FMP(m_RandPointRange);
+						break;
+
 					case eEmberMotionParam::FLAME_MOTION_BACKGROUND_R:
 						APP_FMP(m_Background.r);
 						break;
@@ -1359,6 +1374,7 @@ public:
 		{
 			//If defaults are on, set to reasonable values.
 			m_HighlightPower = 1;
+			m_K2 = 0;
 			m_Background.Reset();
 			m_FinalRasW = 100;
 			m_FinalRasH = 100;
@@ -1375,6 +1391,7 @@ public:
 			m_CamMat = m3T(0);
 			m_Quality = 1;
 			m_SubBatchSize = 10240;
+			m_RandPointRange = 1;
 			m_FuseCount = 15;
 			m_MaxRadDE = T(9.0);
 			m_MinRadDE = 0;
@@ -1393,6 +1410,7 @@ public:
 		{
 			//Defaults are off, so set to UN-reasonable values.
 			m_HighlightPower = -1;
+			m_K2 = -1;
 			m_Background = Color<T>(-1, -1, -1, 1);
 			m_FinalRasW = 0;
 			m_FinalRasH = 0;
@@ -1409,6 +1427,7 @@ public:
 			m_CamMat = m3T(999999);
 			m_Quality = -1;
 			m_SubBatchSize = 0;
+			m_RandPointRange = 0;
 			m_FuseCount = 0;
 			m_MaxRadDE = -1;
 			m_MinRadDE = -1;
@@ -1459,6 +1478,7 @@ public:
 		   << "Quality: " << m_Quality << "\n"
 		   << "Pixels Per Unit: " << m_PixelsPerUnit << "\n"
 		   << "Original Pixels Per Unit: " << m_OrigPixPerUnit << "\n"
+		   << "Initial Point Range: " << m_RandPointRange << "\n"
 		   << "Sub Batch Size: " << m_SubBatchSize << "\n"
 		   << "Fuse Count: " << m_FuseCount << "\n"
 		   << "Zoom: " << m_Zoom << "\n"
@@ -1476,6 +1496,7 @@ public:
 		   << "Vibrancy: " << m_Vibrancy << "\n"
 		   << "Gamma Threshold: " << m_GammaThresh << "\n"
 		   << "Highlight Power: " << m_HighlightPower << "\n"
+		   << "K2: " << m_K2 << "\n"
 		   << "Time: " << m_Time << "\n"
 		   << "Background: " << m_Background.r << ", " << m_Background.g << ", " << m_Background.b << ", " << m_Background.a << "\n"
 		   << "Interp: " << m_Interp << "\n"
@@ -1530,6 +1551,10 @@ public:
 	size_t m_OrigFinalRasW = 1920;//Keep track of the originals read from the Xml, because...
 	size_t m_OrigFinalRasH = 1080;//the dimension may change in an editor and the originals are needed for the aspect ratio.
 	T m_OrigPixPerUnit = 240;
+
+	//The range in the x and y directions from the center of the world space from which the initial random point will be selected at the start of each sub batch.
+	//Or when recovering from a bad point.
+	T m_RandPointRange = 1;
 
 	//The iteration depth. This was a rendering parameter in flam3 but has been made a member here
 	//so that it can be adjusted more easily.
@@ -1627,6 +1652,9 @@ public:
 	//Value to control saturation of some pixels in gamma correction during final accumulation.
 	//Xml field: "highlight_power".
 	T m_HighlightPower = 1;
+
+	//An alternative way to set brightness, ignored when zero.
+	T m_K2 = 0;
 
 	//When animating a file full of many embers, this value is used to specify the time in the animation
 	//that this ember should be rendered. They must all be sequential and increase by a default value of 1.

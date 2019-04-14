@@ -198,7 +198,6 @@ public:
 	bool InFinalAccum();
 
 	void* m_ProgressParameter = nullptr;
-
 protected:
 	bool m_EarlyClip = false;
 	bool m_YAxisUp = false;

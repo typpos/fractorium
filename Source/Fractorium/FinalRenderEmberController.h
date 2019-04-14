@@ -39,6 +39,7 @@ struct FinalRenderGuiState
 	QList<QVariant> m_Devices;
 	uint m_ThreadCount;
 	int m_ThreadPriority;
+	double m_SubBatchPct;
 	double m_WidthScale;
 	double m_HeightScale;
 	double m_Quality;
@@ -62,8 +63,8 @@ public:
 	virtual ~FinalRenderEmberControllerBase() { }
 
 	virtual void SyncCurrentToGui() { }
-	virtual void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0) { }
-	virtual void SyncCurrentToSizeSpinners(bool scale, bool size) { }
+	virtual void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true) { }
+	virtual void SyncCurrentToSizeSpinners(bool scale, bool size, bool doWidth = true, bool doHeight = true) { }
 	virtual void ResetProgress(bool total = true) { }
 	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory() { return tuple<size_t, size_t, size_t>(0, 0, 0); }
 	virtual double OriginalAspect() { return 1; }
@@ -120,8 +121,8 @@ public:
 
 	//Virtual functions overridden from FinalRenderEmberControllerBase.
 	virtual void SyncCurrentToGui() override;
-	virtual void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0) override;
-	virtual void SyncCurrentToSizeSpinners(bool scale, bool size) override;
+	virtual void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true) override;
+	virtual void SyncCurrentToSizeSpinners(bool scale, bool size, bool doWidth = true, bool doHeight = true) override;
 	virtual void ResetProgress(bool total = true)  override;
 	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory() override;
 	virtual double OriginalAspect() override { return double(m_Ember->m_OrigFinalRasW) / m_Ember->m_OrigFinalRasH; }
@@ -141,7 +142,7 @@ protected:
 	void SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
 	void RenderComplete(Ember<T>& ember);
 	void RenderComplete(Ember<T>& ember, const EmberStats& stats, Timing& renderTimer);
-	void SyncGuiToEmber(Ember<T>& ember, size_t widthOverride = 0, size_t heightOverride = 0);
+	void SyncGuiToEmber(Ember<T>& ember, size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true);
 	bool SyncGuiToRenderer();
 	void SetProgressComplete(int val);
 

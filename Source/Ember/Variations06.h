@@ -3807,13 +3807,13 @@ public:
 		ss2 << "_" << XformIndexInEmber();
 		string weight = WeightDefineString();
 		string index = ss2.str() + "]";
-		string cellSize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string distort = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cellSize     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string distort      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string z            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string halfCellSize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cache = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cache        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint di = -1, dj = -1;\n"
 		   << "\t\tint i = 0;\n"
@@ -3884,13 +3884,13 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.reserve(8);
-		m_Params.push_back(ParamWithName<T>(&m_CellSize, prefix + "crackle_cellsize", 1, eParamType::REAL, T(0.0001)));
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "crackle_power", T(0.2)));
-		m_Params.push_back(ParamWithName<T>(&m_Distort, prefix + "crackle_distort"));
-		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "crackle_scale", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Z, prefix + "crackle_z"));
+		m_Params.push_back(ParamWithName<T>(&m_CellSize,           prefix + "crackle_cellsize", 1, eParamType::REAL, T(0.0001)));
+		m_Params.push_back(ParamWithName<T>(&m_Power,              prefix + "crackle_power", T(0.2)));
+		m_Params.push_back(ParamWithName<T>(&m_Distort,            prefix + "crackle_distort"));
+		m_Params.push_back(ParamWithName<T>(&m_Scale,              prefix + "crackle_scale", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Z,                  prefix + "crackle_z"));
 		m_Params.push_back(ParamWithName<T>(true, &m_HalfCellSize, prefix + "crackle_half_cellsize"));
-		m_Params.push_back(ParamWithName<T>(true, &(m_C[0][0].x), prefix + "crackle_cache", sizeof(m_C)));
+		m_Params.push_back(ParamWithName<T>(true, &(m_C[0][0].x),  prefix + "crackle_cache", sizeof(m_C)));
 	}
 
 private:
@@ -3925,6 +3925,115 @@ private:
 	T m_HalfCellSize;//Precalc
 	v2T m_C[CACHE_WIDTH][CACHE_WIDTH];//Not kept as a precalc because it crashes Nvidia GPUs.
 	shared_ptr<VarFuncs<T>> m_VarFuncs = VarFuncs<T>::Instance();
+};
+
+/// <summary>
+/// crackle2.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class Crackle2Variation : public ParametricVariation<T>
+{
+public:
+	Crackle2Variation(T weight = 1.0) : ParametricVariation<T>("crackle2", eVariationId::VAR_CRACKLE2, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Crackle2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T seed = 34554;
+		v2T cell(Floor(helper.In.x), Floor(helper.In.y));
+		v2T xy0(cell.x + m_OneOverCellsize * VarFuncs<T>::HashShadertoy(cell.x, cell.y, seed), cell.y + m_OneOverCellsize * VarFuncs<T>::HashShadertoy(cell.y, cell.x * 3, seed + 7));
+		v2T xy1_aux;
+
+		if (rand.Frand01<T>() < 0.5)
+		{
+			if (rand.Frand01<T>() < 0.5)
+				xy1_aux = v2T(cell.x, cell.y + 1);
+			else
+				xy1_aux = v2T(cell.x, cell.y - 1);
+		}
+		else
+		{
+			if (rand.Frand01<T>() < 0.5)
+				xy1_aux = v2T(cell.x + 1, cell.y);
+			else
+				xy1_aux = v2T(cell.x - 1, cell.y);
+		}
+
+		v2T xy1(xy1_aux.x + m_OneOverCellsize * VarFuncs<T>::HashShadertoy(xy1_aux.x, xy1_aux.y, seed), xy1_aux.y + m_OneOverCellsize * VarFuncs<T>::HashShadertoy(xy1_aux.y, xy1_aux.x * 3, seed + 7));
+		v2T v = xy1 - xy0;
+		v2T result = (xy0 + v * rand.Frand01<T>()) * m_Cellsize;
+		helper.Out.x = result.x;
+		helper.Out.y = result.y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string cellsize        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovercellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t seed = 34554.0;\n"
+		   << "\t\treal2 cell = (real2)(floor(vIn.x), floor(vIn.y));\n"
+		   << "\t\treal2 xy0 = (real2)(cell.x + " << oneovercellsize << " * HashShadertoy(cell.x, cell.y, seed), cell.y + " << oneovercellsize << " * HashShadertoy(cell.y, cell.x * 3.0, seed + 7.0));\n"
+		   << "\t\treal2 xy1_aux;\n"
+		   << "\t\t\n"
+		   << "\t\tif (MwcNext01(mwc) < 0.5)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (MwcNext01(mwc) < 0.5)\n"
+		   << "\t\t		xy1_aux = (real2)(cell.x, cell.y + 1);\n"
+		   << "\t\t	else\n"
+		   << "\t\t		xy1_aux = (real2)(cell.x, cell.y - 1);\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (MwcNext01(mwc) < 0.5)\n"
+		   << "\t\t		xy1_aux = (real2)(cell.x + 1, cell.y);\n"
+		   << "\t\t	else\n"
+		   << "\t\t		xy1_aux = (real2)(cell.x - 1, cell.y);\n"
+		   << "\t\t}\n"
+		   << "\t\t\n"
+		   << "\t\treal2 xy1 = (real2)(xy1_aux.x + " << oneovercellsize << " * HashShadertoy(xy1_aux.x, xy1_aux.y, seed), xy1_aux.y + " << oneovercellsize << " * HashShadertoy(xy1_aux.y, xy1_aux.x * 3.0, seed + 7.0));\n"
+		   << "\t\treal2 v = xy1 - xy0;\n"
+		   << "\t\treal2 result = (xy0 + v * MwcNext01(mwc)) * " << cellsize << ";\n"
+		   << "\t\tvOut.x = result.x;\n"
+		   << "\t\tvOut.y = result.y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_OneOverCellsize = 1 / Zeps(m_Cellsize);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Cellsize,              prefix + "crackle2_cellsize", 1, eParamType::REAL, T(0.0001)));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverCellsize, prefix + "crackle2_one_over_cellsize"));
+	}
+
+private:
+	T m_Cellsize;
+	T m_OneOverCellsize;
 };
 
 /// <summary>
@@ -5417,6 +5526,7 @@ MAKEPREPOSTPARVAR(Crob, crob, CROB)
 MAKEPREPOSTPARVAR(BubbleT3D, bubbleT3D, BUBBLET3D)
 MAKEPREPOSTPARVAR(Synth, synth, SYNTH)
 MAKEPREPOSTPARVAR(Crackle, crackle, CRACKLE)
+MAKEPREPOSTPARVAR(Crackle2, crackle2, CRACKLE2)
 MAKEPREPOSTVAR(Erf, erf, ERF)
 MAKEPREPOSTVAR(Xerf, xerf, XERF)
 MAKEPREPOSTPARVAR(W, w, W)

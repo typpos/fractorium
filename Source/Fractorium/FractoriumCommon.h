@@ -528,7 +528,7 @@ static QString BaseStyle()
 		   "{\n"
 		   "\tcolor: black;\n"
 		   "\tbackground-color: lightgray;\n"
-		   "\tborder: 0px solid darkgray;\n"
+		   "\tborder: 1px solid darkgray;\n"
 		   "\tborder-right: 1px solid gray;\n"
 		   "\tpadding-top: 0px;\n"
 		   "\tpadding-bottom: 0px;\n"

@@ -4,6 +4,7 @@
 #include "PaletteList.h"
 #include "VariationList.h"
 #include "Ember.h"
+#include "Spline.h"
 
 #ifdef __APPLE__
 	#include <libgen.h>
@@ -33,7 +34,7 @@ private:
 };
 
 /// <summary>
-/// Class for reading Xml files into ember objects.
+/// Class for reading standard Xml flame files as well as Chaotica .chaos files into ember objects.
 /// This class derives from EmberReport, so the caller is able
 /// to retrieve a text dump of error information if any errors occur.
 /// Since this class contains a VariationList object, it's important to declare one
@@ -57,15 +58,22 @@ public:
 private:
 	template <typename Alloc, template <typename, typename> class C>
 	void ScanForEmberNodes(xmlNode* curNode, const char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults);
+	template <typename Alloc, template <typename, typename> class C>
+	void ScanForChaosNodes(xmlNode* curNode, const char* parentFile, C<Ember<T>, Alloc>& embers, bool useDefaults);
 	bool ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber);
+	bool ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& currentEmber);
 	bool AttToEmberMotionFloat(xmlAttrPtr att, const char* attStr, eEmberMotionParam param, EmberMotion<T>& motion);
 	bool ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion, bool fromEmber);
 	static string GetCorrectedParamName(const unordered_map<string, string>& names, const char* name);
 	static string GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, xmlAttrPtr att);
+	static string GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, const string& varname);
 	static bool XmlContainsTag(xmlAttrPtr att, const char* name);
 	bool ParseHexColors(const char* colstr, Ember<T>& ember, size_t numColors, intmax_t chan);
 	template <typename valT>
 	bool ParseAndAssign(const xmlChar* name, const char* attStr, const char* str, valT& val, bool& b);
+	template <typename valT>
+	bool ParseAndAssignContent(xmlNode* node, const char* fieldname, const char* fieldnameval, valT& val);
+	bool ParseAndAssignContent(xmlNode* node, const char* fieldname, const char* fieldnameval, std::string& val);
 
 	static bool m_Init;
 	static unordered_map<string, string> m_BadParamNames;

@@ -587,6 +587,9 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 
 			if (m_Fractorium->m_QualitySpin->value() < val)
 				m_Fractorium->m_QualitySpin->setValue(val);
+
+			if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get()))
+				rendererCL->SubBatchPercentPerThread(float(s->OpenCLSubBatchPct()));
 		}
 		else
 		{

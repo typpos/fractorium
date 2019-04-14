@@ -28,6 +28,10 @@ CONFIG(release, debug|release) {
 	qtplatforms.path = $$BIN_INSTALL_DIR\platforms
 	qtplatforms.files = $$(QTDIR)\plugins\platforms\qwindows.dll
 	INSTALLS += qtplatforms
+	
+	qimageformats.path = $$BIN_INSTALL_DIR\imageformats
+	qimageformats.files = $$(QTDIR)\plugins\imageformats\qjpeg.dll
+	INSTALLS += qimageformats
 }
 
 CONFIG(debug, debug|release) {
@@ -38,6 +42,10 @@ CONFIG(debug, debug|release) {
 	qtplatforms.path = $$BIN_INSTALL_DIR\platforms
 	qtplatforms.files = $$(QTDIR)\plugins\platforms\qwindowsd.dll
 	INSTALLS += qtplatforms
+	
+	qimageformats.path = $$BIN_INSTALL_DIR\imageformats
+	qimageformats.files = $$(QTDIR)\plugins\imageformats\qjpeg.dll
+	INSTALLS += qimageformats
 }
 }
 

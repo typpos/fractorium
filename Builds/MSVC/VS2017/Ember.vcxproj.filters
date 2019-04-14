@@ -128,6 +128,9 @@
     <ClInclude Include="..\..\..\Source\Ember\Variations07.h">
       <Filter>Header Files\Variations</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Source\Ember\Spline.h">
+      <Filter>Header Files\Xml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Ember\DllMain.cpp">
@@ -159,6 +162,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Source\Ember\PaletteList.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Source\Ember\Spline.cpp">
+      <Filter>Header Files\Xml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

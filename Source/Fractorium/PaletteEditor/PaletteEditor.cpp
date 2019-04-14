@@ -1,13 +1,11 @@
 ﻿#include "FractoriumPch.h"
 #include "PaletteEditor.h"
+#include "Fractorium.h"
 
 /// <summary>
 /// Constructor which passes parent widget to the base and sets up slots and other ui
 /// elements.
-/// This takes a reference to a palette list, which it then searches for user created palettes
-/// and only populates the combo box with those.
 /// </summary>
-/// <param name="paletteList">A reference to an existing palette list, gotten from the main window.</param>
 /// <param name="p">The parent widget</param>
 PaletteEditor::PaletteEditor(QWidget* p) :
 	QDialog(p),
@@ -519,6 +517,7 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 		m_FileDialog->setWindowTitle("Open Image");
 		m_FileDialog->setDirectory(settings->OpenPaletteImageFolder());
 		m_FileDialog->selectNameFilter("*.jpg");
+		m_FileDialog->setSidebarUrls(dynamic_cast<Fractorium*>(parent())->Urls());
 	}
 
 	if (m_FileDialog->exec() == QDialog::Accepted)

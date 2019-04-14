@@ -830,6 +830,34 @@ static inline T NormalizeDeg180(T angle)
 }
 
 /// <summary>
+/// Put an angular measurement in degrees into the range of 0 - 360.
+/// </summary>
+/// <param name="angle">The angle to normalize</param>
+/// <returns>The normalized angle in a range of 0 - 360</returns>
+template <typename T>
+static inline T NormalizeDeg360(T angle)
+{
+	if (angle > 360 || angle < -360)
+		angle = fmod(angle, T(360));
+
+	if (angle < 0)
+		angle += 360;
+
+	return angle;
+}
+
+/// <summary>
+/// Convert an angle where 0 is up to a trigonometry style angle where 0 is to the right.
+/// </summary>
+/// <param name="Angle">The angle to convert</param>
+/// <returns>The trig equivalent of the angle passed in</returns>
+template <typename T>
+static inline T ToTrigAngle(T angle)
+{
+	return NormalizeDeg360(90 - angle);
+}
+
+/// <summary>
 /// Determine whether the passed in string ends with the passed in suffix, case sensitive.
 /// </summary>
 /// <param name="str">The string to test</param>
@@ -839,6 +867,18 @@ static bool EndsWith(const std::string& str, const std::string& suffix)
 {
 	return str.size() >= suffix.size() &&
 		   str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+/// <summary>
+/// Determine whether the passed in string starts with the passed in prefix, case sensitive.
+/// </summary>
+/// <param name="str">The string to test</param>
+/// <param name="suffix">The string to test for</param>
+/// <returns>True if str starts with suffix, else false.</returns>
+static bool StartsWith(const std::string& str, const std::string& prefix)
+{
+	return str.size() >= prefix.size() &&
+		   str.compare(0, prefix.size(), prefix) == 0;
 }
 
 /// <summary>

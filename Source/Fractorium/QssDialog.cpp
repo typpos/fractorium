@@ -639,6 +639,7 @@ void QssDialog::SetupFileDialog()
 		m_FileDialog->setViewMode(QFileDialog::List);
 		m_FileDialog->setDirectory(m_Parent->m_SettingsPath);
 		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
+		m_FileDialog->setSidebarUrls(dynamic_cast<Fractorium*>(parent())->Urls());
 	}
 
 #endif

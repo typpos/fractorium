@@ -176,6 +176,8 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 		{
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 			StartTimer();
+			e->accept();
+			return true;
 		}
 		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseButtonRelease &&
@@ -183,18 +185,22 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 		{
 			StopTimer();
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
+			e->accept();
+			return true;
 		}
 		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseMove &&
 				 QGuiApplication::mouseButtons() & Qt::RightButton)
 		{
 			m_MouseMovePoint = me->pos();
+			e->accept();
+			return true;
 		}
 		else if (m_DoubleClick &&
 				 ((!m_Settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
 				  (m_Settings->ToggleType() && me->type() == QMouseEvent::MouseButtonRelease && me->button() == Qt::RightButton)))
 		{
-			if (IsClose(m_DoubleClickLowVal, value()))
+			if (m_DoubleClickLowVal == value())
 			{
 				m_DoubleClickZeroEvent(this, m_DoubleClickZero);
 				setValue(m_DoubleClickZero);
@@ -204,6 +210,9 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 				m_DoubleClickNonZeroEvent(this, m_DoubleClickNonZero);
 				setValue(m_DoubleClickNonZero);
 			}
+
+			e->accept();
+			return true;
 		}
 	}
 	else
@@ -241,11 +250,15 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 						setValue(value() - (ctrl ? m_Step * 10 : m_Step));
 					}
 				}
-			}
-			else if (dynamic_cast<QKeyEvent*>(e))
-			{
+
+				e->accept();
 				return true;
 			}
+		}
+		else if (dynamic_cast<QKeyEvent*>(e))
+		{
+			e->accept();
+			return true;
 		}
 	}
 

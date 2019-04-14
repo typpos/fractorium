@@ -53,6 +53,12 @@ Fractorium::Fractorium(QWidget* p)
 							 );
 	}
 
+	m_Urls << QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).first())
+		   << QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).first())
+		   << QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first())
+		   << QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).first())
+		   << QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::PicturesLocation).first())
+		   ;
 	m_FontSize = 9;
 	m_VarSortMode = 1;//Sort by weight by default.
 	m_PaletteSortMode = 0;//Sort by palette ascending by default.
@@ -236,6 +242,14 @@ Fractorium::~Fractorium()
 
 	if (m_Settings->LoadLast())
 		m_Controller->SaveCurrentFileOnShutdown();
+}
+
+/// <summary>
+/// Return the URLs used to determine the icons that show up in the location bar in all file/folder dialogs.
+/// </summary>
+QList<QUrl> Fractorium::Urls()
+{
+	return m_Urls;
 }
 
 /// <summary>
@@ -502,7 +516,7 @@ void Fractorium::dragEnterEvent(QDragEnterEvent* e)
 			QFileInfo fileInfo(localFile);
 			QString suf = fileInfo.suffix();
 
-			if (suf == "flam3" || suf == "flame" || suf == "xml")
+			if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
 			{
 				e->accept();
 				break;
@@ -541,7 +555,7 @@ void Fractorium::dropEvent(QDropEvent* e)
 			QFileInfo fileInfo(localFile);
 			QString suf = fileInfo.suffix();
 
-			if (suf == "flam3" || suf == "flame" || suf == "xml")
+			if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
 				filenames << localFile;
 		}
 	}
@@ -603,8 +617,9 @@ QStringList Fractorium::SetupOpenXmlDialog()
 		connect(m_OpenFileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
 		m_OpenFileDialog->setFileMode(QFileDialog::ExistingFiles);
 		m_OpenFileDialog->setAcceptMode(QFileDialog::AcceptOpen);
-		m_OpenFileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)");
+		m_OpenFileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml);;chaos (*.chaos)");
 		m_OpenFileDialog->setWindowTitle("Open Flame");
+		m_OpenFileDialog->setSidebarUrls(m_Urls);
 	}
 
 	QStringList filenames;
@@ -621,7 +636,7 @@ QStringList Fractorium::SetupOpenXmlDialog()
 
 #else
 	auto defaultFilter(m_Settings->OpenXmlExt());
-	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; fml(*.xml)"), &defaultFilter);
+	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; xml(*.xml);; chaos (*.chaos)"), &defaultFilter);
 	m_Settings->OpenXmlExt(defaultFilter);
 
 	if (!filenames.empty())
@@ -659,6 +674,7 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 		});
 		m_SaveFileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml)");
 		m_SaveFileDialog->setWindowTitle("Save flame as xml");
+		m_SaveFileDialog->setSidebarUrls(m_Urls);
 	}
 
 	QString filename;
@@ -714,6 +730,7 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 		m_SaveImageDialog->setNameFilter(".jpg;;.png;;.exr");
 #endif
 		m_SaveImageDialog->setWindowTitle("Save image");
+		m_SaveImageDialog->setSidebarUrls(m_Urls);
 	}
 
 	QString filename;
@@ -754,6 +771,7 @@ QString Fractorium::SetupSaveFolderDialog()
 		m_FolderDialog->setFileMode(QFileDialog::Directory);
 		m_FolderDialog->setOption(QFileDialog::ShowDirsOnly, true);
 		m_FolderDialog->setWindowTitle("Save to folder");
+		m_FolderDialog->setSidebarUrls(m_Urls);
 	}
 
 	QString filename;
@@ -825,11 +843,11 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_DECurveSpin);
 	w = SetTabOrder(this, w, m_SbsSpin);//Flame iteration.
 	w = SetTabOrder(this, w, m_FuseSpin);
+	w = SetTabOrder(this, w, m_RandRangeSpin);
 	w = SetTabOrder(this, w, m_QualitySpin);
 	w = SetTabOrder(this, w, m_SupersampleSpin);
 	w = SetTabOrder(this, w, m_InterpTypeCombo);//Flame animation.
 	w = SetTabOrder(this, w, m_AffineInterpTypeCombo);
-	w = SetTabOrder(this, w, m_TemporalSamplesSpin);
 	w = SetTabOrder(this, w, m_TemporalFilterWidthSpin);
 	w = SetTabOrder(this, w, m_TemporalFilterTypeCombo);
 	w = SetTabOrder(this, ui.LibraryTree, ui.SequenceStartCountSpinBox);//Library.
@@ -881,11 +899,11 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PreY2Spin);
 	w = SetTabOrder(this, w, m_PreO1Spin);
 	w = SetTabOrder(this, w, m_PreO2Spin);
-	w = SetTabOrder(this, w, ui.PreFlipVerticalButton);
 	w = SetTabOrder(this, w, ui.PreCopyButton);
+	w = SetTabOrder(this, w, ui.PreFlipVerticalButton);
 	w = SetTabOrder(this, w, ui.PreResetButton);
-	w = SetTabOrder(this, w, ui.PrePasteButton);
 	w = SetTabOrder(this, w, ui.PreFlipHorizontalButton);
+	w = SetTabOrder(this, w, ui.PrePasteButton);
 	w = SetTabOrder(this, w, ui.PreRotate90CcButton);
 	w = SetTabOrder(this, w, ui.PreRotateCcButton);
 	w = SetTabOrder(this, w, ui.PreRotateCombo);
@@ -901,6 +919,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PreScaleUpButton);
 	w = SetTabOrder(this, w, ui.PreRandomButton);
 	w = SetTabOrder(this, w, ui.ShowPreAffineCurrentRadio);
+	w = SetTabOrder(this, w, ui.ShowPreAffineSelectedRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineAllRadio);
 	w = SetTabOrder(this, w, ui.SwapAffinesButton);
 	w = SetTabOrder(this, w, ui.PostAffineGroupBox);
@@ -910,11 +929,11 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PostY2Spin);
 	w = SetTabOrder(this, w, m_PostO1Spin);
 	w = SetTabOrder(this, w, m_PostO2Spin);
-	w = SetTabOrder(this, w, ui.PostFlipVerticalButton);
 	w = SetTabOrder(this, w, ui.PostCopyButton);
+	w = SetTabOrder(this, w, ui.PostFlipVerticalButton);
 	w = SetTabOrder(this, w, ui.PostResetButton);
-	w = SetTabOrder(this, w, ui.PostPasteButton);
 	w = SetTabOrder(this, w, ui.PostFlipHorizontalButton);
+	w = SetTabOrder(this, w, ui.PostPasteButton);
 	w = SetTabOrder(this, w, ui.PostRotate90CcButton);
 	w = SetTabOrder(this, w, ui.PostRotateCcButton);
 	w = SetTabOrder(this, w, ui.PostRotateCombo);
@@ -930,6 +949,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PostScaleUpButton);
 	w = SetTabOrder(this, w, ui.PostRandomButton);
 	w = SetTabOrder(this, w, ui.ShowPostAffineCurrentRadio);
+	w = SetTabOrder(this, w, ui.ShowPostAffineSelectedRadio);
 	w = SetTabOrder(this, w, ui.ShowPostAffineAllRadio);
 	w = SetTabOrder(this, w, ui.PolarAffineCheckBox);
 	w = SetTabOrder(this, w, ui.LocalPivotRadio);
@@ -940,6 +960,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.RandomXaosButton);
 	w = SetTabOrder(this, w, ui.AddLayerButton);
 	w = SetTabOrder(this, w, ui.AddLayerSpinBox);
+	w = SetTabOrder(this, w, ui.TransposeXaosButton);
 	//Xforms xaos is done dynamically every time.
 	w = SetTabOrder(this, ui.PaletteFilenameCombo, m_PaletteHueSpin);//Palette.
 	w = SetTabOrder(this, w, m_PaletteContrastSpin);

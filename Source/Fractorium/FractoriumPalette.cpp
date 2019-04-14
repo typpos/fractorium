@@ -45,6 +45,8 @@ void Fractorium::InitPaletteUI()
 	connect(paletteTable->horizontalHeader(), SIGNAL(sectionClicked(int)),                          this, SLOT(OnPaletteHeaderSectionClicked(int)),             Qt::QueuedConnection);
 	connect(ui.ResetCurvesButton,             SIGNAL(clicked(bool)),                                this, SLOT(OnResetCurvesButtonClicked(bool)),               Qt::QueuedConnection);
 	connect(ui.CurvesView,                    SIGNAL(PointChangedSignal(int, int, const QPointF&)), this, SLOT(OnCurvesPointChanged(int, int, const QPointF&)), Qt::QueuedConnection);
+	connect(ui.CurvesView,                    SIGNAL(PointAddedSignal(size_t, const QPointF&)),     this, SLOT(OnCurvesPointAdded(size_t, const QPointF&)),     Qt::QueuedConnection);
+	connect(ui.CurvesView,                    SIGNAL(PointRemovedSignal(size_t, int)),              this, SLOT(OnCurvesPointRemoved(size_t, int)),              Qt::QueuedConnection);
 	connect(ui.CurvesAllRadio,                SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesAllRadioButtonToggled(bool)),            Qt::QueuedConnection);
 	connect(ui.CurvesRedRadio,                SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesRedRadioButtonToggled(bool)),            Qt::QueuedConnection);
 	connect(ui.CurvesGreenRadio,              SIGNAL(toggled(bool)),                                this, SLOT(OnCurvesGreenRadioButtonToggled(bool)),          Qt::QueuedConnection);
@@ -208,6 +210,8 @@ void Fractorium::OnPaletteAdjust(int d) { m_Controller->PaletteAdjust(); }
 template <typename T>
 void FractoriumEmberController<T>::SetBasePaletteAndAdjust(const Palette<float>& palette)
 {
+	//The temp palette is assigned the palette read when the file was parsed/saved. The user can apply adjustments on the GUI later.
+	//These adjustments will be applied to the temp palette, then assigned back to m_Ember.m_Palette.
 	m_TempPalette = palette;//Deep copy.
 	ApplyPaletteToEmber();//Copy temp palette to ember palette and apply adjustments.
 	UpdateAdjustedPaletteGUI(m_Ember.m_Palette);//Show the adjusted palette.
@@ -288,7 +292,7 @@ void Fractorium::OnPreviewPaletteMouseReleased()
 /// <param name="col">Ignored</param>
 void Fractorium::OnPreviewPaletteCellDoubleClicked(int row, int col)
 {
-	m_PreviewPaletteRotation = 0;
+	m_PreviewPaletteRotation = m_PreviewPaletteMouseDownRotation = 0;
 	m_PreviewPaletteMouseDown = false;
 	m_Controller->PaletteAdjust();
 }
@@ -335,7 +339,8 @@ void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 	uint i = 0;
 	int rowCount = ui.PaletteListTable->rowCount();
 
-	while (((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow)) || i >= uint(rowCount));
+	if (rowCount > 1)//If only one palette in the current palette file, just use it.
+		while (((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow)) || i >= uint(rowCount));
 
 	if (checked)
 		OnPaletteCellDoubleClicked(i, 1);//Will clear the adjustments.
@@ -539,6 +544,7 @@ void Fractorium::OnPaletteHeaderSectionClicked(int col)
 /// </summary>
 void Fractorium::ResetPaletteControls()
 {
+	m_PreviewPaletteRotation = m_PreviewPaletteMouseDownRotation = 0;
 	m_PaletteHueSpin->SetValueStealth(0);
 	m_PaletteSaturationSpin->SetValueStealth(0);
 	m_PaletteBrightnessSpin->SetValueStealth(0);
@@ -599,7 +605,7 @@ void Fractorium::OnResetCurvesButtonClicked(bool checked)
 /// Called when the position of any of the points in the curves editor is is changed.
 /// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
 /// </summary>
-/// <param name="curveIndex">The curve index, 0-1/</param>
+/// <param name="curveIndex">The curve index, 0-3/</param>
 /// <param name="pointIndex">The point index within the selected curve, 1-2.</param>
 /// <param name="point">The new coordinate of the point in terms of the curves control rect.</param>
 template <typename T>
@@ -613,6 +619,49 @@ void FractoriumEmberController<T>::ColorCurveChanged(int curveIndex, int pointIn
 }
 
 void Fractorium::OnCurvesPointChanged(int curveIndex, int pointIndex, const QPointF& point) { m_Controller->ColorCurveChanged(curveIndex, pointIndex, point); }
+
+/// <summary>
+/// Remove curve point.
+/// Called when right clicking on a color curve point.
+/// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
+/// </summary>
+/// <param name="curveIndex">The curve index./</param>
+/// <param name="pointIndex">The point index within the selected curve.</param>
+template <typename T>
+void FractoriumEmberController<T>::ColorCurvesPointRemoved(size_t curveIndex, int pointIndex)
+{
+	Update([&]
+	{
+		if (m_Ember.m_Curves.m_Points[curveIndex].size() > 2)
+		{
+			m_Ember.m_Curves.m_Points[curveIndex].erase(m_Ember.m_Curves.m_Points[curveIndex].begin() + pointIndex);
+			std::sort(m_Ember.m_Curves.m_Points[curveIndex].begin(), m_Ember.m_Curves.m_Points[curveIndex].end(), [&](auto & lhs, auto & rhs) { return lhs.x < rhs.x; });
+		}
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+	FillCurvesControl();
+}
+
+void Fractorium::OnCurvesPointRemoved(size_t curveIndex, int pointIndex) { m_Controller->ColorCurvesPointRemoved(curveIndex, pointIndex); }
+
+/// <summary>
+/// Add a curve point.
+/// Called when clicking in between points on a color curve.
+/// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
+/// </summary>
+/// <param name="curveIndex">The curve index./</param>
+/// <param name="pointIndex">The point to add to the selected curve.</param>
+template <typename T>
+void FractoriumEmberController<T>::ColorCurvesPointAdded(size_t curveIndex, const QPointF& point)
+{
+	Update([&]
+	{
+		m_Ember.m_Curves.m_Points[curveIndex].push_back({ point.x(), point.y() });
+		std::sort(m_Ember.m_Curves.m_Points[curveIndex].begin(), m_Ember.m_Curves.m_Points[curveIndex].end(), [&](auto & lhs, auto & rhs) { return lhs.x < rhs.x; });
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+	FillCurvesControl();
+}
+
+void Fractorium::OnCurvesPointAdded(size_t curveIndex, const QPointF& point) { m_Controller->ColorCurvesPointAdded(curveIndex, point); }
 
 /// <summary>
 /// Set the top most points in the curves control, which makes it easier to
@@ -632,16 +681,7 @@ template <typename T>
 void FractoriumEmberController<T>::FillCurvesControl()
 {
 	m_Fractorium->ui.CurvesView->blockSignals(true);
-
-	for (auto i = 0; i < 4; i++)
-	{
-		for (auto j = 1; j < 3; j++)//Only do middle points.
-		{
-			QPointF point(m_Ember.m_Curves.m_Points[i][j].x, m_Ember.m_Curves.m_Points[i][j].y);
-			m_Fractorium->ui.CurvesView->Set(i, j, point);
-		}
-	}
-
+	m_Fractorium->ui.CurvesView->Set(m_Ember.m_Curves);
 	m_Fractorium->ui.CurvesView->blockSignals(false);
 	m_Fractorium->ui.CurvesView->update();
 }

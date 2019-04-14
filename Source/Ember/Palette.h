@@ -416,6 +416,20 @@ public:
 	}
 
 	/// <summary>
+	/// Determine if a palette is all black.
+	/// </summary>
+	/// <returns>True if all colors are black, else false if at least one component of one color is non zero.</returns>
+	bool IsEmpty()
+	{
+		for (glm::length_t i = 0; i < Size(); i++)
+			for (glm::length_t j = 0; j < 3; j++)
+				if (m_Entries[i][j] != 0)
+					return false;
+
+		return true;
+	}
+
+	/// <summary>
 	/// Convert RGB to HSV.
 	/// </summary>
 	/// <param name="r">Red 0 - 1</param>

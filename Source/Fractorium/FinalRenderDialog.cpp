@@ -35,14 +35,32 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	connect(ui.FinalRenderScaleWidthRadioButton,   SIGNAL(toggled(bool)),			 this, SLOT(OnScaleRadioButtonChanged(bool)),			 Qt::QueuedConnection);
 	connect(ui.FinalRenderScaleHeightRadioButton,  SIGNAL(toggled(bool)),			 this, SLOT(OnScaleRadioButtonChanged(bool)),			 Qt::QueuedConnection);
 	connect(ui.FinalRenderDeviceTable,			   SIGNAL(cellChanged(int, int)),	 this, SLOT(OnDeviceTableCellChanged(int, int)),		 Qt::QueuedConnection);
-	SetupSpinner<DoubleSpinBox, double>(ui.FinalRenderSizeTable, this, row, 1, m_WidthScaleSpin,  spinHeight, 0.001, 99.99, 0.1, SIGNAL(valueChanged(double)), SLOT(OnWidthScaleChanged(double)), true, 1.0, 1.0, 1.0);
-	SetupSpinner<DoubleSpinBox, double>(ui.FinalRenderSizeTable, this, row, 1, m_HeightScaleSpin, spinHeight, 0.001, 99.99, 0.1, SIGNAL(valueChanged(double)), SLOT(OnHeightScaleChanged(double)), true, 1.0, 1.0, 1.0);
-	m_WidthScaleSpin->setDecimals(3);
-	m_HeightScaleSpin->setDecimals(3);
-	m_WidthScaleSpin->setSuffix(" ( )");
-	m_HeightScaleSpin->setSuffix(" ( )");
-	m_WidthScaleSpin->SmallStep(0.001);
-	m_HeightScaleSpin->SmallStep(0.001);
+	SetupSpinner<DoubleSpinBox, double>(ui.FinalRenderSizeTable, this, row, -1, m_WidthScaleSpin,  spinHeight, 0.001, 99.99, 0.1, SIGNAL(valueChanged(double)), SLOT(OnWidthScaleChanged(double)), true, 1.0, 1.0, 1.0);
+	SetupSpinner<SpinBox, int>(ui.FinalRenderSizeTable, this, row, -1, m_WidthSpin,  spinHeight, 10, std::numeric_limits<int>::max(), 10, SIGNAL(valueChanged(int)), SLOT(OnWidthChanged(int)), true, 1920, 1920, 1920);
+	SetupSpinner<DoubleSpinBox, double>(ui.FinalRenderSizeTable, this, row, -1, m_HeightScaleSpin, spinHeight, 0.001, 99.99, 0.1, SIGNAL(valueChanged(double)), SLOT(OnHeightScaleChanged(double)), true, 1.0, 1.0, 1.0);
+	SetupSpinner<SpinBox, int>(ui.FinalRenderSizeTable, this, row, -1, m_HeightSpin, spinHeight, 10, std::numeric_limits<int>::max(), 10, SIGNAL(valueChanged(int)), SLOT(OnHeightChanged(int)), true, 1080, 1080, 1080);
+	int spinsize = 120;
+	m_WidthScaleSpin->setDecimals(4);
+	m_HeightScaleSpin->setDecimals(4);
+	m_WidthScaleSpin->setFixedWidth(spinsize);
+	m_HeightScaleSpin->setFixedWidth(spinsize);
+	m_WidthScaleSpin->SmallStep(0.0001);
+	m_HeightScaleSpin->SmallStep(0.0001);
+	m_WidthSpin->setFixedWidth(spinsize);
+	m_HeightSpin->setFixedWidth(spinsize);
+	m_WidthSpinnerWidget = new DoubleIntSpinnerWidget(m_WidthScaleSpin, m_WidthSpin, ui.FinalRenderSizeTable);
+	m_WidthSpinnerWidget->m_DoubleSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_WidthSpinnerWidget->m_SpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_WidthSpinnerWidget->setMinimumWidth(spinsize);
+	m_WidthSpinnerWidget->setMaximumWidth(spinsize);
+	ui.FinalRenderSizeTable->setCellWidget(0, 1, m_WidthSpinnerWidget);
+	//
+	m_HeightSpinnerWidget = new DoubleIntSpinnerWidget(m_HeightScaleSpin, m_HeightSpin, ui.FinalRenderSizeTable);
+	m_HeightSpinnerWidget->m_DoubleSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_HeightSpinnerWidget->m_SpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	m_HeightSpinnerWidget->setMinimumWidth(spinsize);
+	m_HeightSpinnerWidget->setMaximumWidth(spinsize);
+	ui.FinalRenderSizeTable->setCellWidget(1, 1, m_HeightSpinnerWidget);
 	row = 0;
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_QualitySpin,		    spinHeight,  1, dmax, 50, SIGNAL(valueChanged(double)), SLOT(OnQualityChanged(double)),	     true, 1000, 1000, 1000);
 	SetupSpinner<SpinBox, int>         (table, this, row, 1, m_TemporalSamplesSpin, spinHeight,  1, 5000, 50, SIGNAL(valueChanged(int)),    SLOT(OnTemporalSamplesChanged(int)), true, 1000, 1000, 1000);
@@ -139,6 +157,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 		ui.FinalRenderThreadPriorityComboBox->setCurrentIndex(Clamp<int>(m_Settings->FinalThreadPriority() / 25, 0, tpc));
 
 #endif
+	ui.FinalRenderOpenCLSubBatchPctSpin->setValue(m_Settings->FinalOpenCLSubBatchPct());
 	m_QualitySpin->setValue(m_Settings->FinalQuality());
 	m_TemporalSamplesSpin->setValue(m_Settings->FinalTemporalSamples());
 	m_SupersampleSpin->setValue(m_Settings->FinalSupersample());
@@ -188,6 +207,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	w = SetTabOrder(this, w, ui.FinalRenderApplyToAllCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderThreadCountSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderThreadPriorityComboBox);
+	w = SetTabOrder(this, w, ui.FinalRenderOpenCLSubBatchPctSpin);
 	w = SetTabOrder(this, w, m_WidthScaleSpin);
 	w = SetTabOrder(this, w, m_HeightScaleSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderScaleNoneRadioButton);
@@ -260,6 +280,7 @@ int FractoriumFinalRenderDialog::ThreadPriority()
 		return ui.FinalRenderThreadPriorityComboBox->currentIndex() * 25;
 }
 #endif
+double FractoriumFinalRenderDialog::OpenCLSubBatchPct() { return ui.FinalRenderOpenCLSubBatchPctSpin->value();  }
 double FractoriumFinalRenderDialog::WidthScale() { return m_WidthScaleSpin->value(); }
 double FractoriumFinalRenderDialog::HeightScale() { return m_HeightScaleSpin->value(); }
 double FractoriumFinalRenderDialog::Quality() { return m_QualitySpin->value(); }
@@ -294,6 +315,7 @@ FinalRenderGuiState FractoriumFinalRenderDialog::State()
 	state.m_Devices = Devices();
 	state.m_ThreadCount = ThreadCount();
 	state.m_ThreadPriority = ThreadPriority();
+	state.m_SubBatchPct = OpenCLSubBatchPct();
 	state.m_WidthScale = WidthScale();
 	state.m_HeightScale = HeightScale();
 	state.m_Quality = Quality();
@@ -384,6 +406,7 @@ void FractoriumFinalRenderDialog::OnOpenCLCheckBoxStateChanged(int state)
 {
 	bool checked = state == Qt::Checked;
 	ui.FinalRenderDeviceTable->setEnabled(checked);
+	ui.FinalRenderOpenCLSubBatchPctSpin->setEnabled(checked);
 	ui.FinalRenderThreadCountSpin->setEnabled(!checked);
 	ui.FinalRenderThreadPriorityLabel->setEnabled(!checked);
 	ui.FinalRenderThreadPriorityComboBox->setEnabled(!checked);
@@ -462,11 +485,38 @@ void FractoriumFinalRenderDialog::OnApplyAllCheckBoxStateChanged(int state)
 /// <param name="d">Ignored</param>
 void FractoriumFinalRenderDialog::OnWidthScaleChanged(double d)
 {
-	if (ui.FinalRenderKeepAspectCheckBox->isChecked() && m_Controller.get())
-		m_HeightScaleSpin->SetValueStealth(m_WidthScaleSpin->value());
+	if (m_Controller.get())
+	{
+		if (ui.FinalRenderKeepAspectCheckBox->isChecked())
+			m_HeightScaleSpin->SetValueStealth(m_WidthScaleSpin->value());
 
-	if (SetMemory())
-		m_Controller->SyncCurrentToSizeSpinners(false, true);
+		if (SetMemory())
+			m_Controller->SyncCurrentToSizeSpinners(false, true);
+	}
+}
+
+/// <summary>
+/// The width spinner was changed, recompute required memory.
+/// If the aspect ratio checkbox is checked, set the value of
+/// the height spinner as well to be in proportion.
+/// </summary>
+/// <param name="d">Ignored</param>
+void FractoriumFinalRenderDialog::OnWidthChanged(int d)
+{
+	if (m_Controller.get())
+	{
+		m_Controller->SyncGuiToEmbers(m_WidthSpin->value(), m_HeightSpin->value());//Copy changed width value from gui to ember (height will be copied even though it hasn't changed).
+		m_Controller->SyncCurrentToSizeSpinners(true, false, true, false);//Compute how much the original width had to be scaled by to equal the new width and put the value in the width scale spinner.
+
+		if (ui.FinalRenderKeepAspectCheckBox->isChecked())
+		{
+			m_HeightScaleSpin->SetValueStealth(m_WidthScaleSpin->value());//Make the height scale spinner match the newly computed width scale spinner.
+			m_Controller->SyncGuiToEmbers(0, 0, false, true);//Scale height by the amount in the height scale spinner and assign the value to the ember height.
+			m_Controller->SyncCurrentToSizeSpinners(false, true, false, true);//Copy new height value from the ember to the height spinner.
+		}
+	}
+
+	if (SetMemory()) {}
 }
 
 /// <summary>
@@ -477,11 +527,38 @@ void FractoriumFinalRenderDialog::OnWidthScaleChanged(double d)
 /// <param name="d">Ignored</param>
 void FractoriumFinalRenderDialog::OnHeightScaleChanged(double d)
 {
-	if (ui.FinalRenderKeepAspectCheckBox->isChecked() && m_Controller.get())
-		m_WidthScaleSpin->SetValueStealth(m_HeightScaleSpin->value());
+	if (m_Controller.get())
+	{
+		if (ui.FinalRenderKeepAspectCheckBox->isChecked())
+			m_WidthScaleSpin->SetValueStealth(m_HeightScaleSpin->value());
 
-	if (SetMemory())
-		m_Controller->SyncCurrentToSizeSpinners(false, true);
+		if (SetMemory())
+			m_Controller->SyncCurrentToSizeSpinners(false, true);
+	}
+}
+
+/// <summary>
+/// The height spinner was changed, recompute required memory.
+/// If the aspect ratio checkbox is checked, set the value of
+/// the width spinner as well to be in proportion.
+/// </summary>
+/// <param name="d">Ignored</param>
+void FractoriumFinalRenderDialog::OnHeightChanged(int d)
+{
+	if (m_Controller.get())
+	{
+		m_Controller->SyncGuiToEmbers(m_WidthSpin->value(), m_HeightSpin->value());//Copy changed height value from gui to ember (width will be copied even though it hasn't changed).
+		m_Controller->SyncCurrentToSizeSpinners(true, false, false, true);//Compute how much the original height had to be scaled by to equal the new height and put the value in the height scale spinner.
+
+		if (ui.FinalRenderKeepAspectCheckBox->isChecked())
+		{
+			m_WidthScaleSpin->SetValueStealth(m_HeightScaleSpin->value());//Make the width scale spinner match the newly computed height scale spinner.
+			m_Controller->SyncGuiToEmbers(0, 0, true, false);//Scale width by the amount in the width scale spinner and assign the value to the ember width.
+			m_Controller->SyncCurrentToSizeSpinners(false, true, true, false);//Copy new width value from the ember to the width spinner.
+		}
+	}
+
+	if (SetMemory()) {}
 }
 
 /// <summary>
@@ -492,8 +569,9 @@ void FractoriumFinalRenderDialog::OnHeightScaleChanged(double d)
 void FractoriumFinalRenderDialog::OnKeepAspectCheckBoxStateChanged(int state)
 {
 	if (state && m_Controller.get())
-		m_HeightScaleSpin->SetValueStealth(m_WidthScaleSpin->value());
+		m_HeightScaleSpin->setValue(m_WidthScaleSpin->value());
 
+	//m_HeightScaleSpin->SetValueStealth(m_WidthScaleSpin->value());
 	SetMemory();
 }
 
@@ -501,7 +579,7 @@ void FractoriumFinalRenderDialog::OnKeepAspectCheckBoxStateChanged(int state)
 /// The scaling method radio button selection was changed.
 /// </summary>
 /// <param name="checked">The state of the radio button</param>
-void FractoriumFinalRenderDialog::OnScaleRadioButtonChanged(bool checked)
+void FractoriumFinalRenderDialog::OnScaleRadioButtonChanged(bool checked)//This is wrong. Does not react when scale is switched back to zero. Fix!//TODO
 {
 	if (checked)
 		SetMemory();
@@ -714,6 +792,8 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 	if (m_Controller.get() && m_Controller->m_Run)//On Linux, this event will be called when the main window minimized/maximized while rendering, so filter it out.
 		return;
 
+	QString firstfile;
+
 	if (CreateControllerFromGUI(true))//Create controller if it does not exist, or if it does and the renderer is not running.
 	{
 		int index = int(m_Fractorium->m_Controller->Index()) + 1;
@@ -727,6 +807,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 			ember.m_Supersample = m_Settings->FinalSupersample();
 			ember.m_TemporalSamples = m_Settings->FinalTemporalSamples();
 		});//Copy the whole file, will take about 0.2ms per ember in the file.
+		firstfile = efi.m_Filename;
 #else
 		Ember<float> ed;
 		EmberFile<float> efi;
@@ -737,6 +818,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 			ember.m_Supersample = m_Settings->FinalSupersample();
 			ember.m_TemporalSamples = m_Settings->FinalTemporalSamples();
 		});//Copy the whole file, will take about 0.2ms per ember in the file.
+		firstfile = efi.m_Filename;
 #endif
 		m_Controller->SetEmberFile(efi, true);//Move the temp file into the final render controller.
 		ui.FinalRenderCurrentSpin->setMaximum(int(efi.Size()));
@@ -758,6 +840,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 		ui.FinalRenderDoAllCheckBox->setChecked(true);
 		ui.FinalRenderDoSequenceCheckBox->setChecked(true);
 		ui.FinalRenderApplyToAllCheckBox->setChecked(true);
+		m_PrefixEdit->setText(firstfile + "_");
 	}
 
 	ui.FinalRenderTextOutput->clear();

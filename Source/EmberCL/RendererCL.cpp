@@ -34,6 +34,7 @@ RendererCL<T, bucketT>::RendererCL(const vector<pair<size_t, size_t>>& devices, 
 	m_FinalFormat.image_channel_order = CL_RGBA;
 	m_FinalFormat.image_channel_data_type = CL_FLOAT;
 	m_CompileBegun = [&]() { };
+	m_IterCountPerKernel = size_t(m_SubBatchPercentPerThread * m_Ember.m_SubBatchSize);
 	Init(devices, shared, outputTexID);
 }
 
@@ -86,7 +87,7 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 
 				if (b)
 				{
-					m_Devices.push_back(std::move(cld));//Success, so move to the vector, else it will go out of scope and be deleted.
+					m_Devices.push_back(std::move(cld));//Success, so move to the device vector, else it will go out of scope and be deleted.
 				}
 				else
 				{
@@ -329,6 +330,26 @@ bool RendererCL<T, bucketT>::WriteRandomPoints(size_t device)
 	return WritePoints(device, vec);
 }
 #endif
+
+/// <summary>
+/// Set the percentage of a sub batch that should be executed in each thread per kernel call.
+/// </summary>
+/// <param name="f">The percentage as a value from 0.01 to 1.0</param>
+template <typename T, typename bucketT>
+void RendererCL<T, bucketT>::SubBatchPercentPerThread(float f)
+{
+	m_SubBatchPercentPerThread = Clamp(f, 0.01f, 1.0f);
+}
+
+/// <summary>
+/// Get the percentage of a sub batch that should be executed in each thread per kernel call.
+/// </summary>
+/// <returns>The percentage as a value from 0.01 to 1.0</returns>
+template <typename T, typename bucketT>
+float RendererCL<T, bucketT>::SubBatchPercentPerThread() const
+{
+	return m_SubBatchPercentPerThread;
+}
 
 /// <summary>
 /// Get the kernel string for the last built iter program.
@@ -660,7 +681,7 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 
 		if (b && !(b = device->m_Wrapper.AddBuffer(m_XformsBufferName, SizeOf(m_XformsCL))))						 { ErrorStr(loc, "Failed to set xforms buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_ParVarsBufferName, 128 * sizeof(T))))                           { ErrorStr(loc, "Failed to set parametric variations buffer", device.get()); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_ParVarsBufferName, 128 * sizeof(T))))                           { ErrorStr(loc, "Failed to set parametric variations buffer", device.get()); break; }//Will be resized with the needed amount later.
 
 		if (b && !(b = device->m_Wrapper.AddBuffer(m_DistBufferName, CHOOSE_XFORM_GRAIN)))                           { ErrorStr(loc, "Failed to set xforms distribution buffer", device.get()); break; }//Will be resized for xaos.
 
@@ -967,6 +988,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	vector<std::thread> threadVec;
 	std::atomic<size_t> atomLaunchesRan;
 	std::atomic<intmax_t> atomItersRan, atomItersRemaining;
+	m_IterCountPerKernel = size_t(m_SubBatchPercentPerThread * m_Ember.m_SubBatchSize);
 	size_t adjustedIterCountPerKernel = m_IterCountPerKernel;
 	itersRan = 0;
 	atomItersRan.store(0);
@@ -994,6 +1016,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 		bool b = true;
 		auto& wrapper = m_Devices[dev]->m_Wrapper;
 		intmax_t itersRemaining = 0;
+		//Timing looptimer;
 
 		while (b && (atomLaunchesRan.fetch_add(1) + 1 <= launches) && ((itersRemaining = atomItersRemaining.load()) > 0) && success && !m_Abort)
 		{
@@ -1001,6 +1024,7 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			while (Paused())
 				std::this_thread::sleep_for(500ms);
 
+			//looptimer.Tic();
 			cl_uint argIndex = 0;
 #ifdef TEST_CL
 			uint fuse = 0;
@@ -1084,6 +1108,8 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 					m_ProgressTimer.Tic();
 				}
 			}
+
+			//cout << "CL kernel call " << atomLaunchesRan << " took: " << looptimer.Toc() << endl;
 		}
 	};
 
@@ -1747,19 +1773,20 @@ template <typename T, typename bucketT>
 void RendererCL<T, bucketT>::ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, vector<XformCL<T>>& xformsCL)
 {
 	memset(&emberCL, 0, sizeof(EmberCL<T>));//Might not really be needed.
-	emberCL.m_RotA           = m_RotMat.A();
-	emberCL.m_RotB           = m_RotMat.B();
-	emberCL.m_RotD           = m_RotMat.D();
-	emberCL.m_RotE           = m_RotMat.E();
-	emberCL.m_CamMat		 = ember.m_CamMat;
-	emberCL.m_CenterX        = CenterX();
-	emberCL.m_CenterY		 = ember.m_RotCenterY;
+	emberCL.m_RandPointRange = ember.m_RandPointRange;
 	emberCL.m_CamZPos		 = ember.m_CamZPos;
 	emberCL.m_CamPerspective = ember.m_CamPerspective;
 	emberCL.m_CamYaw		 = ember.m_CamYaw;
 	emberCL.m_CamPitch		 = ember.m_CamPitch;
 	emberCL.m_CamDepthBlur	 = ember.m_CamDepthBlur;
 	emberCL.m_BlurCoef		 = ember.BlurCoef();
+	emberCL.m_CamMat		 = ember.m_CamMat;
+	emberCL.m_CenterX        = CenterX();
+	emberCL.m_CenterY		 = ember.m_RotCenterY;
+	emberCL.m_RotA           = m_RotMat.A();
+	emberCL.m_RotB           = m_RotMat.B();
+	emberCL.m_RotD           = m_RotMat.D();
+	emberCL.m_RotE           = m_RotMat.E();
 
 	for (size_t i = 0; i < ember.TotalXformCount() && i < xformsCL.size(); i++)
 	{

@@ -196,6 +196,7 @@ static const char* XformCLStructString =
 template <typename T>
 struct ALIGN EmberCL
 {
+	T m_RandPointRange;
 	T m_CamZPos;
 	T m_CamPerspective;
 	T m_CamYaw;
@@ -213,6 +214,7 @@ struct ALIGN EmberCL
 static const char* EmberCLStructString =
 	"typedef struct __attribute__ " ALIGN_CL " _EmberCL\n"
 	"{\n"
+	"	real_t m_RandPointRange;\n"
 	"	real_t m_CamZPos;\n"
 	"	real_t m_CamPerspective;\n"
 	"	real_t m_CamYaw;\n"

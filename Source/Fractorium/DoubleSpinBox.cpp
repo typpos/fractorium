@@ -184,6 +184,8 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 		{
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
 			StartTimer();
+			e->accept();
+			return true;
 		}
 		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseButtonRelease &&
@@ -191,12 +193,16 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 		{
 			StopTimer();
 			m_MouseDownPoint = m_MouseMovePoint = me->pos();
+			e->accept();
+			return true;
 		}
 		else if (!m_Settings->ToggleType() &&
 				 me->type() == QMouseEvent::MouseMove &&
 				 QGuiApplication::mouseButtons() & Qt::RightButton)
 		{
 			m_MouseMovePoint = me->pos();
+			e->accept();
+			return true;
 		}
 		else if (m_DoubleClick &&
 				 ((!m_Settings->ToggleType() && e->type() == QMouseEvent::MouseButtonDblClick && me->button() == Qt::LeftButton) ||
@@ -207,6 +213,7 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 			else
 				setValue(m_DoubleClickNonZero);
 
+			e->accept();
 			return true;
 		}
 	}
@@ -246,11 +253,13 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 					}
 				}
 
+				e->accept();
 				return true;
 			}
 		}
 		else if (dynamic_cast<QKeyEvent*>(e))
 		{
+			e->accept();
 			return true;
 		}
 	}
@@ -376,6 +385,31 @@ void DoubleSpinBox::StopTimer()
 SpecialDoubleSpinBox::SpecialDoubleSpinBox(QWidget* p, int h, double step)
 	: DoubleSpinBox(p, h, step)
 {
+}
+
+/// <summary>
+/// Called when focus enters the spinner.
+/// When leaving the spinner, the context menu was disabled so it doesn't pop up on
+/// distant loctions on the screen when dragging with the right mouse button then releasing.
+/// So re-enable it here just to ensure whenever they focus this control, the menu works.
+/// </summary>
+/// <param name="e">The event</param>
+void SpecialDoubleSpinBox::enterEvent(QEvent* e)
+{
+	this->setContextMenuPolicy(Qt::ActionsContextMenu);
+	DoubleSpinBox::enterEvent(e);
+}
+
+/// <summary>
+/// Called when focus leaves the spinner.
+/// When leaving the spinner, disable the context menu so it doesn't pop up on distant loctions on the screen
+/// when dragging with the right mouse button then releasing.
+/// </summary>
+/// <param name="e">The event</param>
+void SpecialDoubleSpinBox::leaveEvent(QEvent* e)
+{
+	this->setContextMenuPolicy(Qt::PreventContextMenu);
+	DoubleSpinBox::leaveEvent(e);
 }
 
 /// <summary>

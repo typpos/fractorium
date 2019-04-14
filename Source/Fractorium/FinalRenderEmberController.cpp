@@ -368,6 +368,7 @@ template <typename T> void FinalRenderEmberController<T>::CopyEmberFile(EmberFil
 /// Resets the rendering process.
 /// </summary>
 /// <param name="index">The index in the file from which to retrieve the ember</param>
+/// <param name="verbatim">Unused</param>
 template <typename T>
 void FinalRenderEmberController<T>::SetEmber(size_t index, bool verbatim)
 {
@@ -420,6 +421,7 @@ bool FinalRenderEmberController<T>::Render()
 /// </summary>
 /// <param name="renderType">The type of render to create</param>
 /// <param name="devices">The platform,device index pairs of the devices to use</param>
+/// <param name="updatePreviews">Unused</param>
 /// <param name="shared">True if shared with OpenGL, else false. Always false in this case.</param>
 /// <returns>True if nothing went wrong, else false.</returns>
 template <typename T>
@@ -477,7 +479,7 @@ bool FinalRenderEmberController<T>::CreateRenderer(eRendererType renderType, con
 /// Note this is only called on the primary renderer.
 /// </summary>
 /// <param name="ember">The ember currently being rendered</param>
-/// <param name="foo">An extra dummy parameter</param>
+/// <param name="foo">An extra dummy parameter, unused.</param>
 /// <param name="fraction">The progress fraction from 0-100</param>
 /// <param name="stage">The stage of iteration. 1 is iterating, 2 is density filtering, 2 is final accumulation.</param>
 /// <param name="etaMs">The estimated milliseconds to completion of the current stage</param>
@@ -527,17 +529,19 @@ void FinalRenderEmberController<T>::SyncCurrentToGui()
 /// </summary>
 /// <param name="widthOverride">Width override to use instead of scaling the original width</param>
 /// <param name="heightOverride">Height override to use instead of scaling the original height</param>
+/// <param name="dowidth">Whether to apply width adjustment to the ember</param>
+/// <param name="doheight">Whether to apply height adjustment to the ember</param>
 template <typename T>
-void FinalRenderEmberController<T>::SyncGuiToEmbers(size_t widthOverride, size_t heightOverride)
+void FinalRenderEmberController<T>::SyncGuiToEmbers(size_t widthOverride, size_t heightOverride, bool dowidth, bool doheight)
 {
 	if (m_FinalRenderDialog->ApplyToAll())
 	{
 		for (auto& ember : m_EmberFile.m_Embers)
-			SyncGuiToEmber(ember, widthOverride, heightOverride);
+			SyncGuiToEmber(ember, widthOverride, heightOverride, dowidth, doheight);
 	}
 	else
 	{
-		SyncGuiToEmber(*m_Ember, widthOverride, heightOverride);
+		SyncGuiToEmber(*m_Ember, widthOverride, heightOverride, dowidth, doheight);
 	}
 }
 
@@ -556,6 +560,9 @@ bool FinalRenderEmberController<T>::SyncGuiToRenderer()
 		m_Renderer->YAxisUp(m_FinalRenderDialog->YAxisUp());
 		m_Renderer->ThreadCount(m_FinalRenderDialog->ThreadCount());
 		m_Renderer->Priority((eThreadPriority)m_FinalRenderDialog->ThreadPriority());
+
+		if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get()))
+			rendererCL->SubBatchPercentPerThread(m_FinalRenderDialog->OpenCLSubBatchPct());
 	}
 	else if (!m_Renderers.empty())
 	{
@@ -566,6 +573,9 @@ bool FinalRenderEmberController<T>::SyncGuiToRenderer()
 			m_Renderers[i]->YAxisUp(m_FinalRenderDialog->YAxisUp());
 			m_Renderers[i]->ThreadCount(m_FinalRenderDialog->ThreadCount());
 			m_Renderers[i]->Priority((eThreadPriority)m_FinalRenderDialog->ThreadPriority());
+
+			if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderers[i].get()))
+				rendererCL->SubBatchPercentPerThread(m_FinalRenderDialog->OpenCLSubBatchPct());
 		}
 	}
 	else
@@ -583,19 +593,27 @@ bool FinalRenderEmberController<T>::SyncGuiToRenderer()
 /// </summary>
 /// <param name="scale">Whether to update the scale values</param>
 /// <param name="size">Whether to update the size suffix text</param>
+/// <param name="dowidth">Whether to apply width value to the width scale spinner</param>
+/// <param name="doheight">Whether to apply height value to the height scale spinner</param>
 template <typename T>
-void FinalRenderEmberController<T>::SyncCurrentToSizeSpinners(bool scale, bool size)
+void FinalRenderEmberController<T>::SyncCurrentToSizeSpinners(bool scale, bool size, bool doWidth, bool doHeight)
 {
 	if (scale)
 	{
-		m_FinalRenderDialog->m_WidthScaleSpin->SetValueStealth(double(m_Ember->m_FinalRasW) / m_Ember->m_OrigFinalRasW);//Work backward to determine the scale.
-		m_FinalRenderDialog->m_HeightScaleSpin->SetValueStealth(double(m_Ember->m_FinalRasH) / m_Ember->m_OrigFinalRasH);
+		if (doWidth)
+			m_FinalRenderDialog->m_WidthScaleSpin->SetValueStealth(double(m_Ember->m_FinalRasW) / m_Ember->m_OrigFinalRasW);//Work backward to determine the scale.
+
+		if (doHeight)
+			m_FinalRenderDialog->m_HeightScaleSpin->SetValueStealth(double(m_Ember->m_FinalRasH) / m_Ember->m_OrigFinalRasH);
 	}
 
 	if (size)
 	{
-		m_FinalRenderDialog->m_WidthScaleSpin->setSuffix(" (" + ToString<qulonglong>(m_Ember->m_FinalRasW) + ")");
-		m_FinalRenderDialog->m_HeightScaleSpin->setSuffix(" (" + ToString<qulonglong>(m_Ember->m_FinalRasH) + ")");
+		if (doWidth)
+			m_FinalRenderDialog->m_WidthSpinnerWidget->m_SpinBox->SetValueStealth(m_Ember->m_FinalRasW);
+
+		if (doHeight)
+			m_FinalRenderDialog->m_HeightSpinnerWidget->m_SpinBox->SetValueStealth(m_Ember->m_FinalRasH);
 	}
 }
 
@@ -800,7 +818,7 @@ void FinalRenderEmberController<T>::HandleFinishedProgress()
 /// </summary>
 /// <param name="ember">The ember currently being rendered</param>
 /// <param name="stats">The renderer stats</param>
-/// <param name="pixels">The timer which was started at the beginning of the render</param>
+/// <param name="renderTimer">The timer which was started at the beginning of the render</param>
 template<typename T>
 void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberStats& stats, Timing& renderTimer)
 {
@@ -845,6 +863,7 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 		m_Settings->FinalExt(m_GuiState.m_Ext);
 		m_Settings->FinalThreadCount(m_GuiState.m_ThreadCount);
 		m_Settings->FinalThreadPriority(m_GuiState.m_ThreadPriority);
+		m_Settings->FinalOpenCLSubBatchPct(m_GuiState.m_SubBatchPct);
 		m_Settings->FinalQuality(m_GuiState.m_Quality);
 		m_Settings->FinalTemporalSamples(m_GuiState.m_TemporalSamples);
 		m_Settings->FinalSupersample(m_GuiState.m_Supersample);
@@ -860,8 +879,10 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 /// <param name="ember">The ember whose values will be modified</param>
 /// <param name="widthOverride">Width override to use instead of scaling the original width</param>
 /// <param name="heightOverride">Height override to use instead of scaling the original height</param>
+/// <param name="dowidth">Whether to use the computed/overridden width value, or use the existing value in the ember</param>
+/// <param name="doheight">Whether to use the computed/overridden height value, or use the existing value in the ember</param>
 template <typename T>
-void FinalRenderEmberController<T>::SyncGuiToEmber(Ember<T>& ember, size_t widthOverride, size_t heightOverride)
+void FinalRenderEmberController<T>::SyncGuiToEmber(Ember<T>& ember, size_t widthOverride, size_t heightOverride, bool dowidth, bool doheight)
 {
 	size_t w;
 	size_t h;
@@ -879,8 +900,8 @@ void FinalRenderEmberController<T>::SyncGuiToEmber(Ember<T>& ember, size_t width
 		h = ember.m_OrigFinalRasH * hScale;
 	}
 
-	w = std::max<size_t>(w, 10);
-	h = std::max<size_t>(h, 10);
+	w = dowidth ? std::max<size_t>(w, 10) : ember.m_FinalRasW;
+	h = doheight ? std::max<size_t>(h, 10) : ember.m_FinalRasH;
 	ember.SetSizeAndAdjustScale(w, h, false, m_FinalRenderDialog->Scale());
 	ember.m_Quality = m_FinalRenderDialog->m_QualitySpin->value();
 	ember.m_Supersample = m_FinalRenderDialog->m_SupersampleSpin->value();
@@ -973,7 +994,7 @@ QString FinalRenderEmberController<T>::CheckMemory(const tuple<size_t, size_t, s
 	}
 
 	if (!s.isEmpty())
-		s += "Rendering will most likely fail.";
+		s += "Rendering will most likely fail.\n\nMake strips > 1 to fix this. Strips must divide into the height evenly, and will also scale the number of iterations performed.";
 
 	return s;
 }

@@ -2,6 +2,9 @@
 
 #include "Utils.h"
 #include "Isaac.h"
+#include "Curves.h"
+
+#define CURVE_POINTS 5
 
 /// <summary>
 /// Curves class.
@@ -10,8 +13,9 @@
 namespace EmberNs
 {
 /// <summary>
-/// The Bezier curves used to adjust the colors during final accumulation.
-/// This functionality was gotten directly from Apophysis.
+/// The b-spline curves used to adjust the colors during final accumulation.
+/// This functionality was gotten inferred from Chaotica.
+/// Note this is now incompatible with Apophysis, which uses Bezier curves instead.
 /// </summary>
 template <typename T>
 class EMBER_API Curves
@@ -69,14 +73,23 @@ public:
 	template <typename U>
 	Curves<T>& operator = (const Curves<U>& curves)
 	{
-		for (size_t i = 0; i < 4; i++)
+		int i = 0;
+
+		for (auto& pp : curves.m_Points)
 		{
-			m_Points[i][0].x = T(curves.m_Points[i][0].x); m_Points[i][0].y = T(curves.m_Points[i][0].y); m_Weights[i].x = T(curves.m_Weights[i].x);
-			m_Points[i][1].x = T(curves.m_Points[i][1].x); m_Points[i][1].y = T(curves.m_Points[i][1].y); m_Weights[i].y = T(curves.m_Weights[i].y);
-			m_Points[i][2].x = T(curves.m_Points[i][2].x); m_Points[i][2].y = T(curves.m_Points[i][2].y); m_Weights[i].z = T(curves.m_Weights[i].z);
-			m_Points[i][3].x = T(curves.m_Points[i][3].x); m_Points[i][3].y = T(curves.m_Points[i][3].y); m_Weights[i].w = T(curves.m_Weights[i].w);
+			int j = 0;
+			m_Points[i].clear();
+
+			for (auto& p : pp)
+			{
+				m_Points[i].push_back(p);
+				j++;
+			}
+
+			i++;
 		}
 
+		i = 0;
 		return *this;
 	}
 
@@ -88,13 +101,23 @@ public:
 	template <typename U>
 	Curves<T>& operator += (const Curves<U>& curves)
 	{
-		for (size_t i = 0; i < 4; i++)
+		int i = 0;
+
+		for (auto& pp : m_Points)
 		{
-			m_Points[i][0] += curves.m_Points[i][0];
-			m_Points[i][1] += curves.m_Points[i][1];
-			m_Points[i][2] += curves.m_Points[i][2];
-			m_Points[i][3] += curves.m_Points[i][3];
-			m_Weights[i]   += curves.m_Weights[i];
+			int j = 0;
+
+			for (auto& p : pp)
+			{
+				if (j < curves.m_Points[i].size())
+					p += curves.m_Points[i][j];
+				else
+					break;
+
+				j++;
+			}
+
+			i++;
 		}
 
 		return *this;
@@ -108,13 +131,23 @@ public:
 	template <typename U>
 	Curves<T>& operator *= (const Curves<U>& curves)
 	{
-		for (size_t i = 0; i < 4; i++)
+		int i = 0;
+
+		for (auto& pp : m_Points)
 		{
-			m_Points[i][0] *= curves.m_Points[i][0];
-			m_Points[i][1] *= curves.m_Points[i][1];
-			m_Points[i][2] *= curves.m_Points[i][2];
-			m_Points[i][3] *= curves.m_Points[i][3];
-			m_Weights[i]   *= curves.m_Weights[i];
+			int j = 0;
+
+			for (auto& p : pp)
+			{
+				if (j < curves.m_Points[i].size())
+					p *= curves.m_Points[i][j];
+				else
+					break;
+
+				j++;
+			}
+
+			i++;
 		}
 
 		return *this;
@@ -128,14 +161,9 @@ public:
 	template <typename U>
 	Curves<T>& operator *= (const U& t)
 	{
-		for (size_t i = 0; i < 4; i++)
-		{
-			m_Points[i][0] *= T(t);
-			m_Points[i][1] *= T(t);
-			m_Points[i][2] *= T(t);
-			m_Points[i][3] *= T(t);
-			m_Weights[i]   *= T(t);
-		}
+		for (auto& pp : m_Points)
+			for (auto& p : pp)
+				p *= T(t);
 
 		return *this;
 	}
@@ -147,11 +175,12 @@ public:
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
-			m_Points[i][0] = v2T(0);//0,0 -> 0,0 -> 1,1 -> 1,1.
-			m_Points[i][1] = v2T(0);
-			m_Points[i][2] = v2T(1);
-			m_Points[i][3] = v2T(1);
-			m_Weights[i] = v4T(1);
+			m_Points[i].resize(5);
+			m_Points[i][0] = v2T(0);
+			m_Points[i][1] = v2T(T(0.25));
+			m_Points[i][2] = v2T(T(0.50));
+			m_Points[i][3] = v2T(T(0.75));
+			m_Points[i][4] = v2T(1);
 		}
 	}
 
@@ -162,11 +191,12 @@ public:
 	{
 		if (i < 4)
 		{
-			m_Points[i][0] = v2T(0);//0,0 -> 0,0 -> 1,1 -> 1,1.
-			m_Points[i][1] = v2T(0);
-			m_Points[i][2] = v2T(1);
-			m_Points[i][3] = v2T(1);
-			m_Weights[i] = v4T(1);
+			m_Points[i].resize(5);
+			m_Points[i][0] = v2T(0);
+			m_Points[i][1] = v2T(T(0.25));
+			m_Points[i][2] = v2T(T(0.50));
+			m_Points[i][3] = v2T(T(0.75));
+			m_Points[i][4] = v2T(1);
 		}
 	}
 
@@ -175,8 +205,8 @@ public:
 	/// </summary>
 	void Clear()
 	{
-		memset(&m_Points, 0, sizeof(m_Points));
-		memset(&m_Weights, 0, sizeof(m_Weights));
+		for (auto& p : m_Points)
+			p.clear();
 	}
 
 	/// <summary>
@@ -189,10 +219,18 @@ public:
 
 		for (size_t i = 0; i < 4; i++)
 		{
+			if (m_Points[i].size() != CURVE_POINTS)
+			{
+				set = true;
+				break;
+			}
+
 			if ((m_Points[i][0] != v2T(0)) ||
-					(m_Points[i][1] != v2T(0)) ||
-					(m_Points[i][2] != v2T(1)) ||
-					(m_Points[i][3] != v2T(1)))
+					(m_Points[i][1] != v2T(T(0.25))) ||
+					(m_Points[i][2] != v2T(T(0.50))) ||
+					(m_Points[i][3] != v2T(T(0.75))) ||
+					(m_Points[i][4] != v2T(1))
+			   )
 			{
 				set = true;
 				break;
@@ -202,52 +240,9 @@ public:
 		return set;
 	}
 
-	/// <summary>
-	/// Wrapper around calling BezierSolve() on each of the 4 weight and point vectors.
-	/// </summary>
-	/// <param name="t">The position to apply</param>
-	/// <returns>vec4<T> that contains the y component of the solution for each vector in each component</returns>
-	v4T BezierFunc(const T& t)
-	{
-		v4T result;
-		v2T solution(0, 0);
-		BezierSolve(t, m_Points[0], &m_Weights[0], solution); result.x = solution.y;
-		BezierSolve(t, m_Points[1], &m_Weights[1], solution); result.y = solution.y;
-		BezierSolve(t, m_Points[2], &m_Weights[2], solution); result.z = solution.y;
-		BezierSolve(t, m_Points[3], &m_Weights[3], solution); result.w = solution.y;
-		return result;
-	}
-
-private:
-	/// <summary>
-	/// Solve the given point and weight vectors for the given position and store
-	/// the output in the solution vec2 passed in.
-	/// </summary>
-	/// <param name="t">The position to apply</param>
-	/// <param name="src">A pointer to an array of 4 vec2</param>
-	/// <param name="w">A pointer to an array of 4 weights</param>
-	/// <param name="solution">The vec2 to store the solution in</param>
-	void BezierSolve(const T& t, v2T* src, v4T* w, v2T& solution)
-	{
-		T s = 1 - t;
-		T s2 = s * s;
-		T s3 = s * s * s;
-		T t2 = t * t;
-		T t3 = t * t * t;
-		T nom_x = (w->x * s3 * src->x) + (w->y * s2 * 3 * t * src[1].x) + (w->z * s * 3 * t2 * src[2].x) + (w->w * t3 * src[3].x);
-		T nom_y = (w->x * s3 * src->y) + (w->y * s2 * 3 * t * src[1].y) + (w->z * s * 3 * t2 * src[2].y) + (w->w * t3 * src[3].y);
-		T denom = (w->x * s3) + (w->y * s2 * 3 * t) + (w->z * s * 3 * t2) + (w->w * t3);
-
-		if (std::isnan(nom_x) || std::isnan(nom_y) || std::isnan(denom) || denom == 0)
-			return;
-
-		solution.x = nom_x / denom;
-		solution.y = nom_y / denom;
-	}
 
 public:
-	v2T m_Points[4][4];
-	v4T m_Weights[4];
+	std::array<std::vector<v2T>, 4> m_Points;
 };
 
 //Must declare this outside of the class to provide for both orders of parameters.
@@ -264,14 +259,9 @@ Curves<T> operator * (const Curves<T>& curves, const U& t)
 	T tt = T(t);
 	Curves<T> c(curves);
 
-	for (size_t i = 0; i < 4; i++)
-	{
-		c.m_Points[i][0] *= tt;
-		c.m_Points[i][1] *= tt;
-		c.m_Points[i][2] *= tt;
-		c.m_Points[i][3] *= tt;
-		c.m_Weights[i] *= tt;
-	}
+	for (auto& pp : c.m_Points)
+		for (auto& p : pp)
+			p *= tt;
 
 	return c;
 }

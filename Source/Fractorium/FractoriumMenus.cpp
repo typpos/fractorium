@@ -60,7 +60,7 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 	m_EmberFile.Clear();
 	m_EmberFile.m_Filename = EmberFile<T>::DefaultFilename();
 	vector<eVariationId> filteredVariations;
-	vector<eVariationId>& filteredVariationsRef = m_FilteredVariations;
+	vector<eVariationId>* filteredVariationsRef = &m_FilteredVariations;
 	auto& deviceNames = OpenCLInfo::Instance()->AllDeviceNames();
 
 	for (auto& dev : deviceNames)
@@ -70,15 +70,18 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 	if (nv)//Nvidia cannot handle synth. It takes over a minute to compile and uses about 4GB of memory.
 	{
 		filteredVariations = m_FilteredVariations;
-		filteredVariationsRef = filteredVariations;
-		std::remove(filteredVariations.begin(), filteredVariations.end(), eVariationId::VAR_SYNTH);
-		std::remove(filteredVariations.begin(), filteredVariations.end(), eVariationId::VAR_PRE_SYNTH);
-		std::remove(filteredVariations.begin(), filteredVariations.end(), eVariationId::VAR_POST_SYNTH);
+		filteredVariations.erase(std::remove_if(filteredVariations.begin(), filteredVariations.end(),
+												[&](const eVariationId & id) -> bool
+		{
+			return id == eVariationId::VAR_SYNTH || id == eVariationId::VAR_PRE_SYNTH || id == eVariationId::VAR_POST_SYNTH;
+		}
+											   ), filteredVariations.end());
+		filteredVariationsRef = &filteredVariations;
 	}
 
 	for (size_t i = 0; i < count; i++)
 	{
-		m_SheepTools->Random(ember, filteredVariationsRef, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, 8);
+		m_SheepTools->Random(ember, *filteredVariationsRef, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, 8);
 		ParamsToEmber(ember);
 		ember.m_Index = i;
 		ember.m_Name = m_EmberFile.m_Filename.toStdString() + "_" + ToString(i + 1ULL).toStdString();
@@ -892,7 +895,9 @@ void FractoriumEmberController<T>::ClearFlame()
 			}
 		}
 
+		m_Ember.m_Curves.Init();
 		FillXforms();
+		FillCurvesControl();
 	});
 }
 

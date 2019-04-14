@@ -7,6 +7,7 @@
 #include "Interpolate.h"
 #include "CarToRas.h"
 #include "EmberToXml.h"
+#include "Spline.h"
 
 /// <summary>
 /// Renderer.
@@ -157,6 +158,7 @@ private:
 	void VectorizedLogScale(size_t row, size_t rowEnd);
 
 protected:
+//public:
 	T m_Scale;
 	T m_PixelsPerUnitX;
 	T m_PixelsPerUnitY;

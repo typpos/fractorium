@@ -115,6 +115,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Source\Ember\Affine2D.h" />
     <ClInclude Include="..\..\..\Source\Ember\CarToRas.h" />
+    <ClInclude Include="..\..\..\Source\Ember\Spline.h" />
     <ClInclude Include="..\..\..\Source\Ember\Curves.h" />
     <ClInclude Include="..\..\..\Source\Ember\EmberDefines.h" />
     <ClInclude Include="..\..\..\Source\Ember\EmberMotion.h" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\Ember\Affine2D.cpp" />
+    <ClCompile Include="..\..\..\Source\Ember\Spline.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\DllMain.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\Ember.cpp" />
     <ClCompile Include="..\..\..\Source\Ember\EmberPch.cpp">

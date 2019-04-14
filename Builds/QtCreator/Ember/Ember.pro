@@ -43,6 +43,7 @@ SOURCES += \
     $$PRJ_SRC_DIR/RendererBase.cpp \
     $$PRJ_SRC_DIR/Renderer.cpp \
     $$PRJ_SRC_DIR/VariationList.cpp \
+    $$PRJ_SRC_DIR/Spline.cpp \
     $$PRJ_SRC_DIR/XmlToEmber.cpp
 
 include(deployment.pri)
@@ -51,6 +52,7 @@ qtcAddDeployment()
 HEADERS += \
     $$PRJ_SRC_DIR/Affine2D.h \
     $$PRJ_SRC_DIR/CarToRas.h \
+    $$PRJ_SRC_DIR/Spline.h \
     $$PRJ_SRC_DIR/Curves.h \
     $$PRJ_SRC_DIR/DensityFilter.h \
     $$PRJ_SRC_DIR/EmberDefines.h \

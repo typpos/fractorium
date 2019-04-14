@@ -143,10 +143,12 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 	os << " temporal_samples=\"" << ember.m_TemporalSamples << "\"";
 	os << " sub_batch_size=\"" << ember.m_SubBatchSize << "\"";
 	os << " fuse=\"" << ember.m_FuseCount << "\"";
+	os << " rand_range=\"" << ember.m_RandPointRange << "\"";
 	os << " background=\"" << ember.m_Background.r << " " << ember.m_Background.g << " " << ember.m_Background.b << "\"";
 	os << " brightness=\"" << ember.m_Brightness << "\"";
 	os << " gamma=\"" << ember.m_Gamma << "\"";
 	os << " highlight_power=\"" << ember.m_HighlightPower << "\"";
+	os << " logscale_k2=\"" << ember.m_K2 << "\"";
 	os << " vibrancy=\"" << ember.m_Vibrancy << "\"";
 	os << " estimator_radius=\"" << ember.m_MaxRadDE << "\"";
 	os << " estimator_minimum=\"" << ember.m_MinRadDE << "\"";
@@ -200,8 +202,40 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 		{
 			os << ember.m_Curves.m_Points[ci][cj].x << " ";
 			os << ember.m_Curves.m_Points[ci][cj].y << " ";
-			os << ember.m_Curves.m_Weights[ci][cj] << " ";
+			os << "1 ";
 		}
+	}
+
+	os << "\" overall_curve=\"";
+
+	for (glm::length_t cj = 0; cj < ember.m_Curves.m_Points[0].size(); cj++)
+	{
+		os << ember.m_Curves.m_Points[0][cj].x << " ";
+		os << ember.m_Curves.m_Points[0][cj].y << " ";
+	}
+
+	os << "\" red_curve=\"";
+
+	for (glm::length_t cj = 0; cj < ember.m_Curves.m_Points[1].size(); cj++)
+	{
+		os << ember.m_Curves.m_Points[1][cj].x << " ";
+		os << ember.m_Curves.m_Points[1][cj].y << " ";
+	}
+
+	os << "\" green_curve=\"";
+
+	for (glm::length_t cj = 0; cj < ember.m_Curves.m_Points[2].size(); cj++)
+	{
+		os << ember.m_Curves.m_Points[2][cj].x << " ";
+		os << ember.m_Curves.m_Points[2][cj].y << " ";
+	}
+
+	os << "\" blue_curve=\"";
+
+	for (glm::length_t cj = 0; cj < ember.m_Curves.m_Points[3].size(); cj++)
+	{
+		os << ember.m_Curves.m_Points[3][cj].x << " ";
+		os << ember.m_Curves.m_Points[3][cj].y << " ";
 	}
 
 	os << "\">\n";
@@ -811,6 +845,14 @@ string EmberToXml<T>::ToString(const EmberMotion<T>& motion)
 
 			case eEmberMotionParam::FLAME_MOTION_HIGHLIGHT_POWER:
 				os << " highlight_power=\"" << motion.m_MotionParams[i].second << "\"";
+				break;
+
+			case eEmberMotionParam::FLAME_MOTION_K2:
+				os << " logscale_k2=\"" << motion.m_MotionParams[i].second << "\"";
+				break;
+
+			case eEmberMotionParam::FLAME_MOTION_RAND_RANGE:
+				os << " rand_range=\"" << motion.m_MotionParams[i].second << "\"";
 				break;
 
 			case eEmberMotionParam::FLAME_MOTION_BACKGROUND_R:

@@ -24,7 +24,6 @@ void Fractorium::InitXformsUI()
 	m_XformWeightSpinnerButtonWidget = new SpinnerLabelButtonWidget(m_XformWeightSpin, "=", 20, 19, ui.XformWeightNameTable);
 	m_XformWeightSpinnerButtonWidget->m_SpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	m_XformWeightSpinnerButtonWidget->m_Label->setStyleSheet("border: 0px;");
-	m_XformWeightSpinnerButtonWidget->m_Label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_XformWeightSpinnerButtonWidget->m_Label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	m_XformWeightSpinnerButtonWidget->m_Button->setToolTip("Equalize weights");
 	m_XformWeightSpinnerButtonWidget->m_Button->setStyleSheet("text-align: center center");
@@ -380,8 +379,11 @@ void FractoriumEmberController<T>::XformWeightChanged(double d)
 		xform->m_Weight = d;
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL);
 	SetNormalizedWeightText(CurrentXform());
+	FillAppliedXaos();
 }
+
 void Fractorium::OnXformWeightChanged(double d) { m_Controller->XformWeightChanged(d); }
+
 /// <summary>
 /// Equalize the weights of all xforms in the ember.
 /// </summary>
@@ -393,8 +395,11 @@ void FractoriumEmberController<T>::EqualizeWeights()
 		m_Ember.EqualizeWeights();
 		m_Fractorium->m_XformWeightSpin->setValue(xform->m_Weight);//Will trigger an update, so pass false to updateRender below.
 	}, eXformUpdate::UPDATE_CURRENT, false);
+	FillAppliedXaos();
 }
+
 void Fractorium::OnEqualWeightButtonClicked(bool checked) { m_Controller->EqualizeWeights(); }
+
 /// <summary>
 /// Set the name of the current xform.
 /// Update the corresponding xform checkbox text with the name.

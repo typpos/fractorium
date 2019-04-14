@@ -20,6 +20,16 @@ FunctionMapper::FunctionMapper()
 			"{\n"
 			"	return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);\n"
 			"}\n";
+		s_GlobalMap["Fract"] =
+			"inline real_t Fract(real_t x)\n"
+			"{\n"
+			"	return x - floor(x);\n"
+			"}\n";
+		s_GlobalMap["HashShadertoy"] =
+			"inline real_t HashShadertoy(real_t x, real_t y, real_t seed)\n"
+			"{\n"
+			"	return Fract(sin(fma(x, 12.9898, fma(y, 78.233, seed))) * 43758.5453);\n"
+			"}\n";
 		s_GlobalMap["Sign"] =
 			"inline real_t Sign(real_t v)\n"
 			"{\n"
@@ -124,6 +134,59 @@ FunctionMapper::FunctionMapper()
 			"	real_t tmp = *val1;\n"
 			"	*val1 = *val2;\n"
 			"	*val2 = tmp;\n"
+			"}\n";
+		s_GlobalMap["Modulate"] =
+			"inline real_t Modulate(real_t amp, real_t freq, real_t x)\n"
+			"{\n"
+			"	return amp * cos(x * freq * M_2PI);\n"
+			"}\n";
+		s_GlobalMap["RealDivComplex"] =
+			"inline real2 RealDivComplex(real_t x, real2 a)\n"
+			"{\n"
+			"	real_t s = x / Zeps(fma(a.x, a.x, a.y * a.y));\n"
+			"	return (real2)(a.x * s, -a.y * s);\n"
+			"}\n";
+		s_GlobalMap["ComplexDivComplex"] =
+			"inline real2 ComplexDivComplex(real2 a, real2 b)\n"
+			"{\n"
+			"	real_t s = 1.0 / Zeps(fma(b.x, b.x, b.y * b.y));\n"
+			"	return (real2)(fma(a.x, b.x, a.y * b.y), fma(a.y, b.x, -(a.x * b.y))) * s;\n"
+			"}\n";
+		s_GlobalMap["ComplexMultReal"] =
+			"inline real2 ComplexMultReal(real2 a, real_t x)\n"
+			"{\n"
+			"	return (real2)(a.x * x, a.y * x);\n"
+			"}\n";
+		s_GlobalMap["ComplexMultComplex"] =
+			"inline real2 ComplexMultComplex(real2 a, real2 b)\n"
+			"{\n"
+			"	return (real2)(fma(a.x, b.x, -(a.y * b.y)), fma(a.x, b.y, a.y * b.x));\n"
+			"}\n";
+		s_GlobalMap["ComplexPlusReal"] =
+			"inline real2 ComplexPlusReal(real2 a, real_t x)\n"
+			"{\n"
+			"	return (real2)(a.x + x, a.y);\n"
+			"}\n";
+		s_GlobalMap["ComplexPlusComplex"] =
+			"inline real2 ComplexPlusComplex(real2 a, real2 b)\n"
+			"{\n"
+			"	return (real2)(a.x + b.x, a.y + b.y);\n"
+			"}\n";
+		s_GlobalMap["ComplexMinusReal"] =
+			"inline real2 ComplexMinusReal(real2 a, real_t x)\n"
+			"{\n"
+			"	return (real2)(a.x - x, a.y);\n"
+			"}\n";
+		s_GlobalMap["ComplexSqrt"] =
+			"inline real2 ComplexSqrt(real2 a)\n"
+			"{\n"
+			"	real_t mag = Hypot(a.x, a.y);\n"
+			"	return ComplexMultReal((real2)(sqrt(mag + a.x), Sign(a.y) * sqrt(mag - a.x)), 0.5 * sqrt(2.0));\n"
+			"}\n";
+		s_GlobalMap["ComplexLog"] =
+			"inline real2 ComplexLog(real2 a)\n"
+			"{\n"
+			"	return (real2)(0.5 * log(fma(a.x, a.x, a.y * a.y)), atan2(a.y, a.x));\n"
 			"}\n";
 		s_GlobalMap["Hash"] =
 			"inline real_t Hash(int a)\n"
@@ -295,6 +358,92 @@ FunctionMapper::FunctionMapper()
 			"	}\n"
 			"\n"
 			"	return n;\n"
+			"}\n";
+		s_GlobalMap["EvalRational"] =
+			"inline real_t EvalRational(__global real_t* num, __global real_t* denom, real_t z_, int count)//This function was taken from boost.org.\n"
+			"{\n"
+			"	real_t z = z_;\n"
+			"	real_t s1, s2;\n"
+			"\n"
+			"	if (z <= 1)\n"
+			"	{\n"
+			"		s1 = num[count - 1];\n"
+			"		s2 = denom[count - 1];\n"
+			"\n"
+			"		for (int i = count - 2; i >= 0; --i)\n"
+			"		{\n"
+			"			s1 *= z;\n"
+			"			s2 *= z;\n"
+			"			s1 += num[i];\n"
+			"			s2 += denom[i];\n"
+			"		}\n"
+			"	}\n"
+			"	else\n"
+			"	{\n"
+			"		z = 1 / z;\n"
+			"		s1 = num[0];\n"
+			"		s2 = denom[0];\n"
+			"\n"
+			"		for (unsigned i = 1; i < count; ++i)\n"
+			"		{\n"
+			"			s1 *= z;\n"
+			"			s2 *= z;\n"
+			"			s1 += num[i];\n"
+			"			s2 += denom[i];\n"
+			"		}\n"
+			"	}\n"
+			"\n"
+			"	return s1 / s2;\n"
+			"}\n";
+		s_GlobalMap["J1"] =
+			"inline real_t J1(real_t x, __global real_t* P1, __global real_t* Q1, __global real_t* P2, __global real_t* Q2, __global real_t* PC, __global real_t* QC, __global real_t* PS, __global real_t* QS)//This function was taken from boost.org.\n"
+			"{\n"
+			"	real_t x1 = 3.8317059702075123156e+00,\n"
+			"		   x2    = 7.0155866698156187535e+00,\n"
+			"		   x11   = 9.810e+02,\n"
+			"		   x12   = -3.2527979248768438556e-04,\n"
+			"		   x21   = 1.7960e+03,\n"
+			"		   x22   = -3.8330184381246462950e-05;\n"
+			"	real_t value, factor, r, rc, rs, w;\n"
+			"	w = fabs(x);\n"
+			"\n"
+			"	if (x == 0)\n"
+			"	{\n"
+			"		return 0.0;\n"
+			"	}\n"
+			"\n"
+			"	if (w <= 4)                       // w in (0, 4]\n"
+			"	{\n"
+			"		real_t y = x * x;\n"
+			"		r = EvalRational(P1, Q1, y, 7);\n"
+			"		factor = w * (w + x1) * ((w - x11 / 256) - x12);\n"
+			"		value = factor * r;\n"
+			"	}\n"
+			"	else if (w <= 8)                  // w in (4, 8]\n"
+			"	{\n"
+			"		real_t y = x * x;\n"
+			"		r = EvalRational(P2, Q2, y, 8);\n"
+			"		factor = w * (w + x2) * ((w - x21 / 256) - x22);\n"
+			"		value = factor * r;\n"
+			"	}\n"
+			"	else                                // w in (8, \infty)\n"
+			"	{\n"
+			"		real_t y = 8 / w;\n"
+			"		real_t y2 = y * y;\n"
+			"		rc = EvalRational(PC, QC, y2, 7);\n"
+			"		rs = EvalRational(PS, QS, y2, 7);\n"
+			"		factor = 1 / (sqrt(w) * 1.772453850905516027);//sqrt pi\n"
+			"		real_t sx = sin(x);\n"
+			"		real_t cx = cos(x);\n"
+			"		value = factor * (rc * (sx - cx) + y * rs * (sx + cx));\n"
+			"	}\n"
+			"\n"
+			"	if (x < 0)\n"
+			"	{\n"
+			"		value *= -1;                 // odd function\n"
+			"	}\n"
+			"\n"
+			"	return value;\n"
 			"}\n";
 		s_GlobalMap["JacobiElliptic"] =
 			"inline void JacobiElliptic(real_t uu, real_t emmc, real_t* sn, real_t* cn, real_t* dn)\n"

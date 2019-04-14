@@ -99,7 +99,7 @@ template <typename T, typename bucketT>
 void Renderer<T, bucketT>::ComputeQuality()
 {
 	m_Scale = std::pow(T(2.0), Zoom());
-	m_ScaledQuality = Quality() * m_Scale * m_Scale;
+	m_ScaledQuality = Quality() * SQR(m_Scale);
 }
 
 /// <summary>
@@ -591,18 +591,23 @@ FilterAndAccum:
 		//Compute k1 and k2.
 		auto fullRun = eRenderStatus::RENDER_OK;//Whether density filtering was run to completion without aborting prematurely or triggering an error.
 		T area = FinalRasW() * FinalRasH() / (m_PixelsPerUnitX * m_PixelsPerUnitY);//Need to use temps from field if ever implemented.
-		m_K1 = bucketT((Brightness() * 268) / 256);
+		m_K1 = Brightness();
 
-		//When doing an interactive render, force output early on in the render process, before all iterations are done.
-		//This presents a problem with the normal calculation of K2 since it relies on the quality value; it will scale the colors
-		//to be very dark. Correct it by pretending the number of iters done is the exact quality desired and then scale according to that.
-		if (forceOutput)
+		if (!m_Ember.m_K2 || forceOutput)
 		{
-			T quality = (T(m_Stats.m_Iters) / T(FinalDimensions())) * (m_Scale * m_Scale);
-			m_K2 = bucketT((Supersample() * Supersample()) / (area * quality * m_TemporalFilter->SumFilt()));
+			//When doing an interactive render, force output early on in the render process, before all iterations are done.
+			//This presents a problem with the normal calculation of K2 since it relies on the quality value; it will scale the colors
+			//to be very dark. Correct it by pretending the number of iters done is the exact quality desired and then scale according to that.
+			if (forceOutput)
+			{
+				T quality = (T(m_Stats.m_Iters) / T(FinalDimensions())) * (m_Scale * m_Scale);
+				m_K2 = bucketT((Supersample() * Supersample()) / (area * quality * m_TemporalFilter->SumFilt()));
+			}
+			else
+				m_K2 = bucketT((Supersample() * Supersample()) / (area * m_ScaledQuality * m_TemporalFilter->SumFilt()));
 		}
 		else
-			m_K2 = bucketT((Supersample() * Supersample()) / (area * m_ScaledQuality * m_TemporalFilter->SumFilt()));
+			m_K2 = bucketT(m_Ember.m_K2);
 
 		if (!ResetBuckets(false, true))//Only the histogram was reset above, now reset the density filtering buffer.
 		{
@@ -1282,10 +1287,10 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 			//For example, if 51,000 are requested, and the sbs is 10,000, it should run 5 sub batches of 10,000 iters, and one final sub batch of 1,000 iters.
 			params.m_Count = std::min(params.m_Count, totalItersPerThread - m_SubBatch[threadIndex]);
 			//Use first as random point, the rest are iterated points.
-			//Note that this gets reset with a new random point for each subBatchSize iterations.
+			//Note that this gets reset with a new random point for each SubBatchSize iterations.
 			//This helps correct if iteration happens to be on a bad trajectory.
-			m_Samples[threadIndex][0].m_X = m_Rand[threadIndex].template Frand11<T>();
-			m_Samples[threadIndex][0].m_Y = m_Rand[threadIndex].template Frand11<T>();
+			m_Samples[threadIndex][0].m_X = m_Rand[threadIndex].template Frand<T>(-m_ThreadEmbers[threadIndex].m_RandPointRange, m_ThreadEmbers[threadIndex].m_RandPointRange);
+			m_Samples[threadIndex][0].m_Y = m_Rand[threadIndex].template Frand<T>(-m_ThreadEmbers[threadIndex].m_RandPointRange, m_ThreadEmbers[threadIndex].m_RandPointRange);
 			m_Samples[threadIndex][0].m_Z = 0;//m_Ember.m_CamZPos;//Apo set this to 0, then made the user use special variations to kick it. It seems easier to just set it to zpos.
 			m_Samples[threadIndex][0].m_ColorX = m_Rand[threadIndex].template Frand01<T>();
 
@@ -1727,9 +1732,21 @@ void Renderer<T, bucketT>::ComputeCurves()
 	{
 		//Timing t;
 		auto st = m_Csa.size();
+		vector<glm::tvec2<float, glm::defaultp>> vals;
+		vals.reserve(m_Ember.m_Curves.m_Points[0].size());
 
-		for (size_t i = 0; i < st; i++)
-			m_Csa[i] = m_Ember.m_Curves.BezierFunc(i * ONE_OVER_CURVES_LENGTH_M1);
+		for (glm::length_t i = 0; i < m_Ember.m_Curves.m_Points.size(); i++)//Overall, r, g, b.
+		{
+			for (auto& p : m_Ember.m_Curves.m_Points[i])
+				vals.push_back(p);
+
+			Spline<float> spline(vals);//Will internally sort.
+
+			for (glm::length_t j = 0; j < st; j++)
+				m_Csa[j][i] = spline.Interpolate(j * ONE_OVER_CURVES_LENGTH_M1);
+
+			vals.clear();
+		}
 
 		//t.Toc("ComputeCurves");
 	}

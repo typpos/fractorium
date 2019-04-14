@@ -119,7 +119,7 @@ private:
 
 /// <summary>
 /// Bwraps.
-/// Note, this is the same as bwraps2.
+/// Note, this is the same as bwraps7, which is the same as bwraps2 except for the precalc function.
 /// </summary>
 template <typename T>
 class BwrapsVariation : public ParametricVariation<T>
@@ -240,7 +240,7 @@ public:
 	virtual void Precalc() override
 	{
 		T radius = T(0.5) * (m_BwrapsCellsize / (1 + SQR(m_BwrapsSpace)));
-		m_G2 = Zeps(SQR(m_BwrapsGain) / Zeps(radius));
+		m_G2 = SQR(m_BwrapsGain) + T(1.0e-6);
 		T maxBubble = m_G2 * radius;
 
 		if (maxBubble > 2)
@@ -281,6 +281,195 @@ private:
 	T m_G2;//Precalc.
 	T m_R2;
 	T m_Rfactor;
+};
+
+/// <summary>
+/// bwraps_rand.
+/// By tatasz.
+/// </summary>
+template <typename T>
+class BwrapsRandVariation : public ParametricVariation<T>
+{
+public:
+	BwrapsRandVariation(T weight = 1.0) : ParametricVariation<T>("bwraps_rand", eVariationId::VAR_BWRAPS_RAND, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(BwrapsRandVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		if (m_CellSize == 0)
+		{
+			helper.Out.x = helper.In.x * m_Weight;
+			helper.Out.y = helper.In.y * m_Weight;
+		}
+		else
+		{
+			T Cx = (Floor<T>(helper.In.x * m_InvCellSize) + T(0.5)) * m_CellSize;
+			T Cy = (Floor<T>(helper.In.y * m_InvCellSize) + T(0.5)) * m_CellSize;
+			T Lx = helper.In.x - Cx;
+			T Ly = helper.In.y - Cy;
+			T radius;
+
+			if (m_Symm == 0)
+				radius = m_HalfCellSizeOver1pSpaceSq * VarFuncs<T>::HashShadertoy(Cx, Cy, m_Seed);
+			else
+				radius = m_HalfCellSizeOver1pSpaceSq * VarFuncs<T>::HashShadertoy(SQR(Cx), SQR(Cy), m_Seed);
+
+			T mb = m_G2 * radius;
+			T max_bubble;
+
+			if (mb > 2)
+				max_bubble = 1;
+			else
+				max_bubble = mb / (mb * mb * T(0.25) + 1);
+
+			T r2 = SQR(radius);
+
+			if (SQR(Lx) + SQR(Ly) > r2)
+			{
+				helper.Out.x = helper.In.x * m_Weight;
+				helper.Out.y = helper.In.y * m_Weight;
+			}
+			else
+			{
+				T rfactor = radius / Zeps(max_bubble);
+				T Lx2 = Lx * m_G2;
+				T Ly2 = Ly * m_G2;
+				T r = rfactor / ((SQR(Lx2) + SQR(Ly2)) * T(0.25) + 1);
+				T Lx3 = Lx2 * r;
+				T Ly3 = Ly2 * r;
+				T r_2 = (SQR(Lx3) + SQR(Ly3)) / Zeps(r2);
+				T theta = m_InnerTwist * (1 - r_2) + m_OuterTwist * r_2;
+				T ct = std::cos(theta);
+				T st = std::sin(theta);
+				helper.Out.x = (Cx + ct * Lx3 + st * Ly3) * m_Weight;
+				helper.Out.y = (Cy - st * Lx3 + ct * Ly3) * m_Weight;
+			}
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string cellsize                  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string space                     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string gain                      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string innertwist                = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string outertwist                = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string symm                      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed                      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invcellsize               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string g2                        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string spacesq                   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfcellsizeover1pspacesq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\tif (" << cellsize << " == 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t    vOut.x = vIn.x * " << weight << ";\n"
+		   << "\t\t    vOut.y = vIn.y * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t    real_t Cx = (floor(vIn.x * " << invcellsize << ") + 0.5) * " << cellsize << ";\n"
+		   << "\t\t    real_t Cy = (floor(vIn.y * " << invcellsize << ") + 0.5) * " << cellsize << ";\n"
+		   << "\t\t    real_t Lx = vIn.x - Cx;\n"
+		   << "\t\t    real_t Ly = vIn.y - Cy;\n"
+		   << "\t\t    real_t radius;\n"
+		   << "\n"
+		   << "\t\t    if (" << symm << " == 0)\n"
+		   << "\t\t        radius = " << halfcellsizeover1pspacesq << " * HashShadertoy(Cx, Cy, " << seed << ");\n"
+		   << "\t\t    else\n"
+		   << "\t\t        radius = " << halfcellsizeover1pspacesq << " * HashShadertoy(SQR(Cx), SQR(Cy), " << seed << ");\n"
+		   << "\n"
+		   << "\t\t    real_t mb = " << g2 << " * radius;\n"
+		   << "\t\t    real_t max_bubble;\n"
+		   << "\n"
+		   << "\t\t    if (mb > 2)\n"
+		   << "\t\t        max_bubble = 1;\n"
+		   << "\t\t    else\n"
+		   << "\t\t        max_bubble = mb / fma(SQR(mb), 0.25, 1.0);\n"
+		   << "\n"
+		   << "\t\t    real_t r2 = SQR(radius);\n"
+		   << "\n"
+		   << "\t\t    if (SQR(Lx) + SQR(Ly) > r2)\n"
+		   << "\t\t    {\n"
+		   << "\t\t        vOut.x = vIn.x * " << weight << ";\n"
+		   << "\t\t        vOut.y = vIn.y * " << weight << ";\n"
+		   << "\t\t    }\n"
+		   << "\t\t    else\n"
+		   << "\t\t    {\n"
+		   << "\t\t        real_t rfactor = radius / Zeps(max_bubble);\n"
+		   << "\t\t        real_t Lx2 = Lx * " << g2 << ";\n"
+		   << "\t\t        real_t Ly2 = Ly * " << g2 << ";\n"
+		   << "\t\t        real_t r = rfactor / fma(fma(Lx2, Lx2, SQR(Ly2)), 0.25, 1.0);\n"
+		   << "\t\t        real_t Lx3 = Lx2 * r;\n"
+		   << "\t\t        real_t Ly3 = Ly2 * r;\n"
+		   << "\t\t        real_t r_2 = fma(Lx3, Lx3, SQR(Ly3)) / Zeps(r2);\n"
+		   << "\t\t        real_t theta = " << innertwist << " * (1.0 - r_2) + " << outertwist << " * r_2;\n"
+		   << "\t\t        real_t ct = cos(theta);\n"
+		   << "\t\t        real_t st = sin(theta);\n"
+		   << "\n"
+		   << "\t\t        vOut.x = (Cx + ct * Lx3 + st * Ly3) * " << weight << ";\n"
+		   << "\t\t        vOut.y = (Cy - st * Lx3 + ct * Ly3) * " << weight << ";\n"
+		   << "\t\t    }\n"
+		   << "\t\t}\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_G2 = SQR(m_Gain);
+		m_InvCellSize = 1 / Zeps(m_CellSize);
+		m_SpaceSq = SQR(m_Space);
+		m_HalfCellSizeOver1pSpaceSq = T(0.5) * (m_CellSize / (1 + m_SpaceSq));
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_CellSize,                        prefix + "bwraps_rand_cellsize", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Space,                           prefix + "bwraps_rand_space"));
+		m_Params.push_back(ParamWithName<T>(&m_Gain,                            prefix + "bwraps_rand_gain", 2));
+		m_Params.push_back(ParamWithName<T>(&m_InnerTwist,                      prefix + "bwraps_rand_inner_twist"));
+		m_Params.push_back(ParamWithName<T>(&m_OuterTwist,                      prefix + "bwraps_rand_outer_twist"));
+		m_Params.push_back(ParamWithName<T>(&m_Symm,                            prefix + "bwraps_rand_symm"));
+		m_Params.push_back(ParamWithName<T>(&m_Seed,                            prefix + "bwraps_rand_seed", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_InvCellSize,               prefix + "bwraps_rand_inv_cellsize"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_G2,                        prefix + "bwraps_rand_g2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SpaceSq,                   prefix + "bwraps_rand_space_sq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfCellSizeOver1pSpaceSq, prefix + "bwraps_rand_half_cellsize_over_1_plus_space_sq"));
+	}
+
+private:
+	T m_CellSize;
+	T m_Space;
+	T m_Gain;
+	T m_InnerTwist;
+	T m_OuterTwist;
+	T m_Symm;
+	T m_Seed;
+	T m_InvCellSize;//Precalc.
+	T m_G2;
+	T m_SpaceSq;
+	T m_HalfCellSizeOver1pSpaceSq;
 };
 
 /// <summary>
@@ -2452,7 +2641,7 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	if (MwcNext01(mwc) > (real_t)(0.5))\n"
 		   << "\t\t	{\n"
-		   << "\t\t		d = sqrt(r + vIn.x);\n"
+		   << "\t\t		d = Zeps(sqrt(r + vIn.x));\n"
 		   << "\t\t		vOut.x = -(" << v2 << " * d);\n"
 		   << "\t\t		vOut.y = -(" << v2 << " / d * vIn.y);\n"
 		   << "\t\t	}\n"
@@ -2486,6 +2675,132 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(true, &m_V2, prefix + "glynnia_v2"));//Precalcs only, no params.
+	}
+
+private:
+	T m_V2;//Precalcs only, no params.
+};
+
+/// <summary>
+/// Glynnia2.
+/// By guagapunyaimel.
+/// </summary>
+template <typename T>
+class Glynnia2Variation : public ParametricVariation<T>
+{
+public:
+	Glynnia2Variation(T weight = 1.0) : ParametricVariation<T>("glynnia2", eVariationId::VAR_GLYNNIA2, weight, true, true)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Glynnia2Variation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T d, r = helper.m_PrecalcSqrtSumSquares;
+
+		if (r > 0 && helper.In.y > 0)
+		{
+			if (rand.Frand01<T>() > T(0.5))
+			{
+				d = std::sqrt(r + helper.In.x);
+				helper.Out.x = m_V2 * d;
+				helper.Out.y = -(m_V2 / d * helper.In.y);
+			}
+			else
+			{
+				d = r + helper.In.x;
+				r = m_Weight / std::sqrt(r * (SQR(helper.In.y) + SQR(d)));
+				helper.Out.x = r * d;
+				helper.Out.y = r * helper.In.y;
+			}
+		}
+		else
+		{
+			if (rand.Frand01<T>() > T(0.5))
+			{
+				d = Zeps(std::sqrt(r + helper.In.x));
+				helper.Out.x = -(m_V2 * d);
+				helper.Out.y = -(m_V2 / d * helper.In.y);
+			}
+			else
+			{
+				d = r + helper.In.x;
+				r = m_Weight / Zeps(std::sqrt(r * (SQR(helper.In.y) + SQR(d))));
+				helper.Out.x = -(r * d);
+				helper.Out.y = r * helper.In.y;
+			}
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string v2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalcs only, no params.
+		ss << "\t{\n"
+		   << "\t\treal_t d, r = precalcSqrtSumSquares;\n"
+		   << "\n"
+		   << "\t\tif (r > 0 && vIn.y > 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (MwcNext01(mwc) > (real_t)(0.5))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		d = sqrt(r + vIn.x);\n"
+		   << "\t\t		vOut.x = " << v2 << " * d;\n"
+		   << "\t\t		vOut.y = -(" << v2 << " / d * vIn.y);\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		d = r + vIn.x;\n"
+		   << "\t\t		r = " << weight << " / sqrt(r * fma(vIn.y, vIn.y, SQR(d)));\n"
+		   << "\t\t		vOut.x = r * d;\n"
+		   << "\t\t		vOut.y = r * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (MwcNext01(mwc) > (real_t)(0.5))\n"
+		   << "\t\t	{\n"
+		   << "\t\t		d = Zeps(sqrt(r + vIn.x));\n"
+		   << "\t\t		vOut.x = -(" << v2 << " * d);\n"
+		   << "\t\t		vOut.y = -(" << v2 << " / d * vIn.y);\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		d = r + vIn.x;\n"
+		   << "\t\t		r = " << weight << " / Zeps(sqrt(r * fma(vIn.y, vIn.y, SQR(d))));\n"
+		   << "\t\t		vOut.x = -(r * d);\n"
+		   << "\t\t		vOut.y = r * vIn.y;\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_V2 = m_Weight * std::sqrt(T(2)) / 2;
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(true, &m_V2, prefix + "glynnia2_v2"));//Precalcs only, no params.
 	}
 
 private:
@@ -5657,6 +5972,7 @@ private:
 MAKEPREPOSTVAR(Hemisphere, hemisphere, HEMISPHERE)
 MAKEPREPOSTPARVAR(Epispiral, epispiral, EPISPIRAL)
 MAKEPREPOSTPARVAR(Bwraps, bwraps, BWRAPS)
+MAKEPREPOSTPARVAR(BwrapsRand, bwraps_rand, BWRAPS_RAND)
 MAKEPREPOSTVARASSIGN(BlurCircle, blur_circle, BLUR_CIRCLE, eVariationAssignType::ASSIGNTYPE_SUM)
 MAKEPREPOSTPARVAR(BlurZoom, blur_zoom, BLUR_ZOOM)
 MAKEPREPOSTPARVAR(BlurPixelize, blur_pixelize, BLUR_PIXELIZE)
@@ -5686,6 +6002,7 @@ MAKEPREPOSTVAR(FDisc, fdisc, FDISC)
 MAKEPREPOSTPARVAR(Fibonacci, fibonacci, FIBONACCI)
 MAKEPREPOSTPARVAR(Fibonacci2, fibonacci2, FIBONACCI2)
 MAKEPREPOSTPARVAR(Glynnia, glynnia, GLYNNIA)
+MAKEPREPOSTPARVAR(Glynnia2, glynnia2, GLYNNIA2)
 MAKEPREPOSTVAR(GridOut, gridout, GRIDOUT)
 MAKEPREPOSTPARVAR(Hole, hole, HOLE)
 MAKEPREPOSTPARVAR(Hypertile, hypertile, HYPERTILE)

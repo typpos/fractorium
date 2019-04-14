@@ -1084,6 +1084,77 @@ public:
 };
 
 /// <summary>
+/// foci_p.
+/// Idea by Chaosfissure.
+/// </summary>
+template <typename T>
+class FociPVariation : public ParametricVariation<T>
+{
+public:
+	FociPVariation(T weight = 1.0) : ParametricVariation<T>("foci_p", eVariationId::VAR_FOCI_P, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(FociPVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T exp_x = Zeps(std::exp(helper.In.x));
+		T exp_x_2 = exp_x * m_C1;
+		T exp_nz = m_C2 / exp_x;
+		T cos_y = std::cos(helper.In.y);
+		T sin_y = std::sin(helper.In.y);
+		T r = m_Weight / Zeps(exp_x_2 + exp_nz - cos_y);
+		helper.Out.x = (exp_x_2 - exp_nz) * r;
+		helper.Out.y = sin_y * r;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string c1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string c2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t exp_x = Zeps(exp(vIn.x));\n"
+		   << "\t\treal_t exp_x_2 = exp_x * " << c1 << ";\n"
+		   << "\t\treal_t exp_nz = " << c2 << " / exp_x;\n"
+		   << "\t\treal_t cos_y = cos(vIn.y);\n"
+		   << "\t\treal_t sin_y = sin(vIn.y);\n"
+		   << "\t\treal_t r = " << weight << " / Zeps(exp_x_2 + exp_nz - cos_y);\n"
+		   << "\n"
+		   << "\t\tvOut.x = (exp_x_2 - exp_nz) * r;\n"
+		   << "\t\tvOut.y = sin_y * r;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_C1, prefix + "foci_p_c1", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_C2, prefix + "foci_p_c2", T(0.5)));
+	}
+
+private:
+	T m_C1;
+	T m_C2;
+};
+
+/// <summary>
 /// ho.
 /// </summary>
 template <typename T>
@@ -4330,6 +4401,7 @@ MAKEPREPOSTPARVAR(CircleTrans1, CircleTrans1, CIRCLETRANS1)
 MAKEPREPOSTPARVAR(Cubic3D, cubic3D, CUBIC3D)
 MAKEPREPOSTPARVAR(CubicLattice3D, cubicLattice_3D, CUBIC_LATTICE3D)
 MAKEPREPOSTVAR(Foci3D, foci_3D, FOCI3D)
+MAKEPREPOSTPARVAR(FociP, foci_p, FOCI_P)
 MAKEPREPOSTPARVAR(Ho, ho, HO)
 MAKEPREPOSTPARVAR(Julia3Dq, julia3Dq, JULIA3DQ)
 MAKEPREPOSTPARVARASSIGN(Line, line, LINE, eVariationAssignType::ASSIGNTYPE_SUM)

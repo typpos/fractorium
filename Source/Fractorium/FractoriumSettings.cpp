@@ -55,6 +55,16 @@ void FractoriumSettings::EnsureDefaults()
 	FinalThreadPriority(Clamp<int>(FinalThreadPriority(), (int)eThreadPriority::LOWEST, (int)eThreadPriority::HIGHEST));
 	CpuSubBatch(std::max(1u, CpuSubBatch()));
 	OpenCLSubBatch(std::max(1u, OpenCLSubBatch()));
+
+	if (OpenCLSubBatchPct() == 0)
+		OpenCLSubBatchPct(0.025);//Default to 256 iters per thread when using the default sub batch size of 10,240.
+
+	OpenCLSubBatchPct(Clamp(OpenCLSubBatchPct(), 0.01, 1.0));
+
+	if (FinalOpenCLSubBatchPct() == 0)
+		FinalOpenCLSubBatchPct(0.025);//Default to 256 iters per thread when using the default sub batch size of 10,240.
+
+	FinalOpenCLSubBatchPct(Clamp(FinalOpenCLSubBatchPct(), 0.01, 1.0));
 	RandomCount(std::max(1u, RandomCount()));
 
 	if (CpuQuality() == 0)
@@ -118,74 +128,77 @@ void FractoriumSettings::EnsureDefaults()
 /// Interactive renderer settings.
 /// </summary>
 
-bool FractoriumSettings::EarlyClip()							 { return value(EARLYCLIP).toBool();       }
-void FractoriumSettings::EarlyClip(bool b)						 { setValue(EARLYCLIP, b);                 }
+bool FractoriumSettings::EarlyClip()							 { return value(EARLYCLIP).toBool();                                       }
+void FractoriumSettings::EarlyClip(bool b)						 { setValue(EARLYCLIP, b);                                                 }
 
-bool FractoriumSettings::YAxisUp()								 { return value(YAXISUP).toBool();		   }
-void FractoriumSettings::YAxisUp(bool b)						 { setValue(YAXISUP, b);				   }
+bool FractoriumSettings::YAxisUp()								 { return value(YAXISUP).toBool();		                                   }
+void FractoriumSettings::YAxisUp(bool b)						 { setValue(YAXISUP, b);				                                   }
 
-bool FractoriumSettings::Transparency()							 { return value(TRANSPARENCY).toBool();    }
-void FractoriumSettings::Transparency(bool b)					 { setValue(TRANSPARENCY, b);              }
+bool FractoriumSettings::Transparency()							 { return value(TRANSPARENCY).toBool();                                    }
+void FractoriumSettings::Transparency(bool b)					 { setValue(TRANSPARENCY, b);                                              }
 
-bool FractoriumSettings::OpenCL()								 { return value(OPENCL).toBool();          }
-void FractoriumSettings::OpenCL(bool b)							 { setValue(OPENCL, b);                    }
+bool FractoriumSettings::OpenCL()								 { return value(OPENCL).toBool();                                          }
+void FractoriumSettings::OpenCL(bool b)							 { setValue(OPENCL, b);                                                    }
 
-bool FractoriumSettings::SharedTexture()						 { return value(SHAREDTEXTURE).toBool();   }
-void FractoriumSettings::SharedTexture(bool b)					 { setValue(SHAREDTEXTURE, b);             }
+bool FractoriumSettings::SharedTexture()						 { return value(SHAREDTEXTURE).toBool();                                   }
+void FractoriumSettings::SharedTexture(bool b)					 { setValue(SHAREDTEXTURE, b);                                             }
 
-bool FractoriumSettings::Double()								 { return value(DOUBLEPRECISION).toBool(); }
-void FractoriumSettings::Double(bool b)							 { setValue(DOUBLEPRECISION, b);		   }
+bool FractoriumSettings::Double()								 { return value(DOUBLEPRECISION).toBool();                                 }
+void FractoriumSettings::Double(bool b)							 { setValue(DOUBLEPRECISION, b);		                                   }
 
-bool FractoriumSettings::ShowAllXforms()						 { return value(SHOWALLXFORMS).toBool();   }
-void FractoriumSettings::ShowAllXforms(bool b)					 { setValue(SHOWALLXFORMS, b);			   }
+bool FractoriumSettings::ShowAllXforms()						 { return value(SHOWALLXFORMS).toBool();                                   }
+void FractoriumSettings::ShowAllXforms(bool b)					 { setValue(SHOWALLXFORMS, b);			                                   }
 
-bool FractoriumSettings::ShowXforms()                            { return value(SHOWXFORMS, QVariant::fromValue(true)).toBool(); }
-void FractoriumSettings::ShowXforms(bool b)                      { setValue(SHOWXFORMS, b);                }
+bool FractoriumSettings::ShowXforms()                            { return value(SHOWXFORMS, QVariant::fromValue(true)).toBool();           }
+void FractoriumSettings::ShowXforms(bool b)                      { setValue(SHOWXFORMS, b);                                                }
 
-bool FractoriumSettings::ShowGrid()                              { return value(SHOWGRID, QVariant::fromValue(true)).toBool();   }
-void FractoriumSettings::ShowGrid(bool b)                        { setValue(SHOWGRID, b);                  }
+bool FractoriumSettings::ShowGrid()                              { return value(SHOWGRID, QVariant::fromValue(true)).toBool();             }
+void FractoriumSettings::ShowGrid(bool b)                        { setValue(SHOWGRID, b);                                                  }
 
-bool FractoriumSettings::ToggleType()                            { return value(TOGGLETYPE).toBool();      }
-void FractoriumSettings::ToggleType(bool b)                      { setValue(TOGGLETYPE, b);                }
+bool FractoriumSettings::ToggleType()                            { return value(TOGGLETYPE).toBool();                                      }
+void FractoriumSettings::ToggleType(bool b)                      { setValue(TOGGLETYPE, b);                                                }
 
-bool FractoriumSettings::Png16Bit()                              { return value(PNG16BIT).toBool();        }
-void FractoriumSettings::Png16Bit(bool b)                        { setValue(PNG16BIT, b);                  }
+bool FractoriumSettings::Png16Bit()                              { return value(PNG16BIT).toBool();                                        }
+void FractoriumSettings::Png16Bit(bool b)                        { setValue(PNG16BIT, b);                                                  }
 
-bool FractoriumSettings::ContinuousUpdate()						 { return value(CONTUPDATE).toBool();	   }
-void FractoriumSettings::ContinuousUpdate(bool b)				 { setValue(CONTUPDATE, b);				   }
+bool FractoriumSettings::ContinuousUpdate()						 { return value(CONTUPDATE).toBool();	                                   }
+void FractoriumSettings::ContinuousUpdate(bool b)				 { setValue(CONTUPDATE, b);				                                   }
 
-QList<QVariant> FractoriumSettings::Devices()					 { return value(DEVICES).toList();		   }
-void FractoriumSettings::Devices(const QList<QVariant>& devices) { setValue(DEVICES, devices);			   }
+QList<QVariant> FractoriumSettings::Devices()					 { return value(DEVICES).toList();		                                   }
+void FractoriumSettings::Devices(const QList<QVariant>& devices) { setValue(DEVICES, devices);			                                   }
 
-uint FractoriumSettings::ThreadCount()							 { return value(THREADCOUNT).toUInt();     }
-void FractoriumSettings::ThreadCount(uint i)					 { setValue(THREADCOUNT, i);               }
+uint FractoriumSettings::ThreadCount()							 { return value(THREADCOUNT).toUInt();                                     }
+void FractoriumSettings::ThreadCount(uint i)					 { setValue(THREADCOUNT, i);                                               }
 
-bool FractoriumSettings::CpuDEFilter()							 { return value(CPUDEFILTER).toBool();     }
-void FractoriumSettings::CpuDEFilter(bool b)					 { setValue(CPUDEFILTER, b);               }
+bool FractoriumSettings::CpuDEFilter()							 { return value(CPUDEFILTER).toBool();                                     }
+void FractoriumSettings::CpuDEFilter(bool b)					 { setValue(CPUDEFILTER, b);                                               }
 
-bool FractoriumSettings::OpenCLDEFilter()						 { return value(OPENCLDEFILTER).toBool();  }
-void FractoriumSettings::OpenCLDEFilter(bool b)					 { setValue(OPENCLDEFILTER, b);            }
+bool FractoriumSettings::OpenCLDEFilter()						 { return value(OPENCLDEFILTER).toBool();                                  }
+void FractoriumSettings::OpenCLDEFilter(bool b)					 { setValue(OPENCLDEFILTER, b);                                            }
 
-uint FractoriumSettings::CpuSubBatch()							 { return value(CPUSUBBATCH).toUInt();	   }
-void FractoriumSettings::CpuSubBatch(uint i)					 { setValue(CPUSUBBATCH, i);			   }
+uint FractoriumSettings::CpuSubBatch()							 { return value(CPUSUBBATCH).toUInt();	                                   }
+void FractoriumSettings::CpuSubBatch(uint i)					 { setValue(CPUSUBBATCH, i);			                                   }
 
-uint FractoriumSettings::OpenCLSubBatch()						 { return value(OPENCLSUBBATCH).toUInt();  }
-void FractoriumSettings::OpenCLSubBatch(uint i)					 { setValue(OPENCLSUBBATCH, i);			   }
+double FractoriumSettings::OpenCLSubBatchPct()					 { return value(OPENCLSUBBATCHPCT).toDouble();                             }
+void FractoriumSettings::OpenCLSubBatchPct(double d)			 { setValue(OPENCLSUBBATCHPCT, d);			                               }
 
-uint FractoriumSettings::RandomCount()							 { return value(RANDOMCOUNT).toUInt();	   }
-void FractoriumSettings::RandomCount(uint i)					 { setValue(RANDOMCOUNT, i);			   }
+uint FractoriumSettings::OpenCLSubBatch()						 { return value(OPENCLSUBBATCH).toUInt();                                  }
+void FractoriumSettings::OpenCLSubBatch(uint i)					 { setValue(OPENCLSUBBATCH, i);			                                   }
 
-uint FractoriumSettings::CpuQuality()                            { return value(CPUQUALITY).toUInt();      }
-void FractoriumSettings::CpuQuality(uint i)                      { setValue(CPUQUALITY, i);                }
+uint FractoriumSettings::RandomCount()							 { return value(RANDOMCOUNT).toUInt();	                                   }
+void FractoriumSettings::RandomCount(uint i)					 { setValue(RANDOMCOUNT, i);			                                   }
 
-uint FractoriumSettings::OpenClQuality()                         { return value(OPENCLQUALITY).toUInt();   }
-void FractoriumSettings::OpenClQuality(uint i)                   { setValue(OPENCLQUALITY, i);             }
+uint FractoriumSettings::CpuQuality()                            { return value(CPUQUALITY).toUInt();                                      }
+void FractoriumSettings::CpuQuality(uint i)                      { setValue(CPUQUALITY, i);                                                }
 
-bool FractoriumSettings::LoadLast()                              { return value(LOADLAST).toBool();        }
-void FractoriumSettings::LoadLast(bool b)                        { setValue(LOADLAST, b);                  }
+uint FractoriumSettings::OpenClQuality()                         { return value(OPENCLQUALITY).toUInt();                                   }
+void FractoriumSettings::OpenClQuality(uint i)                   { setValue(OPENCLQUALITY, i);                                             }
 
-bool FractoriumSettings::RotateAndScale()                        { return value(ROTSCALE).toBool();        }
-void FractoriumSettings::RotateAndScale(bool b)                  { setValue(ROTSCALE, b);                  }
+bool FractoriumSettings::LoadLast()                              { return value(LOADLAST).toBool();                                        }
+void FractoriumSettings::LoadLast(bool b)                        { setValue(LOADLAST, b);                                                  }
+
+bool FractoriumSettings::RotateAndScale()                        { return value(ROTSCALE).toBool();                                        }
+void FractoriumSettings::RotateAndScale(bool b)                  { setValue(ROTSCALE, b);                                                  }
 
 /// <summary>
 /// Sequence generation settings.
@@ -253,62 +266,65 @@ void FractoriumSettings::VarFilterNonparam(int i) { setValue(VARFILTERNONPARAM, 
 /// Final render settings.
 /// </summary>
 
-bool FractoriumSettings::FinalEarlyClip()							  { return value(FINALEARLYCLIP).toBool();       }
-void FractoriumSettings::FinalEarlyClip(bool b)						  { setValue(FINALEARLYCLIP, b);                 }
+bool FractoriumSettings::FinalEarlyClip()							  { return value(FINALEARLYCLIP).toBool();           }
+void FractoriumSettings::FinalEarlyClip(bool b)						  { setValue(FINALEARLYCLIP, b);                     }
 
-bool FractoriumSettings::FinalYAxisUp()								  { return value(FINALYAXISUP).toBool();		 }
-void FractoriumSettings::FinalYAxisUp(bool b)						  { setValue(FINALYAXISUP, b);					 }
+bool FractoriumSettings::FinalYAxisUp()								  { return value(FINALYAXISUP).toBool();		     }
+void FractoriumSettings::FinalYAxisUp(bool b)						  { setValue(FINALYAXISUP, b);					     }
 
-bool FractoriumSettings::FinalTransparency()						  { return value(FINALTRANSPARENCY).toBool();    }
-void FractoriumSettings::FinalTransparency(bool b)					  { setValue(FINALTRANSPARENCY, b);              }
+bool FractoriumSettings::FinalTransparency()						  { return value(FINALTRANSPARENCY).toBool();        }
+void FractoriumSettings::FinalTransparency(bool b)					  { setValue(FINALTRANSPARENCY, b);                  }
 
-bool FractoriumSettings::FinalOpenCL()								  { return value(FINALOPENCL).toBool();          }
-void FractoriumSettings::FinalOpenCL(bool b)						  { setValue(FINALOPENCL, b);                    }
+bool FractoriumSettings::FinalOpenCL()								  { return value(FINALOPENCL).toBool();              }
+void FractoriumSettings::FinalOpenCL(bool b)						  { setValue(FINALOPENCL, b);                        }
 
-bool FractoriumSettings::FinalDouble()								  { return value(FINALDOUBLEPRECISION).toBool(); }
-void FractoriumSettings::FinalDouble(bool b)						  { setValue(FINALDOUBLEPRECISION, b);			 }
+bool FractoriumSettings::FinalDouble()								  { return value(FINALDOUBLEPRECISION).toBool();     }
+void FractoriumSettings::FinalDouble(bool b)						  { setValue(FINALDOUBLEPRECISION, b);			     }
 
-bool FractoriumSettings::FinalSaveXml()								  { return value(FINALSAVEXML).toBool();		 }
-void FractoriumSettings::FinalSaveXml(bool b)						  { setValue(FINALSAVEXML, b);					 }
+bool FractoriumSettings::FinalSaveXml()								  { return value(FINALSAVEXML).toBool();		     }
+void FractoriumSettings::FinalSaveXml(bool b)						  { setValue(FINALSAVEXML, b);					     }
 
-bool FractoriumSettings::FinalDoAll()								  { return value(FINALDOALL).toBool();		     }
-void FractoriumSettings::FinalDoAll(bool b)							  { setValue(FINALDOALL, b);					 }
+bool FractoriumSettings::FinalDoAll()								  { return value(FINALDOALL).toBool();		         }
+void FractoriumSettings::FinalDoAll(bool b)							  { setValue(FINALDOALL, b);					     }
 
-bool FractoriumSettings::FinalDoSequence()							  { return value(FINALDOSEQUENCE).toBool();	     }
-void FractoriumSettings::FinalDoSequence(bool b)					  { setValue(FINALDOSEQUENCE, b);				 }
+bool FractoriumSettings::FinalDoSequence()							  { return value(FINALDOSEQUENCE).toBool();	         }
+void FractoriumSettings::FinalDoSequence(bool b)					  { setValue(FINALDOSEQUENCE, b);				     }
 
-bool FractoriumSettings::FinalPng16Bit()							  { return value(FINALPNG16BIT).toBool();	     }
-void FractoriumSettings::FinalPng16Bit(bool b)			    		  { setValue(FINALPNG16BIT, b);			    	 }
+bool FractoriumSettings::FinalPng16Bit()							  { return value(FINALPNG16BIT).toBool();	         }
+void FractoriumSettings::FinalPng16Bit(bool b)			    		  { setValue(FINALPNG16BIT, b);			    	     }
 
-bool FractoriumSettings::FinalKeepAspect()							  { return value(FINALKEEPASPECT).toBool();		 }
-void FractoriumSettings::FinalKeepAspect(bool b)					  { setValue(FINALKEEPASPECT, b);				 }
+bool FractoriumSettings::FinalKeepAspect()							  { return value(FINALKEEPASPECT).toBool();		     }
+void FractoriumSettings::FinalKeepAspect(bool b)					  { setValue(FINALKEEPASPECT, b);				     }
 
-uint FractoriumSettings::FinalScale()								  { return value(FINALSCALE).toUInt();			 }
-void FractoriumSettings::FinalScale(uint i)							  { setValue(FINALSCALE, i);					 }
+uint FractoriumSettings::FinalScale()								  { return value(FINALSCALE).toUInt();			     }
+void FractoriumSettings::FinalScale(uint i)							  { setValue(FINALSCALE, i);					     }
 
-QString FractoriumSettings::FinalExt()								  { return value(FINALEXT).toString();			 }
-void FractoriumSettings::FinalExt(const QString& s)					  { setValue(FINALEXT, s);						 }
+QString FractoriumSettings::FinalExt()								  { return value(FINALEXT).toString();			     }
+void FractoriumSettings::FinalExt(const QString& s)					  { setValue(FINALEXT, s);						     }
 
-QList<QVariant> FractoriumSettings::FinalDevices()					  { return value(FINALDEVICES).toList();		 }
-void FractoriumSettings::FinalDevices(const QList<QVariant>& devices) { setValue(FINALDEVICES, devices);			 }
+QList<QVariant> FractoriumSettings::FinalDevices()					  { return value(FINALDEVICES).toList();		     }
+void FractoriumSettings::FinalDevices(const QList<QVariant>& devices) { setValue(FINALDEVICES, devices);			     }
 
-uint FractoriumSettings::FinalThreadCount()							  { return value(FINALTHREADCOUNT).toUInt();     }
-void FractoriumSettings::FinalThreadCount(uint i)					  { setValue(FINALTHREADCOUNT, i);               }
+uint FractoriumSettings::FinalThreadCount()							  { return value(FINALTHREADCOUNT).toUInt();         }
+void FractoriumSettings::FinalThreadCount(uint i)					  { setValue(FINALTHREADCOUNT, i);                   }
 
-int FractoriumSettings::FinalThreadPriority()						  { return value(FINALTHREADPRIORITY).toInt();   }
-void FractoriumSettings::FinalThreadPriority(int i)					  { setValue(FINALTHREADPRIORITY, i);			 }
+int FractoriumSettings::FinalThreadPriority()						  { return value(FINALTHREADPRIORITY).toInt();       }
+void FractoriumSettings::FinalThreadPriority(int i)					  { setValue(FINALTHREADPRIORITY, i);			     }
 
-uint FractoriumSettings::FinalQuality()								  { return value(FINALQUALITY).toUInt();         }
-void FractoriumSettings::FinalQuality(uint i)						  { setValue(FINALQUALITY, i);                   }
+double FractoriumSettings::FinalOpenCLSubBatchPct()                   { return value(FINALOPENCLSUBBATCHPCT).toDouble(); }
+void FractoriumSettings::FinalOpenCLSubBatchPct(double d)             { setValue(FINALOPENCLSUBBATCHPCT, d);             }
 
-uint FractoriumSettings::FinalTemporalSamples()						  { return value(FINALTEMPORALSAMPLES).toUInt(); }
-void FractoriumSettings::FinalTemporalSamples(uint i)				  { setValue(FINALTEMPORALSAMPLES, i);           }
+uint FractoriumSettings::FinalQuality()								  { return value(FINALQUALITY).toUInt();             }
+void FractoriumSettings::FinalQuality(uint i)						  { setValue(FINALQUALITY, i);                       }
 
-uint FractoriumSettings::FinalSupersample()							  { return value(FINALSUPERSAMPLE).toUInt();     }
-void FractoriumSettings::FinalSupersample(uint i)					  { setValue(FINALSUPERSAMPLE, i);               }
+uint FractoriumSettings::FinalTemporalSamples()						  { return value(FINALTEMPORALSAMPLES).toUInt();     }
+void FractoriumSettings::FinalTemporalSamples(uint i)				  { setValue(FINALTEMPORALSAMPLES, i);               }
 
-size_t FractoriumSettings::FinalStrips()							  { return value(FINALSTRIPS).toULongLong();	 }
-void FractoriumSettings::FinalStrips(size_t i)						  { setValue(FINALSTRIPS, uint(i));				 }
+uint FractoriumSettings::FinalSupersample()							  { return value(FINALSUPERSAMPLE).toUInt();         }
+void FractoriumSettings::FinalSupersample(uint i)					  { setValue(FINALSUPERSAMPLE, i);                   }
+
+size_t FractoriumSettings::FinalStrips()							  { return value(FINALSTRIPS).toULongLong();	     }
+void FractoriumSettings::FinalStrips(size_t i)						  { setValue(FINALSTRIPS, uint(i));				     }
 
 /// <summary>
 /// Xml file saving settings.

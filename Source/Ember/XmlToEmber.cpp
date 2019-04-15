@@ -176,9 +176,9 @@ XmlToEmber<T>::XmlToEmber()
 			{ "angle", "pixel_flow_angle" },
 			{ "len", "pixel_flow_len" },
 			{ "width", "pixel_flow_width" },
-			{ "radial_gaussian_angle", "radial_blur_angle" },
 			//{ "seed", "pixel_flow_seed" },//randCubes above already uses "seed", but it's just for randomness, so it shouldn't matter.
 			{ "enable_dc", "pixel_flow_enable_dc" },
+			{ "radial_gaussian_angle", "radial_blur_angle" },
 			{ "pr_a",	"projective_A"  },
 			{ "pr_b",	"projective_B"  },
 			{ "pr_c",	"projective_C"  },

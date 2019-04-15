@@ -439,10 +439,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The percentage of a sub batch to execute on each thread per kernel call when using OpenCL. Default: 0.025 (256 iters).&lt;/p&gt;&lt;p&gt;Increase this number for slightly faster render times.&lt;/p&gt;&lt;p&gt;Note that this can cause a crash and subsequent restart of the graphics driver if each kernel call takes too long. So reduce the value if you encounter such a problem.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The percentage of a sub batch to execute on each thread per kernel call when using OpenCL. Default: 0.025 (256 iters with a 10k sub batch size).&lt;/p&gt;&lt;p&gt;Increase this number for slightly faster render times.&lt;/p&gt;&lt;p&gt;Note that this can cause a crash and subsequent restart of the graphics driver if each kernel call takes too long. So reduce the value if you encounter such a problem.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="prefix">
-            <string>OpenCL Sub Batch Percent Per Thread </string>
+            <string>OpenCL sub batch percent per thread </string>
            </property>
            <property name="decimals">
             <number>3</number>

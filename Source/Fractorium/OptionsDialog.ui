@@ -317,7 +317,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of ~8M iteration chunks ran using OpenCL in interactive mode for each mouse movement.&lt;/p&gt;&lt;p&gt;Increase this number for a higher quality image on each mouse movement, at the expense of responsiveness.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="prefix">
-            <string>OpenCL Chunks per Mouse Movement </string>
+            <string>OpenCL chunks per mouse movement </string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -380,7 +380,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of ~10,000 iteration chunks ran per thread on the CPU in interactive mode for each mouse movement.&lt;/p&gt;&lt;p&gt;Increase this number for a higher quality image on each mouse movement, at the expense of responsiveness.&lt;/p&gt;&lt;p&gt;The number of iterations done in each chunk is controlled by the Sub Batch Size field in the Flame tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="prefix">
-            <string>CPU Chunks per Mouse Movement </string>
+            <string>CPU chunks per mouse movement </string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -428,7 +428,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The percentage of a sub batch to execute on each thread per kernel call when using OpenCL in interactive mode. Default: 0.025 (256 iters).&lt;/p&gt;&lt;p&gt;Increase this number for a higher quality image on each mouse movement, at the expense of responsiveness.&lt;/p&gt;&lt;p&gt;Note that this can cause a crash and subsequent restart of the graphics driver if each kernel call takes too long. So reduce the value if you encounter such a problem.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="prefix">
-            <string>OpenCL Sub Batch Percent Per Thread </string>
+            <string>OpenCL sub batch percent per thread </string>
            </property>
            <property name="decimals">
             <number>3</number>

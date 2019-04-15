@@ -8200,10 +8200,10 @@
      <normaloff>:/Fractorium/Icons/layers-stack.png</normaloff>:/Fractorium/Icons/layers-stack.png</iconset>
    </property>
    <property name="text">
-    <string>New Floc&amp;k</string>
+    <string>New floc&amp;k</string>
    </property>
    <property name="iconText">
-    <string>New Flock</string>
+    <string>New flock</string>
    </property>
    <property name="toolTip">
     <string>Clear any existing flames and create a new file with 10 random flames in it</string>
@@ -8239,7 +8239,7 @@
      <normaloff>:/Fractorium/Icons/database-medium.png</normaloff>:/Fractorium/Icons/database-medium.png</iconset>
    </property>
    <property name="text">
-    <string>Save &amp;Current as Xml</string>
+    <string>Save &amp;current as xml</string>
    </property>
    <property name="toolTip">
     <string>Save the current flame as an xml file</string>
@@ -8272,7 +8272,10 @@
      <normaloff>:/Fractorium/Icons/cog.png</normaloff>:/Fractorium/Icons/cog.png</iconset>
    </property>
    <property name="text">
-    <string>Final &amp;Render</string>
+    <string>Final &amp;render</string>
+   </property>
+   <property name="iconText">
+    <string>Final render</string>
    </property>
   </action>
   <action name="ActionSaveCurrentScreen">
@@ -8281,7 +8284,7 @@
      <normaloff>:/Fractorium/Icons/monitor.png</normaloff>:/Fractorium/Icons/monitor.png</iconset>
    </property>
    <property name="text">
-    <string>Save Current Scree&amp;n</string>
+    <string>Save current scree&amp;n</string>
    </property>
    <property name="toolTip">
     <string>Save the current screen as an image</string>
@@ -8293,7 +8296,7 @@
      <normaloff>:/Fractorium/Icons/068123-3d-transparent-glass-icon-alphanumeric-question-mark3.png</normaloff>:/Fractorium/Icons/068123-3d-transparent-glass-icon-alphanumeric-question-mark3.png</iconset>
    </property>
    <property name="text">
-    <string>New &amp;Random Flame</string>
+    <string>New &amp;random Flame</string>
    </property>
    <property name="toolTip">
     <string>Add a new random flame to the end of the current file</string>
@@ -8308,10 +8311,10 @@
      <normaloff>:/Fractorium/Icons/databases.png</normaloff>:/Fractorium/Icons/databases.png</iconset>
    </property>
    <property name="text">
-    <string>Save Entire &amp;File as Xml</string>
+    <string>Save entire &amp;file as xml</string>
    </property>
    <property name="iconText">
-    <string>Save Entire File as Xml</string>
+    <string>Save entire file as xml</string>
    </property>
    <property name="toolTip">
     <string>Save all flames as a single xml file</string>
@@ -8326,7 +8329,7 @@
      <normaloff>:/Fractorium/Icons/proxy.png</normaloff>:/Fractorium/Icons/proxy.png</iconset>
    </property>
    <property name="text">
-    <string>Add R&amp;eflective Symmetry</string>
+    <string>Add r&amp;eflective symmetry</string>
    </property>
    <property name="toolTip">
     <string>Add reflective symmetry</string>
@@ -8338,7 +8341,7 @@
      <normaloff>:/Fractorium/Icons/display-brightness-off.png</normaloff>:/Fractorium/Icons/display-brightness-off.png</iconset>
    </property>
    <property name="text">
-    <string>Add R&amp;otational Symmetry</string>
+    <string>Add r&amp;otational symmetry</string>
    </property>
    <property name="toolTip">
     <string>Add rotational symmetry</string>
@@ -8346,7 +8349,7 @@
   </action>
   <action name="ActionAddBothSymmetry">
    <property name="text">
-    <string>Add Reflective &amp;and Rotational Symmetry</string>
+    <string>Add reflective &amp;and rotational symmetry</string>
    </property>
    <property name="toolTip">
     <string>Add reflective and rotational symmetry</string>
@@ -8358,7 +8361,7 @@
      <normaloff>:/Fractorium/Icons/layer--plus.png</normaloff>:/Fractorium/Icons/layer--plus.png</iconset>
    </property>
    <property name="text">
-    <string>New &amp;Empty Flame</string>
+    <string>New &amp;empty flame</string>
    </property>
    <property name="toolTip">
     <string>Add a new empty flame to the end of the current file</string>
@@ -8373,7 +8376,7 @@
      <normaloff>:/Fractorium/Icons/layers.png</normaloff>:/Fractorium/Icons/layers.png</iconset>
    </property>
    <property name="text">
-    <string>Add Co&amp;py of Flame</string>
+    <string>Add co&amp;py of flame</string>
    </property>
    <property name="toolTip">
     <string>Add a copy of the current flame to the end of the current file</string>
@@ -8388,7 +8391,7 @@
      <normaloff>:/Fractorium/Icons/016938-3d-transparent-glass-icon-symbols-shapes-shape-square-clear-16.png</normaloff>:/Fractorium/Icons/016938-3d-transparent-glass-icon-symbols-shapes-shape-square-clear-16.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Clear Flame</string>
+    <string>&amp;Clear flame</string>
    </property>
    <property name="toolTip">
     <string>Delete all but one xform, clear its variations and set pre and post affine to the identity matrix.</string>
@@ -8400,10 +8403,10 @@
      <normaloff>:/Fractorium/Icons/page_copy.png</normaloff>:/Fractorium/Icons/page_copy.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Copy Xml</string>
+    <string>&amp;Copy xml</string>
    </property>
    <property name="toolTip">
-    <string>Copy Xml for the current flame</string>
+    <string>Copy xml for the current flame</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -8411,7 +8414,7 @@
   </action>
   <action name="ActionPasteXmlOver">
    <property name="text">
-    <string>Paste Xml &amp;Over</string>
+    <string>Paste xml &amp;over</string>
    </property>
    <property name="toolTip">
     <string>Paste Xml over the current flame in the current file</string>
@@ -8422,10 +8425,10 @@
   </action>
   <action name="ActionCopyAllXml">
    <property name="text">
-    <string>Copy &amp;All Xmls</string>
+    <string>Copy &amp;all xmls</string>
    </property>
    <property name="toolTip">
-    <string>Copy Xmls for all flames as a single string</string>
+    <string>Copy xmls for all flames as a single string</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+C</string>
@@ -8437,7 +8440,7 @@
      <normaloff>:/Fractorium/Icons/stop.png</normaloff>:/Fractorium/Icons/stop.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Stop Rendering Previews</string>
+    <string>&amp;Stop rendering previews</string>
    </property>
    <property name="toolTip">
     <string>Stop rendering previews</string>
@@ -8449,7 +8452,7 @@
      <normaloff>:/Fractorium/Icons/application_side_boxes.png</normaloff>:/Fractorium/Icons/application_side_boxes.png</iconset>
    </property>
    <property name="text">
-    <string>Render &amp;Previews</string>
+    <string>Render &amp;previews</string>
    </property>
    <property name="toolTip">
     <string>Render previews</string>
@@ -8485,10 +8488,10 @@
      <normaloff>:/Fractorium/Icons/page_paste.png</normaloff>:/Fractorium/Icons/page_paste.png</iconset>
    </property>
    <property name="text">
-    <string>Paste Xml A&amp;ppend</string>
+    <string>Paste xml a&amp;ppend</string>
    </property>
    <property name="toolTip">
-    <string>Paste Xml as a new flame in the current file</string>
+    <string>Paste xml as a new flame in the current file</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -8520,7 +8523,7 @@
   </action>
   <action name="ActionCopySelectedXforms">
    <property name="text">
-    <string>Copy Selected &amp;Xforms</string>
+    <string>Copy selected &amp;xforms</string>
    </property>
    <property name="toolTip">
     <string>Copy selected xforms to the clipboard</string>
@@ -8531,7 +8534,7 @@
   </action>
   <action name="ActionPasteSelectedXforms">
    <property name="text">
-    <string>Paste Selected X&amp;forms</string>
+    <string>Paste selected x&amp;forms</string>
    </property>
    <property name="toolTip">
     <string>Paste copied xforms into the current flame</string>
@@ -8542,7 +8545,7 @@
   </action>
   <action name="ActionResetWorkspace">
    <property name="text">
-    <string>&amp;Reset Workspace</string>
+    <string>&amp;Reset workspace</string>
    </property>
    <property name="toolTip">
     <string>Reset workspace</string>
@@ -8648,7 +8651,7 @@
      <normaloff>:/Fractorium/Icons/pic.png</normaloff>:/Fractorium/Icons/pic.png</iconset>
    </property>
    <property name="text">
-    <string>Show/Hide Image</string>
+    <string>Show/Hide image</string>
    </property>
    <property name="toolTip">
     <string>Show/Hide Image</string>
@@ -8666,10 +8669,10 @@
      <normaloff>:/Fractorium/Icons/grid.png</normaloff>:/Fractorium/Icons/grid.png</iconset>
    </property>
    <property name="text">
-    <string>Show/Hide Grid</string>
+    <string>Show/Hide grid</string>
    </property>
    <property name="toolTip">
-    <string>Show/Hide Grid</string>
+    <string>Show/Hide grid</string>
    </property>
   </action>
   <action name="ActionDrawXforms">
@@ -8681,15 +8684,15 @@
      <normaloff>:/Fractorium/Icons/Function-512.png</normaloff>:/Fractorium/Icons/Function-512.png</iconset>
    </property>
    <property name="text">
-    <string>Show/Hide Xforms</string>
+    <string>Show/Hide xforms</string>
    </property>
    <property name="toolTip">
-    <string>Show/Hide Xforms</string>
+    <string>Show/Hide xforms</string>
    </property>
   </action>
   <action name="ActionAlternateEditorImage">
    <property name="text">
-    <string>Alternate Editor/Image</string>
+    <string>Alternate editor/image</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -8697,12 +8700,12 @@
   </action>
   <action name="ActionResetScale">
    <property name="text">
-    <string>Reset Scale</string>
+    <string>Reset scale</string>
    </property>
   </action>
   <action name="ActionCopyKernel">
    <property name="text">
-    <string>Copy &amp;Kernel</string>
+    <string>Copy &amp;kernel</string>
    </property>
    <property name="statusTip">
     <string>Copy the OpenCL program to the clipboard for debugging.</string>

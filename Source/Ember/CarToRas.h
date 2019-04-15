@@ -182,6 +182,7 @@ public:
 	/// <param name="singleBufferIndex">The converted single raster buffer index</param>
 	inline void Convert(Point<T>& point, size_t& singleBufferIndex)
 	{
+		//singleBufferIndex = static_cast<size_t>(Round(m_PixPerImageUnitW * point.m_X - m_RasLlX) + (m_RasWidth * Round(m_PixPerImageUnitH * point.m_Y - m_RasLlY)));
 		singleBufferIndex = static_cast<size_t>(m_PixPerImageUnitW * point.m_X - m_RasLlX) + (m_RasWidth * static_cast<size_t>(m_PixPerImageUnitH * point.m_Y - m_RasLlY));
 	}
 

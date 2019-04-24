@@ -1310,19 +1310,18 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 				{
 					if (auto palettevalsnode = GetChildNodeByNodeName(palettenode, "values"))
 					{
-						int i = 0;
 						float r = 0, g = 0, b = 0;
 						auto colors = CCX(palettevalsnode->children->content);
 						istringstream istr(colors);
+						currentEmber.m_Palette.m_Entries.clear();
+						std::vector<v4F> tempv;
+						tempv.reserve(256);
 
-						while (istr >> r && istr >> g && istr >> b && i < COLORMAP_LENGTH)
-						{
-							currentEmber.m_Palette.m_Entries[i][0] = r;
-							currentEmber.m_Palette.m_Entries[i][1] = g;
-							currentEmber.m_Palette.m_Entries[i][2] = b;
-							currentEmber.m_Palette.m_Entries[i][3] = 1;
-							i++;
-						}
+						while (istr >> r && istr >> g && istr >> b)
+							tempv.push_back(v4F(r, g, b, 1));
+
+						if (!tempv.empty())
+							currentEmber.m_Palette.m_Entries = std::move(tempv);
 					}
 				}
 				else
@@ -1393,9 +1392,10 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						Spline<float> hspline(hvec);
 						Spline<float> sspline(svec);
 						Spline<float> vspline(vvec);
-						auto stepsize = (1.0f / (COLORMAP_LENGTH - 1));
+						currentEmber.m_Palette.m_Entries.resize(COLORMAP_LENGTH);
+						auto stepsize = (1.0f / (currentEmber.m_Palette.Size() - 1));
 
-						for (auto palindex = 0; palindex < COLORMAP_LENGTH; palindex++)
+						for (auto palindex = 0; palindex < currentEmber.m_Palette.Size(); palindex++)
 						{
 							float t = palindex * stepsize;
 							auto h = hspline.Interpolate(t);
@@ -1768,22 +1768,15 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 				xmlFree(attStr);
 			}
 
-			//Palette colors are [0..255], convert to [0..1].
-			if (index >= 0 && index <= 255)
-			{
-				float alphaPercent = a / 255.0f;//Aplha percentage in the range of 0 to 1.
-				//Premultiply the palette.
-				currentEmber.m_Palette.m_Entries[index].r = alphaPercent * (r / 255.0f);
-				currentEmber.m_Palette.m_Entries[index].g = alphaPercent * (g / 255.0f);
-				currentEmber.m_Palette.m_Entries[index].b = alphaPercent * (b / 255.0f);
-				currentEmber.m_Palette.m_Entries[index].a = a / 255.0f;//Will be one for RGB, and other than one if RGBA with A != 255.
-			}
-			else
-			{
-				stringstream ss;
-				ss << "ParseEmberElement() : Color element with bad/missing index attribute " << index;
-				AddToReport(ss.str());
-			}
+			while (index >= currentEmber.m_Palette.Size())
+				currentEmber.m_Palette.m_Entries.push_back(v4F());
+
+			float alphaPercent = a / 255.0f;//Aplha percentage in the range of 0 to 1.
+			//Premultiply the palette.
+			currentEmber.m_Palette.m_Entries[index].r = alphaPercent * (r / 255.0f);//Palette colors are [0..255], convert to [0..1].
+			currentEmber.m_Palette.m_Entries[index].g = alphaPercent * (g / 255.0f);
+			currentEmber.m_Palette.m_Entries[index].b = alphaPercent * (b / 255.0f);
+			currentEmber.m_Palette.m_Entries[index].a = a / 255.0f;//Will be one for RGB, and other than one if RGBA with A != 255.
 		}
 		else if (!Compare(childNode->name, "colors"))
 		{
@@ -2487,12 +2480,16 @@ bool XmlToEmber<T>::ParseHexColors(const char* colstr, Ember<T>& ember, size_t n
 
 	for (size_t strIndex = 0; strIndex < length;)
 	{
-		for (glm::length_t i = 0; i < 3 && colorCount < ember.m_Palette.Size(); i++)
+		for (glm::length_t i = 0; i < 3; i++)
 		{
 			const char tmpStr[3] = { s[strIndex++], s[strIndex++], 0 };//Read out and convert the string two characters at a time.
 			ss.clear();//Reset and fill the string stream.
 			ss.str(tmpStr);
 			ss >> tmp;//Do the conversion.
+
+			while (colorCount >= ember.m_Palette.Size())
+				ember.m_Palette.m_Entries.push_back(v4F());
+
 			ember.m_Palette.m_Entries[colorCount][i] = float(tmp) / 255.0f;//Hex palette is [0..255], convert to [0..1].
 		}
 

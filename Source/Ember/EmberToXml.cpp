@@ -259,7 +259,7 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 	//less error prone to just embed the palette.
 	if (hexPalette)
 	{
-		os << "   <palette count=\"256\" format=\"RGB\"";
+		os << "   <palette count=\"" << ember.m_Palette.Size() << "\" format=\"RGB\"";
 
 		if (!ember.m_Palette.m_SourceColors.empty())
 		{
@@ -279,8 +279,9 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 
 		os << ">\n";
 		os << std::uppercase;
+		auto rows = ember.m_Palette.Size() / 8;
 
-		for (i = 0; i < 32; i++)
+		for (i = 0; i < rows; i++)
 		{
 			os << "      ";
 
@@ -300,7 +301,7 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 	}
 	else
 	{
-		for (i = 0; i < 256; i++)
+		for (i = 0; i < ember.m_Palette.Size(); i++)
 		{
 			double r = ember.m_Palette[i][0] * 255;
 			double g = ember.m_Palette[i][1] * 255;

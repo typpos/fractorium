@@ -248,6 +248,7 @@ public:
 	virtual void PaletteCellClicked(int row, int col) { }
 	virtual void SetBasePaletteAndAdjust(const Palette<float>& palette) { }
 	virtual void PaletteEditorButtonClicked() { }
+	virtual void PaletteEditorColorChanged() { }
 	QImage& FinalPaletteImage() { return m_FinalPaletteImage; }
 
 	//Info.
@@ -535,6 +536,7 @@ public:
 	virtual void PaletteCellClicked(int row, int col) override;
 	virtual void SetBasePaletteAndAdjust(const Palette<float>& palette) override;
 	virtual void PaletteEditorButtonClicked() override;
+	virtual void PaletteEditorColorChanged() override;
 
 	//Info.
 	virtual void FillSummary() override;

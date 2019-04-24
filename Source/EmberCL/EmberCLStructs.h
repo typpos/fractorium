@@ -70,8 +70,6 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define NTHREADS 256u\n"
 	   "#define THREADS_PER_WARP 32u\n"
 	   "#define NWARPS (NTHREADS / THREADS_PER_WARP)\n"
-	   "#define COLORMAP_LENGTH 256u\n"
-	   "#define COLORMAP_LENGTH_MINUS_1 255\n"
 	   "#define DE_THRESH 100u\n"
 	   "#define BadVal(x) (isnan(x))\n"
 	   "#define SQR(x) ((x) * (x))\n"
@@ -206,6 +204,8 @@ struct ALIGN EmberCL
 	m3T m_CamMat;
 	T m_CenterX, m_CenterY;
 	T m_RotA, m_RotB, m_RotD, m_RotE;
+	T m_Psm1;
+	T m_Psm2;
 };
 
 /// <summary>
@@ -232,6 +232,8 @@ static const char* EmberCLStructString =
 	"	real_t m_C22;\n"
 	"	real_t m_CenterX, m_CenterY;\n"
 	"	real_t m_RotA, m_RotB, m_RotD, m_RotE;\n"
+	"	real_t m_Psm1;\n"
+	"	real_t m_Psm2;\n"
 	"} EmberCL;\n"
 	"\n";
 

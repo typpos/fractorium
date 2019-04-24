@@ -393,12 +393,10 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 				if (m_Info->CheckCL(err, "cl::ImageGL()"))
 				{
 					m_GLImages.push_back(namedImageGL);
-
-					if (data)
-						return WriteImage2D(m_GLImages.size() - 1, true, width, height, row_pitch, data);//OpenGL images/textures require a separate write.
-					else
-						return true;
+					imageIndex = int(m_GLImages.size()) - 1;
 				}
+				else
+					return false;
 			}
 			else
 			{
@@ -407,8 +405,10 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 				if (m_Info->CheckCL(err, "cl::Image2D()"))
 				{
 					m_Images.push_back(namedImage);
-					return true;
+					imageIndex = int(m_Images.size()) - 1;
 				}
+				else
+					return false;
 			}
 		}
 		else//It did exist, so create new if sizes are different. Write if data is not NULL.
@@ -422,18 +422,10 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 					NamedImage2DGL namedImageGL(cl::ImageGL(m_Context, flags, GL_TEXTURE_2D, 0, texName, &err), name);//Sizes are different, so create new.
 
 					if (m_Info->CheckCL(err, "cl::ImageGL()"))
-					{
 						m_GLImages[imageIndex] = namedImageGL;
-					}
 					else
 						return false;
 				}
-
-				//Write data to new image since OpenGL images/textures require a separate write, must match new size.
-				if (data)
-					return WriteImage2D(imageIndex, true, width, height, row_pitch, data);
-				else
-					return true;
 			}
 			else
 			{
@@ -443,17 +435,17 @@ bool OpenCLWrapper::AddAndWriteImage(const string& name, cl_mem_flags flags, con
 					NamedImage2D namedImage(cl::Image2D(m_Context, flags, format, width, height, row_pitch, data, &err), name);
 
 					if (m_Info->CheckCL(err, "cl::Image2D()"))
-					{
 						m_Images[imageIndex] = namedImage;
-						return true;
-					}
+					else
+						return false;
 				}
-				else if (data)
-					return WriteImage2D(imageIndex, false, width, height, row_pitch, data);
-				else//Strange case: images were same dimensions but no data was passed in, so do nothing.
-					return true;
 			}
 		}
+
+		if (data)
+			return WriteImage2D(imageIndex, shared, width, height, row_pitch, data);
+		else//Strange case: images were same dimensions but no data was passed in, so do nothing.
+			return true;
 	}
 
 	return false;

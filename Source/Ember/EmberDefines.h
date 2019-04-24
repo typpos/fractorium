@@ -53,7 +53,6 @@ namespace EmberNs
 #define SQRT5 T(2.2360679774997896964091736687313)
 #define M_PHI T(1.61803398874989484820458683436563)
 #define COLORMAP_LENGTH 256//These will need to change if 2D palette support is ever added, or variable sized palettes.
-#define COLORMAP_LENGTH_MINUS_1 255
 #define WHITE 255
 #define DEFAULT_SBS (1024 * 10)
 //#define XC(c) ((const xmlChar*)(c))

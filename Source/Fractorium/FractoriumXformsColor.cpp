@@ -229,7 +229,7 @@ void Fractorium::OnXformRefPaletteResized(int logicalIndex, int oldSize, int new
 template <typename T>
 QColor FractoriumEmberController<T>::ColorIndexToQColor(double d)
 {
-	v4F entry = m_Ember.m_Palette[Clamp<size_t>(d * COLORMAP_LENGTH_MINUS_1, 0, m_Ember.m_Palette.Size())];
+	v4F entry = m_Ember.m_Palette[Clamp<size_t>(d * (m_Ember.m_Palette.Size() - 1), 0, m_Ember.m_Palette.Size())];
 	entry.r *= 255;
 	entry.g *= 255;
 	entry.b *= 255;

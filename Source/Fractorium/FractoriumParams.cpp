@@ -22,12 +22,12 @@ void Fractorium::InitParamsUI()
 	SetFixedTableHeader(ui.IterationTableHeader->horizontalHeader());
 	SetFixedTableHeader(ui.AnimationTableHeader->horizontalHeader());
 	//Color.
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.05,  1000,       1, SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	  true,  4.0,    4.0,  4.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1,  9999,     0.5, SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0,    4.0,  4.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,    10,    0.01, SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)), true,  0.1,    0.1,  0.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,    30,    0.01, SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0,    1.0,  0.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BrightnessSpin,	   spinHeight, 0.01,  dmax,       1, SIGNAL(valueChanged(double)), SLOT(OnBrightnessChanged(double)),	  true,  4.0,    4.0,  4.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaSpin,		   spinHeight,    1,  dmax,     0.5, SIGNAL(valueChanged(double)), SLOT(OnGammaChanged(double)),          true,  4.0,    4.0,  4.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_GammaThresholdSpin, spinHeight,    0,  dmax,    0.01, SIGNAL(valueChanged(double)), SLOT(OnGammaThresholdChanged(double)), true,  0.1,    0.1,  0.0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_VibrancySpin,	   spinHeight,    0,  dmax,    0.01, SIGNAL(valueChanged(double)), SLOT(OnVibrancyChanged(double)),       true,  1.0,    1.0,  0.0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_HighlightSpin,	   spinHeight,  -1.0,   10,     0.1, SIGNAL(valueChanged(double)), SLOT(OnHighlightPowerChanged(double)), true,  1.0,    1.0, -1.0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_K2Spin,	           spinHeight,     0, 10.0,  0.0001, SIGNAL(valueChanged(double)), SLOT(OnK2Changed(double)),             true,    0, 0.0001,    0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_K2Spin,	           spinHeight,     0, 99.0,  0.0001, SIGNAL(valueChanged(double)), SLOT(OnK2Changed(double)),             true,    0, 0.0001,    0);
 	m_HighlightSpin->DoubleClickLowVal(-1.0);
 	int dec = 6;
 	m_BrightnessSpin->setDecimals(dec);

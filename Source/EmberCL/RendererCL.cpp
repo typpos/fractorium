@@ -81,7 +81,7 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 			{
 				if (b && !(b = cld->m_Wrapper.AddProgram(m_IterOpenCLKernelCreator.ZeroizeEntryPoint(), zeroizeProgram, m_IterOpenCLKernelCreator.ZeroizeEntryPoint(), m_DoublePrecision))) { ErrorStr(loc, "Failed to init zeroize program: "s + cld->ErrorReportString(), cld.get()); }
 
-				if (b && !(b = cld->m_Wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, 256, 1, 0, nullptr))) { ErrorStr(loc, "Failed to init palette buffer: "s + cld->ErrorReportString(), cld.get()); }
+				if (b && !(b = cld->m_Wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, m_Ember.m_Palette.Size(), 1, 0, nullptr))) { ErrorStr(loc, "Failed to init palette buffer: "s + cld->ErrorReportString(), cld.get()); }
 
 				if (b && !(b = cld->m_Wrapper.AddAndWriteBuffer(m_GlobalSharedBufferName, m_GlobalShared.second.data(), m_GlobalShared.second.size() * sizeof(m_GlobalShared.second[0])))) { ErrorStr(loc, "Failed to init global shared buffer: "s + cld->ErrorReportString(), cld.get()); }//Empty at start, will be filled in later if needed.
 
@@ -853,7 +853,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 					break;
 				}
 
-				if (b && !(b = wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, m_Dmap.m_Entries.size(), 1, 0, m_Dmap.m_Entries.data())))
+				if (b && !(b = wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, m_Dmap.Size(), 1, 0, m_Dmap.m_Entries.data())))
 				{
 					ErrorStr(loc, "Write palette buffer failed", device.get());
 					break;
@@ -1787,6 +1787,8 @@ void RendererCL<T, bucketT>::ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, 
 	emberCL.m_RotB           = m_RotMat.B();
 	emberCL.m_RotD           = m_RotMat.D();
 	emberCL.m_RotE           = m_RotMat.E();
+	emberCL.m_Psm1           = T(m_Dmap.Size() - 1);
+	emberCL.m_Psm2           = T(m_Dmap.Size() - 2);
 
 	for (size_t i = 0; i < ember.TotalXformCount() && i < xformsCL.size(); i++)
 	{

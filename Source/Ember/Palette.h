@@ -246,7 +246,7 @@ public:
 
 		for (size_t i = 0; i < Size(); i++)
 		{
-			size_t ii = (i * 256) / COLORMAP_LENGTH;
+			size_t ii = (i * Size()) / Size();
 			T rgb[3], hsv[3];
 			rgb[0] = m_Entries[ii].r;
 			rgb[1] = m_Entries[ii].g;
@@ -279,6 +279,7 @@ public:
 	void MakeAdjustedPalette(Palette<T>& palette, int rot, T hue, T sat, T bright, T cont, uint blur, uint freq)
 	{
 		T rgb[3], hsv[3];
+		palette.m_Entries.resize(Size());
 
 		if (freq > 1)
 		{
@@ -306,13 +307,13 @@ public:
 		}
 
 		auto tempPal = palette;
+		intmax_t iSize = intmax_t(Size());
 
-		for (size_t i = 0; i < Size(); i++)
+		for (intmax_t i = 0; i < iSize; i++)
 		{
-			int ii = int(i);
-			rgb[0] = tempPal[std::abs(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].r;//Rotation.
-			rgb[1] = tempPal[std::abs(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].g;
-			rgb[2] = tempPal[std::abs(COLORMAP_LENGTH + ii - rot) % COLORMAP_LENGTH].b;
+			rgb[0] = tempPal[std::abs(iSize + i - rot) % iSize].r;//Rotation.
+			rgb[1] = tempPal[std::abs(iSize + i - rot) % iSize].g;
+			rgb[2] = tempPal[std::abs(iSize + i - rot) % iSize].b;
 			RgbToHsv(rgb, hsv);
 			hsv[0] += hue * T(6.0);//Hue.
 			hsv[1] = Clamp<T>(hsv[1] + sat, 0, 1);//Saturation.
@@ -335,7 +336,7 @@ public:
 		{
 			tempPal = palette;
 
-			for (int i = 0; i < 256; i++)
+			for (int i = 0; i < iSize; i++)
 			{
 				int n = -1;
 				rgb[0] = 0;
@@ -345,7 +346,7 @@ public:
 				for (int j = i - int(blur); j <= i + int(blur); j++)
 				{
 					n++;
-					int k = (256 + j) % 256;
+					auto k = (iSize + j) % iSize;
 
 					if (k != i)
 					{

@@ -406,7 +406,7 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 			if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
 				xform->m_ColorX = index.second;
 
-		edPal = ed->GetPalette(int(256));
+		edPal = ed->GetPalette(int(prevPal.Size()));
 		SetBasePaletteAndAdjust(edPal);//This will take care of updating the color index controls.
 
 		if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
@@ -458,10 +458,16 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 /// <summary>
 /// Slot called every time a color is changed in the palette editor.
 /// </summary>
+template <typename T>
+void FractoriumEmberController<T>::PaletteEditorColorChanged()
+{
+	SetBasePaletteAndAdjust(m_Fractorium->m_PaletteEditor->GetPalette(int(m_TempPalette.Size())));
+}
+
 void Fractorium::OnPaletteEditorColorChanged()
 {
 	m_PaletteChanged = true;
-	m_Controller->SetBasePaletteAndAdjust(m_PaletteEditor->GetPalette(int(256)));
+	m_Controller->PaletteEditorColorChanged();
 }
 
 /// <summary>
@@ -569,7 +575,7 @@ void Fractorium::SetPaletteFileComboIndex(const string& filename)
 /// <summary>
 /// Reset the color curve values for the selected curve in the current ember to their default state and also update the curves control.
 /// Called when ResetCurvesButton is clicked.
-/// Note if they click Reset Curves when the "All" radio button is selected, then it clears all curves.
+/// Note if they click Reset Curves when the ctrl is pressed, then it clears all curves.
 /// Resets the rendering process at either ACCUM_ONLY by default, or FILTER_AND_ACCUM when using early clip.
 /// </summary>
 /// <param name="i">The index of the curve to be cleared, 0 to clear all.</param>
@@ -578,26 +584,34 @@ void FractoriumEmberController<T>::ClearColorCurves(int i)
 {
 	Update([&]
 	{
-		if (i)
-			m_Ember.m_Curves.Init(i);
-		else
-			m_Ember.m_Curves.Init(0);
+		m_Ember.m_Curves.Init(i);
+
 	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
 	FillCurvesControl();
 }
 
 void Fractorium::OnResetCurvesButtonClicked(bool checked)
 {
-	if (ui.CurvesAllRadio->isChecked())
-		m_Controller->ClearColorCurves(0);
-	else if (ui.CurvesRedRadio->isChecked())
-		m_Controller->ClearColorCurves(1);
-	else if (ui.CurvesGreenRadio->isChecked())
-		m_Controller->ClearColorCurves(2);
-	else if (ui.CurvesBlueRadio->isChecked())
-		m_Controller->ClearColorCurves(3);
+	if (!QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier))
+	{
+		if (ui.CurvesAllRadio->isChecked())
+			m_Controller->ClearColorCurves(0);
+		else if (ui.CurvesRedRadio->isChecked())
+			m_Controller->ClearColorCurves(1);
+		else if (ui.CurvesGreenRadio->isChecked())
+			m_Controller->ClearColorCurves(2);
+		else if (ui.CurvesBlueRadio->isChecked())
+			m_Controller->ClearColorCurves(3);
+		else
+			m_Controller->ClearColorCurves(0);
+	}
 	else
+	{
 		m_Controller->ClearColorCurves(0);
+		m_Controller->ClearColorCurves(1);
+		m_Controller->ClearColorCurves(2);
+		m_Controller->ClearColorCurves(3);
+	}
 }
 
 /// <summary>

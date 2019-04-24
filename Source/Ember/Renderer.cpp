@@ -1497,6 +1497,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 {
 	size_t histIndex, intColorIndex, histSize = m_HistBuckets.size();
 	bucketT colorIndex, colorIndexFrac;
+	auto psm1 = m_Ember.m_Palette.Size() - 1;
 
 	//Linear is a linear scale for when the color index is not a whole number, which is most of the time.
 	//It uses a portion of the value of the index, and the remainder of the next index.
@@ -1506,6 +1507,8 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 	//Use overloaded addition and multiplication operators in vec4 to perform the accumulation.
 	if (PaletteMode() == ePaletteMode::PALETTE_LINEAR)
 	{
+		auto psm2 = psm1 - 1;
+
 		//It's critical to understand what's going on here as it's one of the most important parts of the algorithm.
 		//A color value gets retrieved from the palette and
 		//its RGB values are added to the existing RGB values in the histogram bucket.
@@ -1542,7 +1545,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 					//This will result in a few points at the very edges getting discarded, but prevents a crash and doesn't seem to make a speed difference.
 					if (histIndex < histSize)
 					{
-						colorIndex = bucketT(p.m_ColorX) * COLORMAP_LENGTH_MINUS_1;
+						colorIndex = bucketT(p.m_ColorX) * psm1;
 						intColorIndex = size_t(colorIndex);
 
 						if (intColorIndex < 0)
@@ -1550,9 +1553,9 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 							intColorIndex = 0;
 							colorIndexFrac = 0;
 						}
-						else if (intColorIndex >= COLORMAP_LENGTH_MINUS_1)
+						else if (intColorIndex >= psm1)
 						{
-							intColorIndex = COLORMAP_LENGTH_MINUS_1 - 1;
+							intColorIndex = psm2;
 							colorIndexFrac = 1;
 						}
 						else
@@ -1608,7 +1611,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 
 					if (histIndex < histSize)
 					{
-						intColorIndex = Clamp<size_t>(size_t(p.m_ColorX * COLORMAP_LENGTH_MINUS_1), 0, COLORMAP_LENGTH_MINUS_1);
+						intColorIndex = Clamp<size_t>(size_t(p.m_ColorX * psm1), 0, psm1);
 						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
 						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
 

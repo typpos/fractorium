@@ -471,23 +471,24 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		{
 			os <<
 			   "				real_t colorIndexFrac;\n"
-			   "				real_t colorIndex = secondPoint.m_ColorX * COLORMAP_LENGTH_MINUS_1;\n"
-			   "				int intColorIndex = (int)colorIndex;\n"
+			   "				real_t colorIndex = secondPoint.m_ColorX * ember->m_Psm1;\n"
+			   "				int intColorIndex;\n"
 			   "				float4 palColor2;\n"
 			   "\n"
-			   "				if (intColorIndex < 0)\n"
+			   "				if (colorIndex < 0)\n"
 			   "				{\n"
 			   "					intColorIndex = 0;\n"
 			   "					colorIndexFrac = 0;\n"
 			   "				}\n"
-			   "				else if (intColorIndex >= COLORMAP_LENGTH_MINUS_1)\n"
+			   "				else if (colorIndex >= ember->m_Psm1)\n"
 			   "				{\n"
-			   "					intColorIndex = COLORMAP_LENGTH_MINUS_1 - 1;\n"
+			   "					intColorIndex = (int)ember->m_Psm2;\n"
 			   "					colorIndexFrac = 1.0;\n"
 			   "				}\n"
 			   "				else\n"
 			   "				{\n"
-			   "					colorIndexFrac = colorIndex - (real_t)intColorIndex;\n"//Interpolate between intColorIndex and intColorIndex + 1.
+			   "					intColorIndex = (int)colorIndex;\n"
+			   "					colorIndexFrac = colorIndex - intColorIndex;\n"//Interpolate between intColorIndex and intColorIndex + 1.
 			   "				}\n"
 			   "\n"
 			   "				iPaletteCoord.x = intColorIndex;\n"//Palette operations are strictly float because OpenCL does not support dp64 textures.
@@ -499,7 +500,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		else if (ember.m_PaletteMode == ePaletteMode::PALETTE_STEP)
 		{
 			os <<
-			   "				iPaletteCoord.x = (int)(secondPoint.m_ColorX * COLORMAP_LENGTH_MINUS_1);\n"
+			   "				iPaletteCoord.x = (int)(secondPoint.m_ColorX * ember->m_Psm1);\n"
 			   "				palColor1 = read_imagef(palette, paletteSampler, iPaletteCoord);\n";
 		}
 

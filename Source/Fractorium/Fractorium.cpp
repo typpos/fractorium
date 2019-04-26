@@ -359,7 +359,6 @@ void Fractorium::dockLocationChanged(Qt::DockWidgetArea area)
 bool Fractorium::eventFilter(QObject* o, QEvent* e)
 {
 	static int fcount = 0;//Qt seems to deliver three events for every key press. So a count must be kept to only respond to the third event.
-	static int libdelcount = 0;//Note that if anything ever changes under the hood with Qt, this will likely stop working, so adjust as accordingly.
 	static int xfupcount = 0;
 	static int xfdncount = 0;
 
@@ -395,17 +394,10 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			//Require shift for deleting to prevent it from triggering when the user enters delete in the edit box.
 			if (ke->key() == Qt::Key_Delete && e->type() == QEvent::KeyRelease && shift)
 			{
-				libdelcount++;
+				auto v = GetCurrentEmberIndex();
 
-				if (libdelcount >= 3)
-				{
-					auto v = GetCurrentEmberIndex();
-
-					if (ui.LibraryTree->topLevelItem(0)->childCount() > 1)
-						OnDelete(v);
-
-					libdelcount = 0;
-				}
+				if (ui.LibraryTree->topLevelItem(0)->childCount() > 1)
+					OnDelete(v);
 
 				return true;
 			}

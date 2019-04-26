@@ -584,7 +584,10 @@ void FractoriumEmberController<T>::ClearColorCurves(int i)
 {
 	Update([&]
 	{
-		m_Ember.m_Curves.Init(i);
+		if (i < 0)
+			m_Ember.m_Curves.Init();
+		else
+			m_Ember.m_Curves.Init(i);
 
 	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
 	FillCurvesControl();
@@ -607,10 +610,7 @@ void Fractorium::OnResetCurvesButtonClicked(bool checked)
 	}
 	else
 	{
-		m_Controller->ClearColorCurves(0);
-		m_Controller->ClearColorCurves(1);
-		m_Controller->ClearColorCurves(2);
-		m_Controller->ClearColorCurves(3);
+		m_Controller->ClearColorCurves(-1);
 	}
 }
 

@@ -1733,25 +1733,18 @@ void Renderer<T, bucketT>::ComputeCurves()
 {
 	if (m_CurvesSet)
 	{
-		//Timing t;
 		auto st = m_Csa.size();
-		vector<glm::tvec2<float, glm::defaultp>> vals;
-		vals.reserve(m_Ember.m_Curves.m_Points[0].size());
 
 		for (glm::length_t i = 0; i < m_Ember.m_Curves.m_Points.size(); i++)//Overall, r, g, b.
 		{
-			for (auto& p : m_Ember.m_Curves.m_Points[i])
-				vals.push_back(p);
+			if (!m_Ember.m_Curves.m_Points[i].empty())
+			{
+				Spline<float> spline(m_Ember.m_Curves.m_Points[i]);//Will internally sort.
 
-			Spline<float> spline(vals);//Will internally sort.
-
-			for (glm::length_t j = 0; j < st; j++)
-				m_Csa[j][i] = spline.Interpolate(j * ONE_OVER_CURVES_LENGTH_M1);
-
-			vals.clear();
+				for (glm::length_t j = 0; j < st; j++)
+					m_Csa[j][i] = spline.Interpolate(j * ONE_OVER_CURVES_LENGTH_M1);
+			}
 		}
-
-		//t.Toc("ComputeCurves");
 	}
 }
 

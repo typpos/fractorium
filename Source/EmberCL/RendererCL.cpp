@@ -853,7 +853,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 					break;
 				}
 
-				if (b && !(b = wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY, m_PaletteFormat, m_Dmap.Size(), 1, 0, m_Dmap.m_Entries.data())))
+				if (b && !(b = wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, m_PaletteFormat, m_Dmap.Size(), 1, 0, m_Dmap.m_Entries.data())))
 				{
 					ErrorStr(loc, "Write palette buffer failed", device.get());
 					break;

@@ -273,7 +273,6 @@ public:
 			if (UseFinalXform())//Caller wanted one and this ember has one.
 			{
 				ember.m_FinalXform = m_FinalXform;
-				ember.m_FinalXform.m_ColorX = T(XformCount() & 1);
 			}
 			else//Caller wanted one and this ember doesn't have one.
 			{
@@ -779,7 +778,24 @@ public:
 		InterpT<&Ember<T>::m_MinRadDE>(embers, coefs, size);
 		InterpT<&Ember<T>::m_CurveDE>(embers, coefs, size);
 		InterpT<&Ember<T>::m_SpatialFilterRadius>(embers, coefs, size);
-		InterpX<Curves<float>, &Ember<T>::m_Curves>(embers, coefs, size);
+
+		//At this point, all of the curves at a given curve index (0 - 3) should have the same number of spline points across all embers.
+		for (size_t i = 0; i < embers[0].m_Curves.m_Points.size(); i++)//4 point arrays.
+		{
+			while (m_Curves.m_Points[i].size() < embers[0].m_Curves.m_Points[i].size())
+				m_Curves.m_Points[i].push_back(v2F(0));
+
+			for (size_t j = 0; j < embers[0].m_Curves.m_Points[i].size(); j++)//Same number of points for this curve across all embers, so just use the first one.
+			{
+				v2F x(0);
+
+				for (size_t k = 0; k < size; k++)//Iterate over all embers.
+					x += float(coefs[k]) * embers[k].m_Curves.m_Points[i][j];
+
+				m_Curves.m_Points[i][j] = x;
+			}
+		}
+
 		//Normally done in assignment, must manually do here.
 		SetProjFunc();
 		//An extra step needed here due to the OOD that was not needed in the original.

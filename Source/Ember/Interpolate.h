@@ -61,13 +61,13 @@ public:
 	{
 		bool aligned = true;
 		bool currentFinal, hasFinal = sourceEmbers[0].UseFinalXform();
-		size_t i, xf, currentCount, maxCount = sourceEmbers[0].XformCount();
+		size_t xf, currentCount, maxCount = sourceEmbers[0].XformCount();
 		Xform<T>* destOtherXform;
 		auto variationList = VariationList<T>::Instance();
 
 		//Determine the max number of xforms present in sourceEmbers.
 		//Also check if final xforms are used in any of them.
-		for (i = 1; i < count; i++)
+		for (size_t i = 1; i < count; i++)
 		{
 			currentCount = sourceEmbers[i].XformCount();
 
@@ -89,19 +89,31 @@ public:
 		}
 
 		//Copy them using the max xform count, and do final if any had final.
-		for (i = 0; i < count; i++)
+		for (size_t i = 0; i < count; i++)
 			destEmbers[i] = sourceEmbers[i].Copy(maxCount, hasFinal);
 
 		if (hasFinal)
 			maxCount++;
 
+		std::array<size_t, 4> maxCurvePoints = { 0, 0, 0, 0 };
+
+		//Find the maximum number of points for each curve type in all curves.
+		for (size_t e = 0; e < count; e++)
+			for (size_t j = 0; j < sourceEmbers[0].m_Curves.m_Points.size(); j++)//Should always be 4 for every ember.
+				maxCurvePoints[j] = std::max(maxCurvePoints[j], sourceEmbers[e].m_Curves.m_Points[j].size());
+
 		//Check to see if there's a parametric variation present in one xform
 		//but not in an aligned xform.  If this is the case, use the parameters
 		//from the xform with the variation as the defaults for the blank one.
 		//All embers will have the same number of xforms at this point.
-		for (i = 0; i < count; i++)
+		for (size_t i = 0; i < count; i++)
 		{
 			intmax_t ii;
+			destEmbers[i].m_Curves = sourceEmbers[i].m_Curves;
+
+			for (size_t j = 0; j < sourceEmbers[0].m_Curves.m_Points.size(); j++)//Should always be 4 for every ember.
+				while (destEmbers[i].m_Curves.m_Points[j].size() < maxCurvePoints[j])
+					destEmbers[i].m_Curves.m_Points[j].push_back(sourceEmbers[i].m_Curves.m_Points[j].back());
 
 			for (xf = 0; xf < maxCount; xf++)//This will include both normal xforms and the final.
 			{

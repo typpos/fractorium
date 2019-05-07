@@ -2286,9 +2286,10 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T e = 1 / helper.m_PrecalcSumSquares + SQR(T(M_2_PI));
-		helper.Out.x = m_Weight * (m_Weight / helper.m_PrecalcSumSquares * helper.In.x / e);
-		helper.Out.y = m_Weight * (m_Weight / helper.m_PrecalcSumSquares * helper.In.y / e);
+		T e = 1 / Zeps(helper.m_PrecalcSumSquares) + SQR(T(M_2_PI));
+		T temp = m_Weight / Zeps(helper.m_PrecalcSumSquares);
+		helper.Out.x = m_Weight * (temp * helper.In.x / e);
+		helper.Out.y = m_Weight * (temp * helper.In.y / e);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -2298,10 +2299,11 @@ public:
 		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\treal_t e = fma(M2PI, M2PI, 1 / precalcSumSquares);\n"
+		   << "\t\treal_t e = fma(M2PI, M2PI, 1 / Zeps(precalcSumSquares));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (" << weight << " / precalcSumSquares * vIn.x / e);\n"
-		   << "\t\tvOut.y = " << weight << " * (" << weight << " / precalcSumSquares * vIn.y / e);\n"
+		   << "\t\treal_t temp = " << weight << " / Zeps(precalcSumSquares);\n"
+		   << "\t\tvOut.x = " << weight << " * (temp * vIn.x / e);\n"
+		   << "\t\tvOut.y = " << weight << " * (temp * vIn.y / e);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -3804,7 +3806,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Zeps" };
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -3877,7 +3879,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Zeps" };
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -3963,7 +3965,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Zeps" };
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -4054,7 +4056,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Zeps" };
+		return vector<string> { "Zeps" };
 	}
 
 	virtual void Precalc() override

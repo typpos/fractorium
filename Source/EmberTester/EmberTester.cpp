@@ -1278,6 +1278,12 @@ bool TestGlobalFuncs()
 	{
 		auto var = vlf->GetVariation(i);
 		funcs = var->OpenCLGlobalFuncNames();
+		auto localfuncs = var->OpenCLFuncsString();
+		Ember<float> ember;
+		Xform<float> xf;
+		xf.AddVariation(var->Copy());
+		ember.AddXform(xf);
+		auto kernel = GetEmberCLKernelString(ember, true, false, false, 1u, false);
 
 		for (auto& func : funcs)//Test if the functions the variation says it requires actually exist.
 		{
@@ -1306,6 +1312,44 @@ bool TestGlobalFuncs()
 					for (auto& v : vec)
 						cout << v << endl;
 				}
+			}
+		}
+
+		//Test whether the global functions the variations purports to need are actually used.
+		for (auto& v : vec)
+		{
+			bool found = false;
+
+			for (auto& v2 : vec)//Test if the functions the variation uses possibly use this function. It can be the case sometimes where a variation does not use it directly, but its global functions do.
+			{
+				if (v != v2)
+				{
+					auto it = funcmap.find(v2);
+
+					if (it != funcmap.end())
+					{
+						if (Find(it->second, v + "("))
+						{
+							found = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if (!found && Find(str, v + "("))
+			{
+				found = true;
+			}
+
+			if (!found && Find(localfuncs, v + "("))
+			{
+				found = true;
+			}
+
+			if (!found)
+			{
+				cout << "Variation " << var->Name() << " purported to require the usage of global function " << v << ", but it's not found in its OpenCL function string:\n" /*<< kernel*/ << endl;
 			}
 		}
 	}

@@ -1995,11 +1995,6 @@ public:
 		return ss.str();
 	}
 
-	virtual vector<string> OpenCLGlobalFuncNames() const override
-	{
-		return vector<string> { "Sqr" };
-	}
-
 	virtual void Precalc() override
 	{
 		m_SinTanC = std::sin(SafeTan<T>(m_C));
@@ -2547,7 +2542,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Lerp" };
+		return vector<string> { "Lerp" };
 	}
 
 	virtual void Precalc() override
@@ -2751,7 +2746,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Zeps" };
+		return vector<string> { "Zeps" };
 	}
 
 	virtual void Precalc() override
@@ -2984,7 +2979,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "SignNz", "LogMap", "LogScale", "Sqr", "Zeps" };
+		return vector<string> { "SignNz", "LogMap", "LogScale", "Zeps" };
 	}
 
 	virtual void Precalc() override

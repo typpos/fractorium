@@ -4460,7 +4460,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr", "Zeps" };
+		return vector<string> { "Zeps" };
 	}
 
 protected:
@@ -5016,8 +5016,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T c0 = m_Ax / (1 + std::exp(m_Sx * helper.In.x));
-		T c1 = m_Ay / (1 + std::exp(m_Sy * helper.In.y));
+		T c0 = m_Ax / Zeps(1 + std::exp(m_Sx * helper.In.x));
+		T c1 = m_Ay / Zeps(1 + std::exp(m_Sy * helper.In.y));
 		T x = (2 * (c0 - T(0.5)));
 		T y = (2 * (c1 - T(0.5)));
 		helper.Out.x = m_Vv * x;
@@ -5040,8 +5040,8 @@ public:
 		string ay = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string vv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t c0 = " << ax << " / (1 + exp(" << sx << " * vIn.x));\n"
-		   << "\t\treal_t c1 = " << ay << " / (1 + exp(" << sy << " * vIn.y));\n"
+		   << "\t\treal_t c0 = " << ax << " / Zeps(1 + exp(" << sx << " * vIn.x));\n"
+		   << "\t\treal_t c1 = " << ay << " / Zeps(1 + exp(" << sy << " * vIn.y));\n"
 		   << "\t\treal_t x = (2 * (c0 - (real_t)(0.5)));\n"
 		   << "\t\treal_t y = (2 * (c1 - (real_t)(0.5)));\n"
 		   << "\n"
@@ -5793,11 +5793,6 @@ public:
 		   << "\t}\n";
 		return ss.str();
 	}
-
-	virtual vector<string> OpenCLGlobalFuncNames() const override
-	{
-		return vector<string> { "Sqr" };
-	}
 };
 
 /// <summary>
@@ -5813,7 +5808,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T d = m_Weight / helper.m_PrecalcSumSquares;
+		T d = m_Weight / Zeps(helper.m_PrecalcSumSquares);
 		T sinx = std::sin(helper.In.x);
 		T sinx2 = SQR(sinx);
 		T cosx = std::cos(helper.In.x);
@@ -5829,7 +5824,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\treal_t d = " << weight << " / precalcSumSquares;\n"
+		   << "\t\treal_t d = " << weight << " / Zeps(precalcSumSquares);\n"
 		   << "\t\treal_t sinx = sin(vIn.x);\n"
 		   << "\t\treal_t sinx2 = SQR(sinx);\n"
 		   << "\t\treal_t cosx = cos(vIn.x);\n"
@@ -5844,7 +5839,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Sqr" };
+		return vector<string> { "Zeps" };
 	}
 };
 

@@ -484,6 +484,11 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(DCTriangle, T) \
 	EXPORTPREPOSTREGVAR(RandCubes, T) \
 	EXPORTPREPOSTREGVAR(PixelFlow, T) \
+	EXPORTPREPOSTREGVAR(Waves22, T) \
+	EXPORTPREPOSTREGVAR(Waves23, T) \
+	EXPORTPREPOSTREGVAR(Waves42, T) \
+	EXPORTPREPOSTREGVAR(Waves3, T) \
+	EXPORTPREPOSTREGVAR(Waves4, T) \
 	template EMBER_API class VariationList<T>; \
 	template EMBER_API class SpatialFilter<T>; \
 	template EMBER_API class GaussianFilter<T>; \

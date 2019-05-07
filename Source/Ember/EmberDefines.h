@@ -52,6 +52,7 @@ namespace EmberNs
 #define M_3PI (T(M_PI * 3))
 #define SQRT5 T(2.2360679774997896964091736687313)
 #define M_PHI T(1.61803398874989484820458683436563)
+#define M_1_2PI T(0.15915494309189533576888376337251)
 #define COLORMAP_LENGTH 256//These will need to change if 2D palette support is ever added, or variable sized palettes.
 #define WHITE 255
 #define DEFAULT_SBS (1024 * 10)

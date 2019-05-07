@@ -4014,7 +4014,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "Zeps", "Fract", "HashShadertoy" };
+		return vector<string> { "Fract", "HashShadertoy" };
 	}
 
 	virtual void Precalc() override

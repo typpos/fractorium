@@ -80,7 +80,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1305</width>
+      <width>1277</width>
       <height>985</height>
      </rect>
     </property>
@@ -173,7 +173,7 @@
             <x>0</x>
             <y>0</y>
             <width>230</width>
-            <height>936</height>
+            <height>934</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -563,96 +563,6 @@
              <column>
               <property name="text">
                <string>Iteration</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
-              </property>
-             </column>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QTableWidget" name="ColorTableHeader">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>19</height>
-              </size>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="autoFillBackground">
-              <bool>false</bool>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::Panel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Plain</enum>
-             </property>
-             <property name="verticalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="verticalScrollMode">
-              <enum>QAbstractItemView::ScrollPerItem</enum>
-             </property>
-             <property name="horizontalScrollMode">
-              <enum>QAbstractItemView::ScrollPerItem</enum>
-             </property>
-             <property name="showGrid">
-              <bool>false</bool>
-             </property>
-             <property name="cornerButtonEnabled">
-              <bool>false</bool>
-             </property>
-             <attribute name="horizontalHeaderVisible">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>15</number>
-             </attribute>
-             <attribute name="horizontalHeaderHighlightSections">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
-             </attribute>
-             <attribute name="horizontalHeaderStretchLastSection">
-              <bool>true</bool>
-             </attribute>
-             <attribute name="verticalHeaderVisible">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderDefaultSectionSize">
-              <number>15</number>
-             </attribute>
-             <attribute name="verticalHeaderHighlightSections">
-              <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
-             </attribute>
-             <column>
-              <property name="text">
-               <string>Color</string>
               </property>
               <property name="textAlignment">
                <set>AlignCenter</set>
@@ -1675,6 +1585,11 @@
               <property name="text">
                <string>Brightness</string>
               </property>
+              <property name="font">
+               <font>
+                <kerning>true</kerning>
+               </font>
+              </property>
              </row>
              <row>
               <property name="text">
@@ -1714,6 +1629,11 @@
              <column>
               <property name="text">
                <string>Field</string>
+              </property>
+              <property name="font">
+               <font>
+                <kerning>true</kerning>
+               </font>
               </property>
              </column>
              <column>
@@ -1825,6 +1745,96 @@
                <string>0</string>
               </property>
              </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QTableWidget" name="ColorTableHeader">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>19</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>19</height>
+              </size>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::NoFocus</enum>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Panel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="verticalScrollMode">
+              <enum>QAbstractItemView::ScrollPerItem</enum>
+             </property>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollPerItem</enum>
+             </property>
+             <property name="showGrid">
+              <bool>false</bool>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>false</bool>
+             </property>
+             <attribute name="horizontalHeaderVisible">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>15</number>
+             </attribute>
+             <attribute name="horizontalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>16</number>
+             </attribute>
+             <attribute name="verticalHeaderHighlightSections">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>16</number>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Color</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignCenter</set>
+              </property>
+             </column>
             </widget>
            </item>
           </layout>
@@ -2389,13 +2399,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>67</height>
+               <height>68</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>67</height>
+               <height>68</height>
               </size>
              </property>
              <property name="focusPolicy">
@@ -2622,13 +2632,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>21</height>
+               <height>22</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>21</height>
+               <height>22</height>
               </size>
              </property>
              <property name="focusPolicy">
@@ -3310,13 +3320,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>42</height>
+               <height>41</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>42</height>
+               <height>41</height>
               </size>
              </property>
              <property name="font">
@@ -3519,13 +3529,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>22</height>
+                   <height>23</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>22</height>
+                   <height>23</height>
                   </size>
                  </property>
                  <property name="font">
@@ -3849,13 +3859,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>45</height>
+                   <height>68</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>67</height>
+                   <height>68</height>
                   </size>
                  </property>
                  <property name="font">
@@ -6260,7 +6270,7 @@
                        <x>0</x>
                        <y>0</y>
                        <width>267</width>
-                       <height>676</height>
+                       <height>670</height>
                       </rect>
                      </property>
                      <property name="sizePolicy">
@@ -6472,13 +6482,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>126</height>
+                   <height>128</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>126</height>
+                   <height>128</height>
                   </size>
                  </property>
                  <property name="focusPolicy">
@@ -6812,13 +6822,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>250</height>
+                   <height>255</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>250</height>
+                   <height>255</height>
                   </size>
                  </property>
                  <property name="baseSize">
@@ -6863,13 +6873,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>173</height>
+                      <height>170</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>173</height>
+                      <height>170</height>
                      </size>
                     </property>
                     <property name="autoFillBackground">
@@ -7499,8 +7509,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>407</width>
-           <height>541</height>
+           <width>424</width>
+           <height>574</height>
           </rect>
          </property>
          <property name="sizePolicy">

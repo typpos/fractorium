@@ -98,6 +98,8 @@ unix:!macx {
 themes.files = $$ASSETS_DIR/dark_linux.qss
 }
 
+themes.files += $$ASSETS_DIR/lightdark.qss
+
 #message(THEMES INSTALL SOURCE: $$themes.files)
 INSTALLS += themes
 

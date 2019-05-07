@@ -3001,11 +3001,6 @@ public:
 		return ss.str();
 	}
 
-	virtual vector<string> OpenCLGlobalFuncNames() const override
-	{
-		return vector<string> { "Sqr" };
-	}
-
 protected:
 	void Init()
 	{

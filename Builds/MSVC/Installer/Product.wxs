@@ -264,6 +264,10 @@
 			<Component Id="dark_windows.qss" Guid="c120ace3-5fab-416f-b7f1-a8d9e3e0f061">
 				<File Id="dark_windows.qss" Source="$(var.SolutionDir)..\..\..\Data\dark_windows.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
+			
+			<Component Id="lightdark.qss" Guid="e4cbb38c-359e-464d-938b-e52ff0ce375d">
+				<File Id="lightdark.qss" Source="$(var.SolutionDir)..\..\..\Data\lightdark.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
 				
 			<Component Id="VersionHistory.txt" Guid="8b031217-9e7d-4700-9ab8-2593a4e002b6">
 				<File Id="VersionHistory.txt" Source="$(var.SolutionDir)..\..\..\Data\Version History.txt" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>

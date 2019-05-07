@@ -1822,9 +1822,9 @@ void RendererCL<T, bucketT>::ConvertCarToRas(const CarToRas<T>& carToRas)
 {
 	m_CarToRasCL.m_RasWidth = uint(carToRas.RasWidth());
 	m_CarToRasCL.m_PixPerImageUnitW = carToRas.PixPerImageUnitW();
-	m_CarToRasCL.m_RasLlX = carToRas.RasLlX();
+	m_CarToRasCL.m_RasLlX = -carToRas.RasLlX();//Flip here because it's only used by CarToRasConvertPointToSingle(), which only needs the negative of it.
 	m_CarToRasCL.m_PixPerImageUnitH = carToRas.PixPerImageUnitH();
-	m_CarToRasCL.m_RasLlY = carToRas.RasLlY();
+	m_CarToRasCL.m_RasLlY = -carToRas.RasLlY();//Ditto here.
 	m_CarToRasCL.m_CarLlX = carToRas.CarLlX();
 	m_CarToRasCL.m_CarLlY = carToRas.CarLlY();
 	m_CarToRasCL.m_CarUrX = carToRas.CarUrX();

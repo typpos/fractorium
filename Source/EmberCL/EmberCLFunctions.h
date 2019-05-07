@@ -185,13 +185,13 @@ static const char* RandFunctionString =
 	"inline real_t MwcNextFRange(uint2* s, real_t lower, real_t upper)\n"
 	"{\n"
 	"	real_t f = (real_t)MwcNext(s) / (real_t)UINT_MAX;\n"
-	"	return lower + (f * (upper - lower));\n"
+	"	return fma(f, upper - lower, lower);\n"
 	"}\n"
 	"\n"
 	"inline real_t MwcNextNeg1Pos1(uint2* s)\n"
 	"{\n"
 	"	real_t f = (real_t)MwcNext(s) / (real_t)UINT_MAX;\n"
-	"	return -1.0 + (f * 2.0);\n"
+	"	return fma(f, 2.0, -1.0);\n"
 	"}\n"
 	"\n"
 	"inline real_t MwcNext0505(uint2* s)\n"
@@ -213,11 +213,12 @@ static const char* AddToAccumWithCheckFunctionString =
 
 /// <summary>
 /// OpenCL equivalent various CarToRas member functions.
+/// Normaly would subtract m_RasLlX and m_RasLlY, but they were negated in RendererCL before being passed in, so they could be used with fma().
 /// </summary>
 static const char* CarToRasFunctionString =
 	"inline void CarToRasConvertPointToSingle(__constant CarToRasCL* carToRas, Point* point, uint* singleBufferIndex)\n"
 	"{\n"
-	"	*singleBufferIndex = (uint)(carToRas->m_PixPerImageUnitW * point->m_X - carToRas->m_RasLlX) + (carToRas->m_RasWidth * (uint)(carToRas->m_PixPerImageUnitH * point->m_Y - carToRas->m_RasLlY));\n"
+	"	*singleBufferIndex = (uint)fma(carToRas->m_PixPerImageUnitW, point->m_X, carToRas->m_RasLlX) + (carToRas->m_RasWidth * (uint)fma(carToRas->m_PixPerImageUnitH, point->m_Y, carToRas->m_RasLlY));\n"
 	"}\n"
 	"\n"
 	"inline bool CarToRasInBounds(__constant CarToRasCL* carToRas, Point* point)\n"

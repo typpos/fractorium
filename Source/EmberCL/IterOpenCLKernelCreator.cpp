@@ -93,7 +93,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		if (needPrecalcAtanYX)
 			xformFuncs << "\treal_t precalcAtanyx;\n";
 
-		xformFuncs << "\treal_t tempColor = outPoint->m_ColorX = xform->m_ColorSpeedCache + (xform->m_OneMinusColorCache * inPoint->m_ColorX);\n\n";
+		xformFuncs << "\treal_t tempColor = outPoint->m_ColorX = fma(xform->m_OneMinusColorCache, inPoint->m_ColorX, xform->m_ColorSpeedCache);\n\n";
 
 		if (xform->PreVariationCount() + xform->VariationCount() == 0)
 		{
@@ -215,7 +215,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 					   "\toutPoint->m_Y = fma(xform->m_PostD, tempX, fma(xform->m_PostE, outPoint->m_Y, xform->m_PostF));\n";
 		}
 
-		xformFuncs << "\toutPoint->m_ColorX = tempColor + xform->m_DirectColor * (outPoint->m_ColorX - tempColor);\n";
+		xformFuncs << "\toutPoint->m_ColorX = fma(xform->m_DirectColor, (outPoint->m_ColorX - tempColor), tempColor);\n";
 		xformFuncs << "\n";
 		xformFuncs << "\tif (isnan(outPoint->m_ColorX))\n";
 		xformFuncs << "\t	outPoint->m_ColorX = 0.0; \n";

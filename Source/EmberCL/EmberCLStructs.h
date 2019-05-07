@@ -83,6 +83,7 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define M_3PI (MPI * 3)\n"
 	   "#define SQRT5 2.2360679774997896964091736687313\n"
 	   "#define M_PHI 1.61803398874989484820458683436563\n"
+	   "#define M_1_2PI 0.15915494309189533576888376337251\n"
 	   "#define DEG_2_RAD (MPI / 180)\n"
 	   "#define CURVES_LENGTH_M1 ((real_bucket_t)" << CURVES_LENGTH_M1 << ")\n" <<
 	   "#define ONE_OVER_CURVES_LENGTH_M1 ((real_bucket_t)" << ONE_OVER_CURVES_LENGTH_M1 << ")\n" <<

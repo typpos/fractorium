@@ -1,0 +1,26 @@
+Source: Fractorium
+Section: graphics
+Priority: optional
+Maintainer: Gambhiro Bhikkhu <matt.feemster@gmail.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.5
+Homepage: http://fractorium.com/
+Vcs-Git: https://bitbucket.org/mfeemster/fractorium
+Vcs-Browser: https://bitbucket.org/mfeemster/fractorium
+Package: Fractorium
+Version: 1.0.0.15
+Architecture: amd64
+Description: A fractal flame editor with GPU support
+ Fractorium
+ .
+ A fractal flame editor with GPU support.
+ .
+ http://fractorium.com/
+ .
+ The project is maintained on Bitbucket:
+ .
+ https://bitbucket.org/mfeemster/fractorium
+ .
+ News and updates at the above or on Matt Feemster's DeviantArt page:
+ .
+ http://mfeemster.deviantart.com/

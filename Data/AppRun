@@ -13,6 +13,9 @@ if [ ! -z "$DEBUG" ] ; then
 fi
 
 THIS="$0"
+# http://stackoverflow.com/questions/3190818/
+args=("$@")
+NUMBER_OF_ARGS="$#"
 
 CONFIG_PATH=~/.config/fractorium
 DARK_LINUX=~/.config/fractorium/dark_linux.qss
@@ -50,14 +53,24 @@ fi
 atexit()
 {
   if [ ! -z $APPIMAGE ] ; then
+
     BINARY_NAME=$(basename "$ARGV0")
-    if [ -e "$APPDIR/usr/bin/$BINARY_NAME" ] ; then
-      exec "$APPDIR/usr/bin/$BINARY_NAME" "$@"
+
+    if [ $NUMBER_OF_ARGS -eq 0 ] ; then
+       FINAL_ARGS=""
     else
-      exec "$APPDIR/usr/bin/fractorium" "$@"
+       FINAL_ARGS="${args[@]}"
+    fi
+
+    #echo "args: " $FINAL_ARGS
+
+    if [ -e "$APPDIR/usr/bin/$BINARY_NAME" ] ; then
+      exec "$APPDIR/usr/bin/$BINARY_NAME" $FINAL_ARGS
+    else
+      exec "$APPDIR/usr/bin/fractorium" $FINAL_ARGS
     fi
   else  
-    exec "$APPDIR/usr/bin/fractorium" "$@"
+    exec "$APPDIR/usr/bin/fractorium"
   fi
 }
 

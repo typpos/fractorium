@@ -198,8 +198,8 @@ tatasz_pack_02_dark.gradient
 tatasz_pack_02_warmer.gradient
 tatasz_pack_03.gradient
 tbb.dll
-platforms\qwindows.dll
 imageformats\qjpeg.dll
+platforms\qwindows.dll
 ```
 
 Double click fractorium.exe to run it, and use the command line to run the others.
@@ -265,10 +265,10 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  ├─ vccorlib140.dll (optional)
  ├─ concrt140.dll (optional)
  │  
- └─platforms
-    │
-    ├─qwindows.dll
  └─imageformats
     │
     ├─qjpeg.dll
+ └─platforms
+    │
+    ├─qwindows.dll
 ```

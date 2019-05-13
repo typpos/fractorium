@@ -1,7 +1,7 @@
 Source: fractorium
 Section: graphics
 Priority: optional
-Maintainer: Gambhiro Bhikkhu <matt.feemster@gmail.com>
+Maintainer: Matt Feemster <matt.feemster@gmail.com>
 Build-Depends: debhelper (>= 9), g++ (>= 5.4), libc6-dev, libgl1-mesa-dev, libgl-dev, libglm-dev, libjpeg-dev, libpng-dev, libqt5opengl5-dev, libtbb-dev, libxml2-dev, ocl-icd-libopencl1, ocl-icd-opencl-dev, opencl-headers, qt5-default, qt5-qmake, qtbase5-dev, libopenexr22, libopenexr-dev
 Standards-Version: 3.9.5
 Homepage: http://fractorium.com/

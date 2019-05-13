@@ -121,6 +121,7 @@ tar --exclude='package-linux.sh' \
 	./Data/Mica_Group.ugr \
 	./Data/Quartz_Varieties.ugr \
 	./Data/dark_linux.qss \
+	./Data/lightdark.qss \
 	.
 
 [ $? -ne 0 ] && echo "Tar command failed." && exit 2

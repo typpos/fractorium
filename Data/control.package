@@ -1,7 +1,7 @@
 Source: Fractorium
 Section: graphics
 Priority: optional
-Maintainer: Gambhiro Bhikkhu <matt.feemster@gmail.com>
+Maintainer: Matt Feemster <matt.feemster@gmail.com>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.5
 Homepage: http://fractorium.com/

@@ -11,6 +11,12 @@ FRACTORIUM_PACKAGE=$BUILD_PATH/../Bin/Fractorium
 FRACTORIUM_RPM_PACKAGE=$BUILD_PATH/../Bin/rpmbuild
 EXTRA_LIBS=/usr/lib/x86_64-linux-gnu
 
+# replace 5.12.2 by your QT version, and check if the instation path is the same
+QT_PATH=/home/$USER/Dev/Qt/5.11.2/gcc_64/bin
+
+LINUX_DEPLOY_QT=/home/$USER/Dev/linuxdeployqt-6-x86_64.AppImage
+APP_IMAGE_TOOL=/home/$USER/Dev/appimagetool-x86_64.AppImage
+
 #######################
 #simple check
 
@@ -38,16 +44,31 @@ if [ -d "$FRACTORIUM_RPM_PACKAGE" ]; then
    exit 2
 fi
 
+if [ ! -d "$QT_PATH" ]; then
+   echo "QT folder not found. Please, change QT_PATH."
+   exit 2
+fi
+
+check_apps()
+{
+  FILE=$1
+  echo $FILE
+  if [ ! -e "$FILE" ] ; then
+    echo "Application not found: " $FILE
+    exit 0
+  fi
+}
+
+check_apps "$LINUX_DEPLOY_QT"
+check_apps "$APP_IMAGE_TOOL"
+
 #######################
 
-# replace 5.12.2 by your QT version, and check if the instation path is the same
-export PATH=/home/$USER/Qt/5.12.2/gcc_64/bin:$PATH
+export PATH=$QT_PATH:$PATH
 
+mkdir -p $APP_DIR
 
-LINUX_DEPLOY_QT=/home/$USER/Qt/linuxdeployqt-6-x86_64.AppImage
-APP_IMAGE_TOOL=/home/$USER/Qt/appimagetool-x86_64.AppImage
-
-cd $FRACTORIUM_RELEASE_ROOT
+cd $APP_DIR
 
 FRACTORIUM_BIN=usr/bin
 FRACTORIUM_LIB=usr/lib
@@ -59,9 +80,9 @@ mkdir -p $FRACTORIUM_LIB
 mkdir -p $FRACTORIUM_SHR
 mkdir -p $FRACTORIUM_ICO
 
-mv ember* $FRACTORIUM_BIN
-mv fractorium $FRACTORIUM_BIN
-mv lib* $FRACTORIUM_LIB
+cp $FRACTORIUM_RELEASE_ROOT/ember* $FRACTORIUM_BIN
+cp $FRACTORIUM_RELEASE_ROOT/fractorium $FRACTORIUM_BIN
+cp $FRACTORIUM_RELEASE_ROOT/lib* $FRACTORIUM_LIB
 
 cp $EXTRA_LIBS/libHalf.so.12 $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libIex-2_2.so.12 $FRACTORIUM_LIB
@@ -79,14 +100,10 @@ cp $DATA_PATH/lightdark.qss $FRACTORIUM_BIN
 cp $DATA_PATH/flam3-palettes.xml $FRACTORIUM_BIN
 cp $DATA_PATH/*.gradient $FRACTORIUM_BIN
 cp $DATA_PATH/*.ugr $FRACTORIUM_BIN
-cp $ICON_PATH/Fractorium.png $FRACTORIUM_ICO
-mv $FRACTORIUM_ICO/Fractorium.png $FRACTORIUM_ICO/fractorium.png
-cp $DATA_PATH/fractorium.appimage.desktop $FRACTORIUM_SHR
-mv $FRACTORIUM_SHR/fractorium.appimage.desktop $FRACTORIUM_SHR/fractorium.desktop
+cp $ICON_PATH/Fractorium.png $FRACTORIUM_ICO/fractorium.png
+cp $DATA_PATH/fractorium.appimage.desktop $FRACTORIUM_SHR/fractorium.desktop
 
 cd ../
-
-mv release Fractorium.AppDir
 
 # LINUX_DEPLOY_QT OPTIONS
 
@@ -106,7 +123,7 @@ echo ""
 echo "Creating the DEB package."
 echo ""
 
-mkdir -p Fractorium
+mkdir    Fractorium
 mkdir -p Fractorium/DEBIAN
 mkdir -p Fractorium/usr/bin
 mkdir -p Fractorium/usr/share/applications
@@ -114,22 +131,24 @@ mkdir -p Fractorium/usr/share/fractorium
 
 cp Fractorium-x86_64.AppImage Fractorium/usr/bin
 
-cp $DATA_PATH/fractorium.package.desktop Fractorium/usr/share/applications
-mv Fractorium/usr/share/applications/fractorium.package.desktop Fractorium/usr/share/applications/fractorium.desktop
+cp $DATA_PATH/fractorium.package.desktop Fractorium/usr/share/applications/fractorium.desktop
 
-cp $ICON_PATH/Fractorium.png Fractorium/usr/share/fractorium
-mv Fractorium/usr/share/fractorium/Fractorium.png Fractorium/usr/share/fractorium/fractorium.png
+cp $ICON_PATH/Fractorium.png Fractorium/usr/share/fractorium/fractorium.png
 
-cp $DATA_PATH/control.package Fractorium/DEBIAN
-mv Fractorium/DEBIAN/control.package Fractorium/DEBIAN/control
+cp $DATA_PATH/control.package Fractorium/DEBIAN/control
 
 #creating symbolic links
 cd ./Fractorium/usr/bin
 
-ln -s Fractorium-x86_64.AppImage fractorium
-ln -s Fractorium-x86_64.AppImage emberrender
-ln -s Fractorium-x86_64.AppImage embergenome
-ln -s Fractorium-x86_64.AppImage emberanimate
+create_symlinks()
+{
+   ln -s Fractorium-x86_64.AppImage fractorium
+   ln -s Fractorium-x86_64.AppImage emberrender
+   ln -s Fractorium-x86_64.AppImage embergenome
+   ln -s Fractorium-x86_64.AppImage emberanimate
+}
+
+create_symlinks
 
 cd ../../../
 
@@ -139,7 +158,7 @@ echo ""
 echo "Creating RPM package"
 echo ""
 
-mkdir -p rpmbuild
+mkdir    rpmbuild
 mkdir -p rpmbuild/BUILD
 mkdir -p rpmbuild/BUILDROOT
 mkdir -p rpmbuild/RPMS
@@ -165,12 +184,26 @@ emberVersion=$(grep '#define EMBER_VERSION' ../Source/Ember/EmberDefines.h | sed
 mv Fractorium.deb Fractorium-$emberVersion-.x86_64.deb
 mv Fractorium-$emberVersion-1.x86_64.rpm Fractorium-$emberVersion.x86_64.rpm
 
-tar -czvf Fractorium-$emberVersion.x86_64.AppImage.tar.gz Fractorium-x86_64.AppImage
+echo ""
+echo "Finishing AppImage"
+echo ""
+
+rm -rf Fractorium
+
+mkdir Fractorium
+
+cp Fractorium-x86_64.AppImage Fractorium
+cd Fractorium
+
+create_symlinks
+
+cd ../
+
+tar -czvf Fractorium-$emberVersion.x86_64.AppImage.tar.gz Fractorium
 
 #cleaning
 rm -rf Fractorium
 rm -rf Fractorium.AppDir
 rm -rf rpmbuild
 rm -rf Fractorium-x86_64.AppImage
-
 

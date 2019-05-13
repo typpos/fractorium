@@ -160,7 +160,8 @@ Apatite_Supergroup.ugr
 boxtail_pack_02.gradient
 boxtail_pack_03_triangle.gradient
 boxtail_pack_04_mineshack.gradient
-dark.qss
+dark_windows.qss
+lightdark.qss
 ember.dll
 ember.exp
 ember.lib
@@ -198,6 +199,7 @@ tatasz_pack_02_warmer.gradient
 tatasz_pack_03.gradient
 tbb.dll
 platforms\qwindows.dll
+imageformats\qjpeg.dll
 ```
 
 Double click fractorium.exe to run it, and use the command line to run the others.
@@ -223,7 +225,8 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  ├─ boxtail_pack_02.gradient
  ├─ boxtail_pack_03_triangle.gradient
  ├─ boxtail_pack_04_mineshack.gradient
- ├─ dark.qss
+ ├─ dark_windows.qss
+ ├─ lightdark.qss
  ├─ ember.dll
  ├─ emberanimate.exe
  ├─ embercl.dll
@@ -265,4 +268,7 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  └─platforms
     │
     ├─qwindows.dll
+ └─imageformats
+    │
+    ├─qjpeg.dll
 ```

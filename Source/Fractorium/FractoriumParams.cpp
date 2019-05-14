@@ -228,7 +228,7 @@ template <typename T> void FractoriumEmberController<T>::K2Changed(double d)
 	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
 		ember.m_K2 = d;
-	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
+	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
 
 void Fractorium::OnK2Changed(double d) { m_Controller->K2Changed(d); }

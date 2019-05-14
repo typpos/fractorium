@@ -11,7 +11,7 @@ FRACTORIUM_PACKAGE=$BUILD_PATH/../Bin/Fractorium
 FRACTORIUM_RPM_PACKAGE=$BUILD_PATH/../Bin/rpmbuild
 EXTRA_LIBS=/usr/lib/x86_64-linux-gnu
 
-# replace 5.12.2 by your QT version, and check if the bin path is the same
+# replace 5.11.2 by your QT version, and check if the instation path is the same
 QT_PATH=/home/$USER/Dev/Qt/5.11.2/gcc_64/bin
 
 LINUX_DEPLOY_QT=/home/$USER/Dev/linuxdeployqt-6-x86_64.AppImage
@@ -127,7 +127,7 @@ mkdir    Fractorium
 mkdir -p Fractorium/DEBIAN
 mkdir -p Fractorium/usr/bin
 mkdir -p Fractorium/usr/share/applications
-mkdir -p Fractorium/usr/share/fractorium
+mkdir -p Fractorium/usr/share/fractorium/bench
 
 cp Fractorium-x86_64.AppImage Fractorium/usr/bin
 
@@ -136,6 +136,8 @@ cp $DATA_PATH/fractorium.package.desktop Fractorium/usr/share/applications/fract
 cp $ICON_PATH/Fractorium.png Fractorium/usr/share/fractorium/fractorium.png
 
 cp $DATA_PATH/control.package Fractorium/DEBIAN/control
+
+cp $DATA_PATH/Bench/* Fractorium/usr/share/fractorium/bench
 
 #creating symbolic links
 cd ./Fractorium/usr/bin
@@ -197,6 +199,10 @@ cd Fractorium
 
 create_symlinks
 
+mkdir bench
+
+cp $DATA_PATH/Bench/* bench
+
 cd ../
 
 tar -czvf Fractorium-$emberVersion.x86_64.AppImage.tar.gz Fractorium
@@ -206,4 +212,3 @@ rm -rf Fractorium
 rm -rf Fractorium.AppDir
 rm -rf rpmbuild
 rm -rf Fractorium-x86_64.AppImage
-

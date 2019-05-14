@@ -37,5 +37,13 @@ http://mfeemster.deviantart.com/
 %attr(0644, root, root) "/usr/share/applications/fractorium.desktop"
 %attr(0644, root, root) "/usr/share/fractorium/fractorium.png"
 
+#bench files
+%attr(0644, root, root) "/usr/share/fractorium/bench/EmberBench.ps1"
+%attr(0644, root, root) "/usr/share/fractorium/bench/golubaja_rippingfrominside_complexcode.flame"
+%attr(0644, root, root) "/usr/share/fractorium/bench/mfeemster_basicmemory.flame"
+%attr(0644, root, root) "/usr/share/fractorium/bench/tatasz_springcrown_manysimplexforms.flame"
+%attr(0644, root, root) "/usr/share/fractorium/bench/tyrantwave_flippeddisc_normal.flame"
+%attr(0644, root, root) "/usr/share/fractorium/bench/zy0rg_six_bigcomplexcode.flame"
+
 %changelog
 

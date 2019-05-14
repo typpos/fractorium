@@ -1634,7 +1634,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		}
 		else if (!Compare(curAtt->name, "overall_curve"))
 		{
-			cout << "found overall curves\n";
+			//cout << "found overall curves\n";
 			auto splits = Split(attStr, ' ');
 			istringstream is(attStr);
 			vector<v2F> vals;
@@ -1657,7 +1657,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		}
 		else if (!Compare(curAtt->name, "red_curve"))
 		{
-			cout << "found red curves\n";
+			//cout << "found red curves\n";
 			auto splits = Split(attStr, ' ');
 			istringstream is(attStr);
 			vector<v2F> vals;
@@ -1680,7 +1680,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		}
 		else if (!Compare(curAtt->name, "green_curve"))
 		{
-			cout << "found green curves\n";
+			//cout << "found green curves\n";
 			auto splits = Split(attStr, ' ');
 			istringstream is(attStr);
 			vector<v2F> vals;
@@ -1703,7 +1703,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		}
 		else if (!Compare(curAtt->name, "blue_curve"))
 		{
-			cout << "found blue curves\n";
+			//cout << "found blue curves\n";
 			auto splits = Split(attStr, ' ');
 			istringstream is(attStr);
 			vector<v2F> vals;

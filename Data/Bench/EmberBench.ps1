@@ -1,7 +1,14 @@
-$exe = "./EmberRender.exe"
-#On linux do this:
-#$exe = "emberrender"
-$benchprefix = "./Bench/"
+$exe = ""
+if ([System.Environment]::OSVersion.Platform.ToString().ToLower() -like "*win*")
+{
+    $exe = "./EmberRender.exe"
+}
+else
+{
+    $exe = "emberrender"
+}
+
+$benchprefix = "./bench/"
 $devices = "2"#Set this to whatever device index your main GPU resides at. If you are unsure, just run emberrender --opencl info to find out.
 $cpuquality = 150
 $gpuquality = 2000
@@ -15,7 +22,7 @@ $ssSuffixArray = @("_ss1","_ss2","_ss4")
 $Script:output = ""
 [Collections.Generic.List[String]] $filteredLines = ""
 
-$table = New-Object system.Data.DataTable “BenchTable”
+$table = New-Object system.Data.DataTable "BenchTable"
 $col1 = New-Object system.Data.DataColumn Filename, ([string])
 $col2 = New-Object system.Data.DataColumn Precision, ([string])
 $col3 = New-Object system.Data.DataColumn Device,([string])

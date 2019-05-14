@@ -6609,12 +6609,10 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x0 = helper.In.x;
-		T y0 = helper.In.y;
-		T scalex = T(0.5) * m_Scalex * (T(1.0) + std::sin(y0 * m_Sxfreq));
-		T scaley = T(0.5) * m_Scaley * (T(1.0) + std::sin(x0 * m_Syfreq));
-		helper.Out.x = m_Weight * (x0 + std::sin(y0 * m_Freqx) * scalex);
-		helper.Out.y = m_Weight * (y0 + std::sin(x0 * m_Freqy) * scaley);
+		T scalex = T(0.5) * m_Scalex * (T(1.0) + std::sin(helper.In.y * m_Sxfreq));
+		T scaley = T(0.5) * m_Scaley * (T(1.0) + std::sin(helper.In.x * m_Syfreq));
+		helper.Out.x = m_Weight * (helper.In.x + std::sin(helper.In.y * m_Freqx) * scalex);
+		helper.Out.y = m_Weight * (helper.In.y + std::sin(helper.In.x * m_Freqy) * scaley);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6627,19 +6625,16 @@ public:
 		string weight = WeightDefineString();
 		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string sxfreq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string syfreq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x0 = vIn.x;\n"
-		   << "\t\treal_t y0 = vIn.y;\n"
+		   << "\t\treal_t scalex = (real_t)(0.5) * " << scalex << " * ((real_t)(1.0) + sin(vIn.y * " << sxfreq << "));\n"
+		   << "\t\treal_t scaley = (real_t)(0.5) * " << scaley << " * ((real_t)(1.0) + sin(vIn.x * " << syfreq << "));\n"
 		   << "\n"
-		   << "\t\treal_t scalex = (real_t)(0.5) * " << scalex << " * ((real_t)(1.0) + sin(y0 * " << sxfreq << "));\n"
-		   << "\t\treal_t scaley = (real_t)(0.5) * " << scaley << " * ((real_t)(1.0) + sin(x0 * " << syfreq << "));\n"
-		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (x0 + sin(y0 * " << freqx << ") * scalex);\n"
-		   << "\t\tvOut.y = " << weight << " * (y0 + sin(x0 * " << freqy << ") * scaley);\n"
+		   << "\t\tvOut.x = " << weight << " * fma(sin(vIn.y * " << freqx << "), scalex, vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(sin(vIn.x * " << freqy << "), scaley, vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -6657,8 +6652,8 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Scalex, prefix + "waves3_scalex", T(0.05)));
 		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves3_scaley", T(0.05)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqx, prefix + "waves3_freqx", T(7.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqy, prefix + "waves3_freqy", T(13.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,  prefix + "waves3_freqx", T(7.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,  prefix + "waves3_freqy", T(13.0)));
 		m_Params.push_back(ParamWithName<T>(&m_Sxfreq, prefix + "waves3_sx_freq"));
 		m_Params.push_back(ParamWithName<T>(&m_Syfreq, prefix + "waves3_sy_freq", T(2.0)));
 	}
@@ -6689,16 +6684,14 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x0 = helper.In.x;
-		T y0 = helper.In.y;
-		T ax = T(Floor<T>(y0 * m_Freqx / M_2PI));
-		ax = std::sin(ax * T(12.9898) + ax * T(78.233) + T(1.0) + y0 * T(0.001) * m_Yfact) * T(43758.5453);
+		T ax = T(Floor<T>(helper.In.y * m_Freqx / M_2PI));
+		ax = std::sin(ax * T(12.9898) + ax * T(78.233) + T(1.0) + helper.In.y * T(0.001) * m_Yfact) * T(43758.5453);
 		ax = ax - (int)ax;
 
 		if (m_Cont == 1) ax = (ax > T(0.5)) ? T(1.0) : T(0.0);
 
-		helper.Out.x = m_Weight * (x0 + std::sin(y0 * m_Freqx) * ax * ax * m_Scalex);
-		helper.Out.y = m_Weight * (y0 + std::sin(x0 * m_Freqy) * m_Scaley);
+		helper.Out.x = m_Weight * (helper.In.x + std::sin(helper.In.y * m_Freqx) * ax * ax * m_Scalex);
+		helper.Out.y = m_Weight * (helper.In.y + std::sin(helper.In.x * m_Freqy) * m_Scaley);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6711,21 +6704,18 @@ public:
 		string weight = WeightDefineString();
 		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cont = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string yfact = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cont   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string yfact  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x0 = vIn.x;\n"
-		   << "\t\treal_t y0 = vIn.y;\n"
-		   << "\n"
-		   << "\t\treal_t ax = floor(y0 * " << freqx << " / M_2PI);\n"
-		   << "\t\tax = sin(ax * (real_t)(12.9898) + ax * (real_t)(78.233) + (real_t)(1.0) + y0 * (real_t)(0.001) * " << yfact << ") * (real_t)(43758.5453);\n"
+		   << "\t\treal_t ax = floor(vIn.y * " << freqx << " / M_2PI);\n"
+		   << "\t\tax = sin(ax * (real_t)(12.9898) + ax * (real_t)(78.233) + (real_t)(1.0) + vIn.y * (real_t)(0.001) * " << yfact << ") * (real_t)(43758.5453);\n"
 		   << "\t\tax = ax - (int) ax;\n"
 		   << "\t\tif (" << cont << " == 1) ax = (ax > (real_t)(0.5)) ? (real_t)(1.0) : 0.0;\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (x0 + sin(y0 * " << freqx << ") * ax * ax * " << scalex << ");\n"
-		   << "\t\tvOut.y = " << weight << " * (y0 + sin(x0 * " << freqy << ") * " << scaley << ");\n"
+		   << "\t\tvOut.x = " << weight << " * fma(sin(vIn.y * " << freqx << "), ax * ax * " << scalex << ", vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(sin(vIn.x * " << freqy << "), " << scaley << ", vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -6743,10 +6733,10 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Scalex, prefix + "waves4_scalex", T(0.05)));
 		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves4_scaley", T(0.05)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqx, prefix + "waves4_freqx", T(7.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqy, prefix + "waves4_freqy", T(13.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Cont, prefix + "waves4_cont", T(0), eParamType::INTEGER, T(0), T(1)));
-		m_Params.push_back(ParamWithName<T>(&m_Yfact, prefix + "waves4_yfact", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,  prefix + "waves4_freqx", T(7.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,  prefix + "waves4_freqy", T(13.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Cont,   prefix + "waves4_cont", T(0), eParamType::INTEGER, T(0), T(1)));
+		m_Params.push_back(ParamWithName<T>(&m_Yfact,  prefix + "waves4_yfact", T(0.1)));
 	}
 
 private:
@@ -6775,35 +6765,33 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x0 = helper.In.x;
-		T y0 = helper.In.y;
 		T sinx, siny;
 		int px = (int)m_Powerx;
 		int py = (int)m_Powery;
 
 		if (m_Modex < T(0.5))
 		{
-			sinx = std::sin(y0 * m_Freqx);
+			sinx = std::sin(helper.In.y * m_Freqx);
 		}
 		else
 		{
-			sinx = T(0.5) * (T(1.0) + std::sin(y0 * m_Freqx));
+			sinx = T(0.5) * (T(1.0) + std::sin(helper.In.y * m_Freqx));
 		}
 
 		T offsetx = std::pow(sinx, px) * m_Scalex;
 
 		if (m_Modey < T(0.5))
 		{
-			siny = std::sin(x0 * m_Freqy);
+			siny = std::sin(helper.In.x * m_Freqy);
 		}
 		else
 		{
-			siny = T(0.5) * (T(1.0) + std::sin(x0 * m_Freqy));
+			siny = T(0.5) * (T(1.0) + std::sin(helper.In.x * m_Freqy));
 		}
 
 		T offsety = std::pow(siny, py) * m_Scaley;
-		helper.Out.x = m_Weight * (x0 + offsetx);
-		helper.Out.y = m_Weight * (y0 + offsety);
+		helper.Out.x = m_Weight * (helper.In.x + offsetx);
+		helper.Out.y = m_Weight * (helper.In.y + offsety);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6816,34 +6804,31 @@ public:
 		string weight = WeightDefineString();
 		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string modex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string modey = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string modex  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string modey  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powerx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powery = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x0 = vIn.x;\n"
-		   << "\t\treal_t y0 = vIn.y;\n"
-		   << "\n"
 		   << "\t\treal_t sinx, siny;\n"
 		   << "\n"
 		   << "\t\tint px = (int) " << powerx << ";\n"
 		   << "\t\tint py = (int) " << powery << ";\n"
 		   << "\t\tif (" << modex << " < (real_t)(0.5)){\n"
-		   << "\t\tsinx = sin(y0 * " << freqx << ");\n"
+		   << "\t\tsinx = sin(vIn.y * " << freqx << ");\n"
 		   << "\t\t} else {\n"
-		   << "\t\tsinx = (real_t)(0.5) * ((real_t)(1.0) + sin(y0 * " << freqx << "));\n"
+		   << "\t\tsinx = (real_t)(0.5) * ((real_t)(1.0) + sin(vIn.y * " << freqx << "));\n"
 		   << "\t\t}\n"
 		   << "\t\treal_t offsetx = pow(sinx, px) * " << scalex << ";\n"
 		   << "\t\tif (" << modey << " < (real_t)(0.5)){\n"
-		   << "\t\tsiny = sin(x0 * " << freqy << ");\n"
+		   << "\t\tsiny = sin(vIn.x * " << freqy << ");\n"
 		   << "\t\t} else {\n"
-		   << "\t\tsiny = (real_t)(0.5) * ((real_t)(1.0) + sin(x0 * " << freqy << "));\n"
+		   << "\t\tsiny = (real_t)(0.5) * ((real_t)(1.0) + sin(vIn.x * " << freqy << "));\n"
 		   << "\t\t}\n"
 		   << "\t\treal_t offsety = pow(siny, py) * " << scaley << ";\n"
-		   << "\t\tvOut.x = " << weight << " * (x0 + offsetx);\n"
-		   << "\t\tvOut.y = " << weight << " * (y0 + offsety);\n"
+		   << "\t\tvOut.x = " << weight << " * (vIn.x + offsetx);\n"
+		   << "\t\tvOut.y = " << weight << " * (vIn.y + offsety);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -6861,10 +6846,10 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Scalex, prefix + "waves22_scalex", T(0.05)));
 		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves22_scaley", T(0.05)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqx, prefix + "waves22_freqx", T(7.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqy, prefix + "waves22_freqy", T(13.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Modex, prefix + "waves22_modex", T(0), eParamType::INTEGER, T(0), T(1)));
-		m_Params.push_back(ParamWithName<T>(&m_Modey, prefix + "waves22_modey", T(0), eParamType::INTEGER, T(0), T(1)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,  prefix + "waves22_freqx", T(7.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,  prefix + "waves22_freqy", T(13.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Modex,  prefix + "waves22_modex", T(0), eParamType::INTEGER, T(0), T(1)));
+		m_Params.push_back(ParamWithName<T>(&m_Modey,  prefix + "waves22_modey", T(0), eParamType::INTEGER, T(0), T(1)));
 		m_Params.push_back(ParamWithName<T>(&m_Powerx, prefix + "waves22_powerx", T(2.0)));
 		m_Params.push_back(ParamWithName<T>(&m_Powery, prefix + "waves22_powery", T(2.0)));
 	}
@@ -6897,20 +6882,18 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x0 = helper.In.x;
-		T y0 = helper.In.y;
-		T mx = y0 * m_Freqx * M_1_2PI;
+		T mx = helper.In.y * m_Freqx * M_1_2PI;
 		T fx = mx - Floor<T>(mx);
 
 		if (fx > T(0.5)) fx = T(0.5) - fx;
 
-		T my = x0 * m_Freqy * M_1_2PI;
+		T my = helper.In.x * m_Freqy * M_1_2PI;
 		T fy = my - Floor<T>(my);
 
 		if (fy > T(0.5)) fy = T(0.5) - fy;
 
-		helper.Out.x = m_Weight * (x0 + fx * m_Scalex);
-		helper.Out.y = m_Weight * (y0 + fy * m_Scaley);
+		helper.Out.x = m_Weight * (helper.In.x + fx * m_Scalex);
+		helper.Out.y = m_Weight * (helper.In.y + fy * m_Scaley);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6923,20 +6906,17 @@ public:
 		string weight = WeightDefineString();
 		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x0 = vIn.x;\n"
-		   << "\t\treal_t y0 = vIn.y;\n"
-		   << "\n"
-		   << "\t\treal_t mx = y0 * " << freqx << " * M_1_2PI;\n"
+		   << "\t\treal_t mx = vIn.y * " << freqx << " * M_1_2PI;\n"
 		   << "\t\treal_t fx = mx - floor(mx);\n"
 		   << "\t\tif (fx > (real_t)(0.5)) fx = (real_t)(0.5) - fx;\n"
-		   << "\t\treal_t my = x0 * " << freqy << " * M_1_2PI;\n"
+		   << "\t\treal_t my = vIn.x * " << freqy << " * M_1_2PI;\n"
 		   << "\t\treal_t fy = my - floor(my);\n"
 		   << "\t\tif (fy > (real_t)(0.5)) fy = (real_t)(0.5) - fy;\n"
-		   << "\t\tvOut.x = " << weight << " * (x0 + fx * " << scalex << ");\n"
-		   << "\t\tvOut.y = " << weight << " * (y0 + fy * " << scaley << ");\n"
+		   << "\t\tvOut.x = " << weight << " * fma(fx, " << scalex << ", vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(fy, " << scaley << ", vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -6954,8 +6934,8 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Scalex, prefix + "waves23_scalex", T(0.05)));
 		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves23_scaley", T(0.05)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqx, prefix + "waves23_freqx", T(7.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqy, prefix + "waves23_freqy", T(13.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,  prefix + "waves23_freqx", T(7.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,  prefix + "waves23_freqy", T(13.0)));
 	}
 
 private:
@@ -6982,16 +6962,14 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x0 = helper.In.x;
-		T y0 = helper.In.y;
-		T ax = T(Floor<T>(y0 * m_Freqx2));
-		ax = std::sin(ax * T(12.9898) + ax * T(78.233) + T(1.0) + y0 * T(0.001) * m_Yfact) * T(43758.5453);
-		ax = ax - (int)ax;
+		T ax = T(Floor<T>(helper.In.y * m_Freqx2));
+		ax = std::sin(ax * T(12.9898) + ax * T(78.233) + T(1.0) + helper.In.y * T(0.001) * m_Yfact) * T(43758.5453);
+		ax = ax - int(ax);
 
 		if (m_Cont == 1) ax = (ax > T(0.5)) ? T(1.0) : T(0.0);
 
-		helper.Out.x = m_Weight * (x0 + std::sin(y0 * m_Freqx) * ax * ax * m_Scalex);
-		helper.Out.y = m_Weight * (y0 + std::sin(x0 * m_Freqy) * m_Scaley);
+		helper.Out.x = m_Weight * (helper.In.x + std::sin(helper.In.y * m_Freqx) * ax * ax * m_Scalex);
+		helper.Out.y = m_Weight * (helper.In.y + std::sin(helper.In.x * m_Freqy) * m_Scaley);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -7004,22 +6982,19 @@ public:
 		string weight = WeightDefineString();
 		string scalex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scaley = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqx = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freqy = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cont = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string yfact = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string cont   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string yfact  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string freqx2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x0 = vIn.x;\n"
-		   << "\t\treal_t y0 = vIn.y;\n"
-		   << "\n"
-		   << "\t\treal_t ax = floor(y0 * " << freqx2 << ");\n"
-		   << "\t\tax = sin(ax * (real_t)(12.9898) + ax * (real_t)(78.233) + (real_t)(1.0) + y0 * (real_t)(0.001) * " << yfact << ") * (real_t)(43758.5453);\n"
+		   << "\t\treal_t ax = floor(vIn.y * " << freqx2 << ");\n"
+		   << "\t\tax = sin(ax * (real_t)(12.9898) + ax * (real_t)(78.233) + (real_t)(1.0) + vIn.y * (real_t)(0.001) * " << yfact << ") * (real_t)(43758.5453);\n"
 		   << "\t\tax = ax - (int) ax;\n"
 		   << "\t\tif (" << cont << " == 1) ax = (ax > (real_t)(0.5)) ? (real_t)(1.0) : 0.0;\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (x0 + sin(y0 * " << freqx << ") * ax * ax * " << scalex << ");\n"
-		   << "\t\tvOut.y = " << weight << " * (y0 + sin(x0 * " << freqy << ") * " << scaley << ");\n"
+		   << "\t\tvOut.x = " << weight << " * fma(sin(vIn.y * " << freqx << "), ax * ax * " << scalex << ", vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(sin(vIn.x * " << freqy << "), " << scaley << ", vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
@@ -7037,10 +7012,10 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Scalex, prefix + "waves42_scalex", T(0.05)));
 		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves42_scaley", T(0.05)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqx, prefix + "waves42_freqx", T(7.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Freqy, prefix + "waves42_freqy", T(13.0)));
-		m_Params.push_back(ParamWithName<T>(&m_Cont, prefix + "waves42_cont", T(0), eParamType::INTEGER, T(0), T(1)));
-		m_Params.push_back(ParamWithName<T>(&m_Yfact, prefix + "waves42_yfact", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqx,  prefix + "waves42_freqx", T(7.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Freqy,  prefix + "waves42_freqy", T(13.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Cont,   prefix + "waves42_cont", T(0), eParamType::INTEGER, T(0), T(1)));
+		m_Params.push_back(ParamWithName<T>(&m_Yfact,  prefix + "waves42_yfact", T(0.1)));
 		m_Params.push_back(ParamWithName<T>(&m_Freqx2, prefix + "waves42_freqx2", T(1.0)));
 	}
 

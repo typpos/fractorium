@@ -1,5 +1,7 @@
-$exe = ".\EmberRender.exe"
-$benchprefix = ".\Bench\"
+$exe = "./EmberRender.exe"
+#On linux do this:
+#$exe = "emberrender"
+$benchprefix = "./Bench/"
 $devices = "2"#Set this to whatever device index your main GPU resides at. If you are unsure, just run emberrender --opencl info to find out.
 $cpuquality = 150
 $gpuquality = 2000
@@ -7,8 +9,8 @@ $verbose = "--verbose"
 $name_enable = "--name_enable"
 $dump_args = ""#"--dumpargs"
 $totalOutput = ""
-$ssArray = @(“1”,”2”,”4”)
-$ssSuffixArray = @(“_ss1”,”_ss2”,”_ss4”)
+$ssArray = @("1","2","4")
+$ssSuffixArray = @("_ss1","_ss2","_ss4")
 
 $Script:output = ""
 [Collections.Generic.List[String]] $filteredLines = ""

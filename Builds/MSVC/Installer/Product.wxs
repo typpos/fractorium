@@ -58,7 +58,7 @@
 
 		<WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)..\..\..\Data\gplv3.rtf" />
 		<WixVariable Id="WixUIBannerBmp" Value="$(var.SolutionDir)..\..\..\Source\Fractorium\Icons\banner.bmp" /><!--493 x 58 pixels -->
-		<WixVariable Id="WixUIDialogBmp" Value="$(var.SolutionDir)..\..\..\Source\Fractorium\Icons\dialog.bmp" /><!--493 × 312 pixels -->
+		<WixVariable Id="WixUIDialogBmp" Value="$(var.SolutionDir)..\..\..\Source\Fractorium\Icons\dialog.bmp" /><!--493 x 312 pixels -->
 		
 		<Property Id="MSIUSEREALADMINDETECTION" Value="1" />
 		<Property Id="MSIFASTINSTALL" Value="1" />

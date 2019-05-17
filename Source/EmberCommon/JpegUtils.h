@@ -59,7 +59,7 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		info.image_width = JDIMENSION(width);
 		info.image_height = JDIMENSION(height);
 		jpeg_set_defaults(&info);
-#if defined(_WIN32) || defined(__APPLE__) // michel
+#if defined(_WIN32) || defined(__APPLE__)
 		jpeg_set_quality(&info, quality, static_cast<boolean>(TRUE));
 		jpeg_start_compress(&info, static_cast<boolean>(TRUE));
 		//Win32:TRUE is defined in MSVC2013\Windows Kits\8.1\Include\shared\minwindef.h:"#define TRUE                1"

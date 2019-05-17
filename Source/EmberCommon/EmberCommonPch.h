@@ -67,9 +67,10 @@
 	#include <OpenEXR/ImfRgbaFile.h>
 	#include <OpenEXR/ImfStringAttribute.h>
 	#include <OpenEXR/half.h>
-	#undef FALSE
-	#undef TRUE
-	#include <mach-o/dyld.h>
+    // #undef FALSE -- michel
+    // #undef TRUE -- michel
+    #define ENUM_DYLD_BOOL // michel
+    #include <mach-o/dyld.h>
 #else
 	#include <ImfRgbaFile.h>
 	#include <ImfStringAttribute.h>

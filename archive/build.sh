@@ -38,11 +38,11 @@ cp ./emberanimate.app/Contents/MacOS/emberanimate $FRACTORIUM_FINAL_ROOT
 cp ./embergenome.app/Contents/MacOS/embergenome $FRACTORIUM_FINAL_ROOT
 cp ./emberrender.app/Contents/MacOS/emberrender $FRACTORIUM_FINAL_ROOT
 
-#solving macdeployqt 5.9.3 bug (wasn't necessary when using 5.4.2)
+#solving macdeployqt bug
 cd $FRACTORIUM_FINAL_FRAMEWORKS
-install_name_tool -change /usr/local/Cellar/ilmbase/2.2.0/lib/libIex-2_2.12.dylib @executable_path/../Frameworks/libIex-2_2.12.dylib libIexMath-2_2.12.dylib
-install_name_tool -change /usr/local/Cellar/ilmbase/2.2.0/lib/libIex-2_2.12.dylib @executable_path/../Frameworks/libIex-2_2.12.dylib libIlmThread-2_2.12.dylib
-install_name_tool -change /usr/local/Cellar/ilmbase/2.2.0/lib/libIex-2_2.12.dylib @executable_path/../Frameworks/libIex-2_2.12.dylib libImath-2_2.12.dylib
+install_name_tool -change /usr/local/Cellar/ilmbase/2.2.1/lib/libIex-2_2.23.dylib @executable_path/../Frameworks/libIex-2_2.23.dylib libIexMath-2_2.23.dylib
+install_name_tool -change /usr/local/Cellar/ilmbase/2.2.1/lib/libIex-2_2.23.dylib @executable_path/../Frameworks/libIex-2_2.23.dylib libIlmThread-2_2.23.dylib
+install_name_tool -change /usr/local/Cellar/ilmbase/2.2.1/lib/libIex-2_2.23.dylib @executable_path/../Frameworks/libIex-2_2.23.dylib libImath-2_2.23.dylib
 
 cd $OSX_BUILD_PATH
 
@@ -54,6 +54,7 @@ cp flam3-palettes.xml $FRACTORIUM_FINAL_ROOT
 cp *.gradient $FRACTORIUM_FINAL_ROOT
 cp *.ugr $FRACTORIUM_FINAL_ROOT
 cp Info.plist $FRACTORIUM_FINAL_ROOT/../
+cp -r Bench $FRACTORIUM_FINAL_ROOT
 
 cd $FRACTORIUM_RELEASE_ROOT
 

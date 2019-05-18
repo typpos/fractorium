@@ -17,7 +17,7 @@
 	#define fopen_s(pFile,filename,mode) ((*(pFile)=fopen((filename),(mode)))==nullptr)
 	#define _stat stat
 	#define _fstat fstat
-	#define _stricmp strcmp
+	#define _stricmp strcasecmp
 	typedef int errno_t;
 #endif
 

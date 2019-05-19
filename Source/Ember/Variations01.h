@@ -6834,8 +6834,8 @@ public:
 	{
 		T s = std::sin(m_Freq * helper.In.x);
 		T t = std::sin(m_Freq * helper.In.y);
-		T dy = helper.In.y + m_AugerWeight * (m_Scale * s / Zeps(2 + std::abs(helper.In.y) * s));
-		T dx = helper.In.x + m_AugerWeight * (m_Scale * t / Zeps(2 + std::abs(helper.In.x) * t));
+		T dx = helper.In.x + m_AugerWeight * (m_HalfScale * t + std::abs(helper.In.x) * t);
+		T dy = helper.In.y + m_AugerWeight * (m_HalfScale * s + std::abs(helper.In.y) * s);
 		helper.Out.x = m_Weight * (helper.In.x + m_Symmetry * (dx - helper.In.x));
 		helper.Out.y = m_Weight * dy;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -6848,15 +6848,16 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string symmetry = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string symmetry    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string augerWeight = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string freq = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string freq        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scale       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfscale   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t s = sin(" << freq << " * vIn.x);\n"
 		   << "\t\treal_t t = sin(" << freq << " * vIn.y);\n"
-		   << "\t\treal_t dy = fma(" << augerWeight << ", " << scale << " * s / Zeps(fma(fabs(vIn.y), s, (real_t)(2.0))), vIn.y);\n"
-		   << "\t\treal_t dx = fma(" << augerWeight << ", " << scale << " * t / Zeps(fma(fabs(vIn.x), t, (real_t)(2.0))), vIn.x);\n"
+		   << "\t\treal_t dx = fma(" << augerWeight << ", fma(" << halfscale << ", t, fabs(vIn.x) * t), vIn.x);\n"
+		   << "\t\treal_t dy = fma(" << augerWeight << ", fma(" << halfscale << ", s, fabs(vIn.y) * s), vIn.y);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * fma(" << symmetry << ", (dx - vIn.x), vIn.x);\n"
 		   << "\t\tvOut.y = " << weight << " * dy;\n"
@@ -6873,6 +6874,11 @@ public:
 		m_Scale = rand.Frand01<T>();
 	}
 
+	virtual void Precalc() override
+	{
+		m_HalfScale = m_Scale / 2;
+	}
+
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
 		return vector<string> { "Zeps" };
@@ -6887,6 +6893,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_AugerWeight, prefix + "auger_weight", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Freq, prefix + "auger_freq", 5));
 		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "auger_scale", T(0.1)));
+		m_Params.push_back(ParamWithName<T>(&m_HalfScale, prefix + "auger_half_scale"));
 	}
 
 private:
@@ -6894,6 +6901,7 @@ private:
 	T m_AugerWeight;
 	T m_Freq;
 	T m_Scale;
+	T m_HalfScale;
 };
 
 /// <summary>

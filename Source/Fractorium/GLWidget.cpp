@@ -919,8 +919,6 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 		{
 			if (m_Fractorium->DrawImage())
 			{
-				UpdateHover(mouseFlipped);
-				m_SelectedXform = m_HoverXform;
 				m_CenterDownX = ember->m_CenterX;//Capture these because they will change when rotating and scaling.
 				m_CenterDownY = ember->m_CenterY;
 				m_RotationDown = ember->m_Rotate;

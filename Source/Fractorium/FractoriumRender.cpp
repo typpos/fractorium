@@ -724,6 +724,7 @@ bool Fractorium::CreateControllerFromOptions()
 		auto con = m_PaletteContrastSpin->value();
 		auto blur = m_PaletteBlurSpin->value();
 		auto freq = m_PaletteFrequencySpin->value();
+		auto rot = m_PreviewPaletteRotation;
 		double scale;
 		uint current = 0;
 #ifdef DO_DOUBLE
@@ -784,6 +785,7 @@ bool Fractorium::CreateControllerFromOptions()
 			m_PaletteContrastSpin->SetValueStealth(con);
 			m_PaletteBlurSpin->SetValueStealth(blur);
 			m_PaletteFrequencySpin->SetValueStealth(freq);
+			m_PreviewPaletteRotation = rot;
 			m_Controller->PaletteAdjust();//Applies the adjustments to temp and saves in m_Ember.m_Palette, then fills in the palette preview widget.
 		}
 

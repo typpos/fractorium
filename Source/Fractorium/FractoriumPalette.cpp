@@ -383,25 +383,22 @@ template <typename T>
 void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 {
 	size_t i = 0;
-	auto ed = m_Fractorium->m_PaletteEditor;	
+	auto ed = m_Fractorium->m_PaletteEditor;
 	map<size_t, float> colorIndices;
-    bool forceFinal = m_Fractorium->HaveFinal();
-
-    m_PreviosTempPalette = m_TempPalette; // it's necessary because m_TempPalette is changed when the user make changes in palette editor
-
-    ed->SetPalette(m_TempPalette);
+	bool forceFinal = m_Fractorium->HaveFinal();
+	m_PreviousTempPalette = m_TempPalette; // it's necessary because m_TempPalette is changed when the user make changes in palette editor
+	ed->SetPalette(m_TempPalette);
 
 	while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
 		colorIndices[i++] = xform->m_ColorX;
 
 	ed->SetColorIndices(colorIndices);
-    ed->SetPreviousColorIndices(colorIndices); // also necessary because the colors are changed in palette editor
+	ed->SetPreviousColorIndices(colorIndices); // also necessary because the colors are changed in palette editor
 	ed->SetPaletteFile(m_CurrentPaletteFilePath);
-
 #ifdef __linux__
-    ed->show();
-#else    
-    SyncPalette(ed->exec() == QDialog::Accepted);
+	ed->show();
+#else
+	SyncPalette(ed->exec() == QDialog::Accepted);
 #endif
 }
 
@@ -423,12 +420,12 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 {
 	if (!m_PaletteEditor)
 	{
-        m_PaletteEditor = new PaletteEditor(this);
+		m_PaletteEditor = new PaletteEditor(this);
 		connect(m_PaletteEditor, SIGNAL(PaletteChanged()),                 this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()),             this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(ColorIndexChanged(size_t, float)), this, SLOT(OnPaletteEditorColorIndexChanged(size_t, float)), Qt::QueuedConnection);
 #ifdef __linux__
-        connect(m_PaletteEditor, SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection);
+		connect(m_PaletteEditor, SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection);
 #endif
 	}
 
@@ -443,42 +440,42 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::SyncPalette(bool accepted)
 {
-    size_t i = 0;
-    auto ed = m_Fractorium->m_PaletteEditor;
-    Palette<float> edPal;
-    Palette<float> prevPal = m_PreviosTempPalette;
-    map<size_t, float> colorIndices;
-    bool forceFinal = m_Fractorium->HaveFinal();
+	size_t i = 0;
+	auto ed = m_Fractorium->m_PaletteEditor;
+	Palette<float> edPal;
+	Palette<float> prevPal = m_PreviousTempPalette;
+	map<size_t, float> colorIndices;
+	bool forceFinal = m_Fractorium->HaveFinal();
 
-    if (accepted)
-    {
-        //Copy all just to be safe, because they may or may not have synced.
-        colorIndices = ed->GetColorIndices();
+	if (accepted)
+	{
+		//Copy all just to be safe, because they may or may not have synced.
+		colorIndices = ed->GetColorIndices();
 
-        for (auto& index : colorIndices)
-            if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
-                xform->m_ColorX = index.second;
+		for (auto& index : colorIndices)
+			if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
+				xform->m_ColorX = index.second;
 
-        edPal = ed->GetPalette(int(prevPal.Size()));
-        SetBasePaletteAndAdjust(edPal);//This will take care of updating the color index controls.
+		edPal = ed->GetPalette(int(prevPal.Size()));
+		SetBasePaletteAndAdjust(edPal);//This will take care of updating the color index controls.
 
-        if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
-            m_Fractorium->SetPaletteFileComboIndex(*edPal.m_Filename);
-    }
-    else if (m_Fractorium->PaletteChanged())//They clicked cancel, but synced at least once, restore the previous palette.
-    {
-        colorIndices = ed->GetPreviousColorIndices();
+		if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
+			m_Fractorium->SetPaletteFileComboIndex(*edPal.m_Filename);
+	}
+	else if (m_Fractorium->PaletteChanged())//They clicked cancel, but synced at least once, restore the previous palette.
+	{
+		colorIndices = ed->GetPreviousColorIndices();
 
-        for (auto& index : colorIndices)
-            if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
-                xform->m_ColorX = index.second;
+		for (auto& index : colorIndices)
+			if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
+				xform->m_ColorX = index.second;
 
-        SetBasePaletteAndAdjust(prevPal);//This will take care of updating the color index controls.
-    }
+		SetBasePaletteAndAdjust(prevPal);//This will take care of updating the color index controls.
+	}
 
-    //Whether the current palette file was changed or not, if it's modifiable then reload it just to be safe (even though it might be overkill).
-    if (m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
-        m_Fractorium->OnPaletteFilenameComboChanged(QString::fromStdString(m_CurrentPaletteFilePath));
+	//Whether the current palette file was changed or not, if it's modifiable then reload it just to be safe (even though it might be overkill).
+	if (m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
+		m_Fractorium->OnPaletteFilenameComboChanged(QString::fromStdString(m_CurrentPaletteFilePath));
 }
 
 /// <summary>
@@ -528,7 +525,7 @@ void Fractorium::OnPaletteEditorColorIndexChanged(size_t index, float value)
 /// <param name="result">Cancel/OK action</param>
 void Fractorium::OnPaletteEditorFinished(int result)
 {
-    m_Controller->SyncPalette(result == QDialog::Accepted);
+	m_Controller->SyncPalette(result == QDialog::Accepted);
 }
 
 /// <summary>

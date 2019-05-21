@@ -360,7 +360,7 @@ public slots:
 	void OnPaletteEditorColorChanged();
 	void OnPaletteEditorFileChanged();
 	void OnPaletteEditorColorIndexChanged(size_t index, float value);
-    void OnPaletteEditorFinished(int result);
+	void OnPaletteEditorFinished(int result);
 
 	//Info.
 	void OnSummaryTableHeaderResized(int logicalIndex, int oldSize, int newSize);

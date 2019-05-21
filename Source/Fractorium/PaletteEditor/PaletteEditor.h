@@ -27,16 +27,16 @@ class PaletteEditor : public QDialog
 	Q_OBJECT
 
 public:
-    explicit PaletteEditor(QWidget* p = nullptr);
+	explicit PaletteEditor(QWidget* p = nullptr);
 
 public:
 	bool Sync();
 	Palette<float>& GetPalette(int size);
 	void SetPalette(const Palette<float>& palette);
 	map<size_t, float> GetColorIndices() const;
-    map<size_t, float> GetPreviousColorIndices() const;
+	map<size_t, float> GetPreviousColorIndices() const;
 	void SetColorIndices(const map<size_t, float>& indices);
-    void SetPreviousColorIndices(const map<size_t, float>& indices);
+	void SetPreviousColorIndices(const map<size_t, float>& indices);
 	string GetPaletteFile() const;
 	void SetPaletteFile(const string& filename);
 
@@ -80,7 +80,7 @@ private:
 	bool IsCurrentPaletteAndFileEditable();
 	bool m_PaletteFileChanged = false;
 	int m_PaletteIndex = 0;
-    map<size_t, float> m_PreviousColorIndices;
+	map<size_t, float> m_PreviousColorIndices;
 	QString m_Filename;
 	string m_CurrentPaletteFilePath;
 	ColorPickerWidget* m_ColorPicker = nullptr;

@@ -124,7 +124,7 @@ map<size_t, float> PaletteEditor::GetColorIndices() const
 /// <returns>The color indices</returns>
 map<size_t, float> PaletteEditor::GetPreviousColorIndices() const
 {
-    return m_PreviousColorIndices;
+	return m_PreviousColorIndices;
 }
 
 /// <summary>
@@ -143,7 +143,7 @@ void PaletteEditor::SetColorIndices(const map<size_t, float>& indices)
 /// <param name="indices">The color indices to backup</param>
 void PaletteEditor::SetPreviousColorIndices(const map<size_t, float>& indices)
 {
-    m_PreviousColorIndices = indices;
+	m_PreviousColorIndices = indices;
 }
 
 /// <summary>

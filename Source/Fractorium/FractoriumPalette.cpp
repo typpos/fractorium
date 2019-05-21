@@ -396,11 +396,11 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 	ed->SetColorIndices(colorIndices);
 	ed->SetPaletteFile(m_CurrentPaletteFilePath);
 
-    // michel - waiting to be approved - may be used with IFDEF LINUX
+#ifdef __linux__
     m_PreviosTempPalette = m_TempPalette;
     ed->SetPreviousColorIndices(colorIndices);
     ed->show();
-    return;
+#else
 
 	//ed->setpal
 	if (ed->exec() == QDialog::Accepted)
@@ -430,6 +430,7 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 	//Whether the current palette file was changed or not, if it's modifiable then reload it just to be safe (even though it might be overkill).
 	if (m_PaletteList->IsModifiable(m_CurrentPaletteFilePath))
 		m_Fractorium->OnPaletteFilenameComboChanged(QString::fromStdString(m_CurrentPaletteFilePath));
+#endif
 }
 
 /// <summary>
@@ -454,7 +455,9 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 		connect(m_PaletteEditor, SIGNAL(PaletteChanged()),                 this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()),             this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(ColorIndexChanged(size_t, float)), this, SLOT(OnPaletteEditorColorIndexChanged(size_t, float)), Qt::QueuedConnection);
-        connect(m_PaletteEditor, SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection); // michel
+#ifdef __linux__
+        connect(m_PaletteEditor, SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection);
+#endif
 	}
 
 	m_PaletteChanged = false;
@@ -462,7 +465,6 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 	m_Controller->PaletteEditorButtonClicked();
 }
 
-// michel
 /// <summary>
 /// Slot called when palette editor window is closed.
 /// </summary>
@@ -549,7 +551,6 @@ void Fractorium::OnPaletteEditorColorIndexChanged(size_t index, float value)
 		OnXformColorIndexChanged(value, true, true, true, eXformUpdate::UPDATE_SPECIFIC, index);
 }
 
-// michel
 /// Slot called after EditPallete is closed.
 /// </summary>
 /// <param name="result">Cancel/OK action</param>

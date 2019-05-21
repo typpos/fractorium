@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FractoriumPch.h"
-#include "Fractorium.h" // michel
+#include "Fractorium.h"
 #include "ColorPickerWidget.h"
 #include "GradientColorsView.h"
 #include "EmberFile.h"
@@ -34,9 +34,9 @@ public:
 	Palette<float>& GetPalette(int size);
 	void SetPalette(const Palette<float>& palette);
 	map<size_t, float> GetColorIndices() const;
-    map<size_t, float> GetPreviousColorIndices() const; // michel
+    map<size_t, float> GetPreviousColorIndices() const;
 	void SetColorIndices(const map<size_t, float>& indices);
-    void SetPreviousColorIndices(const map<size_t, float>& indices); // michel
+    void SetPreviousColorIndices(const map<size_t, float>& indices);
 	string GetPaletteFile() const;
 	void SetPaletteFile(const string& filename);
 
@@ -80,7 +80,7 @@ private:
 	bool IsCurrentPaletteAndFileEditable();
 	bool m_PaletteFileChanged = false;
 	int m_PaletteIndex = 0;
-    map<size_t, float> m_PreviousColorIndices; // michel
+    map<size_t, float> m_PreviousColorIndices;
 	QString m_Filename;
 	string m_CurrentPaletteFilePath;
 	ColorPickerWidget* m_ColorPicker = nullptr;

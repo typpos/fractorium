@@ -21,7 +21,7 @@
 
 class GLWidget;
 class QssDialog;
-class PaletteEditor; // michel
+class PaletteEditor;
 class FractoriumOptionsDialog;
 class FractoriumVariationsDialog;
 class FractoriumFinalRenderDialog;
@@ -360,7 +360,7 @@ public slots:
 	void OnPaletteEditorColorChanged();
 	void OnPaletteEditorFileChanged();
 	void OnPaletteEditorColorIndexChanged(size_t index, float value);
-    void OnPaletteEditorFinished(int result); // michel
+    void OnPaletteEditorFinished(int result);
 
 	//Info.
 	void OnSummaryTableHeaderResized(int logicalIndex, int oldSize, int newSize);

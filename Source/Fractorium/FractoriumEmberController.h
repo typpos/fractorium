@@ -249,7 +249,7 @@ public:
 	virtual void SetBasePaletteAndAdjust(const Palette<float>& palette) { }
 	virtual void PaletteEditorButtonClicked() { }
 	virtual void PaletteEditorColorChanged() { }
-    virtual void SyncPalette(bool accepted) { } // michel
+    virtual void SyncPalette(bool accepted) { }
 	QImage& FinalPaletteImage() { return m_FinalPaletteImage; }
 
 	//Info.
@@ -311,7 +311,7 @@ protected:
 	unique_ptr<EmberNs::RendererBase> m_Renderer;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> m_Rand;
 	Fractorium* m_Fractorium;
-    Palette<float> m_TempPalette, m_PreviosTempPalette; // michel
+    Palette<float> m_TempPalette, m_PreviosTempPalette;
 	std::unique_ptr<QTimer> m_RenderTimer;
 	std::unique_ptr<QTimer> m_RenderRestartTimer;
 	shared_ptr<PaletteList<float>> m_PaletteList;
@@ -538,7 +538,7 @@ public:
 	virtual void SetBasePaletteAndAdjust(const Palette<float>& palette) override;
 	virtual void PaletteEditorButtonClicked() override;
 	virtual void PaletteEditorColorChanged() override;
-    virtual void SyncPalette(bool accepted) override; // michel
+    virtual void SyncPalette(bool accepted) override;
 
 	//Info.
 	virtual void FillSummary() override;

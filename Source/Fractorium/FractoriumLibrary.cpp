@@ -148,6 +148,9 @@ void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 
 				if (update & eLibraryUpdate::POINTER)
 					item->SetEmberPointer(&(*it));
+
+				if (item->checkState(0) == Qt::Checked)
+					m_EmberFilePointer = item->GetEmber();
 			}
 		}
 	}

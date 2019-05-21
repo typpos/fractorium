@@ -398,7 +398,7 @@ void FractoriumEmberController<T>::PaletteEditorButtonClicked()
     ed->SetPreviousColorIndices(colorIndices); // also necessary because the colors are changed in palette editor
 	ed->SetPaletteFile(m_CurrentPaletteFilePath);
 
-#ifndef __linux__
+#ifdef __linux__
     ed->show();
 #else    
     SyncPalette(ed->exec() == QDialog::Accepted);
@@ -427,7 +427,7 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 		connect(m_PaletteEditor, SIGNAL(PaletteChanged()),                 this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()),             this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
 		connect(m_PaletteEditor, SIGNAL(ColorIndexChanged(size_t, float)), this, SLOT(OnPaletteEditorColorIndexChanged(size_t, float)), Qt::QueuedConnection);
-#ifndef __linux__
+#ifdef __linux__
         connect(m_PaletteEditor, SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection);
 #endif
 	}

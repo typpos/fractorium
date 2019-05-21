@@ -118,6 +118,16 @@ map<size_t, float> PaletteEditor::GetColorIndices() const
 }
 
 /// <summary>
+/// Return the previous xform color indices as a map.
+/// The keys are the xform indices, and the values are the color indices.
+/// </summary>
+/// <returns>The color indices</returns>
+map<size_t, float> PaletteEditor::GetPreviousColorIndices() const
+{
+    return m_PreviousColorIndices;
+}
+
+/// <summary>
 /// Assign the values of the xform color indices to the arrows.
 /// This will clear out any existing values first.
 /// </summary>
@@ -125,6 +135,15 @@ map<size_t, float> PaletteEditor::GetColorIndices() const
 void PaletteEditor::SetColorIndices(const map<size_t, float>& indices)
 {
 	m_GradientColorView->SetColorIndices(indices);
+}
+
+/// <summary>
+/// Backup xform color
+/// </summary>
+/// <param name="indices">The color indices to backup</param>
+void PaletteEditor::SetPreviousColorIndices(const map<size_t, float>& indices)
+{
+    m_PreviousColorIndices = indices;
 }
 
 /// <summary>

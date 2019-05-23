@@ -1198,7 +1198,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 		{
 			if (!Compare(childNode->name, "imaging"))
 			{
-                                std::string bgstr, useHighlightPower;
+				std::string bgstr, useHighlightPower;
 
 				for (auto imgChildNode = childNode->children; imgChildNode; imgChildNode = imgChildNode->next)
 				{
@@ -1211,7 +1211,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						else if (ParseAndAssignContent(imgChildNode, "name", "brightness", currentEmber.m_Brightness)) {}
 						else if (ParseAndAssignContent(imgChildNode, "name", "flam3_gamma", currentEmber.m_Gamma)) {}
 						else if (ParseAndAssignContent(imgChildNode, "name", "flam3_vibrancy", currentEmber.m_Vibrancy)) {}
-                                                else if (ParseAndAssignContent(imgChildNode, "name", "flam3_use_highlight_power", useHighlightPower)) {}
+						else if (ParseAndAssignContent(imgChildNode, "name", "flam3_use_highlight_power", useHighlightPower)) {}
 						else if (ParseAndAssignContent(imgChildNode, "name", "flam3_highlight_power", currentEmber.m_HighlightPower)) {}
 						else if (ParseAndAssignContent(imgChildNode, "name", "flam3_gamma_linear_threshold", currentEmber.m_GammaThresh)) {}
 						else if (ParseAndAssignContent(imgChildNode, "name", "background_colour", bgstr))
@@ -1225,11 +1225,11 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 					}
 				}
 
-                                // there is no warranty that flam3_use_highlight_power will be read before flam3_highlight_power. So, better to be here.
-                                bool bVal; istringstream istr(useHighlightPower); istr >> std::boolalpha >> bVal;
+				// there is no warranty that flam3_use_highlight_power will be read before flam3_highlight_power. So, better to be here.
+				bool bVal; istringstream istr(useHighlightPower); istr >> std::boolalpha >> bVal;
 
-                                if(!bVal && !istr.bad() && !istr.fail())
-                                    currentEmber.m_HighlightPower = T(-1);
+				if (!bVal && !istr.bad() && !istr.fail())
+					currentEmber.m_HighlightPower = T(-1);
 
 				if (auto curvesnode = GetChildNodeByNodeName(childNode, "curves"))
 				{
@@ -1341,7 +1341,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						{
 							istringstream istr(pos);
 							istr >> currentEmber.m_CenterX >> currentEmber.m_CenterY;
-                                                        currentEmber.m_CenterY *= -1;
+							currentEmber.m_CenterY *= -1;
 							currentEmber.m_RotCenterY = currentEmber.m_CenterY;
 						}
 						else

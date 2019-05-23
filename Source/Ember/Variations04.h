@@ -1161,56 +1161,40 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
+		helper.Out.x = std::abs(helper.In.x);
+
+		if (rand.RandBit())
+			helper.Out.x = -helper.Out.x;
+
+		helper.Out.y = helper.In.y;
+		helper.Out.z = helper.In.z;
+
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
-			helper.Out.x = std::abs(outPoint.m_X);
-
-			if (rand.RandBit())
-				helper.Out.x = -helper.Out.x;
-
-			helper.Out.y = 0;
-			helper.Out.z = 0;
-			outPoint.m_X = 0;//Flipped x will be added.
-		}
-		else
-		{
-			helper.Out.x = std::abs(helper.In.x);
-
-			if (rand.RandBit())
-				helper.Out.x = -helper.Out.x;
-
-			helper.Out.y = helper.In.y;
-			helper.Out.z = helper.In.z;
+			outPoint.m_X = 0;//All will be added.
+			outPoint.m_Y = 0;
+			outPoint.m_Z = 0;
 		}
 	}
 
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		ss << "\t{\n";
+		ss << "\t{\n"
+		   "\t\tvOut.x = fabs(vIn.x);\n"
+		   "\n"
+		   "\t\tif (MwcNext(mwc) & 1)\n"
+		   "\t\t	vOut.x = -vOut.x;\n"
+		   "\n"
+		   "\t\tvOut.y = vIn.y;\n"
+		   "\t\tvOut.z = vIn.z;\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss <<
-			   "\t\tvOut.x = fabs(outPoint->m_X);\n"
-			   "\n"
-			   "\t\tif (MwcNext(mwc) & 1)\n"
-			   "\t\t	vOut.x = -vOut.x;\n"
-			   "\n"
-			   "\t\tvOut.y = 0;\n"
-			   "\t\tvOut.z = 0;\n"
-			   "\t\toutPoint->m_X = 0;\n";
-		}
-		else
-		{
-			ss <<
-			   "\t\tvOut.x = fabs(vIn.x);\n"
-			   "\n"
-			   "\t\tif (MwcNext(mwc) & 1)\n"
-			   "\t\t	vOut.x = -vOut.x;\n"
-			   "\n"
-			   "\t\tvOut.y = vIn.y;\n"
-			   "\t\tvOut.z = vIn.z;\n";
+			   "\t\toutPoint->m_X = 0;\n"
+			   "\t\toutPoint->m_Y = 0;\n"
+			   "\t\toutPoint->m_Z = 0;\n";
 		}
 
 		ss << "\t}\n";
@@ -1232,56 +1216,40 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
+		helper.Out.y = std::abs(helper.In.y);
+
+		if (rand.RandBit())
+			helper.Out.y = -helper.Out.y;
+
+		helper.Out.x = helper.In.x;
+		helper.Out.z = helper.In.z;
+
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
-			helper.Out.y = std::abs(outPoint.m_Y);
-
-			if (rand.RandBit())
-				helper.Out.y = -helper.Out.y;
-
-			helper.Out.x = 0;
-			helper.Out.z = 0;
-			outPoint.m_Y = 0;//Flipped y will be added.
-		}
-		else
-		{
-			helper.Out.y = std::abs(helper.In.y);
-
-			if (rand.RandBit())
-				helper.Out.y = -helper.Out.y;
-
-			helper.Out.x = helper.In.x;
-			helper.Out.z = helper.In.z;
+			outPoint.m_X = 0;//All will be added.
+			outPoint.m_Y = 0;
+			outPoint.m_Z = 0;
 		}
 	}
 
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		ss << "\t{\n";
+		ss << "\t{\n"
+		   "\t\tvOut.y = fabs(vIn.y);\n"
+		   "\n"
+		   "\t\tif (MwcNext(mwc) & 1)\n"
+		   "\t\t	vOut.y = -vOut.y;\n"
+		   "\n"
+		   "\t\tvOut.x = vIn.x;\n"
+		   "\t\tvOut.z = vIn.z;\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss <<
-			   "\t\tvOut.y = fabs(outPoint->m_Y);\n"
-			   "\n"
-			   "\t\tif (MwcNext(mwc) & 1)\n"
-			   "\t\t	vOut.y = -vOut.y;\n"
-			   "\n"
-			   "\t\tvOut.x = 0;\n"
-			   "\t\tvOut.z = 0;\n"
-			   "\t\toutPoint->m_Y = 0;\n";
-		}
-		else
-		{
-			ss <<
-			   "\t\tvOut.y = fabs(vIn.y);\n"
-			   "\n"
-			   "\t\tif (MwcNext(mwc) & 1)\n"
-			   "\t\t	vOut.y = -vOut.y;\n"
-			   "\n"
-			   "\t\tvOut.x = vIn.x;\n"
-			   "\t\tvOut.z = vIn.z;\n";
+			   "\t\toutPoint->m_X = 0;\n"
+			   "\t\toutPoint->m_Y = 0;\n"
+			   "\t\toutPoint->m_Z = 0;\n";
 		}
 
 		ss << "\t}\n";
@@ -1303,56 +1271,40 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
+		helper.Out.z = std::abs(helper.In.z);
+
+		if (rand.RandBit())
+			helper.Out.z = -helper.Out.z;
+
+		helper.Out.x = helper.In.x;
+		helper.Out.y = helper.In.y;
+
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
-			helper.Out.z = std::abs(outPoint.m_Z);
-
-			if (rand.RandBit())
-				helper.Out.z = -helper.Out.z;
-
-			helper.Out.x = 0;
-			helper.Out.y = 0;
-			outPoint.m_Z = 0;//Flipped z will be added.
-		}
-		else
-		{
-			helper.Out.z = std::abs(helper.In.z);
-
-			if (rand.RandBit())
-				helper.Out.z = -helper.Out.z;
-
-			helper.Out.x = helper.In.x;
-			helper.Out.y = helper.In.y;
+			outPoint.m_X = 0;//All will be added.
+			outPoint.m_Y = 0;
+			outPoint.m_Z = 0;
 		}
 	}
 
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		ss << "\t{\n";
+		ss << "\t{\n"
+		   "\t\tvOut.z = fabs(vIn.z);\n"
+		   "\n"
+		   "\t\tif (MwcNext(mwc) & 1)\n"
+		   "\t\t	vOut.z = -vOut.z;\n"
+		   "\n"
+		   "\t\tvOut.x = vIn.x;\n"
+		   "\t\tvOut.y = vIn.y;\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 		{
 			ss <<
-			   "\t\tvOut.z = fabs(outPoint->m_Z);\n"
-			   "\n"
-			   "\t\tif (MwcNext(mwc) & 1)\n"
-			   "\t\t	vOut.z = -vOut.z;\n"
-			   "\n"
-			   "\t\tvOut.x = 0;\n"
-			   "\t\tvOut.y = 0;\n"
+			   "\t\toutPoint->m_X = 0;\n"
+			   "\t\toutPoint->m_Y = 0;\n"
 			   "\t\toutPoint->m_Z = 0;\n";
-		}
-		else
-		{
-			ss <<
-			   "\t\tvOut.z = fabs(vIn.z);\n"
-			   "\n"
-			   "\t\tif (MwcNext(mwc) & 1)\n"
-			   "\t\t	vOut.z = -vOut.z;\n"
-			   "\n"
-			   "\t\tvOut.x = vIn.x;\n"
-			   "\t\tvOut.y = vIn.y;\n";
 		}
 
 		ss << "\t}\n";

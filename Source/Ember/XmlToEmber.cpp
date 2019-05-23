@@ -1234,14 +1234,59 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						vector<v2F> vals;
 
 						if (auto knotsnode = GetChildNode(node, "knots"))
+						{
 							if (auto knotvalsnode = GetChildNodeByNodeName(knotsnode, "values"))
 								if (knotvalsnode->children)
 									knots = CCX(knotvalsnode->children->content);
+						}
 
 						if (auto valuesnode = GetChildNode(node, "values"))
+						{
 							if (auto valvalsnode = GetChildNodeByNodeName(valuesnode, "values"))
 								if (valvalsnode->children)
 									values = CCX(valvalsnode->children->content);
+						}
+
+						if (knots.empty() && values.empty())
+						{
+							bool haveknots = false, havevals = false;
+
+							for (auto childNode = node->children; childNode; childNode = childNode->next)
+							{
+								if (childNode->type == XML_ELEMENT_NODE)
+								{
+									if (auto node = CheckNodeName(childNode, "table"))
+									{
+										if (!haveknots)
+										{
+											if (auto knotvalsnode = GetChildNodeByNodeName(node, "values"))
+											{
+												if (knotvalsnode->children)
+												{
+													knots = CCX(knotvalsnode->children->content);
+													haveknots = true;
+												}
+
+												continue;
+											}
+										}
+										else if (!havevals)
+										{
+											if (auto valvalsnode = GetChildNodeByNodeName(node, "values"))
+											{
+												if (valvalsnode->children)
+												{
+													values = CCX(valvalsnode->children->content);
+													havevals = true;
+												}
+
+												continue;
+											}
+										}
+									}
+								}
+							}
+						}
 
 						istringstream kistr(knots);
 						istringstream vistr(values);

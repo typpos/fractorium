@@ -243,7 +243,9 @@ XmlToEmber<T>::XmlToEmber()
 			{ "sin_y_amplitude", "unicorngaloshen_sin_y_amplitude" },
 			{ "sin_y_freq", "unicorngaloshen_sin_y_freq" },
 			{ "mode", "unicorngaloshen_mode" },
-			{ "d_spher_weight", "d_spherical_weight" }
+			{ "d_spher_weight", "d_spherical_weight" },
+			{ "poincare_p", "poincare2_p" },
+            { "poincare_q", "poincare2_q" }			
 		};
 		m_FlattenNames =
 		{

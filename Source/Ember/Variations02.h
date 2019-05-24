@@ -4494,6 +4494,93 @@ private:
 };
 
 /// <summary>
+/// Poincare.
+/// </summary>
+template <typename T>
+class Poincare2Variation : public ParametricVariation<T>
+{
+public:
+    Poincare2Variation(T weight = 1.0) : ParametricVariation<T>("poincare2", eVariationId::VAR_POINCARE2, weight)
+    {
+        Init();
+    }
+
+    PARVARCOPY(Poincare2Variation)
+
+    virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+    {
+        T a = helper.In.x - m_Cx;
+        T b = helper.In.y - m_Cy;
+        T c = T(1) - m_Cx * helper.In.x - m_Cy * helper.In.y;
+        T d = m_Cy * helper.In.x - m_Cx * helper.In.y;
+
+        T num = m_Weight / (c * c + d * d);
+
+        helper.Out.x = (a * c + b * d) * num;
+        helper.Out.y = (b * c - a * d) * num;
+        helper.Out.z = DefaultZ(helper);
+    }
+
+    virtual string OpenCLString() const override
+    {
+        ostringstream ss, ss2;
+        intmax_t i = 0;
+        ss2 << "_" << XformIndexInEmber() << "]";
+        string index = ss2.str();
+        string weight = WeightDefineString();
+        string cP = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string cQ = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string cX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string cY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+
+        ss << "\t{\n"
+           << "\t\treal_t a = vIn.x - " << cX << ";\n"
+           << "\t\treal_t b = vIn.y - " << cY << ";\n"
+           << "\t\treal_t c = 1 - " << cX << " * vIn.x - " << cY << " * vIn.y;\n"
+           << "\t\treal_t d = " << cY <<" * vIn.x - " << cX << " * vIn.y;\n"
+           << "\t\treal_t num = " << weight <<" / (c * c + d * d);\n"
+           << "\n"
+           << "\t\tvOut.x = (a * c + b * d) * num;\n"
+           << "\t\tvOut.y = (b * c - a * d) * num;\n"
+           << "\t\tvOut.z = " << DefaultZCl()
+           << "\t}\n";
+        return ss.str();
+    }
+
+    virtual void Precalc() override
+    {
+        T a0 = M_2PI / m_PoincareP;
+        T dist2 = T(1) - (cos(a0) - T(1)) / (cos(a0) + cos(M_2PI / m_PoincareQ));
+        T dist  = (dist2 > T(0)) ? T(1) / sqrt(dist2) : T(1);
+
+        if (T(1) / m_PoincareP + T(1) / m_PoincareQ < T(0.5))
+        {
+            m_Cx = cos(a0) * dist;
+            m_Cy = sin(a0) * dist;
+        }
+        else
+            m_Cx = m_Cy = T(0);
+    }
+
+protected:
+    void Init()
+    {
+        string prefix = Prefix();
+        m_Params.clear();
+        m_Params.push_back(ParamWithName<T>(&m_PoincareP, prefix + "poincare_p", 3));
+        m_Params.push_back(ParamWithName<T>(&m_PoincareQ, prefix + "poincare_q", 7));
+        m_Params.push_back(ParamWithName<T>(true, &m_Cx, prefix + "poincare_cx")); //Precalc.
+        m_Params.push_back(ParamWithName<T>(true, &m_Cy, prefix + "poincare_cy"));
+    }
+
+private:
+    T m_PoincareP;
+    T m_PoincareQ;
+    T m_Cx; //Precalc.
+    T m_Cy;
+};
+
+/// <summary>
 /// Poincare3D.
 /// </summary>
 template <typename T>
@@ -6014,6 +6101,7 @@ MAKEPREPOSTPARVAR(Murl2, murl2, MURL2)
 MAKEPREPOSTPARVAR(NPolar, npolar, NPOLAR)
 MAKEPREPOSTPARVAR(Ortho, ortho, ORTHO)
 MAKEPREPOSTPARVAR(Poincare, poincare, POINCARE)
+MAKEPREPOSTPARVAR(Poincare2, poincare2, POINCARE2)
 MAKEPREPOSTPARVAR(Poincare3D, poincare3D, POINCARE3D)
 MAKEPREPOSTPARVAR(Polynomial, polynomial, POLYNOMIAL)
 MAKEPREPOSTPARVAR(PSphere, psphere, PSPHERE)

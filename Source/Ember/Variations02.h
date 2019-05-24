@@ -4494,7 +4494,7 @@ private:
 };
 
 /// <summary>
-/// Poincare.
+/// Poincare2.
 /// </summary>
 template <typename T>
 class Poincare2Variation : public ParametricVariation<T>

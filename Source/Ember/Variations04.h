@@ -3151,7 +3151,7 @@ public:
 		   << "\t\treal_t st = sin(temp);\n"
 		   << "\t\treal_t ct = cos(temp);\n"
 		   << "\n"
-		   << "\t\ttemp = fma(" << ap << ", sin(fma(" << bp << ", r, " << cp << ")), acos(clamp(vIn.z / r, -(real_t)(1.0), (real_t)(1.0))));\n"
+		   << "\t\ttemp = fma(" << ap << ", sin(fma(" << bp << ", r, " << cp << ")), acos(clamp(vIn.z / r, (real_t)(-1.0), (real_t)(1.0))));\n"
 		   << "\n"
 		   << "\t\treal_t sp = sin(temp);\n"
 		   << "\t\treal_t cp = cos(temp);\n"
@@ -4800,7 +4800,7 @@ public:
 		   << "\t\treal_t cellx = floor(vIn.x);\n"
 		   << "\t\treal_t celly = floor(vIn.y);\n"
 		   << "\t\treal_t xy0x = (MwcNext01(mwc) - 0.5) * wd;\n"
-		   << "\t\treal_t xy0y = fma(MwcNext01(mwc), 2.0, -1.0) * (1.0 - space - wd * 0.5);\n"
+		   << "\t\treal_t xy0y = fma(MwcNext01(mwc), (real_t)(2.0), (real_t)(-1.0)) * (1.0 - space - wd * 0.5);\n"
 		   << "\t\treal_t dir0 = fabs(cellx + celly);\n"
 		   << "\t\treal_t dir1 = dir0 - 2.0 * floor(dir0 / 2.0);\n"
 		   << "\t\treal_t xyx, xyy;\n"
@@ -5313,7 +5313,7 @@ public:
 		string reInv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string im100 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t arg = fma(fmod((real_t)MwcNext(mwc), (real_t)(1 / " << reInv << ")), M_2PI, precalcAtanyx);\n"
+		   << "\t\treal_t arg = fma(fmod((real_t)MwcNext(mwc), (real_t)((real_t)(1.0) / " << reInv << ")), M_2PI, precalcAtanyx);\n"
 		   << "\t\treal_t lnmod = " << dist << " * (real_t)(0.5) * log(precalcSumSquares);\n"
 		   << "\t\treal_t temp = fma(arg, " << reInv << ", lnmod * " << im100 << ");\n"
 		   << "\t\treal_t mod2 = exp(fma(lnmod, " << reInv << ", -(arg * " << im100 << ")));\n"

@@ -165,7 +165,7 @@ public:
 		   << "\t\tvOut.x = " << weight << " * (xform->m_A * x + xform->m_B * y + xform->m_E);\n"
 		   << "\t\tvOut.y = " << weight << " * (xform->m_C * x + xform->m_D * y + xform->m_F);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
-		   << "\t\toutPoint->m_ColorX = fmod(fabs(outPoint->m_ColorX * (real_t)(0.5) * (1 + h) + x0_xor_y0 * (1 - h) * (real_t)(0.5)), (real_t)(1.0));\n"
+		   << "\t\toutPoint->m_ColorX = fmod(fabs(outPoint->m_ColorX * (real_t)(0.5) * (real_t)(1 + h) + x0_xor_y0 * (real_t)(1 - h) * (real_t)(0.5)), (real_t)(1.0));\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1520,7 +1520,7 @@ public:
 
 		ss << "\t\tvOut.x = fma(blockx, " << density << ", MwcNext01(mwc)) * " << blocksize << ";\n"
 		   << "\t\tvOut.y = fma(blocky, " << density << ", MwcNext01(mwc)) * " << blocksize << ";\n"
-		   << "\t\tvOut.z = " << blockheight << " * z * pow(MwcNext01(mwc), 0.125);\n"
+		   << "\t\tvOut.z = " << blockheight << " * z * pow(MwcNext01(mwc), (real_t)(0.125));\n"
 		   << "\t\toutPoint->m_ColorX = z / 2;\n"
 		   << "\t}\n";
 		return ss.str();

@@ -2517,7 +2517,7 @@ public:
 		   << "\t\t	case 1:\n"
 		   << "\t\t		rad = fma(" << mulX << ", ax * rs, r);\n"
 		   << "\t\t		phi = fma(" << mulY << ", ay * rs, precalcAtanyx);\n"
-		   << "\t\t		sigma = fma(" << mulZ << ", az * rs, asin(r == 0 ? 0 : vIn.z / r));\n"
+		   << "\t\t		sigma = fma(" << mulZ << ", az * rs, asin(r == 0 ? (real_t)(0.0) : vIn.z / r));\n"
 		   << "\n"
 		   << "\t\t		sigmas = sin(sigma);\n"
 		   << "\t\t		sigmac = cos(sigma);\n"
@@ -3235,7 +3235,7 @@ public:
 			"			else\n"
 			"			{\n"
 			"				ga1 = fma(width1, ga, width2 * hc * ga / be);\n"
-			"				de1 = fma(width1, be, width2 * s2ab * (3 - ga / be));\n"
+			"				de1 = fma(width1, be, width2 * s2ab * ((real_t)(3.0) - ga / be));\n"
 			"			}\n"
 			"\n"
 			"			*al1 = s2a + fma(-ba, de1, - ca * ga1);\n"
@@ -3253,7 +3253,7 @@ public:
 			"				else\n"
 			"				{\n"
 			"					de1 = fma(width1, be, width2 * hb * be / ga);\n"
-			"					ga1 = fma(width1, ga, width2 * s2ac * (3 - be / ga));\n"
+			"					ga1 = fma(width1, ga, width2 * s2ac * ((real_t)(3.0) - be / ga));\n"
 			"				}\n"
 			"\n"
 			"				*al1 = s2a + fma(-ba, de1, -ca * ga1);\n"
@@ -3269,7 +3269,7 @@ public:
 			"				else\n"
 			"				{\n"
 			"					*be1 = fma(width1, be, width2 * hb * be / al);\n"
-			"					*al1 = fma(width1, al, width2 * s2ac * (3 - be / al));\n"
+			"					*al1 = fma(width1, al, width2 * s2ac * ((real_t)(3.0) - be / al));\n"
 			"				}\n"
 			"			}\n"
 			"		}\n"
@@ -3286,7 +3286,7 @@ public:
 			"			else\n"
 			"			{\n"
 			"				ga1 = fma(width1, ga, width2 * hc * ga / al);\n"
-			"				de1 = fma(width1, al, width2 * s2ab * (3 - ga / al));\n"
+			"				de1 = fma(width1, al, width2 * s2ab * ((real_t)(3.0) - ga / al));\n"
 			"			}\n"
 			"\n"
 			"			*be1 = s2b + fma(-ab, de1, -cb * ga1);\n"
@@ -3304,7 +3304,7 @@ public:
 			"				else\n"
 			"				{\n"
 			"					de1 = fma(width1, al, width2 * ha * al / ga);\n"
-			"					ga1 = fma(width1, ga, width2 * s2bc * (3 - al / ga));\n"
+			"					ga1 = fma(width1, ga, width2 * s2bc * ((real_t)(3.0) - al / ga));\n"
 			"				}\n"
 			"\n"
 			"				*be1 = s2b + fma(-ab, de1, -cb * ga1);\n"
@@ -3320,7 +3320,7 @@ public:
 			"				else\n"
 			"				{\n"
 			"					*al1 = fma(width1, al, width2 * ha * al / be);\n"
-			"					*be1 = fma(width1, be, width2 * s2bc * (3 - al / be));\n"
+			"					*be1 = fma(width1, be, width2 * s2bc * ((real_t)(3.0) - al / be));\n"
 			"				}\n"
 			"			}\n"
 			"		}\n"
@@ -3729,7 +3729,7 @@ public:
 				<< "\t\t}\n"
 				<< "\n"
 				<< "\t\tif (majplane == 2)\n"
-				<< "\t\t	vOut.z = fma(vIn.z * 0.5, " << zlift << ", (posNeg * boost));\n"
+				<< "\t\t	vOut.z = fma(vIn.z * (real_t)(0.5), " << zlift << ", (posNeg * boost));\n"
 				<< "\t\telse\n"
 				<< "\t\t	vOut.z = vIn.z * 0.5 * " << zlift << ";\n"
 				<< "\n"
@@ -4104,7 +4104,7 @@ public:
 				<< "\t\t   }\n"
 				<< "\t\t   else\n"
 				<< "\t\t   {\n"
-				<< "\t\t	   vOut.z = fma(smooth * posNeg, fma(vIn.z * scale, " << zlift << ", boost), sumZ - (2 * smooth * sumZ));\n";
+				<< "\t\t	   vOut.z = fma(smooth * posNeg, fma(vIn.z * scale, " << zlift << ", boost), sumZ - ((real_t)(2.0) * smooth * sumZ));\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 			ss << "\t\t	   outPoint->m_Z = 0;\n";
@@ -4153,9 +4153,9 @@ public:
 		//CPU sets fycle and bcycle to 0 at the beginning in Precalc().
 		//Set to random in OpenCL since a value can't be set once and kept between kernel launches without writing it back to an OpenCL buffer.
 		//This doesn't seem to make a difference from setting them to 0, but do it anyway because it seems more correct.
-		ss << "\n\tvarState." << prefix << "hexnix3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * 3.0);";
-		ss << "\n\tvarState." << prefix << "hexnix3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 5.0);";
-		ss << "\n\tvarState." << prefix << "hexnix3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 2.0);";
+		ss << "\n\tvarState." << prefix << "hexnix3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * (real_t)(3.0));";
+		ss << "\n\tvarState." << prefix << "hexnix3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * (real_t)(5.0));";
+		ss << "\n\tvarState." << prefix << "hexnix3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * (real_t)(2.0));";
 		return ss.str();
 	}
 

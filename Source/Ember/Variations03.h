@@ -35,7 +35,7 @@ public:
 		string weight = WeightDefineString();
 		string effect = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t temp = fma(" << effect << ", MPI, 1 / Zeps(cos(vIn.y)));\n"
+		   << "\t\treal_t temp = fma(" << effect << ", MPI, (real_t)(1.0) / Zeps(cos(vIn.y)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * (tanh(vIn.x) * temp);\n"
 		   << "\t\tvOut.y = " << weight << " * (tanh(vIn.y) * temp);\n"
@@ -258,8 +258,8 @@ public:
 		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\tvOut.x = fma(" << weight << ", (vIn.x - ((SQR(vIn.x) * vIn.x) / 3)), vIn.x * SQR(vIn.y));\n"
-		   << "\t\tvOut.y = fma(" << weight << ", (vIn.y - ((SQR(vIn.y) * vIn.y) / 3)), vIn.y * SQR(vIn.x));\n"
+		   << "\t\tvOut.x = fma(" << weight << ", (vIn.x - ((SQR(vIn.x) * vIn.x) / (real_t)(3.0))), vIn.x * SQR(vIn.y));\n"
+		   << "\t\tvOut.y = fma(" << weight << ", (vIn.y - ((SQR(vIn.y) * vIn.y) / (real_t)(3.0))), vIn.y * SQR(vIn.x));\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1184,12 +1184,12 @@ public:
 		   << "\t\tf -= angle;\n"
 		   << "\n"
 		   << "\t\treal_t x = f * " << length << ";\n"
-		   << "\t\treal_t z = sqrt(fma(x, x, (real_t)(1.0)) - 2 * x * cos(" << alpha << "));\n"
+		   << "\t\treal_t z = sqrt(fma(x, x, (real_t)(1.0)) - (real_t)(2.0) * x * cos(" << alpha << "));\n"
 		   << "\n"
 		   << "\t\tif (((int)angle) & 1)\n"
-		   << "\t\t	angle = fma(M_2PI / " << power << ", (real_t)(((int)angle) / 2), asin(sin(" << alpha << ") * x / z));\n"
+		   << "\t\t	angle = fma(M_2PI / " << power << ", (real_t)(((int)angle) / (real_t)(2.0)), asin(sin(" << alpha << ") * x / z));\n"
 		   << "\t\telse\n"
-		   << "\t\t	angle = fma(M_2PI / " << power << ", (real_t)(((int)angle) / 2), -asin(sin(" << alpha << ") * x / z));\n"
+		   << "\t\t	angle = fma(M_2PI / " << power << ", (real_t)(((int)angle) / (real_t)(2.0)), -asin(sin(" << alpha << ") * x / z));\n"
 		   << "\n"
 		   << "\t\tz *= sqrt(MwcNext01(mwc));\n"
 		   << "\n"
@@ -3075,8 +3075,8 @@ public:
 		   << "\t\t	s = fma((real_t)(2.0) * " << width << ", deltaS, -" << width << ");\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tmx = fma(s, cos(t / 2), " << radius << ") * cos(t);\n"
-		   << "\t\tmy = fma(s, cos(t / 2), " << radius << ") * sin(t);\n"
+		   << "\t\tmx = fma(s, cos(t / (real_t)(2.0)), " << radius << ") * cos(t);\n"
+		   << "\t\tmy = fma(s, cos(t / (real_t)(2.0)), " << radius << ") * sin(t);\n"
 		   << "\t\tmz = s * sin(t / 2);\n"
 		   << "\n"
 		   << "\t\trx = mx;\n"

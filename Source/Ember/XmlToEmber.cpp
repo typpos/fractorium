@@ -908,13 +908,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						if (!varname.empty())
 						{
 							T weight = 1;
-							string corrvarname;
-
-							if (varname != "mobius")//Chaotica actually gets this right, but Apophysis doesn't.
-								corrvarname = GetCorrectedVariationName(m_BadVariationNames, varname);
-							else
-								corrvarname = varname;
-
+                            string corrvarname = GetCorrectedVariationName(m_BadVariationNames, varname);
 							auto corrwprefix = !StartsWith(corrvarname, prefix) ? prefix + corrvarname : corrvarname;
 
 							if (auto var = m_VariationList->GetVariation(corrwprefix))
@@ -2486,11 +2480,14 @@ string XmlToEmber<T>::GetCorrectedVariationName(vector<pair<pair<string, string>
 template <typename T>
 string XmlToEmber<T>::GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, const string& varname)
 {
-	for (auto& v : vec)
-		if (!_stricmp(v.first.first.c_str(), varname.c_str()))//Do case insensitive here.
-			return v.first.second;
+    if (varname == "poincare")//for Apo flames, poincare must be the same, but chaotica poincare is implemented as poincare2
+        return "poincare2";
+    else if (varname != "mobius")//Chaotica actually gets this right, but Apophysis doesn't.
+        for (auto& v : vec)
+            if (!_stricmp(v.first.first.c_str(), varname.c_str()))//Do case insensitive here.
+                return v.first.second;
 
-	return varname;
+    return varname;
 }
 
 /// <summary>

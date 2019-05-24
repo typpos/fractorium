@@ -4495,6 +4495,8 @@ private:
 
 /// <summary>
 /// Poincare2.
+/// This is intended to mimic the Poincare variation in Chaotica. But we couldn't use the same name because
+/// Poincare already exists above.
 /// </summary>
 template <typename T>
 class Poincare2Variation : public ParametricVariation<T>
@@ -4511,10 +4513,10 @@ public:
     {
         T a = helper.In.x - m_Cx;
         T b = helper.In.y - m_Cy;
-        T c = T(1) - m_Cx * helper.In.x - m_Cy * helper.In.y;
+        T c = 1 - m_Cx * helper.In.x - m_Cy * helper.In.y;
         T d = m_Cy * helper.In.x - m_Cx * helper.In.y;
 
-        T num = m_Weight / (c * c + d * d);
+        T num = m_Weight / Zeps(c * c + d * d);
 
         helper.Out.x = (a * c + b * d) * num;
         helper.Out.y = (b * c - a * d) * num;
@@ -4538,7 +4540,7 @@ public:
            << "\t\treal_t b = vIn.y - " << cY << ";\n"
            << "\t\treal_t c = 1 - " << cX << " * vIn.x - " << cY << " * vIn.y;\n"
            << "\t\treal_t d = " << cY <<" * vIn.x - " << cX << " * vIn.y;\n"
-           << "\t\treal_t num = " << weight <<" / (c * c + d * d);\n"
+           << "\t\treal_t num = " << weight <<" / Zeps(c * c + d * d);\n"
            << "\n"
            << "\t\tvOut.x = (a * c + b * d) * num;\n"
            << "\t\tvOut.y = (b * c - a * d) * num;\n"
@@ -4547,19 +4549,24 @@ public:
         return ss.str();
     }
 
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+	
     virtual void Precalc() override
     {
         T a0 = M_2PI / m_PoincareP;
-        T dist2 = T(1) - (cos(a0) - T(1)) / (cos(a0) + cos(M_2PI / m_PoincareQ));
-        T dist  = (dist2 > T(0)) ? T(1) / sqrt(dist2) : T(1);
+        T dist2 = 1 - (std::cos(a0) - 1) / (std::cos(a0) + std::cos(M_2PI / m_PoincareQ));
+        T dist  = (dist2 > 0) ? T(1) / std::sqrt(dist2) : T(1);
 
-        if (T(1) / m_PoincareP + T(1) / m_PoincareQ < T(0.5))
+        if (1 / m_PoincareP + 1 / m_PoincareQ < T(0.5))
         {
-            m_Cx = cos(a0) * dist;
-            m_Cy = sin(a0) * dist;
+            m_Cx = std::cos(a0) * dist;
+            m_Cy = std::sin(a0) * dist;
         }
         else
-            m_Cx = m_Cy = T(0);
+            m_Cx = m_Cy = 0;
     }
 
 protected:
@@ -4567,16 +4574,16 @@ protected:
     {
         string prefix = Prefix();
         m_Params.clear();
-        m_Params.push_back(ParamWithName<T>(&m_PoincareP, prefix + "poincare_p", 3));
-        m_Params.push_back(ParamWithName<T>(&m_PoincareQ, prefix + "poincare_q", 7));
-        m_Params.push_back(ParamWithName<T>(true, &m_Cx, prefix + "poincare_cx")); //Precalc.
-        m_Params.push_back(ParamWithName<T>(true, &m_Cy, prefix + "poincare_cy"));
+        m_Params.push_back(ParamWithName<T>(&m_PoincareP, prefix + "poincare2_p", 3));
+        m_Params.push_back(ParamWithName<T>(&m_PoincareQ, prefix + "poincare2_q", 7));
+        m_Params.push_back(ParamWithName<T>(true, &m_Cx, prefix  + "poincare2_cx"));//Precalc.
+        m_Params.push_back(ParamWithName<T>(true, &m_Cy, prefix  + "poincare2_cy"));
     }
 
 private:
     T m_PoincareP;
     T m_PoincareQ;
-    T m_Cx; //Precalc.
+    T m_Cx;//Precalc.
     T m_Cy;
 };
 

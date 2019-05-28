@@ -7076,6 +7076,118 @@ private:
 	T m_Yfact001;//Precalc.
 };
 
+/// <summary>
+/// Gnarly.
+/// </summary>
+template <typename T>
+class GnarlyVariation : public ParametricVariation<T>
+{
+public:
+    GnarlyVariation(T weight = 1.0) : ParametricVariation<T>("gnarly", eVariationId::VAR_GNARLY, weight)
+    {
+        Init();
+    }
+
+    PARVARCOPY(GnarlyVariation)
+
+    virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+    {
+        T Vx, Vy;
+        T Cx, Cy;
+        T Lx, Ly;
+        T r, theta, s, c;
+
+        Vx = helper.In.x;
+        Vy = helper.In.y;       
+
+        if (m_GnarlyCellSize != T(0))
+        {
+            Cx = (Floor<T>(Vx / m_GnarlyCellSize) + T(0.5)) * m_GnarlyCellSize;
+            Cy = (Floor<T>(Vy / m_GnarlyCellSize) + T(0.5)) * m_GnarlyCellSize;
+
+            Lx = Vx - Cx;
+            Ly = Vy - Cy;
+
+            if ((Lx * Lx + Ly * Ly) <= m_R2)
+            {
+                r = (Lx * Lx + Ly * Ly) / m_R2;
+                theta = m_GnarlyTwist * std::log(r);
+                sincos(theta, &s, &c);
+                Vx = Cx + c * Lx + s * Ly;
+                Vy = Cy - s * Lx + c * Ly;
+            }
+        }
+
+        helper.Out.x += m_Weight * Vx;
+        helper.Out.y += m_Weight * Vy;        
+        helper.Out.z = DefaultZ(helper);
+    }
+
+    virtual string OpenCLString() const override
+    {
+        ostringstream ss, ss2;
+        intmax_t i = 0, varIndex = IndexInXform();
+        ss2 << "_" << XformIndexInEmber() << "]";
+        string index = ss2.str();
+        string weight = WeightDefineString();
+        string cellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string twist    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string r2       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        ss << "\t{\n"
+           << "\t\treal_t Vx, Vy, Cx, Cy, Lx, Ly;\n"
+           << "\t\treal_t r, theta, s, c;\n"
+           << "\n"
+           << "\t\tVx = vIn.x;\n"
+           << "\t\tVy = vIn.y;\n"
+           << "\n"
+           << "\t\tif (" << cellsize << " != (real_t)(0))\n"
+           << "\t\t{\n"
+           << "\t\t\tCx = (floor(Vx / " << cellsize << ") + (real_t)(0.5)) * " << cellsize << ";\n"
+           << "\t\t\tCy = (floor(Vy / " << cellsize << ") + (real_t)(0.5)) * " << cellsize << ";\n"
+           << "\n"
+           << "\t\t\tLx = Vx - Cx;\n"
+           << "\t\t\tLy = Vy - Cy;\n"
+           << "\n"
+           << "\t\t\tif ((Lx * Lx + Ly * Ly) <= " << r2 << ")\n"
+           << "\t\t\t{\n"
+           << "\t\t\t\tr = (Lx * Lx + Ly * Ly) / " << r2 << ";\n"
+           << "\t\t\t\ttheta = " << twist << " * log(r);\n"
+           << "\t\t\t\ts = sin(theta);\n"
+           << "\t\t\t\tc = cos(theta);\n"
+           << "\t\t\t\tVx = Cx + c * Lx + s * Ly;\n"
+           << "\t\t\t\tVy = Cy - s * Lx + c * Ly;\n"
+           << "\t\t\t}\n"
+           << "\t\t}\n"
+           << "\n"
+           << "\t\tvOut.x += " << weight << " * Vx;\n"
+           << "\t\tvOut.y += " << weight << " * Vy;\n"
+           << "\t\tvOut.z = " << DefaultZCl()
+           << "\t}\n";
+        return ss.str();
+    }
+
+    virtual void Precalc() override
+    {
+        T radius = T(0.5) * m_GnarlyCellSize;
+        m_R2 = Zeps(radius * radius);
+    }
+
+protected:
+    void Init()
+    {
+        string prefix = Prefix();
+        m_Params.clear();
+        m_Params.push_back(ParamWithName<T>(&m_GnarlyCellSize, prefix + "gnarly_cellsize", T(1)));
+        m_Params.push_back(ParamWithName<T>(&m_GnarlyTwist, prefix + "gnarly_twist", T(1)));
+        m_Params.push_back(ParamWithName<T>(true, &m_R2, prefix + "gnarly_r2"));//Precalc.
+    }
+
+private:
+    T m_GnarlyCellSize;
+    T m_GnarlyTwist;
+    T m_R2;//Precalc.
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -7144,4 +7256,5 @@ MAKEPREPOSTPARVAR(Waves23, waves23, WAVES23)
 MAKEPREPOSTPARVAR(Waves42, waves42, WAVES42)
 MAKEPREPOSTPARVAR(Waves3, waves3, WAVES3)
 MAKEPREPOSTPARVAR(Waves4, waves4, WAVES4)
+MAKEPREPOSTPARVAR(Gnarly, gnarly, GNARLY)
 }

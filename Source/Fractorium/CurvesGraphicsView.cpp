@@ -20,7 +20,6 @@ CurvesGraphicsView::CurvesGraphicsView(QWidget* parent)
 	m_GPen.setWidth(2);
 	m_BPen.setWidth(2);
 	setScene(&m_Scene);
-	SetTop(CurveIndex::ALL);
 	//qDebug() << "Original scene rect before setting anything is: " << sceneRect();
 	m_OriginalRect = sceneRect();
 	Curves<float> curves(true);
@@ -30,16 +29,19 @@ CurvesGraphicsView::CurvesGraphicsView(QWidget* parent)
 }
 
 /// <summary>
-/// Get the position of a given point within a given curve.
+/// Called when an underlying point has had its position changed, so emit a signal so that a listener can take action.
 /// </summary>
-/// <param name="curveIndex">The curve whose point value will be retrieved, 0-3.</param>
-/// <param name="pointIndex">The point within the curve value will be retrieved, 1-2.</param>
+/// <param name="curveIndex">The curve whose point value was changed, 0-3.</param>
+/// <param name="pointIndex">The point within the curve whose point value was changed.</param>
 /// <param name="point">The position of the point. X,Y will each be within 0-1.</param>
 void CurvesGraphicsView::PointChanged(int curveIndex, int pointIndex, const QPointF& point)
 {
-	double x = point.x() / width();
-	double y = (height() - point.y()) / height();
-	emit PointChangedSignal(curveIndex, pointIndex, QPointF(x, y));
+	if (curveIndex == m_Index)
+	{
+		double x = point.x() / width();
+		double y = (height() - point.y()) / height();
+		emit PointChangedSignal(curveIndex, pointIndex, QPointF(x, y));
+	}
 }
 
 /// <summary>
@@ -105,6 +107,7 @@ void CurvesGraphicsView::Set(Curves<float>& curves)
 	createpoints(1, m_RedP, Qt::GlobalColor::red, 1);
 	createpoints(2, m_GrnP, Qt::GlobalColor::green, 1);
 	createpoints(3, m_BluP, Qt::GlobalColor::blue, 1);
+	SetTop(CurveIndex(m_Index));
 }
 
 /// <summary>
@@ -135,16 +138,10 @@ void CurvesGraphicsView::SetTop(CurveIndex curveIndex)
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		if (i == m_Index)
-		{
-			for (auto& p : m_Points[i])
-				p->setZValue(2);
-		}
-		else
-		{
-			for (auto& p : m_Points[i])
-				p->setZValue(1);
-		}
+		bool b = (i == m_Index);
+
+		for (auto& p : m_Points[i])
+			p->SetCurrent(b);
 	}
 }
 
@@ -237,7 +234,7 @@ void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 		return -1;
 	};
 
-	if (e->button() == Qt::RightButton)//Right button does whole image rotation and scaling.
+	if (e->button() == Qt::RightButton)
 	{
 		int i = findpoint(e->pos().x(), e->pos().y());
 

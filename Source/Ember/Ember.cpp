@@ -489,7 +489,7 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(Waves42, T) \
 	EXPORTPREPOSTREGVAR(Waves3, T) \
 	EXPORTPREPOSTREGVAR(Waves4, T) \
-    EXPORTPREPOSTREGVAR(Gnarly, T) \
+	EXPORTPREPOSTREGVAR(Gnarly, T) \
 	template EMBER_API class VariationList<T>; \
 	template EMBER_API class SpatialFilter<T>; \
 	template EMBER_API class GaussianFilter<T>; \

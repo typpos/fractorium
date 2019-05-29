@@ -1108,7 +1108,7 @@ public:
 		T temp, x = helper.In.x / m_Width;
 		bool pos = x > 0;
 
-		if (std::cos((pos ? x - (int)x : x + (int)x) * M_PI) < rand.Frand01<T>() * 2 - 1)
+		if (std::cos((pos ? x - (int)x : x + (int)x) * T(M_PI)) < rand.Frand01<T>() * 2 - 1)
 			temp = pos ? -m_Vwidth : m_Vwidth;
 		else
 			temp = 0;
@@ -4280,11 +4280,11 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		v2T z1(helper.In.x, helper.In.y);
-		v2T z = VarFuncs<T>::RealDivComplex(1.0, z1);
-		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexPlusComplex(z, VarFuncs<T>::ComplexMultComplex(VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexPlusReal(z, 1.0)), VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexMinusReal(z, 1.0))))), m_WeightInvPi);
-		helper.Out.x = result.x;
-		helper.Out.y = result.y;
+		std::complex<T> z(helper.In.x, helper.In.y);
+		z = T(1.0) / z;
+		std::complex<T> result = m_WeightInvPi * std::log(z + std::sqrt(z + T(1.0)) * std::sqrt(z - T(1.0)));
+		helper.Out.x = result.real();
+		helper.Out.y = result.imag();
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -4347,19 +4347,19 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		v2T z1(helper.In.x, helper.In.y);
-		v2T z = VarFuncs<T>::RealDivComplex(1.0, z1);
-		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexPlusComplex(z, VarFuncs<T>::ComplexMultComplex(VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexPlusReal(z, 1.0)), VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexMinusReal(z, 1.0))))), m_WeightInvPi);
+		std::complex<T> z(helper.In.x, helper.In.y);
+		z = T(1.0) / z;
+		std::complex<T> result = m_WeightInvPi * std::log(z + std::sqrt(z + T(1.0)) * std::sqrt(z - T(1.0)));
 
-		if (result.y < 0)
+		if (result.imag() < 0)
 		{
-			helper.Out.x = result.x;
-			helper.Out.y = result.y + 1;
+			helper.Out.x = result.real();
+			helper.Out.y = result.imag() + T(1.0);
 		}
 		else
 		{
-			helper.Out.x = -result.x;
-			helper.Out.y = result.y - 1;
+			helper.Out.x = -result.real();
+			helper.Out.y = result.imag() - T(1.0);
 		}
 
 		helper.Out.z = DefaultZ(helper);
@@ -4433,10 +4433,10 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		v2T z(helper.In.x, helper.In.y);
-		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexPlusComplex(z, VarFuncs<T>::ComplexSqrt(VarFuncs<T>::ComplexPlusReal(VarFuncs<T>::ComplexMultComplex(z, z), 1.0)))), m_WeightInvPi);
-		helper.Out.x = result.x;
-		helper.Out.y = result.y;
+		std::complex<T> z(helper.In.x, helper.In.y);
+		std::complex<T> result = m_WeightInvPi * std::log(z + std::sqrt(z * z + T(1.0)));
+		helper.Out.x = result.real();
+		helper.Out.y = result.imag();
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -4497,11 +4497,10 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		v2T z(helper.In.x, helper.In.y);
-		v2T zm(-helper.In.x, -helper.In.y);
-		v2T result = VarFuncs<T>::ComplexMultReal(VarFuncs<T>::ComplexLog(VarFuncs<T>::ComplexDivComplex(VarFuncs<T>::ComplexPlusReal(z, 1.0), VarFuncs<T>::ComplexPlusReal(zm, 1.0))), m_WeightInvPi);
-		helper.Out.x = result.x;
-		helper.Out.y = result.y;
+		std::complex<T> z(helper.In.x, helper.In.y);
+		std::complex<T> result = m_WeightInvPi * std::log((z + T(1.0)) / (-z + T(1.0)));
+		helper.Out.x = result.real();
+		helper.Out.y = result.imag();
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -7083,109 +7082,108 @@ template <typename T>
 class GnarlyVariation : public ParametricVariation<T>
 {
 public:
-    GnarlyVariation(T weight = 1.0) : ParametricVariation<T>("gnarly", eVariationId::VAR_GNARLY, weight)
-    {
-        Init();
-    }
+	GnarlyVariation(T weight = 1.0) : ParametricVariation<T>("gnarly", eVariationId::VAR_GNARLY, weight)
+	{
+		Init();
+	}
 
-    PARVARCOPY(GnarlyVariation)
+	PARVARCOPY(GnarlyVariation)
 
-    virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
-    {
-        T Vx, Vy;
-        T Cx, Cy;
-        T Lx, Ly;
-        T r, theta, s, c;
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T Vx, Vy;
+		T Cx, Cy;
+		T Lx, Ly;
+		T r, theta, s, c;
+		Vx = helper.In.x;
+		Vy = helper.In.y;
 
-        Vx = helper.In.x;
-        Vy = helper.In.y;       
+		if (m_GnarlyCellSize != T(0))
+		{
+			Cx = (Floor<T>(Vx / m_GnarlyCellSize) + T(0.5)) * m_GnarlyCellSize;
+			Cy = (Floor<T>(Vy / m_GnarlyCellSize) + T(0.5)) * m_GnarlyCellSize;
+			Lx = Vx - Cx;
+			Ly = Vy - Cy;
 
-        if (m_GnarlyCellSize != T(0))
-        {
-            Cx = (Floor<T>(Vx / m_GnarlyCellSize) + T(0.5)) * m_GnarlyCellSize;
-            Cy = (Floor<T>(Vy / m_GnarlyCellSize) + T(0.5)) * m_GnarlyCellSize;
+			if ((Lx * Lx + Ly * Ly) <= m_R2)
+			{
+				r = (Lx * Lx + Ly * Ly) / m_R2;
+				theta = m_GnarlyTwist * std::log(r);
+				sincos(theta, &s, &c);
+				Vx = Cx + c * Lx + s * Ly;
+				Vy = Cy - s * Lx + c * Ly;
+			}
+		}
 
-            Lx = Vx - Cx;
-            Ly = Vy - Cy;
+		helper.Out.x = m_Weight * Vx;
+		helper.Out.y = m_Weight * Vy;
+		helper.Out.z = DefaultZ(helper);
+	}
 
-            if ((Lx * Lx + Ly * Ly) <= m_R2)
-            {
-                r = (Lx * Lx + Ly * Ly) / m_R2;
-                theta = m_GnarlyTwist * std::log(r);
-                sincos(theta, &s, &c);
-                Vx = Cx + c * Lx + s * Ly;
-                Vy = Cy - s * Lx + c * Ly;
-            }
-        }
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string cellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string twist    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string r2       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t Vx, Vy, Cx, Cy, Lx, Ly, Lxy;\n"
+		   << "\t\treal_t r, theta, s, c;\n"
+		   << "\n"
+		   << "\t\tVx = vIn.x;\n"
+		   << "\t\tVy = vIn.y;\n"
+		   << "\n"
+		   << "\t\tif (" << cellsize << " != (real_t)(0))\n"
+		   << "\t\t{\n"
+		   << "\t\t\tCx = (floor(Vx / " << cellsize << ") + (real_t)(0.5)) * " << cellsize << ";\n"
+		   << "\t\t\tCy = (floor(Vy / " << cellsize << ") + (real_t)(0.5)) * " << cellsize << ";\n"
+		   << "\n"
+		   << "\t\t\tLx = Vx - Cx;\n"
+		   << "\t\t\tLy = Vy - Cy;\n"
+		   << "\t\t\tLxy = fma(Lx, Lx, Ly * Ly);\n"
+		   << "\n"
+		   << "\t\t\tif (Lxy <= " << r2 << ")\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tr = Lxy / " << r2 << ";\n"
+		   << "\t\t\t\ttheta = " << twist << " * log(r);\n"
+		   << "\t\t\t\ts = sin(theta);\n"
+		   << "\t\t\t\tc = cos(theta);\n"
+		   << "\t\t\t\tVx = Cx + c * Lx + s * Ly;\n"
+		   << "\t\t\t\tVy = Cy - s * Lx + c * Ly;\n"
+		   << "\t\t\t}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * Vx;\n"
+		   << "\t\tvOut.y = " << weight << " * Vy;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
 
-        helper.Out.x += m_Weight * Vx;
-        helper.Out.y += m_Weight * Vy;        
-        helper.Out.z = DefaultZ(helper);
-    }
-
-    virtual string OpenCLString() const override
-    {
-        ostringstream ss, ss2;
-        intmax_t i = 0, varIndex = IndexInXform();
-        ss2 << "_" << XformIndexInEmber() << "]";
-        string index = ss2.str();
-        string weight = WeightDefineString();
-        string cellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string twist    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string r2       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        ss << "\t{\n"
-           << "\t\treal_t Vx, Vy, Cx, Cy, Lx, Ly;\n"
-           << "\t\treal_t r, theta, s, c;\n"
-           << "\n"
-           << "\t\tVx = vIn.x;\n"
-           << "\t\tVy = vIn.y;\n"
-           << "\n"
-           << "\t\tif (" << cellsize << " != (real_t)(0))\n"
-           << "\t\t{\n"
-           << "\t\t\tCx = (floor(Vx / " << cellsize << ") + (real_t)(0.5)) * " << cellsize << ";\n"
-           << "\t\t\tCy = (floor(Vy / " << cellsize << ") + (real_t)(0.5)) * " << cellsize << ";\n"
-           << "\n"
-           << "\t\t\tLx = Vx - Cx;\n"
-           << "\t\t\tLy = Vy - Cy;\n"
-           << "\n"
-           << "\t\t\tif ((Lx * Lx + Ly * Ly) <= " << r2 << ")\n"
-           << "\t\t\t{\n"
-           << "\t\t\t\tr = (Lx * Lx + Ly * Ly) / " << r2 << ";\n"
-           << "\t\t\t\ttheta = " << twist << " * log(r);\n"
-           << "\t\t\t\ts = sin(theta);\n"
-           << "\t\t\t\tc = cos(theta);\n"
-           << "\t\t\t\tVx = Cx + c * Lx + s * Ly;\n"
-           << "\t\t\t\tVy = Cy - s * Lx + c * Ly;\n"
-           << "\t\t\t}\n"
-           << "\t\t}\n"
-           << "\n"
-           << "\t\tvOut.x += " << weight << " * Vx;\n"
-           << "\t\tvOut.y += " << weight << " * Vy;\n"
-           << "\t\tvOut.z = " << DefaultZCl()
-           << "\t}\n";
-        return ss.str();
-    }
-
-    virtual void Precalc() override
-    {
-        T radius = T(0.5) * m_GnarlyCellSize;
-        m_R2 = Zeps(radius * radius);
-    }
+	virtual void Precalc() override
+	{
+		T radius = T(0.5) * m_GnarlyCellSize;
+		m_R2 = Zeps(SQR(radius));
+	}
 
 protected:
-    void Init()
-    {
-        string prefix = Prefix();
-        m_Params.clear();
-        m_Params.push_back(ParamWithName<T>(&m_GnarlyCellSize, prefix + "gnarly_cellsize", T(1)));
-        m_Params.push_back(ParamWithName<T>(&m_GnarlyTwist, prefix + "gnarly_twist", T(1)));
-        m_Params.push_back(ParamWithName<T>(true, &m_R2, prefix + "gnarly_r2"));//Precalc.
-    }
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_GnarlyCellSize, prefix + "gnarly_cellsize", T(1)));
+		m_Params.push_back(ParamWithName<T>(&m_GnarlyTwist,    prefix + "gnarly_twist", T(1)));
+		m_Params.push_back(ParamWithName<T>(true, &m_R2,       prefix + "gnarly_r2"));//Precalc.
+	}
 
 private:
-    T m_GnarlyCellSize;
-    T m_GnarlyTwist;
-    T m_R2;//Precalc.
+	T m_GnarlyCellSize;
+	T m_GnarlyTwist;
+	T m_R2;//Precalc.
 };
 
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)

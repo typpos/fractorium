@@ -39,6 +39,7 @@ public:
 	void Set(int curveIndex, int pointIndex, const QPointF& point);
 	void Set(Curves<float>& curves);
 	void SetTop(CurveIndex curveIndex);
+	size_t SelectedCurveIndex() const { return m_Index; }
 
 Q_SIGNALS:
 	void PointChangedSignal(int curveIndex, int pointIndex, const QPointF& point);
@@ -87,13 +88,23 @@ public:
 	EllipseItem(const QRectF& rect, int curveIndex, int pointIndex, CurvesGraphicsView* viewParent, QGraphicsItem* parent = nullptr)
 		: QGraphicsEllipseItem(rect, parent)
 	{
+		m_CurveIndex = curveIndex;
+		m_PointIndex = pointIndex;
+		m_ViewParent = viewParent;
 		setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
 		setFlag(QGraphicsItem::ItemIsSelectable);
 		setFlag(QGraphicsItem::ItemIsMovable);
 		setPen(Qt::NoPen);
-		m_CurveIndex = curveIndex;
-		m_PointIndex = pointIndex;
-		m_ViewParent = viewParent;
+	}
+
+	/// <summary>
+	/// Set whether this item is selectable, which means this curve is the current one.
+	/// </summary>
+	/// <param name="b">True if selected, else false.</param>
+	void SetCurrent(bool b)
+	{
+		setFlag(QGraphicsItem::ItemIsMovable, b);
+		setZValue(b ? 2 : 1);
 	}
 
 	/// <summary>
@@ -125,7 +136,7 @@ protected:
 	/// <returns>The new position</returns>
 	virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override
 	{
-		if (change == ItemPositionChange && scene())
+		if ((change == ItemPositionChange) && scene())
 		{
 			//Value is the new position.
 			QPointF newPos = value.toPointF();

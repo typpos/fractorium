@@ -245,7 +245,7 @@ XmlToEmber<T>::XmlToEmber()
 			{ "mode", "unicorngaloshen_mode" },
 			{ "d_spher_weight", "d_spherical_weight" },
 			{ "poincare_p", "poincare2_p" },
-            { "poincare_q", "poincare2_q" }			
+			{ "poincare_q", "poincare2_q" }
 		};
 		m_FlattenNames =
 		{
@@ -910,7 +910,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						if (!varname.empty())
 						{
 							T weight = 1;
-                            string corrvarname = GetCorrectedVariationName(m_BadVariationNames, varname);
+							string corrvarname = GetCorrectedVariationName(m_BadVariationNames, varname);
 							auto corrwprefix = !StartsWith(corrvarname, prefix) ? prefix + corrvarname : corrvarname;
 
 							if (auto var = m_VariationList->GetVariation(corrwprefix))
@@ -961,7 +961,9 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 														}
 														else if (parvar)
 														{
-															paramstr = prefix + paramstr;
+															if (!StartsWith(paramstr, prefix))
+																paramstr = prefix + paramstr;
+
 															parvar->SetParamVal(paramstr.c_str(), val);
 															//if (!parvar->SetParamVal(paramstr.c_str(), val))
 															//	AddToReport(string(loc) + " : Failed to set parametric variation parameter " + paramstr);
@@ -2482,14 +2484,14 @@ string XmlToEmber<T>::GetCorrectedVariationName(vector<pair<pair<string, string>
 template <typename T>
 string XmlToEmber<T>::GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, const string& varname)
 {
-    if (varname == "poincare")//for Apo flames, poincare must be the same, but chaotica poincare is implemented as poincare2
-        return "poincare2";
-    else if (varname != "mobius")//Chaotica actually gets this right, but Apophysis doesn't.
-        for (auto& v : vec)
-            if (!_stricmp(v.first.first.c_str(), varname.c_str()))//Do case insensitive here.
-                return v.first.second;
+	if (varname == "poincare")//for Apo flames, poincare must be the same, but chaotica poincare is implemented as poincare2
+		return "poincare2";
+	else if (varname != "mobius")//Chaotica actually gets this right, but Apophysis doesn't.
+		for (auto& v : vec)
+			if (!_stricmp(v.first.first.c_str(), varname.c_str()))//Do case insensitive here.
+				return v.first.second;
 
-    return varname;
+	return varname;
 }
 
 /// <summary>

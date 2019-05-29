@@ -19,9 +19,11 @@ namespace apoconv
 			{ "(float)", "" },
 			{ "double", "T" },
 			{ "float", "T" },
+			{ "Complex", "std::complex<T>" },
 			//{ "0.0", "0" },
 			{ "0.5", "T(0.5)" },
 			{ "1.0", "T(1.0)" },
+			{ "2.0", "T(2.0)" },
 			{ "0.1", "T(0.1)" },
 			{ "0.01", "T(0.01)" },
 			{ "0.001", "T(0.001)" },
@@ -56,6 +58,7 @@ namespace apoconv
 			{ "sqrt(", "std::sqrt(" },
 			{ "pow(", "std::pow(" },
 			{ "fabs(", "std::abs(" },
+			{ "log(", "std::log(" },
 
 			{ "sqr(", "Sqr(" },
 

@@ -443,7 +443,8 @@ bool FractoriumEmberController<T>::Render()
 				{
 					auto btn = QApplication::mouseButtons();
 
-					if (!btn.testFlag(Qt::LeftButton) && !btn.testFlag(Qt::RightButton) && !btn.testFlag(Qt::MiddleButton))
+					if ((action == eProcessAction::ACCUM_ONLY || action == eProcessAction::FILTER_AND_ACCUM) ||
+							(!btn.testFlag(Qt::LeftButton) && !btn.testFlag(Qt::RightButton) && !btn.testFlag(Qt::MiddleButton)))
 					{
 						m_UndoList.push_back(m_Ember);
 						m_UndoIndex = m_UndoList.size() - 1;

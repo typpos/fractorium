@@ -2294,7 +2294,7 @@ public:
 		T x = rad * fx + m_Shift;
 		T y = rad * fy;
 		rad = m_Weight * m_Scale / Zeps(x * x + y * y);
-		T angle = ((rand.Frand01<T>() * m_IP) + 1) * T(M_PI) / m_P;
+        T angle = (Floor<T>(rand.Frand01<T>() * m_P) * 2 + 1) * T(M_PI) / m_P;
 		T X = rad * x + m_Shift;
 		T Y = rad * y;
 		T cosa = std::cos(angle);
@@ -2320,7 +2320,6 @@ public:
 		string shift  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scale  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scale2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string ip     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t fx = vIn.x * " << scale2 << ";\n"
 		   << "\t\treal_t fy = vIn.y * " << scale2 << ";\n"
@@ -2328,7 +2327,7 @@ public:
 		   << "\t\treal_t x = fma(rad, fx, " << shift << ");\n"
 		   << "\t\treal_t y = rad * fy;\n"
 		   << "\t\trad = " << weight << " * " << scale << " / Zeps(fma(x, x, SQR(y)));\n"
-		   << "\t\treal_t angle = fma(MwcNext01(mwc), " << ip << ", (real_t)(1.0)) * MPI / " << p << ";\n"
+           << "\t\treal_t angle = (floor(MwcNext01(mwc) * " << p << ") * 2 + 1) * MPI / " << p << ";\n"
 		   << "\t\treal_t X = fma(rad, x, " << shift << ");\n"
 		   << "\t\treal_t Y = rad * y;\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
@@ -2344,7 +2343,7 @@ public:
 		return ss.str();
 	}
 
-	virtual void Precalc() override
+    virtual void Precalc() override
 	{
 		T pq = T(M_PI) / m_Q;
 		T pp = T(M_PI) / m_P;
@@ -2355,7 +2354,6 @@ public:
 		m_Scale2 = 1 / std::sqrt(Sqr(sin(T(M_PI) / 2 + pp)) / Sqr(spq) - 1);
 		m_Scale2 = m_Scale2 * (std::sin(T(M_PI) / 2 + pp) / spq - 1);
 		m_Scale = 1 - SQR(m_Shift);
-		m_IP = T((int)m_P * 2);
 	}
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
@@ -2373,7 +2371,6 @@ protected:
 		m_Params.push_back(ParamWithName<T>(true, &m_Shift,  prefix + "hypershift2_shift"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Scale,  prefix + "hypershift2_scale"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Scale2, prefix + "hypershift2_scale2"));
-		m_Params.push_back(ParamWithName<T>(true, &m_IP, prefix + "hypershift2_ip"));
 	}
 
 private:
@@ -2382,7 +2379,6 @@ private:
 	T m_Shift;//Precalc.
 	T m_Scale;
 	T m_Scale2;
-	T m_IP;
 };
 
 /// <summary>

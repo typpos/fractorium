@@ -3053,7 +3053,7 @@ public:
 		T vr = m_Weight / (SQR(c) + SQR(d));
 		helper.Out.x = vr * (a * c + b * d);
 		helper.Out.y = vr * (b * c - a * d);
-		helper.Out.z = DefaultZ(helper);        
+		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -3084,12 +3084,11 @@ public:
 
 	virtual void Precalc() override
 	{
-        T pa = T(M_2PI) / Zeps(m_P);
-        T cs = std::cos(pa);
-        T r2 = (T(1) - cs) / (cs + cos(M_2PI / Zeps(m_Q))) + 1;
-        T r  = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
-        T a  = m_N * pa;
-
+		T pa = M_2PI / Zeps(m_P);
+		T cs = std::cos(pa);
+		T r2 = (T(1) - cs) / (cs + cos(M_2PI / Zeps(m_Q))) + 1;
+		T r  = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
+		T a  = m_N * pa;
 		m_Real = r * std::cos(a);
 		m_Imag = r * std::sin(a);
 	}
@@ -3099,9 +3098,9 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-        m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile_p", T(3)));
-        m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile_q", T(7)));
-        m_Params.push_back(ParamWithName<T>(&m_N, prefix + "hypertile_n", T(0)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile_p", T(3)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile_q", T(7)));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "hypertile_n", T(0)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Real, prefix + "hypertile_real"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Imag, prefix + "hypertile_imag"));
 	}
@@ -3129,8 +3128,8 @@ public:
 	PARVARCOPY(Hypertile1Variation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
-    {
-        T temp = Floor<T>(rand.Frand01<T>() * m_IP) * m_Pa;
+	{
+		T temp = Floor<T>(rand.Frand01<T>() * m_IP) * m_Pa;
 		T sina = std::sin(temp);
 		T cosa = std::cos(temp);
 		T re = m_R * cosa;
@@ -3156,9 +3155,9 @@ public:
 		string q  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string pa = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string r  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string ip = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string ip = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-           << "\t\treal_t temp = floor(MwcNext01(mwc) * " << ip << ") * " << pa << ";\n"
+		   << "\t\treal_t temp = floor(MwcNext01(mwc) * " << ip << ") * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\t\treal_t re = " << r << " * cosa;\n"
@@ -3178,11 +3177,11 @@ public:
 
 	virtual void Precalc() override
 	{
-        m_Pa = T(M_2PI) / Zeps(m_P);
-        T cs = cos(m_Pa);
-        T r2 = T(1) - (cs - 1) / (cs + cos(M_2PI / Zeps(m_Q)));
-        m_R  = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
-        m_IP = (int) m_P;
+		m_Pa = M_2PI / Zeps(m_P);
+		T cs = cos(m_Pa);
+		T r2 = T(1) - (cs - 1) / (cs + cos(M_2PI / Zeps(m_Q)));
+		m_R  = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
+		m_IP = (int) m_P;
 	}
 
 protected:
@@ -3190,11 +3189,11 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-        m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile1_p", T(3)));
-        m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile1_q", T(7)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile1_p", T(3)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile1_q", T(7)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa, prefix + "hypertile1_pa"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_R, prefix + "hypertile1_r"));
-        m_Params.push_back(ParamWithName<T>(true, &m_IP, prefix + "hypertile1_ip"));
+		m_Params.push_back(ParamWithName<T>(true, &m_IP, prefix + "hypertile1_ip"));
 	}
 
 private:
@@ -3202,7 +3201,7 @@ private:
 	T m_Q;
 	T m_Pa;//Precalc.
 	T m_R;
-    T m_IP;
+	T m_IP;
 };
 
 /// <summary>
@@ -3227,11 +3226,11 @@ public:
 		T d = m_R * helper.In.y;
 		T x = (a * c + b * d);
 		T y = (b * c - a * d);
-        T vr   = m_Weight / (SQR(c) + SQR(d));
-        T temp = Floor<T>(rand.Frand01<T>() * 32767) * m_Pa;
+		T vr   = m_Weight / (SQR(c) + SQR(d));
+		T temp = Floor<T>(rand.Frand01<T>() * 32767) * m_Pa;
 		T sina = std::sin(temp);
-        T cosa = std::cos(temp);
-        helper.Out.x = vr * (x * cosa + y * sina);
+		T cosa = std::cos(temp);
+		helper.Out.x = vr * (x * cosa + y * sina);
 		helper.Out.y = vr * (y * cosa - x * sina);
 		helper.Out.z = DefaultZ(helper);
 	}
@@ -3255,7 +3254,7 @@ public:
 		   << "\t\treal_t x = fma(a, c, b * d);\n"
 		   << "\t\treal_t y = fma(b, c, -(a * d));\n"
 		   << "\t\treal_t vr = " << weight << " / fma(c, c, SQR(d));\n"
-           << "\t\treal_t temp = floor(MwcNext01(mwc) * 32767) * " << pa << ";\n"
+		   << "\t\treal_t temp = floor(MwcNext01(mwc) * 32767) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\n"
@@ -3267,20 +3266,20 @@ public:
 	}
 
 	virtual void Precalc() override
-	{            
-        m_Pa = T(M_2PI) / Zeps(m_P);
-        T cs = cos(m_Pa);
-        T r2 = T(1) - (cs - T(1)) / (cs + cos(T(M_2PI) / Zeps(m_Q)));
-        m_R = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
-    }
+	{
+		m_Pa = T(M_2PI) / Zeps(m_P);
+		T cs = cos(m_Pa);
+		T r2 = T(1) - (cs - T(1)) / (cs + cos(T(M_2PI) / Zeps(m_Q)));
+		m_R = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
+	}
 
 protected:
 	void Init()
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-        m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile2_p", T(3)));
-        m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile2_q", T(7)));
+		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile2_p", T(3)));
+		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile2_q", T(7)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa, prefix + "hypertile2_pa"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_R, prefix + "hypertile2_r"));
 	}

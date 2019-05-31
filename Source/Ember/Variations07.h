@@ -2326,7 +2326,7 @@ public:
 		   << "\t\treal_t rad = 1 / Zeps(fma(fx, fx, SQR(fy)));\n"
 		   << "\t\treal_t x = rad * fx + " << shift << ";\n"
 		   << "\t\treal_t y = rad * fy;\n"
-		   << "\t\trad = " << weight << " * " << shift << " / Zeps(fma(x, x, SQR(y)));\n"
+           << "\t\trad = " << weight << " * " << scale << " / Zeps(fma(x, x, SQR(y)));\n"
 		   << "\t\treal_t angle = (MwcNextRange(mwc, (int)" << p << ") * 2 + 1) * MPI / " << p << ";\n"
 		   << "\t\treal_t X = fma(rad, x, " << shift << ");\n"
 		   << "\t\treal_t Y = rad * y;\n"

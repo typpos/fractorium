@@ -2454,13 +2454,13 @@ public:
 				rad = r + m_MulX * ax * rs;
 				phi = helper.m_PrecalcAtanyx + m_MulY * ay * rs;
 				sigma = std::asin(r == 0 ? 0 : helper.In.z / r) + m_MulZ * az * rs;
-				sigmas = std::sin(sigma);
-				sigmac = std::cos(sigma);
+				sigmas = std::sin(sigma) * m_Weight;
+				sigmac = std::cos(sigma) * m_Weight;
 				phis = std::sin(phi);
 				phic = std::cos(phi);
-				helper.Out.x = m_Weight * (rad * sigmac * phic);
-				helper.Out.y = m_Weight * (rad * sigmac * phis);
-				helper.Out.z = m_Weight * (rad * sigmas);
+				helper.Out.x = rad * sigmac * phic;
+				helper.Out.y = rad * sigmac * phis;
+				helper.Out.z = rad * sigmas;
 				break;
 
 			case 2://Box.
@@ -2519,14 +2519,14 @@ public:
 		   << "\t\t		phi = fma(" << mulY << ", ay * rs, precalcAtanyx);\n"
 		   << "\t\t		sigma = fma(" << mulZ << ", az * rs, asin(r == 0 ? (real_t)(0.0) : vIn.z / r));\n"
 		   << "\n"
-		   << "\t\t		sigmas = sin(sigma);\n"
-		   << "\t\t		sigmac = cos(sigma);\n"
+		   << "\t\t		sigmas = sin(sigma) * " << weight << ";\n"
+		   << "\t\t		sigmac = cos(sigma) * " << weight << ";\n"
 		   << "\t\t		phis = sin(phi);\n"
 		   << "\t\t		phic = cos(phi);\n"
 		   << "\n"
-		   << "\t\t		vOut.x = " << weight << " * (rad * sigmac * phic);\n"
-		   << "\t\t		vOut.y = " << weight << " * (rad * sigmac * phis);\n"
-		   << "\t\t		vOut.z = " << weight << " * (rad * sigmas);\n"
+		   << "\t\t		vOut.x = rad * sigmac * phic;\n"
+		   << "\t\t		vOut.y = rad * sigmac * phis;\n"
+		   << "\t\t		vOut.z = rad * sigmas;\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 2:\n"
 		   << "\t\t		scale = clamp(rs, (real_t)(0.0), (real_t)(0.9)) + (real_t)(0.1);\n"
@@ -2555,17 +2555,17 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Scatter, prefix + "falloff_scatter", 1, eParamType::REAL, EPS, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_MinDist, prefix + "falloff_mindist", T(0.5), eParamType::REAL, 0, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_MulX, prefix + "falloff_mul_x", 1, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulY, prefix + "falloff_mul_y", 1, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulZ, prefix + "falloff_mul_z", 0, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_X0, prefix + "falloff_x0"));
-		m_Params.push_back(ParamWithName<T>(&m_Y0, prefix + "falloff_y0"));
-		m_Params.push_back(ParamWithName<T>(&m_Z0, prefix + "falloff_z0"));
-		m_Params.push_back(ParamWithName<T>(&m_Invert, prefix + "falloff_invert", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Type, prefix + "falloff_type", 0, eParamType::INTEGER, 0, 2));
-		m_Params.push_back(ParamWithName<T>(&m_BoxPow, prefix + "falloff_boxpow", 2, eParamType::INTEGER, 2, 32));//Original defaulted this to 0 which directly contradicts the specified range of 2-32.
+		m_Params.push_back(ParamWithName<T>(&m_Scatter,               prefix + "falloff_scatter", 1, eParamType::REAL, EPS, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_MinDist,               prefix + "falloff_mindist", T(0.5), eParamType::REAL, 0, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,                  prefix + "falloff_mul_x", 1, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,                  prefix + "falloff_mul_y", 1, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulZ,                  prefix + "falloff_mul_z", 0, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_X0,                    prefix + "falloff_x0"));
+		m_Params.push_back(ParamWithName<T>(&m_Y0,                    prefix + "falloff_y0"));
+		m_Params.push_back(ParamWithName<T>(&m_Z0,                    prefix + "falloff_z0"));
+		m_Params.push_back(ParamWithName<T>(&m_Invert,                prefix + "falloff_invert", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Type,                  prefix + "falloff_type", 0, eParamType::INTEGER, 0, 2));
+		m_Params.push_back(ParamWithName<T>(&m_BoxPow,                prefix + "falloff_boxpow", 2, eParamType::INTEGER, 2, 32));//Original defaulted this to 0 which directly contradicts the specified range of 2-32.
 		m_Params.push_back(ParamWithName<T>(true, &m_InternalScatter, prefix + "falloff_internal_scatter"));
 	}
 
@@ -2609,19 +2609,20 @@ public:
 		{
 			case 0://Linear.
 			{
-				helper.Out.x = helper.In.x + m_MulX * random.x * dist;
-				helper.Out.y = helper.In.y + m_MulY * random.y * dist;
-				helper.Out.z = helper.In.z + m_MulZ * random.z * dist;
-				outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + m_MulC * random.w * dist, T(1)));
+				helper.Out.x = (helper.In.x + m_MulX * random.x * dist) * m_Weight;
+				helper.Out.y = (helper.In.y + m_MulY * random.y * dist) * m_Weight;
+				helper.Out.z = (helper.In.z + m_MulZ * random.z * dist) * m_Weight;
 			}
 			break;
 
 			case 1://Radial.
+			{
 				if (helper.In.x == 0 && helper.In.y == 0 && helper.In.z == 0)
 				{
-					helper.Out.x = helper.In.x;
-					helper.Out.y = helper.In.y;
-					helper.Out.z = helper.In.z;
+					helper.Out.x = helper.In.x * m_Weight;
+					helper.Out.y = helper.In.y * m_Weight;
+					helper.Out.z = helper.In.z * m_Weight;
+					return;
 				}
 				else
 				{
@@ -2629,17 +2630,16 @@ public:
 					const T r = rIn + m_MulX * random.x * dist;
 					const T phi = helper.m_PrecalcAtanyx + m_MulY * random.y * dist;
 					const T sigma = std::asin(helper.In.z / rIn) + m_MulZ * random.z * dist;
-					const T sigmas = std::sin(sigma);
-					const T sigmac = std::cos(sigma);
+					const T sigmas = std::sin(sigma) * m_Weight;
+					const T sigmac = std::cos(sigma) * m_Weight;
 					const T phis = std::sin(phi);
 					const T phic = std::cos(phi);
 					helper.Out.x = r * sigmac * phic;
 					helper.Out.y = r * sigmac * phis;
 					helper.Out.z = r * sigmas;
-					outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + m_MulC * random.w * dist, T(1)));
 				}
-
-				break;
+			}
+			break;
 
 			case 2://Gaussian.
 			default:
@@ -2651,13 +2651,14 @@ public:
 				const T sigmac = std::cos(sigma);
 				const T phis = std::sin(phi);
 				const T phic = std::cos(phi);
-				helper.Out.x = helper.In.x + m_MulX * rad * sigmac * phic;
-				helper.Out.y = helper.In.y + m_MulY * rad * sigmac * phis;
-				helper.Out.z = helper.In.z + m_MulZ * rad * sigmas;
-				outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + m_MulC * random.w * dist, T(1)));
+				helper.Out.x = (helper.In.x + m_MulX * rad * sigmac * phic) * m_Weight;
+				helper.Out.y = (helper.In.y + m_MulY * rad * sigmac * phis) * m_Weight;
+				helper.Out.z = (helper.In.z + m_MulZ * rad * sigmas) * m_Weight;
 			}
 			break;
 		}
+
+		outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + m_MulC * random.w * dist, T(1)));
 	}
 
 	virtual string OpenCLString() const override
@@ -2667,18 +2668,18 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string scatter = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string minDist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string mulX    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string mulY    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string mulZ    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string mulC    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string x0      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string y0      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string z0      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string invert  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string type    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rMax    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string scatter    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string minDist    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulX       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulY       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulZ       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string mulC       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x0         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y0         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string z0         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string invert     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string type       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rMax       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tconst real_t randx = MwcNext0505(mwc);\n"
 		   << "\t\tconst real_t randy = MwcNext0505(mwc);\n"
@@ -2694,17 +2695,17 @@ public:
 		   << "\t\tswitch ((int)" << type << ")\n"
 		   << "\t\t{\n"
 		   << "\t\t   case 0:\n"
-		   << "\t\t	   vOut.x = fma(" << mulX << ", randx * dist, vIn.x);\n"
-		   << "\t\t	   vOut.y = fma(" << mulY << ", randy * dist, vIn.y);\n"
-		   << "\t\t	   vOut.z = fma(" << mulZ << ", randz * dist, vIn.z);\n"
+		   << "\t\t	   vOut.x = fma(" << mulX << ", randx * dist, vIn.x) * " << weight << ";\n"
+		   << "\t\t	   vOut.y = fma(" << mulY << ", randy * dist, vIn.y) * " << weight << ";\n"
+		   << "\t\t	   vOut.z = fma(" << mulZ << ", randz * dist, vIn.z) * " << weight << ";\n"
 		   << "\t\t	   outPoint->m_ColorX = fabs(fmod(fma(" << mulC << ", randc * dist, outPoint->m_ColorX), (real_t)(1.0)));\n"
 		   << "\t\t	   break;\n"
 		   << "\t\t   case 1:\n"
 		   << "\t\t	   if (vIn.x == 0 && vIn.y == 0 && vIn.z == 0)\n"
 		   << "\t\t	   {\n"
-		   << "\t\t		   vOut.x = vIn.x;\n"
-		   << "\t\t		   vOut.y = vIn.y;\n"
-		   << "\t\t		   vOut.z = vIn.z;\n"
+		   << "\t\t		   vOut.x = vIn.x * " << weight << ";\n"
+		   << "\t\t		   vOut.y = vIn.y * " << weight << ";\n"
+		   << "\t\t		   vOut.z = vIn.z * " << weight << ";\n"
 		   << "\t\t	   }\n"
 		   << "\t\t	   else\n"
 		   << "\t\t	   {\n"
@@ -2712,8 +2713,8 @@ public:
 		   << "\t\t		   real_t r = fma(" << mulX << ", randx * dist, rIn);\n"
 		   << "\t\t		   real_t phi = fma(" << mulY << ", randy * dist, precalcAtanyx);\n"
 		   << "\t\t		   real_t sigma = fma(" << mulZ << ", randz * dist, asin(vIn.z / rIn));\n"
-		   << "\t\t		   real_t sigmas = sin(sigma);\n"
-		   << "\t\t		   real_t sigmac = cos(sigma);\n"
+		   << "\t\t		   real_t sigmas = sin(sigma) * " << weight << ";\n"
+		   << "\t\t		   real_t sigmac = cos(sigma) * " << weight << ";\n"
 		   << "\t\t		   real_t phis = sin(phi);\n"
 		   << "\t\t		   real_t phic = cos(phi);\n"
 		   << "\n"
@@ -2723,23 +2724,24 @@ public:
 		   << "\t\t		   outPoint->m_ColorX = fabs(fmod(fma(" << mulC << ", randc * dist, outPoint->m_ColorX), (real_t)(1.0)));\n"
 		   << "\t\t	   }\n"
 		   << "\t\t	   break;\n"
-		   << "\t\t   case 2:\n"
-		   << "\t\t	  {\n"
-		   << "\t\t	   real_t sigma = dist * randy * M_2PI;\n"
-		   << "\t\t	   real_t phi = dist * randz * MPI;\n"
-		   << "\t\t	   real_t rad = dist * randx;\n"
-		   << "\t\t	   real_t sigmas = sin(sigma);\n"
-		   << "\t\t	   real_t sigmac = cos(sigma);\n"
-		   << "\t\t	   real_t phis = sin(phi);\n"
-		   << "\t\t	   real_t phic = cos(phi);\n"
+		   << "\t\t    case 2:\n"
+		   << "\t\t	   {\n"
+		   << "\t\t	    real_t sigma = dist * randy * M_2PI;\n"
+		   << "\t\t	    real_t phi = dist * randz * MPI;\n"
+		   << "\t\t	    real_t rad = dist * randx;\n"
+		   << "\t\t	    real_t sigmas = sin(sigma);\n"
+		   << "\t\t	    real_t sigmac = cos(sigma);\n"
+		   << "\t\t	    real_t phis = sin(phi);\n"
+		   << "\t\t	    real_t phic = cos(phi);\n"
 		   << "\n"
-		   << "\t\t	   vOut.x = fma(" << mulX << " * rad, sigmac * phic, vIn.x);\n"
-		   << "\t\t	   vOut.y = fma(" << mulY << " * rad, sigmac * phis, vIn.y);\n"
-		   << "\t\t	   vOut.z = fma(" << mulZ << " * rad, sigmas, vIn.z);\n"
-		   << "\t\t	   outPoint->m_ColorX = fabs(fmod(fma(" << mulC << ", randc * dist, outPoint->m_ColorX), (real_t)(1.0)));\n"
-		   << "\t\t	   break;\n"
-		   << "\t\t	  }\n"
+		   << "\t\t	    vOut.x = fma(" << mulX << " * rad, sigmac * phic, vIn.x) * " << weight << ";\n"
+		   << "\t\t	    vOut.y = fma(" << mulY << " * rad, sigmac * phis, vIn.y) * " << weight << ";\n"
+		   << "\t\t	    vOut.z = fma(" << mulZ << " * rad, sigmas, vIn.z) * " << weight << ";\n"
+		   << "\t\t	    outPoint->m_ColorX = fabs(fmod(fma(" << mulC << ", randc * dist, outPoint->m_ColorX), (real_t)(1.0)));\n"
+		   << "\t\t	    break;\n"
+		   << "\t\t	   }\n"
 		   << "\t\t}\n"
+		   << "\n"
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -2759,18 +2761,18 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Scatter, prefix + "falloff2_scatter", 1, eParamType::REAL, EPS, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_MinDist, prefix + "falloff2_mindist", T(0.5), eParamType::REAL, 0, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_MulX, prefix + "falloff2_mul_x", 1, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulY, prefix + "falloff2_mul_y", 1, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulZ, prefix + "falloff2_mul_z", 0, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulC, prefix + "falloff2_mul_c", 0, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_X0, prefix + "falloff2_x0"));
-		m_Params.push_back(ParamWithName<T>(&m_Y0, prefix + "falloff2_y0"));
-		m_Params.push_back(ParamWithName<T>(&m_Z0, prefix + "falloff2_z0"));
-		m_Params.push_back(ParamWithName<T>(&m_Invert, prefix + "falloff2_invert", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Type, prefix + "falloff2_type", 0, eParamType::INTEGER, 0, 2));
-		m_Params.push_back(ParamWithName<T>(true, &m_RMax, prefix + "falloff2_rmax"));
+		m_Params.push_back(ParamWithName<T>(&m_Scatter,          prefix + "falloff2_scatter", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MinDist,          prefix + "falloff2_mindist", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,             prefix + "falloff2_mul_x", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,             prefix + "falloff2_mul_y", 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulZ,             prefix + "falloff2_mul_z", 0));
+		m_Params.push_back(ParamWithName<T>(&m_MulC,             prefix + "falloff2_mul_c", 0));
+		m_Params.push_back(ParamWithName<T>(&m_X0,               prefix + "falloff2_x0"));
+		m_Params.push_back(ParamWithName<T>(&m_Y0,               prefix + "falloff2_y0"));
+		m_Params.push_back(ParamWithName<T>(&m_Z0,               prefix + "falloff2_z0"));
+		m_Params.push_back(ParamWithName<T>(&m_Invert,           prefix + "falloff2_invert", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Type,             prefix + "falloff2_type", 0, eParamType::INTEGER, 0, 2));
+		m_Params.push_back(ParamWithName<T>(true, &m_RMax,       prefix + "falloff2_rmax"));//Precalc.
 	}
 
 private:
@@ -2785,7 +2787,7 @@ private:
 	T m_Z0;
 	T m_Invert;
 	T m_Type;
-	T m_RMax;
+	T m_RMax;//Precalc.
 };
 
 /// <summary>
@@ -2807,17 +2809,10 @@ public:
 		const v4T random(rand.Frand<T>(T(-0.5), T(0.5)), rand.Frand<T>(T(-0.5), T(0.5)), rand.Frand<T>(T(-0.5), T(0.5)), rand.Frand<T>(T(-0.5), T(0.5)));
 		T radius;
 
-		switch (int(m_BlurShape))
-		{
-			case 0://Circle.
-				radius = std::sqrt(Sqr(helper.In.x - m_CenterX) + Sqr(helper.In.y - m_CenterY) + Sqr(helper.In.z - m_CenterZ));
-				break;
-
-			case 1://Square.
-			default:
-				radius = std::max(std::abs(helper.In.x - m_CenterX), std::max(std::abs(helper.In.y - m_CenterY), (std::abs(helper.In.z - m_CenterZ))));//Original called a macro named min, which internally performed max.
-				break;
-		}
+		if (m_BlurShape == 0)//Circle.
+			radius = std::sqrt(Sqr(helper.In.x - m_CenterX) + Sqr(helper.In.y - m_CenterY) + Sqr(helper.In.z - m_CenterZ));
+		else//Square.
+			radius = std::max(std::abs(helper.In.x - m_CenterX), std::max(std::abs(helper.In.y - m_CenterY), (std::abs(helper.In.z - m_CenterZ))));//Original called a macro named min, which internally performed max.
 
 		const T dist = std::max<T>(((m_InvertDistance != 0 ? std::max<T>(1 - radius, 0) : std::max<T>(radius, 0)) - m_MinDistance) * m_RMax, 0);
 
@@ -2832,9 +2827,9 @@ public:
 				const T sigmac = std::cos(sigma);
 				const T phis = std::sin(phi);
 				const T phic = std::cos(phi);
-				helper.Out.x = helper.In.x + m_MulX * rad * sigmac * phic;
-				helper.Out.y = helper.In.y + m_MulY * rad * sigmac * phis;
-				helper.Out.z = helper.In.z + m_MulZ * rad * sigmas;
+				helper.Out.x = (helper.In.x + m_MulX * rad * sigmac * phic) * m_Weight;
+				helper.Out.y = (helper.In.y + m_MulY * rad * sigmac * phis) * m_Weight;
+				helper.Out.z = (helper.In.z + m_MulZ * rad * sigmas) * m_Weight;
 				outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + m_MulC * random.w * dist, T(1)));
 			}
 			break;
@@ -2842,9 +2837,10 @@ public:
 			case 1://Radial.
 				if (helper.In.x == 0 && helper.In.y == 0 && helper.In.z == 0)
 				{
-					helper.Out.x = helper.In.x;
-					helper.Out.y = helper.In.y;
-					helper.Out.z = helper.In.z;
+					helper.Out.x = helper.In.x * m_Weight;
+					helper.Out.y = helper.In.y * m_Weight;
+					helper.Out.z = helper.In.z * m_Weight;
+					return;
 				}
 				else
 				{
@@ -2852,8 +2848,8 @@ public:
 					const T r = rIn + m_MulX * random.x * dist;
 					const T phi = helper.m_PrecalcAtanyx + m_MulY * random.y * dist;
 					const T sigma = std::asin(helper.In.z / rIn) + m_MulZ * random.z * dist;
-					const T sigmas = std::sin(sigma);
-					const T sigmac = std::cos(sigma);
+					const T sigmas = std::sin(sigma) * m_Weight;
+					const T sigmac = std::cos(sigma) * m_Weight;
 					const T phis = std::sin(phi);
 					const T phic = std::cos(phi);
 					helper.Out.x = r * sigmac * phic;
@@ -2868,9 +2864,9 @@ public:
 			default:
 			{
 				const T coeff = m_RMax <= EPS ? dist : dist + m_Alpha * (VarFuncs<T>::LogMap(dist) - dist);
-				helper.Out.x = helper.In.x + VarFuncs<T>::LogMap(m_MulX) * VarFuncs<T>::LogScale(random.x) * coeff;
-				helper.Out.y = helper.In.y + VarFuncs<T>::LogMap(m_MulY) * VarFuncs<T>::LogScale(random.y) * coeff;
-				helper.Out.z = helper.In.z + VarFuncs<T>::LogMap(m_MulZ) * VarFuncs<T>::LogScale(random.z) * coeff;
+				helper.Out.x = (helper.In.x + VarFuncs<T>::LogMap(m_MulX) * VarFuncs<T>::LogScale(random.x) * coeff) * m_Weight;
+				helper.Out.y = (helper.In.y + VarFuncs<T>::LogMap(m_MulY) * VarFuncs<T>::LogScale(random.y) * coeff) * m_Weight;
+				helper.Out.z = (helper.In.z + VarFuncs<T>::LogMap(m_MulZ) * VarFuncs<T>::LogScale(random.z) * coeff) * m_Weight;
 				outPoint.m_ColorX = std::abs(fmod(outPoint.m_ColorX + VarFuncs<T>::LogMap(m_MulC) * VarFuncs<T>::LogScale(random.w) * coeff, T(1)));
 			}
 			break;
@@ -2908,15 +2904,10 @@ public:
 		   << "\t\tconst real_t zmz = vIn.z - " << centerZ << ";\n"
 		   << "\t\treal_t radius;\n"
 		   << "\n"
-		   << "\t\tswitch ((int)" << blurShape << ")\n"
-		   << "\t\t{\n"
-		   << "\t\t	case 0:\n"
+		   << "\t\tif (" << blurShape << " == 0)\n"
 		   << "\t\t		radius = sqrt(fma(xmx, xmx, fma(ymy, ymy, SQR(zmz))));\n"
-		   << "\t\t		break;\n"
-		   << "\t\t	case 1:\n"
+		   << "\t\telse\n"
 		   << "\t\t		radius = max(fabs(xmx), max(fabs(ymy), (fabs(zmz))));\n"
-		   << "\t\t		break;\n"
-		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tconst real_t dist = max(((" << invertDist << " != 0 ? max(1 - radius, (real_t)(0.0)) : max(radius, (real_t)(0.0))) - " << minDist << ") * " << rMax << ", (real_t)(0.0));\n"
 		   << "\n"
@@ -2932,18 +2923,18 @@ public:
 		   << "\t\t		real_t phis = sin(phi);\n"
 		   << "\t\t		real_t phic = cos(phi);\n"
 		   << "\n"
-		   << "\t\t		vOut.x = fma(" << mulX << " * rad, sigmac * phic, vIn.x);\n"
-		   << "\t\t		vOut.y = fma(" << mulY << " * rad, sigmac * phis, vIn.y);\n"
-		   << "\t\t		vOut.z = fma(" << mulZ << " * rad, sigmas, vIn.z);\n"
+		   << "\t\t		vOut.x = fma(" << mulX << " * rad, sigmac * phic, vIn.x) * " << weight << ";\n"
+		   << "\t\t		vOut.y = fma(" << mulY << " * rad, sigmac * phis, vIn.y) * " << weight << ";\n"
+		   << "\t\t		vOut.z = fma(" << mulZ << " * rad, sigmas, vIn.z) * " << weight << ";\n"
 		   << "\t\t		outPoint->m_ColorX = fabs(fmod(fma(" << mulC << ", randc * dist, outPoint->m_ColorX), (real_t)(1.0)));\n"
 		   << "\t\t	}\n"
 		   << "\t\t	break;\n"
 		   << "\t\tcase 1:\n"
 		   << "\t\t	if (vIn.x == 0 && vIn.y == 0 && vIn.z == 0)\n"
 		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = vIn.x;\n"
-		   << "\t\t		vOut.y = vIn.y;\n"
-		   << "\t\t		vOut.z = vIn.z;\n"
+		   << "\t\t		vOut.x = vIn.x * " << weight << ";\n"
+		   << "\t\t		vOut.y = vIn.y * " << weight << ";\n"
+		   << "\t\t		vOut.z = vIn.z * " << weight << ";\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
@@ -2951,8 +2942,8 @@ public:
 		   << "\t\t		real_t r = fma(" << mulX << ", randx * dist, rIn);\n"
 		   << "\t\t		real_t phi = fma(" << mulY << ", randy * dist, precalcAtanyx);\n"
 		   << "\t\t		real_t sigma = fma(" << mulZ << ", randz * dist, asin(vIn.z / rIn));\n"
-		   << "\t\t		real_t sigmas = sin(sigma);\n"
-		   << "\t\t		real_t sigmac = cos(sigma);\n"
+		   << "\t\t		real_t sigmas = sin(sigma) * " << weight << ";\n"
+		   << "\t\t		real_t sigmac = cos(sigma) * " << weight << ";\n"
 		   << "\t\t		real_t phis = sin(phi);\n"
 		   << "\t\t		real_t phic = cos(phi);\n"
 		   << "\n"
@@ -2966,9 +2957,9 @@ public:
 		   << "\t\t	{\n"
 		   << "\t\t		real_t coeff = " << rMax << " <= EPS ? dist : fma(" << alpha << ", (LogMap(dist) - dist), dist);\n"
 		   << "\n"
-		   << "\t\t		vOut.x = fma(LogMap(" << mulX << "), LogScale(randx) * coeff, vIn.x);\n"
-		   << "\t\t		vOut.y = fma(LogMap(" << mulY << "), LogScale(randy) * coeff, vIn.y);\n"
-		   << "\t\t		vOut.z = fma(LogMap(" << mulZ << "), LogScale(randz) * coeff, vIn.z);\n"
+		   << "\t\t		vOut.x = fma(LogMap(" << mulX << "), LogScale(randx) * coeff, vIn.x) * " << weight << ";\n"
+		   << "\t\t		vOut.y = fma(LogMap(" << mulY << "), LogScale(randy) * coeff, vIn.y) * " << weight << ";\n"
+		   << "\t\t		vOut.z = fma(LogMap(" << mulZ << "), LogScale(randz) * coeff, vIn.z) * " << weight << ";\n"
 		   << "\t\t		outPoint->m_ColorX = fabs(fmod(fma(LogMap(" << mulC << "), LogScale(randc) * coeff, outPoint->m_ColorX), (real_t)(1.0)));\n"
 		   << "\t\t	}\n"
 		   << "\t\t	break;\n"
@@ -2992,20 +2983,20 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_BlurType, prefix + "falloff3_blur_type", 0, eParamType::INTEGER, 0, 3));
-		m_Params.push_back(ParamWithName<T>(&m_BlurShape, prefix + "falloff3_blur_shape", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_BlurStrength, prefix + "falloff3_blur_strength", 1, eParamType::REAL, EPS, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_MinDistance, prefix + "falloff3_min_distance", T(0.5), eParamType::REAL, 0, TMAX));
-		m_Params.push_back(ParamWithName<T>(&m_InvertDistance, prefix + "falloff3_invert_distance", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulX, prefix + "falloff3_mul_x", 1, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulY, prefix + "falloff3_mul_y", 1, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulZ, prefix + "falloff3_mul_z", 0, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_MulC, prefix + "falloff3_mul_c", 0, eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_CenterX, prefix + "falloff3_center_x"));
-		m_Params.push_back(ParamWithName<T>(&m_CenterY, prefix + "falloff3_center_y"));
-		m_Params.push_back(ParamWithName<T>(&m_CenterZ, prefix + "falloff3_center_z"));
-		m_Params.push_back(ParamWithName<T>(&m_Alpha, prefix + "falloff3_alpha"));
-		m_Params.push_back(ParamWithName<T>(true, &m_RMax, prefix + "falloff3_rmax"));
+		m_Params.push_back(ParamWithName<T>(&m_BlurType,         prefix + "falloff3_blur_type", 0, eParamType::INTEGER, 0, 3));
+		m_Params.push_back(ParamWithName<T>(&m_BlurShape,        prefix + "falloff3_blur_shape", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_BlurStrength,     prefix + "falloff3_blur_strength", 1, eParamType::REAL, EPS, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_MinDistance,      prefix + "falloff3_min_distance", T(0.5), eParamType::REAL, 0, TMAX));
+		m_Params.push_back(ParamWithName<T>(&m_InvertDistance,   prefix + "falloff3_invert_distance", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulX,             prefix + "falloff3_mul_x", 1, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulY,             prefix + "falloff3_mul_y", 1, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulZ,             prefix + "falloff3_mul_z", 0, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_MulC,             prefix + "falloff3_mul_c", 0, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_CenterX,          prefix + "falloff3_center_x"));
+		m_Params.push_back(ParamWithName<T>(&m_CenterY,          prefix + "falloff3_center_y"));
+		m_Params.push_back(ParamWithName<T>(&m_CenterZ,          prefix + "falloff3_center_z"));
+		m_Params.push_back(ParamWithName<T>(&m_Alpha,            prefix + "falloff3_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_RMax,       prefix + "falloff3_rmax"));//Precalc.
 	}
 
 private:
@@ -3022,7 +3013,7 @@ private:
 	T m_CenterY;
 	T m_CenterZ;
 	T m_Alpha;
-	T m_RMax;
+	T m_RMax;//Precalc.
 };
 
 /// <summary>

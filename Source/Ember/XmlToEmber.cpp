@@ -964,6 +964,22 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 															if (!StartsWith(paramstr, prefix))
 																paramstr = prefix + paramstr;
 
+															//Need some special corrections here because Chaotica allows values that don't make sense.
+															if (varname == "falloff2")
+															{
+																if (paramstr == "falloff2_mul_c")
+																	val = 0;
+																else if (paramstr == "falloff2_type")
+																	val = std::ceil(val);
+															}
+															else if (varname == "falloff3")
+															{
+																if (paramstr == "falloff3_mul_c")
+																	val = 0;
+																else if (paramstr == "falloff3_blur_type")
+																	val = std::ceil(val);
+															}
+
 															parvar->SetParamVal(paramstr.c_str(), val);
 															//if (!parvar->SetParamVal(paramstr.c_str(), val))
 															//	AddToReport(string(loc) + " : Failed to set parametric variation parameter " + paramstr);

@@ -3181,7 +3181,7 @@ public:
 		T cs = cos(m_Pa);
 		T r2 = T(1) - (cs - 1) / (cs + cos(M_2PI / Zeps(m_Q)));
 		m_R  = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
-		m_IP = (int) m_P;
+		m_IP = T((int)m_P);
 	}
 
 protected:
@@ -3189,10 +3189,10 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "hypertile1_p", T(3)));
-		m_Params.push_back(ParamWithName<T>(&m_Q, prefix + "hypertile1_q", T(7)));
+		m_Params.push_back(ParamWithName<T>(&m_P,        prefix + "hypertile1_p", T(3)));
+		m_Params.push_back(ParamWithName<T>(&m_Q,        prefix + "hypertile1_q", T(7)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Pa, prefix + "hypertile1_pa"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_R, prefix + "hypertile1_r"));
+		m_Params.push_back(ParamWithName<T>(true, &m_R,  prefix + "hypertile1_r"));
 		m_Params.push_back(ParamWithName<T>(true, &m_IP, prefix + "hypertile1_ip"));
 	}
 

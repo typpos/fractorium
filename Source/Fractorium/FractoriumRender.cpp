@@ -458,7 +458,9 @@ bool FractoriumEmberController<T>::Render()
 					//else
 					//	qDebug() << "Mouse was down, not adding to undo list.";
 				}
-				else if (!m_LastEditWasUndoRedo && m_UndoIndex < m_UndoList.size() - 1)//They were anywhere but the end of the undo list, then did a manual edit, so clear the undo list.
+				else if (!m_LastEditWasUndoRedo &&
+						 m_UndoList.size() &&
+						 m_UndoIndex < m_UndoList.size() - 1)//They were anywhere but the end of the undo list, then did a manual edit, so clear the undo list.
 				{
 					Ember<T> ember(m_UndoList[m_UndoIndex]);
 					ClearUndo();

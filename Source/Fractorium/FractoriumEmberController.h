@@ -33,7 +33,7 @@ template <typename T> class PreviewRenderer;
 template <typename T> class TreePreviewRenderer;
 
 #define PREVIEW_SIZE 256
-#define UNDO_SIZE 128
+#define UNDO_SIZE 512
 
 /// <summary>
 /// FractoriumEmberControllerBase serves as a non-templated base class with virtual

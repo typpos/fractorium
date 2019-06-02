@@ -6879,11 +6879,6 @@ public:
 		m_HalfScale = m_Scale / 2;
 	}
 
-	virtual vector<string> OpenCLGlobalFuncNames() const override
-	{
-		return vector<string> { "Zeps" };
-	}
-
 protected:
 	void Init()
 	{

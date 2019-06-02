@@ -177,6 +177,11 @@ FunctionMapper::FunctionMapper()
 			"{\n"
 			"	return (real2)(a.x - x, a.y);\n"
 			"}\n";
+		s_GlobalMap["ComplexMinusComplex"] =
+			"inline real2 ComplexMinusComplex(real2 a, real2 b)\n"
+			"{\n"
+			"	return (real2)(a.x - b.x, a.y - b.y);\n"
+			"}\n";
 		s_GlobalMap["ComplexSqrt"] =
 			"inline real2 ComplexSqrt(real2 a)\n"
 			"{\n"
@@ -187,6 +192,11 @@ FunctionMapper::FunctionMapper()
 			"inline real2 ComplexLog(real2 a)\n"
 			"{\n"
 			"	return (real2)(0.5 * log(fma(a.x, a.x, a.y * a.y)), atan2(a.y, a.x));\n"
+			"}\n";
+		s_GlobalMap["ComplexExp"] =
+			"inline real2 ComplexExp(real2 a)\n"
+			"{\n"
+			"	return (real2)(cos(a.y), sin(a.y)) * exp(a.x);\n"
 			"}\n";
 		s_GlobalMap["Hash"] =
 			"inline real_t Hash(int a)\n"

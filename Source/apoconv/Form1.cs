@@ -59,6 +59,7 @@ namespace apoconv
 			{ "pow(", "std::pow(" },
 			{ "fabs(", "std::abs(" },
 			{ "log(", "std::log(" },
+			{ "exp(", "std::exp(" },
 
 			{ "sqr(", "Sqr(" },
 
@@ -69,7 +70,7 @@ namespace apoconv
 			{ "M_LN10", "T(M_LN10)" },
 			{ "M_PI", "T(M_PI)" },
 			{ "M_PI_2", "T(M_PI_2)" },
-			{ "M_PI_4", "T(M_PI_4)" },
+			{ "M_PI_4", "M_PI4" },
 			{ "M_1_PI", "T(M_1_PI)" },
 			{ "M_2_PI", "T(M_2_PI)" },
 			{ "M_2_SQRTPI", "T(M_2_SQRTPI)" },

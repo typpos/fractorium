@@ -302,6 +302,17 @@ public:
 	}
 
 	/// <summary>
+	/// Subtract complex from complex.
+	/// </summary>
+	/// <param name="a">The first complex number</param>
+	/// <param name="b">The second complex number</param>
+	/// <returns>a - b</returns>
+	static v2T ComplexMinusComplex(v2T a, v2T b)
+	{
+		return v2T(a.x - b.x, a.y - b.y);
+	}
+
+	/// <summary>
 	/// Subtract real from complex.
 	/// </summary>
 	/// <param name="a">The complex number</param>
@@ -331,6 +342,16 @@ public:
 	static v2T ComplexLog(v2T a)
 	{
 		return v2T(T(0.5) * std::log(a.x * a.x + a.y * a.y), std::atan2(a.y, a.x));
+	}
+
+	/// <summary>
+	/// Compute the inverse of the natural logarithm of a complex number.
+	/// </summary>
+	/// <param name="a">The complex number</param>
+	/// <returns>exp(a)</returns>
+	static v2T ComplexExp(v2T a)
+	{
+		return v2T(std::cos(a.y), std::sin(a.y)) * std::exp(a.x);
 	}
 
 	/// <summary>

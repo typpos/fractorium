@@ -2069,12 +2069,12 @@ public:
 	{
 		T fx = helper.In.x;
 		T fy = helper.In.y;
-		T fz = helper.In.z;		
-        T angle = Floor<T>(helper.m_PrecalcAtanyx * m_Coeff) / m_Coeff + m_A0;
-        T x0 = std::cos(angle) * m_Len;
-        T y0 = std::sin(angle) * m_Len;
+		T fz = helper.In.z;
+		T angle = Floor<T>(helper.m_PrecalcAtanyx * m_Coeff) / m_Coeff + m_A0;
+		T x0 = std::cos(angle) * m_Len;
+		T y0 = std::sin(angle) * m_Len;
 
-        if (std::sqrt(Sqr(helper.In.x - x0) + Sqr(helper.In.y - y0)) < m_D)
+		if (std::sqrt(Sqr(helper.In.x - x0) + Sqr(helper.In.y - y0)) < m_D)
 		{
 			if (m_Zero > 1.5)
 			{
@@ -2093,8 +2093,8 @@ public:
 				else
 				{
 					T rangle = std::atan2(helper.In.y - y0, helper.In.x - x0);
-                    fx = x0 + std::cos(rangle) * m_D;
-                    fy = y0 + std::sin(rangle) * m_D;
+					fx = x0 + std::cos(rangle) * m_D;
+					fy = y0 + std::sin(rangle) * m_D;
 					fz = 0;
 				}
 			}
@@ -2115,21 +2115,21 @@ public:
 		string n     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rad   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string zero  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string coeff = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string a0    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string len   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-        string d     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string coeff = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string a0    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string len   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string d     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t fx = vIn.x;\n"
 		   << "\t\treal_t fy = vIn.y;\n"
 		   << "\t\treal_t fz = vIn.z;\n"
-           << "\t\treal_t angle = floor(precalcAtanyx * " << coeff << ") / " << coeff << " + " << a0 << ";\n"
-           << "\t\treal_t x0 = cos(angle) * " << len << ";\n"
-           << "\t\treal_t y0 = sin(angle) * " << len << ";\n"
+		   << "\t\treal_t angle = floor(precalcAtanyx * " << coeff << ") / " << coeff << " + " << a0 << ";\n"
+		   << "\t\treal_t x0 = cos(angle) * " << len << ";\n"
+		   << "\t\treal_t y0 = sin(angle) * " << len << ";\n"
 		   << "\t\treal_t xmx = vIn.x - x0;\n"
 		   << "\t\treal_t ymy = vIn.y - y0;\n"
 		   << "\n"
-           << "\t\tif (sqrt(fma(xmx, xmx, SQR(ymy))) < " << d << ")\n"
+		   << "\t\tif (sqrt(fma(xmx, xmx, SQR(ymy))) < " << d << ")\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (" << zero << " > 1.5)\n"
 		   << "\t\t	{\n"
@@ -2148,8 +2148,8 @@ public:
 		   << "\t\t		else\n"
 		   << "\t\t		{\n"
 		   << "\t\t			real_t rangle = atan2(vIn.y - y0, vIn.x - x0);\n"
-           << "\t\t			fx = fma(cos(rangle), " << d << ", x0);\n"
-           << "\t\t			fy = fma(sin(rangle), " << d << ", y0);\n"
+		   << "\t\t			fx = fma(cos(rangle), " << d << ", x0);\n"
+		   << "\t\t			fy = fma(sin(rangle), " << d << ", y0);\n"
 		   << "\t\t			fz = 0;\n"
 		   << "\t\t		}\n"
 		   << "\t\t	}\n"
@@ -2166,9 +2166,9 @@ public:
 	{
 		m_N = Zeps(m_N);
 		m_Coeff = Zeps<T>(m_N * T(0.5) / T(M_PI));
-        m_A0 = T(M_PI) / m_N;
-        m_Len = 1 / Zeps(std::cos(m_A0));
-        m_D = m_Rad * std::sin(m_A0) * m_Len;
+		m_A0 = T(M_PI) / m_N;
+		m_Len = 1 / Zeps(std::cos(m_A0));
+		m_D = m_Rad * std::sin(m_A0) * m_Len;
 	}
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
@@ -2181,13 +2181,13 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_N,     prefix + "hypercrop_n", 4));
-		m_Params.push_back(ParamWithName<T>(&m_Rad,   prefix + "hypercrop_rad", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Zero,  prefix + "hypercrop_zero"));
+		m_Params.push_back(ParamWithName<T>(&m_N,           prefix + "hypercrop_n", 4));
+		m_Params.push_back(ParamWithName<T>(&m_Rad,         prefix + "hypercrop_rad", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero,        prefix + "hypercrop_zero"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Coeff, prefix + "hypercrop_coeff"));//Precalc.
-        m_Params.push_back(ParamWithName<T>(true, &m_A0,    prefix + "hypercrop_a0"));//Precalc.
-        m_Params.push_back(ParamWithName<T>(true, &m_Len,   prefix + "hypercrop_len"));//Precalc.
-        m_Params.push_back(ParamWithName<T>(true, &m_D,     prefix + "hypercrop_d"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_A0,    prefix + "hypercrop_a0"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Len,   prefix + "hypercrop_len"));
+		m_Params.push_back(ParamWithName<T>(true, &m_D,     prefix + "hypercrop_d"));
 	}
 
 private:
@@ -2195,9 +2195,9 @@ private:
 	T m_Rad;
 	T m_Zero;
 	T m_Coeff;//Precalc.
-    T m_A0;
-    T m_Len;
-    T m_D;
+	T m_A0;
+	T m_Len;
+	T m_D;
 };
 
 /// <summary>
@@ -2300,7 +2300,7 @@ public:
 		T x = rad * fx + m_Shift;
 		T y = rad * fy;
 		rad = m_Weight * m_Scale / Zeps(x * x + y * y);
-        T angle = (Floor<T>(rand.Frand01<T>() * m_P) * 2 + 1) * T(M_PI) / m_P;
+		T angle = (Floor<T>(rand.Frand01<T>() * m_P) * 2 + 1) * T(M_PI) / m_P;
 		T X = rad * x + m_Shift;
 		T Y = rad * y;
 		T cosa = std::cos(angle);
@@ -2333,7 +2333,7 @@ public:
 		   << "\t\treal_t x = fma(rad, fx, " << shift << ");\n"
 		   << "\t\treal_t y = rad * fy;\n"
 		   << "\t\trad = " << weight << " * " << scale << " / Zeps(fma(x, x, SQR(y)));\n"
-           << "\t\treal_t angle = (floor(MwcNext01(mwc) * " << p << ") * 2 + 1) * MPI / " << p << ";\n"
+		   << "\t\treal_t angle = (floor(MwcNext01(mwc) * " << p << ") * 2 + 1) * MPI / " << p << ";\n"
 		   << "\t\treal_t X = fma(rad, x, " << shift << ");\n"
 		   << "\t\treal_t Y = rad * y;\n"
 		   << "\t\treal_t cosa = cos(angle);\n"
@@ -2349,7 +2349,7 @@ public:
 		return ss.str();
 	}
 
-    virtual void Precalc() override
+	virtual void Precalc() override
 	{
 		T pq = T(M_PI) / m_Q;
 		T pp = T(M_PI) / m_P;

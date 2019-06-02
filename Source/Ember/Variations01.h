@@ -6271,9 +6271,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		//clamp fabs x and y to 7.104760e+002 for cosh, and |x| 7.104760e+002 for sinh
-		helper.Out.x = m_Weight * std::cos(helper.In.x)   * std::cosh(helper.In.y);
-		helper.Out.y = -(m_Weight * std::sin(helper.In.x) * std::sinh(helper.In.y));
+		helper.Out.x = m_Weight * std::cos(helper.In.x) * std::cosh(helper.In.y);
+		helper.Out.y = m_Weight * -std::sin(helper.In.x) * std::sinh(helper.In.y);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6284,7 +6283,7 @@ public:
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
 		   << "\t\tvOut.x = " << weight << " * cos(vIn.x) * cosh(vIn.y);\n"
-		   << "\t\tvOut.y = -(" << weight << " * sin(vIn.x) * sinh(vIn.y));\n"
+		   << "\t\tvOut.y = " << weight << " * -sin(vIn.x) * sinh(vIn.y);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6305,12 +6304,14 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T tansin, tancos, tansinh, tancosh, tanden;
-		sincos(2 * helper.In.x, &tansin, &tancos);
-		tansinh = std::sinh(2 * helper.In.y);
-		tancosh = std::cosh(2 * helper.In.y);
-		tanden = 1 / Zeps(tancos + tancosh);
-		helper.Out.x = m_Weight * tanden * tansin;
-		helper.Out.y = m_Weight * tanden * tansinh;
+		T x2 = 2 * helper.In.x;
+		T y2 = 2 * helper.In.y;
+		sincos(x2, &tansin, &tancos);
+		tansinh = std::sinh(y2);
+		tancosh = std::cosh(y2);
+		tanden = m_Weight / Zeps(tancos + tancosh);
+		helper.Out.x = tanden * tansin;
+		helper.Out.y = tanden * tansinh;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6320,14 +6321,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t tansin = sin((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t tancos = cos((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t tansinh = sinh((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t tancosh = cosh((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t tanden = (real_t)(1.0) / Zeps(tancos + tancosh);\n"
+		   << "\t\treal_t x2 = (real_t)(2.0) * vIn.x;\n"
+		   << "\t\treal_t y2 = (real_t)(2.0) * vIn.y;\n"
+		   << "\t\treal_t tansin = sin(x2);\n"
+		   << "\t\treal_t tancos = cos(x2);\n"
+		   << "\t\treal_t tansinh = sinh(y2);\n"
+		   << "\t\treal_t tancosh = cosh(y2);\n"
+		   << "\t\treal_t tanden = " << weight << " / Zeps(tancos + tancosh);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * tanden * tansin;\n"
-		   << "\t\tvOut.y = " << weight << " * tanden * tansinh;\n"
+		   << "\t\tvOut.x = tanden * tansin;\n"
+		   << "\t\tvOut.y = tanden * tansinh;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6356,9 +6359,9 @@ public:
 		sincos(helper.In.x, &secsin, &seccos);
 		secsinh = std::sinh(helper.In.y);
 		seccosh = std::cosh(helper.In.y);
-		secden = 2 / Zeps(std::cos(2 * helper.In.x) + std::cosh(2 * helper.In.y));
-		helper.Out.x = m_Weight * secden * seccos * seccosh;
-		helper.Out.y = m_Weight * secden * secsin * secsinh;
+		secden = (m_Weight * 2) / Zeps(std::cos(2 * helper.In.x) + std::cosh(2 * helper.In.y));
+		helper.Out.x = secden * seccos * seccosh;
+		helper.Out.y = secden * secsin * secsinh;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6372,10 +6375,10 @@ public:
 		   << "\t\treal_t seccos = cos(vIn.x);\n"
 		   << "\t\treal_t secsinh = sinh(vIn.y);\n"
 		   << "\t\treal_t seccosh = cosh(vIn.y);\n"
-		   << "\t\treal_t secden = (real_t)(2.0) / Zeps(cos((real_t)(2.0) * vIn.x) + cosh((real_t)(2.0) * vIn.y));\n"
+		   << "\t\treal_t secden = (" << weight << " * (real_t)(2.0)) / Zeps(cos((real_t)(2.0) * vIn.x) + cosh((real_t)(2.0) * vIn.y));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * secden * seccos * seccosh;\n"
-		   << "\t\tvOut.y = " << weight << " * secden * secsin * secsinh;\n"
+		   << "\t\tvOut.x = secden * seccos * seccosh;\n"
+		   << "\t\tvOut.y = secden * secsin * secsinh;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6404,9 +6407,9 @@ public:
 		sincos(helper.In.x, &cscsin, &csccos);
 		cscsinh = std::sinh(helper.In.y);
 		csccosh = std::cosh(helper.In.y);
-		cscden = 2 / Zeps(std::cosh(2 * helper.In.y) - std::cos(2 * helper.In.x));
-		helper.Out.x = m_Weight * cscden * cscsin * csccosh;
-		helper.Out.y = -(m_Weight * cscden * csccos * cscsinh);
+		cscden = (m_Weight * 2) / Zeps(std::cosh(2 * helper.In.y) - std::cos(2 * helper.In.x));
+		helper.Out.x = cscden * cscsin * csccosh;
+		helper.Out.y = -(cscden * csccos * cscsinh);//Chaotica does not flip the sign, but uses completely different code which is possibly a mistake. Leave the flip to be compatible with flam3.
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6420,10 +6423,10 @@ public:
 		   << "\t\treal_t csccos = cos(vIn.x);\n"
 		   << "\t\treal_t cscsinh = sinh(vIn.y);\n"
 		   << "\t\treal_t csccosh = cosh(vIn.y);\n"
-		   << "\t\treal_t cscden = (real_t)(2.0) / Zeps(cosh((real_t)(2.0) * vIn.y) - cos((real_t)(2.0) * vIn.x));\n"
+		   << "\t\treal_t cscden = (" << weight << " * (real_t)(2.0)) / Zeps(cosh((real_t)(2.0) * vIn.y) - cos((real_t)(2.0) * vIn.x));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * cscden * cscsin * csccosh;\n"
-		   << "\t\tvOut.y = -(" << weight << " * cscden * csccos * cscsinh);\n"
+		   << "\t\tvOut.x = cscden * cscsin * csccosh;\n"
+		   << "\t\tvOut.y = -(cscden * csccos * cscsinh);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6449,12 +6452,14 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T cotsin, cotcos, cotsinh, cotcosh, cotden;
-		sincos(2 * helper.In.x, &cotsin, &cotcos);
-		cotsinh = std::sinh(2 * helper.In.y);
-		cotcosh = std::cosh(2 * helper.In.y);
-		cotden = 1 / Zeps(cotcosh - cotcos);
-		helper.Out.x = m_Weight * cotden * cotsin;
-		helper.Out.y = m_Weight * cotden * -1 * cotsinh;
+		T x2 = 2 * helper.In.x;
+		T y2 = 2 * helper.In.y;
+		sincos(x2, &cotsin, &cotcos);
+		cotsinh = std::sinh(y2);
+		cotcosh = std::cosh(y2);
+		cotden = m_Weight / Zeps(cotcosh - cotcos);
+		helper.Out.x = cotden * cotsin;
+		helper.Out.y = -cotden * cotsinh;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6464,14 +6469,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t cotsin = sin((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t cotcos = cos((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t cotsinh = sinh((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t cotcosh = cosh((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t cotden = (real_t)(1.0) / Zeps(cotcosh - cotcos);\n"
+		   << "\t\treal_t x2 = (real_t)(2.0) * vIn.x;\n"
+		   << "\t\treal_t y2 = (real_t)(2.0) * vIn.y;\n"
+		   << "\t\treal_t cotsin = sin(x2);\n"
+		   << "\t\treal_t cotcos = cos(x2);\n"
+		   << "\t\treal_t cotsinh = sinh(y2);\n"
+		   << "\t\treal_t cotcosh = cosh(y2);\n"
+		   << "\t\treal_t cotden = " << weight << " / Zeps(cotcosh - cotcos);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * cotden * cotsin;\n"
-		   << "\t\tvOut.y = " << weight << " * cotden * -1 * cotsinh;\n"
+		   << "\t\tvOut.x = cotden * cotsin;\n"
+		   << "\t\tvOut.y = -cotden * cotsinh;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6497,9 +6504,11 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T sinhsin, sinhcos, sinhsinh, sinhcosh;
-		sincos(helper.In.y, &sinhsin, &sinhcos);
-		sinhsinh = std::sinh(helper.In.x);
-		sinhcosh = std::cosh(helper.In.x);
+		T xpi4 = helper.In.x * M_PI4;
+		T ypi4 = helper.In.y * M_PI4;
+		sincos(ypi4, &sinhsin, &sinhcos);
+		sinhsinh = std::sinh(xpi4);
+		sinhcosh = std::cosh(xpi4);
 		helper.Out.x = m_Weight * sinhsinh * sinhcos;
 		helper.Out.y = m_Weight * sinhcosh * sinhsin;
 		helper.Out.z = DefaultZ(helper);
@@ -6511,10 +6520,12 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t sinhsin = sin(vIn.y);\n"
-		   << "\t\treal_t sinhcos = cos(vIn.y);\n"
-		   << "\t\treal_t sinhsinh = sinh(vIn.x);\n"
-		   << "\t\treal_t sinhcosh = cosh(vIn.x);\n"
+		   << "\t\treal_t xpi4 = vIn.x * MPI4;\n"
+		   << "\t\treal_t ypi4 = vIn.y * MPI4;\n"
+		   << "\t\treal_t sinhsin = sin(ypi4);\n"
+		   << "\t\treal_t sinhcos = cos(ypi4);\n"
+		   << "\t\treal_t sinhsinh = sinh(xpi4);\n"
+		   << "\t\treal_t sinhcosh = cosh(xpi4);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * sinhsinh * sinhcos;\n"
 		   << "\t\tvOut.y = " << weight << " * sinhcosh * sinhsin;\n"
@@ -6538,9 +6549,11 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T coshsin, coshcos, coshsinh, coshcosh;
-		sincos(helper.In.y, &coshsin, &coshcos);
-		coshsinh = std::sinh(helper.In.x);
-		coshcosh = std::cosh(helper.In.x);
+		T xpi4 = helper.In.x * M_PI4;
+		T ypi4 = helper.In.y * M_PI4;
+		sincos(ypi4, &coshsin, &coshcos);
+		coshsinh = std::sinh(xpi4);
+		coshcosh = std::cosh(xpi4);
 		helper.Out.x = m_Weight * coshcosh * coshcos;
 		helper.Out.y = m_Weight * coshsinh * coshsin;
 		helper.Out.z = DefaultZ(helper);
@@ -6552,10 +6565,12 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t coshsin = sin(vIn.y);\n"
-		   << "\t\treal_t coshcos = cos(vIn.y);\n"
-		   << "\t\treal_t coshsinh = sinh(vIn.x);\n"
-		   << "\t\treal_t coshcosh = cosh(vIn.x);\n"
+		   << "\t\treal_t xpi4 = vIn.x * MPI4;\n"
+		   << "\t\treal_t ypi4 = vIn.y * MPI4;\n"
+		   << "\t\treal_t coshsin = sin(ypi4);\n"
+		   << "\t\treal_t coshcos = cos(ypi4);\n"
+		   << "\t\treal_t coshsinh = sinh(xpi4);\n"
+		   << "\t\treal_t coshcosh = cosh(xpi4);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * coshcosh * coshcos;\n"
 		   << "\t\tvOut.y = " << weight << " * coshsinh * coshsin;\n"
@@ -6579,12 +6594,14 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T tanhsin, tanhcos, tanhsinh, tanhcosh, tanhden;
-		sincos(2 * helper.In.y, &tanhsin, &tanhcos);
-		tanhsinh = std::sinh(2 * helper.In.x);
-		tanhcosh = std::cosh(2 * helper.In.x);
-		tanhden = 1 / Zeps(tanhcos + tanhcosh);
-		helper.Out.x = m_Weight * tanhden * tanhsinh;
-		helper.Out.y = m_Weight * tanhden * tanhsin;
+		T x2pi4 = helper.In.x * M_PI4 * 2;
+		T y2pi4 = helper.In.y * M_PI4 * 2;
+		sincos(y2pi4, &tanhsin, &tanhcos);
+		tanhsinh = std::sinh(x2pi4);
+		tanhcosh = std::cosh(x2pi4);
+		tanhden = m_Weight / Zeps(tanhcos + tanhcosh);
+		helper.Out.x = tanhden * tanhsinh;
+		helper.Out.y = tanhden * tanhsin;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6594,14 +6611,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t tanhsin = sin((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t tanhcos = cos((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t tanhsinh = sinh((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t tanhcosh = cosh((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t tanhden = (real_t)(1.0) / Zeps(tanhcos + tanhcosh);\n"
+		   << "\t\treal_t x2pi4 = (real_t)(2.0) * vIn.x * MPI4;\n"
+		   << "\t\treal_t y2pi4 = (real_t)(2.0) * vIn.y * MPI4;\n"
+		   << "\t\treal_t tanhsin = sin(y2pi4);\n"
+		   << "\t\treal_t tanhcos = cos(y2pi4);\n"
+		   << "\t\treal_t tanhsinh = sinh(x2pi4);\n"
+		   << "\t\treal_t tanhcosh = cosh(x2pi4);\n"
+		   << "\t\treal_t tanhden = " << weight << " / Zeps(tanhcos + tanhcosh);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * tanhden * tanhsinh;\n"
-		   << "\t\tvOut.y = " << weight << " * tanhden * tanhsin;\n"
+		   << "\t\tvOut.x = tanhden * tanhsinh;\n"
+		   << "\t\tvOut.y = tanhden * tanhsin;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6685,15 +6704,15 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-        T sechsin, sechcos, sechsinh, sechcosh, sechden;
-        T x = T(M_PI / 4) * helper.In.x;
-        T y = T(M_PI / 4) * helper.In.y;
-        sincos(y, &sechsin, &sechcos);
-        sechsinh = std::sinh(x);
-        sechcosh = std::cosh(x);
-        sechden = 2 / Zeps(std::cos(y * 2) + std::cosh(x * 2));
-        helper.Out.x = m_Weight * sechden * sechcos * sechcosh;
-        helper.Out.y = m_Weight * sechden * sechsin * sechsinh;
+		T sechsin, sechcos, sechsinh, sechcosh, sechden;
+		T xpi4 = helper.In.x * M_PI4;
+		T ypi4 = helper.In.y * M_PI4;
+		sincos(ypi4, &sechsin, &sechcos);
+		sechsinh = std::sinh(xpi4);
+		sechcosh = std::cosh(xpi4);
+		sechden = (m_Weight * 2) / Zeps(std::cos(ypi4 * 2) + std::cosh(xpi4 * 2));
+		helper.Out.x = sechden * sechcos * sechcosh;
+		helper.Out.y = -sechden * sechsin * sechsinh;//Flam3 flips the sign, but Chaotica does not. Leave to be compatible with flam3.
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6703,16 +6722,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-           << "\t\treal_t x = MPI / (real_t)(4.0) * vIn.x;\n"
-           << "\t\treal_t y = MPI / (real_t)(4.0) * vIn.y;\n"
-           << "\t\treal_t sechsin = sin(y);\n"
-           << "\t\treal_t sechcos = cos(y);\n"
-           << "\t\treal_t sechsinh = sinh(x);\n"
-           << "\t\treal_t sechcosh = cosh(x);\n"
-           << "\t\treal_t sechden = (real_t)(2.0) / Zeps(cos(y * (real_t)(2.0)) + cosh(x * (real_t)(2.0)));\n"
+		   << "\t\treal_t xpi4 = vIn.x * MPI4;\n"
+		   << "\t\treal_t ypi4 = vIn.y * MPI4;\n"
+		   << "\t\treal_t sechsin = sin(ypi4);\n"
+		   << "\t\treal_t sechcos = cos(ypi4);\n"
+		   << "\t\treal_t sechsinh = sinh(xpi4);\n"
+		   << "\t\treal_t sechcosh = cosh(xpi4);\n"
+		   << "\t\treal_t sechden = (" << weight << " * (real_t)(2.0)) / Zeps(cos(ypi4 * (real_t)(2.0)) + cosh(xpi4 * (real_t)(2.0)));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * sechden * sechcos * sechcosh;\n"
-           << "\t\tvOut.y = " << weight << " * sechden * sechsin * sechsinh;\n"
+		   << "\t\tvOut.x = sechden * sechcos * sechcosh;\n"
+		   << "\t\tvOut.y = -sechden * sechsin * sechsinh;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6738,12 +6757,14 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T cschsin, cschcos, cschsinh, cschcosh, cschden;
-		sincos(helper.In.y, &cschsin, &cschcos);
-		cschsinh = std::sinh(helper.In.x);
-		cschcosh = std::cosh(helper.In.x);
-		cschden = 2 / Zeps(std::cosh(2 * helper.In.x) - std::cos(2 * helper.In.y));
-		helper.Out.x = m_Weight * cschden * cschsinh * cschcos;
-		helper.Out.y = -(m_Weight * cschden * cschcosh * cschsin);
+		T xpi4 = helper.In.x * M_PI4;
+		T ypi4 = helper.In.y * M_PI4;
+		sincos(ypi4, &cschsin, &cschcos);
+		cschsinh = std::sinh(xpi4);
+		cschcosh = std::cosh(xpi4);
+		cschden = (m_Weight * 2) / Zeps(std::cosh(2 * xpi4) - std::cos(2 * ypi4));
+		helper.Out.x = cschden * cschsinh * cschcos;
+		helper.Out.y = -cschden * cschcosh * cschsin;//Chaotica does not flip the sign, but uses completely different code which is possibly a mistake. Leave the flip to be compatible with flam3.
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6753,14 +6774,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t cschsin = sin(vIn.y);\n"
-		   << "\t\treal_t cschcos = cos(vIn.y);\n"
-		   << "\t\treal_t cschsinh = sinh(vIn.x);\n"
-		   << "\t\treal_t cschcosh = cosh(vIn.x);\n"
-		   << "\t\treal_t cschden = (real_t)(2.0) / Zeps(cosh((real_t)(2.0) * vIn.x) - cos((real_t)(2.0) * vIn.y));\n"
+		   << "\t\treal_t xpi4 = vIn.x * MPI4;\n"
+		   << "\t\treal_t ypi4 = vIn.y * MPI4;\n"
+		   << "\t\treal_t cschsin = sin(ypi4);\n"
+		   << "\t\treal_t cschcos = cos(ypi4);\n"
+		   << "\t\treal_t cschsinh = sinh(xpi4);\n"
+		   << "\t\treal_t cschcosh = cosh(xpi4);\n"
+		   << "\t\treal_t cschden = (" << weight << " * (real_t)(2.0)) / Zeps(cosh((real_t)(2.0) * xpi4) - cos((real_t)(2.0) * ypi4));\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * cschden * cschsinh * cschcos;\n"
-		   << "\t\tvOut.y = -(" << weight << " * cschden * cschcosh * cschsin);\n"
+		   << "\t\tvOut.x = cschden * cschsinh * cschcos;\n"
+		   << "\t\tvOut.y = -cschden * cschcosh * cschsin;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -6786,12 +6809,14 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T cothsin, cothcos, cothsinh, cothcosh, cothden;
-		sincos(2 * helper.In.y, &cothsin, &cothcos);
-		cothsinh = std::sinh(2 * helper.In.x);
-		cothcosh = std::cosh(2 * helper.In.x);
-		cothden = 1 / Zeps(cothcosh - cothcos);
-		helper.Out.x = m_Weight * cothden * cothsinh;
-		helper.Out.y = m_Weight * cothden * cothsin;
+		T x2pi4 = helper.In.x * M_PI4 * 2;
+		T y2pi4 = helper.In.y * M_PI4 * 2;
+		sincos(y2pi4, &cothsin, &cothcos);
+		cothsinh = std::sinh(x2pi4);
+		cothcosh = std::cosh(x2pi4);
+		cothden = m_Weight / Zeps(cothcosh - cothcos);
+		helper.Out.x = cothden * cothsinh;
+		helper.Out.y = cothden * cothsin;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6801,14 +6826,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t cothsin = sin((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t cothcos = cos((real_t)(2.0) * vIn.y);\n"
-		   << "\t\treal_t cothsinh = sinh((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t cothcosh = cosh((real_t)(2.0) * vIn.x);\n"
-		   << "\t\treal_t cothden = (real_t)(1.0) / Zeps(cothcosh - cothcos);\n"
+		   << "\t\treal_t x2pi4 = (real_t)(2.0) * vIn.x * MPI4;\n"
+		   << "\t\treal_t y2pi4 = (real_t)(2.0) * vIn.y * MPI4;\n"
+		   << "\t\treal_t cothsin = sin(y2pi4);\n"
+		   << "\t\treal_t cothcos = cos(y2pi4);\n"
+		   << "\t\treal_t cothsinh = sinh(x2pi4);\n"
+		   << "\t\treal_t cothcosh = cosh(x2pi4);\n"
+		   << "\t\treal_t cothden = " << weight << " / Zeps(cothcosh - cothcos);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * cothden * cothsinh;\n"
-		   << "\t\tvOut.y = " << weight << " * cothden * cothsin;\n"
+		   << "\t\tvOut.x = cothden * cothsinh;\n"
+		   << "\t\tvOut.y = cothden * cothsin;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();

@@ -6685,13 +6685,15 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T sechsin, sechcos, sechsinh, sechcosh, sechden;
-		sincos(helper.In.y, &sechsin, &sechcos);
-		sechsinh = std::sinh(helper.In.x);
-		sechcosh = std::cosh(helper.In.x);
-		sechden = 2 / Zeps(std::cos(2 * helper.In.y) + std::cosh(2 * helper.In.x));
-		helper.Out.x = m_Weight * sechden * sechcos * sechcosh;
-		helper.Out.y = -(m_Weight * sechden * sechsin * sechsinh);
+        T sechsin, sechcos, sechsinh, sechcosh, sechden;
+        T x = T(M_PI / 4) * helper.In.x;
+        T y = T(M_PI / 4) * helper.In.y;
+        sincos(y, &sechsin, &sechcos);
+        sechsinh = std::sinh(x);
+        sechcosh = std::cosh(x);
+        sechden = 2 / Zeps(std::cos(y * 2) + std::cosh(x * 2));
+        helper.Out.x = m_Weight * sechden * sechcos * sechcosh;
+        helper.Out.y = m_Weight * sechden * sechsin * sechsinh;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -6701,14 +6703,16 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t sechsin = sin(vIn.y);\n"
-		   << "\t\treal_t sechcos = cos(vIn.y);\n"
-		   << "\t\treal_t sechsinh = sinh(vIn.x);\n"
-		   << "\t\treal_t sechcosh = cosh(vIn.x);\n"
-		   << "\t\treal_t sechden = (real_t)(2.0) / Zeps(cos((real_t)(2.0) * vIn.y) + cosh((real_t)(2.0) * vIn.x));\n"
+           << "\t\treal_t x = MPI / (real_t)(4.0) * vIn.x;\n"
+           << "\t\treal_t y = MPI / (real_t)(4.0) * vIn.y;\n"
+           << "\t\treal_t sechsin = sin(y);\n"
+           << "\t\treal_t sechcos = cos(y);\n"
+           << "\t\treal_t sechsinh = sinh(x);\n"
+           << "\t\treal_t sechcosh = cosh(x);\n"
+           << "\t\treal_t sechden = (real_t)(2.0) / Zeps(cos(y * (real_t)(2.0)) + cosh(x * (real_t)(2.0)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * sechden * sechcos * sechcosh;\n"
-		   << "\t\tvOut.y = -(" << weight << " * sechden * sechsin * sechsinh);\n"
+           << "\t\tvOut.y = " << weight << " * sechden * sechsin * sechsinh;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();

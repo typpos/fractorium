@@ -50,6 +50,7 @@ namespace EmberNs
 #define RAD_2_DEG_T (T(180) / T(M_PI))
 #define M_2PI (T(M_PI * 2))
 #define M_3PI (T(M_PI * 3))
+#define M_PI2 (T(M_PI_2))
 #define M_PI4 (T(M_PI_4))
 #define SQRT5 T(2.2360679774997896964091736687313)
 #define M_PHI T(1.61803398874989484820458683436563)

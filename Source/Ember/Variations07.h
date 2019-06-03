@@ -3555,10 +3555,10 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T X = std::fmod(T(Floor(helper.In.x)), m_Zdens) / m_Zdens;
-		T Y = std::fmod(T(Floor(helper.In.y)), m_Zdens) / m_Zdens;
-		T random_x = VarFuncs<T>::HashShadertoy(X, Y, 0);
-		T random_y = VarFuncs<T>::HashShadertoy(Y, X, 0);
+		T X = std::fmod(T(Floor(std::abs(helper.In.x))), m_Zdens) / m_Zdens;
+		T Y = std::fmod(T(Floor(std::abs(helper.In.y))), m_Zdens) / m_Zdens;
+		T random_x = VarFuncs<T>::HashShadertoy(X, Y, 1);
+		T random_y = VarFuncs<T>::HashShadertoy(Y, X, 2);
 		T a = (X + random_x * m_Dist) * M_2PI;
 		T r = std::exp(std::log(Y + random_y * m_Dist) * m_Power);
 		helper.Out.x = m_Weight * std::cos(a) * r;
@@ -3578,10 +3578,10 @@ public:
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string zdens = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t X = fmod(floor(vIn.x), " << zdens << ") / " << zdens << ";\n"
-		   << "\t\treal_t Y = fmod(floor(vIn.y), " << zdens << ") / " << zdens << ";\n"
-		   << "\t\treal_t random_x = HashShadertoy(X, Y, (real_t)(0.0));\n"
-		   << "\t\treal_t random_y = HashShadertoy(Y, X, (real_t)(0.0));\n"
+		   << "\t\treal_t X = fmod(floor(fabs(vIn.x)), " << zdens << ") / " << zdens << ";\n"
+		   << "\t\treal_t Y = fmod(floor(fabs(vIn.y)), " << zdens << ") / " << zdens << ";\n"
+		   << "\t\treal_t random_x = HashShadertoy(X, Y, (real_t)(1.0));\n"
+		   << "\t\treal_t random_y = HashShadertoy(Y, X, (real_t)(2.0));\n"
 		   << "\t\treal_t a = fma(random_x, " << dist << ", X) * M_2PI;\n"
 		   << "\t\treal_t r = exp(log(fma(random_y, " << dist << ", Y)) * " << power << ");\n"
 		   << "\t\tvOut.x = " << weight << " * cos(a) * r;\n"

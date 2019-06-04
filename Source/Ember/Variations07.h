@@ -2171,11 +2171,6 @@ public:
 		m_D = m_Rad * std::sin(m_A0) * m_Len;
 	}
 
-	virtual vector<string> OpenCLGlobalFuncNames() const override
-	{
-		return vector<string> { "Zeps" };
-	}
-
 protected:
 	void Init()
 	{

@@ -217,7 +217,7 @@ bool DoubleSpinBox::eventFilter(QObject* o, QEvent* e)
 			return true;
 		}
 	}
-	else
+	else if (isEnabled())
 	{
 		if (e->type() == QEvent::Wheel)
 		{

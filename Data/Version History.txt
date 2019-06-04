@@ -1,3 +1,18 @@
+1.0.0.16 6/03/2019
+--User changes:
+ -Allow changes which do not trigger a full render to be added to the undo list.
+
+--Bug fixes:
+ -auger, falloff2, falloff3, hypertile, hypertile1, hypertile2, mirror_x, mirror_y and mirror_z variations were wrong.
+ -Dragging library items to a new position was not properly resetting the current flame pointer, so subsequent edits would unintentionally overwrite different flames.
+ -Switching between SP/DP was resetting palette rotation.
+ -Right clicking when showing only current affines caused a crash.
+
+--Code changes:
+ -Optimize hypercrop.
+ -Make dust, sin, cos, tan, sec, csc, cot, sinh, cosh, tanh, sech, csch, coth match Chaotica.
+ -Case insensitive comparisons via stricmp() were wrong on non-Windows systems.
+
 1.0.0.15 5/13/2019
 --User changes:
  -Add a new stylesheet named lightdark.qss that provides a more modern looking dark theme.

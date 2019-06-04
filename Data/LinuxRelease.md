@@ -77,6 +77,10 @@ Which can be downloaded from:
 https://github.com/probonopd/linuxdeployqt/releases
 https://appimage.github.io/appimagetool/
 
+Make them executable by running this command in the folder they reside in:
+
+`chmod +x ./*.AppImage`
+
 Once those are installed, run these commands from the root of the fractorium folder:
 
 `make`

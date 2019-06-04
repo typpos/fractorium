@@ -56,6 +56,42 @@ An email will arrive to say if the package was accepted or rejected.
 Wait for the autobuild to complete, and when the package is published, copy the
 link to the `.deb` from "Package Details".
 
+
+### Building an AppImage `.deb` and `.rpm` locally
+
+The deb used in the PPA is different than the one downloaded from the website.
+The latter is an encapsulation of an AppImage file which makes installation much easier and more likely to succeed due to the library dependencies being contained within.
+
+Because of how AppImage works, the build cannot be done on a shared folder from within a VM that points back to the host OS’s file system (usually in /mnt/hgfs).
+So be sure to checkout the source into a location that exists directly in the VM if you are using one.
+
+To build the AppImage after successfully building using the make after qmake has ben run, do the following:
+
+Ensure you these have two files in the folder up one level from the fractorium folder:
+
+`linuxdeployqt-6-x86_64.AppImage`
+`appimagetool-x86_64.AppImage`
+
+Which can be downloaded from:
+
+https://github.com/probonopd/linuxdeployqt/releases
+https://appimage.github.io/appimagetool/
+
+Once those are installed, run these commands from the root of the fractorium folder:
+
+`make`
+`cd archive`
+`./build_linux.sh`
+
+In fractorium/Bin the output is contained in the following file:
+
+`Fractorium-x.y.z.w-.x86_64.deb`
+
+Alternatively, select the `.rpm` file for Red Hat.
+
+These will contain an AppImage file inside of them. Just copy the file to the machine you want to install on and double click it. Follow the installer instructions.
+
+
 ## Narrative
 
 Test that the package creator script:

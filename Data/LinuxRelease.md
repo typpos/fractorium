@@ -70,11 +70,13 @@ To build the AppImage after successfully building using the make after qmake has
 Ensure you these have two files in the folder up one level from the fractorium folder:
 
 `linuxdeployqt-6-x86_64.AppImage`
+
 `appimagetool-x86_64.AppImage`
 
 Which can be downloaded from:
 
 https://github.com/probonopd/linuxdeployqt/releases
+
 https://appimage.github.io/appimagetool/
 
 Make them executable by running this command in the folder they reside in:

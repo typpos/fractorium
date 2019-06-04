@@ -84,7 +84,9 @@ Make them executable by running this command in the folder they reside in:
 Once those are installed, run these commands from the root of the fractorium folder:
 
 `make`
+
 `cd archive`
+
 `./build_linux.sh`
 
 In fractorium/Bin the output is contained in the following file:

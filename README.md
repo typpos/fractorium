@@ -15,7 +15,7 @@ Download: [Fractorium_1.0.0.16.msi](https://drive.google.com/open?id=1FY43J-Nbia
 
 Download: [Fractorium_1.0.0.16.dmg](https://drive.google.com/open?id=1Jbwkg53ncjFaQhBYnRrXykyUDEao5mra)
 
-## Linux - Only bionic builds of ubuntu are supported.
+## Linux
 
 ### Install from PPA
 
@@ -35,7 +35,7 @@ sudo apt-get install fractorium
 
 ### Install from App Image .deb
 
-Install Bionic ubuntu or later.
+Install ubuntu.
 
 Download: [Fractorium-1.0.0.16-.x86_64.deb](https://drive.google.com/open?id=14EJv5zKt6iohgTOT8J0AIyi8u1NIM_v5)
 

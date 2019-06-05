@@ -41,7 +41,7 @@ Download: [Fractorium-1.0.0.16-.x86_64.deb](https://drive.google.com/open?id=14E
 
 ```
 cd ~/Downloads
-sudo dpkg -i fractorium_1.0.0.16-0ubuntu1_amd64.deb
+sudo dpkg -i Fractorium-1.0.0.16-.x86_64.deb
 ```
 
 ### Install from App Image .rpm

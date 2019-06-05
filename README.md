@@ -9,11 +9,11 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_1.0.0.14.msi](https://drive.google.com/open?id=1qBkG4_h8lyOFTeegY_ft34UCMYelqiHV)
+Download: [Fractorium_1.0.0.16.msi](https://drive.google.com/open?id=1FY43J-NbiaOIqgspGJDugFqVjan43xAl)
 
 ## Mac
 
-Download: [Fractorium_1.0.0.14.dmg](https://drive.google.com/open?id=1rVMd0X5kEKL0xH6XlU24H-_frnu6wQR8)
+Download: [Fractorium_1.0.0.16.dmg](https://drive.google.com/open?id=1Jbwkg53ncjFaQhBYnRrXykyUDEao5mra)
 
 ## Linux - Only bionic builds of ubuntu are supported.
 
@@ -33,16 +33,20 @@ sudo apt-get update
 sudo apt-get install fractorium
 ```
 
-### Install from .deb
+### Install from App Image .deb
 
 Install Bionic ubuntu or later.
 
-Download: [fractorium_1.0.0.14-0ubuntu1_amd64.deb](https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_1.0.0.14-0ubuntu1_amd64.deb)
+Download: [Fractorium-1.0.0.16-.x86_64.deb](https://drive.google.com/open?id=14EJv5zKt6iohgTOT8J0AIyi8u1NIM_v5)
 
 ```
 cd ~/Downloads
-sudo dpkg -i fractorium_1.0.0.14-0ubuntu1_amd64.deb
+sudo dpkg -i fractorium_1.0.0.16-0ubuntu1_amd64.deb
 ```
+
+### Install from App Image .rpm
+
+Download: [Fractorium-1.0.0.16.x86_64.rpm](https://drive.google.com/open?id=1nzvIJ6gc7uAk6zubTPy4NIuMWCnCC2dx)
 
 # Building from git
 

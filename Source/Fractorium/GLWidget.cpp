@@ -374,7 +374,7 @@ void GLEmberControllerBase::ClearControl() { m_DragModifier &= ~et(eDragModifier
 template <typename T>
 void GLEmberController<T>::ClearWindow()
 {
-	auto ember = m_FractoriumEmberController->CurrentEmber();
+    auto ember = m_FractoriumEmberController->CurrentEmber();
 	m_GL->makeCurrent();
 	m_GL->glClearColor(ember->m_Background.r, ember->m_Background.g, ember->m_Background.b, 1.0);
 	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -804,7 +804,7 @@ bool GLEmberControllerBase::KeyPress_(QKeyEvent* e)
 	{
 		SetControl();
 		return true;
-	}
+    }
 
 	return false;
 }
@@ -829,7 +829,7 @@ bool GLEmberControllerBase::KeyRelease_(QKeyEvent* e)
 {
 	if (e->key() == Qt::Key_Control)
 	{
-		ClearControl();
+        ClearControl();
 		return true;
 	}
 
@@ -1116,12 +1116,10 @@ void GLEmberController<T>::Wheel(QWheelEvent* e)
 	}
 	else
 	{
-		if (m_Fractorium->DrawImage())
+        if (m_Fractorium->DrawImage() && (!(e->buttons() & Qt::MiddleButton)) && (!(e->modifiers() & Qt::ShiftModifier))) //Middle button does whole image translation, so ignore the mouse wheel while panning to avoid inadvertent zooming. ShiftModifier for sensitive mouse.
 		{
 			auto ember = m_FractoriumEmberController->CurrentEmber();
-
-			if (!(e->buttons() & Qt::MiddleButton))//Middle button does whole image translation, so ignore the mouse wheel while panning to avoid inadvertent zooming.
-				m_Fractorium->SetScale(ember->m_PixelsPerUnit + (e->angleDelta().y() >= 0 ? 50 : -50));
+            m_Fractorium->SetScale(ember->m_PixelsPerUnit + (e->angleDelta().y() >= 0 ? 50 : -50));
 		}
 	}
 }

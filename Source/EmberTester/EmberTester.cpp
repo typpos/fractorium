@@ -1583,6 +1583,26 @@ void TestOperations()
 	}
 }
 
+void TestArbitrary()
+{
+	vector<string> stringVec;
+	auto varList = VariationList<float>::Instance();
+	auto& vars = varList->AllVars();
+	stringVec.push_back(" = vIn.x - ");
+	stringVec.push_back(" = vIn.y - ");
+	stringVec.push_back("sqrt(");
+	stringVec.push_back("atan2(");
+	stringVec.push_back("sin(");
+	stringVec.push_back("cos(");
+	//stringVec.push_back("sincos(");
+	auto varVec = FindVarsWith<float>(vars, stringVec, true, true);
+
+	for (auto& it : varVec)
+	{
+		cout << "Variation " << it->Name() << " contained the desired strings." << endl;
+	}
+}
+
 template <typename T>
 void TestVarsSimilar()
 {
@@ -2448,6 +2468,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	t.Tic();
 	TestOperations<float>();
 	t.Toc("TestOperations()");
+	t.Tic();
+	TestArbitrary();
+	t.Toc("TestArbitrary()");
 	//t.Tic();
 	//TestVarsSimilar<float>();
 	//t.Toc("TestVarsSimilar()");

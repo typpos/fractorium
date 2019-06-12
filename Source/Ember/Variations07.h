@@ -7187,6 +7187,90 @@ private:
 	T m_R2;//Precalc.
 };
 
+/// <summary>
+/// inkdrop by Jess.
+/// </summary>
+template <typename T>
+class InkdropVariation : public ParametricVariation<T>
+{
+public:
+	InkdropVariation(T weight = 1.0) : ParametricVariation<T>("inkdrop", eVariationId::VAR_INKDROP, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(InkdropVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T distx = helper.In.x - m_X;
+		T disty = helper.In.y - m_Y;
+		T dist2 = SQR(distx) + SQR(disty);
+		T adjust = std::sqrt(dist2 + m_Rad2) - std::sqrt(dist2);
+		T bearing = std::atan2(disty, distx);
+		T x = helper.In.x + (std::cos(bearing) * adjust);
+		T y = helper.In.y + (std::sin(bearing) * adjust);
+		helper.Out.x = m_Weight * x;
+		helper.Out.y = m_Weight * y;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string r = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rad2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t distx = vIn.x - " << x << ";\n"
+		   << "\t\treal_t disty = vIn.y - " << y << ";\n"
+		   << "\t\treal_t dist2 = SQR(distx) + SQR(disty);\n"
+		   << "\t\treal_t adjust = sqrt(dist2 + " << rad2 << ") - sqrt(dist2);\n"
+		   << "\n"
+		   << "\t\treal_t bearing = atan2(disty, distx);\n"
+		   << "\t\treal_t x = fma(cos(bearing), adjust, vIn.x);\n"
+		   << "\t\treal_t y = fma(sin(bearing), adjust, vIn.y);\n"
+		   << "\n"
+		   << "\t\tvOut.x = " << weight << " * x;\n"
+		   << "\t\tvOut.y = " << weight << " * y;\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_Rad2 = SQR(m_R);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_R, prefix + "inkdrop_r", T(0.5), eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "inkdrop_x"));
+		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "inkdrop_y"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rad2, prefix + "inkdrop_rad2"));//Precalc.
+	}
+
+private:
+	T m_R;
+	T m_X;
+	T m_Y;
+	T m_Rad2;//Precalc.
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -7256,4 +7340,5 @@ MAKEPREPOSTPARVAR(Waves42, waves42, WAVES42)
 MAKEPREPOSTPARVAR(Waves3, waves3, WAVES3)
 MAKEPREPOSTPARVAR(Waves4, waves4, WAVES4)
 MAKEPREPOSTPARVAR(Gnarly, gnarly, GNARLY)
+MAKEPREPOSTPARVAR(Inkdrop, inkdrop, INKDROP)
 }

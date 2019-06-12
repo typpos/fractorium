@@ -744,16 +744,17 @@ bool SearchVar(const Variation<T>* var, const vector<string>& stringVec, bool ma
 /// <param name="stringVec">The vector of variation pointers to search</param>
 /// <param name="stringVec">The vector of strings to search for</param>
 /// <param name="findAll">True to find all variations which match any strings, false to break after the first match is found.</param>
+/// <param name="matchAll">True to find all variations which match all strings, false to stop searching a variation after the first match succeeds.</param>
 /// <returns>A vector of pointers to variations whose OpenCL string matched at least one string in stringVec</returns>
 template <typename T>
-static vector<const Variation<T>*> FindVarsWith(const vector<const Variation<T>*>& vars, const vector<string>& stringVec, bool findAll = true)
+static vector<const Variation<T>*> FindVarsWith(const vector<const Variation<T>*>& vars, const vector<string>& stringVec, bool findAll = true, bool matchAll = false)
 {
 	vector<const Variation<T>*> vec;
 	auto vl = VariationList<T>::Instance();
 
 	for (auto& v : vars)
 	{
-		if (SearchVar<T>(v, stringVec, false))
+		if (SearchVar<T>(v, stringVec, matchAll))
 		{
 			vec.push_back(v);
 

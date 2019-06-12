@@ -183,19 +183,19 @@ void GLWidget::InitGL()
 		m_Fractorium->m_Controller->DelayedStartRenderTimer();
 		m_Init = true;
 		/*
-		    auto clinfo = OpenCLInfo::DefInstance();
-		    auto& platforms = clinfo->Platforms();
-		    auto& alldevices = clinfo->Devices();
-		    std::vector<std::string> strs;
-		    auto cdc = wglGetCurrentDC();
-		    auto cc = wglGetCurrentContext();
-		    ostringstream os;
-		    strs.push_back(os.str()); os.str(""); os << "GLWidget::InitGL():";
-		    strs.push_back(os.str()); os.str(""); os << "\nCurrent DC: " << cdc;
-		    strs.push_back(os.str()); os.str(""); os << "\nCurrent Context: " << cc;
+			auto clinfo = OpenCLInfo::DefInstance();
+			auto& platforms = clinfo->Platforms();
+			auto& alldevices = clinfo->Devices();
+			std::vector<std::string> strs;
+			auto cdc = wglGetCurrentDC();
+			auto cc = wglGetCurrentContext();
+			ostringstream os;
+			strs.push_back(os.str()); os.str(""); os << "GLWidget::InitGL():";
+			strs.push_back(os.str()); os.str(""); os << "\nCurrent DC: " << cdc;
+			strs.push_back(os.str()); os.str(""); os << "\nCurrent Context: " << cc;
 
-		    for (int platform = 0; platform < platforms.size(); platform++)
-		    {
+			for (int platform = 0; platform < platforms.size(); platform++)
+			{
 			cl_context_properties props[] =
 			{
 				CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -237,9 +237,9 @@ void GLWidget::InitGL()
 					strs.push_back(os.str()); os.str(""); os << "\nDevice OpenCL C version: " << dev.getInfo<CL_DEVICE_OPENCL_C_VERSION>(nullptr).c_str() << endl;
 				}
 			}
-		    }
+			}
 
-		    m_Fractorium->ErrorReportToQTextEdit(strs, m_Fractorium->ui.InfoRenderingTextEdit);
+			m_Fractorium->ErrorReportToQTextEdit(strs, m_Fractorium->ui.InfoRenderingTextEdit);
 		*/
 	}
 }
@@ -374,7 +374,7 @@ void GLEmberControllerBase::ClearControl() { m_DragModifier &= ~et(eDragModifier
 template <typename T>
 void GLEmberController<T>::ClearWindow()
 {
-    auto ember = m_FractoriumEmberController->CurrentEmber();
+	auto ember = m_FractoriumEmberController->CurrentEmber();
 	m_GL->makeCurrent();
 	m_GL->glClearColor(ember->m_Background.r, ember->m_Background.g, ember->m_Background.b, 1.0);
 	m_GL->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -524,12 +524,12 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
 	/*
-	    auto  qsf = this->format();
-	    qDebug() << "paintGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-	    qDebug() << "Profile: " << qsf.profile();
-	    qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-	    qDebug() << "Swap behavior: " << qsf.swapBehavior();
-	    qDebug() << "Swap interval: " << qsf.swapInterval();
+		auto  qsf = this->format();
+		qDebug() << "paintGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
+		qDebug() << "Profile: " << qsf.profile();
+		qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
+		qDebug() << "Swap behavior: " << qsf.swapBehavior();
+		qDebug() << "Swap interval: " << qsf.swapInterval();
 	*/
 	auto controller = m_Fractorium->m_Controller.get();
 
@@ -804,7 +804,7 @@ bool GLEmberControllerBase::KeyPress_(QKeyEvent* e)
 	{
 		SetControl();
 		return true;
-    }
+	}
 
 	return false;
 }
@@ -829,7 +829,7 @@ bool GLEmberControllerBase::KeyRelease_(QKeyEvent* e)
 {
 	if (e->key() == Qt::Key_Control)
 	{
-        ClearControl();
+		ClearControl();
 		return true;
 	}
 
@@ -1116,10 +1116,10 @@ void GLEmberController<T>::Wheel(QWheelEvent* e)
 	}
 	else
 	{
-        if (m_Fractorium->DrawImage() && (!(e->buttons() & Qt::MiddleButton)) && (!(e->modifiers() & Qt::ShiftModifier))) //Middle button does whole image translation, so ignore the mouse wheel while panning to avoid inadvertent zooming. ShiftModifier for sensitive mouse.
+		if (m_Fractorium->DrawImage() && !(e->buttons() & Qt::MiddleButton) && !(e->modifiers() & Qt::ShiftModifier))//Middle button does whole image translation, so ignore the mouse wheel while panning to avoid inadvertent zooming. ShiftModifier for sensitive mouse.
 		{
 			auto ember = m_FractoriumEmberController->CurrentEmber();
-            m_Fractorium->SetScale(ember->m_PixelsPerUnit + (e->angleDelta().y() >= 0 ? 50 : -50));
+			m_Fractorium->SetScale(ember->m_PixelsPerUnit + (e->angleDelta().y() >= 0 ? 50 : -50));
 		}
 	}
 }

@@ -261,7 +261,7 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 			FillLibraryTree(append ? previousSize - 1 : 0);
 
 		ClearUndo();
-        m_GLController->ClearControl();
+		m_GLController->ClearControl();
 		SetEmber(previousSize, false);
 	}
 }
@@ -280,7 +280,7 @@ void Fractorium::OnActionOpen(bool checked) { m_Controller->OpenAndPrepFiles(Set
 template <typename T>
 void FractoriumEmberController<T>::SaveCurrentAsXml()
 {
-    QString filename;
+	QString filename;
 	auto s = m_Fractorium->m_Settings;
 
 	if (s->SaveAutoUnique() && m_LastSaveCurrent != "")
@@ -323,7 +323,7 @@ void FractoriumEmberController<T>::SaveCurrentAsXml()
 			m_Fractorium->ShowCritical("Save Failed", "Could not save file, try saving to a different folder.");
 	}
 
-    m_GLController->ClearControl();
+	m_GLController->ClearControl();
 }
 
 void Fractorium::OnActionSaveCurrentAsXml(bool checked) { m_Controller->SaveCurrentAsXml(); }
@@ -368,7 +368,7 @@ void FractoriumEmberController<T>::SaveEntireFileAsXml()
 			m_Fractorium->ShowCritical("Save Failed", "Could not save file, try saving to a different folder.");
 	}
 
-    m_GLController->ClearControl();
+	m_GLController->ClearControl();
 }
 
 void Fractorium::OnActionSaveEntireFileAsXml(bool checked) { m_Controller->SaveEntireFileAsXml(); }

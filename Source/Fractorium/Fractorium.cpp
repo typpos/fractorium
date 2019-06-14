@@ -404,11 +404,10 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 		}
 		else if (o == this)
 		{
-            auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
+			auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
+			auto focusedctrlDbSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
 
-            auto focusedctrlDbSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
-
-            if (!focusedctrlSpin && !focusedctrlDbSpin)//Doesn't seem to matter, but just to be safe.
+			if (!focusedctrlSpin && !focusedctrlDbSpin)//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform.
 			{
 				unsigned int index = combo->currentIndex();
 

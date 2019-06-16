@@ -1324,6 +1324,7 @@ public:
 			helper.Out.x = x1 - helper.In.x;
 			helper.Out.y = y1 - helper.In.y;
 		}
+        helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -1455,9 +1456,9 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Exponent,            prefix + "Truchet_fill_exponent", 2, eParamType::REAL_CYCLIC, T(0.001), 2));
-		m_Params.push_back(ParamWithName<T>(&m_ArcWidth,            prefix + "Truchet_fill_arc_width", T(0.5), eParamType::REAL_CYCLIC, T(0.001), 1));
-		m_Params.push_back(ParamWithName<T>(&m_Seed,                prefix + "Truchet_fill_seed"));
+        m_Params.push_back(ParamWithName<T>(&m_Exponent,            prefix + "Truchet_fill_exponent", 2, eParamType::REAL_CYCLIC, T(0.001), 2));
+        m_Params.push_back(ParamWithName<T>(&m_ArcWidth,            prefix + "Truchet_fill_arc_width", T(0.5), eParamType::REAL_CYCLIC, T(0.001), 1));
+        m_Params.push_back(ParamWithName<T>(&m_Seed,                prefix + "Truchet_fill_seed"));
 		m_Params.push_back(ParamWithName<T>(true, &m_FinalExponent, prefix + "Truchet_fill_final_exponent"));//Precalc
 		m_Params.push_back(ParamWithName<T>(true, &m_OneOverEx,     prefix + "Truchet_fill_oneoverex"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Width,         prefix + "Truchet_fill_width"));
@@ -1476,6 +1477,462 @@ private:
 	T m_Seed2;
 	T m_Rmax;
 	T m_Scale;
+};
+
+/// <summary>
+/// Truchet_hex_fill.
+/// By tatasz.
+/// http://fav.me/dd9ay2c
+/// </summary>
+template <typename T>
+class TruchetHexFillVariation : public ParametricVariation<T>
+{
+public:
+    TruchetHexFillVariation(T weight = 1.0) : ParametricVariation<T>("Truchet_hex_fill", eVariationId::VAR_TRUCHET_HEX_FILL, weight)
+    {
+        Init();
+    }
+
+    PARVARCOPY(TruchetHexFillVariation)
+
+    virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+    {
+        //round
+        T rx = Floor<T>(std::log(rand.Frand01<T>()) * (rand.Frand01<T>() < T(0.5) ? m_SpreadX : -m_SpreadX));
+        T rz = Floor<T>(std::log(rand.Frand01<T>()) * (rand.Frand01<T>() < T(0.5) ? m_SpreadY : -m_SpreadY));
+
+        T fx_h = SQRT3 * rx + SQRT3_2 * (rand.Frand01<T>() < T(0.5) ? rz : -rz);
+        T fy_h = T(1.5) * rz;
+
+        bool add = true;
+
+        if (m_Seed == T(1))
+        {
+            if (((((int) rx) % 2) == 0) && ((((int) rz) % 2) == 0))
+                add = false;
+        }
+        else if (m_Seed >= T(2))
+        {
+            T hash_f = std::sin(fx_h * T(12.9898) + fy_h * T(78.233) + m_Seed) * T(43758.5453);
+            hash_f = hash_f - Floor<T>(hash_f);
+            if (hash_f < T(0.5))
+                add = false;
+        }
+
+        //exponential to make a tiled circle
+        T rangle = floor(rand.Frand01<T>() * m_3N) * M_2PI * m_1_3N;
+        T x_aux = m_FlipX ? (add ? helper.In.x : -helper.In.x) : helper.In.x;
+        T y_aux = m_FlipY ? (add ? helper.In.y : -helper.In.y) : helper.In.y;
+        T fx = x_aux * m_1_3N;
+        T fy = y_aux * m_1_3N;
+
+        T ang = fy * M_PI + rangle;
+        T a = T(1) + fx * M_PI;
+        fx = a * std::cos(ang);
+        fy = a * std::sin(ang);
+
+        //split
+        T a2 = std::atan2(fy, fx);
+
+        if (a2 < T(0))
+            a2 += M_2PI;
+
+        ang = (M_PI + Floor<T>(T(1.5) * a2 * M_1_PI) * M_2PI) / T(3.0);
+
+        T fx_new = fx - std::cos(ang) * T(2);
+        T fy_new = fy - std::sin(ang) * T(2);
+
+        //rotate by 30 to fit the hex
+        if (add)
+        {
+            fx = SQRT3_2 * fx_new - T(0.5) * fy_new;
+            fy = 0.5 * fx_new + SQRT3_2 * fy_new;
+        }
+        else
+        {
+            fx = SQRT3_2 * fx_new + T(0.5) * fy_new;
+            fy = -T(0.5) * fx_new + SQRT3_2 * fy_new;
+        }
+
+        helper.Out.x = (fx * T(0.5) + fx_h) * m_Weight;
+        helper.Out.y = (fy * T(0.5) + fy_h) * m_Weight;
+        helper.Out.z = DefaultZ(helper);
+    }
+
+    virtual string OpenCLString() const override
+    {
+        ostringstream ss, ss2;
+        intmax_t i = 0;
+        ss2 << "_" << XformIndexInEmber() << "]";
+        string index = ss2.str();
+        string weight  = WeightDefineString();
+        string pN      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string flipX   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string flipY   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string spreadX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string spreadY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string seed    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string p3N     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string p1_3N   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        ss << "\t{\n"
+           << "\t\treal_t rx = floor(log(MwcNext01(mwc)) * (MwcNext01(mwc) < (real_t)(0.5) ? " << m_SpreadX << " : -" << m_SpreadX << "));\n"
+           << "\t\treal_t rz = floor(log(MwcNext01(mwc)) * (MwcNext01(mwc) < (real_t)(0.5) ? " << m_SpreadY << " : -" << m_SpreadY << "));\n"
+           << "\n"
+           << "\t\treal_t fx_h = SQRT3 * rx + SQRT3_2 * (MwcNext01(mwc) < (real_t)(0.5) ? rz : -rz);\n"
+           << "\t\treal_t fy_h = (real_t)(1.5) * rz;\n"
+           << "\n"
+           << "\t\tbool add = true;\n"
+           << "\n"
+           << "\t\tif (" << seed << " == (real_t)(1))\n"
+           << "\t\t{\n"
+           << "\t\t if (((((int) rx) % 2) == 0) && ((((int) rz) % 2) == 0))\n"
+           << "\t\t     add = false;\n"
+           << "\t\t}\n"
+           << "\t\telse if (" << seed << " >= (real_t)(2))\n"
+           << "\t\t{\n"
+           << "\t\t real_t hash_f = sin(fx_h * (real_t)(12.9898) + fy_h * (real_t)(78.233) + " << seed << ") * (real_t)(43758.5453);\n"
+           << "\t\t hash_f = hash_f - floor(hash_f);\n"
+           << "\t\t if (hash_f < (real_t)(0.5))\n"
+           << "\t\t     add = false;\n"
+           << "\t\t}\n"
+           << "\n"
+           << "\t\treal_t rangle = floor(MwcNext01(mwc) * " << p3N << ") * M_2PI * " << p1_3N << ";\n"
+           << "\t\treal_t x_aux = " << flipX << " ? (add ? vIn.x : -vIn.x) : vIn.x;\n"
+           << "\t\treal_t y_aux = " << flipY << " ? (add ? vIn.y : -vIn.y) : vIn.y;\n"
+           << "\t\treal_t fx = x_aux * " << p1_3N << ";\n"
+           << "\t\treal_t fy = y_aux * " << p1_3N << ";\n"
+           << "\n"
+           << "\t\treal_t ang = fy * M_PI + rangle;\n"
+           << "\t\treal_t a = (real_t)(1) + fx * M_PI;\n"
+           << "\t\tfx = a * cos(ang);\n"
+           << "\t\tfy = a * sin(ang);\n"
+           << "\n"
+           << "\t\treal_t a2 = atan2(fy, fx);\n"
+           << "\n"
+           << "\t\tif (a2 < (real_t)(0))\n"
+           << "\t\t a2 += M_2PI;\n"
+           << "\n"
+           << "\t\tang = (M_PI + floor((real_t)(1.5) * a2 * M_1_PI) * M_2PI) / (real_t)(3.0);\n"
+           << "\n"
+           << "\t\treal_t fx_new = fx - cos(ang) * (real_t)(2);\n"
+           << "\t\treal_t fy_new = fy - sin(ang) * (real_t)(2);\n"
+           << "\n"
+           << "\t\tif (add)\n"
+           << "\t\t{\n"
+           << "\t\t fx = SQRT3_2 * fx_new - (real_t)(0.5) * fy_new;\n"
+           << "\t\t fy = 0.5 * fx_new + SQRT3_2 * fy_new;\n"
+           << "\t\t}\n"
+           << "\t\telse\n"
+           << "\t\t{\n"
+           << "\t\t fx = SQRT3_2 * fx_new + (real_t)(0.5) * fy_new;\n"
+           << "\t\t fy = -(real_t)(0.5) * fx_new + SQRT3_2 * fy_new;\n"
+           << "\t\t}\n"
+           << "\n"
+           << "\t\tvOut.x = (fx * (real_t)(0.5) + fx_h) * " << weight << ";\n"
+           << "\t\tvOut.y = (fy * (real_t)(0.5) + fy_h) * " << weight << ";\n"
+           << "\n"
+           << "\t\tvOut.z = " << DefaultZCl()
+           << "\t}\n";
+        return ss.str();
+    }
+
+    virtual void Precalc() override
+    {
+        m_3N = T(3.0) * m_N;
+        m_1_3N = T(1.0) / m_3N;
+    }
+
+protected:
+    void Init()
+    {
+        string prefix = Prefix();
+        m_Params.clear();
+        m_Params.push_back(ParamWithName<T>(&m_N,          prefix + "Truchet_hex_fill_n", 3));
+        m_Params.push_back(ParamWithName<T>(&m_FlipX,      prefix + "Truchet_hex_fill_flipx", 1, eParamType::INTEGER, 0, 1));
+        m_Params.push_back(ParamWithName<T>(&m_FlipY,      prefix + "Truchet_hex_fill_flipy", 1, eParamType::INTEGER, 0, 1));
+        m_Params.push_back(ParamWithName<T>(&m_SpreadX,    prefix + "Truchet_hex_fill_spreadx", 1));
+        m_Params.push_back(ParamWithName<T>(&m_SpreadY,    prefix + "Truchet_hex_fill_spready", 1));
+        m_Params.push_back(ParamWithName<T>(&m_Seed,       prefix + "Truchet_hex_fill_seed"));
+        m_Params.push_back(ParamWithName<T>(true, &m_3N,   prefix + "Truchet_hex_fill_3N"));//Precalc
+        m_Params.push_back(ParamWithName<T>(true, &m_1_3N, prefix + "Truchet_hex_fill_1_3N"));
+    }
+
+private:
+    T m_N;
+    T m_FlipX;
+    T m_FlipY;
+    T m_SpreadX;
+    T m_SpreadY;
+    T m_Seed;
+    T m_3N;//Precalc.
+    T m_1_3N;
+};
+
+/// <summary>
+/// Truchet_hex_crop.
+/// By tatasz.
+/// http://fav.me/dd9ay2c
+/// </summary>
+template <typename T>
+class TruchetHexCropVariation : public ParametricVariation<T>
+{
+public:
+    TruchetHexCropVariation(T weight = 1.0) : ParametricVariation<T>("Truchet_hex_crop", eVariationId::VAR_TRUCHET_HEX_CROP, weight)
+    {
+        Init();
+    }
+
+    PARVARCOPY(TruchetHexCropVariation)
+
+    virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+    {
+        //get hex
+        T x = SQRT3_3 * helper.In.x - helper.In.y / T(3.0);
+        T z = T(2.0) * helper.In.y / T(3.0);
+        T y = -x - z;
+
+        //round
+        T rx = Round(x);
+        T ry = Round(y);
+        T rz = Round(z);
+
+        T x_diff = std::abs(rx - x);
+        T y_diff = std::abs(ry - y);
+        T z_diff = std::abs(rz - z);
+
+        if ((x_diff > y_diff) && (x_diff > z_diff))
+            rx = -ry-rz;
+        else if (y_diff > z_diff)
+            ry = -rx-rz;
+        else
+            rz = -rx-ry;
+
+        T fx_h = SQRT3 * rx + SQRT3_2 * rz;
+        T fy_h = T(1.5) * rz;
+
+        T fx = helper.In.x - fx_h;
+        T fy = helper.In.y - fy_h;
+
+        T add = 0;
+
+        if (m_Seed == T(1))
+        {
+            if (((((int) rx) % 2) == 0) && ((((int) rz) % 2) == 0))
+                add = M_PI3;
+        }
+        else if (m_Seed >= T(2))
+        {
+            T hash_f = std::sin(fx_h * T(12.9898) + fy_h * T(78.233) + m_Seed) * T(43758.5453);
+            hash_f = hash_f - Floor<T>(hash_f);
+            if (hash_f < T(0.5))
+                add = M_PI3;
+        }
+
+        T angle  = std::atan2(fy, fx) + M_PI6 - add;
+        T angle2 = Floor<T>(angle * m_Coef) / m_Coef + M_PI6 + add; //or subtract 0.5
+        T x0     = std::cos(angle2);
+        T y0     = std::sin(angle2);
+        T dist   = std::sqrt(SQR(fx - x0) + SQR(fy - y0));
+
+        if (m_Inv)
+        {
+            if ((dist > m_D1) || (dist < m_D2))
+            {
+                if (m_Mode < T(0.5))
+                {
+                    fx = 0;
+                    fy = 0;
+                }
+                else if (m_Mode < T(1.5))
+                {
+                    fx = x0;
+                    fy = y0;
+                }
+                else
+                {
+                    T rangle = std::atan2(fy - y0, fx - x0);
+                    T d = (rand.Frand01<T>() < T(0.5)) ? m_D1 : m_D2;
+                    fx = x0 + std::cos(rangle) * d;
+                    fy = y0 + std::sin(rangle) * d;
+                }
+            }
+
+        }
+        else
+        {
+            if ((dist < m_D1) && (dist > m_D2))
+            {
+                if (m_Mode < T(0.5))
+                {
+                    fx = 0;
+                    fy = 0;
+                }
+                else if (m_Mode < T(1.5))
+                {
+                    fx = x0;
+                    fy = y0;
+                }
+                else
+                {
+                    T rangle = std::atan2(fy - y0, fx - x0);
+                    T d = (rand.Frand01<T>() < T(0.5)) ? m_D1 : m_D2;
+                    fx = x0 + std::cos(rangle) * d;
+                    fy = y0 + std::sin(rangle) * d;
+                }
+            }
+        }
+
+        helper.Out.x = (fx + fx_h) * m_Weight;
+        helper.Out.y = (fy + fy_h) * m_Weight;
+        helper.Out.z = DefaultZ(helper);
+    }
+
+    virtual string OpenCLString() const override
+    {
+        ostringstream ss, ss2;
+        intmax_t i = 0;
+        ss2 << "_" << XformIndexInEmber() << "]";
+        string index  = ss2.str();
+        string weight = WeightDefineString();
+        string wd     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string mode   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string inv    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string seed   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string d1     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string d2     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        string coef   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+        ss << "\t{\n"
+           << "\t\treal_t x = SQRT3_3 * vIn.x - vIn.y / (real_t)(3.0);\n"
+           << "\t\treal_t z = (real_t)(2.0) * vIn.y / (real_t)(3.0);\n"
+           << "\t\treal_t y = -x - z;\n"
+           << "\t\treal_t rx = Round(x);\n"
+           << "\t\treal_t ry = Round(y);\n"
+           << "\t\treal_t rz = Round(z);\n"
+           << "\t\treal_t x_diff = fabs(rx - x);\n"
+           << "\t\treal_t y_diff = fabs(ry - y);\n"
+           << "\t\treal_t z_diff = fabs(rz - z);\n"
+           << "\n"
+           << "\t\tif ((x_diff > y_diff) && (x_diff > z_diff))\n"
+           << "\t\t rx = -ry-rz;\n"
+           << "\t\telse if (y_diff > z_diff)\n"
+           << "\t\t ry = -rx-rz;\n"
+           << "\t\telse\n"
+           << "\t\trz = -rx-ry;\n"
+           << "\n"
+           << "\t\treal_t fx_h = SQRT3 * rx + SQRT3_2 * rz;\n"
+           << "\t\treal_t fy_h = (real_t)(1.5) * rz;\n"
+           << "\t\treal_t fx = vIn.x - fx_h;\n"
+           << "\t\treal_t fy = vIn.y - fy_h;\n"
+           << "\t\treal_t add = 0;\n"
+           << "\n"
+           << "\t\tif (" << seed << " == (real_t)(1))\n"
+           << "\t\t{\n"
+           << "\t\t if (((((int) rx) % 2) == 0) && ((((int) rz) % 2) == 0))\n"
+           << "\t\t     add = M_PI3;\n"
+           << "\t\t}\n"
+           << "\t\telse if (" << seed << " >= (real_t)(2))\n"
+           << "\t\t{\n"
+           << "\t\t real_t hash_f = sin(fx_h * (real_t)(12.9898) + fy_h * (real_t)(78.233) + " << seed << ") * (real_t)(43758.5453);\n"
+           << "\t\t hash_f = hash_f - floor(hash_f);\n"
+           << "\t\t if (hash_f < (real_t)(0.5))\n"
+           << "\t\t     add = M_PI3;\n"
+           << "\t\t}\n"
+           << "\n"
+           << "\t\treal_t angle  = atan2(fy, fx) + M_PI6 - add;\n"
+           << "\t\treal_t angle2 = floor(angle * " << coef << ") / " << coef << " + M_PI6 + add;\n"
+           << "\t\treal_t x0     = cos(angle2);\n"
+           << "\t\treal_t y0     = sin(angle2);\n"
+           << "\t\treal_t dist   = sqrt(SQR(fx - x0) + SQR(fy - y0));\n"
+           << "\n"
+           << "\t\tif (" << inv << ")\n"
+           << "\t\t{\n"
+           << "\t\t if ((dist > " << d1 << ") || (dist < " << d2 << "))\n"
+           << "\t\t {\n"
+           << "\t\t     if (" << mode << " < (real_t)(0.5))\n"
+           << "\t\t     {\n"
+           << "\t\t         fx = 0;\n"
+           << "\t\t         fy = 0;\n"
+           << "\t\t     }\n"
+           << "\t\t     else if (" << mode << " < (real_t)(1.5))\n"
+           << "\t\t     {\n"
+           << "\t\t         fx = x0;\n"
+           << "\t\t         fy = y0;\n"
+           << "\t\t     }\n"
+           << "\t\t     else\n"
+           << "\t\t     {\n"
+           << "\t\t         real_t rangle = atan2(fy - y0, fx - x0);\n"
+           << "\t\t         real_t d = (MwcNext01(mwc) < (real_t)(0.5)) ? " << d1 << " : " << d2 << ";\n"
+           << "\t\t         fx = x0 + cos(rangle) * d;\n"
+           << "\t\t         fy = y0 + sin(rangle) * d;\n"
+           << "\t\t     }\n"
+           << "\t\t }\n"
+           << "\t\t}\n"
+           << "\t\telse\n"
+           << "\t\t{\n"
+           << "\t\t if ((dist < " << d1 << ") && (dist > " << d2 << "))\n"
+           << "\t\t {\n"
+           << "\t\t     if (" << mode << " < (real_t)(0.5))\n"
+           << "\t\t     {\n"
+           << "\t\t         fx = 0;\n"
+           << "\t\t         fy = 0;\n"
+           << "\t\t     }\n"
+           << "\t\t     else if (" << mode << " < (real_t)(1.5))\n"
+           << "\t\t     {\n"
+           << "\t\t         fx = x0;\n"
+           << "\t\t         fy = y0;\n"
+           << "\t\t     }\n"
+           << "\t\t     else\n"
+           << "\t\t     {\n"
+           << "\t\t         real_t rangle = atan2(fy - y0, fx - x0);\n"
+           << "\t\t         real_t d = (MwcNext01(mwc) < (real_t)(0.5)) ? " << d1 << " : " << d2 << ";\n"
+           << "\t\t         fx = x0 + cos(rangle) * d;\n"
+           << "\t\t         fy = y0 + sin(rangle) * d;\n"
+           << "\t\t     }\n"
+           << "\t\t }\n"
+           << "\t\t}\n"
+           << "\n"
+           << "\t\t\tvOut.x = (fx + fx_h) * " << weight << ";\n"
+           << "\t\t\tvOut.y = (fy + fy_h) * " << weight << ";\n"
+           << "\n"
+           << "\t\tvOut.z = " << DefaultZCl()
+           << "\t}\n";
+        return ss.str();
+    }
+
+    virtual vector<string> OpenCLGlobalFuncNames() const override
+    {
+        return vector<string> { "Round" };
+    }
+
+    virtual void Precalc() override
+    {
+        m_D1 = T(0.5) + m_Wd;
+        m_D2 = T(0.5) - m_Wd;
+        m_Coef = T(1.5) / T(M_PI);
+    }
+
+protected:
+    void Init()
+    {
+        string prefix = Prefix();
+        m_Params.clear();
+        m_Params.push_back(ParamWithName<T>(&m_Wd,          prefix + "Truchet_hex_crop_wd", T(0.2), eParamType::REAL_CYCLIC, 0, 5));
+        m_Params.push_back(ParamWithName<T>(&m_Mode,        prefix + "Truchet_hex_crop_mode", 0, eParamType::INTEGER, 0, 2));
+        m_Params.push_back(ParamWithName<T>(&m_Inv,         prefix + "Truchet_hex_crop_inv", 0, eParamType::INTEGER, 0, 1));
+        m_Params.push_back(ParamWithName<T>(&m_Seed,        prefix + "Truchet_hex_crop_seed"));
+        m_Params.push_back(ParamWithName<T>(true, &m_D1,    prefix + "Truchet_hex_crop_d1"));//Precalc
+        m_Params.push_back(ParamWithName<T>(true, &m_D2,    prefix + "Truchet_hex_crop_d2"));
+        m_Params.push_back(ParamWithName<T>(true, &m_Coef,  prefix + "Truchet_hex_crop_coef"));
+    }
+
+private:
+    T m_Wd;
+    T m_Mode;
+    T m_Inv;
+    T m_Seed;
+    T m_D1;//Precalc.
+    T m_D2;
+    T m_Coef;
 };
 
 /// <summary>
@@ -7285,6 +7742,8 @@ MAKEPREPOSTVAR(Cylinder2, cylinder2, CYLINDER2)
 MAKEPREPOSTPARVAR(TileLog, tile_log, TILE_LOG)
 MAKEPREPOSTPARVAR(TileHlp, tile_hlp, TILE_HLP)
 MAKEPREPOSTPARVAR(TruchetFill, Truchet_fill, TRUCHET_FILL)
+MAKEPREPOSTPARVAR(TruchetHexFill, Truchet_hex_fill, TRUCHET_HEX_FILL)
+MAKEPREPOSTPARVAR(TruchetHexCrop, Truchet_hex_crop, TRUCHET_HEX_CROP)
 MAKEPREPOSTPARVAR(Waves2Radial, waves2_radial, WAVES2_RADIAL)
 MAKEPREPOSTVAR(Panorama1, panorama1, PANORAMA1)
 MAKEPREPOSTVAR(Panorama2, panorama2, PANORAMA2)

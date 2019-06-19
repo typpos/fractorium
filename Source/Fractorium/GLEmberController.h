@@ -147,7 +147,8 @@ private:
 	m4T m_Projection;
 
 	Affine2D<T> m_DragSrcTransform;
-	vector<Affine2D<T>> m_DragSrcTransforms;
+	std::map<size_t, Affine2D<T>> m_DragSrcPreTransforms;
+	std::map<size_t, Affine2D<T>> m_DragSrcPostTransforms;
 
 	Xform<T>* m_HoverXform;
 	Xform<T>* m_SelectedXform;

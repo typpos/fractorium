@@ -7,6 +7,7 @@
 #include "Variations05.h"
 #include "Variations06.h"
 #include "Variations07.h"
+#include "Variations08.h"
 #include "VariationsDC.h"
 
 namespace EmberNs
@@ -308,8 +309,8 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(BlurHeart)
 	ADDPREPOSTREGVAR(Truchet)
 	ADDPREPOSTREGVAR(TruchetFill)
-    ADDPREPOSTREGVAR(TruchetHexFill)
-    ADDPREPOSTREGVAR(TruchetHexCrop)
+	ADDPREPOSTREGVAR(TruchetHexFill)
+	ADDPREPOSTREGVAR(TruchetHexCrop)
 	ADDPREPOSTREGVAR(TruchetGlyph)
 	ADDPREPOSTREGVAR(TruchetInv)
 	ADDPREPOSTREGVAR(TruchetKnot)
@@ -433,6 +434,7 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(Waves42)
 	ADDPREPOSTREGVAR(Gnarly)
 	ADDPREPOSTREGVAR(Inkdrop)
+	ADDPREPOSTREGVAR(HexModulus)
 	//ADDPREPOSTREGVAR(LinearXZ)
 	//ADDPREPOSTREGVAR(LinearYZ)
 	//DC are special.

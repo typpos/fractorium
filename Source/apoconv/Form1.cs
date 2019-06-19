@@ -23,7 +23,9 @@ namespace apoconv
 			//{ "0.0", "0" },
 			{ "0.5", "T(0.5)" },
 			{ "1.0", "T(1.0)" },
+			{ "1.5", "T(1.5)" },
 			{ "2.0", "T(2.0)" },
+			{ "3.0", "T(3.0)" },
 			{ "0.1", "T(0.1)" },
 			{ "0.01", "T(0.01)" },
 			{ "0.001", "T(0.001)" },
@@ -38,7 +40,8 @@ namespace apoconv
 			{ "FPz", "helper.Out.z" },
 			{ "VVAR", "m_Weight" },
 			{ "floor(", "Floor<T>(" },
-			{ "cel(", "std::ceil(" },
+			{ "ceil(", "std::ceil(" },
+			{ "round(", "std::round(" },
 			{ "sin(", "std::sin(" },
 			{ "sinh(", "std::sinh(" },
 			{ "asin(", "std::asin(" },
@@ -58,10 +61,13 @@ namespace apoconv
 			{ "sqrt(", "std::sqrt(" },
 			{ "pow(", "std::pow(" },
 			{ "fabs(", "std::abs(" },
+			{ "abs(", "std::abs(" },
 			{ "log(", "std::log(" },
 			{ "exp(", "std::exp(" },
 
 			{ "sqr(", "Sqr(" },
+
+			{ "random01()", "rand.Frand01<T>()" },
 
 			{ "M_E", "T(M_E)" },
 			{ "M_LOG2E", "T(M_LOG2E)" },
@@ -391,6 +397,11 @@ namespace apoconv
 				final += "\t\tstring " + param.MemberName.Replace("m_", "").ToLower() + " = \"parVars[\" + ToUpper(m_Params[i++].Name()) + index;\r\n";
 			}
 
+			foreach (var param in m_StructParams)
+			{
+				final += "\t\tstring " + param.MemberName.Replace("m_", "").ToLower() + " = \"parVars[\" + ToUpper(m_Params[i++].Name()) + index;\r\n";
+			}
+
 			final += "\t\tss << \"\\t{\\n\"\r\n";
 
 			foreach (var line in m_FinalCalcFuncLines)
@@ -413,6 +424,7 @@ namespace apoconv
 						   Replace("std::abs", "fabs").
 						   Replace("m_Weight", "\" << weight << \"").
 						   Replace("std::", "").
+						   Replace("rand.Frand01<T>()", "MwcNext01(mwc)").
 						   Replace("T(", "(real_t)(")
 						   ;
 

@@ -1506,10 +1506,11 @@ public:
 		bool add = true;
 
 		if (m_Seed == 1)
+		{
 			if (!(int(rx) & 1) && !(int(rz) & 1))
 				add = false;
-
-		if (m_Seed >= 2)
+		}
+		else if (m_Seed >= 2)
 		{
 			T hash_f = std::sin(FX_h * T(12.9898) + FY_h * T(78.233) + m_Seed) * T(43758.5453);
 			hash_f = hash_f - Floor<T>(hash_f);
@@ -1581,10 +1582,11 @@ public:
 		   << "\t\tbool add = true;\n"
 		   << "\n"
 		   << "\t\tif (" << seed << " == 1)\n"
+		   << "\t\t{\n"
 		   << "\t\t	if (!((int)rx & 1) && !((int)rz & 1))\n"
 		   << "\t\t		add = false;\n"
-		   << "\n"
-		   << "\t\tif (" << seed << " >= 2)\n"
+		   << "\t\t}\n"
+		   << "\t\telse if (" << seed << " >= 2)\n"
 		   << "\t\t{\n"
 		   << "\t\t	real_t hash_f = sin(fma(FX_h, (real_t)(12.9898), fma(FY_h, (real_t)(78.233), " << seed << "))) * (real_t)(43758.5453);\n"
 		   << "\t\t	hash_f = hash_f - floor(hash_f);\n"

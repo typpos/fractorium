@@ -1149,15 +1149,16 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T f = rand.Frand01<T>() * m_Power * 2;
-		T angle = T(int(f));
+		int intangle = int(f);
+		T angle = T(intangle);
 		f -= angle;
 		T x = f * m_Length;
 		T z = std::sqrt(1 + SQR(x) - 2 * x * std::cos(m_Alpha));
 
-		if (int(angle) & 1)
-			angle = M_2PI / m_Power * (int(angle) / 2) + std::asin(std::sin(m_Alpha) * x / z);
+		if (intangle & 1)
+			angle = M_2PI / m_Power * (intangle / 2) + std::asin(std::sin(m_Alpha) * x / z);
 		else
-			angle = M_2PI / m_Power * (int(angle) / 2) - std::asin(std::sin(m_Alpha) * x / z);
+			angle = M_2PI / m_Power * (intangle / 2) - std::asin(std::sin(m_Alpha) * x / z);
 
 		z *= std::sqrt(rand.Frand01<T>());
 		T temp = angle - T(M_PI_2);
@@ -1179,17 +1180,18 @@ public:
 		string alpha  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t f = MwcNext01(mwc) * " << power << " * 2;\n"
-		   << "\t\treal_t angle = (real_t)(int)(f);\n"
+		   << "\t\tint intangle = (int)(f);\n"
+		   << "\t\treal_t angle = (real_t)intangle;\n"
 		   << "\n"
 		   << "\t\tf -= angle;\n"
 		   << "\n"
 		   << "\t\treal_t x = f * " << length << ";\n"
 		   << "\t\treal_t z = sqrt(fma(x, x, (real_t)(1.0)) - (real_t)(2.0) * x * cos(" << alpha << "));\n"
 		   << "\n"
-		   << "\t\tif (((int)angle) & 1)\n"
-           << "\t\t	angle = fma(M_2PI / " << power << ", ((int)angle) / 2, asin(sin(" << alpha << ") * x / z));\n"
+		   << "\t\tif (intangle & 1)\n"
+		   << "\t\t	angle = fma(M_2PI / " << power << ", (real_t)(intangle / 2), asin(sin(" << alpha << ") * x / z));\n"
 		   << "\t\telse\n"
-           << "\t\t	angle = fma(M_2PI / " << power << ", ((int)angle) / 2, -asin(sin(" << alpha << ") * x / z));\n"
+		   << "\t\t	angle = fma(M_2PI / " << power << ", (real_t)(intangle / 2), -asin(sin(" << alpha << ") * x / z));\n"
 		   << "\n"
 		   << "\t\tz *= sqrt(MwcNext01(mwc));\n"
 		   << "\n"
@@ -1214,10 +1216,10 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "starblur_power", 5, eParamType::INTEGER_NONZERO));
-		m_Params.push_back(ParamWithName<T>(&m_Range, prefix + "starblur_range", T(0.4016228317)));
+		m_Params.push_back(ParamWithName<T>(&m_Power,        prefix + "starblur_power", 5, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Range,        prefix + "starblur_range", T(0.4016228317)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Length, prefix + "starblur_length"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "starblur_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,  prefix + "starblur_alpha"));
 	}
 
 private:

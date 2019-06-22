@@ -116,10 +116,8 @@ public:
 	void CurrentXform(uint i);
 
 	//Xforms Affine.
-	bool DrawCurrentPre();
 	bool DrawSelectedPre();
 	bool DrawAllPre();
-	bool DrawCurrentPost();
 	bool DrawSelectedPost();
 	bool DrawAllPost();
 	bool LocalPivot();

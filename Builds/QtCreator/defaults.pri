@@ -1,4 +1,4 @@
-VERSION = 1.0.0.16
+VERSION = 1.0.0.17
 win32:CONFIG += skip_target_version_ext
 CONFIG += c++14
 

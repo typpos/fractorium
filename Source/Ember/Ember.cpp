@@ -25,6 +25,7 @@ template EMBER_API class QTIsaac<ISAAC_SIZE, ISAAC_INT>;
 #include "Variations05.h"
 #include "Variations06.h"
 #include "Variations07.h"
+#include "Variations08.h"
 #include "VariationsDC.h"
 #include "VariationList.h"
 #include "Affine2D.h"
@@ -422,8 +423,8 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(TileHlp, T) \
 	EXPORTPREPOSTREGVAR(Truchet, T) \
 	EXPORTPREPOSTREGVAR(TruchetFill, T) \
-    EXPORTPREPOSTREGVAR(TruchetHexFill, T) \
-    EXPORTPREPOSTREGVAR(TruchetHexCrop, T) \
+	EXPORTPREPOSTREGVAR(TruchetHexFill, T) \
+	EXPORTPREPOSTREGVAR(TruchetHexCrop, T) \
 	EXPORTPREPOSTREGVAR(TruchetGlyph, T) \
 	EXPORTPREPOSTREGVAR(TruchetInv, T) \
 	EXPORTPREPOSTREGVAR(TruchetKnot, T) \
@@ -493,6 +494,7 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(Waves4, T) \
 	EXPORTPREPOSTREGVAR(Gnarly, T) \
 	EXPORTPREPOSTREGVAR(Inkdrop, T) \
+	EXPORTPREPOSTREGVAR(HexModulus, T) \
 	template EMBER_API class VariationList<T>; \
 	template EMBER_API class SpatialFilter<T>; \
 	template EMBER_API class GaussianFilter<T>; \

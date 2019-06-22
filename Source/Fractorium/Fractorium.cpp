@@ -404,11 +404,10 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 		}
 		else if (o == this)
 		{
-            auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
+			auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
+			auto focusedctrlDbSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
 
-            auto focusedctrlDbSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
-
-            if (!focusedctrlSpin && !focusedctrlDbSpin)//Doesn't seem to matter, but just to be safe.
+			if (!focusedctrlSpin && !focusedctrlDbSpin)//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform.
 			{
 				unsigned int index = combo->currentIndex();
 
@@ -912,7 +911,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PreScaleCombo);
 	w = SetTabOrder(this, w, ui.PreScaleUpButton);
 	w = SetTabOrder(this, w, ui.PreRandomButton);
-	w = SetTabOrder(this, w, ui.ShowPreAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineSelectedRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineAllRadio);
 	w = SetTabOrder(this, w, ui.SwapAffinesButton);
@@ -942,7 +940,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PostScaleCombo);
 	w = SetTabOrder(this, w, ui.PostScaleUpButton);
 	w = SetTabOrder(this, w, ui.PostRandomButton);
-	w = SetTabOrder(this, w, ui.ShowPostAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPostAffineSelectedRadio);
 	w = SetTabOrder(this, w, ui.ShowPostAffineAllRadio);
 	w = SetTabOrder(this, w, ui.PolarAffineCheckBox);

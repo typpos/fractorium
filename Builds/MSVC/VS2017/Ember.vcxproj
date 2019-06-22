@@ -144,6 +144,7 @@
     <ClInclude Include="..\..\..\Source\Ember\Variations05.h" />
     <ClInclude Include="..\..\..\Source\Ember\Variations06.h" />
     <ClInclude Include="..\..\..\Source\Ember\Variations07.h" />
+    <ClInclude Include="..\..\..\Source\Ember\Variations08.h" />
     <ClInclude Include="..\..\..\Source\Ember\VariationsDC.h" />
     <ClInclude Include="..\..\..\Source\Ember\Xform.h" />
     <ClInclude Include="..\..\..\Source\Ember\Isaac.h" />

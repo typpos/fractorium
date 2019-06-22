@@ -82,6 +82,7 @@ HEADERS += \
     $$PRJ_SRC_DIR/Variations05.h \
     $$PRJ_SRC_DIR/Variations06.h \
     $$PRJ_SRC_DIR/Variations07.h \
+    $$PRJ_SRC_DIR/Variations08.h \
     $$PRJ_SRC_DIR/VariationsDC.h \
     $$PRJ_SRC_DIR/VarFuncs.h \
     $$PRJ_SRC_DIR/Xform.h \

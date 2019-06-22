@@ -2458,7 +2458,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_Five = 1 / SQRT5;
+		m_Five = 1 / M_SQRT5;
 		m_NatLog = std::log(M_PHI);
 	}
 
@@ -2534,7 +2534,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_Five = 1 / SQRT5;
+		m_Five = 1 / M_SQRT5;
 		m_NatLog = std::log(M_PHI);
 	}
 

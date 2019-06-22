@@ -911,7 +911,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PreScaleCombo);
 	w = SetTabOrder(this, w, ui.PreScaleUpButton);
 	w = SetTabOrder(this, w, ui.PreRandomButton);
-	w = SetTabOrder(this, w, ui.ShowPreAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineSelectedRadio);
 	w = SetTabOrder(this, w, ui.ShowPreAffineAllRadio);
 	w = SetTabOrder(this, w, ui.SwapAffinesButton);
@@ -941,7 +940,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PostScaleCombo);
 	w = SetTabOrder(this, w, ui.PostScaleUpButton);
 	w = SetTabOrder(this, w, ui.PostRandomButton);
-	w = SetTabOrder(this, w, ui.ShowPostAffineCurrentRadio);
 	w = SetTabOrder(this, w, ui.ShowPostAffineSelectedRadio);
 	w = SetTabOrder(this, w, ui.ShowPostAffineAllRadio);
 	w = SetTabOrder(this, w, ui.PolarAffineCheckBox);

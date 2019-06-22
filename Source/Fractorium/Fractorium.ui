@@ -3481,7 +3481,7 @@
               <enum>QTabWidget::Triangular</enum>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="XformColorTab">
               <property name="sizePolicy">
@@ -4903,13 +4903,6 @@
                       <number>6</number>
                      </property>
                      <item>
-                      <widget class="QRadioButton" name="ShowPreAffineCurrentRadio">
-                       <property name="text">
-                        <string>Current</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <widget class="QRadioButton" name="ShowPreAffineSelectedRadio">
                        <property name="text">
                         <string>Selected</string>
@@ -5785,22 +5778,12 @@
                       <number>6</number>
                      </property>
                      <item>
-                      <widget class="QRadioButton" name="ShowPostAffineCurrentRadio">
-                       <property name="enabled">
-                        <bool>true</bool>
-                       </property>
-                       <property name="text">
-                        <string>Current</string>
-                       </property>
-                       <property name="checked">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <widget class="QRadioButton" name="ShowPostAffineSelectedRadio">
                        <property name="text">
                         <string>Selected</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>

@@ -666,10 +666,20 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		if (pre && m_Fractorium->DrawAllPre())//Draw all pre affine if specified.
 		{
 			size_t i = 0;
+			bool any = false;
+
+			while (auto xform = ember->GetTotalXform(i, forceFinal))
+				if (m_Fractorium->IsXformSelected(i++))
+				{
+					any = true;
+					break;
+				}
+
+			i = 0;
 
 			while (auto xform = ember->GetTotalXform(i, forceFinal))
 			{
-				bool selected = m_Fractorium->IsXformSelected(i++) || m_SelectedXform == xform;
+				bool selected = m_Fractorium->IsXformSelected(i++) || (!any && m_SelectedXform == xform);
 				DrawAffine(xform, true, selected, !dragging && (m_HoverXform == xform));
 			}
 		}
@@ -690,18 +700,24 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 			if (!any)
 				DrawAffine(m_FractoriumEmberController->CurrentXform(), true, true, !dragging && (m_HoverXform == m_FractoriumEmberController->CurrentXform()));
 		}
-		else if (pre)//Only draw current pre affine.
-		{
-			DrawAffine(m_SelectedXform, true, true, !dragging && (m_HoverXform == m_FractoriumEmberController->CurrentXform()));
-		}
 
 		if (post && m_Fractorium->DrawAllPost())//Draw all post affine if specified.
 		{
 			size_t i = 0;
+			bool any = false;
+
+			while (auto xform = ember->GetTotalXform(i, forceFinal))
+				if (m_Fractorium->IsXformSelected(i++))
+				{
+					any = true;
+					break;
+				}
+
+			i = 0;
 
 			while (auto xform = ember->GetTotalXform(i, forceFinal))
 			{
-				bool selected = m_Fractorium->IsXformSelected(i++) || m_SelectedXform == xform;
+				bool selected = m_Fractorium->IsXformSelected(i++) || (!any && m_SelectedXform == xform);
 				DrawAffine(xform, false, selected, !dragging && (m_HoverXform == xform));
 			}
 		}
@@ -721,10 +737,6 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 
 			if (!any)
 				DrawAffine(m_FractoriumEmberController->CurrentXform(), false, true, !dragging && (m_HoverXform == m_FractoriumEmberController->CurrentXform()));
-		}
-		else if (post)//Only draw current post affine.
-		{
-			DrawAffine(m_SelectedXform, false, true, !dragging && (m_HoverXform == m_FractoriumEmberController->CurrentXform()));
 		}
 	}
 
@@ -902,7 +914,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 						m_DragSrcPreTransforms[xfindex] = xform->m_Affine;
 					else
 						m_DragSrcPostTransforms[xfindex] = xform->m_Post;
-				}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Don't update renderer here.
+				}, eXformUpdate::UPDATE_SELECTED, false);//Don't update renderer here.
 				m_DragHandlePos = m_HoverHandlePos;//The location in local coordinates of the point selected on the spinner, x, y or center.
 				m_DragState = eDragState::DragDragging;
 				m_GL->repaint();
@@ -1038,7 +1050,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 			{
 				QPointF cd(xform->m_Affine.C() * scale, xform->m_Affine.F() * scale);
 				bool b = qrf.contains(cd);
-				m_FractoriumEmberController->XformCheckboxAt(xfindex, [&](QCheckBox * cb)
+				m_FractoriumEmberController->XformCheckboxAt(int(xfindex), [&](QCheckBox * cb)
 				{
 					cb->setChecked(b);
 				});
@@ -1048,7 +1060,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 			{
 				QPointF cd(xform->m_Post.C() * scale, xform->m_Post.F() * scale);
 				bool b = qrf.contains(cd);
-				m_FractoriumEmberController->XformCheckboxAt(xfindex, [&](QCheckBox * cb)
+				m_FractoriumEmberController->XformCheckboxAt(int(xfindex), [&](QCheckBox * cb)
 				{
 					if (!cb->isChecked() && b)
 						cb->setChecked(b);
@@ -1799,8 +1811,8 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 			//is set to show current, and the user hovers over another xform, but doesn't select it, then moves the mouse
 			//back over the hidden circle for the pre/post that was set to only show current.
 			bool isSel = m_Fractorium->IsXformSelected(ember->GetTotalXformIndex(m_SelectedXform));
-			bool checkPre = pre && (m_Fractorium->DrawAllPre() || (m_Fractorium->DrawSelectedPre() && isSel) || m_Fractorium->DrawCurrentPre());
-			bool checkPost = post && (m_Fractorium->DrawAllPost() || (m_Fractorium->DrawSelectedPost() && isSel) || m_Fractorium->DrawCurrentPost());
+			bool checkPre = pre && (m_Fractorium->DrawAllPre() || (m_Fractorium->DrawSelectedPre() && isSel));
+			bool checkPost = post && (m_Fractorium->DrawAllPost() || (m_Fractorium->DrawSelectedPost() && isSel));
 
 			if (CheckXformHover(m_SelectedXform, glCoords, bestDist, checkPre, checkPost))
 			{
@@ -2005,7 +2017,7 @@ void GLEmberController<T>::CalcDragXAxis()
 		{
 			auto it = m_DragSrcPreTransforms.find(xfindex);
 
-			if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+			if (it != m_DragSrcPreTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Affine;
@@ -2024,7 +2036,7 @@ void GLEmberController<T>::CalcDragXAxis()
 
 			it = m_DragSrcPostTransforms.find(xfindex);
 
-			if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+			if (it != m_DragSrcPostTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Post;
@@ -2045,7 +2057,7 @@ void GLEmberController<T>::CalcDragXAxis()
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
 				m_DragHandlePos = v3T((affine.O() + affine.X()) * worldToAffineScale, 0);
-		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
+		}, eXformUpdate::UPDATE_SELECTED, false);//Calling code will update renderer.
 	}
 	else
 	{
@@ -2064,7 +2076,7 @@ void GLEmberController<T>::CalcDragXAxis()
 		{
 			auto it = m_DragSrcPreTransforms.find(xfindex);
 
-			if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+			if (it != m_DragSrcPreTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Affine;
@@ -2093,7 +2105,7 @@ void GLEmberController<T>::CalcDragXAxis()
 
 			it = m_DragSrcPostTransforms.find(xfindex);
 
-			if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+			if (it != m_DragSrcPostTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Post;
@@ -2124,7 +2136,7 @@ void GLEmberController<T>::CalcDragXAxis()
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
 				m_DragHandlePos = v3T((affine.O() + affine.X()) * worldToAffineScale, 0);
-		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
+		}, eXformUpdate::UPDATE_SELECTED, false);
 	}
 }
 
@@ -2170,7 +2182,7 @@ void GLEmberController<T>::CalcDragYAxis()
 		{
 			auto it = m_DragSrcPreTransforms.find(xfindex);
 
-			if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+			if (it != m_DragSrcPreTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Affine;
@@ -2189,7 +2201,7 @@ void GLEmberController<T>::CalcDragYAxis()
 
 			it = m_DragSrcPostTransforms.find(xfindex);
 
-			if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+			if (it != m_DragSrcPostTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Post;
@@ -2210,7 +2222,7 @@ void GLEmberController<T>::CalcDragYAxis()
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
 				m_DragHandlePos = v3T((affine.O() + affine.Y()) * worldToAffineScale, 0);
-		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
+		}, eXformUpdate::UPDATE_SELECTED, false);//Calling code will update renderer.
 	}
 	else
 	{
@@ -2229,7 +2241,7 @@ void GLEmberController<T>::CalcDragYAxis()
 		{
 			auto it = m_DragSrcPreTransforms.find(xfindex);
 
-			if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+			if (it != m_DragSrcPreTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Affine;
@@ -2258,7 +2270,7 @@ void GLEmberController<T>::CalcDragYAxis()
 
 			it = m_DragSrcPostTransforms.find(xfindex);
 
-			if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+			if (it != m_DragSrcPostTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Post;
@@ -2289,7 +2301,7 @@ void GLEmberController<T>::CalcDragYAxis()
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
 				m_DragHandlePos = v3T((affine.O() + affine.Y()) * worldToAffineScale, 0);
-		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
+		}, eXformUpdate::UPDATE_SELECTED, false);
 	}
 }
 
@@ -2324,7 +2336,7 @@ void GLEmberController<T>::CalcDragTranslation()
 		{
 			auto it = m_DragSrcPreTransforms.find(xfindex);
 
-			if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+			if (it != m_DragSrcPreTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Affine;
@@ -2342,7 +2354,7 @@ void GLEmberController<T>::CalcDragTranslation()
 
 			it = m_DragSrcPostTransforms.find(xfindex);
 
-			if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+			if (it != m_DragSrcPostTransforms.end())
 			{
 				auto src = it->second;
 				auto& affine = xform->m_Post;
@@ -2362,7 +2374,7 @@ void GLEmberController<T>::CalcDragTranslation()
 
 			if (xform == m_FractoriumEmberController->CurrentXform())
 				m_DragHandlePos = v3T(affine.O(), 0) * worldToAffineScale;
-		}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);//Calling code will update renderer.
+		}, eXformUpdate::UPDATE_SELECTED, false);//Calling code will update renderer.
 	}
 	else
 	{
@@ -2374,7 +2386,7 @@ void GLEmberController<T>::CalcDragTranslation()
 			{
 				auto it = m_DragSrcPreTransforms.find(xfindex);
 
-				if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+				if (it != m_DragSrcPreTransforms.end())
 				{
 					auto& src = it->second;
 					auto& affine = xform->m_Affine;
@@ -2385,7 +2397,7 @@ void GLEmberController<T>::CalcDragTranslation()
 
 				it = m_DragSrcPostTransforms.find(xfindex);
 
-				if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+				if (it != m_DragSrcPostTransforms.end())
 				{
 					auto& src = it->second;
 					auto& affine = xform->m_Post;
@@ -2406,7 +2418,7 @@ void GLEmberController<T>::CalcDragTranslation()
 			{
 				auto it = m_DragSrcPreTransforms.find(xfindex);
 
-				if (it != m_DragSrcPreTransforms.end() && (m_Fractorium->DrawAllPre() || xform == m_SelectedXform))
+				if (it != m_DragSrcPreTransforms.end())
 				{
 					auto& src = it->second;
 					auto& affine = xform->m_Affine;
@@ -2415,7 +2427,7 @@ void GLEmberController<T>::CalcDragTranslation()
 
 				it = m_DragSrcPostTransforms.find(xfindex);
 
-				if (it != m_DragSrcPostTransforms.end() && (m_Fractorium->DrawAllPost() || xform == m_SelectedXform))
+				if (it != m_DragSrcPostTransforms.end())
 				{
 					auto& src = it->second;
 					auto& affine = xform->m_Post;
@@ -2426,7 +2438,7 @@ void GLEmberController<T>::CalcDragTranslation()
 
 				if (xform == m_FractoriumEmberController->CurrentXform())
 					m_DragHandlePos = v3T(affine.O(), 0) * worldToAffineScale;
-			}, eXformUpdate::UPDATE_CURRENT_AND_SELECTED, false);
+			}, eXformUpdate::UPDATE_SELECTED, false);
 		}
 	}
 }

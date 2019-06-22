@@ -97,10 +97,8 @@ void Fractorium::InitXformsAffineUI()
 	connect(ui.PostAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
 	connect(ui.SwapAffinesButton,           SIGNAL(clicked(bool)),     this, SLOT(OnSwapAffinesButtonClicked(bool)),              Qt::QueuedConnection);
 	connect(ui.ShowPreAffineAllRadio,       SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPreAffineCurrentRadio,   SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.ShowPreAffineSelectedRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.ShowPostAffineAllRadio,      SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineCurrentRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.ShowPostAffineSelectedRadio, SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.PolarAffineCheckBox,         SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)),		   Qt::QueuedConnection);
 #ifndef _WIN32
@@ -796,10 +794,8 @@ void Fractorium::SetupAffineSpinner(QTableWidget* table, const QObject* receiver
 /// GUI wrapper functions, getters only.
 /// </summary>
 
-bool Fractorium::DrawCurrentPre() { return !DrawAllPre() && !DrawSelectedPre(); }
 bool Fractorium::DrawSelectedPre()  { return ui.ShowPreAffineSelectedRadio->isChecked();  }
 bool Fractorium::DrawAllPre()  { return ui.ShowPreAffineAllRadio->isChecked();  }
-bool Fractorium::DrawCurrentPost() { return !DrawAllPost() && !DrawSelectedPost(); }
 bool Fractorium::DrawSelectedPost()  { return ui.ShowPostAffineSelectedRadio->isChecked();  }
 bool Fractorium::DrawAllPost() { return ui.ShowPostAffineAllRadio->isChecked(); }
 bool Fractorium::LocalPivot()  { return ui.LocalPivotRadio->isChecked();        }

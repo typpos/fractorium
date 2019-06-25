@@ -5026,7 +5026,7 @@ public:
 		   << "\t\treal_t t;\n"
 		   << "\t\treal_t pt = " << perturbation << " * sin(" << tpf2 << " * vIn.y);\n"
 		   << "\n"
-		   << "\t\tif (!" << damping << ")\n"
+		   << "\t\tif (" << damping << " == 0)\n"
 		   << "\t\t	t = fma(" << amplitude << ", cos(fma(" << tpf << ", vIn.x, pt)), " << separation << ");\n"
 		   << "\t\telse\n"
 		   << "\t\t	t = fma(" << amplitude << ", exp(-fabs(vIn.x) * " << damping << ") * cos(fma(" << tpf << ", vIn.x, pt)), " << separation << ");\n"

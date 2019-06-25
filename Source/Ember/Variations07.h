@@ -1581,7 +1581,7 @@ public:
 		   << "\n"
 		   << "\t\tbool add = true;\n"
 		   << "\n"
-		   << "\t\tif (" << seed << " == 1)\n"
+		   << "\t\tif (" << seed << " == (real_t)(1.0))\n"
 		   << "\t\t{\n"
 		   << "\t\t	if (!((int)rx & 1) && !((int)rz & 1))\n"
 		   << "\t\t		add = false;\n"
@@ -1861,7 +1861,7 @@ public:
 		   << "\t\treal_t y0 = sin(angle2);\n"
 		   << "\t\treal_t dist = sqrt(Sqr(FX - x0) + Sqr(FY - y0));\n"
 		   << "\n"
-		   << "\t\tif (" << inv << ")\n"
+		   << "\t\tif (" << inv << " != (real_t)(0.0))\n"
 		   << "\t\t{\n"
 		   << "\t\t	if ((dist > " << d1precalc << ") || (dist < " << d2precalc << "))\n"
 		   << "\t\t	{\n"
@@ -3007,11 +3007,12 @@ public:
 			f = f - int_angle;
 			T x = f * m_Length;
 			T z = std::sqrt(1 + SQR(x) - 2 * x * m_CosAlpha);
+			int iangle = int(int_angle);
 
-			if (!(((int)int_angle) & 1))
-				int_angle = m_2piOverPower * (((int)int_angle) / 2) + std::asin(m_SinAlpha * x / Zeps(z));
+			if (!(iangle & 1))
+				int_angle = m_2piOverPower * (iangle / 2) + std::asin(m_SinAlpha * x / Zeps(z));
 			else
-				int_angle = m_2piOverPower * (((int)int_angle) / 2) - std::asin(m_SinAlpha * x / Zeps(z));
+				int_angle = m_2piOverPower * (iangle / 2) - std::asin(m_SinAlpha * x / Zeps(z));
 
 			z *= std::sqrt(rand.Frand01<T>());
 			by = std::sin(int_angle - T(M_PI_2));
@@ -3056,11 +3057,12 @@ public:
 		   << "\t\t	f = f - int_angle;\n"
 		   << "\t\t	real_t x = f * " << length << ";\n"
 		   << "\t\t	real_t z = sqrt(1 + SQR(x) - 2 * x * " << cosalpha << ");\n"
+		   << "\t\t	int iangle = (int)int_angle;\n"
 		   << "\n"
-		   << "\t\t	if (!(((int)int_angle) & 1))\n"
-		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) + asin(" << sinalpha << " * x / Zeps(z));\n"
+		   << "\t\t	if (!(iangle & 1))\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (iangle / 2) + asin(" << sinalpha << " * x / Zeps(z));\n"
 		   << "\t\t	else\n"
-		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) - asin(" << sinalpha << " * x / Zeps(z));\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (iangle / 2) - asin(" << sinalpha << " * x / Zeps(z));\n"
 		   << "\n"
 		   << "\t\t	z *= sqrt(MwcNext01(mwc));\n"
 		   << "\t\t	by = sin(int_angle - MPI2);\n"
@@ -3155,11 +3157,12 @@ public:
 			f = f - int_angle;
 			T x = f * m_Length;
 			T z = std::sqrt(1 + SQR(x) - 2 * x * std::cos(m_Alpha));
+			int iangle = int(int_angle);
 
-			if (!(((int)int_angle) & 1))
-				int_angle = m_2piOverPower * (((int)int_angle) / 2) + std::asin(std::sin(m_Alpha) * x / Zeps(z));
+			if (!(iangle & 1))
+				int_angle = m_2piOverPower * (iangle / 2) + std::asin(std::sin(m_Alpha) * x / Zeps(z));
 			else
-				int_angle = m_2piOverPower * (((int)int_angle) / 2) - std::asin(std::sin(m_Alpha) * x / Zeps(z));
+				int_angle = m_2piOverPower * (iangle / 2) - std::asin(std::sin(m_Alpha) * x / Zeps(z));
 
 			z *= std::sqrt(rand.Frand01<T>());
 			by = std::sin(int_angle - T(M_PI_2));
@@ -3209,11 +3212,12 @@ public:
 		   << "\t\t	f = f - int_angle;\n"
 		   << "\t\t	real_t x = f * " << length << ";\n"
 		   << "\t\t	real_t z = sqrt(1 + SQR(x) - 2 * x * cos(" << alpha << "));\n"
+		   << "\t\t	int iangle = (int)int_angle;\n"
 		   << "\n"
-		   << "\t\t	if (!(((int)int_angle) & 1))\n"
-		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) + asin(sin(" << alpha << ") * x / Zeps(z));\n"
+		   << "\t\t	if (!(iangle & 1))\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (iangle / 2) + asin(sin(" << alpha << ") * x / Zeps(z));\n"
 		   << "\t\t	else\n"
-		   << "\t\t		int_angle = " << twopioverpower << " * (((int)int_angle) / 2) - asin(sin(" << alpha << ") * x / Zeps(z));\n"
+		   << "\t\t		int_angle = " << twopioverpower << " * (iangle / 2) - asin(sin(" << alpha << ") * x / Zeps(z));\n"
 		   << "\n"
 		   << "\t\t	z *= sqrt(MwcNext01(mwc));\n"
 		   << "\t\t	by = sin(int_angle - MPI2);\n"

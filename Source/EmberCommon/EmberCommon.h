@@ -736,6 +736,38 @@ bool SearchVar(const Variation<T>* var, const vector<string>& stringVec, bool ma
 	return ret;
 }
 
+template <typename T>
+bool SearchVarWWO(const Variation<T>* var, const vector<string>& withVec, const vector<string>& withoutVec)
+{
+	bool ret = false;
+	size_t i, j, k;
+	bool onegood = false;
+	auto cl = var->OpenCLFuncsString() + "\n" + var->OpenCLString();
+	vector<string> clsplits = Split(cl, '\n');
+
+	for (i = 0; i < clsplits.size(); i++)
+	{
+		for (j = 0; j < withVec.size(); j++)
+		{
+			if (clsplits[i].find(withVec[j]) != std::string::npos)
+			{
+				for (k = 0; k < withoutVec.size(); k++)
+				{
+					if (clsplits[i].find(withoutVec[k]) != std::string::npos)
+					{
+						return false;
+					}
+				}
+
+				onegood = true;
+			}
+		}
+	}
+
+	return onegood;
+	//return i == clsplits.size() && j == withVec.size() && k == withoutVec.size();
+}
+
 /// <summary>
 /// Find all variations whose OpenCL string contains any of the search strings in stringVec.
 /// This is useful for finding variations with certain characteristics since it's not possible
@@ -760,6 +792,23 @@ static vector<const Variation<T>*> FindVarsWith(const vector<const Variation<T>*
 
 			if (!findAll)
 				break;
+		}
+	}
+
+	return vec;
+}
+
+template <typename T>
+static vector<const Variation<T>*> FindVarsWithWithout(const vector<const Variation<T>*>& vars, const vector<string>& withVec, const vector<string>& withoutVec)
+{
+	vector<const Variation<T>*> vec;
+	auto vl = VariationList<T>::Instance();
+
+	for (auto& v : vars)
+	{
+		if (SearchVarWWO<T>(v, withVec, withoutVec))
+		{
+			vec.push_back(v);
 		}
 	}
 

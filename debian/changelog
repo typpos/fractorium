@@ -1,3 +1,9 @@
+fractorium (1.0.0.17-0ubuntu1) bionic; urgency=low
+
+  * release 1.0.0.17
+
+ -- Matt Feemster <matt.feemster@gmail.com>  Mon, 24 Jun 2019 20:30:00 -0700
+ 
 fractorium (1.0.0.16-0ubuntu1) bionic; urgency=low
 
   * release 1.0.0.16

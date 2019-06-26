@@ -2190,7 +2190,7 @@ public:
 			helper.Out.x = m_Weight * xi + m_X;
 			helper.Out.y = m_Weight * yi + m_Y;
 		}
-		else if (!cr0 &&  esc)
+		else if (!cr0 && esc)
 		{
 			helper.Out.x = m_Weight * rdc * c + m_X;
 			helper.Out.y = m_Weight * rdc * s + m_Y;
@@ -2360,7 +2360,7 @@ public:
 		   << "\n"
 		   << "\t\tif (rad > " << out << " || rad < " << in << ")\n"
 		   << "\t\t{\n"
-		   << "\t\t	if (!" << zero << ")\n"
+		   << "\t\t	if (" << zero << " == 0)\n"
 		   << "\t\t	{\n"
 		   << "\t\t		s = sin(ang) * " << outweight << ";\n"
 		   << "\t\t		c = cos(ang) * " << outweight << ";\n"

@@ -625,7 +625,6 @@ public:
 	{
 		m_PreviewRun = false;
 		m_PreviewRenderer.Abort();
-		m_PreviewResult.cancel();
 		m_PreviewResult.waitForFinished();
 	}
 

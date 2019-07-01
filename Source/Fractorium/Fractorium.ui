@@ -4412,6 +4412,11 @@
                       </property>
                       <item>
                        <property name="text">
+                        <string>101</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
                         <string>110</string>
                        </property>
                       </item>
@@ -4665,6 +4670,11 @@
                       <property name="frame">
                        <bool>true</bool>
                       </property>
+                      <item>
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                      </item>
                       <item>
                        <property name="text">
                         <string>5</string>
@@ -5281,6 +5291,11 @@
                       </property>
                       <item>
                        <property name="text">
+                        <string>1</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
                         <string>5</string>
                        </property>
                       </item>
@@ -5620,6 +5635,11 @@
                       <property name="frame">
                        <bool>true</bool>
                       </property>
+                      <item>
+                       <property name="text">
+                        <string>101</string>
+                       </property>
+                      </item>
                       <item>
                        <property name="text">
                         <string>110</string>

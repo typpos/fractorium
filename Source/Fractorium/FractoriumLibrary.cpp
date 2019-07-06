@@ -132,7 +132,6 @@ void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 {
 	auto it = m_EmberFile.m_Embers.begin();
 	auto tree = m_Fractorium->ui.LibraryTree;
-	tree->blockSignals(true);
 
 	if (auto top = tree->topLevelItem(0))
 	{
@@ -154,8 +153,6 @@ void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 			}
 		}
 	}
-
-	tree->blockSignals(false);
 }
 
 /// <summary>
@@ -173,8 +170,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 	vector<byte> v(size * size * 4);
 	StopAllPreviewRenderers();
 	tree->clear();
-	QCoreApplication::flush();
-	tree->blockSignals(true);
+	QCoreApplication::processEvents();
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_EmberFile.m_Filename);
 	fileItem->setText(0, info.fileName());
@@ -194,13 +190,10 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 		emberItem->SetImage(v, size, size);
 	}
 
-	tree->blockSignals(false);
-
 	if (selectIndex != -1)
 		m_Fractorium->SelectLibraryItem(selectIndex);
 
 	m_Fractorium->SyncFileCountToSequenceCount();
-	QCoreApplication::flush();
 	RenderLibraryPreviews(0, uint(m_EmberFile.Size()));
 	tree->expandAll();
 }
@@ -220,7 +213,6 @@ void FractoriumEmberController<T>::UpdateLibraryTree()
 	{
 		int origChildCount = top->childCount();
 		int i = origChildCount;
-		tree->blockSignals(true);
 
 		for (auto it = Advance(m_EmberFile.m_Embers.begin(), i); it != m_EmberFile.m_Embers.end(); ++it)
 		{
@@ -238,7 +230,6 @@ void FractoriumEmberController<T>::UpdateLibraryTree()
 		//When adding elements, ensure all indices are sequential.
 		SyncLibrary(eLibraryUpdate::INDEX);
 		m_Fractorium->SyncFileCountToSequenceCount();
-		tree->blockSignals(false);
 		RenderLibraryPreviews(origChildCount, uint(m_EmberFile.Size()));
 	}
 }
@@ -277,7 +268,6 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 			if (oldName == newName)//If nothing changed, nothing to do.
 				return;
 
-			tree->blockSignals(true);
 			emberItem->UpdateEmberName();//Copy edit text to the ember's name variable.
 			m_EmberFile.MakeNamesUnique();//Ensure all names remain unique.
 			SyncLibrary(eLibraryUpdate::NAME);//Copy all ember names to the tree items since some might have changed to be made unique.
@@ -288,8 +278,6 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 				m_Ember.m_Name = newName;
 				m_LastSaveCurrent = "";//Reset will force the dialog to show on the next save current since the user probably wants a different name.
 			}
-
-			tree->blockSignals(false);
 		}
 		else if (auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
 		{
@@ -433,8 +421,6 @@ void FractoriumEmberController<T>::RenderPreviews(QTreeWidget* tree, TreePreview
 
 	if (start == UINT_MAX && end == UINT_MAX)
 	{
-		tree->blockSignals(true);
-
 		if (auto top = tree->topLevelItem(0))
 		{
 			int childCount = top->childCount();
@@ -445,7 +431,6 @@ void FractoriumEmberController<T>::RenderPreviews(QTreeWidget* tree, TreePreview
 					treeItem->SetImage(emptyPreview, PREVIEW_SIZE, PREVIEW_SIZE);
 		}
 
-		tree->blockSignals(false);
 		renderer->Render(0, uint(file.Size()));
 	}
 	else
@@ -490,8 +475,7 @@ void FractoriumEmberController<T>::FillSequenceTree()
 	vector<byte> v(size * size * 4);
 	m_SequencePreviewRenderer->Stop();
 	tree->clear();
-	QCoreApplication::flush();
-	tree->blockSignals(true);
+	QCoreApplication::processEvents();//Having to flush events is usually a sign of poor design. However, in this case, it's critical to have this here, else rapid button clicks will crash.
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_SequenceFile.m_Filename);
 	fileItem->setText(0, info.fileName());
@@ -503,19 +487,18 @@ void FractoriumEmberController<T>::FillSequenceTree()
 		auto emberItem = new EmberTreeWidgetItemBase(fileItem);
 
 		if (it.m_Name.empty())
-			emberItem->setText(0, ToString(i++));
+			emberItem->setText(0, ToString(i));
 		else
 			emberItem->setText(0, it.m_Name.c_str());
 
+		i++;
 		emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		emberItem->setToolTip(0, emberItem->text(0));
 		emberItem->SetImage(v, size, size);
 	}
 
-	tree->blockSignals(false);
-	QCoreApplication::flush();
-	RenderSequencePreviews(0, uint(m_SequenceFile.Size()));
 	tree->expandAll();
+	RenderSequencePreviews(0, uint(m_SequenceFile.Size()));
 }
 
 /// <summary>

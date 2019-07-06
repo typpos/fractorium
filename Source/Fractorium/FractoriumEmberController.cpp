@@ -400,11 +400,14 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 					//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
 					//This ensures the events are processed in order as each preview is updated, and that control does not return here
 					//until the update is complete.
-					QMetaObject::invokeMethod(f, "SetLibraryTreeItemData", Qt::BlockingQueuedConnection,
-											  Q_ARG(EmberTreeWidgetItemBase*, treeItem),
-											  Q_ARG(vv4F&, m_PreviewFinalImage),
-											  Q_ARG(uint, PREVIEW_SIZE),
-											  Q_ARG(uint, PREVIEW_SIZE));
+					if (m_PreviewRun)
+					{
+						QMetaObject::invokeMethod(f, "SetLibraryTreeItemData", Qt::DirectConnection,
+												  Q_ARG(EmberTreeWidgetItemBase*, treeItem),
+												  Q_ARG(vv4F&, m_PreviewFinalImage),
+												  Q_ARG(uint, PREVIEW_SIZE),
+												  Q_ARG(uint, PREVIEW_SIZE));
+					}
 				}
 			}
 		}

@@ -269,7 +269,7 @@ Palette<T>* PaletteList<T>::GetRandomPalette()
 	while (attempts < Size() * 10)
 	{
 		auto p = s_Palettes.begin();
-		auto paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % Size();
+		auto paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(Size());
 		size_t i = 0;
 
 		//Move p forward i elements.
@@ -281,7 +281,7 @@ Palette<T>* PaletteList<T>::GetRandomPalette()
 
 		if (i < Size())
 		{
-			size_t paletteIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand() % p->second.size();
+			size_t paletteIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(p->second.size());
 
 			if (paletteIndex < p->second.size() && !p->second[paletteIndex].IsEmpty())
 				return &p->second[paletteIndex];

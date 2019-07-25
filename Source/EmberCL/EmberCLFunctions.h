@@ -174,7 +174,7 @@ static const char* RandFunctionString =
 	"\n"
 	"inline uint MwcNextRange(uint2* s, uint val)\n"
 	"{\n"
-	"	return (val == 0) ? MwcNext(s) : (MwcNext(s) % val);\n"
+	"	return (val == 0) ? MwcNext(s) : (uint)(((ulong)MwcNext(s) * (ulong)val) >> 32);\n"
 	"}\n"
 	"\n"
 	"inline real_t MwcNext01(uint2* s)\n"

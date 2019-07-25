@@ -1777,7 +1777,7 @@ public:
 		T temp = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(uint(m_AbsN))) / m_N;
 		helper.Out.x = r * std::cos(temp);
 		helper.Out.y = r * std::sin(temp);
-		helper.Out.z = r * helper.In.z / (helper.m_PrecalcSqrtSumSquares * m_AbsN);
+		helper.Out.z = r * helper.In.z / Zeps(helper.m_PrecalcSqrtSumSquares * m_AbsN);
 	}
 
 	virtual string OpenCLString() const override
@@ -1796,9 +1796,14 @@ public:
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
 		   << "\t\tvOut.y = r * sin(temp);\n"
-		   << "\t\tvOut.z = r * vIn.z / (precalcSqrtSumSquares * " << absn << ");\n"
+		   << "\t\tvOut.z = r * vIn.z / Zeps(precalcSqrtSumSquares * " << absn << ");\n"
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
 	}
 
 	virtual void Precalc() override

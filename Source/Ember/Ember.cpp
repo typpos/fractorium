@@ -18,7 +18,11 @@ template EMBER_API class QTIsaac<ISAAC_SIZE, ISAAC_INT>;
 #include "Point.h"
 #include "VarFuncs.h"
 #include "Variation.h"
-#include "Variations01.h"
+#ifdef FLAM3_COMPAT
+	#include "Variations01_flam3_compat.h"//Do this instead if you want full compatibility with flam3.
+#else
+	#include "Variations01.h"
+#endif
 #include "Variations02.h"
 #include "Variations03.h"
 #include "Variations04.h"

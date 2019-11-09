@@ -613,14 +613,13 @@ void Fractorium::SetPaletteFileComboIndex(const string& filename)
 template <typename T>
 void FractoriumEmberController<T>::ClearColorCurves(int i)
 {
-	Update([&]
+	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
 		if (i < 0)
-			m_Ember.m_Curves.Init();
+			ember.m_Curves.Init();
 		else
-			m_Ember.m_Curves.Init(i);
-
-	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+			ember.m_Curves.Init(i);
+	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
 	FillCurvesControl();
 }
 

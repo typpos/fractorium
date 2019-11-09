@@ -69,6 +69,7 @@ public:
 	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory() { return tuple<size_t, size_t, size_t>(0, 0, 0); }
 	virtual double OriginalAspect() { return 1; }
 	virtual QString ComposePath(const QString& name) { return ""; }
+	virtual bool BumpQualityRender(double d) { return false; }
 	virtual void CancelRender() { }
 	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) { return ""; }
 
@@ -78,6 +79,7 @@ public:
 
 protected:
 	bool m_Run = false;
+	bool m_IsQualityBump = false;
 	size_t m_ImageCount = 0;
 	std::atomic<size_t> m_FinishedImageCount;
 
@@ -114,6 +116,7 @@ public:
 #endif
 	virtual void SetEmber(size_t index, bool verbatim) override;
 	virtual bool Render() override;
+	virtual bool BumpQualityRender(double d) override;
 	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
 	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
 	virtual size_t Index() const override { return m_Ember->m_Index; }

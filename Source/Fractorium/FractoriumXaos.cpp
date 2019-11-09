@@ -206,7 +206,10 @@ void Fractorium::FillXaosTable()
 template <typename T>
 void FractoriumEmberController<T>::ClearXaos()
 {
-	Update([&] { m_Ember.ClearXaos(); });
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.ClearXaos();
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 	FillXaos();
 	FillAppliedXaos();
 }

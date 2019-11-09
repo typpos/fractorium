@@ -1193,6 +1193,25 @@
           </spacer>
          </item>
          <item>
+          <widget class="QToolButton" name="FinalRenderBumpQualityStartButton">
+           <property name="text">
+            <string>Add Quality</string>
+           </property>
+           <property name="popupMode">
+            <enum>QToolButton::MenuButtonPopup</enum>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextOnly</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+           <property name="arrowType">
+            <enum>Qt::NoArrow</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="FinalRenderStartButton">
            <property name="focusPolicy">
             <enum>Qt::TabFocus</enum>

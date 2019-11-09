@@ -647,7 +647,9 @@ static bool StripsRender(RendererBase* renderer, Ember<T>& ember, vector<v4F>& f
 	ember.m_Quality /= strips;
 	ember.m_FinalRasH = realHeight;
 	ember.m_CenterY = centerY;
-	renderer->SetEmber(ember);//Further processing will require the dimensions to match the original ember, so re-assign.
+
+	if (strips > 1)
+		renderer->SetEmber(ember);//Further processing will require the dimensions to match the original ember, so re-assign.
 
 	if (success)
 		allStripsFinished(ember);

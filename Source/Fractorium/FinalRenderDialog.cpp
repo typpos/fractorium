@@ -840,7 +840,7 @@ void FractoriumFinalRenderDialog::Pause(bool paused)
 /// <param name="e">The event</param>
 void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 {
-	if (m_Controller.get() && m_Controller->m_Run)//On Linux, this event will be called when the main window minimized/maximized while rendering, so filter it out.
+	if (m_Controller.get())//On Linux, this event will be called when the main window minimized/maximized, so filter it out if the window and controller have already been created.
 		return;
 
 	QString firstfile;

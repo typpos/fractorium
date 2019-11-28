@@ -880,6 +880,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.AddFinalXformButton);
 	w = SetTabOrder(this, w, m_XformWeightSpin);
 	w = SetTabOrder(this, w, m_XformWeightSpinnerButtonWidget->m_Button);
+	w = SetTabOrder(this, w, m_XformNameEdit);
 	w = SetTabOrder(this, m_XformColorIndexSpin, ui.XformColorScroll);//Xforms color.
 	w = SetTabOrder(this, w, ui.RandomColorIndicesButton);
 	w = SetTabOrder(this, w, ui.ToggleColorIndicesButton);

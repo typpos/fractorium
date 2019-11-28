@@ -255,7 +255,7 @@ public slots:
 	void OnAddFinalXformButtonClicked(bool checked);
 	void OnXformWeightChanged(double d);
 	void OnEqualWeightButtonClicked(bool checked);
-	void OnXformNameChanged(int row, int col);
+	void OnXformNameChanged(const QString& s);
 	void OnXformAnimateCheckBoxStateChanged(int state);
 
 	//Xforms Affine.
@@ -504,6 +504,7 @@ private:
 	//Xforms.
 	DoubleSpinBox* m_XformWeightSpin;
 	SpinnerLabelButtonWidget* m_XformWeightSpinnerButtonWidget;
+	QLineEdit* m_XformNameEdit;
 	QFormLayout* m_XformsSelectionLayout;
 	vector<QCheckBox*> m_XformSelections;
 

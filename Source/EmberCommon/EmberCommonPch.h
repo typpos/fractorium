@@ -67,11 +67,15 @@
 	#include <OpenEXR/ImfRgbaFile.h>
 	#include <OpenEXR/ImfStringAttribute.h>
 	#include <OpenEXR/half.h>
-    #define ENUM_DYLD_BOOL
-    #include <mach-o/dyld.h>
+	#include <OpenEXR/ImfChannelList.h>
+	#include <OpenEXR/ImfOutputFile.h>
+	#define ENUM_DYLD_BOOL
+	#include <mach-o/dyld.h>
 #else
 	#include <ImfRgbaFile.h>
 	#include <ImfStringAttribute.h>
+	#include <ImfChannelList.h>
+	#include <ImfOutputFile.h>
 	#include <half.h>
 #endif
 

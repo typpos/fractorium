@@ -163,22 +163,42 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_SupersampleSpin->setValue(m_Settings->FinalSupersample());
 	m_StripsSpin->setValue(int(m_Settings->FinalStrips()));
 	Scale(eScaleType(m_Settings->FinalScale()));
-	auto menu = new QMenu(this);
+	auto bumpmenu = new QMenu(this);
 	auto add10 = new QAction("Add 10% quality", this); add10->setProperty("tag", QVariant(0.10));
 	auto add25 = new QAction("Add 25% quality", this); add25->setProperty("tag", QVariant(0.25));
 	auto add50 = new QAction("Add 50% quality", this); add50->setProperty("tag", QVariant(0.50));
 	auto add100 = new QAction("Add 100% quality", this); add100->setProperty("tag", QVariant(1.0));
 	auto add200 = new QAction("Add 200% quality", this); add200->setProperty("tag", QVariant(2.0));
-	menu->addAction(add10);
-	menu->addAction(add25);
-	menu->addAction(add50);
-	menu->addAction(add100);
-	menu->addAction(add200);
-	ui.FinalRenderBumpQualityStartButton->setMenu(menu);
+	bumpmenu->addAction(add10);
+	bumpmenu->addAction(add25);
+	bumpmenu->addAction(add50);
+	bumpmenu->addAction(add100);
+	bumpmenu->addAction(add200);
+	ui.FinalRenderBumpQualityStartButton->setMenu(bumpmenu);
 	ui.FinalRenderBumpQualityStartButton->setProperty("tag", add25->property("tag"));
 	ui.FinalRenderBumpQualityStartButton->setText(add25->text());
 	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
+	auto saamenu = new QMenu(this);
+#ifdef _WIN32
+	auto saabmp = new QAction("bmp", this);
+	saamenu->addAction(saabmp);
+	connect(saabmp, SIGNAL(triggered()), this, SLOT(OnSaveAgainAsClicked()));
+#endif
+	auto saajpg = new QAction("jpg", this);
+	auto saapng = new QAction("png", this);
+	auto saaexr = new QAction("exr", this);
+	saamenu->addAction(saajpg);
+	saamenu->addAction(saapng);
+	saamenu->addAction(saaexr);
+	ui.FinalRenderSaveAgainAsButton->setMenu(saamenu);
+	ui.FinalRenderSaveAgainAsButton->setProperty("tag", "jpg");
+	ui.FinalRenderSaveAgainAsButton->setText("Save again as jpg");
+	ui.FinalRenderSaveAgainAsButton->setEnabled(false);
+	connect(ui.FinalRenderSaveAgainAsButton, SIGNAL(clicked()), this, SLOT(OnSaveAgainAsClicked()));
 	connect(ui.FinalRenderBumpQualityStartButton, SIGNAL(clicked()), this, SLOT(OnQualityBumpClicked()));
+	connect(saajpg, SIGNAL(triggered()), this, SLOT(OnSaveAgainAsClicked()));
+	connect(saapng, SIGNAL(triggered()), this, SLOT(OnSaveAgainAsClicked()));
+	connect(saaexr, SIGNAL(triggered()), this, SLOT(OnSaveAgainAsClicked()));
 	connect(add10, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
 	connect(add25, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
 	connect(add50, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
@@ -246,6 +266,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	w = SetTabOrder(this, w, m_PrefixEdit);
 	w = SetTabOrder(this, w, m_SuffixEdit);
 	w = SetTabOrder(this, w, ui.FinalRenderTextOutput);
+	w = SetTabOrder(this, w, ui.FinalRenderSaveAgainAsButton);
 	w = SetTabOrder(this, w, ui.FinalRenderBumpQualityStartButton);
 	w = SetTabOrder(this, w, ui.FinalRenderStartButton);
 	w = SetTabOrder(this, w, ui.FinalRenderPauseButton);
@@ -457,6 +478,7 @@ void FractoriumFinalRenderDialog::OnDoAllCheckBoxStateChanged(int state)
 		ui.FinalRenderDoSequenceCheckBox->setChecked(false);
 
 	ui.FinalRenderDoSequenceCheckBox->setEnabled(ui.FinalRenderDoAllCheckBox->isChecked());
+	ui.FinalRenderSaveAgainAsButton->setEnabled(false);
 	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 }
 
@@ -499,6 +521,7 @@ void FractoriumFinalRenderDialog::OnApplyAllCheckBoxStateChanged(int state)
 	if (state && m_Controller.get())
 		m_Controller->SyncGuiToEmbers();
 
+	ui.FinalRenderSaveAgainAsButton->setEnabled(false);
 	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 }
 
@@ -777,6 +800,34 @@ void FractoriumFinalRenderDialog::OnQualityBumpClicked()
 }
 
 /// <summary>
+/// Save the last rendered image output again to a different file format.
+/// Note this is only when rendering a single image with no strips.
+/// </summary>
+void FractoriumFinalRenderDialog::OnSaveAgainAsClicked()
+{
+	auto act = qobject_cast<QAction*>(sender());
+	auto tbtn = qobject_cast<QToolButton*>(sender());
+
+	if (tbtn)
+	{
+		if (m_Controller.get())
+		{
+			auto s = tbtn->property("tag").toString();
+			m_Tbcw->m_Combo->blockSignals(true);
+			m_Tbcw->m_Combo->setCurrentText(s);
+			m_Tbcw->m_Combo->blockSignals(false);
+			auto filename = m_Controller->SaveCurrentAgain();
+			ui.FinalRenderTextOutput->append("\nSaved again as " + filename);
+		}
+	}
+	else if (act)
+	{
+		ui.FinalRenderSaveAgainAsButton->setText("Save again as " + act->text());
+		ui.FinalRenderSaveAgainAsButton->setProperty("tag", act->text());
+	}
+}
+
+/// <summary>
 /// Start the render process.
 /// </summary>
 /// <param name="checked">Ignored</param>
@@ -998,6 +1049,7 @@ bool FractoriumFinalRenderDialog::SetMemory()
 		else
 			ui.FinalRenderTextOutput->clear();
 
+		ui.FinalRenderSaveAgainAsButton->setEnabled(false);
 		ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 		return true;
 	}

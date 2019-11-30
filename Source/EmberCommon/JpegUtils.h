@@ -364,9 +364,9 @@ static bool WriteBmp(const char* filename, byte* image, size_t width, size_t hei
 }
 
 /// <summary>
-/// Write an EXR file.
-/// This is used for extreme color precision because it uses
-/// floats for each color channel.
+/// Write an EXR file which will use the 16 bit half float format for each pixel channel.
+/// This is used for high color precision because it uses
+/// HALFS for each color channel.
 /// </summary>
 /// <param name="filename">The full path and name of the file</param>
 /// <param name="image">Pointer to the image data to write</param>
@@ -378,7 +378,7 @@ static bool WriteBmp(const char* filename, byte* image, size_t width, size_t hei
 /// <param name="url">Url of the author</param>
 /// <param name="nick">Nickname of the author</param>
 /// <returns>True if success, else false</returns>
-static bool WriteExr(const char* filename, Rgba* image, size_t width, size_t height, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
+static bool WriteExr16(const char* filename, Rgba* image, size_t width, size_t height, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
 {
 	try
 	{
@@ -410,6 +410,92 @@ static bool WriteExr(const char* filename, Rgba* image, size_t width, size_t hei
 		}
 
 		file->setFrameBuffer(image, 1, iw);
+		file->writePixels(ih);
+		return true;
+	}
+	catch (std::exception e)
+	{
+		cout << e.what() << endl;
+		return false;
+	}
+}
+
+/// <summary>
+/// Write an EXR file which will use the 32 bit half float format for each pixel channel.
+/// This is used for extreme color precision because it uses
+/// floats for each color channel.
+/// </summary>
+/// <param name="filename">The full path and name of the file</param>
+/// <param name="r">Pointer to the red image data to write</param>
+/// <param name="g">Pointer to the green image data to write</param>
+/// <param name="b">Pointer to the blue image data to write</param>
+/// <param name="a">Pointer to the alpha image data to write</param>
+/// <param name="width">Width of the image in pixels</param>
+/// <param name="height">Height of the image in pixels</param>
+/// <param name="enableComments">True to embed comments, else false</param>
+/// <param name="comments">The comment string to embed</param>
+/// <param name="id">Id of the author</param>
+/// <param name="url">Url of the author</param>
+/// <param name="nick">Nickname of the author</param>
+/// <returns>True if success, else false</returns>
+static bool WriteExr32(const char* filename, float* r, float* g, float* b, float* a, size_t width, size_t height, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
+{
+	try
+	{
+		int iw = int(width);
+		int ih = int(height);
+		std::unique_ptr<OutputFile> file;
+
+		try
+		{
+			rlg l(fileCs);
+			Header header(iw, ih);
+			header.channels().insert("R", Channel(PixelType::FLOAT));
+			header.channels().insert("G", Channel(PixelType::FLOAT));
+			header.channels().insert("B", Channel(PixelType::FLOAT));
+			header.channels().insert("A", Channel(PixelType::FLOAT));
+			file = std::make_unique<OutputFile>(filename, header);
+		}
+		catch (std::exception)
+		{
+			return false;
+		}
+
+		if (enableComments)
+		{
+			auto& header = const_cast<Imf::Header&>(file->header());
+			header.insert("ember_version", StringAttribute(EmberVersion()));
+			header.insert("ember_nickname", StringAttribute(nick));
+			header.insert("ember_url", StringAttribute(url));
+			header.insert("ember_id", StringAttribute(id));
+			header.insert("ember_error_rate", StringAttribute(comments.m_Badvals));
+			header.insert("ember_samples", StringAttribute(comments.m_NumIters));
+			header.insert("ember_time", StringAttribute(comments.m_Runtime));
+			header.insert("ember_genome", StringAttribute(comments.m_Genome));
+		}
+
+		FrameBuffer frameBuffer;
+		frameBuffer.insert("R",
+						   Slice(PixelType::FLOAT,
+								 (char*)r,
+								 sizeof(*r) * 1,
+								 sizeof(*r) * width));
+		frameBuffer.insert("G",
+						   Slice(PixelType::FLOAT,
+								 (char*)g,
+								 sizeof(*g) * 1,
+								 sizeof(*g) * width));
+		frameBuffer.insert("B",
+						   Slice(PixelType::FLOAT,
+								 (char*)b,
+								 sizeof(*b) * 1,
+								 sizeof(*b) * width));
+		frameBuffer.insert("A",
+						   Slice(PixelType::FLOAT,
+								 (char*)a,
+								 sizeof(*a) * 1,
+								 sizeof(*a) * width));
+		file->setFrameBuffer(frameBuffer);
 		file->writePixels(ih);
 		return true;
 	}

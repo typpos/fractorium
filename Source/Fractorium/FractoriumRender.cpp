@@ -118,13 +118,13 @@ void FractoriumEmberController<T>::DeleteRenderer()
 /// <param name="pixels">The buffer containing the pixels</param>
 /// <param name="width">The width in pixels of the image</param>
 /// <param name="height">The height in pixels of the image</param>
-/// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png.</param>
+/// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png/32-bits per channel when saving as Exr.</param>
 /// <param name="transparency">Whether to use alpha when saving as Png or Exr.</param>
 void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
 {
 	if (filename != "")
 	{
-		bool b = false;
+		bool ret = false;
 		auto size = width * height;
 		auto settings = m_Fractorium->m_Settings;
 		QFileInfo fileInfo(filename);
@@ -149,9 +149,9 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 			Rgba32ToRgb8(data, rgb8Image.data(), width, height);
 
 			if (suffix.endsWith("bmp", Qt::CaseInsensitive))
-				b = WriteBmp(s.c_str(), rgb8Image.data(), width, height);
+				ret = WriteBmp(s.c_str(), rgb8Image.data(), width, height);
 			else if (suffix.endsWith("jpg", Qt::CaseInsensitive))
-				b = WriteJpeg(s.c_str(), rgb8Image.data(), width, height, 100, true, comments, id, url, nick);
+				ret = WriteJpeg(s.c_str(), rgb8Image.data(), width, height, 100, true, comments, id, url, nick);
 		}
 		else if (suffix.endsWith("png", Qt::CaseInsensitive))
 		{
@@ -159,20 +159,32 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 			{
 				vector<byte> rgba8Image(size * 4);
 				Rgba32ToRgba8(data, rgba8Image.data(), width, height, transparency);
-				b = WritePng(s.c_str(), rgba8Image.data(), width, height, 1, true, comments, id, url, nick);
+				ret = WritePng(s.c_str(), rgba8Image.data(), width, height, 1, true, comments, id, url, nick);
 			}
 			else
 			{
 				vector<glm::uint16> rgba16Image(size * 4);
 				Rgba32ToRgba16(data, rgba16Image.data(), width, height, transparency);
-				b = WritePng(s.c_str(), (byte*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);
+				ret = WritePng(s.c_str(), (byte*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);
 			}
 		}
 		else if (suffix.endsWith("exr", Qt::CaseInsensitive))
 		{
-			vector<Rgba> rgba32Image(size);
-			Rgba32ToRgbaExr(data, rgba32Image.data(), width, height, transparency);
-			b = WriteExr(s.c_str(), rgba32Image.data(), width, height, true, comments, id, url, nick);
+			if (!png16Bit)//Repurpose this for EXR 32-bit.
+			{
+				vector<Rgba> rgba32Image(size);
+				Rgba32ToRgbaExr(data, rgba32Image.data(), width, height, transparency);
+				ret = WriteExr16(s.c_str(), rgba32Image.data(), width, height, true, comments, id, url, nick);
+			}
+			else
+			{
+				vector<float> r(size);
+				vector<float> g(size);
+				vector<float> b(size);
+				vector<float> a(size);
+				Rgba32ToRgba32Exr(data, r.data(), g.data(), b.data(), a.data(), width, height, transparency);
+				ret = WriteExr32(s.c_str(), r.data(), g.data(), b.data(), a.data(), width, height, true, comments, id, url, nick);
+			}
 		}
 		else
 		{
@@ -180,7 +192,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 			return;
 		}
 
-		if (b)
+		if (ret)
 			settings->SaveFolder(fileInfo.canonicalPath());
 		else
 			m_Fractorium->ShowCritical("Save Failed", "Could not save file, try saving to a different folder.", true);

@@ -263,12 +263,12 @@ static void Rgba32ToRgba16(v4F* rgba, glm::uint16* rgb, size_t width, size_t hei
 }
 
 /// <summary>
-/// Convert an RGBA 32-bit float buffer to an EXR RGBA 32-bit float buffer.
+/// Convert an RGBA 32-bit float buffer to an EXR RGBA 16-bit float buffer.
 /// The two buffers can point to the same memory location if needed.
 /// Note that this squares the values coming in, for some reason EXR expects that.
 /// </summary>
 /// <param name="rgba">The RGBA 32-bit float buffer</param>
-/// <param name="rgb">The EXR RGBA 32-bit float buffer</param>
+/// <param name="ilmfRgba">The EXR RGBA 16-bit float buffer</param>
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
 /// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
@@ -280,6 +280,30 @@ static void Rgba32ToRgbaExr(v4F* rgba, Rgba* ilmfRgba, size_t width, size_t heig
 		ilmfRgba[i].g = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
 		ilmfRgba[i].b = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
 		ilmfRgba[i].a = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
+	}
+}
+
+/// <summary>
+/// Convert an RGBA 32-bit float buffer to an EXR RGBA 32-bit float buffer.
+/// The two buffers can point to the same memory location if needed.
+/// Note that this squares the values coming in, for some reason EXR expects that.
+/// </summary>
+/// <param name="rgba">The RGBA 32-bit float buffer</param>
+/// <param name="r">The EXR red 32-bit float buffer</param>
+/// <param name="g">The EXR green 32-bit float buffer</param>
+/// <param name="b">The EXR blue 32-bit float buffer</param>
+/// <param name="a">The EXR alpha 32-bit float buffer</param>
+/// <param name="width">The width of the image in pixels</param>
+/// <param name="height">The height of the image in pixels</param>
+/// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
+static void Rgba32ToRgba32Exr(v4F* rgba, float* r, float* g, float* b, float* a, size_t width, size_t height, bool doAlpha)
+{
+	for (size_t i = 0; i < (width * height); i++)
+	{
+		r[i] = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
+		g[i] = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
+		b[i] = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
+		a[i] = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
 	}
 }
 
@@ -599,6 +623,7 @@ static bool StripsRender(RendererBase* renderer, Ember<T>& ember, vector<v4F>& f
 	vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>> randVec;
 	ember.m_Quality *= strips;
 	ember.m_FinalRasH = size_t(ceil(floatStripH));
+	Memset(finalImage);
 
 	if (strips > 1)
 		randVec = renderer->RandVec();
@@ -654,7 +679,6 @@ static bool StripsRender(RendererBase* renderer, Ember<T>& ember, vector<v4F>& f
 	if (success)
 		allStripsFinished(ember);
 
-	Memset(finalImage);
 	return success;
 }
 

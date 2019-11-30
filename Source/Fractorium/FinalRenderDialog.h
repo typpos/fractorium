@@ -112,6 +112,7 @@ public slots:
 	void OnPrefixChanged(const QString& s);
 	void OnSuffixChanged(const QString& s);
 	void OnQualityBumpClicked();
+	void OnSaveAgainAsClicked();
 	void OnRenderClicked(bool checked);
 	void OnPauseClicked(bool checked);
 	void OnCancelRenderClicked(bool checked);

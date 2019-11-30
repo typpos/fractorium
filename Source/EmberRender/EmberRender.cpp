@@ -291,10 +291,12 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 			auto size = finalEmber.m_FinalRasW * finalEmber.m_FinalRasH;
 			bool doBmp = Find(opt.Format(), "bmp");
 			bool doJpg = Find(opt.Format(), "jpg");
-			bool doExr = Find(opt.Format(), "exr");
+			bool doExr16 = Find(opt.Format(), "exr");
+			bool doExr32 = Find(opt.Format(), "exr32");
 			bool doPng8 = Find(opt.Format(), "png");
 			bool doPng16 = Find(opt.Format(), "png16");
 			bool doOnlyPng8 = doPng8 && !doPng16;
+			bool doOnlyExr16 = doExr16 && !doExr32;
 			vector<byte> rgb8Image;
 			vector<std::thread> writeFileThreads;
 			writeFileThreads.reserve(5);
@@ -335,7 +337,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				bool doBothPng = doPng16 && (opt.Format().find("png") != opt.Format().rfind("png"));
 
-				if (doBothPng || doOnlyPng8)//8-bit PNG
+				if (doBothPng || doOnlyPng8)//8-bit PNG.
 				{
 					writeFileThreads.push_back(std::thread([&]()
 					{
@@ -350,7 +352,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 					}));
 				}
 
-				if (doPng16)
+				if (doPng16)//16-bit PNG.
 				{
 					writeFileThreads.push_back(std::thread([&]()
 					{
@@ -374,19 +376,57 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 				}
 			}
 
-			if (doExr)
+			if (doExr16)
 			{
-				writeFileThreads.push_back(std::thread([&]()
-				{
-					auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "exr", padding, i, useName);
-					VerbosePrint("Writing " + filename);
-					vector<Rgba> rgba32Image(size);
-					Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-					auto writeSuccess = WriteExr(filename.c_str(), rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+				bool doBothExr = doExr32 && (opt.Format().find("exr") != opt.Format().rfind("exr"));
 
-					if (!writeSuccess)
-						cout << "Error writing " << filename << "\n";
-				}));
+				if (doBothExr || doOnlyExr16)//16-bit EXR.
+				{
+					writeFileThreads.push_back(std::thread([&]()
+					{
+						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "exr", padding, i, useName);
+						VerbosePrint("Writing " + filename);
+						vector<Rgba> rgba32Image(size);
+						Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
+						auto writeSuccess = WriteExr16(filename.c_str(),
+													   rgba32Image.data(),
+													   finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+						if (!writeSuccess)
+							cout << "Error writing " << filename << "\n";
+					}));
+				}
+
+				if (doExr32)//32-bit EXR.
+				{
+					writeFileThreads.push_back(std::thread([&]()
+					{
+						auto suffix = opt.Suffix();
+
+						if (doBothExr)//Add suffix if they specified both EXR.
+						{
+							VerbosePrint("Doing both EXR formats, so adding suffix _exr32 to avoid overwriting the same file.");
+							suffix += "_exr32";
+						}
+
+						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "exr", padding, i, useName);
+						VerbosePrint("Writing " + filename);
+						vector<float> r(size);
+						vector<float> g(size);
+						vector<float> b(size);
+						vector<float> a(size);
+						Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
+						auto writeSuccess = WriteExr32(filename.c_str(),
+													   r.data(),
+													   g.data(),
+													   b.data(),
+													   a.data(),
+													   finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+						if (!writeSuccess)
+							cout << "Error writing " << filename << "\n";
+					}));
+				}
 			}
 
 			Join(writeFileThreads);

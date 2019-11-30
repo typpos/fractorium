@@ -241,7 +241,7 @@
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save each RGBA component as 16-bits when saving Png files.&lt;/p&gt;&lt;p&gt;This leads to greater color precision for use in high end rendering and display on HDR monitors, however it makes the file size larger.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Save 16-bit Png</string>
+              <string>Save 16-bit Png/32-bit Exr</string>
              </property>
             </widget>
            </item>
@@ -1191,6 +1191,19 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="FinalRenderSaveAgainAsButton">
+           <property name="text">
+            <string>Save Again As</string>
+           </property>
+           <property name="popupMode">
+            <enum>QToolButton::MenuButtonPopup</enum>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextOnly</enum>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QToolButton" name="FinalRenderBumpQualityStartButton">

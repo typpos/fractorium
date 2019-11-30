@@ -70,6 +70,7 @@ public:
 	virtual double OriginalAspect() { return 1; }
 	virtual QString ComposePath(const QString& name) { return ""; }
 	virtual bool BumpQualityRender(double d) { return false; }
+	virtual QString SaveCurrentAgain() { return ""; }
 	virtual void CancelRender() { }
 	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) { return ""; }
 
@@ -131,6 +132,7 @@ public:
 	virtual double OriginalAspect() override { return double(m_Ember->m_OrigFinalRasW) / m_Ember->m_OrigFinalRasH; }
 	virtual QString Name() const override { return QString::fromStdString(m_Ember->m_Name); }
 	virtual QString ComposePath(const QString& name) override;
+	virtual QString SaveCurrentAgain() override;
 	virtual void CancelRender() override;
 	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) override;
 
@@ -141,8 +143,8 @@ protected:
 	virtual void Pause(bool pause) override;
 	virtual bool Paused() override;
 	void HandleFinishedProgress();
-	void SaveCurrentRender(Ember<T>& ember);
-	void SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
+	QString SaveCurrentRender(Ember<T>& ember);
+	QString SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
 	void RenderComplete(Ember<T>& ember);
 	void RenderComplete(Ember<T>& ember, const EmberStats& stats, Timing& renderTimer);
 	void SyncGuiToEmber(Ember<T>& ember, size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true);

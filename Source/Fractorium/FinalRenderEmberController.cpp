@@ -266,7 +266,6 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 					m_Renderer->SetEmber(it);
 					m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 					m_Stats.Clear();
-					Memset(m_FinalImage);
 					m_RenderTimer.Tic();//Toc() is called in RenderComplete().
 					StripsRender<T>(m_Renderer.get(), it, m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
 					[&](size_t strip) { currentStripForProgress = strip; },//Pre strip.
@@ -298,7 +297,6 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER);
 			m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 			m_Stats.Clear();
-			Memset(m_FinalImage);
 			Output(ComposePath(QString::fromStdString(m_Ember->m_Name)));
 			m_RenderTimer.Tic();//Toc() is called in RenderComplete().
 			StripsRender<T>(m_Renderer.get(), *m_Ember, m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
@@ -745,14 +743,28 @@ EmberNs::Renderer<T, float>* FinalRenderEmberController<T>::FirstOrDefaultRender
 }
 
 /// <summary>
+/// Save the output of the last rendered image using the existing image output buffer in the renderer.
+/// </summary>
+/// <returns>The full path and filename the image was saved to.</returns>
+template<typename T>
+QString FinalRenderEmberController<T>::SaveCurrentAgain()
+{
+	if (m_Ember)
+		return SaveCurrentRender(*m_Ember);
+	else
+		return "";
+}
+
+/// <summary>
 /// Save the output of the render.
 /// </summary>
 /// <param name="ember">The ember whose rendered output will be saved</param>
+/// <returns>The full path and filename the image was saved to.</returns>
 template<typename T>
-void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember)
+QString FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember)
 {
 	auto comments = m_Renderer->ImageComments(m_Stats, 0, true);
-	SaveCurrentRender(ember, comments, m_FinalImage, m_Renderer->FinalRasW(), m_Renderer->FinalRasH(), m_FinalRenderDialog->Png16Bit(), m_FinalRenderDialog->Transparency());
+	return SaveCurrentRender(ember, comments, m_FinalImage, m_Renderer->FinalRasW(), m_Renderer->FinalRasH(), m_FinalRenderDialog->Png16Bit(), m_FinalRenderDialog->Transparency());
 }
 
 /// <summary>
@@ -763,13 +775,15 @@ void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember)
 /// <param name="pixels">The buffer containing the pixels</param>
 /// <param name="width">The width in pixels of the image</param>
 /// <param name="height">The height in pixels of the image</param>
-/// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png.</param>
+/// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png/32-bits per channel when saving as Exr.</param>
 /// <param name="transparency">Whether to use alpha when saving as Png or Exr.</param>
+/// <returns>The full path and filename the image was saved to.</returns>
 template<typename T>
-void FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
+QString FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
 {
 	QString filename = ComposePath(QString::fromStdString(ember.m_Name));
 	FractoriumEmberControllerBase::SaveCurrentRender(filename, comments, pixels, width, height, png16Bit, transparency);
+	return filename;
 }
 
 /// <summary>
@@ -842,6 +856,7 @@ void FinalRenderEmberController<T>::HandleFinishedProgress()
 
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderTotalProgress, "setValue", Qt::QueuedConnection, Q_ARG(int, int((float(finishedCountCached) / float(m_ImageCount)) * 100)));
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderImageCountLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, ToString<qulonglong>(finishedCountCached) + " / " + ToString<qulonglong>(m_ImageCount)));
+	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderSaveAgainAsButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderBumpQualityStartButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
 }
 

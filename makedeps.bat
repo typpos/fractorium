@@ -1,6 +1,9 @@
 REM Make final output folder
 mkdir Deps
 
+REM uncomment if cl message is "Cannot open include file: 'stddef.h'"
+REM C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
+
 REM Move to parent of deps folders
 cd ..
 git clone https://github.com/madler/zlib.git
@@ -61,6 +64,8 @@ SET current=%cd%
 if not exist ".\output" mkdir .\output
 
 cd ..\OpenEXR
+
+REM use -G "Visual Studio 16 2019" if building in Visual Studio 2019
 
 cmake -G "Visual Studio 15 2017 Win64"^
       -DCMAKE_PREFIX_PATH="%current%\output"^

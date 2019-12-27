@@ -2240,42 +2240,79 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	//int i;
 	bool b = true;
+	size_t times = 1'000'000'001;
+	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
+	std::vector<unsigned int> vec(16, 0);
 	Timing t(4);
-	/*  vector<Ember<float>> fv;
-	    vector<Ember<double>> dv;
-	    list<Ember<float>> fl;
-	    list<Ember<double>> dl;
-	    int w = 1000, h = 1000;
-	    string filename = ".\\testexr.exr";
-	    vector<Rgba> pixels;
-	    pixels.resize(w * h);
+	/*
+		for (size_t i = 1; i < times; i++)
+		{
+			auto res = rand.Rand() % i;
+			vec[res & 15]++;
+		}
 
-	    for (auto& pix : pixels)
-	    {
-	    pix.r = 1.0;
-	    pix.b = 0.0;
-	    pix.a = 1.0;
-	    //pix.r = std::numeric_limits<float>::max();
-	    }
+		t.Toc("rand mod");
 
-	    writeRgba1(filename.c_str(), pixels.data(), w, h);
-	    TestFuncs();
-	    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
-	    auto vec = Split(line, delim, true);
+		for (auto& it : vec)
+		{
+			cout << it / (double)times << endl;
+			it = 0;
+		}
 
-	    for (auto& s : vec) cout << s << endl;
+		cout << "\n\n";
+		t.Tic();
 
-	    line = "index=0 color=2177354", delim = " =";
-	    vec = Split(line, delim, true);
+		for (size_t i = 1; i < times; i++)
+		{
+			//auto res = (uint)(((size_t)rand.Rand() * i) >> 32);
+			auto res = rand.Rand(i);
+			vec[res & 15]++;
+		}
 
-	    for (auto& s : vec) cout << s << endl;
+		t.Toc("rand mult shift");
+
+		for (auto& it : vec)
+		{
+			cout << it / (double)times << endl;
+			it = 0;
+		}
+
+		return 1;
+		  vector<Ember<float>> fv;
+		    vector<Ember<double>> dv;
+		    list<Ember<float>> fl;
+		    list<Ember<double>> dl;
+		    int w = 1000, h = 1000;
+		    string filename = ".\\testexr.exr";
+		    vector<Rgba> pixels;
+		    pixels.resize(w * h);
+
+		    for (auto& pix : pixels)
+		    {
+		    pix.r = 1.0;
+		    pix.b = 0.0;
+		    pix.a = 1.0;
+		    //pix.r = std::numeric_limits<float>::max();
+		    }
+
+		    writeRgba1(filename.c_str(), pixels.data(), w, h);
+		    TestFuncs();
+		    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
+		    auto vec = Split(line, delim, true);
+
+		    for (auto& s : vec) cout << s << endl;
+
+		    line = "index=0 color=2177354", delim = " =";
+		    vec = Split(line, delim, true);
+
+		    for (auto& s : vec) cout << s << endl;
 
 
-	    EmberContainerTester<float>::TestEmberContainer(fv);
-	    EmberContainerTester<double>::TestEmberContainer(dv);
-	    EmberContainerTester<float>::TestEmberContainer(fl);
-	    EmberContainerTester<double>::TestEmberContainer(dl);
-	    CopyCont(fv, fl);
+		    EmberContainerTester<float>::TestEmberContainer(fv);
+		    EmberContainerTester<double>::TestEmberContainer(dv);
+		    EmberContainerTester<float>::TestEmberContainer(fl);
+		    EmberContainerTester<double>::TestEmberContainer(dl);
+		    CopyCont(fv, fl);
 	*/
 	//QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(1, 2, 3);
 	//mt19937 meow(1729);

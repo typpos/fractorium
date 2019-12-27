@@ -625,7 +625,7 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 			if (opt.CloneAction() != "")
 				os << " " << opt.CloneAction();
 
-			selp0 = embers[rand.Rand() % embers.size()];
+			selp0 = embers[rand.Rand(embers.size())];
 			save = selp0;
 			aselp0 = &selp0;
 			aselp1 = nullptr;
@@ -643,7 +643,7 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 				if (doMutate)
 				{
-					selp0 = embers[rand.Rand() % embers.size()];
+					selp0 = embers[rand.Rand(embers.size())];
 					orig = selp0;
 					aselp0 = &selp0;
 					aselp1 = nullptr;
@@ -685,8 +685,8 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 				}
 				else if (doCross0)
 				{
-					i0 = rand.Rand() % embers.size();
-					i1 = rand.Rand() % embers2.size();
+					i0 = rand.Rand(embers.size());
+					i1 = rand.Rand(embers2.size());
 					selp0 = embers[i0];
 					selp1 = embers2[i1];
 					aselp0 = &selp0;

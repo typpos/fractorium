@@ -859,7 +859,7 @@ private:
 		if (params.ExactCalc == 1)
 			angXY = rand.Frand01<T>() * M_2PI;
 		else
-			angXY = (std::atan(params.ArcTan1 * (rand.Frand01<T>() - T(0.5))) / params.ArcTan2 + T(0.5) + T(rand.Rand() % glm::uint(params.NumEdges))) * params.MidAngle;
+			angXY = (std::atan(params.ArcTan1 * (rand.Frand01<T>() - T(0.5))) / params.ArcTan2 + T(0.5) + T(rand.Rand(glm::uint(params.NumEdges)))) * params.MidAngle;
 
 		sincos(angXY, &params.X, &params.Y);
 		angMem = angXY;

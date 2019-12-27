@@ -30,8 +30,9 @@ void Fractorium::InitXformsUI()
 	m_XformWeightSpinnerButtonWidget->setMaximumWidth(130);
 	connect(m_XformWeightSpinnerButtonWidget->m_Button, SIGNAL(clicked(bool)), this, SLOT(OnEqualWeightButtonClicked(bool)), Qt::QueuedConnection);
 	ui.XformWeightNameTable->setCellWidget(0, 0, m_XformWeightSpinnerButtonWidget);
-	ui.XformWeightNameTable->setItem(0, 1, new QTableWidgetItem());
-	connect(ui.XformWeightNameTable, SIGNAL(cellChanged(int, int)), this, SLOT(OnXformNameChanged(int, int)), Qt::QueuedConnection);
+	m_XformNameEdit = new QLineEdit(ui.XformWeightNameTable);
+	ui.XformWeightNameTable->setCellWidget(0, 1, m_XformNameEdit);
+	connect(m_XformNameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnXformNameChanged(const QString&)), Qt::QueuedConnection);
 	ui.CurrentXformCombo->view()->setMinimumWidth(100);
 	ui.CurrentXformCombo->view()->setMaximumWidth(500);
 	//ui.CurrentXformCombo->view()->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -405,24 +406,23 @@ void Fractorium::OnEqualWeightButtonClicked(bool checked) { m_Controller->Equali
 /// Update the corresponding xform checkbox text with the name.
 /// Called when the user types in the name cell of the table.
 /// </summary>
-/// <param name="row">The row of the cell</param>
-/// <param name="col">The col of the cell</param>
+/// <param name="s">The text of the cell</param>
 template <typename T>
-void FractoriumEmberController<T>::XformNameChanged(int row, int col)
+void FractoriumEmberController<T>::XformNameChanged(const QString& s)
 {
 	bool forceFinal = m_Fractorium->HaveFinal();
 	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
-		xform->m_Name = m_Fractorium->ui.XformWeightNameTable->item(row, col)->text().toStdString();
+		xform->m_Name = s.toStdString();
 		XformCheckboxAt(int(xfindex), [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(xfindex)); });
 	}, eXformUpdate::UPDATE_CURRENT, false);
 	FillSummary();//Manually update because this does not trigger a render, which is where this would normally be called.
 	m_Fractorium->FillXaosTable();
 }
 
-void Fractorium::OnXformNameChanged(int row, int col)
+void Fractorium::OnXformNameChanged(const QString& s)
 {
-	m_Controller->XformNameChanged(row, col);
+	m_Controller->XformNameChanged(s);
 	m_Controller->UpdateXformName(ui.CurrentXformCombo->currentIndex());
 }
 

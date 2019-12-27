@@ -163,6 +163,27 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_SupersampleSpin->setValue(m_Settings->FinalSupersample());
 	m_StripsSpin->setValue(int(m_Settings->FinalStrips()));
 	Scale(eScaleType(m_Settings->FinalScale()));
+	auto menu = new QMenu(this);
+	auto add10 = new QAction("Add 10% quality", this); add10->setProperty("tag", QVariant(0.10));
+	auto add25 = new QAction("Add 25% quality", this); add25->setProperty("tag", QVariant(0.25));
+	auto add50 = new QAction("Add 50% quality", this); add50->setProperty("tag", QVariant(0.50));
+	auto add100 = new QAction("Add 100% quality", this); add100->setProperty("tag", QVariant(1.0));
+	auto add200 = new QAction("Add 200% quality", this); add200->setProperty("tag", QVariant(2.0));
+	menu->addAction(add10);
+	menu->addAction(add25);
+	menu->addAction(add50);
+	menu->addAction(add100);
+	menu->addAction(add200);
+	ui.FinalRenderBumpQualityStartButton->setMenu(menu);
+	ui.FinalRenderBumpQualityStartButton->setProperty("tag", add25->property("tag"));
+	ui.FinalRenderBumpQualityStartButton->setText(add25->text());
+	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
+	connect(ui.FinalRenderBumpQualityStartButton, SIGNAL(clicked()), this, SLOT(OnQualityBumpClicked()));
+	connect(add10, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
+	connect(add25, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
+	connect(add50, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
+	connect(add100, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
+	connect(add200, SIGNAL(triggered()), this, SLOT(OnQualityBumpClicked()));
 	int index = 0;
 #ifdef _WIN32
 
@@ -225,6 +246,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	w = SetTabOrder(this, w, m_PrefixEdit);
 	w = SetTabOrder(this, w, m_SuffixEdit);
 	w = SetTabOrder(this, w, ui.FinalRenderTextOutput);
+	w = SetTabOrder(this, w, ui.FinalRenderBumpQualityStartButton);
 	w = SetTabOrder(this, w, ui.FinalRenderStartButton);
 	w = SetTabOrder(this, w, ui.FinalRenderPauseButton);
 	w = SetTabOrder(this, w, ui.FinalRenderStopButton);
@@ -435,6 +457,7 @@ void FractoriumFinalRenderDialog::OnDoAllCheckBoxStateChanged(int state)
 		ui.FinalRenderDoSequenceCheckBox->setChecked(false);
 
 	ui.FinalRenderDoSequenceCheckBox->setEnabled(ui.FinalRenderDoAllCheckBox->isChecked());
+	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 }
 
 /// <summary>
@@ -475,6 +498,8 @@ void FractoriumFinalRenderDialog::OnApplyAllCheckBoxStateChanged(int state)
 {
 	if (state && m_Controller.get())
 		m_Controller->SyncGuiToEmbers();
+
+	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 }
 
 /// <summary>
@@ -726,6 +751,32 @@ void FractoriumFinalRenderDialog::OnSuffixChanged(const QString& s)
 }
 
 /// <summary>
+/// Increase the quality of the last render and start rendering again.
+/// Note this is only when rendering a single image with no strips.
+/// </summary>
+void FractoriumFinalRenderDialog::OnQualityBumpClicked()
+{
+	auto act = qobject_cast<QAction*>(sender());
+	auto tbtn = qobject_cast<QToolButton*>(sender());
+
+	if (tbtn)
+	{
+		if (m_Controller.get())
+		{
+			double d = tbtn->property("tag").toDouble();
+			m_QualitySpin->SetValueStealth(std::ceil(Quality() + (Quality() * d)));
+			m_Controller->BumpQualityRender(d);
+			tbtn->setEnabled(false);
+		}
+	}
+	else if (act)
+	{
+		ui.FinalRenderBumpQualityStartButton->setText(act->text());
+		ui.FinalRenderBumpQualityStartButton->setProperty("tag", act->property("tag"));
+	}
+}
+
+/// <summary>
 /// Start the render process.
 /// </summary>
 /// <param name="checked">Ignored</param>
@@ -789,7 +840,7 @@ void FractoriumFinalRenderDialog::Pause(bool paused)
 /// <param name="e">The event</param>
 void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 {
-	if (m_Controller.get() && m_Controller->m_Run)//On Linux, this event will be called when the main window minimized/maximized while rendering, so filter it out.
+	if (m_Controller.get())//On Linux, this event will be called when the main window minimized/maximized, so filter it out if the window and controller have already been created.
 		return;
 
 	QString firstfile;
@@ -947,6 +998,7 @@ bool FractoriumFinalRenderDialog::SetMemory()
 		else
 			ui.FinalRenderTextOutput->clear();
 
+		ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 		return true;
 	}
 

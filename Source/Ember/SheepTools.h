@@ -254,7 +254,7 @@ public:
 			//Generate a 2-xform random.
 			Random(mutation, useVars, sym, 2, maxVars);
 			//Which xform to mutate?
-			modXform = m_Rand.Rand() % ember.TotalXformCount();
+			modXform = m_Rand.Rand(ember.TotalXformCount());
 			auto xform1 = ember.GetTotalXform(modXform);
 			auto xform2 = mutation.GetTotalXform(0);
 			os << "mutate xform " << modXform << " coefs";
@@ -280,7 +280,7 @@ public:
 		else if (mode == eMutateMode::MUTATE_POST_XFORMS)
 		{
 			bool same = (m_Rand.Rand() & 3) > 0;//25% chance of using the same post for all of them.
-			size_t b = 1 + m_Rand.Rand() % 6;
+			size_t b = 1 + m_Rand.Rand(6);
 			os << "mutate post xforms " << b << (same ? " same" : "");
 
 			for (size_t i = 0; i < ember.TotalXformCount(); i++)
@@ -387,7 +387,7 @@ public:
 		}
 		else if (mode == eMutateMode::MUTATE_DELETE_XFORM)
 		{
-			size_t nx = m_Rand.Rand() % ember.TotalXformCount();
+			size_t nx = m_Rand.Rand(ember.TotalXformCount());
 			os << "mutate delete xform " << nx;
 
 			if (ember.TotalXformCount() > 1)
@@ -626,7 +626,7 @@ public:
 		}
 		else
 		{
-			ember.AddXforms(xformDistrib[m_Rand.Rand() % Vlen(xformDistrib)]);
+			ember.AddXforms(xformDistrib[m_Rand.Rand(Vlen(xformDistrib))]);
 			addfinal = m_Rand.Frand01<T>() < T(0.15);//Add a final xform 15% of the time.
 
 			if (addfinal)
@@ -639,7 +639,7 @@ public:
 
 		//If useVars is empty, randomly choose one to use or decide to use multiple.
 		if (useVars.empty())
-			var = m_Rand.RandBit() ? m_Rand.Rand() % varCount : -1;
+			var = m_Rand.RandBit() ? m_Rand.Rand(varCount) : -1;
 		else
 			var = -2;
 
@@ -689,7 +689,7 @@ public:
 				else if (multid && var == -1)
 				{
 					if (xform->TotalVariationCount() < maxVars)
-						xform->AddVariation(m_VariationList->GetVariation(m_Rand.Rand() % varCount)->Copy());//Choose a random var for this xform.
+						xform->AddVariation(m_VariationList->GetVariation(m_Rand.Rand(varCount))->Copy());//Choose a random var for this xform.
 				}
 				else
 				{
@@ -722,7 +722,7 @@ public:
 								if (var != -2)
 								{
 									//Pick a random variation and use a random weight from 0-1.
-									Variation<T>* v = m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand() % varCount), m_Rand.Frand<T>(T(0.001), 1));
+									Variation<T>* v = m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand(varCount)), m_Rand.Frand<T>(T(0.001), 1));
 
 									if (v && !xform->AddVariation(v))
 										delete v;//It already existed and therefore was not added.
@@ -730,7 +730,7 @@ public:
 								else
 								{
 									//Pick a random variation from the suppled IDs and use a random weight from 0-1.
-									Variation<T>* v = m_VariationList->GetVariationCopy(useVars[m_Rand.Rand() % useVars.size()], m_Rand.Frand<T>(T(0.001), 1));
+									Variation<T>* v = m_VariationList->GetVariationCopy(useVars[m_Rand.Rand(useVars.size())], m_Rand.Frand<T>(T(0.001), 1));
 
 									if (v && !xform->AddVariation(v))
 										delete v;
@@ -760,12 +760,12 @@ public:
 						if (var != -2)
 						{
 							//Pick a random variation and use a random weight from 0-1.
-							xform->AddVariation(m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand() % varCount), m_Rand.Frand<T>(T(0.001), 1)));
+							xform->AddVariation(m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand(varCount)), m_Rand.Frand<T>(T(0.001), 1)));
 						}
 						else
 						{
 							//Pick a random variation from the suppled IDs and use a random weight from 0-1.
-							xform->AddVariation(m_VariationList->GetVariationCopy(useVars[m_Rand.Rand() % useVars.size()], m_Rand.Frand<T>(T(0.001), 1)));
+							xform->AddVariation(m_VariationList->GetVariationCopy(useVars[m_Rand.Rand(useVars.size())], m_Rand.Frand<T>(T(0.001), 1)));
 						}
 					}
 				}
@@ -779,7 +779,7 @@ public:
 		}
 
 		//Randomly add symmetry (but not if we've already added a final xform).
-		if (sym || (!(m_Rand.Rand() % 4) && !addfinal))
+		if (sym || (!(m_Rand.Rand(4)) && !addfinal))
 			ember.AddSymmetry(sym, m_Rand);
 		else
 			ember.m_Symmetry = 0;
@@ -932,7 +932,7 @@ public:
 
 		while (ntries++ < 100)
 		{
-			size_t i = m_Rand.Rand() % ember.TotalXformCount();
+			size_t i = m_Rand.Rand(ember.TotalXformCount());
 
 			if (i != excluded)
 			{

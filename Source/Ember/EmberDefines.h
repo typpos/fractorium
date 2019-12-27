@@ -38,6 +38,7 @@ static void sincos(float x, float* s, float* c)
 namespace EmberNs
 {
 #define EMBER_VERSION "1.0.0.17"
+//#define FLAM3_COMPAT 1//Uncomment this if you want full compatibility with flam3 regarding some of the trig-based variations in Variations01.h
 #define EPS6 T(1e-6)
 #define EPS std::numeric_limits<T>::epsilon()//Apoplugin.h uses -20, but it's more mathematically correct to do it this way.
 #define ISAAC_SIZE 4

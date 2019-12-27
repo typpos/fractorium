@@ -292,9 +292,10 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		}
 		else if (m_Renderer.get())//Render a single image.
 		{
+			bool isBump = m_IsQualityBump && m_GuiState.m_Strips == 1;//Should never get called with m_IsQualityBump otherwise, but check one last time to be safe.
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
-			m_Renderer->SetEmber(*m_Ember);
+			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER);
 			m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 			m_Stats.Clear();
 			Memset(m_FinalImage);
@@ -414,6 +415,35 @@ bool FinalRenderEmberController<T>::Render()
 	}
 	else
 		return false;
+}
+
+
+/// <summary>
+/// Increase the quality of the last render and start rendering again.
+/// Note this is only when rendering a single image with no strips.
+/// </summary>
+/// <param name="d">The amount to increase the quality by, expressed as a decimal percentage. Eg: 0.5 means to increase by 50%.</param>
+/// <returns>True if nothing went wrong, else false.</returns>
+template <typename T>
+bool FinalRenderEmberController<T>::BumpQualityRender(double d)
+{
+	m_Ember->m_Quality += std::ceil(m_Ember->m_Quality * d);
+	m_Renderer->SetEmber(*m_Ember, eProcessAction::KEEP_ITERATING, true);
+	QString filename = m_FinalRenderDialog->Path();
+
+	if (filename == "")
+	{
+		m_Fractorium->ShowCritical("File Error", "Please enter a valid path and filename for the output.");
+		return false;
+	}
+
+	m_IsQualityBump = true;
+	auto iterCount = m_Renderer->TotalIterCount(1);
+	m_FinalRenderDialog->ui.FinalRenderParamsTable->item(m_FinalRenderDialog->m_ItersCellIndex, 1)->setText(ToString<qulonglong>(iterCount));
+	m_FinalRenderDialog->ui.FinalRenderTextOutput->setText("Preparing all parameters.\n");
+	m_Result = QtConcurrent::run(m_FinalRenderFunc);
+	m_Settings->sync();
+	return true;
 }
 
 /// <summary>
@@ -803,6 +833,7 @@ template<typename T>
 void FinalRenderEmberController<T>::HandleFinishedProgress()
 {
 	auto finishedCountCached = m_FinishedImageCount.load();//Make sure to use the same value throughout this function even if the atomic is changing.
+	bool doAll = m_GuiState.m_DoAll && m_EmberFile.Size() > 1;
 
 	if (m_FinishedImageCount.load() != m_ImageCount)
 		ResetProgress(false);
@@ -811,6 +842,7 @@ void FinalRenderEmberController<T>::HandleFinishedProgress()
 
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderTotalProgress, "setValue", Qt::QueuedConnection, Q_ARG(int, int((float(finishedCountCached) / float(m_ImageCount)) * 100)));
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderImageCountLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, ToString<qulonglong>(finishedCountCached) + " / " + ToString<qulonglong>(m_ImageCount)));
+	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderBumpQualityStartButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
 }
 
 /// <summary>

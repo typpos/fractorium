@@ -185,7 +185,7 @@ public:
 	virtual void CurrentXformComboChanged(int index) { }
 	virtual void XformWeightChanged(double d) { }
 	virtual void EqualizeWeights() { }
-	virtual void XformNameChanged(int row, int col) { }
+	virtual void XformNameChanged(const QString& s) { }
 	virtual void XformAnimateChanged(int state) { }
 	virtual void FillXforms(int index = 0) { }
 	virtual void UpdateXformName(int index) { }
@@ -467,7 +467,7 @@ public:
 	virtual void CurrentXformComboChanged(int index) override;
 	virtual void XformWeightChanged(double d) override;
 	virtual void EqualizeWeights() override;
-	virtual void XformNameChanged(int row, int col) override;
+	virtual void XformNameChanged(const QString& s) override;
 	virtual void XformAnimateChanged(int state) override;
 	virtual void FillXforms(int index = 0) override;
 	virtual void UpdateXformName(int index) override;

@@ -148,9 +148,9 @@ public:
 	/// </summary>
 	/// <param name="upper">A value one greater than the maximum value that will be returned</param>
 	/// <returns>A value between 0 and the value passed in minus 1</returns>
-	inline T Rand(T upper)
+	inline T Rand(size_t upper)
 	{
-		return (upper == 0) ? Rand() : Rand() % upper;
+		return (upper == 0) ? Rand() : T(((size_t)Rand() * upper) >> 32);
 	}
 
 	/// <summary>
@@ -158,7 +158,7 @@ public:
 	/// </summary>
 	/// <param name="upper">A value one greater than the maximum value that will be returned</param>
 	/// <returns>A value between 0 and the value passed in minus 1</returns>
-	static inline T LockedRand(T upper)
+	static inline T LockedRand(size_t upper)
 	{
 		rlg l(*s_CS.get());
 		T t = GlobalRand->Rand(upper);
@@ -420,14 +420,14 @@ protected:
 		{
 #ifndef __ISAAC64
 			RngStep((a << 13), a, b, mm, m, m2, r, x, y);
-			RngStep((a >> 6) , a, b, mm, m, m2, r, x, y);
-			RngStep((a << 2) , a, b, mm, m, m2, r, x, y);
+			RngStep((a >> 6), a, b, mm, m, m2, r, x, y);
+			RngStep((a << 2), a, b, mm, m, m2, r, x, y);
 			RngStep((a >> 16), a, b, mm, m, m2, r, x, y);
 #else   // __ISAAC64
 			RngStep(~(a ^ (a << 21)), a, b, mm, m, m2, r, x, y);
-			RngStep(  a ^ (a >> 5)  , a, b, mm, m, m2, r, x, y);
-			RngStep(  a ^ (a << 12) , a, b, mm, m, m2, r, x, y);
-			RngStep(  a ^ (a >> 33) , a, b, mm, m, m2, r, x, y);
+			RngStep(  a ^ (a >> 5), a, b, mm, m, m2, r, x, y);
+			RngStep(  a ^ (a << 12), a, b, mm, m, m2, r, x, y);
+			RngStep(  a ^ (a >> 33), a, b, mm, m, m2, r, x, y);
 #endif  // __ISAAC64
 		}
 
@@ -437,14 +437,14 @@ protected:
 		{
 #ifndef __ISAAC64
 			RngStep((a << 13), a, b, mm, m, m2, r, x, y);
-			RngStep((a >> 6) , a, b, mm, m, m2, r, x, y);
-			RngStep((a << 2) , a, b, mm, m, m2, r, x, y);
+			RngStep((a >> 6), a, b, mm, m, m2, r, x, y);
+			RngStep((a << 2), a, b, mm, m, m2, r, x, y);
 			RngStep((a >> 16), a, b, mm, m, m2, r, x, y);
 #else   // __ISAAC64
 			RngStep(~(a ^ (a << 21)), a, b, mm, m, m2, r, x, y);
-			RngStep(  a ^ (a >> 5)  , a, b, mm, m, m2, r, x, y);
-			RngStep(  a ^ (a << 12) , a, b, mm, m, m2, r, x, y);
-			RngStep(  a ^ (a >> 33) , a, b, mm, m, m2, r, x, y);
+			RngStep(  a ^ (a >> 5), a, b, mm, m, m2, r, x, y);
+			RngStep(  a ^ (a << 12), a, b, mm, m, m2, r, x, y);
+			RngStep(  a ^ (a >> 33), a, b, mm, m, m2, r, x, y);
 #endif  // __ISAAC64
 		}
 

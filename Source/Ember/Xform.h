@@ -874,8 +874,8 @@ public:
 
 				if (m_NeedPrecalcAngles)
 				{
-					helper.m_PrecalcSina = helper.m_TransX / Zeps(helper.m_PrecalcSqrtSumSquares);
-					helper.m_PrecalcCosa = helper.m_TransY / Zeps(helper.m_PrecalcSqrtSumSquares);
+					helper.m_PrecalcCosa = helper.m_TransX / Zeps(helper.m_PrecalcSqrtSumSquares);
+					helper.m_PrecalcSina = helper.m_TransY / Zeps(helper.m_PrecalcSqrtSumSquares);
 				}
 			}
 		}

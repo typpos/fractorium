@@ -1349,8 +1349,8 @@ public:
 	T m_TransX, m_TransY, m_TransZ;//Translated point gotten by applying the affine transform to the input point gotten from the output of the previous iteration (excluding final).
 	T m_PrecalcSumSquares;//Precalculated value of the sum of the squares of the translated point.
 	T m_PrecalcSqrtSumSquares;//Precalculated value of the square root of m_PrecalcSumSquares.
-	T m_PrecalcSina;//Precalculated value of m_TransX / m_PrecalcSqrtSumSquares.
 	T m_PrecalcCosa;//Precalculated value of m_TransY / m_PrecalcSqrtSumSquares.
+	T m_PrecalcSina;//Precalculated value of m_TransX / m_PrecalcSqrtSumSquares.
 	T m_PrecalcAtanxy;//Precalculated value of atan2(m_TransX, m_TransY).
 	T m_PrecalcAtanyx;//Precalculated value of atan2(m_TransY, m_TransX).
 	v4T In, Out;
@@ -1489,8 +1489,8 @@ public:
 
 				if (m_NeedPrecalcAngles)
 				{
-					iteratorHelper.m_PrecalcSina = iteratorHelper.In.x / iteratorHelper.m_PrecalcSqrtSumSquares;
-					iteratorHelper.m_PrecalcCosa = iteratorHelper.In.y / iteratorHelper.m_PrecalcSqrtSumSquares;
+					iteratorHelper.m_PrecalcSina = iteratorHelper.In.y / Zeps(iteratorHelper.m_PrecalcSqrtSumSquares);
+					iteratorHelper.m_PrecalcCosa = iteratorHelper.In.x / Zeps(iteratorHelper.m_PrecalcSqrtSumSquares);
 				}
 			}
 		}
@@ -1520,8 +1520,8 @@ public:
 
 				if (m_NeedPrecalcAngles)
 				{
-					ss << "\tprecalcSina = vIn.x / precalcSqrtSumSquares;\n";
-					ss << "\tprecalcCosa = vIn.y / precalcSqrtSumSquares;\n";
+					ss << "\tprecalcSina = vIn.y / Zeps(precalcSqrtSumSquares);\n";
+					ss << "\tprecalcCosa = vIn.x / Zeps(precalcSqrtSumSquares);\n";
 				}
 			}
 		}

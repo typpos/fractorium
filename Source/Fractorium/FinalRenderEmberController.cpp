@@ -111,25 +111,29 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		m_GuiState = m_FinalRenderDialog->State();//Cache render settings from the GUI before running.
 		size_t i = 0;
 		bool doAll = m_GuiState.m_DoAll && m_EmberFile.Size() > 1;
+		bool isBump = !doAll && m_IsQualityBump && m_GuiState.m_Strips == 1;//Should never get called with m_IsQualityBump otherwise, but check one last time to be safe.
 		size_t currentStripForProgress = 0;//Sort of a hack to get the strip value to the progress function.
 		QString path = doAll ? ComposePath(QString::fromStdString(m_EmberFile.m_Embers.begin()->m_Name)) : ComposePath(Name());
 		QString backup = path + "_backup.flame";
-
-		//Save backup Xml.
-		if (doAll)
-			m_XmlWriter.Save(backup.toStdString().c_str(), m_EmberFile.m_Embers, 0, true, false, true, false, false);
-		else
-			m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true, false, false);
-
 		m_FinishedImageCount.store(0);
 		Pause(false);
-		SyncGuiToRenderer();
-		FirstOrDefaultRenderer()->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//When animating, only the first (primary) device has a progress parameter.
-		m_GuiState.m_Strips = VerifyStrips(m_Ember->m_FinalRasH, m_GuiState.m_Strips,
-		[&](const string & s) { Output(QString::fromStdString(s)); }, //Greater than height.
-		[&](const string & s) { Output(QString::fromStdString(s)); }, //Mod height != 0.
-		[&](const string & s) { Output(QString::fromStdString(s) + "\n"); }); //Final strips value to be set.
 		ResetProgress();
+
+		if (!isBump)
+		{
+			//Save backup Xml.
+			if (doAll)
+				m_XmlWriter.Save(backup.toStdString().c_str(), m_EmberFile.m_Embers, 0, true, false, true, false, false);
+			else
+				m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true, false, false);
+
+			SyncGuiToRenderer();
+			FirstOrDefaultRenderer()->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//When animating, only the first (primary) device has a progress parameter.
+			m_GuiState.m_Strips = VerifyStrips(m_Ember->m_FinalRasH, m_GuiState.m_Strips,
+			[&](const string & s) { Output(QString::fromStdString(s)); }, //Greater than height.
+			[&](const string & s) { Output(QString::fromStdString(s)); }, //Mod height != 0.
+			[&](const string & s) { Output(QString::fromStdString(s) + "\n"); }); //Final strips value to be set.
+		}
 
 		//The rendering process is different between doing a single image, and doing multiple.
 		if (doAll)
@@ -291,7 +295,6 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		}
 		else if (m_Renderer.get())//Render a single image.
 		{
-			bool isBump = m_IsQualityBump && m_GuiState.m_Strips == 1;//Should never get called with m_IsQualityBump otherwise, but check one last time to be safe.
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
 			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER);

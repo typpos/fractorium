@@ -235,6 +235,11 @@ XmlToEmber<T>::XmlToEmber()
 			{ "sshape_roundwidth", "smartshape_roundwidth" },
 			{ "sshape_distortion", "smartshape_distortion" },
 			{ "sshape_compensation", "smartshape_compensation" },
+			{ "post_sshape_power", "post_smartshape_power" },
+			{ "post_sshape_roundstr", "post_smartshape_roundstr" },
+			{ "post_sshape_roundwidth", "post_smartshape_roundwidth" },
+			{ "post_sshape_distortion", "post_smartshape_distortion" },
+			{ "post_sshape_compensation", "post_smartshape_compensation" },
 			{ "mult_x", "unicorngaloshen_mult_x" },
 			{ "mult_y", "unicorngaloshen_mult_y" },
 			{ "sine", "unicorngaloshen_sine" },
@@ -346,6 +351,24 @@ XmlToEmber<T>::XmlToEmber()
 			"post_scrop_static"
 		};
 		m_BadVariationNames.push_back(make_pair(make_pair(string("post_scrop"), string("post_smartcrop")), badParams));
+		badParams =
+		{
+			"sshape_power",
+			"sshape_roundstr",
+			"sshape_roundwidth",
+			"sshape_distortion",
+			"sshape_compensation"
+		};
+		m_BadVariationNames.push_back(make_pair(make_pair(string("sshape"), string("smartshape")), badParams));
+		badParams =
+		{
+			"post_sshape_power",
+			"post_sshape_roundstr",
+			"post_sshape_roundwidth",
+			"post_sshape_distortion",
+			"post_sshape_compensation"
+		};
+		m_BadVariationNames.push_back(make_pair(make_pair(string("post_sshape"), string("post_smartshape")), badParams));
 		badParams =
 		{
 			"radial_gaussian_angle"
@@ -2168,9 +2191,9 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 	if (!fromEmber && !newLinear)
 		currentEmber.Flatten(m_FlattenNames);
 
-	for (i = 0; i < currentEmber.XformCount(); i++)
-		if (soloXform >= 0 && i != soloXform)
-			currentEmber.GetXform(i)->m_Opacity = 0;//Will calc the cached adjusted viz value later.
+	if (soloXform >= 0)
+		for (i = 0; i < currentEmber.XformCount(); i++)
+			currentEmber.GetXform(i)->m_Opacity = T(i == soloXform);//Will calc the cached adjusted viz value later.
 
 	return true;
 }

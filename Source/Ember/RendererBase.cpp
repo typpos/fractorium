@@ -43,7 +43,7 @@ void RendererBase::ChangeVal(std::function<void(void)> func, eProcessAction acti
 	//new and old quality values.
 	else if (action == eProcessAction::KEEP_ITERATING)
 	{
-		if (m_ProcessState == eProcessState::ACCUM_DONE && TemporalSamples() == 1)
+		if ((m_ProcessState == eProcessState::ACCUM_DONE || m_ProcessState == eProcessState::ITER_STARTED) && TemporalSamples() == 1)
 		{
 			m_ProcessState = eProcessState::ITER_STARTED;
 			m_ProcessAction = eProcessAction::KEEP_ITERATING;

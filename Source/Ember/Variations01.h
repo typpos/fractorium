@@ -564,8 +564,8 @@ public:
 	{
 		T r = Zeps(helper.m_PrecalcSqrtSumSquares);
 		T r1 = m_Weight / r;
-		helper.Out.x = r1 * (helper.m_PrecalcCosa + std::sin(r));
-		helper.Out.y = r1 * (helper.m_PrecalcSina - std::cos(r));
+		helper.Out.x = r1 * (helper.m_PrecalcSina + std::sin(r));//Intentionally flipped.
+		helper.Out.y = r1 * (helper.m_PrecalcCosa - std::cos(r));
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -578,8 +578,8 @@ public:
 		   << "\t\treal_t r = Zeps(precalcSqrtSumSquares);\n"
 		   << "\t\treal_t r1 = " << weight << " / r;\n"
 		   << "\n"
-		   << "\t\tvOut.x = r1 * (precalcCosa + sin(r));\n"
-		   << "\t\tvOut.y = r1 * (precalcSina - cos(r));\n"
+		   << "\t\tvOut.x = r1 * (precalcSina + sin(r));\n"
+		   << "\t\tvOut.y = r1 * (precalcCosa - cos(r));\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -609,8 +609,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T r = Zeps(helper.m_PrecalcSqrtSumSquares);
-		helper.Out.x = m_Weight * helper.m_PrecalcSina / r;
-		helper.Out.y = m_Weight * helper.m_PrecalcCosa * r;
+		helper.Out.x = m_Weight * helper.m_PrecalcCosa / r;//Flipped from flam3 because flam3 had them erroneously flipped.
+		helper.Out.y = m_Weight * helper.m_PrecalcSina * r;
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -622,8 +622,8 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t r = Zeps(precalcSqrtSumSquares);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * precalcSina / r;\n"
-		   << "\t\tvOut.y = " << weight << " * precalcCosa * r;\n"
+		   << "\t\tvOut.x = " << weight << " * precalcCosa / r;\n"
+		   << "\t\tvOut.y = " << weight << " * precalcSina * r;\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -652,8 +652,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		helper.Out.x = m_Weight * helper.m_PrecalcSina * std::cos(helper.m_PrecalcSqrtSumSquares);
-		helper.Out.y = m_Weight * helper.m_PrecalcCosa * std::sin(helper.m_PrecalcSqrtSumSquares);
+		helper.Out.x = m_Weight * helper.m_PrecalcCosa * std::cos(helper.m_PrecalcSqrtSumSquares);//Flipped from flam3 because flam3 had them erroneously flipped.
+		helper.Out.y = m_Weight * helper.m_PrecalcSina * std::sin(helper.m_PrecalcSqrtSumSquares);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -663,8 +663,8 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\tvOut.x = " << weight << " * precalcSina * cos(precalcSqrtSumSquares);\n"
-		   << "\t\tvOut.y = " << weight << " * precalcCosa * sin(precalcSqrtSumSquares);\n"
+		   << "\t\tvOut.x = " << weight << " * precalcCosa * cos(precalcSqrtSumSquares);\n"
+		   << "\t\tvOut.y = " << weight << " * precalcSina * sin(precalcSqrtSumSquares);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1050,9 +1050,9 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T r = m_Weight * std::pow(helper.m_PrecalcSqrtSumSquares, helper.m_PrecalcSina);
-		helper.Out.x = r * helper.m_PrecalcCosa;
-		helper.Out.y = r * helper.m_PrecalcSina;
+		T r = m_Weight * std::pow(helper.m_PrecalcSqrtSumSquares, helper.m_PrecalcCosa);//Flipped from flam3.
+		helper.Out.x = r * helper.m_PrecalcSina;//Intentionally flipped.
+		helper.Out.y = r * helper.m_PrecalcCosa;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -1062,10 +1062,10 @@ public:
 		string weight = WeightDefineString();
 		intmax_t varIndex = IndexInXform();
 		ss << "\t{\n"
-		   << "\t\treal_t r = " << weight << " * pow(precalcSqrtSumSquares, precalcSina);\n"
+		   << "\t\treal_t r = " << weight << " * pow(precalcSqrtSumSquares, precalcCosa);\n"
 		   << "\n"
-		   << "\t\tvOut.x = r * precalcCosa;\n"
-		   << "\t\tvOut.y = r * precalcSina;\n"
+		   << "\t\tvOut.x = r * precalcSina;\n"
+		   << "\t\tvOut.y = r * precalcCosa;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1140,8 +1140,8 @@ public:
 		T dx = Zeps(m_Xform->m_Affine.C() * m_Xform->m_Affine.C());
 		T r = helper.m_PrecalcSqrtSumSquares;
 		r = m_Weight * (fmod(r + dx, 2 * dx) - dx + r * (1 - dx));
-		helper.Out.x = r * helper.m_PrecalcCosa;
-		helper.Out.y = r * helper.m_PrecalcSina;
+		helper.Out.x = r * helper.m_PrecalcSina;//Intentionally flipped, also flipped from flam3 because flam3 had them erroneously flipped.
+		helper.Out.y = r * helper.m_PrecalcCosa;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -1155,8 +1155,8 @@ public:
 		   << "\t\treal_t r = precalcSqrtSumSquares;\n"
 		   << "\n"
 		   << "\t\tr = " << weight << " * (fmod(r + dx, 2 * dx) + fma(r, ((real_t)(1.0) - dx), -dx));\n"
-		   << "\t\tvOut.x = r * precalcCosa;\n"
-		   << "\t\tvOut.y = r * precalcSina;\n"
+		   << "\t\tvOut.x = r * precalcSina;\n"
+		   << "\t\tvOut.y = r * precalcCosa;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1253,8 +1253,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T r = helper.m_PrecalcSqrtSumSquares * (m_BlobLow + m_BlobDiff * (T(0.5) + T(0.5) * std::sin(m_BlobWaves * helper.m_PrecalcAtanxy)));
-		helper.Out.x = m_Weight * helper.m_PrecalcSina * r;
-		helper.Out.y = m_Weight * helper.m_PrecalcCosa * r;
+		helper.Out.x = m_Weight * helper.m_PrecalcCosa * r;//Flipped from flam3 because flam3 had them erroneously flipped.
+		helper.Out.y = m_Weight * helper.m_PrecalcSina * r;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -1263,17 +1263,17 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
-		string weight = WeightDefineString();
-		string blobLow = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string blobHigh = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string index     = ss2.str();
+		string weight    = WeightDefineString();
+		string blobLow   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blobHigh  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string blobWaves = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string blobDiff = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blobDiff  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t r = precalcSqrtSumSquares * fma(" << blobDiff << ", fma((real_t)(0.5), sin(" << blobWaves << " * precalcAtanxy), (real_t)(0.5)), " << blobLow << ");\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * precalcSina * r;\n"
-		   << "\t\tvOut.y = " << weight << " * precalcCosa * r;\n"
+		   << "\t\tvOut.x = " << weight << " * precalcCosa * r;\n"
+		   << "\t\tvOut.y = " << weight << " * precalcSina * r;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1523,8 +1523,8 @@ public:
 	{
 		T r = helper.m_PrecalcSqrtSumSquares;
 		r += -2 * m_Rings2Val2 * int((r + m_Rings2Val2) / (2 * m_Rings2Val2)) + r * (1 - m_Rings2Val2);
-		helper.Out.x = m_Weight * helper.m_PrecalcSina * r;
-		helper.Out.y = m_Weight * helper.m_PrecalcCosa * r;
+		helper.Out.x = m_Weight * helper.m_PrecalcCosa * r;//Flipped from flam3 because flam3 had them erroneously flipped.
+		helper.Out.y = m_Weight * helper.m_PrecalcSina * r;
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -1542,8 +1542,8 @@ public:
 		   << "\n"
 		   << "\t\tr += fma((real_t)(-2.0) * " << rings2Val2 << ", (real_t)(int)((r + " << rings2Val2 << ") / ((real_t)(2.0) * " << rings2Val2 << ")), r * ((real_t)(1.0) - " << rings2Val2 << "));\n"
 		   //<< "\t\tr += -(real_t)(2.0) * " << rings2Val2 << " * (int)((r + " << rings2Val2 << ") / ((real_t)(2.0) * " << rings2Val2 << ")) + r * ((real_t)(1.0) - " << rings2Val2 << ");\n"
-		   << "\t\tvOut.x = (" << weight << " * precalcSina * r);\n"
-		   << "\t\tvOut.y = (" << weight << " * precalcCosa * r);\n"
+		   << "\t\tvOut.x = (" << weight << " * precalcCosa * r);\n"
+		   << "\t\tvOut.y = (" << weight << " * precalcSina * r);\n"
 		   << "\t\tvOut.z =  " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();

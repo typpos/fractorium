@@ -1390,7 +1390,7 @@ template <typename T>
 class CropNVariation : public ParametricVariation<T>
 {
 public:
-	CropNVariation(T weight = 1.0) : ParametricVariation<T>("cropn", eVariationId::VAR_CROPN, weight, true, true, false, false, true)
+	CropNVariation(T weight = 1.0) : ParametricVariation<T>("cropn", eVariationId::VAR_CROPN, weight, true, true, true, false, true)
 	{
 		Init();
 	}
@@ -1413,8 +1413,8 @@ public:
 			else
 			{
 				T rdc = xr + (rand.Frand01<T>() * T(0.5) * m_ScatterDist);
-				helper.Out.x = m_Weight * rdc * std::cos(helper.m_PrecalcAtanyx);
-				helper.Out.y = m_Weight * rdc * std::sin(helper.m_PrecalcAtanyx);
+				helper.Out.x = m_Weight * rdc * helper.m_PrecalcCosa;
+				helper.Out.y = m_Weight * rdc * helper.m_PrecalcSina;
 			}
 		}
 		else
@@ -1431,14 +1431,14 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
-		string weight = WeightDefineString();
-		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string index       = ss2.str();
+		string weight      = WeightDefineString();
+		string power       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scatterDist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string zero = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string workPower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string zero        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string workPower   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alpha       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xang = (precalcAtanyx + MPI) / " << alpha << ";\n"
 		   << "\n"
@@ -1457,8 +1457,8 @@ public:
 		   << "\t\t	{\n"
 		   << "\t\t		real_t rdc = fma(MwcNext01(mwc), (real_t)(0.5) * " << scatterDist << ", xr);\n"
 		   << "\n"
-		   << "\t\t		vOut.x = " << weight << " * rdc * cos(precalcAtanyx);\n"
-		   << "\t\t		vOut.y = " << weight << " * rdc * sin(precalcAtanyx);\n"
+		   << "\t\t		vOut.x = " << weight << " * rdc * precalcCosa;\n"
+		   << "\t\t		vOut.y = " << weight << " * rdc * precalcSina;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
@@ -1574,7 +1574,7 @@ template <typename T>
 class Blob2Variation : public ParametricVariation<T>
 {
 public:
-	Blob2Variation(T weight = 1.0) : ParametricVariation<T>("blob2", eVariationId::VAR_BLOB2, weight, true, true, false, false, true)
+	Blob2Variation(T weight = 1.0) : ParametricVariation<T>("blob2", eVariationId::VAR_BLOB2, weight, true, true, true, false, true)
 	{
 		Init();
 	}
@@ -1599,8 +1599,8 @@ public:
 				delta = std::exp(m_Prescale * std::log(delta * positive)) * m_Postscale * positive;
 
 			T rad = m_Radius + (helper.m_PrecalcSqrtSumSquares - m_Radius) * delta;
-			helper.Out.x = m_Weight * rad * std::cos(helper.m_PrecalcAtanyx);
-			helper.Out.y = m_Weight * rad * std::sin(helper.m_PrecalcAtanyx);
+			helper.Out.x = m_Weight * rad * helper.m_PrecalcCosa;
+			helper.Out.y = m_Weight * rad * helper.m_PrecalcSina;
 			helper.Out.z = m_Weight * helper.In.z;
 			//helper.m_TransZ += m_Weight * outPoint.m_Z;//Original had this which is probably wrong.
 		}
@@ -1611,16 +1611,16 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
-		string weight = WeightDefineString();
-		string mode = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string prescale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string index     = ss2.str();
+		string weight    = WeightDefineString();
+		string mode      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string n         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string radius    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string prescale  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string postscale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string symmetry = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string comp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dataHelp = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string symmetry  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string comp      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dataHelp  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tif (precalcSqrtSumSquares < " << radius << ")\n"
 		   << "\t\t{\n"
@@ -1639,8 +1639,8 @@ public:
 		   << "\n"
 		   << "\t\t	real_t rad = fma(precalcSqrtSumSquares - " << radius << ", delta, " << radius << ");\n"
 		   << "\n"
-		   << "\t\t	vOut.x = " << weight << " * rad * cos(precalcAtanyx);\n"
-		   << "\t\t	vOut.y = " << weight << " * rad * sin(precalcAtanyx);\n"
+		   << "\t\t	vOut.x = " << weight << " * rad * precalcCosa;\n"
+		   << "\t\t	vOut.y = " << weight << " * rad * precalcSina;\n"
 		   << "\t\t	vOut.z = " << weight << " * vIn.z;\n"
 		   //<< "\t\t	transZ += " << weight << " * outPoint->m_Z;\n"//Original had this which is probably wrong.
 		   << "\t\t}\n"

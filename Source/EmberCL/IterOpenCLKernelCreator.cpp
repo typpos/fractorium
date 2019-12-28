@@ -149,8 +149,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 
 				if (xform->NeedPrecalcAngles())
 				{
-					xformFuncs << "\tprecalcSina = transX / Zeps(precalcSqrtSumSquares);\n";
-					xformFuncs << "\tprecalcCosa = transY / Zeps(precalcSqrtSumSquares);\n";
+					xformFuncs << "\tprecalcCosa = transX / Zeps(precalcSqrtSumSquares);\n";
+					xformFuncs << "\tprecalcSina = transY / Zeps(precalcSqrtSumSquares);\n";
 				}
 
 				if (xform->NeedPrecalcAtanXY())

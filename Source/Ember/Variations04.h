@@ -2512,7 +2512,7 @@ template <typename T>
 class FourthVariation : public ParametricVariation<T>
 {
 public:
-	FourthVariation(T weight = 1.0) : ParametricVariation<T>("fourth", eVariationId::VAR_FOURTH, weight, true, true, false, false, true)
+	FourthVariation(T weight = 1.0) : ParametricVariation<T>("fourth", eVariationId::VAR_FOURTH, weight, true, true, true, false, false)
 	{
 		Init();
 	}
@@ -2524,8 +2524,8 @@ public:
 		if (helper.In.x > 0 && helper.In.y > 0)//Quadrant IV: spherical.
 		{
 			T r = 1 / helper.m_PrecalcSqrtSumSquares;
-			helper.Out.x = m_Weight * r * std::cos(helper.m_PrecalcAtanyx);
-			helper.Out.y = m_Weight * r * std::sin(helper.m_PrecalcAtanyx);
+			helper.Out.x = m_Weight * r * helper.m_PrecalcCosa;
+			helper.Out.y = m_Weight * r * helper.m_PrecalcSina;
 		}
 		else if (helper.In.x > 0 && helper.In.y < 0)//Quadrant I: loonie.
 		{
@@ -2590,8 +2590,8 @@ public:
 		   << "\t\t{\n"
 		   << "\t\t	real_t r = 1 / precalcSqrtSumSquares;\n"
 		   << "\n"
-		   << "\t\t	vOut.x = " << weight << " * r * cos(precalcAtanyx);\n"
-		   << "\t\t	vOut.y = " << weight << " * r * sin(precalcAtanyx);\n"
+		   << "\t\t	vOut.x = " << weight << " * r * precalcCosa;\n"
+		   << "\t\t	vOut.y = " << weight << " * r * precalcSina;\n"
 		   << "\t\t}\n"
 		   << "\t\telse if (vIn.x > 0 && vIn.y < 0)\n"
 		   << "\t\t{\n"
@@ -2833,7 +2833,7 @@ template <typename T>
 class SpherivoidVariation : public ParametricVariation<T>
 {
 public:
-	SpherivoidVariation(T weight = 1.0) : ParametricVariation<T>("spherivoid", eVariationId::VAR_SPHERIVOID, weight, true, true, false, false, true)
+	SpherivoidVariation(T weight = 1.0) : ParametricVariation<T>("spherivoid", eVariationId::VAR_SPHERIVOID, weight, true, true, true, false, false)
 	{
 		Init();
 	}
@@ -2846,8 +2846,8 @@ public:
 		const T phi = std::acos(Clamp<T>(helper.In.z / zr, -1, 1));
 		const T ps = std::sin(phi);
 		const T pc = std::cos(phi);
-		helper.Out.x = m_Weight * std::cos(helper.m_PrecalcAtanyx) * ps * (zr + m_Radius);
-		helper.Out.y = m_Weight * std::sin(helper.m_PrecalcAtanyx) * ps * (zr + m_Radius);
+		helper.Out.x = m_Weight * helper.m_PrecalcCosa * ps * (zr + m_Radius);
+		helper.Out.y = m_Weight * helper.m_PrecalcSina * ps * (zr + m_Radius);
 		helper.Out.z = m_Weight * pc * (zr + m_Radius);
 	}
 
@@ -2865,8 +2865,8 @@ public:
 		   << "\t\tconst real_t ps = sin(phi);\n"
 		   << "\t\tconst real_t pc = cos(phi);\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * cos(precalcAtanyx) * ps * (zr + " << radius << ");\n"
-		   << "\t\tvOut.y = " << weight << " * sin(precalcAtanyx) * ps * (zr + " << radius << ");\n"
+		   << "\t\tvOut.x = " << weight << " * precalcCosa * ps * (zr + " << radius << ");\n"
+		   << "\t\tvOut.y = " << weight << " * precalcSina * ps * (zr + " << radius << ");\n"
 		   << "\t\tvOut.z = " << weight << " * pc * (zr + " << radius << ");\n"
 		   << "\t}\n";
 		return ss.str();
@@ -5407,8 +5407,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T r = helper.m_PrecalcSqrtSumSquares * (m_BlobLow + m_BlobDiff * (T(0.5) + T(0.5) * std::sin(m_BlobWaves * helper.m_PrecalcAtanxy)));
-		helper.Out.x = m_Weight * helper.m_PrecalcSina * r;
-		helper.Out.y = m_Weight * helper.m_PrecalcCosa * r;
+		helper.Out.x = m_Weight * helper.m_PrecalcCosa * r;//Flipped from original JWildfire plugin which did atan2(x, y) then sin, cos.
+		helper.Out.y = m_Weight * helper.m_PrecalcSina * r;//Here we do atan(y, x) then cos, sin.
 		helper.Out.z = m_Weight * std::sin(m_BlobWaves * helper.m_PrecalcAtanxy) * r;
 	}
 
@@ -5426,8 +5426,8 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t r = precalcSqrtSumSquares * fma(" << blobDiff << ", fma((real_t)(0.5), sin(" << blobWaves << " * precalcAtanxy), (real_t)(0.5)), " << blobLow << ");\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * (precalcSina * r);\n"
-		   << "\t\tvOut.y = " << weight << " * (precalcCosa * r);\n"
+		   << "\t\tvOut.x = " << weight << " * (precalcCosa * r);\n"
+		   << "\t\tvOut.y = " << weight << " * (precalcSina * r);\n"
 		   << "\t\tvOut.z = " << weight << " * (sin(" << blobWaves << " * precalcAtanxy) * r);\n"
 		   << "\t}\n";
 		return ss.str();

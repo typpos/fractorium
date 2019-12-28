@@ -5446,7 +5446,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Roundstr,         prefix + "smartshape_roundstr"));
 		m_Params.push_back(ParamWithName<T>(&m_Roundwidth,       prefix + "smartshape_roundwidth", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Distortion,       prefix + "smartshape_distortion", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Compensation,     prefix + "smartshape_compensation", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Compensation,     prefix + "smartshape_compensation", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,      prefix + "smartshape_alpha"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_AlphaCoeff, prefix + "smartshape_alphacoeff"));
 		m_Params.push_back(ParamWithName<T>(true, &m_RoundCoeff, prefix + "smartshape_roundcoeff"));

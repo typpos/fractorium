@@ -56,12 +56,12 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T theta = helper.m_PrecalcAtanyx;
-		T t = (rand.Frand01<T>() * m_Thickness) * (1 / std::cos(m_N * theta)) - m_Holes;
+		T t = (!m_ThicknessWeight ? m_Weight : m_ThicknessWeight * rand.Frand01<T>()) / std::cos(m_N * theta) - m_HolesWeight;
 
 		if (std::abs(t) != 0)
 		{
-			helper.Out.x = m_Weight * t * std::cos(theta);
-			helper.Out.y = m_Weight * t * std::sin(theta);
+			helper.Out.x = t * std::cos(theta);
+			helper.Out.y = t * std::sin(theta);
 		}
 		else
 		{
@@ -77,19 +77,21 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
-		string weight = WeightDefineString();
-		string n = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string holes = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string index           = ss2.str();
+		string weight          = WeightDefineString();
+		string n               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string thickness       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string holes           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string thicknessweight = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string holesweight     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t theta = precalcAtanyx;\n"
-		   << "\t\treal_t t = (MwcNext01(mwc) * " << thickness << ") * (1 / cos(" << n << " * theta)) - " << holes << ";\n"
+		   << "\t\treal_t t = (!" << thicknessweight << " ? " << weight << " : MwcNext01(mwc) * " << thicknessweight << ") / cos(" << n << " * theta) - " << holesweight << ";\n"
 		   << "\n"
 		   << "\t\tif (fabs(t) != 0)\n"
 		   << "\t\t{\n"
-		   << "\t\t\tvOut.x = " << weight << " * t * cos(theta);\n"
-		   << "\t\t\tvOut.y = " << weight << " * t * sin(theta);\n"
+		   << "\t\t\tvOut.x = t * cos(theta);\n"
+		   << "\t\t\tvOut.y = t * sin(theta);\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -101,6 +103,12 @@ public:
 		return ss.str();
 	}
 
+	virtual void Precalc() override
+	{
+		m_ThicknessWeight = m_Thickness * m_Weight;
+		m_HolesWeight = m_Holes * m_Weight;
+	}
+
 protected:
 	void Init()
 	{
@@ -109,12 +117,16 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "epispiral_n", 6));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "epispiral_thickness"));
 		m_Params.push_back(ParamWithName<T>(&m_Holes, prefix + "epispiral_holes", 1));
+		m_Params.push_back(ParamWithName<T>(true, &m_ThicknessWeight, prefix + "epispiral_thickness_weight"));        //Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_HolesWeight, prefix + "epispiral_holes_weight"));
 	}
 
 private:
 	T m_N;
 	T m_Thickness;
 	T m_Holes;
+	T m_ThicknessWeight;//Precalc.
+	T m_HolesWeight;
 };
 
 /// <summary>
@@ -179,16 +191,16 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
-		string weight = WeightDefineString();
-		string bwrapsCellsize = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string bwrapsSpace = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string bwrapsGain = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string index            = ss2.str();
+		string weight           = WeightDefineString();
+		string bwrapsCellsize   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string bwrapsSpace      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string bwrapsGain       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string bwrapsInnerTwist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string bwrapsOuterTwist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string g2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string r2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rfactor = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string g2               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string r2               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string rfactor          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tif (" << bwrapsCellsize << " == 0)\n"
 		   << "\t\t{\n"
@@ -4161,7 +4173,7 @@ template <typename T>
 class OrthoVariation : public ParametricVariation<T>
 {
 public:
-	OrthoVariation(T weight = 1.0) : ParametricVariation<T>("ortho", eVariationId::VAR_ORTHO, weight, true, false, false, false, true)
+	OrthoVariation(T weight = 1.0) : ParametricVariation<T>("ortho", eVariationId::VAR_ORTHO, weight, true, true, true, false, false)
 	{
 		Init();
 	}
@@ -4204,8 +4216,8 @@ public:
 		else
 		{
 			r = 1 / std::sqrt(r);
-			ts = std::sin(helper.m_PrecalcAtanyx);
-			tc = std::cos(helper.m_PrecalcAtanyx);
+			ts = helper.m_PrecalcSina;
+			tc = helper.m_PrecalcCosa;
 			x = r * tc;
 			y = r * ts;
 
@@ -4296,8 +4308,8 @@ public:
 		   << "\t\telse\n"
 		   << "\t\t{\n"
 		   << "\t\t	r = 1 / sqrt(r);\n"
-		   << "\t\t	ts = sin(precalcAtanyx);\n"
-		   << "\t\t	tc = cos(precalcAtanyx);\n"
+		   << "\t\t	ts = precalcSina;\n"
+		   << "\t\t	tc = precalcCosa;\n"
 		   << "\t\t	x = r * tc;\n"
 		   << "\t\t	y = r * ts;\n"
 		   << "\t\t	real_t x2 = SQR(x);\n"

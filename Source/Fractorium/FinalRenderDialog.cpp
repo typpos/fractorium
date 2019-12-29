@@ -788,8 +788,9 @@ void FractoriumFinalRenderDialog::OnQualityBumpClicked()
 		{
 			double d = tbtn->property("tag").toDouble();
 			m_QualitySpin->SetValueStealth(std::ceil(Quality() + (Quality() * d)));
-			m_Controller->BumpQualityRender(d);
 			tbtn->setEnabled(false);
+			ui.FinalRenderSaveAgainAsButton->setEnabled(false);
+			m_Controller->BumpQualityRender(d);
 		}
 	}
 	else if (act)
@@ -836,6 +837,8 @@ void FractoriumFinalRenderDialog::OnRenderClicked(bool checked)
 	if (CreateControllerFromGUI(true))
 	{
 		Pause(false);
+		ui.FinalRenderSaveAgainAsButton->setEnabled(false);
+		ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 		m_Controller->Render();
 	}
 }

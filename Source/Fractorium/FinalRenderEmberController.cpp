@@ -401,6 +401,8 @@ bool FinalRenderEmberController<T>::Render()
 		return false;
 	}
 
+	m_IsQualityBump = false;
+
 	if (CreateRendererFromGUI())
 	{
 		m_FinalRenderDialog->ui.FinalRenderTextOutput->setText("Preparing all parameters.\n");

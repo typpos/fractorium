@@ -701,7 +701,10 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 		ui.ActionCopyKernel->setEnabled(false);
 		m_OptionsDialog->ui.OpenCLCheckBox->setChecked(false);
 		m_OptionsDialog->ui.SharedTextureCheckBox->setChecked(false);
-		m_FinalRenderDialog->ui.FinalRenderOpenCLCheckBox->setChecked(false);
+
+		if (m_FinalRenderDialog)
+			m_FinalRenderDialog->ui.FinalRenderOpenCLCheckBox->setChecked(false);
+
 		ok = false;
 	}
 

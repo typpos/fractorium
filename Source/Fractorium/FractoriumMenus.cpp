@@ -41,7 +41,6 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionStopRenderingPreviews,	SIGNAL(triggered(bool)), this, SLOT(OnActionStopRenderingPreviews(bool)), Qt::QueuedConnection);
 	connect(ui.ActionRenderPreviews,		SIGNAL(triggered(bool)), this, SLOT(OnActionRenderPreviews(bool)),		  Qt::QueuedConnection);
 	connect(ui.ActionFinalRender,			SIGNAL(triggered(bool)), this, SLOT(OnActionFinalRender(bool)),			  Qt::QueuedConnection);
-	connect(m_FinalRenderDialog,			SIGNAL(finished(int)),   this, SLOT(OnFinalRenderClose(int)),			  Qt::QueuedConnection);
 	connect(ui.ActionOptions,				SIGNAL(triggered(bool)), this, SLOT(OnActionOptions(bool)),				  Qt::QueuedConnection);
 	//Help menu.
 	connect(ui.ActionAbout, SIGNAL(triggered(bool)), this, SLOT(OnActionAbout(bool)), Qt::QueuedConnection);
@@ -936,7 +935,10 @@ void Fractorium::OnActionFinalRender(bool checked)
 	m_Controller->StopAllPreviewRenderers();
 	m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
 	m_RenderStatusLabel->setText("Renderer stopped.");
-	m_FinalRenderDialog->Show(false);
+	SetupFinalRenderDialog();
+
+	if (m_FinalRenderDialog)
+		m_FinalRenderDialog->Show(false);
 }
 
 /// <summary>
@@ -949,6 +951,8 @@ void Fractorium::OnFinalRenderClose(int result)
 	StartRenderTimer(false);//Re-create the renderer and start rendering again.
 	ui.ActionStartStopRenderer->setChecked(false);//Re-enable any controls that might have been disabled.
 	OnActionStartStopRenderer(false);
+	delete m_FinalRenderDialog;
+	m_FinalRenderDialog = nullptr;
 }
 
 /// <summary>

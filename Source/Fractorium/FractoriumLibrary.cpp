@@ -755,7 +755,10 @@ void Fractorium::OnSequenceRenderButtonClicked(bool checked)
 		m_Controller->StopAllPreviewRenderers();
 		m_Controller->SaveCurrentToOpenedFile(false);//Save whatever was edited back to the current open file.
 		m_RenderStatusLabel->setText("Renderer stopped.");
-		m_FinalRenderDialog->Show(true);//Show with a bool specifying that it came from the sequence generator.
+		SetupFinalRenderDialog();
+
+		if (m_FinalRenderDialog)
+			m_FinalRenderDialog->Show(true);//Show with a bool specifying that it came from the sequence generator.
 	}
 }
 

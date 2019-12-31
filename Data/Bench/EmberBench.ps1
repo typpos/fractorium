@@ -9,7 +9,7 @@ else
 }
 
 $benchprefix = "./bench/"
-$devices = "2"#Set this to whatever device index your main GPU resides at. If you are unsure, just run emberrender --opencl info to find out.
+$devices = "2"#Set this to whatever device index your main GPU resides at. If you are unsure, just run emberrender --openclinfo to find out.
 $cpuquality = 150
 $gpuquality = 2000
 $verbose = "--verbose"

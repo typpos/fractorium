@@ -458,6 +458,7 @@ private:
 	QString SetupSaveXmlDialog(const QString& defaultFilename);
 	QString SetupSaveImageDialog(const QString& defaultFilename);
 	QString SetupSaveFolderDialog();
+	bool SetupFinalRenderDialog();
 	QColorDialog* m_ColorDialog = nullptr;
 	FractoriumFinalRenderDialog* m_FinalRenderDialog = nullptr;
 	FractoriumOptionsDialog* m_OptionsDialog = nullptr;

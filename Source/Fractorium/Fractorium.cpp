@@ -65,7 +65,6 @@ Fractorium::Fractorium(QWidget* p)
 	m_ColorDialog = new QColorDialog(this);
 	m_Settings = FractoriumSettings::Instance();
 	m_QssDialog = new QssDialog(this);
-	m_FinalRenderDialog = new FractoriumFinalRenderDialog(this);
 	m_OptionsDialog = new FractoriumOptionsDialog(this);
 	m_VarDialog = new FractoriumVariationsDialog(this);
 	m_AboutDialog = new FractoriumAboutDialog(this);
@@ -787,6 +786,30 @@ QString Fractorium::SetupSaveFolderDialog()
 
 #endif
 	return filename;
+}
+
+/// <summary>
+/// Setup the final render dialog.
+/// Note this deletes the existing instance before creating the new one.
+/// This must be called every time the final render dialog is shown because
+/// there are problems with reusing it.
+/// </summary>
+/// <returns>True if created successfully, else false</returns>
+bool Fractorium::SetupFinalRenderDialog()
+{
+	if (m_FinalRenderDialog)
+	{
+		delete m_FinalRenderDialog;
+		m_FinalRenderDialog = nullptr;
+	}
+
+	if (m_FinalRenderDialog = new FractoriumFinalRenderDialog(this))
+	{
+		connect(m_FinalRenderDialog, SIGNAL(finished(int)), this, SLOT(OnFinalRenderClose(int)), Qt::QueuedConnection);
+		return true;
+	}
+
+	return false;
 }
 
 /// <summary>

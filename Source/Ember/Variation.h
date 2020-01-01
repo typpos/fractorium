@@ -44,7 +44,7 @@ enum class eVariationAssignType : et
 /// <summary>
 /// Complete list of every variation class ID.
 /// </summary>
-enum class eVariationId : et
+enum class eVariationId : glm::uint
 {
 	VAR_ARCH,
 	VAR_ARCSECH,
@@ -52,8 +52,6 @@ enum class eVariationId : et
 	VAR_ARCSINH,
 	VAR_ARCTANH,
 	VAR_ASTERIA,
-	//VAR_ARCSINH,
-	//VAR_ARCTANH,
 	VAR_AUGER		,
 	VAR_BARYCENTROID,
 	VAR_BCIRCLE		,
@@ -471,8 +469,6 @@ enum class eVariationId : et
 	VAR_PRE_ARCSINH,
 	VAR_PRE_ARCTANH,
 	VAR_PRE_ASTERIA,
-	//VAR_PRE_ARCSINH,
-	//VAR_PRE_ARCTANH,
 	VAR_PRE_AUGER,
 	VAR_PRE_BARYCENTROID,
 	VAR_PRE_BCIRCLE,
@@ -889,8 +885,6 @@ enum class eVariationId : et
 	VAR_POST_ARCSINH,
 	VAR_POST_ARCTANH,
 	VAR_POST_ASTERIA,
-	//VAR_POST_ARCSINH,
-	//VAR_POST_ARCTANH,
 	VAR_POST_AUGER,
 	VAR_POST_BARYCENTROID,
 	VAR_POST_BCIRCLE,

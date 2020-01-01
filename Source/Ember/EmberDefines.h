@@ -80,7 +80,7 @@ namespace EmberNs
 #define CURVES_LENGTH_M1 65535.0f
 #define ONE_OVER_CURVES_LENGTH_M1 1.525902189669e-5f
 #define EMPTYFIELD -9999
-typedef uint et;
+typedef unsigned char et;
 typedef std::lock_guard <std::recursive_mutex> rlg;
 
 /// <summary>

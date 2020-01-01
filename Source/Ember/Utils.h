@@ -19,7 +19,7 @@ namespace EmberNs
 /// <summary>
 /// Enum to encapsulate and add type safety to the thread priority defines.
 /// </summary>
-enum class eThreadPriority : int
+enum class eThreadPriority : char
 {
 	LOWEST       = THREAD_PRIORITY_LOWEST,//-2
 	BELOW_NORMAL = THREAD_PRIORITY_BELOW_NORMAL,//-1

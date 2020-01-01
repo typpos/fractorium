@@ -14,7 +14,7 @@ namespace EmberNs
 /// <summary>
 /// Mutation mode enum.
 /// </summary>
-enum class eMutateMode : int
+enum class eMutateMode : char
 {
 	MUTATE_NOT_SPECIFIED   = -1,
 	MUTATE_ALL_VARIATIONS  = 0,
@@ -29,7 +29,7 @@ enum class eMutateMode : int
 /// <summary>
 /// Cross mode enum.
 /// </summary>
-enum class eCrossMode : int
+enum class eCrossMode : char
 {
 	CROSS_NOT_SPECIFIED = -1,
 	CROSS_UNION         = 0,

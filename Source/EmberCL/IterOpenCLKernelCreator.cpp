@@ -572,6 +572,10 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 			{
 				auto names = var->OpenCLGlobalFuncNames();
 
+				if (var->NeedPrecalcAngles())
+					if (!Contains(funcNames, zeps))
+						funcNames.push_back(zeps);
+
 				for (auto& name : names)
 					if (!Contains(funcNames, name))
 						funcNames.push_back(name);

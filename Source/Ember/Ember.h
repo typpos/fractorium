@@ -19,7 +19,7 @@ template <typename T> class Interpolater;
 /// Bit position specifying the presence of each type of 3D parameter.
 /// One, none, some or all of these can be present.
 /// </summary>
-enum class eProjBits : et
+enum class eProjBits : unsigned char
 {
 	PROJBITS_ZPOS = 1,
 	PROJBITS_PERSP = 2,

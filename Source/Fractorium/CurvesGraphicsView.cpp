@@ -218,7 +218,7 @@ void CurvesGraphicsView::paintEvent(QPaintEvent* e)
 void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 {
 	QGraphicsView::mousePressEvent(e);
-	auto thresh = devicePixelRatioF() * 2;
+	auto thresh = devicePixelRatioF() * 10;
 	auto findpoint = [&](int x, int y) -> int
 	{
 		for (int i = 0; i < m_Points[m_Index].size(); i++)

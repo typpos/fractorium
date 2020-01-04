@@ -242,7 +242,7 @@ void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 		if (i != -1)
 			emit PointRemovedSignal(m_Index, i);
 	}
-	else if (findpoint(e->pos().x(), e->pos().y(), thresh * 8) == -1)
+	else if (findpoint(e->pos().x(), e->pos().y(), thresh * 2) == -1)
 	{
 		QRectF rect = scene()->sceneRect();
 		auto points = m_Points[m_Index];

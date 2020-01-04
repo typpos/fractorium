@@ -297,6 +297,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		{
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
+            m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true); // update color and filter params
 			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER);
 			m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 			m_Stats.Clear();
@@ -754,10 +755,16 @@ EmberNs::Renderer<T, float>* FinalRenderEmberController<T>::FirstOrDefaultRender
 template<typename T>
 QString FinalRenderEmberController<T>::SaveCurrentAgain()
 {
-	if (m_Ember)
-		return SaveCurrentRender(*m_Ember);
-	else
-		return "";
+    if (!m_Ember)
+        return "";
+
+    m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true); // update color and filter params
+    m_Run = true;
+    m_Ember->m_TemporalSamples = 1;
+    m_Renderer->SetEmber(*m_Ember, eProcessAction::FILTER_AND_ACCUM);
+    m_Renderer->Run(m_FinalImage, 0,  m_GuiState.m_Strips, m_GuiState.m_YAxisUp);
+    m_Run = false;
+    return SaveCurrentRender(*m_Ember);
 }
 
 /// <summary>

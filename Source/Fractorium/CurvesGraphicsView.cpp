@@ -218,16 +218,17 @@ void CurvesGraphicsView::paintEvent(QPaintEvent* e)
 void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 {
 	QGraphicsView::mousePressEvent(e);
-	auto thresh = devicePixelRatioF() * 10;
-	auto findpoint = [&](int x, int y) -> int
+    auto thresh = devicePixelRatioF() * 4;
+    auto findpoint = [&](int x, int y, bool incThresh = false) -> int
 	{
 		for (int i = 0; i < m_Points[m_Index].size(); i++)
 		{
 			auto item = m_Points[m_Index][i];
 			auto xdist = std::abs(item->pos().x() - x);
 			auto ydist = std::abs(item->pos().y() - y);
+            auto threshAgain = incThresh ? thresh * 2 : thresh;
 
-			if (xdist < thresh && ydist < thresh)
+            if (xdist < threshAgain && ydist < threshAgain)
 				return i;
 		}
 
@@ -241,7 +242,7 @@ void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 		if (i != -1)
 			emit PointRemovedSignal(m_Index, i);
 	}
-	else if (findpoint(e->pos().x(), e->pos().y()) == -1)
+    else if (findpoint(e->pos().x(), e->pos().y(), true) == -1)
 	{
 		QRectF rect = scene()->sceneRect();
 		auto points = m_Points[m_Index];

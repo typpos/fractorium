@@ -118,6 +118,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		m_FinishedImageCount.store(0);
 		Pause(false);
 		ResetProgress();
+		FirstOrDefaultRenderer()->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//When animating, only the first (primary) device has a progress parameter.
 
 		if (!isBump)
 		{
@@ -128,7 +129,6 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 				m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true, false, false);
 
 			SyncGuiToRenderer();
-			FirstOrDefaultRenderer()->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//When animating, only the first (primary) device has a progress parameter.
 			m_GuiState.m_Strips = VerifyStrips(m_Ember->m_FinalRasH, m_GuiState.m_Strips,
 			[&](const string & s) { Output(QString::fromStdString(s)); }, //Greater than height.
 			[&](const string & s) { Output(QString::fromStdString(s)); }, //Mod height != 0.
@@ -297,7 +297,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		{
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
-            m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true); // update color and filter params
+			m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true);//Update color and filter params from the main window controls, which only affect the filter and/or final accumulation stage.
 			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER);
 			m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 			m_Stats.Clear();
@@ -750,21 +750,61 @@ EmberNs::Renderer<T, float>* FinalRenderEmberController<T>::FirstOrDefaultRender
 
 /// <summary>
 /// Save the output of the last rendered image using the existing image output buffer in the renderer.
+/// Before rendering, this copies the image coloring/filtering values used in the last step of the rendering
+/// process, and performs that part of the render, before saving.
 /// </summary>
 /// <returns>The full path and filename the image was saved to.</returns>
 template<typename T>
 QString FinalRenderEmberController<T>::SaveCurrentAgain()
 {
-    if (!m_Ember)
-        return "";
+	if (!m_Ember)
+		return "";
 
-    m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true); // update color and filter params
-    m_Run = true;
-    m_Ember->m_TemporalSamples = 1;
-    m_Renderer->SetEmber(*m_Ember, eProcessAction::FILTER_AND_ACCUM);
-    m_Renderer->Run(m_FinalImage, 0,  m_GuiState.m_Strips, m_GuiState.m_YAxisUp);
-    m_Run = false;
-    return SaveCurrentRender(*m_Ember);
+	if (m_GuiState.m_Strips == 1)
+	{
+		size_t currentStripForProgress = 0;
+		auto brightness = m_Ember->m_Brightness;
+		auto gamma = m_Ember->m_Gamma;
+		auto gammathresh = m_Ember->m_GammaThresh;
+		auto vibrancy = m_Ember->m_Vibrancy;
+		auto highlight = m_Ember->m_HighlightPower;
+		auto k2 = m_Ember->m_K2;
+		auto sftype = m_Ember->m_SpatialFilterType;
+		auto sfradius = m_Ember->m_SpatialFilterRadius;
+		auto minde = m_Ember->m_MinRadDE;
+		auto maxde = m_Ember->m_MaxRadDE;
+		auto curvede = m_Ember->m_CurveDE;
+		m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true);//Update color and filter params from the main window controls, which only affect the filter and/or final accumulation stage.
+		auto dofilterandaccum = m_GuiState.m_EarlyClip ||
+								brightness != m_Ember->m_Brightness ||
+								k2 != m_Ember->m_K2 ||
+								minde != m_Ember->m_MinRadDE ||
+								maxde != m_Ember->m_MaxRadDE ||
+								curvede != m_Ember->m_CurveDE;
+
+		//This is sort of a hack outside of the normal rendering process above.
+		if (dofilterandaccum ||
+				gamma != m_Ember->m_Gamma ||
+				gammathresh != m_Ember->m_GammaThresh ||
+				vibrancy != m_Ember->m_Vibrancy ||
+				highlight != m_Ember->m_HighlightPower ||
+				sftype != m_Ember->m_SpatialFilterType ||
+				sfradius != m_Ember->m_SpatialFilterRadius
+		   )
+		{
+			m_Run = true;
+			m_FinishedImageCount.store(0);
+			m_Ember->m_TemporalSamples = 1;
+			m_Renderer->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//Need to reset this because it was set to a local variable within the render thread.
+			m_Renderer->SetEmber(*m_Ember, dofilterandaccum ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
+			m_Renderer->Run(m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp);
+			m_FinishedImageCount.fetch_add(1);
+			HandleFinishedProgress();
+			m_Run = false;
+		}
+	}
+
+	return SaveCurrentRender(*m_Ember);
 }
 
 /// <summary>
@@ -868,7 +908,7 @@ void FinalRenderEmberController<T>::HandleFinishedProgress()
 
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderTotalProgress, "setValue", Qt::QueuedConnection, Q_ARG(int, int((float(finishedCountCached) / float(m_ImageCount)) * 100)));
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderImageCountLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, ToString<qulonglong>(finishedCountCached) + " / " + ToString<qulonglong>(m_ImageCount)));
-	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderSaveAgainAsButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
+	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderSaveAgainAsButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get()));//Can do save again with variable number of strips.
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderBumpQualityStartButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
 }
 

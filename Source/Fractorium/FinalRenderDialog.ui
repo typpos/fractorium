@@ -1194,6 +1194,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="FinalRenderSaveAgainAsButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the rendered image again using the specified file type.&lt;/p&gt;&lt;p&gt;This will copy in the values for Brightness, Gamma, Gamma Threshold, Vibrancy, Highlight Power, K2, Spatial Filter Type/Width, MinDE, MaxDE and CurveDE from the main window, and if any have changed, it will perform the filtering and imaging steps of the rendering process again before saving.&lt;/p&gt;&lt;p&gt;The values will not be copied from the main window if Strips is greater than 1.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Save Again As</string>
            </property>
@@ -1207,6 +1210,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="FinalRenderBumpQualityStartButton">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Render with the additional quality specified, picking up where the last render left off.&lt;/p&gt;&lt;p&gt;This will copy in the values for Brightness, Gamma, Gamma Threshold, Vibrancy, Highlight Power, K2, Spatial Filter Type/Width, MinDE, MaxDE and CurveDE from the main window and will apply them in the filtering and imaging steps of the rendering process.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Add Quality</string>
            </property>

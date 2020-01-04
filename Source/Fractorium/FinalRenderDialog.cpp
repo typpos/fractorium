@@ -164,11 +164,11 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_StripsSpin->setValue(int(m_Settings->FinalStrips()));
 	Scale(eScaleType(m_Settings->FinalScale()));
 	auto bumpmenu = new QMenu(this);
-	auto add10 = new QAction("Add 10% quality", this); add10->setProperty("tag", QVariant(0.10));
-	auto add25 = new QAction("Add 25% quality", this); add25->setProperty("tag", QVariant(0.25));
-	auto add50 = new QAction("Add 50% quality", this); add50->setProperty("tag", QVariant(0.50));
-	auto add100 = new QAction("Add 100% quality", this); add100->setProperty("tag", QVariant(1.0));
-	auto add200 = new QAction("Add 200% quality", this); add200->setProperty("tag", QVariant(2.0));
+	auto add10 = new QAction("Add 10% Quality", this); add10->setProperty("tag", QVariant(0.10));
+	auto add25 = new QAction("Add 25% Quality", this); add25->setProperty("tag", QVariant(0.25));
+	auto add50 = new QAction("Add 50% Quality", this); add50->setProperty("tag", QVariant(0.50));
+	auto add100 = new QAction("Add 100% Quality", this); add100->setProperty("tag", QVariant(1.0));
+	auto add200 = new QAction("Add 200% Quality", this); add200->setProperty("tag", QVariant(2.0));
 	bumpmenu->addAction(add10);
 	bumpmenu->addAction(add25);
 	bumpmenu->addAction(add50);
@@ -192,7 +192,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	saamenu->addAction(saaexr);
 	ui.FinalRenderSaveAgainAsButton->setMenu(saamenu);
 	ui.FinalRenderSaveAgainAsButton->setProperty("tag", "jpg");
-	ui.FinalRenderSaveAgainAsButton->setText("Save again as jpg");
+	ui.FinalRenderSaveAgainAsButton->setText("Save Again as jpg");
 	ui.FinalRenderSaveAgainAsButton->setEnabled(false);
 	connect(ui.FinalRenderSaveAgainAsButton, SIGNAL(clicked()), this, SLOT(OnSaveAgainAsClicked()));
 	connect(ui.FinalRenderBumpQualityStartButton, SIGNAL(clicked()), this, SLOT(OnQualityBumpClicked()));
@@ -823,7 +823,7 @@ void FractoriumFinalRenderDialog::OnSaveAgainAsClicked()
 	}
 	else if (act)
 	{
-		ui.FinalRenderSaveAgainAsButton->setText("Save again as " + act->text());
+		ui.FinalRenderSaveAgainAsButton->setText("Save Again as " + act->text());
 		ui.FinalRenderSaveAgainAsButton->setProperty("tag", act->text());
 	}
 }

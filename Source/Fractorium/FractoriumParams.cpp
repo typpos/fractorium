@@ -828,57 +828,57 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 /// Copy all GUI widget values on the parameters tab to the passed in ember.
 /// </summary>
 /// <param name="ember">The ember to copy values to.</param>
-/// <param name="basicParams">true to get just filter and colors.</param>
-template <typename T> void FractoriumEmberController<T>::ParamsToEmber(Ember<float>& ember, bool basicParams) { ParamsToEmberPrivate<float>(ember, basicParams); }
+/// <param name="imageParamsOnly">True to get just spatial and density filters plus coloring params.</param>
+template <typename T> void FractoriumEmberController<T>::ParamsToEmber(Ember<float>& ember, bool imageParamsOnly) { ParamsToEmberPrivate<float>(ember, imageParamsOnly); }
 #ifdef DO_DOUBLE
-template <typename T> void FractoriumEmberController<T>::ParamsToEmber(Ember<double>& ember, bool basicParams) { ParamsToEmberPrivate<double>(ember, basicParams); }
+template <typename T> void FractoriumEmberController<T>::ParamsToEmber(Ember<double>& ember, bool imageParamsOnly) { ParamsToEmberPrivate<double>(ember, imageParamsOnly); }
 #endif
 template <typename T>
 template <typename U>
-void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool basicParams)
+void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool imageParamsOnly)
 {
-    ember.m_Brightness = m_Fractorium->m_BrightnessSpin->value();//Color.
-    ember.m_Gamma = m_Fractorium->m_GammaSpin->value();
-    ember.m_GammaThresh = m_Fractorium->m_GammaThresholdSpin->value();
-    ember.m_Vibrancy = m_Fractorium->m_VibrancySpin->value();
-    ember.m_HighlightPower = m_Fractorium->m_HighlightSpin->value();
-    ember.m_K2 = m_Fractorium->m_K2Spin->value();
-    ember.m_SpatialFilterRadius = m_Fractorium->m_SpatialFilterWidthSpin->value();//Filter.
-    ember.m_SpatialFilterType = eSpatialFilterType(m_Fractorium->m_SpatialFilterTypeCombo->currentIndex());
-    ember.m_TemporalFilterWidth = m_Fractorium->m_TemporalFilterWidthSpin->value();
-    ember.m_TemporalFilterType = eTemporalFilterType(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
-    ember.m_MinRadDE = m_Fractorium->m_DEFilterMinRadiusSpin->value();
-    ember.m_MaxRadDE = m_Fractorium->m_DEFilterMaxRadiusSpin->value();
-    ember.m_CurveDE = m_Fractorium->m_DECurveSpin->value();
+	ember.m_Brightness = m_Fractorium->m_BrightnessSpin->value();//Color.
+	ember.m_Gamma = m_Fractorium->m_GammaSpin->value();
+	ember.m_GammaThresh = m_Fractorium->m_GammaThresholdSpin->value();
+	ember.m_Vibrancy = m_Fractorium->m_VibrancySpin->value();
+	ember.m_HighlightPower = m_Fractorium->m_HighlightSpin->value();
+	ember.m_K2 = m_Fractorium->m_K2Spin->value();
+	ember.m_SpatialFilterRadius = m_Fractorium->m_SpatialFilterWidthSpin->value();//Filter.
+	ember.m_SpatialFilterType = eSpatialFilterType(m_Fractorium->m_SpatialFilterTypeCombo->currentIndex());
+	ember.m_MinRadDE = m_Fractorium->m_DEFilterMinRadiusSpin->value();
+	ember.m_MaxRadDE = m_Fractorium->m_DEFilterMaxRadiusSpin->value();
+	ember.m_CurveDE  = m_Fractorium->m_DECurveSpin->value();
 
-    if(basicParams)
-        return;
+	if (imageParamsOnly)
+		return;
 
-    auto color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
-    ember.m_Background.r = color.red() / 255.0;
-    ember.m_Background.g = color.green() / 255.0;
-    ember.m_Background.b = color.blue() / 255.0;
-    ember.m_PaletteMode = ePaletteMode(m_Fractorium->m_PaletteModeCombo->currentIndex());
-    ember.m_FinalRasW = m_Fractorium->m_WidthSpin->value();//Geometry.
-    ember.m_FinalRasH = m_Fractorium->m_HeightSpin->value();
-    ember.m_CenterX = m_Fractorium->m_CenterXSpin->value();
-    ember.m_CenterY = ember.m_RotCenterY = m_Fractorium->m_CenterYSpin->value();
-    ember.m_PixelsPerUnit = m_Fractorium->m_ScaleSpin->value();
-    ember.m_Zoom = m_Fractorium->m_ZoomSpin->value();
-    ember.m_Rotate = m_Fractorium->m_RotateSpin->value();
-    ember.m_CamZPos = m_Fractorium->m_ZPosSpin->value();
-    ember.m_CamPerspective = m_Fractorium->m_PerspectiveSpin->value();
-    ember.m_CamPitch = m_Fractorium->m_PitchSpin->value() * DEG_2_RAD_T;
-    ember.m_CamYaw = m_Fractorium->m_YawSpin->value() * DEG_2_RAD_T;
-    ember.m_CamDepthBlur = m_Fractorium->m_DepthBlurSpin->value();
-    ember.m_SubBatchSize = m_Fractorium->m_SbsSpin->value();
-    ember.m_FuseCount = m_Fractorium->m_FuseSpin->value();
-    ember.m_RandPointRange = m_Fractorium->m_RandRangeSpin->value();
-    ember.m_Quality = m_Fractorium->m_QualitySpin->value();
-    ember.m_Supersample = m_Fractorium->m_SupersampleSpin->value();
-    ember.m_AffineInterp = eAffineInterp(m_Fractorium->m_AffineInterpTypeCombo->currentIndex());
-    ember.m_Interp = eInterp(m_Fractorium->m_InterpTypeCombo->currentIndex());
-    ember.SyncSize();
+	ember.m_TemporalFilterWidth = m_Fractorium->m_TemporalFilterWidthSpin->value();
+	ember.m_TemporalFilterType = eTemporalFilterType(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
+	auto color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
+	ember.m_Background.r = color.red() / 255.0;
+	ember.m_Background.g = color.green() / 255.0;
+	ember.m_Background.b = color.blue() / 255.0;
+	ember.m_PaletteMode = ePaletteMode(m_Fractorium->m_PaletteModeCombo->currentIndex());
+	ember.m_FinalRasW = m_Fractorium->m_WidthSpin->value();//Geometry.
+	ember.m_FinalRasH = m_Fractorium->m_HeightSpin->value();
+	ember.m_CenterX = m_Fractorium->m_CenterXSpin->value();
+	ember.m_CenterY = ember.m_RotCenterY = m_Fractorium->m_CenterYSpin->value();
+	ember.m_PixelsPerUnit = m_Fractorium->m_ScaleSpin->value();
+	ember.m_Zoom = m_Fractorium->m_ZoomSpin->value();
+	ember.m_Rotate = m_Fractorium->m_RotateSpin->value();
+	ember.m_CamZPos = m_Fractorium->m_ZPosSpin->value();
+	ember.m_CamPerspective = m_Fractorium->m_PerspectiveSpin->value();
+	ember.m_CamPitch = m_Fractorium->m_PitchSpin->value() * DEG_2_RAD_T;
+	ember.m_CamYaw = m_Fractorium->m_YawSpin->value() * DEG_2_RAD_T;
+	ember.m_CamDepthBlur = m_Fractorium->m_DepthBlurSpin->value();
+	ember.m_SubBatchSize = m_Fractorium->m_SbsSpin->value();
+	ember.m_FuseCount = m_Fractorium->m_FuseSpin->value();
+	ember.m_RandPointRange = m_Fractorium->m_RandRangeSpin->value();
+	ember.m_Quality = m_Fractorium->m_QualitySpin->value();
+	ember.m_Supersample = m_Fractorium->m_SupersampleSpin->value();
+	ember.m_AffineInterp = eAffineInterp(m_Fractorium->m_AffineInterpTypeCombo->currentIndex());
+	ember.m_Interp = eInterp(m_Fractorium->m_InterpTypeCombo->currentIndex());
+	ember.SyncSize();
 }
 
 /// <summary>

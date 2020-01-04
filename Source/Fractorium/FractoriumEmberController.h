@@ -139,9 +139,9 @@ public:
 	virtual void SequenceOpenButtonClicked() { }
 
 	//Params.
-    virtual void ParamsToEmber(Ember<float>& ember, bool basicParams = false) { };
+	virtual void ParamsToEmber(Ember<float>& ember, bool imageParamsOnly = false) { };
 #ifdef DO_DOUBLE
-    virtual void ParamsToEmber(Ember<double>& ember, bool basicParams = false) { };
+	virtual void ParamsToEmber(Ember<double>& ember, bool imageParamsOnly = false) { };
 #endif
 	virtual void SetCenter(double x, double y) { }
 	virtual void FillParamTablesAndPalette() { }
@@ -425,9 +425,9 @@ public:
 	virtual void SequenceOpenButtonClicked() override;
 
 	//Params.
-    virtual void ParamsToEmber(Ember<float>& ember, bool basicParams = false) override;
+	virtual void ParamsToEmber(Ember<float>& ember, bool imageParamsOnly = false) override;
 #ifdef DO_DOUBLE
-    virtual void ParamsToEmber(Ember<double>& ember, bool basicParams = false) override;
+	virtual void ParamsToEmber(Ember<double>& ember, bool imageParamsOnly = false) override;
 #endif
 	virtual void SetCenter(double x, double y) override;
 	virtual void FillParamTablesAndPalette() override;
@@ -566,7 +566,7 @@ private:
 	template <typename U> void SetEmberPrivate(const Ember<U>& ember, bool verbatim, bool updatePointer);
 
 	//Params.
-    template <typename U> void ParamsToEmberPrivate(Ember<U>& ember, bool basicParams);
+	template <typename U> void ParamsToEmberPrivate(Ember<U>& ember, bool imageParamsOnly);
 
 	//Xforms.
 	void SetNormalizedWeightText(Xform<T>* xform);

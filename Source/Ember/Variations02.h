@@ -607,7 +607,7 @@ public:
 	{
 		T z = 1 + m_BlurZoomLength * rand.Frand01<T>();
 		helper.Out.x = m_Weight * ((helper.In.x - m_BlurZoomX) * z + m_BlurZoomX);
-		helper.Out.y = m_Weight * ((helper.In.y - m_BlurZoomY) * z - m_BlurZoomY);
+		helper.Out.y = m_Weight * ((helper.In.y + m_BlurZoomY) * z - m_BlurZoomY);
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -625,7 +625,7 @@ public:
 		   << "\t\treal_t z = fma(" << blurZoomLength << ", MwcNext01(mwc), 1);\n"
 		   << "\n"
 		   << "\t\tvOut.x = " << weight << " * fma((vIn.x - " << blurZoomX << "), z, " << blurZoomX << ");\n"
-		   << "\t\tvOut.y = " << weight << " * fma((vIn.y - " << blurZoomY << "), z, -" << blurZoomY << ");\n"
+		   << "\t\tvOut.y = " << weight << " * fma((vIn.y + " << blurZoomY << "), z, -" << blurZoomY << ");\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();

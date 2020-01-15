@@ -360,6 +360,14 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	static int fcount = 0;//Qt seems to deliver three events for every key press. So a count must be kept to only respond to the third event.
 	static int xfupcount = 0;
 	static int xfdncount = 0;
+	static int wcount = 0;
+	static int scount = 0;
+	static int acount = 0;
+	static int dcount = 0;
+	static int qcount = 0;
+	static int ecount = 0;
+	static int gcount = 0;
+	static int hcount = 0;
 
 	if (o == ui.GLParentScrollArea && e->type() == QEvent::Resize)
 	{
@@ -406,10 +414,45 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			auto focusedctrlEdit = dynamic_cast<QLineEdit*>(this->focusWidget());
 			auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
 			auto focusedctrlDblSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
+			auto focusedctrlCombo = dynamic_cast<QComboBox*>(this->focusWidget());
 
-			if (!focusedctrlEdit && !focusedctrlSpin && !focusedctrlDblSpin)//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform.
+			if (!focusedctrlEdit &&
+					!focusedctrlSpin &&
+					!focusedctrlDblSpin &&
+					!focusedctrlCombo)//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform.
 			{
 				unsigned int index = combo->currentIndex();
+				double vdist = 0.01;
+				double hdist = 0.01;
+				double rot = 1;
+				double grow = 0.01;
+				bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+				bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+				bool pre = true;
+
+				if (auto r = m_Controller->Renderer())
+				{
+					hdist = std::abs(r->UpperRightX() - r->LowerLeftX()) * 0.01 * m_Controller->AffineScaleLockedToCurrent();
+					vdist = std::abs(r->UpperRightY() - r->LowerLeftY()) * 0.01 * m_Controller->AffineScaleLockedToCurrent();
+
+					if (shift)
+					{
+						hdist *= 0.1;
+						vdist *= 0.1;
+						rot *= 0.1;
+						grow *= 0.1;
+					}
+					else if (ctrl)
+					{
+						hdist *= 10;
+						vdist *= 10;
+						rot *= 10;
+						grow *= 10;
+					}
+				}
+
+				if (m_Controller.get() && m_Controller->GLController())
+					pre = m_Controller->GLController()->AffineType() == eAffineType::AffinePre;
 
 				if (ke->key() == Qt::Key_Plus || ke->key() == Qt::Key_Equal)
 				{
@@ -440,6 +483,94 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					}
 
 					return true;
+				}
+				else if (ke->key() == Qt::Key_W)
+				{
+					wcount++;
+
+					if (wcount >= 3)
+					{
+						wcount = 0;
+						m_Controller->MoveXforms(0, vdist, pre);
+					}
+
+					return true;
+				}
+				else if (ke->key() == Qt::Key_S)
+				{
+					scount++;
+
+					if (scount >= 3)
+					{
+						scount = 0;
+						m_Controller->MoveXforms(0, -vdist, pre);
+					}
+
+					return true;
+				}
+				else if (ke->key() == Qt::Key_A)
+				{
+					acount++;
+
+					if (acount >= 3)
+					{
+						acount = 0;
+						m_Controller->MoveXforms(-hdist, 0, pre);
+					}
+
+					return true;
+				}
+				else if (ke->key() == Qt::Key_D)
+				{
+					dcount++;
+
+					if (dcount >= 3)
+					{
+						dcount = 0;
+						m_Controller->MoveXforms(hdist, 0, pre);
+					}
+
+					return true;
+				}
+				else if (ke->key() == Qt::Key_Q)
+				{
+					qcount++;
+
+					if (qcount >= 3)
+					{
+						qcount = 0;
+						m_Controller->RotateXformsByAngle(-rot, pre);
+					}
+				}
+				else if (ke->key() == Qt::Key_E)
+				{
+					ecount++;
+
+					if (ecount >= 3)
+					{
+						ecount = 0;
+						m_Controller->RotateXformsByAngle(rot, pre);
+					}
+				}
+				else if (ke->key() == Qt::Key_G)
+				{
+					gcount++;
+
+					if (gcount >= 3)
+					{
+						gcount = 0;
+						m_Controller->ScaleXforms(1 - grow, pre);
+					}
+				}
+				else if (ke->key() == Qt::Key_H)
+				{
+					hcount++;
+
+					if (hcount >= 3)
+					{
+						hcount = 0;
+						m_Controller->ScaleXforms(1 + grow, pre);
+					}
 				}
 			}
 		}
@@ -1011,6 +1142,7 @@ void Fractorium::SetTabOrders()
 /// The logic is:
 ///		If any cell in the row is non zero, set all cells to zero, else 1.
 ///		If shift is held down, reverse the logic.
+///		If ctrl is held down, set each cell to a random 0 or 1.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="table">The QTableWidget or QTableView whose row will be toggled</param>
@@ -1021,6 +1153,7 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 	auto model = table->model();
 	int cols = model->columnCount();
 	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 	auto tableWidget = qobject_cast<QTableWidget*>(table);
 
 	if (tableWidget)
@@ -1044,7 +1177,10 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 
 		for (int i = 0; i < cols; i++)
 			if (auto spinBox = qobject_cast<DoubleSpinBox*>(tableWidget->cellWidget(logicalIndex, i)))
-				spinBox->setValue(val);
+				if (ctrl)
+					spinBox->setValue(double(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()));
+				else
+					spinBox->setValue(val);
 	}
 	else
 	{
@@ -1063,7 +1199,10 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 		double val = allZero ? 1.0 : 0.0;
 
 		for (int i = 0; i < cols; i++)
-			model->setData(model->index(logicalIndex, i), val, Qt::EditRole);
+			if (ctrl)
+				model->setData(model->index(logicalIndex, i), double(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()), Qt::EditRole);
+			else
+				model->setData(model->index(logicalIndex, i), val, Qt::EditRole);
 	}
 }
 
@@ -1072,6 +1211,7 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 /// The logic is:
 ///		If any cell in the column is non zero, set all cells to zero, else 1.
 ///		If shift is held down, reverse the logic.
+///		If ctrl is held down, set each cell to a random 0 or 1.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="table">The QTableWidget or QTableView whose column will be toggled</param>
@@ -1082,6 +1222,7 @@ void Fractorium::ToggleTableCol(QTableView* table, int logicalIndex)
 	auto model = table->model();
 	int rows = model->rowCount();
 	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 	auto tableWidget = qobject_cast<QTableWidget*>(table);
 
 	if (tableWidget)
@@ -1105,7 +1246,10 @@ void Fractorium::ToggleTableCol(QTableView* table, int logicalIndex)
 
 		for (int i = 0; i < rows; i++)
 			if (auto spinBox = qobject_cast<DoubleSpinBox*>(tableWidget->cellWidget(i, logicalIndex)))
-				spinBox->setValue(val);
+				if (ctrl)
+					spinBox->setValue(double(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()));
+				else
+					spinBox->setValue(val);
 	}
 	else
 	{
@@ -1124,7 +1268,10 @@ void Fractorium::ToggleTableCol(QTableView* table, int logicalIndex)
 		double val = allZero ? 1.0 : 0.0;
 
 		for (int i = 0; i < rows; i++)
-			model->setData(model->index(i, logicalIndex), val, Qt::EditRole);
+			if (ctrl)
+				model->setData(model->index(i, logicalIndex), double(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()), Qt::EditRole);
+			else
+				model->setData(model->index(i, logicalIndex), val, Qt::EditRole);
 	}
 }
 

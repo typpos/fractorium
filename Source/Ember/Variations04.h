@@ -1784,7 +1784,7 @@ public:
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tvOut.x =  fma(" << cosr << ", a, " << sinr << " * r);\n"
-		   << "\t\tvOut.y = -fma(" << sinr << ", a, " << cosr << " * r);\n"
+		   << "\t\tvOut.y = fma(-" << sinr << ", a, " << cosr << " * r);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();

@@ -268,7 +268,11 @@
 			<Component Id="lightdark.qss" Guid="e4cbb38c-359e-464d-938b-e52ff0ce375d">
 				<File Id="lightdark.qss" Source="$(var.SolutionDir)..\..\..\Data\lightdark.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
-				
+
+			<Component Id="uranium.qss" Guid="64e23769-0631-4c5c-a714-bf7c50dc3c1a">
+				<File Id="uranium.qss" Source="$(var.SolutionDir)..\..\..\Data\uranium.qss" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
 			<Component Id="VersionHistory.txt" Guid="8b031217-9e7d-4700-9ab8-2593a4e002b6">
 				<File Id="VersionHistory.txt" Source="$(var.SolutionDir)..\..\..\Data\Version History.txt" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>

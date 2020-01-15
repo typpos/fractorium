@@ -1996,8 +1996,8 @@ bool GLEmberController<T>::CheckXformHover(Xform<T>* xform, v3T& glCoords, T& be
 template <typename T>
 void GLEmberController<T>::CalcDragXAxis()
 {
-	auto affineToWorldScale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
-	auto worldToAffineScale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	T affineToWorldScale = T(m_FractoriumEmberController->AffineScaleLockedToCurrent());
+	T worldToAffineScale = T(m_FractoriumEmberController->AffineScaleCurrentToLocked());
 	bool pre = m_AffineType == eAffineType::AffinePre;
 	bool worldPivotShiftAlt = !m_Fractorium->LocalPivot() && GetShift() && GetAlt();
 	auto worldRelAxisStartScaled = (v2T(m_HoverHandlePos) * affineToWorldScale) - m_DragSrcTransform.O();//World axis start position, relative, scaled by the zoom.
@@ -2161,8 +2161,8 @@ void GLEmberController<T>::CalcDragXAxis()
 template <typename T>
 void GLEmberController<T>::CalcDragYAxis()
 {
-	auto affineToWorldScale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
-	auto worldToAffineScale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	T affineToWorldScale = T(m_FractoriumEmberController->AffineScaleLockedToCurrent());
+	T worldToAffineScale = T(m_FractoriumEmberController->AffineScaleCurrentToLocked());
 	bool pre = m_AffineType == eAffineType::AffinePre;
 	bool worldPivotShiftAlt = !m_Fractorium->LocalPivot() && GetShift() && GetAlt();
 	auto worldRelAxisStartScaled = (v2T(m_HoverHandlePos) * affineToWorldScale) - m_DragSrcTransform.O();//World axis start position, relative, scaled by the zoom.
@@ -2321,8 +2321,8 @@ void GLEmberController<T>::CalcDragYAxis()
 template <typename T>
 void GLEmberController<T>::CalcDragTranslation()
 {
-	auto affineToWorldScale = m_FractoriumEmberController->AffineScaleLockedToCurrent();
-	auto worldToAffineScale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
+	T affineToWorldScale = T(m_FractoriumEmberController->AffineScaleLockedToCurrent());
+	T worldToAffineScale = T(m_FractoriumEmberController->AffineScaleCurrentToLocked());
 	bool worldPivotShift = !m_Fractorium->LocalPivot() && GetShift();
 	bool pre = m_AffineType == eAffineType::AffinePre;
 

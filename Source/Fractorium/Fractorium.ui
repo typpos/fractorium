@@ -2784,7 +2784,10 @@
               <bool>false</bool>
              </property>
              <property name="selectionMode">
-              <enum>QAbstractItemView::NoSelection</enum>
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
              </property>
              <property name="horizontalScrollMode">
               <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -4321,7 +4324,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units right</string>
+                       <string>Move xform x units right (D)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4373,7 +4376,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units up</string>
+                       <string>Move xform x units up (W)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4457,7 +4460,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Scale xform x percent up</string>
+                       <string>Scale xform x percent up (H)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4483,7 +4486,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Scale xform x percent down</string>
+                       <string>Scale xform x percent down (G)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4601,7 +4604,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform x degrees clockwise</string>
+                       <string>Rotate xform x degrees clockwise (E)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4627,7 +4630,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform x degrees counter clockwise</string>
+                       <string>Rotate xform x degrees counter clockwise (Q)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4732,7 +4735,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units left</string>
+                       <string>Move xform x units left (A)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -4791,7 +4794,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units down</string>
+                       <string>Move xform x units down (S)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5156,7 +5159,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform x degrees clockwise</string>
+                       <string>Rotate xform x degrees clockwise (E)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5185,7 +5188,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Rotate xform x degrees counter clockwise</string>
+                       <string>Rotate xform x degrees counter clockwise (Q)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5385,7 +5388,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Scale xform x percent up</string>
+                       <string>Scale xform x percent up (H)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5414,7 +5417,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Scale xform x percent down</string>
+                       <string>Scale xform x percent down (G)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5443,7 +5446,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units left</string>
+                       <string>Move xform x units left (A)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5508,7 +5511,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units right</string>
+                       <string>Move xform x units right (D)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5566,7 +5569,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units up</string>
+                       <string>Move xform x units up (W)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -5685,7 +5688,7 @@
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>Move xform x units down</string>
+                       <string>Move xform x units down (S)</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -8258,7 +8261,7 @@
     <string>Save the current flame as an xml file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="ActionAbout">
@@ -8309,13 +8312,13 @@
      <normaloff>:/Fractorium/Icons/068123-3d-transparent-glass-icon-alphanumeric-question-mark3.png</normaloff>:/Fractorium/Icons/068123-3d-transparent-glass-icon-alphanumeric-question-mark3.png</iconset>
    </property>
    <property name="text">
-    <string>New &amp;random Flame</string>
+    <string>New &amp;random flame</string>
    </property>
    <property name="toolTip">
     <string>Add a new random flame to the end of the current file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="ActionSaveEntireFileAsXml">
@@ -8333,7 +8336,7 @@
     <string>Save all flames as a single xml file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
+    <string>Ctrl+Shift+T</string>
    </property>
   </action>
   <action name="ActionAddReflectiveSymmetry">
@@ -8380,7 +8383,7 @@
     <string>Add a new empty flame to the end of the current file</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="ActionCopyFlameInCurrentFile">
@@ -8708,7 +8711,7 @@
     <string>Alternate editor/image</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+W</string>
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="ActionResetScale">

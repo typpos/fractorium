@@ -62,6 +62,7 @@ public:
 	void ClearShift();
 	void ClearControl();
 	eDragState DragState() { return m_DragState; }
+	eAffineType AffineType() { return m_AffineType; }
 	virtual void DrawImage() { }
 	virtual void DrawAffines(bool pre, bool post) { }
 	virtual void ClearWindow() { }

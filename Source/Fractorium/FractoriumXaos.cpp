@@ -225,6 +225,7 @@ void Fractorium::OnClearXaosButtonClicked(bool checked) { m_Controller->ClearXao
 template <typename T>
 void FractoriumEmberController<T>::RandomXaos()
 {
+	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 	Update([&]
 	{
 		size_t i = 0;
@@ -233,7 +234,9 @@ void FractoriumEmberController<T>::RandomXaos()
 		{
 			for (size_t j = 0; j < m_Ember.XformCount(); j++)
 			{
-				if (m_Rand.RandBit())
+				if (!ctrl)
+					xform->SetXaos(j, T(m_Rand.RandBit()));
+				else if (m_Rand.RandBit())
 					xform->SetXaos(j, T(m_Rand.RandBit()));
 				else
 					xform->SetXaos(j, TruncPrecision(m_Rand.Frand<T>(0, 3), 3));

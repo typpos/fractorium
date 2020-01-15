@@ -99,6 +99,7 @@ themes.files = $$ASSETS_DIR/dark_linux.qss
 }
 
 themes.files += $$ASSETS_DIR/lightdark.qss
+themes.files += $$ASSETS_DIR/uranium.qss
 
 #message(THEMES INSTALL SOURCE: $$themes.files)
 INSTALLS += themes

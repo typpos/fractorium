@@ -188,7 +188,7 @@ void FractoriumEmberController<T>::ChangeLockedScale(T value)
 /// </summary>
 /// <returns>The scale value</returns>
 template <typename T>
-T FractoriumEmberController<T>::AffineScaleCurrentToLocked()
+double FractoriumEmberController<T>::AffineScaleCurrentToLocked()
 {
 	return LockedScale() / m_Ember.m_PixelsPerUnit;
 }
@@ -198,7 +198,7 @@ T FractoriumEmberController<T>::AffineScaleCurrentToLocked()
 /// </summary>
 /// <returns>The scale value</returns>
 template <typename T>
-T FractoriumEmberController<T>::AffineScaleLockedToCurrent()
+double FractoriumEmberController<T>::AffineScaleLockedToCurrent()
 {
 	return m_Ember.m_PixelsPerUnit / LockedScale();
 }

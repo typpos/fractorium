@@ -97,6 +97,7 @@ cp $EXTRA_LIBS/libtbb.so.2 $FRACTORIUM_LIB
 
 cp $DATA_PATH/dark_linux.qss $FRACTORIUM_BIN
 cp $DATA_PATH/lightdark.qss $FRACTORIUM_BIN
+cp $DATA_PATH/uranium.qss $FRACTORIUM_BIN
 cp $DATA_PATH/flam3-palettes.xml $FRACTORIUM_BIN
 cp $DATA_PATH/*.gradient $FRACTORIUM_BIN
 cp $DATA_PATH/*.ugr $FRACTORIUM_BIN

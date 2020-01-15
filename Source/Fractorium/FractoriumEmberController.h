@@ -211,6 +211,8 @@ public:
 	double LockedY() { return m_LockedY; }
 	void LockedScale(double scale) { m_LockedScale = scale; }
 	virtual void InitLockedScale() { }
+	virtual double AffineScaleCurrentToLocked() { return 0; };
+	virtual double AffineScaleLockedToCurrent() { return 0; };
 
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) { }
@@ -496,10 +498,10 @@ public:
 	virtual void FillBothAffines() override;
 	virtual void SwapAffines() override;
 	virtual void InitLockedScale() override;
+	virtual double AffineScaleCurrentToLocked() override;
+	virtual double AffineScaleLockedToCurrent() override;
 	void FillAffineWithXform(Xform<T>* xform, bool pre);
 	void ChangeLockedScale(T value);
-	T AffineScaleCurrentToLocked();
-	T AffineScaleLockedToCurrent();
 
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) override;

@@ -115,6 +115,11 @@ public:
 	QPushButton* m_Button;
 };
 
+/// <summary>
+/// Thin container that is both a widget and a container of one DoubleSpinBox and one QLabel.
+/// Used for when a layout expects a single widget, but two need to go in its place.
+/// The widgets are public so the caller can easily use them individually.
+/// </summary>
 class SpinnerLabelWidget : public QWidget
 {
 	Q_OBJECT
@@ -150,6 +155,9 @@ protected:
 	QHBoxLayout* m_L;
 };
 
+/// <summary>
+/// Thin derivation that adds a button to a SpinnerLabelWidget.
+/// </summary>
 class SpinnerLabelButtonWidget : public SpinnerLabelWidget
 {
 	Q_OBJECT
@@ -184,7 +192,11 @@ public:
 	QPushButton* m_Button;
 };
 
-
+/// <summary>
+/// Thin container that is both a widget and a container of one DoubleSpinBox and one SpinBox.
+/// Used for when a layout expects a single widget, but two need to go in its place.
+/// The widgets are public so the caller can easily use them individually.
+/// </summary>
 class DoubleIntSpinnerWidget : public QWidget
 {
 	Q_OBJECT

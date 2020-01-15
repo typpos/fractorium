@@ -419,7 +419,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			if (!focusedctrlEdit &&
 					!focusedctrlSpin &&
 					!focusedctrlDblSpin &&
-					!focusedctrlCombo)//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform.
+					!focusedctrlCombo &&
+					!QGuiApplication::keyboardModifiers().testFlag(Qt::AltModifier))//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform. Also exclude alt.
 			{
 				unsigned int index = combo->currentIndex();
 				double vdist = 0.01;

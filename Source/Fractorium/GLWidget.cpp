@@ -34,42 +34,6 @@
 	"void main() {\n"
 	"	gl_FragColor = texture2D(quadtex, texcoord.st);\n"
 	"}\n";
-
-	/*
-	static const char* vertexShaderSource =
-	"#version 120\n"
-	"in vec4 posattr;\n"
-	"uniform mat4 matrix;\n"
-	"void main() {\n"
-	"   gl_Position = matrix * posattr;\n"
-	"}\n";
-
-	static const char* fragmentShaderSource =
-	"#version 120\n"
-	"uniform vec4 mycolor;\n"
-	"out vec4 fragout;"
-	"void main() {\n"
-	"   fragout = mycolor;\n"
-	"}\n";
-
-	static const char* quadVertexShaderSource =
-	"#version 120\n"
-	"in vec4 posattr;\n"
-	"uniform mat4 matrix;\n"
-	"out vec4 texcoord;\n"
-	"void main() {\n"
-	"	gl_Position = matrix * posattr;\n"
-	"	texcoord = posattr;\n"
-	"}\n";
-
-	static const char* quadFragmentShaderSource =
-	"#version 120\n"
-	"uniform sampler2D quadtex;\n"
-	"in vec4 texcoord;\n"
-	"out vec4 fragout;"
-	"void main() {\n"
-	"	fragout = texture(quadtex, texcoord.st);\n"
-	"}\n"; */
 #endif
 
 /// <summary>
@@ -585,7 +549,12 @@ void GLWidget::paintGL()
 #else
 		m_Program->bind();
 		m_ProjMatrix.setToIdentity();
-		m_ProjMatrix.ortho(-unitX, unitX, -unitY, unitY, -1, 1);//Projection matrix: OpenGL camera is always centered, just move the ember internally inside the renderer.
+
+		if (!controller->Renderer()->YAxisUp())
+			m_ProjMatrix.ortho(-unitX, unitX, unitY, -unitY, -1, 1);//Projection matrix: OpenGL camera is always centered, just move the ember internally inside the renderer.
+		else
+			m_ProjMatrix.ortho(-unitX, unitX, -unitY, unitY, -1, 1);
+
 		m_ModelViewMatrix.setToIdentity();
 		//this->DrawUnitSquare();
 		controller->GLController()->DrawAffines(pre, post);

@@ -456,7 +456,7 @@ void Fractorium::OnMoveUpButtonClicked(bool checked)
 	double d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
-		m_Controller->MoveXforms(0, d, pre);
+		m_Controller->MoveXforms(0, m_Settings->YAxisUp() ? d : -d, pre);
 }
 
 /// <summary>
@@ -473,7 +473,7 @@ void Fractorium::OnMoveDownButtonClicked(bool checked)
 	double d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
-		m_Controller->MoveXforms(0, -d, pre);
+		m_Controller->MoveXforms(0, m_Settings->YAxisUp() ? -d : d, pre);
 }
 
 /// <summary>

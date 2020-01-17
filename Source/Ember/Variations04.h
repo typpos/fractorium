@@ -1792,8 +1792,8 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_SinR = std::sin(m_Rotation);
-		m_CosR = std::cos(m_Rotation);
+		m_SinR = m_Weight * std::sin(m_Rotation);
+		m_CosR = m_Weight * std::cos(m_Rotation);
 	}
 
 protected:

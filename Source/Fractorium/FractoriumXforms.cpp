@@ -208,6 +208,7 @@ void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->Add
 
 /// <summary>
 /// Duplicate the specified xforms in the current ember, and set the last one as the current xform.
+/// If xaos is present in the ember, the new xforms will be added with xaos preserved, else they'll just be added normally.
 /// Called when the duplicate xform button is clicked.
 /// Resets the rendering process.
 /// </summary>
@@ -218,13 +219,18 @@ void FractoriumEmberController<T>::DuplicateXform()
 	bool forceFinal = m_Fractorium->HaveFinal();
 	vector<Xform<T>> vec;
 	vec.reserve(m_Ember.XformCount());
-	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		vec.push_back(*xform);
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
 	Update([&]()
 	{
-		AddXformsWithXaos(m_Ember, vec, true);
+		if (m_Ember.XaosPresent())
+			AddXformsWithXaos(m_Ember, vec, true);
+		else
+			for (auto& it : vec)
+				m_Ember.AddXform(it);
+
 		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);//Handles xaos.
 	});

@@ -3194,7 +3194,7 @@
                 </size>
                </property>
                <property name="toolTip">
-                <string>Duplicate selected xforms</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate selected xforms.&lt;/p&gt;&lt;p&gt;If xaos is present in the flame, the new xforms will be added with existing xaos preserved, else they'll just be added normally.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>

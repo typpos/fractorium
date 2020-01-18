@@ -378,12 +378,14 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	{
 		auto combo = ui.CurrentXformCombo;
 		bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+		int times = 3;
+		int ftimes = 2;
 
 		if (ke->key() >= Qt::Key_F1 && ke->key() <= Qt::Key_F32)
 		{
 			fcount++;
 
-			if (fcount >= 3)
+			if (fcount >= ftimes)
 			{
 				int val = ke->key() - (int)Qt::Key_F1;
 
@@ -459,7 +461,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					xfupcount++;
 
-					if (xfupcount >= 3)
+					if (xfupcount >= times)
 					{
 						xfupcount = 0;
 						combo->setCurrentIndex((index + 1) % combo->count());
@@ -472,7 +474,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					xfdncount++;
 
-					if (xfdncount >= 3)
+					if (xfdncount >= times)
 					{
 						xfdncount = 0;
 
@@ -489,7 +491,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					wcount++;
 
-					if (wcount >= 3)
+					if (wcount >= times)
 					{
 						wcount = 0;
 						m_Controller->MoveXforms(0, vdist, pre);
@@ -501,7 +503,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					scount++;
 
-					if (scount >= 3)
+					if (scount >= times)
 					{
 						scount = 0;
 						m_Controller->MoveXforms(0, -vdist, pre);
@@ -513,7 +515,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					acount++;
 
-					if (acount >= 3)
+					if (acount >= times)
 					{
 						acount = 0;
 						m_Controller->MoveXforms(-hdist, 0, pre);
@@ -525,7 +527,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					dcount++;
 
-					if (dcount >= 3)
+					if (dcount >= times)
 					{
 						dcount = 0;
 						m_Controller->MoveXforms(hdist, 0, pre);
@@ -537,41 +539,49 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				{
 					qcount++;
 
-					if (qcount >= 3)
+					if (qcount >= times)
 					{
 						qcount = 0;
 						m_Controller->RotateXformsByAngle(-rot, pre);
 					}
+
+					return true;
 				}
 				else if (ke->key() == Qt::Key_E)
 				{
 					ecount++;
 
-					if (ecount >= 3)
+					if (ecount >= times)
 					{
 						ecount = 0;
 						m_Controller->RotateXformsByAngle(rot, pre);
 					}
+
+					return true;
 				}
 				else if (ke->key() == Qt::Key_G)
 				{
 					gcount++;
 
-					if (gcount >= 3)
+					if (gcount >= times)
 					{
 						gcount = 0;
 						m_Controller->ScaleXforms(1 - grow, pre);
 					}
+
+					return true;
 				}
 				else if (ke->key() == Qt::Key_H)
 				{
 					hcount++;
 
-					if (hcount >= 3)
+					if (hcount >= times)
 					{
 						hcount = 0;
 						m_Controller->ScaleXforms(1 + grow, pre);
 					}
+
+					return true;
 				}
 			}
 		}

@@ -1301,7 +1301,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 			//Finally, iterate.
 			//t.Tic();
 			//Iterating, loop 3.
-			m_BadVals[threadIndex] += m_Iterator->Iterate(m_ThreadEmbers[threadIndex], params, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
+			m_BadVals[threadIndex] += m_Iterator->Iterate(m_ThreadEmbers[threadIndex], params, m_CarToRas, m_Samples[threadIndex].data(), m_Rand[threadIndex]);
 			//iterationTime += t.Toc();
 
 			if (m_LockAccum)

@@ -97,6 +97,10 @@ public:
 		m_PadCarLlY = T(carToRas.PadCarLlY());
 		m_PadCarUrX = T(carToRas.PadCarUrX());
 		m_PadCarUrY = T(carToRas.PadCarUrY());
+		m_CarHalfX = T(carToRas.CarHalfX());
+		m_CarHalfY = T(carToRas.CarHalfY());
+		m_CarCenterX = T(carToRas.CarCenterX());
+		m_CarCenterY = T(carToRas.CarCenterY());
 		return *this;
 	}
 
@@ -126,12 +130,16 @@ public:
 		m_RasLlX = m_PixPerImageUnitW * carLlX;
 		m_PixPerImageUnitH = static_cast<T>(rasH) * invSizeH;
 		m_RasLlY = m_PixPerImageUnitH * carLlY;
-		m_OneRow = abs(m_CarUrY - m_CarLlY) / m_RasHeight;
-		m_OneCol = abs(m_CarUrX - m_CarLlX) / m_RasWidth;
+		m_OneRow = std::abs(m_CarUrY - m_CarLlY) / m_RasHeight;
+		m_OneCol = std::abs(m_CarUrX - m_CarLlX) / m_RasWidth;
 		m_PadCarLlX = m_CarLlX + m_OneCol;
 		m_PadCarUrX = m_CarUrX - m_OneCol;
 		m_PadCarLlY = m_CarLlY + m_OneRow;
 		m_PadCarUrY = m_CarUrY - m_OneRow;
+		m_CarHalfX = (m_CarUrX - m_CarLlX) / 2;
+		m_CarHalfY = (m_CarUrY - m_CarLlY) / 2;
+		m_CarCenterX = m_CarLlX + m_CarHalfX;
+		m_CarCenterY = m_CarLlY + m_CarHalfY;
 	}
 
 	/// <summary>
@@ -227,6 +235,10 @@ public:
 	inline T PadCarLlY() const { return m_PadCarLlY; }
 	inline T PadCarUrX() const { return m_PadCarUrX; }
 	inline T PadCarUrY() const { return m_PadCarUrY; }
+	inline T CarHalfX() const { return m_CarHalfX; }
+	inline T CarHalfY() const { return m_CarHalfY; }
+	inline T CarCenterX() const { return m_CarCenterX; }
+	inline T CarCenterY() const { return m_CarCenterY; }
 
 private:
 	size_t m_RasWidth, m_RasHeight;//The width and height of the raster image.
@@ -238,5 +250,7 @@ private:
 	T m_RasLlY;//The lower left y of the raster image plane.
 	T m_CarLlX, m_CarLlY, m_CarUrX, m_CarUrY;//The bounds of the cartesian plane.
 	T m_PadCarLlX, m_PadCarLlY, m_PadCarUrX, m_PadCarUrY;//The bounds of the cartesian plane padded by one raster row and column on each side.
+	T m_CarHalfX, m_CarHalfY;//The distance from the center of the of the cartesian plane to the edges.
+	T m_CarCenterX, m_CarCenterY;//The center of the cartesian plane.
 };
 }

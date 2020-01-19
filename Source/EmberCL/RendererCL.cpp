@@ -1778,6 +1778,7 @@ void RendererCL<T, bucketT>::ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, 
 	emberCL.m_CamPerspective = ember.m_CamPerspective;
 	emberCL.m_CamYaw		 = ember.m_CamYaw;
 	emberCL.m_CamPitch		 = ember.m_CamPitch;
+	emberCL.m_BlurCurve      = ember.m_BlurCurve;
 	emberCL.m_CamDepthBlur	 = ember.m_CamDepthBlur;
 	emberCL.m_BlurCoef		 = ember.BlurCoef();
 	emberCL.m_CamMat		 = ember.m_CamMat;
@@ -1829,6 +1830,10 @@ void RendererCL<T, bucketT>::ConvertCarToRas(const CarToRas<T>& carToRas)
 	m_CarToRasCL.m_CarLlY = carToRas.CarLlY();
 	m_CarToRasCL.m_CarUrX = carToRas.CarUrX();
 	m_CarToRasCL.m_CarUrY = carToRas.CarUrY();
+	m_CarToRasCL.m_CarHalfX   = carToRas.CarHalfX();
+	m_CarToRasCL.m_CarHalfY   = carToRas.CarHalfY();
+	m_CarToRasCL.m_CarCenterX = carToRas.CarCenterX();
+	m_CarToRasCL.m_CarCenterY = carToRas.CarCenterY();
 }
 
 /// <summary>

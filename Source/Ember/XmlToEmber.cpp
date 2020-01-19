@@ -1605,6 +1605,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		else if (ParseAndAssign(curAtt->name, attStr, "cam_yaw", currentEmber.m_CamYaw, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "cam_pitch", currentEmber.m_CamPitch, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "cam_dof", currentEmber.m_CamDepthBlur, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "blur_curve", currentEmber.m_BlurCurve, ret)) {}
 		//Parse simple int reads.
 		else if (ParseAndAssign(curAtt->name, attStr, "palette", currentEmber.m_Palette.m_Index, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "oversample", currentEmber.m_Supersample, ret)) {}

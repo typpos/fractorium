@@ -1253,9 +1253,10 @@ public:
 		m_Samples.resize(samples);
 		params.m_Count = samples;
 		params.m_Skip = 20;
+		auto& ctr = m_Renderer->CoordMap();
 		//params.m_OneColDiv2 = m_Renderer->CoordMap().OneCol() / 2;
 		//params.m_OneRowDiv2 = m_Renderer->CoordMap().OneRow() / 2;
-		size_t bv = m_Iterator->Iterate(ember, params, m_Samples.data(), m_Rand);//Use a special fuse of 20, all other calls to this will use 15, or 100.
+		size_t bv = m_Iterator->Iterate(ember, params, ctr, m_Samples.data(), m_Rand);//Use a special fuse of 20, all other calls to this will use 15, or 100.
 
 		if (bv / T(samples) > eps)
 			eps = 3 * bv / T(samples);

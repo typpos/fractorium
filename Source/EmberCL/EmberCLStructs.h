@@ -205,6 +205,7 @@ struct ALIGN EmberCL
 	T m_CamPerspective;
 	T m_CamYaw;
 	T m_CamPitch;
+	T m_BlurCurve;
 	T m_CamDepthBlur;
 	T m_BlurCoef;
 	m3T m_CamMat;
@@ -225,6 +226,7 @@ static const char* EmberCLStructString =
 	"	real_t m_CamPerspective;\n"
 	"	real_t m_CamYaw;\n"
 	"	real_t m_CamPitch;\n"
+	"	real_t m_BlurCurve;\n"
 	"	real_t m_CamDepthBlur;\n"
 	"	real_t m_BlurCoef;\n"
 	"	real_t m_C00;\n"
@@ -254,6 +256,7 @@ struct ALIGN CarToRasCL
 	uint m_RasWidth;
 	T m_PixPerImageUnitH, m_RasLlY;
 	T m_CarLlX, m_CarUrX, m_CarUrY, m_CarLlY;
+	T m_CarHalfX, m_CarHalfY, m_CarCenterX, m_CarCenterY;
 };
 
 /// <summary>
@@ -266,6 +269,7 @@ static const char* CarToRasCLStructString =
 	"	uint m_RasWidth;\n"
 	"	real_t m_PixPerImageUnitH, m_RasLlY;\n"
 	"	real_t m_CarLlX, m_CarUrX, m_CarUrY, m_CarLlY;\n"
+	"	real_t m_CarHalfX, m_CarHalfY, m_CarCenterX, m_CarCenterY;\n"
 	"} CarToRasCL;\n"
 	"\n";
 

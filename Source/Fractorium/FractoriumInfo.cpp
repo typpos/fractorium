@@ -188,10 +188,10 @@ void Fractorium::UpdateHistogramBounds()
 
 	if (auto r = m_Controller->Renderer())
 	{
-		ul.sprintf("UL: %3.3f, %3.3f", r->LowerLeftX(), m_Settings->YAxisUp() ? r->UpperRightY() : r->LowerLeftY());//These bounds include gutter padding.
-		ur.sprintf("UR: %3.3f, %3.3f", r->UpperRightX(), m_Settings->YAxisUp() ? r->UpperRightY() : r->LowerLeftY());
-		lr.sprintf("LR: %3.3f, %3.3f", r->UpperRightX(), m_Settings->YAxisUp() ? r->LowerLeftY() : r->UpperRightY());
-		ll.sprintf("LL: %3.3f, %3.3f", r->LowerLeftX(), m_Settings->YAxisUp() ? r->LowerLeftY() : r->UpperRightY());
+		ul.sprintf("UL: %3.3f, %3.3f", r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
+		ur.sprintf("UR: %3.3f, %3.3f", r->UpperRightX(), r->UpperRightY());
+		lr.sprintf("LR: %3.3f, %3.3f", r->UpperRightX(), r->LowerLeftY());
+		ll.sprintf("LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
 		wh.sprintf("W x H: %4u x %4u", r->SuperRasW(), r->SuperRasH());
 		g.sprintf("%u", (uint)r->GutterWidth());
 		ui.InfoBoundsLabelUL->setText(ul);

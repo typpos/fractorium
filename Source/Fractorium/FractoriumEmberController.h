@@ -165,6 +165,7 @@ public:
 	virtual void PitchChanged(double d) { }
 	virtual void YawChanged(double d) { }
 	virtual void DepthBlurChanged(double d) { }
+	virtual void BlurCurveChanged(double d) { }
 	virtual void SpatialFilterWidthChanged(double d) { }
 	virtual void SpatialFilterTypeChanged(const QString& text) { }
 	virtual void TemporalFilterWidthChanged(double d) { }
@@ -453,6 +454,7 @@ public:
 	virtual void PitchChanged(double d) override;
 	virtual void YawChanged(double d) override;
 	virtual void DepthBlurChanged(double d) override;
+	virtual void BlurCurveChanged(double d) override;
 	virtual void SpatialFilterWidthChanged(double d) override;
 	virtual void SpatialFilterTypeChanged(const QString& text) override;
 	virtual void TemporalFilterWidthChanged(double d) override;

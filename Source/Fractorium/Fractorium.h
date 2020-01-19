@@ -230,6 +230,7 @@ public slots:
 	void OnPitchChanged(double d);
 	void OnYawChanged(double d);
 	void OnDepthBlurChanged(double d);
+	void OnBlurCurveChanged(double d);
 	void OnSpatialFilterWidthChanged(double d);//Filter.
 	void OnSpatialFilterTypeComboCurrentIndexChanged(const QString& text);
 	void OnTemporalFilterWidthChanged(double d);
@@ -487,6 +488,7 @@ private:
 	DoubleSpinBox* m_PitchSpin;
 	DoubleSpinBox* m_YawSpin;
 	DoubleSpinBox* m_DepthBlurSpin;
+	DoubleSpinBox* m_BlurCurveSpin;
 	DoubleSpinBox* m_SpatialFilterWidthSpin;//Filter.
 	StealthComboBox* m_SpatialFilterTypeCombo;
 	DoubleSpinBox* m_TemporalFilterWidthSpin;

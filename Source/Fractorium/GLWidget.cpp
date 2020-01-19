@@ -549,12 +549,7 @@ void GLWidget::paintGL()
 #else
 		m_Program->bind();
 		m_ProjMatrix.setToIdentity();
-
-		if (!controller->Renderer()->YAxisUp())
-			m_ProjMatrix.ortho(-unitX, unitX, unitY, -unitY, -1, 1);//Projection matrix: OpenGL camera is always centered, just move the ember internally inside the renderer.
-		else
-			m_ProjMatrix.ortho(-unitX, unitX, -unitY, unitY, -1, 1);
-
+		m_ProjMatrix.ortho(-unitX, unitX, -unitY, unitY, -1, 1);//Projection matrix: OpenGL camera is always centered, just move the ember internally inside the renderer.
 		m_ModelViewMatrix.setToIdentity();
 		//this->DrawUnitSquare();
 		controller->GLController()->DrawAffines(pre, post);

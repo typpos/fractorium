@@ -708,21 +708,21 @@ public:
 		   << "\t\tif (" << smoothStyle << " > 1)\n"
 		   << "\t\t	znxy = 1 - (" << smoothStyle << " * (1 - ((exnze + wynze) / 2 * " << smoothStyle << ")));\n"
 		   << "\t\telse\n"
-		   << "\t\t	znxy = 1 - (" << smoothStyle << " * (1 - ((exnze + wynze) * (real_t)(0.5))));\n";
+		   << "\t\t	znxy = 1 - (" << smoothStyle << " * (1 - ((exnze + wynze) * (real_t)(0.5))));\n\n";
 
 		if (m_VarType == eVariationType::VARTYPE_PRE)
 		{
 			ss <<
 			   "\t\tpx = vIn.x;\n"
 			   "\t\tpy = vIn.y;\n"
-			   "\t\tpz = vIn.z;\n";
+			   "\t\tpz = vIn.z;\n\n";
 		}
 		else
 		{
 			ss <<
 			   "\t\tpx = outPoint->m_X;\n"
 			   "\t\tpy = outPoint->m_Y;\n"
-			   "\t\tpz = outPoint->m_Z;\n";
+			   "\t\tpz = outPoint->m_Z;\n\n";
 		}
 
 		ss <<

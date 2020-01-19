@@ -159,6 +159,7 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 	os << " cam_yaw=\"" << ember.m_CamYaw << "\"";
 	os << " cam_pitch=\"" << ember.m_CamPitch << "\"";
 	os << " cam_dof=\"" << ember.m_CamDepthBlur << "\"";
+	os << " blur_curve=\"" << ember.m_BlurCurve << "\"";
 
 	if (ember.m_PaletteMode == ePaletteMode::PALETTE_STEP)
 		os << " palette_mode=\"step\"";

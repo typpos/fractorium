@@ -15,7 +15,7 @@ namespace EmberNs
 	using Iterator<T>::NextXformFromIndex; \
 	using Iterator<T>::DoFinalXform; \
 	using Iterator<T>::DoBadVals;
-	
+
 template <typename T>
 struct IterParams
 {
@@ -69,12 +69,12 @@ public:
 	/// Virtual empty iteration function that will be overidden in derived iterator classes.
 	/// </summary>
 	/// <param name="ember">The ember whose xforms will be applied</param>
-	/// <param name="count">The number of iterations to do</param>
-	/// <param name="skip">The number of times to fuse</param>
+	/// <param name="params">Structure holding number of iterations to do, and the number to fuse. This is passed by value on purpose.</param>
+	/// <param name="ctr">The cartesian to raster conversion structure which is used in some 3D projections</param>
 	/// <param name="samples">The buffer to store the output points</param>
 	/// <param name="rand">The random context to use</param>
 	/// <returns>The number of bad values</returns>
-	virtual size_t Iterate(Ember<T>& ember, IterParams<T>& params, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) { return 0; }
+	virtual size_t Iterate(Ember<T>& ember, const IterParams<T> params, const CarToRas<T>& ctr, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) { return 0; }
 
 	/// <summary>
 	/// Initialize the xform selection vector by normalizing the weights of all xforms and
@@ -292,12 +292,12 @@ public:
 	/// Overridden virtual function which iterates an ember a given number of times and does not use xaos.
 	/// </summary>
 	/// <param name="ember">The ember whose xforms will be applied</param>
-	/// <param name="count">The number of iterations to do</param>
-	/// <param name="skip">The number of times to fuse</param>
+	/// <param name="params">Structure holding number of iterations to do, and the number to fuse. This is passed by value on purpose.</param>
+	/// <param name="ctr">The cartesian to raster conversion structure which is used in some 3D projections</param>
 	/// <param name="samples">The buffer to store the output points</param>
 	/// <param name="rand">The random context to use</param>
 	/// <returns>The number of bad values</returns>
-	virtual size_t Iterate(Ember<T>& ember, IterParams<T>& params, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	virtual size_t Iterate(Ember<T>& ember, const IterParams<T> params, const CarToRas<T>& ctr, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		size_t i, badVals = 0;
 		Point<T> tempPoint, p1;
@@ -316,7 +316,7 @@ public:
 				}
 
 				DoFinalXform(ember, p1, samples, rand);//Apply to last fuse point and store as the first element in samples.
-				ember.Proj(samples[0], rand);
+				ember.Proj(samples[0], rand, ctr);
 
 				for (i = 1; i < params.m_Count; i++)//Real loop.
 				{
@@ -324,7 +324,7 @@ public:
 						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
 
 					DoFinalXform(ember, p1, samples + i, rand);
-					ember.Proj(samples[i], rand);
+					ember.Proj(samples[i], rand, ctr);
 				}
 			}
 			else//No xaos, 3D, no final.
@@ -338,7 +338,7 @@ public:
 				}
 
 				samples[0] = p1;
-				ember.Proj(samples[0], rand);
+				ember.Proj(samples[0], rand, ctr);
 
 				for (i = 1; i < params.m_Count; i++)//Real loop.
 				{
@@ -346,7 +346,7 @@ public:
 						DoBadVals(xforms, ember.m_RandPointRange, badVals, samples + i, rand);
 
 					p1 = samples[i];
-					ember.Proj(samples[i], rand);
+					ember.Proj(samples[i], rand, ctr);
 				}
 			}
 		}
@@ -458,12 +458,12 @@ public:
 	/// Overridden virtual function which iterates an ember a given number of times and uses xaos.
 	/// </summary>
 	/// <param name="ember">The ember whose xforms will be applied</param>
-	/// <param name="count">The number of iterations to do</param>
-	/// <param name="skip">The number of times to fuse</param>
+	/// <param name="params">Structure holding number of iterations to do, and the number to fuse. This is passed by value on purpose.</param>
+	/// <param name="ctr">The cartesian to raster conversion structure which is used in some 3D projections</param>
 	/// <param name="samples">The buffer to store the output points</param>
 	/// <param name="rand">The random context to use</param>
 	/// <returns>The number of bad values</returns>
-	virtual size_t Iterate(Ember<T>& ember, IterParams<T>& params, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	virtual size_t Iterate(Ember<T>& ember, const IterParams<T> params, const CarToRas<T>& ctr, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		size_t i, xformIndex;
 		size_t lastXformUsed = 0;
@@ -488,7 +488,7 @@ public:
 				}
 
 				DoFinalXform(ember, p1, samples, rand);//Apply to last fuse point and store as the first element in samples.
-				ember.Proj(samples[0], rand);
+				ember.Proj(samples[0], rand, ctr);
 
 				for (i = 1; i < params.m_Count; i++)//Real loop.
 				{
@@ -498,7 +498,7 @@ public:
 						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
 
 					DoFinalXform(ember, p1, samples + i, rand);
-					ember.Proj(samples[i], rand);
+					ember.Proj(samples[i], rand, ctr);
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 			}
@@ -517,7 +517,7 @@ public:
 				}
 
 				samples[0] = p1;
-				ember.Proj(samples[0], rand);
+				ember.Proj(samples[0], rand, ctr);
 
 				for (i = 1; i < params.m_Count; i++)//Real loop.
 				{
@@ -527,7 +527,7 @@ public:
 						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
 
 					samples[i] = p1;
-					ember.Proj(samples[i], rand);
+					ember.Proj(samples[i], rand, ctr);
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 			}

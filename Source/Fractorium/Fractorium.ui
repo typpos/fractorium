@@ -713,13 +713,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>266</height>
+               <height>288</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>266</height>
+               <height>288</height>
               </size>
              </property>
              <property name="focusPolicy">
@@ -864,6 +864,11 @@
              <row>
               <property name="text">
                <string>Depth Blur</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Blur Curve</string>
               </property>
              </row>
              <column>
@@ -1028,6 +1033,19 @@
               </property>
              </item>
              <item row="11" column="1">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </item>
+             <item row="12" column="0">
+              <property name="text">
+               <string>Blur Curve (3D)</string>
+              </property>
+              <property name="toolTip">
+               <string>Curve parameter to adjust how blurry points are as they move away from 0,0. Use 0 to make bluriness uniform.</string>
+              </property>
+             </item>
+             <item row="12" column="1">
               <property name="text">
                <string>0</string>
               </property>
@@ -3194,7 +3212,7 @@
                 </size>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate selected xforms.&lt;/p&gt;&lt;p&gt;If xaos is present in the flame, the new xforms will be added with existing xaos preserved, else they'll just be added normally.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate selected xforms.&lt;/p&gt;&lt;p&gt;If xaos is present in the flame, the duplicated xforms will be added with existing xaos preserved, else they'll just be added normally.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>

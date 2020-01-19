@@ -208,7 +208,7 @@ void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->Add
 
 /// <summary>
 /// Duplicate the specified xforms in the current ember, and set the last one as the current xform.
-/// If xaos is present in the ember, the new xforms will be added with xaos preserved, else they'll just be added normally.
+/// If xaos is present in the ember, the duplicated xforms will be added with xaos preserved, else they'll just be added normally.
 /// Called when the duplicate xform button is clicked.
 /// Resets the rendering process.
 /// </summary>

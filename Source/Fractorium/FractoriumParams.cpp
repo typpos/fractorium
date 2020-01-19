@@ -59,11 +59,12 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ScaleSpin,       spinHeight,    10,    dmax,    20, SIGNAL(valueChanged(double)), SLOT(OnScaleChanged(double)),	     true,  240, 240, 240);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,      25,   0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	     true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight,  -180,     180,    10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,     1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,   0.1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PerspectiveSpin, spinHeight,  -500,     500,  0.01, SIGNAL(valueChanged(double)), SLOT(OnPerspectiveChanged(double)), true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PitchSpin,       spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnPitchChanged(double)),       true,	  0,  45,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_YawSpin,         spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnYawChanged(double)),         true,	  0,  45,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DepthBlurSpin,   spinHeight, -dmax,    dmax,  0.01, SIGNAL(valueChanged(double)), SLOT(OnDepthBlurChanged(double)),   true,	  0,   1,	0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BlurCurveSpin,   spinHeight,     0,    dmax,   0.1, SIGNAL(valueChanged(double)), SLOT(OnBlurCurveChanged(double)),   true,	  0,   1,	0);
 	m_WidthSpin->m_DoubleClickNonZeroEvent = [&](SpinBox * sb, int val)
 	{
 		m_Controller->ResizeAndScale(val, m_HeightSpin->DoubleClickNonZero(), eScaleType::SCALE_WIDTH);
@@ -467,6 +468,15 @@ template <typename T> void FractoriumEmberController<T>::DepthBlurChanged(double
 }
 void Fractorium::OnDepthBlurChanged(double d) { m_Controller->DepthBlurChanged(d); }
 
+template <typename T> void FractoriumEmberController<T>::BlurCurveChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_BlurCurve = d;
+	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnBlurCurveChanged(double d) { m_Controller->BlurCurveChanged(d); }
+
 /// <summary>
 /// Filter.
 /// </summary>
@@ -797,6 +807,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_PitchSpin->SetValueStealth(m_Ember.m_CamPitch * RAD_2_DEG_T);
 	m_Fractorium->m_YawSpin->SetValueStealth(m_Ember.m_CamYaw * RAD_2_DEG_T);
 	m_Fractorium->m_DepthBlurSpin->SetValueStealth(m_Ember.m_CamDepthBlur);
+	m_Fractorium->m_BlurCurveSpin->SetValueStealth(m_Ember.m_BlurCurve);
 	m_Fractorium->m_SpatialFilterWidthSpin->SetValueStealth(m_Ember.m_SpatialFilterRadius);//Filter.
 	m_Fractorium->m_SpatialFilterTypeCombo->SetCurrentIndexStealth(int(m_Ember.m_SpatialFilterType));
 	m_Fractorium->m_TemporalFilterWidthSpin->SetValueStealth(m_Ember.m_TemporalFilterWidth);
@@ -871,6 +882,7 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 	ember.m_CamPitch = m_Fractorium->m_PitchSpin->value() * DEG_2_RAD_T;
 	ember.m_CamYaw = m_Fractorium->m_YawSpin->value() * DEG_2_RAD_T;
 	ember.m_CamDepthBlur = m_Fractorium->m_DepthBlurSpin->value();
+	ember.m_BlurCurve = m_Fractorium->m_BlurCurveSpin->value();
 	ember.m_SubBatchSize = m_Fractorium->m_SbsSpin->value();
 	ember.m_FuseCount = m_Fractorium->m_FuseSpin->value();
 	ember.m_RandPointRange = m_Fractorium->m_RandRangeSpin->value();

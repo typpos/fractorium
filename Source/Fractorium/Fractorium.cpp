@@ -995,6 +995,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_PitchSpin);
 	w = SetTabOrder(this, w, m_YawSpin);
 	w = SetTabOrder(this, w, m_DepthBlurSpin);
+	w = SetTabOrder(this, w, m_BlurCurveSpin);
 	w = SetTabOrder(this, w, m_SpatialFilterWidthSpin);//Flame filter.
 	w = SetTabOrder(this, w, m_SpatialFilterTypeCombo);
 	w = SetTabOrder(this, w, m_DEFilterMinRadiusSpin);

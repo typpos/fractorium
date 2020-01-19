@@ -6,6 +6,8 @@
 #include "SpatialFilter.h"
 #include "TemporalFilter.h"
 #include "EmberMotion.h"
+#include "CarToRas.h"
+#include "VarFuncs.h"
 
 /// <summary>
 /// Ember class.
@@ -120,6 +122,7 @@ public:
 		m_CamYaw			  = T(ember.m_CamYaw);
 		m_CamPitch			  = T(ember.m_CamPitch);
 		m_CamDepthBlur		  = T(ember.m_CamDepthBlur);
+		m_BlurCurve           = T(ember.m_BlurCurve);
 		m_CamMat			  = ember.m_CamMat;
 		m_CenterX			  = T(ember.m_CenterX);
 		m_CenterY			  = T(ember.m_CenterY);
@@ -760,6 +763,7 @@ public:
 		InterpT<&Ember<T>::m_CamYaw>(embers, coefs, size);
 		InterpT<&Ember<T>::m_CamPitch>(embers, coefs, size);
 		InterpT<&Ember<T>::m_CamDepthBlur>(embers, coefs, size);
+		InterpT<&Ember<T>::m_BlurCurve>(embers, coefs, size);
 		InterpX<m3T, &Ember<T>::m_CamMat>(embers, coefs, size);
 		InterpT<&Ember<T>::m_CenterX>(embers, coefs, size);
 		InterpT<&Ember<T>::m_CenterY>(embers, coefs, size);
@@ -1162,9 +1166,9 @@ public:
 	/// </summary>
 	/// <param name="point">The point to project</param>
 	/// <param name="rand">The Isaac object to pass to the projection functions</param>
-	inline void Proj(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	inline void Proj(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
-		(this->*m_ProjFunc)(point, rand);
+		(this->*m_ProjFunc)(point, rand, ctr);
 	}
 
 	/// <summary>
@@ -1172,7 +1176,7 @@ public:
 	/// </summary>
 	/// <param name="point">Ignored</param>
 	/// <param name="rand">Ignored</param>
-	void ProjectNone(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	void ProjectNone(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 	}
 
@@ -1181,7 +1185,7 @@ public:
 	/// </summary>
 	/// <param name="point">The point to project</param>
 	/// <param name="rand">Ignored</param>
-	void ProjectZPerspective(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	void ProjectZPerspective(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 		T zr = Zeps(1 - m_CamPerspective * (point.m_Z - m_CamZPos));
 		point.m_X /= zr;
@@ -1194,7 +1198,7 @@ public:
 	/// </summary>
 	/// <param name="point">The point to project</param>
 	/// <param name="rand">Ignored</param>
-	void ProjectPitch(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	void ProjectPitch(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 		T z  = point.m_Z - m_CamZPos;
 		T y  = m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
@@ -1209,7 +1213,7 @@ public:
 	/// </summary>
 	/// <param name="point">The point to project</param>
 	/// <param name="rand">Used for blurring</param>
-	void ProjectPitchDepthBlur(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	void ProjectPitchDepthBlur(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 		T y, z, zr;
 		T dsin, dcos;
@@ -1219,7 +1223,11 @@ public:
 		z = m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z;
 		zr = Zeps(1 - m_CamPerspective * z);
 		sincos(t, &dsin, &dcos);
-		T dr = rand.Frand01<T>() * m_BlurCoef * z;
+		T prcx = (point.m_X - ctr.CarCenterX()) / ctr.CarHalfX();
+		T prcy = (y - ctr.CarCenterY()) / ctr.CarHalfY();
+		T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
+		T scale = m_BlurCurve ? std::min<T>(T(1), Sqr(dist) / (4 * m_BlurCurve)) : T(1);
+		T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
 		point.m_X = (point.m_X + dr * dcos) / zr;
 		point.m_Y = (y + dr * dsin) / zr;
 		point.m_Z -= m_CamZPos;
@@ -1230,7 +1238,7 @@ public:
 	/// </summary>
 	/// <param name="point">The point to project</param>
 	/// <param name="rand">Used for blurring</param>
-	void ProjectPitchYawDepthBlur(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	void ProjectPitchYawDepthBlur(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 		T dsin, dcos;
 		T t = rand.Frand01<T>() * M_2PI;
@@ -1239,7 +1247,11 @@ public:
 		T y = m_CamMat[0][1] * point.m_X + m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
 		z = m_CamMat[0][2] * point.m_X + m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z;
 		T zr = Zeps(1 - m_CamPerspective * z);
-		T dr = rand.Frand01<T>() * m_BlurCoef * z;
+		T prcx = (x - ctr.CarCenterX()) / ctr.CarHalfX();
+		T prcy = (y - ctr.CarCenterY()) / ctr.CarHalfY();
+		T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
+		T scale = m_BlurCurve ? std::min<T>(T(1), Sqr(dist) / (4 * m_BlurCurve)) : T(1);
+		T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
 		sincos(t, &dsin, &dcos);
 		point.m_X = (x + dr * dcos) / zr;
 		point.m_Y = (y + dr * dsin) / zr;
@@ -1251,7 +1263,7 @@ public:
 	/// </summary>
 	/// <param name="point">The point to project</param>
 	/// <param name="rand">Ignored</param>
-	void ProjectPitchYaw(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
+	void ProjectPitchYaw(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 		T z = point.m_Z - m_CamZPos;
 		T x = m_CamMat[0][0] * point.m_X + m_CamMat[1][0] * point.m_Y;
@@ -1356,6 +1368,10 @@ public:
 						APP_FMP(m_Vibrancy);
 						break;
 
+					case eEmberMotionParam::FLAME_MOTION_BLUR_CURVE:
+						APP_FMP(m_BlurCurve);
+						break;
+
 					case eEmberMotionParam::FLAME_MOTION_NONE:
 					default:
 						break;
@@ -1403,6 +1419,7 @@ public:
 			m_CamYaw = 0;
 			m_CamPitch = 0;
 			m_CamDepthBlur = 0;
+			m_BlurCurve = 0;
 			m_BlurCoef = 0;
 			m_CamMat = m3T(0);
 			m_Quality = 1;
@@ -1439,6 +1456,7 @@ public:
 			m_CamYaw = 999999;
 			m_CamPitch = 999999;
 			m_CamDepthBlur = 999999;
+			m_BlurCurve = 999999;
 			m_BlurCoef = 999999;
 			m_CamMat = m3T(999999);
 			m_Quality = -1;
@@ -1502,6 +1520,7 @@ public:
 		   << "Perspective: " << m_CamPerspective << "\n"
 		   << "Yaw: " << m_CamYaw << "\n"
 		   << "Pitch: " << m_CamPitch << "\n"
+		   << "Blur Curve: " << m_BlurCurve << "\n"
 		   << "Depth Blur: " << m_CamDepthBlur << "\n"
 		   << "CenterX: " << m_CenterX << "\n"
 		   << "CenterY: " << m_CenterY << "\n"
@@ -1613,7 +1632,7 @@ public:
 
 	//3D fields.
 private:
-	typedef void (Ember<T>::*ProjFuncPtr)(Point<T>&, QTIsaac<ISAAC_SIZE, ISAAC_INT>&);
+	typedef void (Ember<T>::*ProjFuncPtr)(Point<T>&, QTIsaac<ISAAC_SIZE, ISAAC_INT>&, const CarToRas<T>&);
 	ProjFuncPtr m_ProjFunc;
 
 public:
@@ -1631,6 +1650,9 @@ public:
 
 	//Xml field: "cam_dof".
 	T m_CamDepthBlur = 0;
+
+	//Xml field: "blur_curve".
+	T m_BlurCurve = 0;//Used as p in the equation x^2/4p.
 
 private:
 	T m_BlurCoef = 0;

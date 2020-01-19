@@ -608,7 +608,6 @@ public:
 	{
 		int useNode = rand.Rand() & 7;//Faster than % 8.
 		T exnze, wynze, znxy;
-		T lattd = m_Weight * T(0.5);
 		T px, py, pz;
 		exnze = 1 - (m_SmoothStyle * (1 - (std::cos(std::atan2(helper.In.x, helper.In.z)))));
 		wynze = 1 - (m_SmoothStyle * (1 - (std::sin(std::atan2(helper.In.y, helper.In.z)))));
@@ -631,55 +630,59 @@ public:
 			pz = outPoint.m_Z;
 		}
 
+		T val1 = (px - (m_Smooth1mFill * px * exnze)) + (helper.In.x * m_SmoothFill * exnze);
+		T val2 = (py - (m_Smooth1mFill * py * wynze)) + (helper.In.y * m_SmoothFill * wynze);
+		T val3 = (pz - (m_Smooth1mFill * pz * znxy)) + (helper.In.z * m_SmoothFill * znxy);
+
 		switch (useNode)
 		{
 			case 0:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) + lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) + lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) + lattd;
+				helper.Out.x = val1 + m_HalfWeight;
+				helper.Out.y = val2 + m_HalfWeight;
+				helper.Out.z = val3 + m_HalfWeight;
 				break;
 
 			case 1:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) + lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) - lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) + lattd;
+				helper.Out.x = val1 + m_HalfWeight;
+				helper.Out.y = val2 - m_HalfWeight;
+				helper.Out.z = val3 + m_HalfWeight;
 				break;
 
 			case 2:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) + lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) + lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) - lattd;
+				helper.Out.x = val1 + m_HalfWeight;
+				helper.Out.y = val2 + m_HalfWeight;
+				helper.Out.z = val3 - m_HalfWeight;
 				break;
 
 			case 3:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) + lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) - lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) - lattd;
+				helper.Out.x = val1 + m_HalfWeight;
+				helper.Out.y = val2 - m_HalfWeight;
+				helper.Out.z = val3 - m_HalfWeight;
 				break;
 
 			case 4:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) - lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) + lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) + lattd;
+				helper.Out.x = val1 - m_HalfWeight;
+				helper.Out.y = val2 + m_HalfWeight;
+				helper.Out.z = val3 + m_HalfWeight;
 				break;
 
 			case 5:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) - lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) - lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) + lattd;
+				helper.Out.x = val1 - m_HalfWeight;
+				helper.Out.y = val2 - m_HalfWeight;
+				helper.Out.z = val3 + m_HalfWeight;
 				break;
 
 			case 6:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) - lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) + lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) - lattd;
+				helper.Out.x = val1 - m_HalfWeight;
+				helper.Out.y = val2 + m_HalfWeight;
+				helper.Out.z = val3 - m_HalfWeight;
 				break;
 
 			case 7:
 			default:
-				helper.Out.x = ((px - (m_Smooth * (1 - m_Fill) * px * exnze)) + (helper.In.x * m_Smooth * m_Fill * exnze)) - lattd;
-				helper.Out.y = ((py - (m_Smooth * (1 - m_Fill) * py * wynze)) + (helper.In.y * m_Smooth * m_Fill * wynze)) - lattd;
-				helper.Out.z = ((pz - (m_Smooth * (1 - m_Fill) * pz * znxy)) + (helper.In.z * m_Smooth * m_Fill * znxy)) - lattd;
+				helper.Out.x = val1 - m_HalfWeight;
+				helper.Out.y = val2 - m_HalfWeight;
+				helper.Out.z = val3 - m_HalfWeight;
 				break;
 		}
 	}
@@ -689,17 +692,19 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
-		string weight = WeightDefineString();
-		string xpand = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string style = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string fill = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string smooth = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string smoothStyle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string index        = ss2.str();
+		string weight       = WeightDefineString();
+		string xpand        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string style        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string fill         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string smooth       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string smoothStyle  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string smoothfill   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string smooth1mfill = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfweight   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint useNode = MwcNext(mwc) & 7;\n"
 		   << "\t\treal_t exnze, wynze, znxy;\n"
-		   << "\t\treal_t lattd = " << weight << " * (real_t)(0.5);\n"
 		   << "\t\treal_t px, py, pz;\n"
 		   << "\n"
 		   << "\t\texnze = 1 - (" << smoothStyle << " * (1 - (cos(atan2(vIn.x, vIn.z)))));\n"
@@ -726,47 +731,51 @@ public:
 		}
 
 		ss <<
+		   "\t\treal_t val1 = (px - (" << smooth1mfill << " * px * exnze)) + (vIn.x * " << smoothfill << " * exnze);\n"
+		   "\t\treal_t val2 = (py - (" << smooth1mfill << " * py * wynze)) + (vIn.y * " << smoothfill << " * wynze);\n"
+		   "\t\treal_t val3 = (pz - (" << smooth1mfill << " * pz * znxy))  + (vIn.z * " << smoothfill << " * znxy);\n"
+		   "\n"
 		   "\t\tswitch (useNode)\n"
 		   "\t\t{\n"
 		   "\t\t	case 0 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) + lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) + lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  + lattd;\n"
+		   "\t\t		vOut.x = val1 + " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 + " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 + " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 1 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " *(1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) + lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " *(1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) - lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " *(1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  + lattd;\n"
+		   "\t\t		vOut.x = val1 + " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 - " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 + " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 2 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) + lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) + lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  - lattd;\n"
+		   "\t\t		vOut.x = val1 + " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 + " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 - " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 3 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) + lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) - lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  - lattd;\n"
+		   "\t\t		vOut.x = val1 + " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 - " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 - " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 4 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) - lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) + lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  + lattd;\n"
+		   "\t\t		vOut.x = val1 - " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 + " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 + " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 5 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) - lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) - lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  + lattd;\n"
+		   "\t\t		vOut.x = val1 - " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 - " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 + " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 6 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) - lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) + lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  - lattd;\n"
+		   "\t\t		vOut.x = val1 - " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 + " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 - " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t	case 7 :\n"
-		   "\t\t		vOut.x = ((px - (" << smooth << " * (1 - " << fill << ") * px * exnze)) + (vIn.x * " << smooth << " * " << fill << " * exnze)) - lattd;\n"
-		   "\t\t		vOut.y = ((py - (" << smooth << " * (1 - " << fill << ") * py * wynze)) + (vIn.y * " << smooth << " * " << fill << " * wynze)) - lattd;\n"
-		   "\t\t		vOut.z = ((pz - (" << smooth << " * (1 - " << fill << ") * pz * znxy))  + (vIn.z * " << smooth << " * " << fill << " * znxy))  - lattd;\n"
+		   "\t\t		vOut.x = val1 - " << halfweight << ";\n"
+		   "\t\t		vOut.y = val2 - " << halfweight << ";\n"
+		   "\t\t		vOut.z = val3 - " << halfweight << ";\n"
 		   "\t\t		break;\n"
 		   "\t\t}\n"
 		   "\t}\n";
@@ -796,6 +805,10 @@ public:
 			else
 				m_SmoothStyle = (m_Style + 1) * T(0.25) - 1;
 		}
+
+		m_SmoothFill = m_Smooth * m_Fill;
+		m_Smooth1mFill = m_Smooth * (1 - m_Fill);
+		m_HalfWeight = m_Weight * T(0.5);
 	}
 
 protected:
@@ -803,11 +816,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Xpand, prefix + "cubic3D_xpand", T(0.25)));
-		m_Params.push_back(ParamWithName<T>(&m_Style, prefix + "cubic3D_style"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Fill, prefix + "cubic3D_fill"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Smooth, prefix + "cubic3D_smooth"));
-		m_Params.push_back(ParamWithName<T>(true, &m_SmoothStyle, prefix + "cubic3D_smooth_style"));
+		m_Params.push_back(ParamWithName<T>(&m_Xpand, prefix              + "cubic3D_xpand", T(0.25)));
+		m_Params.push_back(ParamWithName<T>(&m_Style, prefix              + "cubic3D_style"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Fill, prefix         + "cubic3D_fill"));    //Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Smooth, prefix       + "cubic3D_smooth"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SmoothStyle, prefix  + "cubic3D_smooth_style"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SmoothFill, prefix   + "cubic3D_smooth_fill"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Smooth1mFill, prefix + "cubic3D_smooth_1m_fill"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfWeight, prefix   + "cubic3D_half_weight"));
 	}
 
 private:
@@ -816,6 +832,9 @@ private:
 	T m_Fill;//Precalc.
 	T m_Smooth;
 	T m_SmoothStyle;
+	T m_SmoothFill;
+	T m_Smooth1mFill;
+	T m_HalfWeight;
 };
 
 /// <summary>
@@ -835,7 +854,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		int useNode = rand.Rand() & 7;//Faster than % 8.
-		T exnze, wynze, znxy, px, py, pz, lattd = m_Weight;
+		T exnze, wynze, znxy, px, py, pz;
 
 		if (m_Style == 2)
 		{
@@ -863,59 +882,59 @@ public:
 			pz = outPoint.m_Z;
 		}
 
-		T pxtx = px + helper.In.x;
-		T pyty = py + helper.In.y;
-		T pztz = pz + helper.In.z;
+		T pxtx = (px + helper.In.x) * m_Fill * exnze;
+		T pyty = (py + helper.In.y) * m_Fill * wynze;
+		T pztz = (pz + helper.In.z) * m_Fill * znxy;
 
 		switch (useNode)
 		{
 			case 0:
-				helper.Out.x = pxtx * m_Fill * exnze + lattd;
-				helper.Out.y = pyty * m_Fill * wynze + lattd;
-				helper.Out.z = pztz * m_Fill * znxy + lattd;
+				helper.Out.x = pxtx + m_Weight;
+				helper.Out.y = pyty + m_Weight;
+				helper.Out.z = pztz + m_Weight;
 				break;
 
 			case 1:
-				helper.Out.x = pxtx * m_Fill * exnze + lattd;
-				helper.Out.y = pyty * m_Fill * wynze - lattd;
-				helper.Out.z = pztz * m_Fill * znxy + lattd;
+				helper.Out.x = pxtx + m_Weight;
+				helper.Out.y = pyty - m_Weight;
+				helper.Out.z = pztz + m_Weight;
 				break;
 
 			case 2:
-				helper.Out.x = pxtx * m_Fill * exnze + lattd;
-				helper.Out.y = pyty * m_Fill * wynze + lattd;
-				helper.Out.z = pztz * m_Fill * znxy - lattd;
+				helper.Out.x = pxtx + m_Weight;
+				helper.Out.y = pyty + m_Weight;
+				helper.Out.z = pztz - m_Weight;
 				break;
 
 			case 3:
-				helper.Out.x = pxtx * m_Fill * exnze + lattd;
-				helper.Out.y = pyty * m_Fill * wynze - lattd;
-				helper.Out.z = pztz * m_Fill * znxy - lattd;
+				helper.Out.x = pxtx + m_Weight;
+				helper.Out.y = pyty - m_Weight;
+				helper.Out.z = pztz - m_Weight;
 				break;
 
 			case 4:
-				helper.Out.x = pxtx * m_Fill * exnze - lattd;
-				helper.Out.y = pyty * m_Fill * wynze + lattd;
-				helper.Out.z = pztz * m_Fill * znxy + lattd;
+				helper.Out.x = pxtx - m_Weight;
+				helper.Out.y = pyty + m_Weight;
+				helper.Out.z = pztz + m_Weight;
 				break;
 
 			case 5:
-				helper.Out.x = pxtx * m_Fill * exnze - lattd;
-				helper.Out.y = pyty * m_Fill * wynze - lattd;
-				helper.Out.z = pztz * m_Fill * znxy + lattd;
+				helper.Out.x = pxtx - m_Weight;
+				helper.Out.y = pyty - m_Weight;
+				helper.Out.z = pztz + m_Weight;
 				break;
 
 			case 6:
-				helper.Out.x = pxtx * m_Fill * exnze - lattd;
-				helper.Out.y = pyty * m_Fill * wynze + lattd;
-				helper.Out.z = pztz * m_Fill * znxy - lattd;
+				helper.Out.x = pxtx - m_Weight;
+				helper.Out.y = pyty + m_Weight;
+				helper.Out.z = pztz - m_Weight;
 				break;
 
 			case 7:
 			default:
-				helper.Out.x = pxtx * m_Fill * exnze - lattd;
-				helper.Out.y = pyty * m_Fill * wynze - lattd;
-				helper.Out.z = pztz * m_Fill * znxy - lattd;
+				helper.Out.x = pxtx - m_Weight;
+				helper.Out.y = pyty - m_Weight;
+				helper.Out.z = pztz - m_Weight;
 				break;
 		}
 	}
@@ -925,14 +944,14 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
+		string index  = ss2.str();
 		string weight = WeightDefineString();
-		string xpand = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string style = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string fill = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string xpand  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string style  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string fill   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint useNode = MwcNext(mwc) & 7;\n"
-		   << "\t\treal_t exnze, wynze, znxy, px, py, pz, lattd = " << weight << ";\n"
+		   << "\t\treal_t exnze, wynze, znxy, px, py, pz;\n"
 		   << "\n"
 		   << "\t\tif (" << style << " == 2)\n"
 		   << "\t\t{\n"
@@ -962,51 +981,51 @@ public:
 			   "\t\tpz = outPoint->m_Z;\n";
 		}
 
-		ss << "\t\treal_t pxtx = px + vIn.x;\n"
-		   << "\t\treal_t pyty = py + vIn.y;\n"
-		   << "\t\treal_t pztz = pz + vIn.z;\n"
+		ss << "\t\treal_t pxtx = (px + vIn.x) * " << fill << " * exnze;\n"
+		   << "\t\treal_t pyty = (py + vIn.y) * " << fill << " * wynze;\n"
+		   << "\t\treal_t pztz = (pz + vIn.z) * " << fill << " * znxy ;\n"
 		   << "\n"
 		   << "\t\tswitch (useNode)\n"
 		   << "\t\t{\n"
 		   << "\t\t	case 0 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze, lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze, lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy , lattd);\n"
+		   << "\t\t		vOut.x = pxtx + " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty + " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz + " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 1 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze,  lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze, -lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy,   lattd);\n"
+		   << "\t\t		vOut.x = pxtx + " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty - " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz + " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 2 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze, lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze, lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy, -lattd);\n"
+		   << "\t\t		vOut.x = pxtx + " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty + " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz - " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 3 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze,  lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze, -lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy,  -lattd);\n"
+		   << "\t\t		vOut.x = pxtx + " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty - " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz - " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 4 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze, -lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze,  lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy,   lattd);\n"
+		   << "\t\t		vOut.x = pxtx - " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty + " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz + " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 5 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze, -lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze, -lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy,   lattd);\n"
+		   << "\t\t		vOut.x = pxtx - " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty - " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz + " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 6 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze, -lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze,  lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy,  -lattd);\n"
+		   << "\t\t		vOut.x = pxtx - " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty + " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz - " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 7 :\n"
-		   << "\t\t		vOut.x = fma(pxtx, " << fill << " * exnze, -lattd);\n"
-		   << "\t\t		vOut.y = fma(pyty, " << fill << " * wynze, -lattd);\n"
-		   << "\t\t		vOut.z = fma(pztz, " << fill << " * znxy,  -lattd);\n"
+		   << "\t\t		vOut.x = pxtx - " << weight << ";\n"
+		   << "\t\t		vOut.y = pyty - " << weight << ";\n"
+		   << "\t\t		vOut.z = pztz - " << weight << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t}\n"
 		   << "\t}\n";

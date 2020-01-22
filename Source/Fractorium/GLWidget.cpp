@@ -523,8 +523,8 @@ void GLWidget::paintGL()
 		}
 
 		//Affine drawing.
-		bool pre = m_Fractorium->ui.PreAffineGroupBox->isChecked();
-		bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
+        bool pre = m_Fractorium->DrawPreAffines();
+        bool post = m_Fractorium->DrawPostAffines();
 		this->glEnable(GL_BLEND);
 		this->glEnable(GL_LINE_SMOOTH);
 		this->glEnable(GL_POINT_SMOOTH);
@@ -1757,8 +1757,8 @@ void GLWidget::DrawAffineHelper(int index, float circleWidth, float lineWidth, b
 template <typename T>
 int GLEmberController<T>::UpdateHover(v3T& glCoords)
 {
-	bool pre = m_Fractorium->ui.PreAffineGroupBox->isChecked();
-	bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
+    bool pre = m_Fractorium->DrawPreAffines();
+    bool post = m_Fractorium->DrawPostAffines();
 	int i = 0, bestIndex = -1;
 	T bestDist = 10;
 	auto ember = m_FractoriumEmberController->CurrentEmber();

@@ -154,8 +154,10 @@ void Fractorium::InitXformsAffineUI()
 	m_PostSpins[5] = m_PostO2Spin;
 	ui.PreAffineGroupBox->setChecked(false);//Flip both once to force enabling/disabling the disabling of the group boxes and the corner buttons.
 	ui.PreAffineGroupBox->setChecked(true);//Pre affine enabled.
-	ui.PostAffineGroupBox->setChecked(true);
-	ui.PostAffineGroupBox->setChecked(false);//Post affine disabled.
+    ui.PostAffineGroupBox->setChecked(false);
+    ui.PostAffineGroupBox->setChecked(true);//Post affine enabled.
+    ui.PreAffineShowGroupBox->setVisible(false); // michel - to delete
+    ui.PostAffineShowGroupBox->setVisible(false); // michel - to delete
 }
 
 /// <summary>
@@ -791,13 +793,9 @@ void Fractorium::SetupAffineSpinner(QTableWidget* table, const QObject* receiver
 }
 
 /// <summary>
-/// GUI wrapper functions, getters only.
+/// GUI wrapper function, getter only.
 /// </summary>
 
-bool Fractorium::DrawSelectedPre()  { return ui.ShowPreAffineSelectedRadio->isChecked();  }
-bool Fractorium::DrawAllPre()  { return ui.ShowPreAffineAllRadio->isChecked();  }
-bool Fractorium::DrawSelectedPost()  { return ui.ShowPostAffineSelectedRadio->isChecked();  }
-bool Fractorium::DrawAllPost() { return ui.ShowPostAffineAllRadio->isChecked(); }
 bool Fractorium::LocalPivot()  { return ui.LocalPivotRadio->isChecked();        }
 
 template class FractoriumEmberController<float>;

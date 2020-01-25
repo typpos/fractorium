@@ -234,7 +234,7 @@ Fractorium::~Fractorium()
 {
 	SyncSequenceSettings();
 	m_VarDialog->SyncSettings();
-	m_Settings->ShowXforms(ui.ActionDrawXforms->isChecked());
+    m_Settings->ShowXforms(ui.ActionDrawPreAffines->isChecked() || ui.ActionDrawPostAffines->isChecked());
 	m_Settings->ShowGrid(ui.ActionDrawGrid->isChecked());
 	m_Settings->setValue("windowState", saveState());
 	m_Settings->sync();

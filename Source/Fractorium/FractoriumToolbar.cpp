@@ -15,24 +15,37 @@ void Fractorium::InitToolbarUI()
 	spGroup->addAction(ui.ActionDP);
 	SyncOptionsToToolbar();
 	ui.ActionDrawImage->setChecked(true);
-	connect(ui.ActionCpu,	            SIGNAL(triggered(bool)), this, SLOT(OnActionCpu(bool)),	              Qt::QueuedConnection);
-	connect(ui.ActionCL,	            SIGNAL(triggered(bool)), this, SLOT(OnActionCL(bool)),	              Qt::QueuedConnection);
-	connect(ui.ActionSP,	            SIGNAL(triggered(bool)), this, SLOT(OnActionSP(bool)),	              Qt::QueuedConnection);
-	connect(ui.ActionDP,	            SIGNAL(triggered(bool)), this, SLOT(OnActionDP(bool)),	              Qt::QueuedConnection);
-	connect(ui.ActionStyle,             SIGNAL(triggered(bool)), this, SLOT(OnActionStyle(bool)),             Qt::QueuedConnection);
-	connect(ui.ActionStartStopRenderer, SIGNAL(triggered(bool)), this, SLOT(OnActionStartStopRenderer(bool)), Qt::QueuedConnection);
-	connect(ui.ActionDrawXforms,        SIGNAL(triggered(bool)), this, SLOT(OnActionDrawXforms(bool)),        Qt::QueuedConnection);
-	connect(ui.ActionDrawImage,         SIGNAL(triggered(bool)), this, SLOT(OnActionDrawImage(bool)),	      Qt::QueuedConnection);
-	connect(ui.ActionDrawGrid,          SIGNAL(triggered(bool)), this, SLOT(OnActionDrawGrid(bool)),          Qt::QueuedConnection);
+    m_PreviousAffineState[(int)eAffineState::PRE] = true;
+    m_PreviousAffineState[(int)eAffineState::ALL_PRE] = true;
+    m_PreviousAffineState[(int)eAffineState::POST] = false;
+    m_PreviousAffineState[(int)eAffineState::ALL_POST] = false;
+    connect(ui.ActionCpu,	              SIGNAL(triggered(bool)), this, SLOT(OnActionCpu(bool)),	            Qt::QueuedConnection);
+    connect(ui.ActionCL,	              SIGNAL(triggered(bool)), this, SLOT(OnActionCL(bool)),	            Qt::QueuedConnection);
+    connect(ui.ActionSP,	              SIGNAL(triggered(bool)), this, SLOT(OnActionSP(bool)),	            Qt::QueuedConnection);
+    connect(ui.ActionDP,	              SIGNAL(triggered(bool)), this, SLOT(OnActionDP(bool)),	            Qt::QueuedConnection);
+    connect(ui.ActionStyle,               SIGNAL(triggered(bool)), this, SLOT(OnActionStyle(bool)),             Qt::QueuedConnection);
+    connect(ui.ActionStartStopRenderer,   SIGNAL(triggered(bool)), this, SLOT(OnActionStartStopRenderer(bool)), Qt::QueuedConnection);
+    connect(ui.ActionDrawImage,           SIGNAL(triggered(bool)), this, SLOT(OnActionDrawImage(bool)),	        Qt::QueuedConnection);
+    connect(ui.ActionDrawPreAffines,      SIGNAL(triggered(bool)), this, SLOT(OnActionDrawAffines(bool)),       Qt::QueuedConnection);
+    connect(ui.ActionDrawPostAffines,     SIGNAL(triggered(bool)), this, SLOT(OnActionDrawAffines(bool)),       Qt::QueuedConnection);
+    connect(ui.ActionDrawAllPreAffines,   SIGNAL(triggered(bool)), this, SLOT(OnActionDrawAllAffines(bool)),    Qt::QueuedConnection);
+    connect(ui.ActionDrawAllPostAffines,  SIGNAL(triggered(bool)), this, SLOT(OnActionDrawAllAffines(bool)),    Qt::QueuedConnection);
+    connect(ui.ActionDrawGrid,            SIGNAL(triggered(bool)), this, SLOT(OnActionDrawGrid(bool)),          Qt::QueuedConnection);    
 }
 
 /// <summary>
 /// GUI wrapper functions, getters only.
 /// </summary>
 
-bool Fractorium::DrawXforms() { return ui.ActionDrawXforms->isChecked(); }
-bool Fractorium::DrawImage()  { return ui.ActionDrawImage->isChecked();  }
-bool Fractorium::DrawGrid()   { return ui.ActionDrawGrid->isChecked();   }
+bool Fractorium::DrawPreAffines()   { return ui.ActionDrawPreAffines->isChecked();  }
+bool Fractorium::DrawPostAffines()  { return ui.ActionDrawPostAffines->isChecked();  }
+bool Fractorium::DrawSelectedPre()  { return !ui.ActionDrawAllPreAffines->isChecked();  }
+bool Fractorium::DrawAllPre()       { return ui.ActionDrawAllPreAffines->isChecked();  }
+bool Fractorium::DrawSelectedPost() { return !ui.ActionDrawAllPostAffines->isChecked();  }
+bool Fractorium::DrawAllPost()      { return ui.ActionDrawAllPostAffines->isChecked(); }
+bool Fractorium::DrawXforms()       { return ui.ActionDrawPreAffines->isChecked() || ui.ActionDrawPostAffines->isChecked(); }
+bool Fractorium::DrawImage()        { return ui.ActionDrawImage->isChecked();  }
+bool Fractorium::DrawGrid()         { return ui.ActionDrawGrid->isChecked();   }
 
 /// <summary>
 /// Called when the CPU render option on the toolbar is clicked.
@@ -122,18 +135,30 @@ void Fractorium::OnActionStartStopRenderer(bool checked)
 }
 
 /// <summary>
-/// Toggle whether to show the affines.
-/// Called when the editor image button is clicked.
+/// Called when the pre affine button is clicked.
 /// </summary>
-/// <param name="checked">Check state, show editor if true, else hide.</param>
-void Fractorium::OnActionDrawXforms(bool checked)
+/// <param name="checked">Check state, show pre affines if true, else hide.</param>
+void Fractorium::OnActionDrawAffines(bool checked)
 {
-	m_Settings->ShowXforms(checked);
+    m_Settings->ShowXforms(checked);
 
-	if (!ui.ActionDrawImage->isChecked() && !ui.ActionDrawXforms->isChecked())
-		ui.ActionDrawImage->setChecked(true);
+    if (!ui.ActionDrawImage->isChecked() && !(ui.ActionDrawPreAffines->isChecked() || ui.ActionDrawPostAffines->isChecked()))
+        ui.ActionDrawImage->setChecked(true);
 
-	ui.GLDisplay->update();
+    SaveAffineState();
+
+    ui.GLDisplay->update();
+}
+
+/// <summary>
+/// Toggle whether to show selected/all post affines.
+/// Called when the show all post affine button is clicked.
+/// </summary>
+/// <param name="checked">Check state, show all pre affines if true, else show selected.</param>
+void Fractorium::OnActionDrawAllAffines(bool checked)
+{
+    SaveAffineState();
+    ui.GLDisplay->update();
 }
 
 /// <summary>
@@ -143,8 +168,8 @@ void Fractorium::OnActionDrawXforms(bool checked)
 /// <param name="checked">Check state, show image if true, else hide.</param>
 void Fractorium::OnActionDrawImage(bool checked)
 {
-	if (!ui.ActionDrawImage->isChecked() && !ui.ActionDrawXforms->isChecked())
-		ui.ActionDrawXforms->setChecked(true);
+    if (!ui.ActionDrawImage->isChecked())
+        SyncAffineStateToToolbar();
 
 	ui.GLDisplay->update();
 }
@@ -158,6 +183,32 @@ void Fractorium::OnActionDrawGrid(bool checked)
 {
 	m_Settings->ShowGrid(checked);
 	ui.GLDisplay->update();
+}
+
+/// <summary>
+/// Keep previous state of the affines to switch between Editor and Image
+/// </summary>
+void Fractorium::SaveAffineState()
+{
+    if(!ui.ActionDrawPreAffines->isChecked() && !ui.ActionDrawPostAffines->isChecked())
+        return;
+
+    m_PreviousAffineState[(int)eAffineState::PRE] = ui.ActionDrawPreAffines->isChecked();
+    m_PreviousAffineState[(int)eAffineState::ALL_PRE] = ui.ActionDrawAllPreAffines->isChecked();
+    m_PreviousAffineState[(int)eAffineState::POST] = ui.ActionDrawPostAffines->isChecked();
+    m_PreviousAffineState[(int)eAffineState::ALL_POST] = ui.ActionDrawAllPostAffines->isChecked();
+}
+
+/// <summary>
+/// Sync affine state data to the check state of the toolbar buttons.
+/// This does not trigger a clicked() event.
+/// </summary>
+void Fractorium::SyncAffineStateToToolbar()
+{
+    ui.ActionDrawPreAffines->setChecked(m_PreviousAffineState[(int)eAffineState::PRE]);
+    ui.ActionDrawAllPreAffines->setChecked(m_PreviousAffineState[(int)eAffineState::ALL_PRE]);
+    ui.ActionDrawPostAffines->setChecked(m_PreviousAffineState[(int)eAffineState::POST]);
+    ui.ActionDrawAllPostAffines->setChecked(m_PreviousAffineState[(int)eAffineState::ALL_POST]);
 }
 
 /// <summary>
@@ -196,5 +247,8 @@ void Fractorium::SyncOptionsToToolbar()
 	}
 
 	ui.ActionDrawGrid->setChecked(m_Settings->ShowGrid());
-	ui.ActionDrawXforms->setChecked(m_Settings->ShowXforms());
+    ui.ActionDrawPreAffines->setChecked(m_Settings->ShowXforms());
+    ui.ActionDrawAllPreAffines->setChecked(m_Settings->ShowXforms());
+
+    SaveAffineState();
 }

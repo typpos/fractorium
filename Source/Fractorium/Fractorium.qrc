@@ -50,5 +50,6 @@
         <file>Icons/Function-512.png</file>
         <file>Icons/pic.png</file>
         <file>Icons/grid.png</file>
+        <file>Icons/reset_scale.png</file>
     </qresource>
 </RCC>

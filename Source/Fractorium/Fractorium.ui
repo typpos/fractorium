@@ -1983,7 +1983,7 @@
          <item row="0" column="1">
           <widget class="QPushButton" name="RandomXaosButton">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xaos values to a random decimal value between 0 and 3, inclusive.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set all xaos values to either 0 or 1, or a random decimal value between 0 and 3, inclusive if Ctrl is pressed.&lt;/p&gt;&lt;p&gt;Individual rows and columns can be randomized by double clicking their header areas while pressing Ctrl.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Random Xaos</string>

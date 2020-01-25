@@ -766,20 +766,20 @@ void Fractorium::OnActionResetWorkspace(bool checked)
 /// <param name="checked">Ignored</param>
 void Fractorium::OnActionAlternateEditorImage(bool checked)
 {
-    if (DrawPreAffines() || DrawPostAffines())
+	if (DrawPreAffines() || DrawPostAffines())
 	{
-        ui.ActionDrawPreAffines->setChecked(false);
-        ui.ActionDrawAllPreAffines->setChecked(false);
-        ui.ActionDrawPostAffines->setChecked(false);
-        ui.ActionDrawAllPostAffines->setChecked(false);
-        ui.ActionDrawGrid->setChecked(false);
-        ui.ActionDrawImage->setChecked(true);        
+		ui.ActionDrawPreAffines->setChecked(false);
+		ui.ActionDrawAllPreAffines->setChecked(false);
+		ui.ActionDrawPostAffines->setChecked(false);
+		ui.ActionDrawAllPostAffines->setChecked(false);
+		ui.ActionDrawGrid->setChecked(false);
+		ui.ActionDrawImage->setChecked(true);
 	}
 	else
 	{
-        ui.ActionDrawImage->setChecked(false);        
-        ui.ActionDrawGrid->setChecked(true);
-        SyncAffineStateToToolbar();
+		ui.ActionDrawImage->setChecked(false);
+		ui.ActionDrawGrid->setChecked(true);
+		SyncAffineStateToToolbar();
 	}
 
 	ui.GLDisplay->update();

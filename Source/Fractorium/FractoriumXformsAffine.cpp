@@ -96,10 +96,6 @@ void Fractorium::InitXformsAffineUI()
 	connect(ui.PreAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
 	connect(ui.PostAffineGroupBox,		    SIGNAL(toggled(bool)),     this, SLOT(OnAffineGroupBoxToggled(bool)),				   Qt::QueuedConnection);
 	connect(ui.SwapAffinesButton,           SIGNAL(clicked(bool)),     this, SLOT(OnSwapAffinesButtonClicked(bool)),              Qt::QueuedConnection);
-	connect(ui.ShowPreAffineAllRadio,       SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPreAffineSelectedRadio,  SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineAllRadio,      SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
-	connect(ui.ShowPostAffineSelectedRadio, SIGNAL(toggled(bool)),     this, SLOT(OnAffineDrawAllCurrentRadioButtonToggled(bool)), Qt::QueuedConnection);
 	connect(ui.PolarAffineCheckBox,         SIGNAL(stateChanged(int)), this, SLOT(OnPolarAffineCheckBoxStateChanged(int)),		   Qt::QueuedConnection);
 #ifndef _WIN32
 	//For some reason linux makes these 24x24, even though the designer explicitly says 16x16.
@@ -154,10 +150,8 @@ void Fractorium::InitXformsAffineUI()
 	m_PostSpins[5] = m_PostO2Spin;
 	ui.PreAffineGroupBox->setChecked(false);//Flip both once to force enabling/disabling the disabling of the group boxes and the corner buttons.
 	ui.PreAffineGroupBox->setChecked(true);//Pre affine enabled.
-    ui.PostAffineGroupBox->setChecked(false);
-    ui.PostAffineGroupBox->setChecked(true);//Post affine enabled.
-    ui.PreAffineShowGroupBox->setVisible(false); // michel - to delete
-    ui.PostAffineShowGroupBox->setVisible(false); // michel - to delete
+	ui.PostAffineGroupBox->setChecked(false);
+	ui.PostAffineGroupBox->setChecked(true);//Post affine enabled.
 }
 
 /// <summary>

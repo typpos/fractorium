@@ -16,7 +16,7 @@
 #include "PaletteEditor/PaletteEditor.h"
 
 /// <summary>
-/// An enum representing the type of edit being done.
+/// An enum representing the affines being shown.
 /// </summary>
 enum class eAffineState : int { PRE, ALL_PRE, POST, ALL_POST };
 
@@ -121,8 +121,8 @@ public:
 	void CurrentXform(uint i);
 
 	//Xforms Affine.
-    bool DrawPreAffines();
-    bool DrawPostAffines();
+	bool DrawPreAffines();
+	bool DrawPostAffines();
 	bool DrawSelectedPre();
 	bool DrawAllPre();
 	bool DrawSelectedPost();
@@ -181,8 +181,8 @@ public slots:
 	void OnActionDP(bool checked);
 	void OnActionStyle(bool checked);
 	void OnActionStartStopRenderer(bool checked);
-    void OnActionDrawAffines(bool checked);
-    void OnActionDrawAllAffines(bool checked);
+	void OnActionDrawAffines(bool checked);
+	void OnActionDrawAllAffines(bool checked);
 	void OnActionDrawImage(bool checked);
 	void OnActionDrawGrid(bool checked);
 
@@ -420,8 +420,8 @@ private:
 	bool HaveFinal();
 
 	//Toolbar.
-    void SaveAffineState();
-    void SyncAffineStateToToolbar();
+	void SaveAffineState();
+	void SyncAffineStateToToolbar();
 	void SyncOptionsToToolbar();
 
 	//Library.
@@ -602,7 +602,7 @@ private:
 	QColor m_VariationTreeBgColorNonZero, m_VariationTreeBgColorZero;
 	vector<QDockWidget*> m_Docks;
 
-    bool m_PreviousAffineState[4];
+	bool m_PreviousAffineState[4];
 	int m_FontSize;
 	int m_VarSortMode;
 	int m_PaletteSortMode;

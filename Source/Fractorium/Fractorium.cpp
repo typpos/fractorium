@@ -234,7 +234,7 @@ Fractorium::~Fractorium()
 {
 	SyncSequenceSettings();
 	m_VarDialog->SyncSettings();
-    m_Settings->ShowXforms(ui.ActionDrawPreAffines->isChecked() || ui.ActionDrawPostAffines->isChecked());
+	m_Settings->ShowXforms(ui.ActionDrawPreAffines->isChecked() || ui.ActionDrawPostAffines->isChecked());
 	m_Settings->ShowGrid(ui.ActionDrawGrid->isChecked());
 	m_Settings->setValue("windowState", saveState());
 	m_Settings->sync();
@@ -485,6 +485,10 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 						//qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
 					}
 
+					return true;
+				}
+				else if (!DrawXforms())//Everything below this must be for editing xforms via key press.
+				{
 					return true;
 				}
 				else if (ke->key() == Qt::Key_W)
@@ -1079,8 +1083,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PreScaleCombo);
 	w = SetTabOrder(this, w, ui.PreScaleUpButton);
 	w = SetTabOrder(this, w, ui.PreRandomButton);
-	w = SetTabOrder(this, w, ui.ShowPreAffineSelectedRadio);
-	w = SetTabOrder(this, w, ui.ShowPreAffineAllRadio);
 	w = SetTabOrder(this, w, ui.SwapAffinesButton);
 	w = SetTabOrder(this, w, ui.PostAffineGroupBox);
 	w = SetTabOrder(this, w, m_PostX1Spin);
@@ -1108,8 +1110,6 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.PostScaleCombo);
 	w = SetTabOrder(this, w, ui.PostScaleUpButton);
 	w = SetTabOrder(this, w, ui.PostRandomButton);
-	w = SetTabOrder(this, w, ui.ShowPostAffineSelectedRadio);
-	w = SetTabOrder(this, w, ui.ShowPostAffineAllRadio);
 	w = SetTabOrder(this, w, ui.PolarAffineCheckBox);
 	w = SetTabOrder(this, w, ui.LocalPivotRadio);
 	w = SetTabOrder(this, w, ui.WorldPivotRadio);

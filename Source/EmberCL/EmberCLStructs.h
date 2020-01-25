@@ -128,6 +128,8 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "\n"
 	   "#define INDEX_IN_GRID_2D (GLOBAL_ID_Y * GLOBAL_SIZE_X + GLOBAL_ID_X)\n"
 	   "#define INDEX_IN_GRID_3D ((GLOBAL_SIZE_X * GLOBAL_SIZE_Y * GLOBAL_ID_Z) + INDEX_IN_GRID_2D)\n"
+	   "\n"
+	   "#define BLOCK_START_INDEX_IN_GRID_2D ((BLOCK_ID_Y * GRID_SIZE_X * BLOCK_SIZE_Y * BLOCK_SIZE_X) + (BLOCK_ID_X * BLOCK_SIZE_X * BLOCK_SIZE_Y))\n"
 	   "\n";
 	return os.str();
 }

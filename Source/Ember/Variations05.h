@@ -311,13 +311,13 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber() << "]";
-		string index = ss2.str();
+		string index  = ss2.str();
 		string weight = WeightDefineString();
-		string sc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dens = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string seed = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sc     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dens   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string x      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\tint m, n, iters = 0;\n"
 		   << "\t\treal_t x, y, u;\n"
@@ -369,10 +369,10 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Sc, prefix + "CircleRand_Sc", 1, eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Sc, prefix   + "CircleRand_Sc", 1, eParamType::REAL_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_Dens, prefix + "CircleRand_Dens", T(0.5)));
-		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "CircleRand_X", 10));
-		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "CircleRand_Y", 10));
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix    + "CircleRand_X", 10));
+		m_Params.push_back(ParamWithName<T>(&m_Y, prefix    + "CircleRand_Y", 10));
 		m_Params.push_back(ParamWithName<T>(&m_Seed, prefix + "CircleRand_Seed", 0, eParamType::INTEGER));
 	}
 
@@ -1070,7 +1070,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T expx = std::exp(helper.In.x) * T(0.5);
-		T expnx = T(0.25) / expx;
+		T expnx = T(0.25) / Zeps(expx);
 		T boot = helper.In.z == 0 ? helper.m_PrecalcAtanyx : helper.In.z;
 		T tmp = m_Weight / Zeps(expx + expnx - (std::cos(helper.In.y) * std::cos(boot)));
 		helper.Out.x = (expx - expnx) * tmp;
@@ -1085,7 +1085,7 @@ public:
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t expx = exp(vIn.x) * (real_t)(0.5);\n"
-		   << "\t\treal_t expnx = (real_t)(0.25) / expx;\n"
+		   << "\t\treal_t expnx = (real_t)(0.25) / Zeps(expx);\n"
 		   << "\t\treal_t boot = vIn.z == 0 ? precalcAtanyx : vIn.z;\n"
 		   << "\t\treal_t tmp = " << weight << " / Zeps(expx + expnx - (cos(vIn.y) * cos(boot)));\n"
 		   << "\n"
@@ -3593,19 +3593,16 @@ public:
 		if (m_FCycle > 5)
 		{
 			m_FCycle = 0;
-			m_RSwtch = std::trunc(rand.Frand01<T>() * 3);//Chooses 6 or 3 nodes.
+			m_RSwtch = T(rand.RandBit());//Chooses 6 or 3 nodes.
 		}
 
 		if (m_BCycle > 2)
 		{
 			m_BCycle = 0;
-			m_RSwtch = std::trunc(rand.Frand01<T>() * 3);//Chooses 6 or 3 nodes.
+			m_RSwtch = T(rand.RandBit());//Chooses 6 or 3 nodes.
 		}
 
-		int posNeg = 1;
-		int loc;
 		T tempx, tempy;
-		T lrmaj = m_Weight;//Sets hexagon length radius - major plane.
 		T boost = 1;//Boost is the separation distance between the two planes.
 		T sumX, sumY;
 
@@ -3622,48 +3619,33 @@ public:
 			sumY = helper.In.y;
 		}
 
-		if (rand.Frand01<T>() < T(0.5))
-			posNeg = -1;
-
-		//Determine whether one or two major planes.
-		int majplane = 1;
-		T abmajp = std::abs(m_MajP);
-
-		if (abmajp <= 1)
-		{
-			majplane = 1;//Want either 1 or 2.
-		}
-		else
-		{
-			majplane = 2;
-			boost = (abmajp - 1) * T(0.5);//Distance above and below XY plane.
-		}
+		int posNeg = rand.RandBit() ? -1 : 1;
 
 		//Creating Z factors relative to the planes. These will be added, whereas x and y will be assigned.
 		//Original does += z *, so using z on the right side of = is intentional.
-		if (majplane == 2)
-			helper.Out.z = helper.In.z * T(0.5) * m_ZLift + (posNeg * boost);
+		if (m_MajPlane == 2)
+			helper.Out.z = helper.In.z * T(0.5) * m_ZLift + (posNeg * m_Boost);
 		else
 			helper.Out.z = helper.In.z * T(0.5) * m_ZLift;
 
 		//Work out the segments and hexagonal nodes.
-		if (m_RSwtch <= 1)//Occasion to build using 60 degree segments.
+		if (m_RSwtch)//Occasion to build using 60 degree segments.
 		{
-			loc = int(m_FCycle);//Sequential nodes selection.
+			int loc = int(m_FCycle);//Sequential nodes selection.
 			tempx = m_Seg60[loc].x;
 			tempy = m_Seg60[loc].y;
 			m_FCycle++;
 		}
 		else//Occasion to build on 120 degree segments.
 		{
-			loc = int(m_BCycle);//Sequential nodes selection.
+			int loc = int(m_BCycle);//Sequential nodes selection.
 			tempx = m_Seg120[loc].x;
 			tempy = m_Seg120[loc].y;
 			m_BCycle++;
 		}
 
-		helper.Out.x = ((sumX + helper.In.x) * m_HalfScale) + (lrmaj * tempx);
-		helper.Out.y = ((sumY + helper.In.y) * m_HalfScale) + (lrmaj * tempy);
+		helper.Out.x = ((sumX + helper.In.x) * m_HalfScale) + (m_Weight * tempx);
+		helper.Out.y = ((sumY + helper.In.y) * m_HalfScale) + (m_Weight * tempy);
 	}
 
 	virtual string OpenCLString() const override
@@ -3677,6 +3659,8 @@ public:
 		string majp              = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scale             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string zlift             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string majplane          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string boost             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string seg60xStartIndex  = ToUpper(m_Params[i].Name()) + stateIndex; i += 6;//Precalc.
 		string seg60yStartIndex  = ToUpper(m_Params[i].Name()) + stateIndex; i += 6;
 		string seg120xStartIndex = ToUpper(m_Params[i].Name()) + stateIndex; i += 3;
@@ -3689,20 +3673,16 @@ public:
 		   << "\t\tif (" << fcycle << " > 5)\n"
 		   << "\t\t{\n"
 		   << "\t\t	" << fcycle << " = 0;\n"
-		   << "\t\t	" << rswtch << " = trunc(MwcNext01(mwc) * 3.0);\n"
+		   << "\t\t	" << rswtch << " = (real_t)(MwcNext(mwc) & 1);\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << bcycle << " > 2)\n"
 		   << "\t\t{\n"
 		   << "\t\t	" << bcycle << " = 0;\n"
-		   << "\t\t	" << rswtch << " = trunc(MwcNext01(mwc) * 3.0);\n"
+		   << "\t\t	" << rswtch << " = (real_t)(MwcNext(mwc) & 1);\n"
 		   << "\t\t}\n"
 		   << "\t\t\n"
-		   << "\t\tint posNeg = 1;\n"
-		   << "\t\tint loc;\n"
 		   << "\t\treal_t tempx, tempy;\n"
-		   << "\t\treal_t lrmaj = " << weight << ";\n"
-		   << "\t\treal_t boost = 1;\n"
 		   << "\t\treal_t sumX, sumY;\n\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
@@ -3721,61 +3701,40 @@ public:
 		}
 
 		ss
-				<< "\t\t\n"
-				<< "\t\tif (MwcNext01(mwc) < 0.5)\n"
-				<< "\t\t	posNeg = -1;\n"
 				<< "\n"
-				<< "\t\tint majplane = 1;\n"
-				<< "\t\treal_t abmajp = fabs(" << majp << ");\n"
+				<< "\t\tint posNeg = (MwcNext(mwc) & 1) ? -1 : 1;\n"
 				<< "\n"
-				<< "\t\tif (abmajp <= 1)\n"
-				<< "\t\t{\n"
-				<< "\t\t	majplane = 1;\n"
-				<< "\t\t}\n"
-				<< "\t\telse\n"
-				<< "\t\t{\n"
-				<< "\t\t	majplane = 2;\n"
-				<< "\t\t	boost = (abmajp - 1) * 0.5;\n"
-				<< "\t\t}\n"
-				<< "\n"
-				<< "\t\tif (majplane == 2)\n"
-				<< "\t\t	vOut.z = fma(vIn.z * (real_t)(0.5), " << zlift << ", (posNeg * boost));\n"
+				<< "\t\tif (" << majplane << " == 2)\n"
+				<< "\t\t	vOut.z = fma(vIn.z * (real_t)(0.5), " << zlift << ", (posNeg * " << boost << "));\n"
 				<< "\t\telse\n"
 				<< "\t\t	vOut.z = vIn.z * 0.5 * " << zlift << ";\n"
 				<< "\n"
-				<< "\t\tif (" << rswtch << " <= 1)\n"
+				<< "\t\tif (" << rswtch << ")\n"
 				<< "\t\t{\n"
-				<< "\t\t	loc = (int)" << fcycle << ";\n"
+				<< "\t\t	int loc = (int)" << fcycle << ";\n"
 				<< "\t\t	tempx = parVars[" << seg60xStartIndex << " + loc];\n"
 				<< "\t\t	tempy = parVars[" << seg60yStartIndex << " + loc];\n"
 				<< "\t\t	" << fcycle << " = " << fcycle << " + 1;\n"
 				<< "\t\t}\n"
 				<< "\t\telse\n"
 				<< "\t\t{\n"
-				<< "\t\t	loc = (int)" << bcycle << ";\n"
+				<< "\t\t	int loc = (int)" << bcycle << ";\n"
 				<< "\t\t	tempx = parVars[" << seg120xStartIndex << " + loc];\n"
 				<< "\t\t	tempy = parVars[" << seg120yStartIndex << " + loc];\n"
 				<< "\t\t	" << bcycle << " = " << bcycle << " + 1;\n"
 				<< "\t\t}\n"
 				<< "\n"
-				<< "\t\tvOut.x = fma((sumX + vIn.x), " << halfScale << ", (lrmaj * tempx));\n"
-				<< "\t\tvOut.y = fma((sumY + vIn.y), " << halfScale << ", (lrmaj * tempy));\n"
+				<< "\t\tvOut.x = fma(sumX + vIn.x, " << halfScale << ", " << weight << " * tempx);\n"
+				<< "\t\tvOut.y = fma(sumY + vIn.y, " << halfScale << ", " << weight << " * tempy);\n"
 				<< "\t}\n";
 		return ss.str();
 	}
 
-	virtual string StateInitOpenCLString() const override
+	virtual void InitStateVars(T* t, size_t& index) override
 	{
-		ostringstream ss, ss2;
-		ss2 << "_" << XformIndexInEmber();
-		string stateIndex = ss2.str();
-		string prefix = Prefix();
-		//CPU sets fycle and bcycle to 0 at the beginning in Precalc().
-		//Set to random in OpenCL since a value can't be set once and kept between kernel launches without writing it back to an OpenCL buffer.
-		ss << "\n\tvarState." << prefix << "hexaplay3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * 3.0);";
-		ss << "\n\tvarState." << prefix << "hexaplay3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 5.0);";
-		ss << "\n\tvarState." << prefix << "hexaplay3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * 2.0);";
-		return ss.str();
+		t[index++] = T(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit());
+		t[index++] = 0;
+		t[index++] = 0;
 	}
 
 	virtual void Precalc() override
@@ -3784,6 +3743,18 @@ public:
 		m_RSwtch = std::trunc(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand01<T>() * 3);//Chooses 6 or 3 nodes.
 		m_FCycle = 0;
 		m_BCycle = 0;
+		T absmajp = std::abs(m_MajP);
+
+		if (absmajp <= 1)
+		{
+			m_MajPlane = 1;//Want either 1 or 2.
+		}
+		else
+		{
+			m_MajPlane = 2;
+			m_Boost = (absmajp - 1) * T(0.5);//Distance above and below XY plane.
+		}
+
 		m_Seg60[0].x = 1;
 		m_Seg60[1].x = T(0.5);
 		m_Seg60[2].x = T(-0.5);
@@ -3814,7 +3785,9 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_MajP, prefix + "hexaplay3D_majp", 1, eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "hexaplay3D_scale", T(0.25), eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_ZLift, prefix + "hexaplay3D_zlift", T(0.25), eParamType::REAL));
-		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[0].x, prefix + "hexaplay3D_seg60x0"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_MajPlane,   prefix + "hexaplay3D_majplane"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Boost,      prefix + "hexaplay3D_boost"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[0].x, prefix + "hexaplay3D_seg60x0"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[1].x, prefix + "hexaplay3D_seg60x1"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[2].x, prefix + "hexaplay3D_seg60x2"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[3].x, prefix + "hexaplay3D_seg60x3"));
@@ -3842,7 +3815,9 @@ private:
 	T m_MajP;
 	T m_Scale;
 	T m_ZLift;
-	v2T m_Seg60[6];//Precalc.
+	T m_MajPlane;//Precalc.
+	T m_Boost;
+	v2T m_Seg60[6];
 	v2T m_Seg120[3];
 	T m_HalfScale;
 	T m_RSwtch;//State.
@@ -3873,22 +3848,19 @@ public:
 		if (m_FCycle > 5)
 		{
 			m_FCycle = 0;
-			m_RSwtch = std::trunc(rand.Frand01<T>() * 3);//Chooses 6 or 3 nodes.
+			m_RSwtch = T(rand.RandBit());//Chooses 6 or 3 nodes.
 		}
 
 		if (m_BCycle > 2)
 		{
 			m_BCycle = 0;
-			m_RSwtch = std::trunc(rand.Frand01<T>() * 3);//Chooses 6 or 3 nodes.
+			m_RSwtch = T(rand.RandBit());//Chooses 6 or 3 nodes.
 		}
 
-		T lrmaj = m_Weight;
-		T smooth = 1;
 		T smRotxFP = 0;
 		T smRotyFP = 0;
 		T smRotxFT = 0;
 		T smRotyFT = 0;
-		T gentleZ = 0;
 		T sumX, sumY, sumZ;
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
@@ -3906,75 +3878,39 @@ public:
 			sumZ = helper.In.z;
 		}
 
-		if (std::abs(m_Weight) <= 0.5)
-			smooth = m_Weight * 2;
-		else
-			smooth = 1;
-
-		int posNeg = 1;
-		int loc;
-		T boost = 0;
-		T scale = m_Scale;
+		int posNeg = rand.RandBit() ? -1 : 1;
 		T scale3;
 		T tempx, tempy;
 
-		if (rand.Frand01<T>() < T(0.5))
-			posNeg = -1;
-
-		int majplane = 0;
-		T abmajp = std::abs(m_MajP);
-
-		if (abmajp <= 1)
+		if (m_MajPlane == 0)
 		{
-			majplane = 0;
-			boost = 0;
+			helper.Out.z = m_Smooth * helper.In.z * m_Scale * m_ZLift;
 		}
-		else if (abmajp > 1 && abmajp < 2)
+		else if (m_MajPlane == 1 && m_MajP < 0)
 		{
-			majplane = 1;
-			boost = 0;
-		}
-		else
-		{
-			majplane = 2;
-			boost = (abmajp - 2) * T(0.5);
-		}
-
-		if (majplane == 0)
-		{
-			helper.Out.z = smooth * helper.In.z * scale * m_ZLift;
-		}
-		else if (majplane == 1 && m_MajP < 0)
-		{
-			if (m_MajP < -1 && m_MajP >= -2)
-				gentleZ = (abmajp - 1);
-			else
-				gentleZ = 1;
-
 			if (posNeg < 0)
-				helper.Out.z = -2 * (sumZ * gentleZ);
+				helper.Out.z = -2 * (sumZ * m_GentleZ);
 		}
-
-		if (majplane == 2 && m_MajP < 0)
+		else if (m_MajPlane == 2 && m_MajP < 0)
 		{
 			if (posNeg > 0)
 			{
-				helper.Out.z = (smooth * (helper.In.z * scale * m_ZLift + boost));
+				helper.Out.z = (m_Smooth * (helper.In.z * m_Scale * m_ZLift + m_Boost));
 			}
 			else//For this case when reg, assign and zero out. For all others, sum as usual.
 			{
-				helper.Out.z = (sumZ - (2 * smooth * sumZ)) + (smooth * posNeg * (helper.In.z * scale * m_ZLift + boost));
+				helper.Out.z = (sumZ - (2 * m_Smooth * sumZ)) + (m_Smooth * posNeg * (helper.In.z * m_Scale * m_ZLift + m_Boost));
 
 				if (m_VarType == eVariationType::VARTYPE_REG)
 					outPoint.m_Z = 0;
 			}
 		}
 		else
-			helper.Out.z = smooth * (helper.In.z * scale * m_ZLift + (posNeg * boost));
+			helper.Out.z = m_Smooth * (helper.In.z * m_Scale * m_ZLift + (posNeg * m_Boost));
 
-		if (m_RSwtch <= 1)
+		if (m_RSwtch)
 		{
-			loc = int(rand.Frand01<T>() * 6);
+			auto loc = rand.Rand(6);
 			tempx = m_Seg60[loc].x;
 			tempy = m_Seg60[loc].y;
 			scale3 = 1;
@@ -3982,19 +3918,19 @@ public:
 		}
 		else
 		{
-			loc = int(rand.Frand01<T>() * 3);
+			auto loc = rand.Rand(3);
 			tempx = m_Seg120[loc].x;
 			tempy = m_Seg120[loc].y;
 			scale3 = m_3side;
 			m_BCycle++;
 		}
 
-		smRotxFP = (smooth * scale * sumX * tempx) - (smooth * scale * sumY * tempy);
-		smRotyFP = (smooth * scale * sumY * tempx) + (smooth * scale * sumX * tempy);
-		smRotxFT = (helper.In.x * smooth * scale * tempx) - (helper.In.y * smooth * scale * tempy);
-		smRotyFT = (helper.In.y * smooth * scale * tempx) + (helper.In.x * smooth * scale * tempy);
-		helper.Out.x = sumX * (1 - smooth) + smRotxFP + smRotxFT + smooth * lrmaj * scale3 * tempx;
-		helper.Out.y = sumY * (1 - smooth) + smRotyFP + smRotyFT + smooth * lrmaj * scale3 * tempy;
+		smRotxFP = (m_Smooth * m_Scale * sumX * tempx) - (m_Smooth * m_Scale * sumY * tempy);
+		smRotyFP = (m_Smooth * m_Scale * sumY * tempx) + (m_Smooth * m_Scale * sumX * tempy);
+		smRotxFT = (helper.In.x * m_Smooth * m_Scale * tempx) - (helper.In.y * m_Smooth * m_Scale * tempy);
+		smRotyFT = (helper.In.y * m_Smooth * m_Scale * tempx) + (helper.In.x * m_Smooth * m_Scale * tempy);
+		helper.Out.x = sumX * (1 - m_Smooth) + smRotxFP + smRotxFT + m_Smooth * m_Weight * scale3 * tempx;
+		helper.Out.y = sumY * (1 - m_Smooth) + smRotyFP + smRotyFT + m_Smooth * m_Weight * scale3 * tempy;
 	}
 
 	virtual string OpenCLString() const override
@@ -4009,7 +3945,11 @@ public:
 		string scale             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string zlift             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string side3             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string seg60xStartIndex  = ToUpper(m_Params[i].Name()) + stateIndex; i += 6;//Precalc.
+		string smooth            = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
+		string majplane          = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string boost             = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string gentlez           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seg60xStartIndex  = ToUpper(m_Params[i].Name()) + stateIndex; i += 6;
 		string seg60yStartIndex  = ToUpper(m_Params[i].Name()) + stateIndex; i += 6;
 		string seg120xStartIndex = ToUpper(m_Params[i].Name()) + stateIndex; i += 3;
 		string seg120yStartIndex = ToUpper(m_Params[i].Name()) + stateIndex; i += 3;
@@ -4020,22 +3960,21 @@ public:
 		   << "\t\tif (" << fcycle << " > 5)\n"
 		   << "\t\t{\n"
 		   << "\t\t	" << fcycle << " = 0;\n"
-		   << "\t\t	" << rswtch << " = trunc(MwcNext01(mwc) * 3.0);\n"
+		   << "\t\t	" << rswtch << " = (real_t)(MwcNext(mwc) & 1);\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tif (" << bcycle << " > 2)\n"
 		   << "\t\t{\n"
 		   << "\t\t	" << bcycle << " = 0;\n"
-		   << "\t\t	" << rswtch << " = trunc(MwcNext01(mwc) * 3.0);\n"
+		   << "\t\t	" << rswtch << " = (real_t)(MwcNext(mwc) & 1);\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\treal_t lrmaj = " << weight << ";\n"
-		   << "\t\treal_t smooth = 1;\n"
+		   << "\t\treal_t scale = " << scale << ";\n"//This is an optimal blend of memory accesses vs. caching to local variables which seems to work best.
+		   << "\t\treal_t smooth = " << smooth << ";\n"
 		   << "\t\treal_t smRotxFP = 0;\n"
 		   << "\t\treal_t smRotyFP = 0;\n"
 		   << "\t\treal_t smRotxFT = 0;\n"
 		   << "\t\treal_t smRotyFT = 0;\n"
-		   << "\t\treal_t gentleZ = 0;\n"
 		   << "\t\treal_t sumX, sumY, sumZ;\n\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
@@ -4057,64 +3996,28 @@ public:
 
 		ss
 				<< "\n"
-				<< "\t\tif (fabs(lrmaj) <= 0.5)\n"
-				<< "\t\t	smooth = lrmaj * 2;\n"
-				<< "\t\telse\n"
-				<< "\t\t	smooth = 1;\n"
-				<< "\n"
-				<< "\t\tint posNeg = 1;\n"
-				<< "\t\tint loc;\n"
-				<< "\t\treal_t boost = 0;\n"
-				<< "\t\treal_t scale = " << scale << ";\n"//Temp will be used from here on.
+				<< "\t\tint posNeg = (MwcNext(mwc) & 1) ? -1 : 1;\n"
 				<< "\t\treal_t scale3;\n"
 				<< "\t\treal_t tempx, tempy;\n"
 				<< "\n"
-				<< "\t\tif (MwcNext01(mwc) < 0.5)\n"
-				<< "\t\t	posNeg = -1;\n"
-				<< "\n"
-				<< "\t\tint majplane = 0;\n"
-				<< "\t\treal_t abmajp = fabs(" << majp << ");\n"
-				<< "\n"
-				<< "\t\tif (abmajp <= 1)\n"
-				<< "\t\t{\n"
-				<< "\t\t	majplane = 0;\n"
-				<< "\t\t	boost = 0;\n"
-				<< "\t\t}\n"
-				<< "\t\telse if (abmajp > 1 && abmajp < 2)\n"
-				<< "\t\t{\n"
-				<< "\t\t	majplane = 1;\n"
-				<< "\t\t	boost = 0;\n"
-				<< "\t\t}\n"
-				<< "\t\telse\n"
-				<< "\t\t{\n"
-				<< "\t\t	majplane = 2;\n"
-				<< "\t\t	boost = (abmajp - 2) * 0.5;\n"
-				<< "\t\t}\n"
-				<< "\n"
-				<< "\t\tif (majplane == 0)\n"
+				<< "\t\tif (" << majplane << " == 0)\n"
 				<< "\t\t{\n"
 				<< "\t\t	vOut.z = smooth * vIn.z * scale * " << zlift << ";\n"
 				<< "\t\t}\n"
-				<< "\t\telse if (majplane == 1 && " << majp << " < 0)\n"
+				<< "\t\telse if (" << majplane << " == 1 && " << majp << " < 0)\n"
 				<< "\t\t{\n"
-				<< "\t\t	if (" << majp << " < -1 && " << majp << " >= -2)\n"
-				<< "\t\t		gentleZ = (abmajp - 1);\n"
-				<< "\t\t	else\n"
-				<< "\t\t		gentleZ = 1;\n"
-				<< "\n"
 				<< "\t\t	if (posNeg < 0)\n"
-				<< "\t\t		vOut.z = -2 * (sumZ * gentleZ);\n"
+				<< "\t\t		vOut.z = -2 * (sumZ * " << gentlez << ");\n"
 				<< "\t\t}\n"
-				<< "\n"
-				<< "\t\tif (majplane == 2 && " << majp << " < 0)\n"
+				<< "\t\telse if (" << majplane << " == 2 && " << majp << " < 0)\n"
 				<< "\t\t{\n"
 				<< "\t\t   if (posNeg > 0)\n"
 				<< "\t\t   {\n"
-				<< "\t\t	   vOut.z = (smooth * fma(vIn.z * scale, " << zlift << ", boost));\n"
+				<< "\t\t	   vOut.z = (smooth * fma(vIn.z * scale, " << zlift << ", " << boost << "));\n"
 				<< "\t\t   }\n"
 				<< "\t\t   else\n"
 				<< "\t\t   {\n"
-				<< "\t\t	   vOut.z = fma(smooth * posNeg, fma(vIn.z * scale, " << zlift << ", boost), sumZ - ((real_t)(2.0) * smooth * sumZ));\n";
+				<< "\t\t	   vOut.z = fma(smooth * posNeg, fma(vIn.z * scale, " << zlift << ", " << boost << "), sumZ - ((real_t)(2.0) * smooth * sumZ));\n";
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
 			ss << "\t\t	   outPoint->m_Z = 0;\n";
@@ -4124,12 +4027,12 @@ public:
 				<< "\t\t}\n"
 				<< "\t\telse\n"
 				<< "\t\t{\n"
-				<< "\t\t   vOut.z = smooth * fma(vIn.z * scale, " << zlift << ", (posNeg * boost));\n"
+				<< "\t\t   vOut.z = smooth * fma(vIn.z * scale, " << zlift << ", (posNeg * " << boost << "));\n"
 				<< "\t\t}\n"
 				<< "\n"
-				<< "\t\tif (" << rswtch << " <= 1)\n"
+				<< "\t\tif (" << rswtch << ")\n"
 				<< "\t\t{\n"
-				<< "\t\t	loc = (int)(MwcNext01(mwc) * 6);\n"
+				<< "\t\t	uint loc = MwcNextRange(mwc, 6);\n"
 				<< "\t\t	tempx = parVars[" << seg60xStartIndex << " + loc];\n"
 				<< "\t\t	tempy = parVars[" << seg60yStartIndex << " + loc];\n"
 				<< "\t\t	scale3 = 1;\n"
@@ -4137,7 +4040,7 @@ public:
 				<< "\t\t}\n"
 				<< "\t\telse\n"
 				<< "\t\t{\n"
-				<< "\t\t	loc = (int)(MwcNext01(mwc) * 3);\n"
+				<< "\t\t	uint loc = MwcNextRange(mwc, 3);\n"
 				<< "\t\t	tempx = parVars[" << seg120xStartIndex << " + loc];\n"
 				<< "\t\t	tempy = parVars[" << seg120yStartIndex << " + loc];\n"
 				<< "\t\t	scale3 = " << side3 << ";\n"
@@ -4148,33 +4051,58 @@ public:
 				<< "\t\tsmRotyFP = fma(smooth * scale, sumY * tempx, (smooth * scale * sumX * tempy));\n"
 				<< "\t\tsmRotxFT = fma(vIn.x * smooth, scale * tempx, -(vIn.y * smooth * scale * tempy));\n"
 				<< "\t\tsmRotyFT = fma(vIn.y * smooth, scale * tempx, (vIn.x * smooth * scale * tempy));\n"
-				<< "\t\tvOut.x = fma(sumX, (1 - smooth), fma(smooth * lrmaj, scale3 * tempx, smRotxFP + smRotxFT));\n"
-				<< "\t\tvOut.y = fma(sumY, (1 - smooth), fma(smooth * lrmaj, scale3 * tempy, smRotyFP + smRotyFT));\n"
+				<< "\t\tvOut.x = fma(sumX, (1 - smooth), fma(smooth * " << weight << ", scale3 * tempx, smRotxFP + smRotxFT));\n"
+				<< "\t\tvOut.y = fma(sumY, (1 - smooth), fma(smooth * " << weight << ", scale3 * tempy, smRotyFP + smRotyFT));\n"
 				<< "\t}\n";
 		return ss.str();
 	}
 
-	virtual string StateInitOpenCLString() const override
+	virtual void InitStateVars(T* t, size_t& index) override
 	{
-		ostringstream ss, ss2;
-		ss2 << "_" << XformIndexInEmber();
-		string stateIndex = ss2.str();
-		string prefix = Prefix();
-		//CPU sets fycle and bcycle to 0 at the beginning in Precalc().
-		//Set to random in OpenCL since a value can't be set once and kept between kernel launches without writing it back to an OpenCL buffer.
-		//This doesn't seem to make a difference from setting them to 0, but do it anyway because it seems more correct.
-		ss << "\n\tvarState." << prefix << "hexnix3D_rswtch" << stateIndex << " = trunc(MwcNext01(&mwc) * (real_t)(3.0));";
-		ss << "\n\tvarState." << prefix << "hexnix3D_fcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * (real_t)(5.0));";
-		ss << "\n\tvarState." << prefix << "hexnix3D_bcycle" << stateIndex << " = trunc(MwcNext01(&mwc) * (real_t)(2.0));";
-		return ss.str();
+		t[index++] = T(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit());
+		t[index++] = 0;
+		t[index++] = 0;
 	}
 
 	virtual void Precalc() override
 	{
 		T hlift = std::sin(T(M_PI) / 3);
-		m_RSwtch = std::trunc(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand01<T>() * 3);//Chooses 6 or 3 nodes.
+		m_RSwtch = T(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit());// QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(4);// //std::trunc(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand01<T>() * 3);//Chooses 6 or 3 nodes.
 		m_FCycle = 0;
 		m_BCycle = 0;
+		auto absmajp = std::abs(m_MajP);
+
+		if (absmajp <= 1)
+		{
+			m_MajPlane = 0;
+			m_Boost = 0;
+		}
+		else if (absmajp > 1 && absmajp < 2)
+		{
+			m_MajPlane = 1;
+			m_Boost = 0;
+		}
+		else
+		{
+			m_MajPlane = 2;
+			m_Boost = (absmajp - 2) * T(0.5);
+		}
+
+		if (m_MajPlane == 1 && m_MajP < 0)
+		{
+			if (m_MajP < -1 && m_MajP >= -2)
+				m_GentleZ = absmajp - 1;
+			else
+				m_GentleZ = 1;
+		}
+		else
+			m_GentleZ = 0;
+
+		if (std::abs(m_Weight) <= T(0.5))
+			m_Smooth = m_Weight * 2;
+		else
+			m_Smooth = 1;
+
 		m_Seg60[0].x = 1;
 		m_Seg60[1].x = T(0.5);
 		m_Seg60[2].x = T(-0.5);
@@ -4205,7 +4133,11 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "hexnix3D_scale", T(0.25), eParamType::REAL));
 		m_Params.push_back(ParamWithName<T>(&m_ZLift, prefix + "hexnix3D_zlift"));
 		m_Params.push_back(ParamWithName<T>(&m_3side, prefix + "hexnix3D_3side", T(0.667), eParamType::REAL));
-		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[0].x, prefix + "hexnix3D_seg60x0"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Smooth,     prefix + "hexnix3D_smooth"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_MajPlane,   prefix + "hexnix3D_majplane"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Boost,      prefix + "hexnix3D_boost"));
+		m_Params.push_back(ParamWithName<T>(true, &m_GentleZ,    prefix + "hexnix3D_gentlez"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[0].x, prefix + "hexnix3D_seg60x0"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[1].x, prefix + "hexnix3D_seg60x1"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[2].x, prefix + "hexnix3D_seg60x2"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Seg60[3].x, prefix + "hexnix3D_seg60x3"));
@@ -4233,7 +4165,11 @@ private:
 	T m_Scale;
 	T m_ZLift;
 	T m_3side;
-	v2T m_Seg60[6];//Precalc.
+	T m_Smooth;//Precalc.
+	T m_MajPlane;
+	T m_Boost;
+	T m_GentleZ;
+	v2T m_Seg60[6];
 	v2T m_Seg120[3];
 	T m_RSwtch;//State.
 	T m_FCycle;

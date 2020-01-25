@@ -46,6 +46,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	xformFuncs << VariationStateString(ember);
 	xformFuncs << parVarDefines << globalSharedDefines;
 	ember.GetPresentVariations(variations);
+	bool hasVarState = ember.GetVariationStateParamCount();
 
 	for (auto var : variations)
 		if (var)
@@ -224,6 +225,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		i++;
 	}
 
+	auto varStateString = VariationStateInitString(ember);
 	os <<
 	   ConstantDefinesString(doublePrecision) <<
 	   GlobalFunctionsString(ember) <<
@@ -250,7 +252,15 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	__global real_t* globalShared,\n"
 	   "	__global uchar* xformDistributions,\n"//Using uchar is quicker than uint. Can't be constant because the size can be too large to fit when using xaos.
 	   "	__constant CarToRasCL* carToRas,\n"
-	   "	__global real4reals_bucket* histogram,\n"
+	   "	__global real4reals_bucket* histogram,\n";
+
+	if (hasVarState)
+	{
+		os <<
+		   "	__global VariationState* varStates,\n";
+	}
+
+	os <<
 	   "	uint histSize,\n"
 	   "	__read_only image2d_t palette,\n"
 	   "	__global Point* points\n"
@@ -259,6 +269,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	bool fuse, ok;\n"
 	   "	uint threadIndex = INDEX_IN_BLOCK_2D;\n"
 	   "	uint pointsIndex = INDEX_IN_GRID_2D;\n"
+	   "	uint blockStartIndex = BLOCK_START_INDEX_IN_GRID_2D;\n"
+	   "	uint blockStartThreadIndex = blockStartIndex + threadIndex;\n"
 	   "	uint i, itersToDo;\n"
 	   "	uint consec = 0;\n"
 	   //"	int badvals = 0;\n"
@@ -275,14 +287,18 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	uint threadXDivRows = (THREAD_ID_X / NWARPS);\n"
 	   "	uint threadsMinus1 = NTHREADS - 1;\n"
 	   "	VariationState varState;\n"
-	   ;
-	os <<
-	   "\n"
+	   "\n";
+
+	if (ember.XformCount() > 1)
+	{
+		os <<
 #ifndef STRAIGHT_RAND
-	   "	__local Point swap[NTHREADS];\n"
-	   "	__local uint xfsel[NWARPS];\n"
+		   "	__local Point swap[NTHREADS];\n"
+		   "	__local uint xfsel[NWARPS];\n";
 #endif
-	   "\n"
+	}
+
+	os <<
 	   "	iPaletteCoord.y = 0;\n"
 	   "\n"
 	   "	if (fuseCount > 0)\n"
@@ -296,82 +312,107 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "		firstPoint.m_Y = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "		firstPoint.m_Z = 0.0;\n"
 	   "		firstPoint.m_ColorX = MwcNext01(&mwc);\n"
-	   "		firstPoint.m_LastXfUsed = 0 - 1;\n"//This ensures the first iteration chooses from the unweighted distribution array, all subsequent will choose from the weighted ones.
+	   "		firstPoint.m_LastXfUsed = 0 - 1;\n";//This ensures the first iteration chooses from the unweighted distribution array, all subsequent iterations will choose from the weighted ones.
+	//os <<
+	// varStateString << '\n';
+	os <<
 	   "	}\n"
 	   "	else\n"
 	   "	{\n"
 	   "		fuse = false;\n"
 	   "		itersToDo = iterCount;\n"
-	   "		firstPoint = points[pointsIndex];\n"
+	   "		firstPoint = points[blockStartThreadIndex];\n"
 	   "	}\n"
 	   "\n"
 	   ;
-	auto varStateString = VariationStateInitString(ember);
 
-	if (!varStateString.empty())
-		os << varStateString << "\n\n";
+	if (hasVarState)
+	{
+		os <<
+		   "	varState = varStates[blockStartThreadIndex];\n";
+	}
 
 	//This is done once initially here and then again after each swap-sync in the main loop.
 	//This along with the randomness that the point shuffle provides gives sufficient randomness
 	//to produce results identical to those produced on the CPU.
-	os <<
-#ifndef STRAIGHT_RAND
-	   "	if (THREAD_ID_Y == 0 && THREAD_ID_X < NWARPS)\n"
-	   "		xfsel[THREAD_ID_X] = MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << ";\n"//It's faster to do the & here ahead of time than every time an xform is looked up to use inside the loop.
-	   "\n"
-#endif
-	   "	barrier(CLK_LOCAL_MEM_FENCE);\n"
-	   "\n"
-	   "	for (i = 0; i < itersToDo; i++)\n"
-	   "	{\n";
-	os <<
-	   "		consec = 0;\n"
-	   "\n"
-	   "		do\n"
-	   "		{\n";
-
-	//If xaos is present, the a hybrid of the cuburn method is used.
-	//This makes each thread in a row pick the same offset into a distribution, using xfsel.
-	//However, the distribution the offset is in, is determined by firstPoint.m_LastXfUsed.
-	if (ember.XaosPresent())
+	if (ember.XformCount() > 1)
 	{
+#ifndef STRAIGHT_RAND
 		os <<
-#ifdef STRAIGHT_RAND
-		   "			secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << " + (" << CHOOSE_XFORM_GRAIN << " * (firstPoint.m_LastXfUsed + 1u))];\n\n";
-#else
-		   "			secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y] + (" << CHOOSE_XFORM_GRAIN << " * (firstPoint.m_LastXfUsed + 1u))];\n\n";//Partial cuburn hybrid.
+		   "\n"
+		   "	if (THREAD_ID_Y == 0 && THREAD_ID_X < NWARPS)\n"
+		   "		xfsel[THREAD_ID_X] = MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << ";\n"//It's faster to do the & here ahead of time than every time an xform is looked up to use inside the loop.
+		   "\n";
 #endif
 	}
 	else
 	{
 		os <<
+		   "	secondPoint.m_LastXfUsed = 0;\n";
+	}
+
+	os <<
+	   "	barrier(CLK_LOCAL_MEM_FENCE);\n"
+	   "\n"
+	   "	for (i = 0; i < itersToDo; i++)\n"
+	   "	{\n"
+	   "		consec = 0;\n"
+	   "\n"
+	   "		do\n"
+	   "		{\n";
+
+	if (ember.XformCount() > 1)
+	{
+		//If xaos is present, the a hybrid of the cuburn method is used.
+		//This makes each thread in a row pick the same offset into a distribution, using xfsel.
+		//However, the distribution the offset is in, is determined by firstPoint.m_LastXfUsed.
+		if (ember.XaosPresent())
+		{
+			os <<
 #ifdef STRAIGHT_RAND
-		   "			secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "];\n\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
+			   "			secondPoint.m_LastXfUsed = xformDistributions[(MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << ") + (" << CHOOSE_XFORM_GRAIN << " * (firstPoint.m_LastXfUsed + 1u))];\n\n";
 #else
-		   "			secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y]];\n\n";
+			   "			secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y] + (" << CHOOSE_XFORM_GRAIN << " * (firstPoint.m_LastXfUsed + 1u))];\n\n";//Partial cuburn hybrid.
 #endif
+		}
+		else
+		{
+			os <<
+#ifdef STRAIGHT_RAND
+			   "			secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "];\n\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
+#else
+			   "			secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y]];\n\n";
+#endif
+		}
 	}
 
 	for (i = 0; i < ember.XformCount(); i++)
 	{
-		if (i == 0)
+		if (ember.XformCount() > 1)
 		{
+			if (i == 0)
+			{
+				os <<
+				   "			switch (secondPoint.m_LastXfUsed)\n"
+				   "			{\n";
+			}
+
 			os <<
-			   "			switch (secondPoint.m_LastXfUsed)\n"
-			   "			{\n";
+			   "				case " << i << ":\n"
+			   "				{\n" <<
+			   "					Xform" << i << "(&(xforms[" << i << "]), parVars, globalShared, &firstPoint, &secondPoint, &mwc, &varState);\n" <<
+			   "					break;\n"
+			   "				}\n";
+
+			if (i == ember.XformCount() - 1)
+			{
+				os <<
+				   "			}\n";
+			}
 		}
-
-		os <<
-		   "				case " << i << ":\n"
-		   "				{\n" <<
-		   "					Xform" << i << "(&(xforms[" << i << "]), parVars, globalShared, &firstPoint, &secondPoint, &mwc, &varState);\n" <<
-		   "					break;\n"
-		   "				}\n";
-
-		if (i == ember.XformCount() - 1)
+		else
 		{
-			os <<
-			   "			}\n";
+			os << "			Xform0(&(xforms[0]), parVars, globalShared, &firstPoint, &secondPoint, &mwc, &varState);";
 		}
 	}
 
@@ -397,25 +438,54 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "			secondPoint.m_X = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "			secondPoint.m_Y = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "			secondPoint.m_Z = 0.0;\n"
-	   "		}\n"
+	   "		}\n";
 #ifndef STRAIGHT_RAND
-	   "\n"//Rotate points between threads. This is how randomization is achieved.
-	   "		uint swr = threadXY + ((i & 1u) * threadXDivRows);\n"
-	   "		uint sw = (swr * THREADS_PER_WARP + THREAD_ID_X) & threadsMinus1;\n"
-	   "\n"
-	   //Write to another thread's location.
-	   "		swap[sw] = secondPoint;\n"
-	   "\n"
-	   //Populate randomized xform index buffer with new random values.
-	   "		if (THREAD_ID_Y == 0 && THREAD_ID_X < NWARPS)\n"
-	   "			xfsel[THREAD_ID_X] = MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << ";\n"
-	   "\n"
-	   "		barrier(CLK_LOCAL_MEM_FENCE);\n"
-	   //Another thread will have written to this thread's location, so read the new value and use it for accumulation below.
-	   "		firstPoint = swap[threadIndex];\n"
+
+	if (ember.XformCount() > 1)
+	{
+		os <<
+		   "\n"//Rotate points between threads. This is how randomization is achieved.
+		   "		uint swr = threadXY + ((i & 1u) * threadXDivRows);\n"
+		   "		uint sw = (swr * THREADS_PER_WARP + THREAD_ID_X) & threadsMinus1;\n"
+		   "\n"
+		   //Write to another thread's location.
+		   "		swap[sw] = secondPoint;\n";
+
+		if (hasVarState)
+		{
+			os <<
+			   "		varStates[blockStartIndex + sw] = varState;\n";
+		}
+
+		os <<
+		   "\n"
+		   //Populate randomized xform index buffer with new random values.
+		   "		if (THREAD_ID_Y == 0 && THREAD_ID_X < NWARPS)\n"
+		   "			xfsel[THREAD_ID_X] = MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << ";\n"
+		   "\n"
+		   "		barrier(CLK_LOCAL_MEM_FENCE);\n"
+		   //Another thread will have written to this thread's location, so read the new value and use it for accumulation below.
+		   "		firstPoint = swap[threadIndex];\n";
+
+		if (hasVarState)
+		{
+			os <<
+			   "		varState = varStates[blockStartThreadIndex];\n"
+			   ;
+		}
+	}
+	else
+	{
+		os <<
+		   "\n"
+		   "		firstPoint = secondPoint;\n";
+	}
+
 #else
-	   "		firstPoint = secondPoint;\n"//For testing, using straight rand flam4/fractron style instead of cuburn.
+	os <<
+	   "		firstPoint = secondPoint;\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
 #endif
+	os <<
 	   "\n"
 	   "		if (fuse)\n"
 	   "		{\n"
@@ -537,9 +607,17 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	points[pointsIndex].m_Z = MwcNextNeg1Pos1(&mwc);\n"
 	   "	points[pointsIndex].m_ColorX = MwcNextNeg1Pos1(&mwc);\n"
 #else
-	   "	points[pointsIndex] = firstPoint;\n"
 	   "	seeds[pointsIndex] = mwc;\n"
+	   "	points[blockStartThreadIndex] = firstPoint;\n";
+
+	if (hasVarState)
+	{
+		os <<
+		   "	varStates[blockStartThreadIndex] = varState;\n";
+	}
+
 #endif
+	   os <<
 	   "	barrier(CLK_GLOBAL_MEM_FENCE);\n"
 	   "}\n";
 	return os.str();
@@ -593,7 +671,6 @@ string IterOpenCLKernelCreator<T>::GlobalFunctionsString(const Ember<T>& ember)
 
 	return os.str();
 }
-
 /// <summary>
 /// Create an OpenCL string of #defines and a corresponding host side vector for variation weights and parametric variation values.
 /// Parametric variations present a special problem in the iteration code.
@@ -689,7 +766,6 @@ void IterOpenCLKernelCreator<T>::ParVarIndexDefines(const Ember<T>& ember, pair<
 		params.first = os.str();
 	}
 }
-
 /// <summary>
 /// Create an OpenCL string of #defines and a corresponding host side vector for globally shared data.
 /// Certain variations, such as crackle and dc_perlin use static, read-only buffers of data.
@@ -750,7 +826,6 @@ void IterOpenCLKernelCreator<T>::SharedDataIndexDefines(const Ember<T>& ember, p
 		params.first = os.str();
 	}
 }
-
 /// <summary>
 /// Create the string needed for the struct whose values will change between each iteration.
 /// This is only needed for variations whose state changes.
@@ -773,7 +848,6 @@ string IterOpenCLKernelCreator<T>::VariationStateString(const Ember<T>& ember)
 	os << "\n} VariationState;\n\n";
 	return os.str();
 }
-
 /// <summary>
 /// Create the string needed for the initial state of the struct whose values will change between each iteration.
 /// This is only needed for variations whose state changes.
@@ -795,7 +869,6 @@ string IterOpenCLKernelCreator<T>::VariationStateInitString(const Ember<T>& embe
 
 	return os.str();
 }
-
 /// <summary>
 /// Determine whether the two embers passed in differ enough
 /// to require a rebuild of the iteration code.
@@ -855,7 +928,6 @@ bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const E
 
 	return false;
 }
-
 /// <summary>
 /// Create the zeroize kernel string.
 /// OpenCL comes with no way to zeroize a buffer like memset()
@@ -880,7 +952,6 @@ string IterOpenCLKernelCreator<T>::CreateZeroizeKernelString() const
 	   "\n";
 	return os.str();
 }
-
 /// <summary>
 /// Create the histogram summing kernel string.
 /// This is used when running with multiple GPUs. It takes
@@ -910,7 +981,6 @@ string IterOpenCLKernelCreator<T>::CreateSumHistKernelString() const
 	   "\n";
 	return os.str();
 }
-
 /// <summary>
 /// Create the string for 3D projection based on the 3D values of the ember.
 /// Projection is done on the second point.
@@ -1018,9 +1088,7 @@ string IterOpenCLKernelCreator<T>::CreateProjectionString(const Ember<T>& ember)
 
 	return os.str();
 }
-
 template EMBERCL_API class IterOpenCLKernelCreator<float>;
-
 #ifdef DO_DOUBLE
 	template EMBERCL_API class IterOpenCLKernelCreator<double>;
 #endif

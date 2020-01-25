@@ -4244,31 +4244,31 @@ public:
 		ostringstream ss, ss2;
 		intmax_t i = 0, varIndex = IndexInXform();
 		ss2 << "_" << XformIndexInEmber();
-		string weight = WeightDefineString();
-		string index = ss2.str() + "]";
-		string stateIndex = ss2.str();
-		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string roundstr = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string roundwidth = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string distortion = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string edge = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string scatter = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string offset = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string rotation = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string cropmode = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string staticc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string mode = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string radial = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string workradius = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string workpower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string alpha = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string roundcoeff = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string workrotation = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string x = "varState->" + m_Params[i++].Name() + stateIndex;//State.
-		string y = "varState->" + m_Params[i++].Name() + stateIndex;
-		string z = "varState->" + m_Params[i++].Name() + stateIndex;
-		string c = "varState->" + m_Params[i++].Name() + stateIndex;
+		string weight       = WeightDefineString();
+		string index        = ss2.str()    + "]";
+		string stateIndex   = ss2.str();
+		string power        = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string radius       = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string roundstr     = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string roundwidth   = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string distortion   = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string edge         = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string scatter      = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string offset       = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string rotation     = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string cropmode     = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string staticc      = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string mode         = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string radial       = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string workradius   = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string workpower    = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string alpha        = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string roundcoeff   = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string workrotation = "parVars["   + ToUpper(m_Params[i++].Name()) + index;
+		string x            = "varState->" + m_Params[i++].Name() + stateIndex;//State.
+		string y            = "varState->" + m_Params[i++].Name() + stateIndex;
+		string z            = "varState->" + m_Params[i++].Name() + stateIndex;
+		string c            = "varState->" + m_Params[i++].Name() + stateIndex;
 		ss << "\t{\n"
 		   << "\t\tint lastPart = 1;\n"
 		   << "\t\treal_t xi, yi, zi;\n"
@@ -4456,19 +4456,6 @@ public:
 		return ss.str();
 	}
 
-	virtual string StateInitOpenCLString() const override
-	{
-		ostringstream ss, ss2;
-		ss2 << "_" << XformIndexInEmber();
-		string stateIndex = ss2.str();
-		string prefix = Prefix();
-		ss << "\n\tvarState." << prefix << "smartcrop_x" << stateIndex << " = 0;";
-		ss << "\n\tvarState." << prefix << "smartcrop_y" << stateIndex << " = 0;";
-		ss << "\n\tvarState." << prefix << "smartcrop_z" << stateIndex << " = 0;";
-		ss << "\n\tvarState." << prefix << "smartcrop_c" << stateIndex << " = 0;";
-		return ss.str();
-	}
-
 	virtual void Precalc() override
 	{
 		m_Mode = T(((m_Power > 0) == (m_Radius > 0)) ? 1 : 0);
@@ -4496,29 +4483,30 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "smartcrop_power", 4));      //Original used a prefix of scrop_, which is incompatible with Ember's design.
-		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "smartcrop_radius", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Roundstr, prefix + "smartcrop_roundstr"));
-		m_Params.push_back(ParamWithName<T>(&m_Roundwidth, prefix + "smartcrop_roundwidth", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Distortion, prefix + "smartcrop_distortion", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Edge, prefix + "smartcrop_edge"));
-		m_Params.push_back(ParamWithName<T>(&m_Scatter, prefix + "smartcrop_scatter"));
-		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "smartcrop_offset"));
-		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix + "smartcrop_rotation"));
-		m_Params.push_back(ParamWithName<T>(&m_Cropmode, prefix + "smartcrop_cropmode", 1, eParamType::INTEGER, -1, 2));
-		m_Params.push_back(ParamWithName<T>(&m_Static, prefix + "smartcrop_static", 1, eParamType::INTEGER, -1, 3));
-		m_Params.push_back(ParamWithName<T>(true, &m_Mode, prefix + "smartcrop_mode"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_Radial, prefix + "smartcrop_radial"));
-		m_Params.push_back(ParamWithName<T>(true, &m_WorkRadius, prefix + "smartcrop_work_radius"));
-		m_Params.push_back(ParamWithName<T>(true, &m_WorkPower, prefix + "smartcrop_work_power"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "smartcrop_alpha"));
-		m_Params.push_back(ParamWithName<T>(true, &m_RoundCoeff, prefix + "smartcrop_round_coeff"));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix              + "smartcrop_power", 4));      //Original used a prefix of scrop_, which is incompatible with Ember's design.
+		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix             + "smartcrop_radius", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Roundstr, prefix           + "smartcrop_roundstr"));
+		m_Params.push_back(ParamWithName<T>(&m_Roundwidth, prefix         + "smartcrop_roundwidth", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Distortion, prefix         + "smartcrop_distortion", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Edge, prefix               + "smartcrop_edge"));
+		m_Params.push_back(ParamWithName<T>(&m_Scatter, prefix            + "smartcrop_scatter"));
+		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix             + "smartcrop_offset"));
+		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix           + "smartcrop_rotation"));
+		m_Params.push_back(ParamWithName<T>(&m_Cropmode, prefix           + "smartcrop_cropmode", 1, eParamType::INTEGER, -1, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Static, prefix             + "smartcrop_static", 1, eParamType::INTEGER, -1, 3));
+		m_Params.push_back(ParamWithName<T>(true, &m_Mode, prefix         + "smartcrop_mode"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Radial, prefix       + "smartcrop_radial"));
+		m_Params.push_back(ParamWithName<T>(true, &m_WorkRadius, prefix   + "smartcrop_work_radius"));
+		m_Params.push_back(ParamWithName<T>(true, &m_WorkPower, prefix    + "smartcrop_work_power"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix        + "smartcrop_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_RoundCoeff, prefix   + "smartcrop_round_coeff"));
 		m_Params.push_back(ParamWithName<T>(true, &m_WorkRotation, prefix + "smartcrop_work_rotation"));
-		m_Params.push_back(ParamWithName<T>(true, true, &m_X, prefix + "smartcrop_x"));//State.
-		m_Params.push_back(ParamWithName<T>(true, true, &m_Y, prefix + "smartcrop_y"));
-		m_Params.push_back(ParamWithName<T>(true, true, &m_Z, prefix + "smartcrop_z"));
-		m_Params.push_back(ParamWithName<T>(true, true, &m_C, prefix + "smartcrop_c"));
+		m_Params.push_back(ParamWithName<T>(true, true, &m_X, prefix      + "smartcrop_x"));//State.
+		m_Params.push_back(ParamWithName<T>(true, true, &m_Y, prefix      + "smartcrop_y"));
+		m_Params.push_back(ParamWithName<T>(true, true, &m_Z, prefix      + "smartcrop_z"));
+		m_Params.push_back(ParamWithName<T>(true, true, &m_C, prefix      + "smartcrop_c"));
 	}
+
 private:
 	T m_Power;
 	T m_Radius;

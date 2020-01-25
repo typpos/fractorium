@@ -91,7 +91,7 @@ Affine2D<T>& Affine2D<T>::operator = (const Affine2D<T>& affine)
 /// <param name="affine">The Affine2D to compare to</param>
 /// <returns>True if all fields are equal, else false</returns>
 template <typename T>
-bool Affine2D<T>::operator == (const Affine2D<T>& affine)
+bool Affine2D<T>::operator == (const Affine2D<T>& affine) const
 {
 	return IsClose(A(), affine.A()) &&
 		   IsClose(B(), affine.B()) &&
@@ -107,7 +107,7 @@ bool Affine2D<T>::operator == (const Affine2D<T>& affine)
 /// <param name="v">The vec2 to multiply by</param>
 /// <returns>A new vec2 which is the product of the multiplication</returns>
 template <typename T>
-typename v2T Affine2D<T>::operator * (const v2T& v)
+typename v2T Affine2D<T>::operator * (const v2T& v) const
 {
 	return TransformVector(v);
 }
@@ -118,7 +118,7 @@ typename v2T Affine2D<T>::operator * (const v2T& v)
 /// <param name="amount">The amount to scale by</param>
 /// <returns>A new Affine2D which a scaled copy of this instance</returns>
 template <typename T>
-Affine2D<T> Affine2D<T>:: operator * (const T& t)
+Affine2D<T> Affine2D<T>:: operator * (T t) const
 {
 	return Affine2D<T>(A() * t,
 					   D() * t,

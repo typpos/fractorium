@@ -332,6 +332,41 @@ bool RendererCL<T, bucketT>::WriteRandomPoints(size_t device)
 #endif
 
 /// <summary>
+/// Resize the variation state vector to hold all of the variation state variables across all variations
+/// in the ember, aligned to 16, for each thread that will be launched on a device.
+/// </summary>
+template <typename T, typename bucketT>
+void RendererCL<T, bucketT>::InitStateVec()
+{
+	size_t count = 0, i = 0, j = 0, k = 0;
+
+	while (auto xform = m_Ember.GetTotalXform(i++))
+		for (j = 0; j < xform->TotalVariationCount(); j++)
+			if (auto var = xform->GetVariation(j))
+				count += var->StateParamCount() * sizeof(T);
+
+	//Round to 16 and resize the buffer to be copied to OpenCL buffer here.
+	auto igkc = IterGridKernelCount();
+	size_t index = 0, count16 = ((count / 16) * 16) + (count % 16 > 0 ? 16 : 0);
+	auto elcount = count16 / sizeof(T);
+	m_VarStates.resize(igkc * elcount);
+
+	if (count16)
+	{
+		for (k = 0; k < igkc; k++)
+		{
+			i = 0;
+			index = k * elcount;
+
+			while (auto xform = m_Ember.GetTotalXform(i++))
+				for (j = 0; j < xform->TotalVariationCount(); j++)
+					if (auto var = xform->GetVariation(j))
+						var->InitStateVars(m_VarStates.data(), index);
+		}
+	}
+}
+
+/// <summary>
 /// Set the percentage of a sub batch that should be executed in each thread per kernel call.
 /// </summary>
 /// <param name="f">The percentage as a value from 0.01 to 1.0</param>
@@ -650,7 +685,7 @@ bool RendererCL<T, bucketT>::AnyNvidia() const
 
 /// <summary>
 /// Allocate all buffers required for running as well as the final
-/// 2D image.
+/// 2D image and perform some other initialization.
 /// Note that only iteration-related buffers are allocated on secondary devices.
 /// </summary>
 /// <returns>True if success, else false.</returns>
@@ -666,6 +701,8 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 	size_t size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
 	static std::string loc = __FUNCTION__;
 	auto& wrapper = m_Devices[0]->m_Wrapper;
+	InitStateVec();
+	m_IterCountPerKernel = size_t(m_SubBatchPercentPerThread * m_Ember.m_SubBatchSize);//This isn't the greatest place to put this, but it must be computed before the number of iters to do is computed in the base.
 
 	if (b && !(b = wrapper.AddBuffer(m_DEFilterParamsBufferName, sizeof(m_DensityFilterCL))))      { ErrorStr(loc, "Failed to set DE filter parameters buffer", m_Devices[0].get()); }
 
@@ -677,19 +714,22 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 
 	for (auto& device : m_Devices)
 	{
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_EmberBufferName, sizeof(m_EmberCL))))							 { ErrorStr(loc, "Failed to set ember buffer", device.get()); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_EmberBufferName, sizeof(m_EmberCL))))							   { ErrorStr(loc, "Failed to set ember buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_XformsBufferName, SizeOf(m_XformsCL))))						 { ErrorStr(loc, "Failed to set xforms buffer", device.get()); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_XformsBufferName, SizeOf(m_XformsCL))))						   { ErrorStr(loc, "Failed to set xforms buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_ParVarsBufferName, 128 * sizeof(T))))                           { ErrorStr(loc, "Failed to set parametric variations buffer", device.get()); break; }//Will be resized with the needed amount later.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_ParVarsBufferName, 128 * sizeof(T))))                             { ErrorStr(loc, "Failed to set parametric variations buffer", device.get()); break; }//Will be resized with the needed amount later.
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_DistBufferName, CHOOSE_XFORM_GRAIN)))                           { ErrorStr(loc, "Failed to set xforms distribution buffer", device.get()); break; }//Will be resized for xaos.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_DistBufferName, CHOOSE_XFORM_GRAIN)))                             { ErrorStr(loc, "Failed to set xforms distribution buffer", device.get()); break; }//Will be resized for xaos.
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_CarToRasBufferName, sizeof(m_CarToRasCL))))                     { ErrorStr(loc, "Failed to set cartesian to raster buffer", device.get()); break; }
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_CarToRasBufferName, sizeof(m_CarToRasCL))))                       { ErrorStr(loc, "Failed to set cartesian to raster buffer", device.get()); break; }
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, size)))                                         { ErrorStr(loc, "Failed to set histogram buffer", device.get()); break; }//Histogram. Will memset to zero later.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, size)))                                           { ErrorStr(loc, "Failed to set histogram buffer", device.get()); break; }//Histogram. Will memset to zero later.
 
-		if (b && !(b = device->m_Wrapper.AddBuffer(m_PointsBufferName, IterGridKernelCount() * sizeof(PointCL<T>)))) { ErrorStr(loc, "Failed to set points buffer", device.get()); break; }//Points between iter calls.
+		if (b && !(b = device->m_Wrapper.AddBuffer(m_PointsBufferName, IterGridKernelCount() * sizeof(PointCL<T>))))   { ErrorStr(loc, "Failed to set points buffer", device.get()); break; }//Points between iter calls.
+
+		if (m_VarStates.size())
+			if (b && !(b = device->m_Wrapper.AddBuffer(m_VarStateBufferName, SizeOf(m_VarStates))))                        { ErrorStr(loc, "Failed to set variation state buffer", device.get()); break; }//Points between iter calls.
 
 		//Global shared is allocated once and written when building the kernel.
 	}
@@ -835,7 +875,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 					break;
 				}
 
-				if (b && !(b = wrapper.WriteBuffer(m_XformsBufferName, reinterpret_cast<void*>(m_XformsCL.data()), sizeof(m_XformsCL[0]) * m_XformsCL.size())))
+				if (b && !(b = wrapper.WriteBuffer(m_XformsBufferName, reinterpret_cast<void*>(m_XformsCL.data()), SizeOf(m_XformsCL))))
 				{
 					ErrorStr(loc, "Write xforms buffer failed", device.get());
 					break;
@@ -853,6 +893,15 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 					break;
 				}
 
+				if (m_VarStates.size())
+				{
+					if (b && !(b = wrapper.AddAndWriteBuffer(m_VarStateBufferName, reinterpret_cast<void*>(m_VarStates.data()), SizeOf(m_VarStates))))
+					{
+						ErrorStr(loc, "Write variation state buffer failed", device.get());
+						break;
+					}
+				}
+
 				if (b && !(b = wrapper.AddAndWriteImage("Palette", CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, m_PaletteFormat, m_Dmap.Size(), 1, 0, m_Dmap.m_Entries.data())))
 				{
 					ErrorStr(loc, "Write palette buffer failed", device.get());
@@ -867,7 +916,7 @@ EmberStats RendererCL<T, bucketT>::Iterate(size_t iterCount, size_t temporalSamp
 					//So set it up right before the run.
 					if (!m_Params.second.empty())
 					{
-						if (!wrapper.AddAndWriteBuffer(m_ParVarsBufferName, m_Params.second.data(), m_Params.second.size() * sizeof(m_Params.second[0])))
+						if (!wrapper.AddAndWriteBuffer(m_ParVarsBufferName, m_Params.second.data(), SizeOf(m_Params.second)))
 						{
 							ErrorStr(loc, "Write parametric variations buffer failed", device.get());
 							break;
@@ -988,7 +1037,6 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	vector<std::thread> threadVec;
 	std::atomic<size_t> atomLaunchesRan;
 	std::atomic<intmax_t> atomItersRan, atomItersRemaining;
-	m_IterCountPerKernel = size_t(m_SubBatchPercentPerThread * m_Ember.m_SubBatchSize);
 	size_t adjustedIterCountPerKernel = m_IterCountPerKernel;
 	itersRan = 0;
 	atomItersRan.store(0);
@@ -999,6 +1047,9 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 	//If a very small number of iters is requested, and multiple devices
 	//are present, then try to spread the launches over the devices.
 	//Otherwise, only one device would get used.
+	//This also applies to when running a single device, and the requested iters per thread based on the
+	//sub batch size, is greater than is required to run all requested iters. This will reduce the iters
+	//per thread to the appropriate value.
 	//Note that this can lead to doing a few more iterations than requested
 	//due to rounding up to ~32k kernel threads per launch.
 	if (m_Devices.size() >= launches)
@@ -1056,6 +1107,9 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_CarToRasBufferName)))      { ErrorStr(loc, "Setting cartesian to raster buffer argument failed", m_Devices[dev].get()); }//Coordinate converter.
 
 			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_HistBufferName)))          { ErrorStr(loc, "Setting histogram buffer argument failed", m_Devices[dev].get()); }//Histogram.
+
+			if (!m_VarStates.empty())
+				if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_VarStateBufferName)))      { ErrorStr(loc, "Setting variation state buffer argument failed", m_Devices[dev].get()); }//Variation state.
 
 			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, histSuperSize)))		      { ErrorStr(loc, "Setting histogram size argument failed", m_Devices[dev].get()); }//Histogram size.
 

@@ -3212,7 +3212,7 @@
                 </size>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate selected xforms.&lt;/p&gt;&lt;p&gt;If xaos is present in the flame, the duplicated xforms will be added with existing xaos preserved, else they'll just be added normally.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Duplicate selected xforms.&lt;/p&gt;&lt;p&gt;If xaos is present in the flame, the duplicated xforms will be added with existing xaos preserved, or as a layer if Ctrl is pressed, else they'll just be added normally.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
@@ -8571,7 +8571,7 @@
     <string>Paste selected x&amp;forms</string>
    </property>
    <property name="toolTip">
-    <string>Paste copied xforms into the current flame</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Paste copied xforms as a layer into the current flame&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+X, Ctrl+V</string>

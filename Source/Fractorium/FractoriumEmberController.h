@@ -596,7 +596,7 @@ private:
 	EmberFile<T> m_EmberFile;
 	EmberFile<T> m_SequenceFile;
 	deque<Ember<T>> m_UndoList;
-	vector<Xform<T>> m_CopiedXforms;
+	vector<std::pair<Xform<T>, size_t>> m_CopiedXforms;
 	Xform<T> m_CopiedFinalXform;
 	Affine2D<T> m_CopiedAffine;
 	shared_ptr<VariationList<T>> m_VariationList;

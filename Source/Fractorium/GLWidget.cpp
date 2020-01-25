@@ -1519,7 +1519,7 @@ void GLEmberController<T>::DrawGrid()
 /// <param name="selected">True if selected (draw enclosing circle), else false (only draw axes).</param>
 /// <param name="hovered">True if the xform is being hovered over (draw tansparent disc), else false (no disc).</param>
 template <typename T>
-void GLEmberController<T>::DrawAffine(Xform<T>* xform, bool pre, bool selected, bool hovered)
+void GLEmberController<T>::DrawAffine(const Xform<T>* xform, bool pre, bool selected, bool hovered)
 {
 	auto ember = m_FractoriumEmberController->CurrentEmber();
 	auto final = ember->IsFinalXform(xform);
@@ -1755,7 +1755,7 @@ void GLWidget::DrawAffineHelper(int index, float circleWidth, float lineWidth, b
 /// <param name="glCoords">The mouse raster coordinates to check</param>
 /// <returns>The index of the xform being hovered over, else -1 if no hover.</returns>
 template <typename T>
-int GLEmberController<T>::UpdateHover(v3T& glCoords)
+int GLEmberController<T>::UpdateHover(const v3T& glCoords)
 {
 	bool pre = m_Fractorium->ui.PreAffineGroupBox->isChecked();
 	bool post = m_Fractorium->ui.PostAffineGroupBox->isChecked();
@@ -1838,7 +1838,7 @@ int GLEmberController<T>::UpdateHover(v3T& glCoords)
 /// <param name="post">True to check post affine, else don't.</param>
 /// <returns>True if hovering and the distance is smaller than the bestDist parameter</returns>
 template <typename T>
-bool GLEmberController<T>::CheckXformHover(Xform<T>* xform, v3T& glCoords, T& bestDist, bool pre, bool post)
+bool GLEmberController<T>::CheckXformHover(const Xform<T>* xform, const v3T& glCoords, T& bestDist, bool pre, bool post)
 {
 	bool preFound = false, postFound = false;
 	T dist = 0, scale = m_FractoriumEmberController->AffineScaleCurrentToLocked();

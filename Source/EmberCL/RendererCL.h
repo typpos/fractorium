@@ -141,6 +141,7 @@ public:
 #ifdef TEST_CL
 	bool WriteRandomPoints(size_t device);
 #endif
+	void InitStateVec();
 	void SubBatchPercentPerThread(float f);
 	float SubBatchPercentPerThread() const;
 	const string& IterKernel() const;
@@ -238,6 +239,7 @@ private:
 	string m_AccumBufferName = "Accum";
 	string m_FinalImageName = "Final";
 	string m_PointsBufferName = "Points";
+	string m_VarStateBufferName = "VarState";
 
 	//Kernels.
 	string m_IterKernel;
@@ -258,6 +260,7 @@ private:
 	FinalAccumOpenCLKernelCreator m_FinalAccumOpenCLKernelCreator;
 	pair<string, vector<T>> m_Params;
 	pair<string, vector<T>> m_GlobalShared;
+	vector<T> m_VarStates;
 	vector<unique_ptr<RendererClDevice>> m_Devices;
 	Ember<T> m_LastBuiltEmber;
 };

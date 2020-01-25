@@ -686,7 +686,7 @@ void FractoriumEmberController<T>::CopySelectedXforms()
 		if (m_Ember.IsFinalXform(xform))
 			m_CopiedFinalXform = *xform;
 		else
-			m_CopiedXforms.push_back(*xform);
+			m_CopiedXforms.emplace_back(*xform, xfindex);
 	}, eXformUpdate::UPDATE_SELECTED, false);
 	m_Fractorium->ui.ActionPasteSelectedXforms->setEnabled(true);
 }

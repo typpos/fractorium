@@ -1545,6 +1545,15 @@ public:
 	}
 
 	/// <summary>
+	/// Initialize the state variables contained in the passed in array.
+	/// </summary>
+	/// <param name="t">The pointer to the state variables.</param>
+	/// <param name="index">The offset in the pointer where the data begins.</param>
+	virtual void InitStateVars(T* t, size_t& index)
+	{
+	}
+
+	/// <summary>
 	/// Returns an OpenCL string for the initialization of the fields in this variation
 	/// that change during iterations.
 	/// Note these are different than regular variation parameters,
@@ -1693,6 +1702,7 @@ public:
 	void ParentXform(Xform<T>* xform) { m_Xform = xform; }
 	intmax_t IndexInXform() const { return m_Xform ? m_Xform->GetVariationIndex(const_cast<Variation<T>*>(this)) : -1; }
 	intmax_t XformIndexInEmber() const { return m_Xform ? m_Xform->IndexInParentEmber() : -1; }
+	virtual size_t StateParamCount() const { return 0; }
 
 	T m_Weight;//The weight of the variation.
 
@@ -2058,6 +2068,7 @@ private:
 	using Variation<T>::Prefix; \
 	using Variation<T>::Precalc; \
 	using Variation<T>::StateOpenCLString; \
+	using Variation<T>::InitStateVars; \
 	using Variation<T>::WeightDefineString; \
 	using Variation<T>::DefaultZ; \
 	using Variation<T>::DefaultZCl;
@@ -2283,7 +2294,7 @@ public:
 	/// Note these are different than regular variation parameters,
 	/// and thus require a completely different solution.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>The OpenCL string for the state variables</returns>
 	virtual string StateOpenCLString() const override
 	{
 		ostringstream os, os2;
@@ -2299,6 +2310,43 @@ public:
 		}
 
 		return os.str();
+	}
+
+	/// <summary>
+	/// Returns the number of state variables present for this variation.
+	/// </summary>
+	/// <returns>The number of state variables</returns>
+	virtual size_t StateParamCount() const override
+	{
+		size_t count = 0;
+
+		for (auto& param : m_Params)
+		{
+			if (param.IsState())
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	/// <summary>
+	/// Initialize the state variables contained in the passed in array.
+	/// This is meant to be used only with OpenCL to initialize a state struct for every thread before
+	/// starting iteration.
+	/// </summary>
+	/// <param name="t">The pointer to the state variables.</param>
+	/// <param name="index">The offset in the pointer where the data begins.</param>
+	virtual void InitStateVars(T* t, size_t& index) override
+	{
+		for (auto& param : m_Params)
+		{
+			if (param.IsState())
+			{
+				t[index++] = param.ParamVal();
+			}
+		}
 	}
 
 	/// <summary>

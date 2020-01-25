@@ -119,9 +119,9 @@ public:
 	void CalcDragTranslation();
 	void SetSelectedXform(Xform<T>* xform);
 	void DrawGrid();
-	void DrawAffine(Xform<T>* xform, bool pre, bool selected, bool hovered);
-	int UpdateHover(v3T& glCoords);
-	bool CheckXformHover(Xform<T>* xform, v3T& glCoords, T& bestDist, bool pre, bool post);
+	void DrawAffine(const Xform<T>* xform, bool pre, bool selected, bool hovered);
+	int UpdateHover(const v3T& glCoords);
+	bool CheckXformHover(const Xform<T>* xform, const v3T& glCoords, T& bestDist, bool pre, bool post);
 
 private:
 	v2T SnapToGrid(v2T& vec);

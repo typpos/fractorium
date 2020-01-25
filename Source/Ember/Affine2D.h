@@ -67,9 +67,9 @@ public:
 		return *this;
 	}
 
-	bool operator == (const Affine2D<T>& affine);
-	v2T operator * (const v2T& v);
-	Affine2D<T> operator * (const T& t);
+	bool operator == (const Affine2D<T>& affine) const;
+	v2T operator * (const v2T& v) const;
+	Affine2D<T> operator * (T t) const;
 
 	void MakeID();
 	bool IsID() const;

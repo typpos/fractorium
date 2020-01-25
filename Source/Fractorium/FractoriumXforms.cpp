@@ -209,6 +209,7 @@ void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->Add
 /// <summary>
 /// Duplicate the specified xforms in the current ember, and set the last one as the current xform.
 /// If xaos is present in the ember, the duplicated xforms will be added with xaos preserved, else they'll just be added normally.
+/// The manner in which xaos is preserved is altered when ctrl is pressed.
 /// Called when the duplicate xform button is clicked.
 /// Resets the rendering process.
 /// </summary>
@@ -217,19 +218,45 @@ template <typename T>
 void FractoriumEmberController<T>::DuplicateXform()
 {
 	bool forceFinal = m_Fractorium->HaveFinal();
-	vector<Xform<T>> vec;
+	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+	vector<std::pair<Xform<T>, size_t>> vec;
 	vec.reserve(m_Ember.XformCount());
 	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
-		vec.push_back(*xform);
+		vec.emplace_back(*xform, xfindex);
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
 	Update([&]()
 	{
 		if (m_Ember.XaosPresent())
-			AddXformsWithXaos(m_Ember, vec, true);
+		{
+			if (!ctrl)
+			{
+				auto oldxfcount = m_Ember.XformCount();
+
+				for (auto& it : vec)
+				{
+					m_Ember.AddXform(it.first);
+					auto newxfcount = m_Ember.XformCount() - 1;
+					auto* newxform = m_Ember.GetXform(newxfcount);
+
+					for (size_t i = 0; i < oldxfcount; i++)
+					{
+						if (auto xform = m_Ember.GetXform(i))
+						{
+							newxform->SetXaos(i, it.first.Xaos(i));
+							xform->SetXaos(newxfcount, xform->Xaos(it.second));
+						}
+					}
+				}
+			}
+			else
+			{
+				AddXformsWithXaos(m_Ember, vec, true);
+			}
+		}
 		else
 			for (auto& it : vec)
-				m_Ember.AddXform(it);
+				m_Ember.AddXform(it.first);
 
 		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);//Handles xaos.

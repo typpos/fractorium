@@ -375,7 +375,7 @@ public:
 	/// </summary>
 	/// <param name="xform">A pointer to the xform to find</param>
 	/// <returns>The index of the matched xform if found, else -1.</returns>
-	intmax_t GetXformIndex(Xform<T>* xform) const
+	intmax_t GetXformIndex(const Xform<T>* xform) const
 	{
 		intmax_t index = -1;
 
@@ -392,7 +392,7 @@ public:
 	/// <param name="xform">A pointer to the xform to find</param>
 	/// <param name="forceFinal">If true, return the index of the final xform when its pointer is passed, even if a final is not present. Default: false.</param>
 	/// <returns>The index of the matched xform if found, else -1.</returns>
-	intmax_t GetTotalXformIndex(Xform<T>* xform, bool forceFinal = false) const
+	intmax_t GetTotalXformIndex(const Xform<T>* xform, bool forceFinal = false) const
 	{
 		size_t totalXformCount = TotalXformCount(forceFinal);
 
@@ -427,7 +427,7 @@ public:
 	/// </summary>
 	/// <param name="xform">A pointer to the xform to test</param>
 	/// <returns>True if matched, else false.</returns>
-	bool IsFinalXform(Xform<T>* xform) const
+	bool IsFinalXform(const Xform<T>* xform) const
 	{
 		return &m_FinalXform == xform;
 	}
@@ -638,6 +638,22 @@ public:
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Compute the total number of state fields within all variations of all xforms.
+	/// </summary>
+	/// <returns>The number of state fields</returns>
+	size_t GetVariationStateParamCount() const
+	{
+		size_t count = 0, i = 0, j = 0;
+
+		while (auto xform = GetTotalXform(i++))
+			for (j = 0; j < xform->TotalVariationCount(); j++)
+				if (auto var = xform->GetVariation(j))
+					count += var->StateParamCount();
+
+		return count;
 	}
 
 	/// <summary>

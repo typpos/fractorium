@@ -368,6 +368,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	static int ecount = 0;
 	static int gcount = 0;
 	static int hcount = 0;
+	static int pcount = 0;
+	static int lcount = 0;
 
 	if (o == ui.GLParentScrollArea && e->type() == QEvent::Resize)
 	{
@@ -487,7 +489,42 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 
 					return true;
 				}
-				else if (!DrawXforms())//Everything below this must be for editing xforms via key press.
+				else if (ke->key() == Qt::Key_P)
+				{
+					pcount++;
+
+					if (pcount >= times)
+					{
+						pcount = 0;
+
+						if (!shift)
+							ui.ActionDrawPreAffines->setChecked(!ui.ActionDrawPreAffines->isChecked());
+						else
+							ui.ActionDrawPostAffines->setChecked(!ui.ActionDrawPostAffines->isChecked());
+					}
+
+					return true;
+				}
+				else if (ke->key() == Qt::Key_L)
+				{
+					lcount++;
+
+					if (lcount >= times)
+					{
+						lcount = 0;
+
+						if (!shift)
+						{
+							if (DrawPreAffines())
+								ui.ActionDrawAllPreAffines->setChecked(!ui.ActionDrawAllPreAffines->isChecked());
+						}
+						else if (DrawPostAffines())
+							ui.ActionDrawAllPostAffines->setChecked(!ui.ActionDrawAllPostAffines->isChecked());
+					}
+
+					return true;
+				}
+				else if ((!DrawPreAffines() && pre) || (!DrawPostAffines() && !pre))//Everything below this must be for editing xforms via key press.
 				{
 					return true;
 				}

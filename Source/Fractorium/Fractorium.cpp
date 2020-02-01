@@ -491,38 +491,56 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				}
 				else if (ke->key() == Qt::Key_P)
 				{
-					pcount++;
-
-					if (pcount >= times)
+					if (!ctrl)
 					{
-						pcount = 0;
+						pcount++;
 
-						if (!shift)
-							ui.ActionDrawPreAffines->setChecked(!ui.ActionDrawPreAffines->isChecked());
-						else
-							ui.ActionDrawPostAffines->setChecked(!ui.ActionDrawPostAffines->isChecked());
+						if (pcount >= times)
+						{
+							pcount = 0;
+
+							if (!shift)
+							{
+								ui.ActionDrawPreAffines->setChecked(!ui.ActionDrawPreAffines->isChecked());
+								OnActionDrawAffines(ui.ActionDrawPreAffines->isChecked());
+							}
+							else
+							{
+								ui.ActionDrawPostAffines->setChecked(!ui.ActionDrawPostAffines->isChecked());
+								OnActionDrawAffines(ui.ActionDrawPostAffines->isChecked());
+							}
+						}
+
+						return true;
 					}
-
-					return true;
 				}
 				else if (ke->key() == Qt::Key_L)
 				{
-					lcount++;
-
-					if (lcount >= times)
+					if (!ctrl)
 					{
-						lcount = 0;
+						lcount++;
 
-						if (!shift)
+						if (lcount >= times)
 						{
-							if (DrawPreAffines())
-								ui.ActionDrawAllPreAffines->setChecked(!ui.ActionDrawAllPreAffines->isChecked());
-						}
-						else if (DrawPostAffines())
-							ui.ActionDrawAllPostAffines->setChecked(!ui.ActionDrawAllPostAffines->isChecked());
-					}
+							lcount = 0;
 
-					return true;
+							if (!shift)
+							{
+								if (DrawPreAffines())
+								{
+									ui.ActionDrawAllPreAffines->setChecked(!ui.ActionDrawAllPreAffines->isChecked());
+									OnActionDrawAllAffines(ui.ActionDrawAllPreAffines->isChecked());
+								}
+							}
+							else if (DrawPostAffines())
+							{
+								ui.ActionDrawAllPostAffines->setChecked(!ui.ActionDrawAllPostAffines->isChecked());
+								OnActionDrawAllAffines(ui.ActionDrawAllPostAffines->isChecked());
+							}
+						}
+
+						return true;
+					}
 				}
 				else if ((!DrawPreAffines() && pre) || (!DrawPostAffines() && !pre))//Everything below this must be for editing xforms via key press.
 				{

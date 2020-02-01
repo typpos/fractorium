@@ -768,6 +768,7 @@ void Fractorium::OnActionAlternateEditorImage(bool checked)
 {
 	if (DrawPreAffines() || DrawPostAffines())
 	{
+		SaveAffineState();
 		ui.ActionDrawPreAffines->setChecked(false);
 		ui.ActionDrawAllPreAffines->setChecked(false);
 		ui.ActionDrawPostAffines->setChecked(false);

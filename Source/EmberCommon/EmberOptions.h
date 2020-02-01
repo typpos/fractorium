@@ -430,9 +430,9 @@ public:
 		INITSTRINGOPTION(Prefix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_PREFIX,           _T("--prefix"),               "",                   SO_REQ_SEP,  "   --prefix=<val>            Prefix to prepend to all output files.\n"));
 		INITSTRINGOPTION(Suffix,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SUFFIX,           _T("--suffix"),               "",                   SO_REQ_SEP,  "   --suffix=<val>            Suffix to append to all output files.\n"));
 #ifdef _WIN32
-		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: bmp, jpg, png or exr [default: png].\n"));
+		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: bmp, jpg, png, png16, exr or exr32 [default: png].\n"));
 #else
-		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: jpg, png or exr [default: png].\n"));
+		INITSTRINGOPTION(Format,       Eos(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_FORMAT,           _T("--format"),               "png",                SO_REQ_SEP,  "   --format=<val>            Format of the output file. Valid values are: jpg, png, png16, exr or exr32 [default: png].\n"));
 #endif
 		INITSTRINGOPTION(PalettePath,  Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_PALETTE_FILE,     _T("--flam3_palettes"),       "flam3-palettes.xml", SO_REQ_SEP,  "   --flam3_palettes=<val>    Path and name of the palette file [default: flam3-palettes.xml].\n"));
 		INITSTRINGOPTION(Id,           Eos(eOptionUse::OPT_USE_ALL,     eOptionIDs::OPT_ID,               _T("--id"),                   "",                   SO_REQ_SEP,  "   --id=<val>                ID to use in <edit> tags / image comments.\n"));

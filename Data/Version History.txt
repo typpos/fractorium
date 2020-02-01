@@ -1,3 +1,66 @@
+1.0.0.18 1/31/2020
+--User changes
+ -Add entries for 1 and 101 in the affine rotation and scale combo boxes.
+ -Allow for resuming a finished render in the final render dialog with a higher quality.
+ --This only applies to rendering a single image with no strips.
+ --Applies values from coloring & filtering controls in the main window first.
+ -Allow for saving the output from the final render dialog as a different image format without starting the rendering process over.
+ --Applies values from coloring & filtering controls in the main window first.
+ ---These values will only be applied when rendering a single image with no strips.  
+ -Make Clear Xaos apply to all when Apply All is checked.
+ -Improve performance in the following variations: cpow2, dc_cube, julia3d, julia3dz, julian2, log_db, nblur, npolar, waffle, wavesn, xtrb.
+ -Make the xform name field be a standard edit control so it's always editable.
+ -Allow for saving EXR as full 32-bit float per component per pixel. Only of engineering interest.
+ -Make the thresholds for determining left and right mouse clicks on the color curves control more desirable and intuitive.
+ --Larger threshold for left click, same for right click.
+ -Add new style sheet called uranium that is reminiscent of the old Winamp color scheme of the same name.
+ -Allow for keyboard presses to edit affines.
+ --Q: rotate counter clockwise
+ --E: rotate clockwise
+ --W: move up
+ --S: move down
+ --A: move left
+ --D: move right
+ --G: shrink
+ --H: grow
+ --Hold shift to decrease amount, control to increase amount.
+ --P/shift+P toggles visibility of pre/post xforms
+ --L/shift+L toggles visibility of all/selected pre/post xforms
+ ---Change some menu shortcuts to accommodate these new affine editing shortcuts.
+ -Random xaos now just provides values of either 0 or 1, rather than 0-3. Hold control to get the old behavior.
+ -Changes to how xaos is "preserved" when adding new xforms, copying xforms and duplicating xforms.
+ --Duplicating xforms when no xaos is present in the flame now maintains not using xaos, and keeps all values as one.
+ --Duplicating xforms when xaos is present, will result in xaos rows and columns that are the same as the xforms being duplicated, with the new row and column area having values of 1.
+ --Duplicating xforms when xaos is present, while control is pressed, will result in xaos rows and columns that have values of 0, with the new row and column area having values of 1.
+ ---Copying xforms has the same behavior as duplicating with control pressed.
+ --This is a hybrid of the original behavior and the new behavior added a year or so ago.
+ -Add new Blur Curve field which controls how blurring increases when moving from the center out.
+ -Optimization and correction for hexaplay3D and hexnix3D. They now look the same on CPU/GPU.
+ -Major optimization on the GPU for flames which only have one xform, by skipping all random xform selection code.
+ -Show/hide selected/all pre/post affine controls have been moved from the affine tab to the toolbar.
+ 
+--Bug fixes
+ -Properly detect maximization of final render dialog when on linux.
+ -Fix variations: blob2 (broken on CPU), blur_zoom, epispiral, hole, waffle.
+ -Fix reading supershape variation from Apophysis.
+ -hexaplay3D, hexnix3D and post_smartcrop were wrong on the GPU because they are the rare variations which preserve state between iterations, and inter-iter state preservation has been incorrectly implemented until now.
+ -Changing the sub batch size would improperly run the wrong number of iterations.
+
+--Code changes
+ -Rand range now uses multiply + shift rather than modulo.
+ -Add an include for Variations01.h which will allow a developer to make a build which is fully compatible with flam3.
+ -Change some enumeration types to be unsigned char since they only hold a few values.
+ -Make StripsRender() handle memsetting the final output image so calling code no longer has to.
+ -Make FinalRenderEmberController<T>::SaveCurrentRender() return the path that the image was actually saved to.
+ -Flip precalc sina/cosa and apply everywhere by flipping the usage. Flam3 had these reversed and it made the code confusing to read.
+ -Recreate the final render dialog each time it's shown.
+ -Pre/post variations are now checked for precalcs and global function requirements when creating the OpenCL kernel code.
+ -Change some enumeration types to uchar from uint.
+ -Add new field to Ember called m_BlurCurve, and the corresponding xml field is called "blur_curve".
+ -Some functions in Affine2D made const.
+ -Some arguments in some member functions of GLEmberController made const.
+ -Change in the index at which points and variation state are preserved between kernel calls.
+
 1.0.0.17 6/24/2019
 --User changes
  -Add hex_modulus, inkdrop, Truchet_hex_crop and Truchet_hex_fill variations.

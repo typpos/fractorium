@@ -9,11 +9,11 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_1.0.0.17.msi](https://drive.google.com/open?id=1xR7rPFcVvPMhh_n9v5JZ9-QUi7ktF7Qj)
+Download: [Fractorium_1.0.0.18.msi](https://drive.google.com/open?id=1b-Mt8M2-MABhIx7KgjdTmtHtgrjUSgGh)
 
 ## Mac
 
-Download: [Fractorium_1.0.0.17.dmg](https://drive.google.com/open?id=17UjkEBObj_rHRV8DCi1y3CDDONUZSxq_)
+Download: [Fractorium_1.0.0.18.dmg](https://drive.google.com/open?id=1ukLsCfE3_MtZcZxdyC9ZXwFxXQ2NNcwe)
 
 ## Linux
 
@@ -37,16 +37,16 @@ sudo apt-get install fractorium
 
 Install ubuntu.
 
-Download: [Fractorium-1.0.0.17.x86_64.deb](https://drive.google.com/open?id=1aYJ5XC58XPyFA-u-HuApLH4v9hFhf3oG)
+Download: [Fractorium-1.0.0.18.x86_64.deb](https://drive.google.com/open?id=1vQMHRMZpkQXgVjuKRDHVlQb7WZm9VAue)
 
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-1.0.0.17.x86_64.deb
+sudo dpkg -i Fractorium-1.0.0.18.x86_64.deb
 ```
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-1.0.0.17.x86_64.rpm](https://drive.google.com/open?id=18LVDl5UYMGodvF1TjClGn-0HulgX6vhB)
+Download: [Fractorium-1.0.0.18.x86_64.rpm](https://drive.google.com/open?id=1p4hT6E9byE8YLda-VGV7UUWQ9iXU_5sp)
 
 # Building from git
 

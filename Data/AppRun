@@ -20,6 +20,7 @@ NUMBER_OF_ARGS="$#"
 CONFIG_PATH=~/.config/fractorium
 DARK_LINUX=~/.config/fractorium/dark_linux.qss
 LIGHT_DARK=~/.config/fractorium/lightdark.qss
+URANIUM=~/.config/fractorium/uranium.qss
 
 # please do not change $VENDORPREFIX as it will allow for desktop files
 # belonging to AppImages to be recognized by future AppImageKit components
@@ -89,6 +90,11 @@ fi
 if [ ! -e "$LIGHT_DARK" ] ; then
   mkdir -p $CONFIG_PATH
   cp $APPDIR/usr/bin/lightdark.qss $CONFIG_PATH
+fi
+
+if [ ! -e "$URANIUM" ] ; then
+  mkdir -p $CONFIG_PATH
+  cp $APPDIR/usr/bin/uranium.qss $CONFIG_PATH
 fi
 
 check_prevent()

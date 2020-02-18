@@ -7210,6 +7210,7 @@
     <addaction name="ActionNewEmptyFlameInCurrentFile"/>
     <addaction name="ActionNewRandomFlameInCurrentFile"/>
     <addaction name="ActionCopyFlameInCurrentFile"/>
+    <addaction name="ActionCreateReferenceFile"/>
     <addaction name="separator"/>
     <addaction name="ActionOpen"/>
     <addaction name="separator"/>
@@ -8679,6 +8680,14 @@
    </property>
    <property name="toolTip">
     <string>Show All Post Affines</string>
+   </property>
+  </action>
+  <action name="ActionCreateReferenceFile">
+   <property name="text">
+    <string>Create reference file</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a file with a separate flame for each possible variation</string>
    </property>
   </action>
  </widget>

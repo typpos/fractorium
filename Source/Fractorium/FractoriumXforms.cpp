@@ -36,7 +36,7 @@ void Fractorium::InitXformsUI()
 	ui.CurrentXformCombo->view()->setMinimumWidth(100);
 	ui.CurrentXformCombo->view()->setMaximumWidth(500);
 	//ui.CurrentXformCombo->view()->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	ui.CurrentXformCombo->view()->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow);
+	ui.CurrentXformCombo->view()->setSizeAdjustPolicy(QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents);
 #ifndef _WIN32
 	//For some reason linux makes these 24x24, even though the designer explicitly says 16x16.
 	ui.AddXformButton->setIconSize(QSize(16, 16));
@@ -518,9 +518,9 @@ void FractoriumEmberController<T>::FillWithXform(Xform<T>* xform)
 
 	if (auto item = m_Fractorium->ui.XformWeightNameTable->item(0, 1))
 	{
-		m_Fractorium->ui.XformWeightNameTable->blockSignals(true);
-		item->setText(QString::fromStdString(xform->m_Name));
-		m_Fractorium->ui.XformWeightNameTable->blockSignals(false);
+		m_Fractorium->m_XformNameEdit->blockSignals(true);
+		m_Fractorium->m_XformNameEdit->setText(QString::fromStdString(xform->m_Name));
+		m_Fractorium->m_XformNameEdit->blockSignals(false);
 	}
 
 	FillVariationTreeWithXform(xform);
@@ -656,7 +656,7 @@ void FractoriumEmberController<T>::UpdateXformName(int index)
 		auto view = m_Fractorium->ui.CurrentXformCombo->view();
 		auto fontMetrics1 = view->fontMetrics();
 		auto textWidth = m_Fractorium->ui.CurrentXformCombo->width();
-		auto ww = fontMetrics1.width("WW");
+		auto ww = fontMetrics1.width("WW") * 3;
 
 		for (int i = 0; i < m_Fractorium->ui.CurrentXformCombo->count(); ++i)
 			textWidth = std::max(fontMetrics1.width(m_Fractorium->ui.CurrentXformCombo->itemText(i)) + ww, textWidth);

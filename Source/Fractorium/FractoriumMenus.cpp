@@ -11,6 +11,7 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionNewEmptyFlameInCurrentFile,  SIGNAL(triggered(bool)), this, SLOT(OnActionNewEmptyFlameInCurrentFile(bool)),  Qt::QueuedConnection);
 	connect(ui.ActionNewRandomFlameInCurrentFile, SIGNAL(triggered(bool)), this, SLOT(OnActionNewRandomFlameInCurrentFile(bool)), Qt::QueuedConnection);
 	connect(ui.ActionCopyFlameInCurrentFile,	  SIGNAL(triggered(bool)), this, SLOT(OnActionCopyFlameInCurrentFile(bool)),	  Qt::QueuedConnection);
+	connect(ui.ActionCreateReferenceFile,         SIGNAL(triggered(bool)), this, SLOT(OnActionCreateReferenceFile(bool)),         Qt::QueuedConnection);
 	connect(ui.ActionOpen,						  SIGNAL(triggered(bool)), this, SLOT(OnActionOpen(bool)),						  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentAsXml,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentAsXml(bool)),			  Qt::QueuedConnection);
 	connect(ui.ActionSaveEntireFileAsXml,		  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveEntireFileAsXml(bool)),		  Qt::QueuedConnection);
@@ -171,6 +172,104 @@ void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 }
 
 void Fractorium::OnActionCopyFlameInCurrentFile(bool checked) { m_Controller->CopyFlameInCurrentFile(); }
+
+/// <summary>
+/// Create a reference file containing one ember for every possible regular variation, plus one for post_smartcrop
+/// since it only exists in post form.
+/// This will replace whatever file the user has open.
+/// Clears the undo state.
+/// Resets the rendering process.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::CreateReferenceFile()
+{
+	bool nv = false;
+	size_t i;
+	StopAllPreviewRenderers();
+	auto temppal = m_Ember.m_Palette;
+	m_EmberFile.Clear();
+	m_EmberFile.m_Filename = QString("Reference_") + EMBER_VERSION;
+	auto varList = VariationList<T>::Instance();
+	auto& regVars = varList->RegVars();
+	auto count = regVars.size();
+	auto addsquaresfunc = [&](size_t i, const Variation<T>* var)
+	{
+		Ember<T> ember;
+		Xform<T> xf0, xf1, xf2, xf3, xf4, xffinal;
+		//
+		xf0.AddVariation(varList->GetVariationCopy(eVariationId::VAR_SQUARE, T(0.5)));
+		//
+		xf1.m_Affine.C(T(0.5));
+		xf1.m_Affine.F(T(0.5));
+		xf1.AddVariation(varList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		//
+		xf2.m_Affine.C(T(-0.5));
+		xf2.m_Affine.F(T(0.5));
+		xf2.AddVariation(varList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		//
+		xf3.m_Affine.C(T(-0.5));
+		xf3.m_Affine.F(T(-0.5));
+		xf3.AddVariation(varList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		//
+		xf4.m_Affine.C(T(0.5));
+		xf4.m_Affine.F(T(-0.5));
+		xf4.AddVariation(varList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		//
+		xffinal.AddVariation(var->Copy());
+		//
+		ember.AddXform(xf0);
+		ember.AddXform(xf1);
+		ember.AddXform(xf2);
+		ember.AddXform(xf3);
+		ember.AddXform(xf4);
+		ember.SetFinalXform(xffinal);
+		ember.EqualizeWeights();
+		ember.m_Index = i;
+		ember.m_MaxRadDE = 0;
+		ember.m_Name = var->Name() + " Squares";
+		ember.m_Palette = temppal;
+		m_EmberFile.m_Embers.push_back(ember);
+	};
+	auto addsbarsfunc = [&](size_t i, const Variation<T>* var)
+	{
+		Ember<T> ember;
+		Xform<T> xf0, xf1, xf2, xffinal;
+		//
+		xf0.AddVariation(varList->GetVariationCopy(eVariationId::VAR_PRE_BLUR, T(100)));
+		xf0.AddVariation(varList->GetVariationCopy(eVariationId::VAR_CYLINDER, T(0.1)));
+		//
+		xf1.m_Affine.C(T(0.4));
+		xf1.AddVariation(varList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		//
+		xf2.m_Affine.C(T(-0.4));
+		xf2.AddVariation(varList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		//
+		xffinal.AddVariation(var->Copy());
+		ember.AddXform(xf0);
+		ember.AddXform(xf1);
+		ember.AddXform(xf2);
+		ember.SetFinalXform(xffinal);
+		ember.EqualizeWeights();
+		ember.m_Index = i;
+		ember.m_MaxRadDE = 0;
+		ember.m_Name = var->Name() + " Bars";
+		ember.m_Palette = temppal;
+		m_EmberFile.m_Embers.push_back(ember);
+	};
+
+	for (i = 0; i < count; i++)
+	{
+		addsquaresfunc(i, regVars[i]);
+		addsbarsfunc(i, regVars[i]);
+	}
+
+	addsquaresfunc(i, varList->GetVariation(eVariationId::VAR_POST_SMARTCROP));//post_smartcrop is the only variation that exists only in post form, so it must be done manually here.
+	addsbarsfunc(i, varList->GetVariation(eVariationId::VAR_POST_SMARTCROP));
+	m_LastSaveAll = "";
+	FillLibraryTree();
+}
+
+void Fractorium::OnActionCreateReferenceFile(bool checked) { m_Controller->CreateReferenceFile(); }
 
 /// <summary>
 /// Open a list of ember Xml files, apply various values from the GUI widgets.

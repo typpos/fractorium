@@ -96,6 +96,7 @@ public:
 	virtual void NewEmptyFlameInCurrentFile() { }
 	virtual void NewRandomFlameInCurrentFile() { }
 	virtual void CopyFlameInCurrentFile() { }
+	virtual void CreateReferenceFile() { }
 	virtual void OpenAndPrepFiles(const QStringList& filenames, bool append) { }
 	virtual void SaveCurrentAsXml() { }
 	virtual void SaveEntireFileAsXml() { }
@@ -384,6 +385,7 @@ public:
 	virtual void NewEmptyFlameInCurrentFile() override;
 	virtual void NewRandomFlameInCurrentFile() override;
 	virtual void CopyFlameInCurrentFile() override;
+	virtual void CreateReferenceFile() override;
 	virtual void OpenAndPrepFiles(const QStringList& filenames, bool append) override;
 	virtual void SaveCurrentAsXml() override;
 	virtual void SaveEntireFileAsXml() override;

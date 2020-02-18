@@ -300,7 +300,7 @@ public:
 	virtual size_t Iterate(Ember<T>& ember, const IterParams<T> params, const CarToRas<T>& ctr, Point<T>* samples, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		size_t i, badVals = 0;
-		Point<T> tempPoint, p1;
+		Point<T> tempPoint, p1, p2;
 		auto xforms = ember.NonConstXforms();
 
 		if (ember.ProjBits())//No xaos, 3D.
@@ -311,8 +311,10 @@ public:
 
 				for (i = 0; i < params.m_Skip; i++)//Fuse.
 				{
-					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
+					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p2, rand);
+
+					p1 = p2;
 				}
 
 				DoFinalXform(ember, p1, samples, rand);//Apply to last fuse point and store as the first element in samples.
@@ -320,10 +322,11 @@ public:
 
 				for (i = 1; i < params.m_Count; i++)//Real loop.
 				{
-					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
+					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p2, rand);
 
-					DoFinalXform(ember, p1, samples + i, rand);
+					p1 = p2;
+					DoFinalXform(ember, p2, samples + i, rand);
 					ember.Proj(samples[i], rand, ctr);
 				}
 			}
@@ -333,8 +336,10 @@ public:
 
 				for (i = 0; i < params.m_Skip; i++)//Fuse.
 				{
-					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
+					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p2, rand);
+
+					p1 = p2;
 				}
 
 				samples[0] = p1;
@@ -358,18 +363,21 @@ public:
 
 				for (i = 0; i < params.m_Skip; i++)//Fuse.
 				{
-					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
+					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p2, rand);
+
+					p1 = p2;
 				}
 
 				DoFinalXform(ember, p1, samples, rand);//Apply to last fuse point and store as the first element in samples.
 
 				for (i = 1; i < params.m_Count; i++)//Real loop.
 				{
-					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p1, rand))//Feed the resulting value of applying the randomly selected xform back into the next iter, and not the result of applying the final xform.
-						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
+					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p2, rand))//Feed the resulting value of applying the randomly selected xform back into the next iter, and not the result of applying the final xform.
+						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p2, rand);
 
-					DoFinalXform(ember, p1, samples + i, rand);
+					p1 = p2;
+					DoFinalXform(ember, p2, samples + i, rand);
 				}
 			}
 			else//No xaos, no 3D, no final.
@@ -378,8 +386,10 @@ public:
 
 				for (i = 0; i < params.m_Skip; i++)//Fuse.
 				{
-					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p1, rand);
+					if (xforms[NextXformFromIndex(rand.Rand())].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, ember.m_RandPointRange, badVals, &p2, rand);
+
+					p1 = p2;
 				}
 
 				samples[0] = p1;
@@ -468,7 +478,7 @@ public:
 		size_t i, xformIndex;
 		size_t lastXformUsed = 0;
 		size_t badVals = 0;
-		Point<T> tempPoint, p1;
+		Point<T> tempPoint, p1, p2;
 		auto xforms = ember.NonConstXforms();
 
 		if (ember.ProjBits())//Xaos, 3D.
@@ -481,9 +491,10 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
+					p1 = p2;
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 
@@ -494,10 +505,11 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))//Feed the resulting value of applying the randomly selected xform back into the next iter, and not the result of applying the final xform.
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))//Feed the resulting value of applying the randomly selected xform back into the next iter, and not the result of applying the final xform.
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
-					DoFinalXform(ember, p1, samples + i, rand);
+					p1 = p2;
+					DoFinalXform(ember, p2, samples + i, rand);
 					ember.Proj(samples[i], rand, ctr);
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
@@ -510,9 +522,10 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
+					p1 = p2;
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 
@@ -523,10 +536,10 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
-					samples[i] = p1;
+					samples[i] = p1 = p2;
 					ember.Proj(samples[i], rand, ctr);
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
@@ -542,9 +555,10 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
+					p1 = p2;
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 
@@ -554,10 +568,11 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))//Feed the resulting value of applying the randomly selected xform back into the next iter, and not the result of applying the final xform.
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))//Feed the resulting value of applying the randomly selected xform back into the next iter, and not the result of applying the final xform.
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
-					DoFinalXform(ember, p1, samples + i, rand);
+					p1 = p2;
+					DoFinalXform(ember, p2, samples + i, rand);
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 			}
@@ -569,9 +584,10 @@ public:
 				{
 					xformIndex = NextXformFromIndex(rand.Rand(), lastXformUsed);
 
-					if (xforms[xformIndex].Apply(&p1, &p1, rand))
-						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p1, rand);
+					if (xforms[xformIndex].Apply(&p1, &p2, rand))
+						DoBadVals(xforms, xformIndex, ember.m_RandPointRange, lastXformUsed, badVals, &p2, rand);
 
+					p1 = p2;
 					lastXformUsed = xformIndex + 1;//Store the last used transform.
 				}
 

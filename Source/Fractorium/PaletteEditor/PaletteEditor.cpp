@@ -433,7 +433,7 @@ void PaletteEditor::OnCopyPaletteFileButtonClicked()
 /// </summary>
 void PaletteEditor::OnAppendPaletteButtonClicked()
 {
-	auto& pal = m_GradientColorView->GetPalette(256);
+	auto& pal = GetPalette(256);
 	m_PaletteList->AddPaletteToFile(m_CurrentPaletteFilePath, pal);
 	::FillPaletteTable(m_CurrentPaletteFilePath, ui->PaletteListTable, m_PaletteList);
 	m_PaletteIndex = ui->PaletteListTable->rowCount() - 1;
@@ -446,7 +446,7 @@ void PaletteEditor::OnAppendPaletteButtonClicked()
 /// </summary>
 void PaletteEditor::OnOverwritePaletteButtonClicked()
 {
-	auto& pal = m_GradientColorView->GetPalette(256);
+	auto& pal = GetPalette(256);
 	m_PaletteList->Replace(m_CurrentPaletteFilePath, pal, m_PaletteIndex);
 	::FillPaletteTable(m_CurrentPaletteFilePath, ui->PaletteListTable, m_PaletteList);
 	emit PaletteFileChanged();
@@ -632,10 +632,11 @@ void PaletteEditor::EnablePaletteFileControls()
 void PaletteEditor::EnablePaletteControls()
 {
 	bool b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
+	auto& pal = GetPalette(256);
 	ui->DeletePaletteButton->setEnabled(b);
 	ui->CopyPaletteFileButton->setEnabled(b);
 	ui->AppendPaletteButton->setEnabled(b);
-	ui->OverwritePaletteButton->setEnabled(b && (GetFilename(m_CurrentPaletteFilePath) == GetFilename(*m_GradientColorView->GetPalette(256).m_Filename.get())));//Only allow overwrite if the palette is from the file it's overwriting a palette in.
+	ui->OverwritePaletteButton->setEnabled(b && pal.m_Filename.get() && (GetFilename(m_CurrentPaletteFilePath) == GetFilename(*pal.m_Filename.get())));//Only allow overwrite if the palette is from the file it's overwriting a palette in.
 	ui->AddColorButton->setEnabled(b);
 	ui->DistributeColorsButton->setEnabled(b);
 	ui->AutoDistributeCheckBox->setEnabled(b);
@@ -654,5 +655,5 @@ void PaletteEditor::EnablePaletteControls()
 /// <returns>True if both the currently selected palette is editable and if all palettes in the currently selected file are editable.</returns>
 bool PaletteEditor::IsCurrentPaletteAndFileEditable()
 {
-	return m_PaletteList->IsModifiable(m_CurrentPaletteFilePath) && !m_GradientColorView->GetPalette(256).m_SourceColors.empty();
+	return m_PaletteList->IsModifiable(m_CurrentPaletteFilePath) && !GetPalette(256).m_SourceColors.empty();
 }

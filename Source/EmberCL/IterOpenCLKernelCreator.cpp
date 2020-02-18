@@ -25,10 +25,87 @@ template <typename T> const string& IterOpenCLKernelCreator<T>::ZeroizeEntryPoin
 template <typename T> const string& IterOpenCLKernelCreator<T>::SumHistKernel() const     { return m_SumHistKernel;     }
 template <typename T> const string& IterOpenCLKernelCreator<T>::SumHistEntryPoint() const { return m_SumHistEntryPoint; }
 template <typename T> const string& IterOpenCLKernelCreator<T>::IterEntryPoint() const    { return m_IterEntryPoint;    }
-
 /// <summary>
 /// Create the iteration kernel string using the Cuburn method.
 /// Template argument expected to be float or double.
+/// Pre Reg Post Formula
+/// x			 trans = affine(inpoint)
+///				 foreach prevar
+///					tempin = trans
+///					tempout = prevar(i, tempin)
+///					trans = tempout
+///				 outpoint = trans
+///
+/// x	x		 trans = affine(inpoint)
+///				 foreach prevar
+///					tempin = trans
+///					tempout = prevar(i, tempin)
+///					trans = tempout
+///				 tempin = trans
+///				 outpoint = 0
+///				 foreach regvar
+///					tempout = regvar(i, tempin)
+///					outpoint += tempout
+//
+/// x	x	x
+///				 trans = affine(inpoint)
+///				 foreach prevar
+///					tempin = trans
+///					tempout = prevar(i, tempin)
+///					trans = tempout
+///				 tempin = trans
+///				 outpoint = 0
+///				 foreach regvar
+///					tempout = regvar(i, tempin)
+///					outpoint += tempout
+///				 foreach postvar
+///					tempin = outpoint
+///					tempout = postvar(i, tempin)
+///					outpoint = tempout
+///
+/// x		x
+///				 trans = affine(inpoint)
+///				 foreach prevar
+///					tempin = trans
+///					tempout = prevar(i, tempin)
+///					trans = tempout
+///				 outpoint = trans
+///				 foreach postvar
+///					tempin = outpoint
+///					tempout = postvar(i, tempin)
+///					outpoint = tempout
+///
+///		x
+///				 trans = affine(inpoint)
+///				 tempin = trans
+///				 outpoint = 0
+///				 foreach regvar
+///					tempout = regvar(i, tempin)
+///					outpoint += tempout
+///
+///		x	x
+///				 trans = affine(inpoint)
+///				 tempin = trans
+///				 outpoint = 0
+///				 foreach regvar
+///					tempout = regvar(i, tempin)
+///					outpoint += tempout
+///				 foreach postvar
+///					tempin = outpoint
+///					tempout = postvar(i, tempin)
+///					outpoint = tempout
+///
+///			x
+///				 trans = affine(inpoint)
+///				 outpoint = 0
+///				 foreach postvar
+///					tempin = outpoint
+///					tempout = postvar(i, tempin)
+///					outpoint = tempout
+///
+///	none		 trans = affine(inpoint)
+///				 outpoint = 0
+///
 /// </summary>
 /// <param name="ember">The ember to create the kernel string for</param>
 /// <param name="params">The parametric variation #define string</param>
@@ -59,6 +136,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		bool needPrecalcAngles = false;
 		bool needPrecalcAtanXY = false;
 		bool needPrecalcAtanYX = false;
+		bool hasPreReg = (xform->PreVariationCount() + xform->VariationCount()) > 0;
 		v = varIndex = varCount = 0;
 		xformFuncs <<
 				   "void Xform" << i << "(__constant XformCL* xform, __constant real_t* parVars, __global real_t* globalShared, Point* inPoint, Point* outPoint, uint2* mwc, VariationState* varState)\n" <<
@@ -96,32 +174,24 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 
 		xformFuncs << "\treal_t tempColor = outPoint->m_ColorX = fma(xform->m_OneMinusColorCache, inPoint->m_ColorX, xform->m_ColorSpeedCache);\n\n";
 
-		if (xform->PreVariationCount() + xform->VariationCount() == 0)
+		if (optAffine && xform->m_Affine.IsID())
 		{
 			xformFuncs <<
-					   "	outPoint->m_X = 0;\n"
-					   "	outPoint->m_Y = 0;\n"
-					   "	outPoint->m_Z = 0;\n";
+					   "	transX = inPoint->m_X;\n" <<
+					   "	transY = inPoint->m_Y;\n";
 		}
 		else
 		{
-			if (optAffine && xform->m_Affine.IsID())
-			{
-				xformFuncs <<
-						   "	transX = inPoint->m_X;\n" <<
-						   "	transY = inPoint->m_Y;\n";
-			}
-			else
-			{
-				xformFuncs <<
-						   "	transX = fma(xform->m_A, inPoint->m_X, fma(xform->m_B, inPoint->m_Y, xform->m_C));\n" <<
-						   "	transY = fma(xform->m_D, inPoint->m_X, fma(xform->m_E, inPoint->m_Y, xform->m_F));\n";
-			}
-
 			xformFuncs <<
-					   "	transZ = inPoint->m_Z;\n";
-			varCount = xform->PreVariationCount();
+					   "	transX = fma(xform->m_A, inPoint->m_X, fma(xform->m_B, inPoint->m_Y, xform->m_C));\n" <<
+					   "	transY = fma(xform->m_D, inPoint->m_X, fma(xform->m_E, inPoint->m_Y, xform->m_F));\n";
+		}
 
+		xformFuncs << "	transZ = inPoint->m_Z;\n";
+		varCount = xform->PreVariationCount();
+
+		if (hasPreReg)
+		{
 			if (varCount > 0)
 			{
 				xformFuncs << "\n\t//Apply each of the " << varCount << " pre variations in this xform.\n";
@@ -185,6 +255,13 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 						   "	outPoint->m_Y = transY;\n"
 						   "	outPoint->m_Z = transZ;\n";
 			}
+		}
+		else
+		{
+			xformFuncs <<
+					   "	outPoint->m_X = 0;\n"
+					   "	outPoint->m_Y = 0;\n"
+					   "	outPoint->m_Z = 0;\n";
 		}
 
 		if (xform->PostVariationCount() > 0)
@@ -450,13 +527,6 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		   "\n"
 		   //Write to another thread's location.
 		   "		swap[sw] = secondPoint;\n";
-
-		if (hasVarState)
-		{
-			os <<
-			   "		varStates[blockStartIndex + sw] = varState;\n";
-		}
-
 		os <<
 		   "\n"
 		   //Populate randomized xform index buffer with new random values.
@@ -466,13 +536,6 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		   "		barrier(CLK_LOCAL_MEM_FENCE);\n"
 		   //Another thread will have written to this thread's location, so read the new value and use it for accumulation below.
 		   "		firstPoint = swap[threadIndex];\n";
-
-		if (hasVarState)
-		{
-			os <<
-			   "		varState = varStates[blockStartThreadIndex];\n"
-			   ;
-		}
 	}
 	else
 	{
@@ -488,14 +551,40 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	os <<
 	   "\n"
 	   "		if (fuse)\n"
-	   "		{\n"
+	   "		{\n";
+
+	if (hasVarState && ember.XformCount() > 1)
+	{
+		os <<
+		   "			varStates[blockStartIndex + sw] = varState;\n\n";
+	}
+
+	os <<
 	   "			if (i >= fuseCount - 1)\n"
 	   "			{\n"
 	   "				i = 0;\n"
 	   "				fuse = false;\n"
-	   "				itersToDo = iterCount;\n"
-	   "				barrier(CLK_LOCAL_MEM_FENCE);\n"//Sort of seems necessary, sort of doesn't. Makes no speed difference.
+	   "				itersToDo = iterCount;\n";
+
+	if (ember.XformCount() > 1)
+		os <<
+		   "				barrier(CLK_LOCAL_MEM_FENCE);\n"//Sort of seems necessary, sort of doesn't. Makes no speed difference.
+		   ;
+
+	os <<
 	   "			}\n"
+	   ;
+
+	if (hasVarState && ember.XformCount() > 1)
+	{
+		os <<
+		   "\n"
+		   "			barrier(CLK_GLOBAL_MEM_FENCE);\n"//Sort of seems necessary, sort of doesn't. Makes no speed difference.
+		   "			varState = varStates[blockStartThreadIndex];"
+		   ;
+	}
+
+	os <<
 	   "\n"
 	   "			continue;\n"
 	   "		}\n"
@@ -514,6 +603,13 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		   "			secondPoint = tempPoint;\n"
 		   "		}\n"
 		   "\n";
+	}
+
+	if (hasVarState && ember.XformCount() > 1)
+	{
+		os <<
+		   "		varStates[blockStartIndex + sw] = varState;\n"
+		   ;
 	}
 
 	os << CreateProjectionString(ember);
@@ -591,8 +687,16 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 		os <<
 		   "			}\n"//histIndex < histSize.
 		   "		}\n"//CarToRasInBounds.
-		   "\n"
+		   "\n";
+		os <<
 		   "		barrier(CLK_GLOBAL_MEM_FENCE);\n";//Barrier every time, whether or not the point was in bounds, else artifacts will occur when doing strips.
+
+		if (hasVarState && ember.XformCount() > 1)
+		{
+			os <<
+			   "		varState = varStates[blockStartThreadIndex];\n"
+			   ;
+		}
 	}
 
 	os <<
@@ -610,7 +714,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	seeds[pointsIndex] = mwc;\n"
 	   "	points[blockStartThreadIndex] = firstPoint;\n";
 
-	if (hasVarState)
+	if (hasVarState && ember.XformCount() == 1)
 	{
 		os <<
 		   "	varStates[blockStartThreadIndex] = varState;\n";

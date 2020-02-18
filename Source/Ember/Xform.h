@@ -603,24 +603,24 @@ public:
 		outPoint->m_Opacity = m_Opacity;
 		iterHelper.m_Color.x = outPoint->m_ColorX = m_ColorSpeedCache + (m_OneMinusColorCache * inPoint->m_ColorX);
 
+		//Compute the pre affine portion of the transform.
+		//These x, y values are what get passed to the variations below.
+		//Note that they are not changed after this, except in the case of pre_ variations.
+		if (m_HasPre)
+		{
+			iterHelper.m_TransX = (m_Affine.A() * inPoint->m_X) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
+			iterHelper.m_TransY = (m_Affine.D() * inPoint->m_X) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
+		}
+		else
+		{
+			iterHelper.m_TransX = inPoint->m_X;
+			iterHelper.m_TransY = inPoint->m_Y;
+		}
+
+		iterHelper.m_TransZ = inPoint->m_Z;
+
 		if (m_HasPreOrRegularVars)
 		{
-			//Compute the pre affine portion of the transform.
-			//These x, y values are what get passed to the variations below.
-			//Note that they are not changed after this, except in the case of pre_ variations.
-			if (m_HasPre)
-			{
-				iterHelper.m_TransX = (m_Affine.A() * inPoint->m_X) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
-				iterHelper.m_TransY = (m_Affine.D() * inPoint->m_X) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
-			}
-			else
-			{
-				iterHelper.m_TransX = inPoint->m_X;
-				iterHelper.m_TransY = inPoint->m_Y;
-			}
-
-			iterHelper.m_TransZ = inPoint->m_Z;
-
 			//Apply pre_ variations, these don't affect outPoint, only iterHelper.m_TransX, Y, Z.
 			for (i = 0; i < PreVariationCount(); i++)
 			{

@@ -139,6 +139,7 @@ public slots:
 	void OnActionNewEmptyFlameInCurrentFile(bool checked);
 	void OnActionNewRandomFlameInCurrentFile(bool checked);
 	void OnActionCopyFlameInCurrentFile(bool checked);
+	void OnActionCreateReferenceFile(bool checked);
 	void OnActionOpen(bool checked);
 	void OnActionSaveCurrentAsXml(bool checked);
 	void OnActionSaveEntireFileAsXml(bool checked);

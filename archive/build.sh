@@ -50,6 +50,7 @@ cd ../Data
 
 cp dark_mac.qss $FRACTORIUM_FINAL_ROOT
 cp lightdark.qss $FRACTORIUM_FINAL_ROOT
+cp uranium.qss $FRACTORIUM_FINAL_ROOT
 cp flam3-palettes.xml $FRACTORIUM_FINAL_ROOT
 cp *.gradient $FRACTORIUM_FINAL_ROOT
 cp *.ugr $FRACTORIUM_FINAL_ROOT

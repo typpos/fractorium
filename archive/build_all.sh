@@ -22,7 +22,7 @@ do
             ;;
         --*) echo "bad option $1"; exit 1
             ;;
-        *) echo "unrecognised argument $1"; exit 1
+        *) echo "unrecognized argument $1"; exit 1
             ;;
     esac
     shift

@@ -1,5 +1,6 @@
 #include "EmberPch.h"
 #include "PaletteList.h"
+#include "XmlToEmber.h"
 
 namespace EmberNs
 {
@@ -615,6 +616,7 @@ void PaletteList<T>::ParsePalettes(xmlNode* node, const shared_ptr<string>& file
 	char* val;
 	xmlAttrPtr attr;
 	int index = 0;
+	Locale lcl;//This is required to properly read commas in the custom palette file. Because foreign locales treat a comma as the decimal point, which causes errors.
 
 	while (node)
 	{

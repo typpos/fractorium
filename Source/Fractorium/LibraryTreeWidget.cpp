@@ -146,7 +146,7 @@ void InfoTreeWidget::dragMoveEvent(QDragMoveEvent* dme)
 						bool dopost = dragpost && droppost;
 						bool doreg = !dragpre && !droppre && !dragpost && !droppost;
 
-						if (dopre || doreg || doreg)
+						if (dopre || doreg || dopost)
 						{
 							QTreeWidget::dragMoveEvent(dme);
 							return;

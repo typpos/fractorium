@@ -44,7 +44,6 @@ namespace EmberNs
 #define ISAAC_SIZE 4
 #define MEMALIGN 32
 #define DE_THRESH 100
-#define MAX_VARS_PER_XFORM 8
 #define DEG_2_RAD (M_PI / 180)
 #define RAD_2_DEG (180 / M_PI)
 #define DEG_2_RAD_T (T(M_PI) / T(180))

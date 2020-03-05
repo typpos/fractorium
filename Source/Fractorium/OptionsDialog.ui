@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>546</width>
-    <height>490</height>
+    <height>512</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -535,6 +535,16 @@
          </property>
          <property name="text">
           <string>Scale and Rotate With Shift</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="Flam3CompatCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The behavior of the cos, cosh, cot, coth, csc, csch, sec, sech, sin, sinh, tan and tanh variations are different in flam3/Apophysis versus Chaotica.&lt;/p&gt;&lt;p&gt;Checked: use the Apophysis behavior.&lt;/p&gt;&lt;p&gt;Unchecked: use the Chaotica behavior.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Flam3 Compatibility</string>
          </property>
         </widget>
        </item>

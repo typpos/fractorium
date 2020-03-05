@@ -122,6 +122,8 @@ void FractoriumSettings::EnsureDefaults()
 
 	if (value(SHAREDTEXTURE).toString() == "")//Set this to true if the setting is missing because it only needs to be false for the rare system that has problems with shared textures.
 		SharedTexture(true);
+
+	Compat::m_Compat = Flam3Compat();
 }
 
 /// <summary>
@@ -199,6 +201,9 @@ void FractoriumSettings::LoadLast(bool b)                        { setValue(LOAD
 
 bool FractoriumSettings::RotateAndScale()                        { return value(ROTSCALE).toBool();                                        }
 void FractoriumSettings::RotateAndScale(bool b)                  { setValue(ROTSCALE, b);                                                  }
+
+bool FractoriumSettings::Flam3Compat()                           { return value(FLAM3COMPAT).toBool();                                     }
+void FractoriumSettings::Flam3Compat(bool b)                     { setValue(FLAM3COMPAT, b);                                               }
 
 /// <summary>
 /// Sequence generation settings.

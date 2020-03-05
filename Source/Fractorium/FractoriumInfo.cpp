@@ -21,6 +21,7 @@ void Fractorium::InitInfoUI()
 	ui.SummaryTable->setItem(4, 0, m_InfoXformCountItem = new QTableWidgetItem(""));
 	ui.SummaryTable->setItem(5, 0, m_InfoFinalXformItem = new QTableWidgetItem(""));
 	ui.InfoTabWidget->setCurrentIndex(0);//Make summary tab focused by default.
+	ui.SummaryTree->SetMainWindow(this);
 }
 
 /// <summary>
@@ -75,6 +76,8 @@ void FractoriumEmberController<T>::FillSummary()
 	QColor color;
 	auto table = m_Fractorium->ui.SummaryTable;
 	auto tree = m_Fractorium->ui.SummaryTree;
+	auto nondraggable = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	auto draggable = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 	tree->blockSignals(true);
 	tree->clear();
 	m_Fractorium->m_InfoNameItem->setText(m_Ember.m_Name.c_str());
@@ -109,8 +112,10 @@ void FractoriumEmberController<T>::FillSummary()
 			item1->setText(0, "Final xform");
 
 		item1->setText(1, xform->m_Name.c_str());
+		item1->setFlags(nondraggable);
 		auto affineItem = new QTreeWidgetItem(item1);
 		affineItem->setText(0, "Affine");
+		affineItem->setFlags(nondraggable);
 
 		if (xform->m_Affine.IsZero())
 			as += " Empty";
@@ -129,6 +134,7 @@ void FractoriumEmberController<T>::FillSummary()
 		auto colorIndexItem = new QTreeWidgetItem(item1);
 		colorIndexItem->setText(0, "Color index");
 		colorIndexItem->setText(1, QLocale::system().toString(xform->m_ColorX, pc, p));
+		colorIndexItem->setFlags(nondraggable | Qt::ItemNeverHasChildren);
 		color = ColorIndexToQColor(xform->m_ColorX);
 		color.setAlphaF(xform->m_Opacity);
 		colorIndexItem->setBackgroundColor(1, color);
@@ -136,18 +142,25 @@ void FractoriumEmberController<T>::FillSummary()
 		auto colorSpeedItem = new QTreeWidgetItem(item1);
 		colorSpeedItem->setText(0, "Color speed");
 		colorSpeedItem->setText(1, QLocale::system().toString(xform->m_ColorSpeed, pc, p));
+		colorSpeedItem->setFlags(nondraggable | Qt::ItemNeverHasChildren);
 		auto opacityItem = new QTreeWidgetItem(item1);
 		opacityItem->setText(0, "Opacity");
 		opacityItem->setText(1, QLocale::system().toString(xform->m_Opacity, pc, p));
+		opacityItem->setFlags(nondraggable | Qt::ItemNeverHasChildren);
 		auto dcItem = new QTreeWidgetItem(item1);
 		dcItem->setText(0, "Direct color");
 		dcItem->setText(1, QLocale::system().toString(xform->m_DirectColor, pc, p));
+		dcItem->setFlags(nondraggable | Qt::ItemNeverHasChildren);
+
+		if (dcItem->text(0) != tree->LastNonVarField())
+			throw "Last info tree non-variation index did not match expected value";
 
 		while (auto var = xform->GetVariation(i++))
 		{
-			auto vitem = new QTreeWidgetItem(item1);
+			auto vitem = new VariationTreeWidgetItem(var->VariationId(), item1);
 			vitem->setText(0, QString::fromStdString(var->Name()));
 			vitem->setText(1, QLocale::system().toString(var->m_Weight, pc, vp).rightJustified(vlen, ' '));
+			vitem->setFlags(draggable);
 
 			if (auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
 			{
@@ -160,6 +173,7 @@ void FractoriumEmberController<T>::FillSummary()
 						auto pitem = new QTreeWidgetItem(vitem);
 						pitem->setText(0, params[j].Name().c_str());
 						pitem->setText(1, QLocale::system().toString(params[j].ParamVal(), pc, vp).rightJustified(vlen, ' '));
+						pitem->setFlags(nondraggable);
 					}
 				}
 			}
@@ -175,6 +189,57 @@ void FractoriumEmberController<T>::FillSummary()
 void Fractorium::FillSummary()
 {
 	m_Controller->FillSummary();
+}
+
+/// <summary>
+/// Reorder the variations of the xform for the passed in tree widget item.
+/// Read the newly reordered variation items in order, removing each from the xform
+/// corresponding to the passed in item, and storing them in a vector. Then re-add those variation
+/// pointers back to the xform in the same order they were removed.
+/// This will be called after the user performs a drag and drop operation on the variations in the
+/// info tree. So the variations will be in the newly desired order.
+/// </summary>
+/// <param name="dme">Pointer to the parent (xform level) tree widget item which contains the variation item being dragged</param>
+template <typename T>
+void FractoriumEmberController<T>::ReorderVariations(QTreeWidgetItem* item)
+{
+	auto tree = m_Fractorium->ui.SummaryTree;
+	auto xfindex = tree->indexOfTopLevelItem(item) / 2;//Blank lines each count as one.
+
+	if (auto xform = m_Ember.GetTotalXform(xfindex))
+	{
+		vector<Variation<T>*> vars;
+		vars.reserve(xform->TotalVariationCount());
+		Update([&]
+		{
+			int i = 0;
+
+			while (auto ch = item->child(i))
+			{
+				if (ch->text(0) == tree->LastNonVarField())
+				{
+					i++;
+
+					while (auto varch = dynamic_cast<VariationTreeWidgetItem*>(item->child(i++)))
+						if (auto var = xform->RemoveVariationById(varch->Id()))
+							vars.push_back(var);
+
+					for (auto& var : vars)
+						xform->AddVariation(var);
+
+					break;
+				}
+
+				i++;
+			}
+
+		}, true, eProcessAction::FULL_RENDER);
+	}
+}
+
+void Fractorium::ReorderVariations(QTreeWidgetItem* item)
+{
+	m_Controller->ReorderVariations(item);
 }
 
 /// <summary>

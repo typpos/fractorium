@@ -994,6 +994,13 @@ template <typename T>
 bool IterOpenCLKernelCreator<T>::IsBuildRequired(const Ember<T>& ember1, const Ember<T>& ember2, bool optAffine)
 {
 	size_t i, j, xformCount = ember1.TotalXformCount();
+	static bool lastCompat = Compat::m_Compat;
+
+	if (lastCompat != Compat::m_Compat)
+	{
+		lastCompat = Compat::m_Compat;
+		return true;
+	}
 
 	if (xformCount != ember2.TotalXformCount())
 		return true;

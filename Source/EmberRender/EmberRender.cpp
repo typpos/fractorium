@@ -48,6 +48,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 	unique_ptr<Renderer<T, float>> renderer(CreateRenderer<T>(opt.EmberCL() ? eRendererType::OPENCL_RENDERER : eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
 	vector<string> errorReport = emberReport.ErrorReport();
 	auto fullpath = GetExePath(argv[0]);
+	Compat::m_Compat = opt.Flam3Compat();
 
 	if (!errorReport.empty())
 		emberReport.DumpErrorReport();

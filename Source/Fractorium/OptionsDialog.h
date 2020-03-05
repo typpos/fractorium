@@ -38,6 +38,7 @@ public:
 	bool AutoUnique();
 	bool LoadLast();
 	bool RotateAndScale();
+	bool Flam3Compat();
 	uint ThreadCount();
 	uint RandomCount();
 	uint CpuQuality();

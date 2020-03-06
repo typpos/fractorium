@@ -13,6 +13,7 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionCopyFlameInCurrentFile,	  SIGNAL(triggered(bool)), this, SLOT(OnActionCopyFlameInCurrentFile(bool)),	  Qt::QueuedConnection);
 	connect(ui.ActionCreateReferenceFile,         SIGNAL(triggered(bool)), this, SLOT(OnActionCreateReferenceFile(bool)),         Qt::QueuedConnection);
 	connect(ui.ActionOpen,						  SIGNAL(triggered(bool)), this, SLOT(OnActionOpen(bool)),						  Qt::QueuedConnection);
+    connect(ui.ActionOpenExamples,                SIGNAL(triggered(bool)), this, SLOT(OnActionOpenExamples(bool)),				  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentAsXml,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentAsXml(bool)),			  Qt::QueuedConnection);
 	connect(ui.ActionSaveEntireFileAsXml,		  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveEntireFileAsXml(bool)),		  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentScreen,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentScreen(bool)),			  Qt::QueuedConnection);
@@ -369,6 +370,12 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 /// </summary>
 /// <param name="checked">Ignored</param>
 void Fractorium::OnActionOpen(bool checked) { m_Controller->OpenAndPrepFiles(SetupOpenXmlDialog(), false); }
+
+/// <summary>
+/// Show a file open dialog to open examples Xml files.
+/// </summary>
+/// <param name="checked">Ignored</param>
+void Fractorium::OnActionOpenExamples(bool checked) { m_Controller->OpenAndPrepFiles(SetupOpenXmlDialog(true), false); }
 
 /// <summary>
 /// Save current ember as Xml, using the Xml saving template values from the options.

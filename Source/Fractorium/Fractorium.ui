@@ -80,8 +80,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1277</width>
-      <height>985</height>
+      <width>1213</width>
+      <height>978</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -173,7 +173,7 @@
             <x>0</x>
             <y>0</y>
             <width>230</width>
-            <height>934</height>
+            <height>928</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -263,14 +263,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -278,14 +278,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -455,14 +455,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -470,14 +470,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -536,14 +536,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -551,14 +551,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -636,14 +636,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -651,14 +651,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -773,14 +773,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>120</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -788,14 +788,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -1123,14 +1123,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1138,14 +1138,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -1299,14 +1299,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1314,14 +1314,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -1408,14 +1408,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1423,14 +1423,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <row>
               <property name="text">
@@ -1572,14 +1572,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>120</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1587,14 +1587,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -1821,14 +1821,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1836,14 +1836,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>16</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>16</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>16</number>
              </attribute>
              <column>
               <property name="text">
@@ -2093,26 +2093,26 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>35</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>35</number>
-         </attribute>
          <attribute name="verticalHeaderCascadingSectionResizes">
           <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
          </attribute>
         </widget>
        </item>
@@ -2216,10 +2216,10 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
+         <attribute name="horizontalHeaderMinimumSectionSize">
           <number>35</number>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
+         <attribute name="horizontalHeaderDefaultSectionSize">
           <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderStretchLastSection">
@@ -2231,10 +2231,10 @@
          <attribute name="verticalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
+         <attribute name="verticalHeaderMinimumSectionSize">
           <number>22</number>
          </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
+         <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <row/>
@@ -2290,23 +2290,23 @@
          <property name="cornerButtonEnabled">
           <bool>true</bool>
          </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>35</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>35</number>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
          </attribute>
         </widget>
        </item>
@@ -2370,8 +2370,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>285</width>
-            <height>675</height>
+            <width>389</width>
+            <height>690</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -2474,10 +2474,10 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
-             <attribute name="horizontalHeaderDefaultSectionSize">
+             <attribute name="horizontalHeaderMinimumSectionSize">
               <number>62</number>
              </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
+             <attribute name="horizontalHeaderDefaultSectionSize">
               <number>62</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
@@ -2486,14 +2486,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <row/>
              <row/>
@@ -2713,10 +2713,10 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
-             <attribute name="verticalHeaderDefaultSectionSize">
+             <attribute name="verticalHeaderMinimumSectionSize">
               <number>20</number>
              </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
+             <attribute name="verticalHeaderDefaultSectionSize">
               <number>20</number>
              </attribute>
              <row/>
@@ -2825,14 +2825,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>16</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>16</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>16</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -3059,8 +3059,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>291</width>
-            <height>876</height>
+            <width>277</width>
+            <height>880</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -3409,14 +3409,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>27</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>110</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>27</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -3424,14 +3424,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>21</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>21</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>21</number>
              </attribute>
              <row/>
              <column>
@@ -3627,11 +3627,11 @@
                  <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="horizontalHeaderHighlightSections">
-                  <bool>false</bool>
-                 </attribute>
                  <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>27</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderHighlightSections">
+                  <bool>false</bool>
                  </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
@@ -3639,14 +3639,14 @@
                  <attribute name="verticalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>21</number>
+                 </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
                   <number>21</number>
                  </attribute>
                  <attribute name="verticalHeaderHighlightSections">
                   <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
-                  <number>21</number>
                  </attribute>
                  <attribute name="verticalHeaderStretchLastSection">
                   <bool>false</bool>
@@ -3963,14 +3963,14 @@
                  <attribute name="horizontalHeaderCascadingSectionResizes">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>27</number>
+                 </attribute>
                  <attribute name="horizontalHeaderDefaultSectionSize">
                   <number>125</number>
                  </attribute>
                  <attribute name="horizontalHeaderHighlightSections">
                   <bool>false</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderMinimumSectionSize">
-                  <number>27</number>
                  </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
@@ -3978,14 +3978,14 @@
                  <attribute name="verticalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>22</number>
+                 </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
                   <number>22</number>
                  </attribute>
                  <attribute name="verticalHeaderHighlightSections">
                   <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
-                  <number>22</number>
                  </attribute>
                  <attribute name="verticalHeaderStretchLastSection">
                   <bool>false</bool>
@@ -4230,14 +4230,14 @@
                     <attribute name="horizontalHeaderVisible">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>40</number>
+                    </attribute>
                     <attribute name="horizontalHeaderDefaultSectionSize">
                      <number>100</number>
                     </attribute>
                     <attribute name="horizontalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderMinimumSectionSize">
-                     <number>40</number>
                     </attribute>
                     <attribute name="horizontalHeaderStretchLastSection">
                      <bool>true</bool>
@@ -4248,14 +4248,14 @@
                     <attribute name="verticalHeaderCascadingSectionResizes">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="verticalHeaderMinimumSectionSize">
+                     <number>22</number>
+                    </attribute>
                     <attribute name="verticalHeaderDefaultSectionSize">
                      <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderMinimumSectionSize">
-                     <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
@@ -5035,14 +5035,14 @@
                     <attribute name="horizontalHeaderVisible">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>40</number>
+                    </attribute>
                     <attribute name="horizontalHeaderDefaultSectionSize">
                      <number>100</number>
                     </attribute>
                     <attribute name="horizontalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderMinimumSectionSize">
-                     <number>40</number>
                     </attribute>
                     <attribute name="horizontalHeaderStretchLastSection">
                      <bool>true</bool>
@@ -5053,14 +5053,14 @@
                     <attribute name="verticalHeaderCascadingSectionResizes">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="verticalHeaderMinimumSectionSize">
+                     <number>22</number>
+                    </attribute>
                     <attribute name="verticalHeaderDefaultSectionSize">
                      <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderMinimumSectionSize">
-                     <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
@@ -5955,14 +5955,14 @@
                  <property name="columnCount">
                   <number>3</number>
                  </property>
+                 <attribute name="headerMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
                  <attribute name="headerDefaultSectionSize">
                   <number>70</number>
                  </attribute>
                  <attribute name="headerHighlightSections">
                   <bool>true</bool>
-                 </attribute>
-                 <attribute name="headerMinimumSectionSize">
-                  <number>10</number>
                  </attribute>
                  <attribute name="headerShowSortIndicator" stdset="0">
                   <bool>true</bool>
@@ -6187,8 +6187,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>267</width>
-                       <height>670</height>
+                       <width>253</width>
+                       <height>646</height>
                       </rect>
                      </property>
                      <property name="sizePolicy">
@@ -6318,7 +6318,7 @@
             <x>0</x>
             <y>0</y>
             <width>291</width>
-            <height>856</height>
+            <height>854</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -6448,10 +6448,10 @@
                  <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="horizontalHeaderDefaultSectionSize">
+                 <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>22</number>
                  </attribute>
-                 <attribute name="horizontalHeaderMinimumSectionSize">
+                 <attribute name="horizontalHeaderDefaultSectionSize">
                   <number>22</number>
                  </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
@@ -6463,10 +6463,10 @@
                  <attribute name="verticalHeaderCascadingSectionResizes">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="verticalHeaderDefaultSectionSize">
+                 <attribute name="verticalHeaderMinimumSectionSize">
                   <number>21</number>
                  </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
+                 <attribute name="verticalHeaderDefaultSectionSize">
                   <number>21</number>
                  </attribute>
                  <attribute name="verticalHeaderStretchLastSection">
@@ -6583,11 +6583,11 @@
                  <attribute name="headerCascadingSectionResizes">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="headerDefaultSectionSize">
-                  <number>100</number>
-                 </attribute>
                  <attribute name="headerMinimumSectionSize">
                   <number>30</number>
+                 </attribute>
+                 <attribute name="headerDefaultSectionSize">
+                  <number>100</number>
                  </attribute>
                  <attribute name="headerShowSortIndicator" stdset="0">
                   <bool>false</bool>
@@ -6987,14 +6987,14 @@
                     <attribute name="horizontalHeaderCascadingSectionResizes">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>27</number>
+                    </attribute>
                     <attribute name="horizontalHeaderDefaultSectionSize">
                      <number>110</number>
                     </attribute>
                     <attribute name="horizontalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderMinimumSectionSize">
-                     <number>27</number>
                     </attribute>
                     <attribute name="horizontalHeaderStretchLastSection">
                      <bool>true</bool>
@@ -7002,14 +7002,14 @@
                     <attribute name="verticalHeaderVisible">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="verticalHeaderMinimumSectionSize">
+                     <number>22</number>
+                    </attribute>
                     <attribute name="verticalHeaderDefaultSectionSize">
                      <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderMinimumSectionSize">
-                     <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
@@ -7196,7 +7196,7 @@
      <x>0</x>
      <y>0</y>
      <width>1712</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">
@@ -7213,6 +7213,7 @@
     <addaction name="ActionCreateReferenceFile"/>
     <addaction name="separator"/>
     <addaction name="ActionOpen"/>
+    <addaction name="ActionOpenExamples"/>
     <addaction name="separator"/>
     <addaction name="ActionSaveCurrentAsXml"/>
     <addaction name="ActionSaveEntireFileAsXml"/>
@@ -7428,8 +7429,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>424</width>
-           <height>574</height>
+           <width>488</width>
+           <height>643</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -8688,6 +8689,18 @@
    </property>
    <property name="toolTip">
     <string>Create a file with a separate flame for each possible variation</string>
+   </property>
+  </action>
+  <action name="ActionOpenExamples">
+   <property name="icon">
+    <iconset resource="Fractorium.qrc">
+     <normaloff>:/Fractorium/Icons/folder-visiting-4.png</normaloff>:/Fractorium/Icons/folder-visiting-4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Examples</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Examples</string>
    </property>
   </action>
  </widget>

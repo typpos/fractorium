@@ -58,6 +58,7 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 		return true;
 	}
 
+	Compat::m_Compat = opt.Flam3Compat();
 	auto varList = VariationList<T>::Instance();
 
 	if (opt.AllVars() || opt.SumVars() || opt.AssignVars() || opt.PpSumVars() || opt.PpAssignVars() ||

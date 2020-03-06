@@ -68,6 +68,7 @@ enum class eOptionIDs : et
 	OPT_CW_INTERP_LOOPS,
 	OPT_LOCK_ACCUM,
 	OPT_DUMP_KERNEL,
+	OPT_FLAM3_COMPAT,
 
 	//Value args.
 	OPT_NTHREADS,//Int value args.
@@ -372,6 +373,7 @@ public:
 		INITBOOLOPTION(CwInterpLoops,  Eob(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_CW_INTERP_LOOPS,  _T("--cwinterploops"),        false,                SO_NONE,     "   --cwinterploops           Rotate clockwise during interpolation, ignored if --interploops is 0 [default: false].\n"));
 		INITBOOLOPTION(LockAccum,	   Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_LOCK_ACCUM,       _T("--lock_accum"),           false,                SO_NONE,     "   --lock_accum              Lock threads when accumulating to the histogram using the CPU. This will drop performance to that of single threading [default: false].\n"));
 		INITBOOLOPTION(DumpKernel,	   Eob(eOptionUse::OPT_USE_RENDER,	eOptionIDs::OPT_DUMP_KERNEL,      _T("--dump_kernel"),          false,                SO_NONE,     "   --dump_kernel             Print the iteration kernel string when using OpenCL (ignored for CPU) [default: false].\n"));
+		INITBOOLOPTION(Flam3Compat,	   Eob(eOptionUse::OPT_USE_ALL,		eOptionIDs::OPT_FLAM3_COMPAT,     _T("--flam3_compat"),         false,                SO_NONE,     "   --flam3_compat            The behavior of the cos, cosh, cot, coth, csc, csch, sec, sech, sin, sinh, tan and tanh variations are different in flam3/Apophysis versus Chaotica. True for flam3/Apophysis behavior, false for Chaotica behavior [default: false].\n"));
 		//Int.
 		INITINTOPTION(Symmetry,        Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SYMMETRY,         _T("--symmetry"),					0,			   SO_REQ_SEP,	   "   --symmetry=<val>          Set symmetry of result [default: 0].\n"));
 		INITINTOPTION(SheepGen,        Eoi(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_SHEEP_GEN,        _T("--sheep_gen"),	           -1,			   SO_REQ_SEP,	   "   --sheep_gen=<val>         Sheep generation of this flame [default: -1].\n"));
@@ -531,6 +533,7 @@ public:
 					PARSEBOOLOPTION(eOptionIDs::OPT_CW_INTERP_LOOPS, CwInterpLoops);
 					PARSEBOOLOPTION(eOptionIDs::OPT_LOCK_ACCUM, LockAccum);
 					PARSEBOOLOPTION(eOptionIDs::OPT_DUMP_KERNEL, DumpKernel);
+					PARSEBOOLOPTION(eOptionIDs::OPT_FLAM3_COMPAT, Flam3Compat);
 					PARSEOPTION(eOptionIDs::OPT_SYMMETRY, Symmetry);//Int args
 					PARSEOPTION(eOptionIDs::OPT_SHEEP_GEN, SheepGen);
 					PARSEOPTION(eOptionIDs::OPT_SHEEP_ID, SheepId);
@@ -819,6 +822,7 @@ public:
 	Eob CwInterpLoops;
 	Eob LockAccum;
 	Eob DumpKernel;
+	Eob Flam3Compat;
 
 	Eoi Symmetry;//Value int.
 	Eoi SheepGen;

@@ -262,6 +262,7 @@ public:
 
 	//Info.
 	virtual void FillSummary() { }
+	virtual void ReorderVariations(QTreeWidgetItem* item) { }
 
 	//Rendering/progress.
 	virtual bool Render() { return false; }
@@ -556,6 +557,7 @@ public:
 
 	//Info.
 	virtual void FillSummary() override;
+	virtual void ReorderVariations(QTreeWidgetItem* item) override;
 
 	//Rendering/progress.
 	virtual bool Render() override;

@@ -129,6 +129,9 @@ public:
 	bool DrawAllPost();
 	bool LocalPivot();
 
+	//Info.
+	void ReorderVariations(QTreeWidgetItem* item);
+
 public slots:
 	//Dock.
 	void OnDockTopLevelChanged(bool topLevel);

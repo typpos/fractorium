@@ -30,6 +30,7 @@
 #define OPENCLQUALITY        "render/openclquality"
 #define LOADLAST             "render/loadlastonstart"
 #define ROTSCALE             "render/rotateandscale"
+#define FLAM3COMPAT          "render/flam3compat"
 
 #define STAGGER		         "sequence/stagger"
 #define STAGGERMAX		     "sequence/staggermax"
@@ -179,6 +180,9 @@ public:
 
 	bool RotateAndScale();
 	void RotateAndScale(bool b);
+
+	bool Flam3Compat();
+	void Flam3Compat(bool b);
 
 	double Stagger();
 	void Stagger(double i);

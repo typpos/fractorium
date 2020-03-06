@@ -1,28 +1,25 @@
 #include "EmberPch.h"
 #include "EmberDefines.h"
 #include "Isaac.h"
+#include "Utils.h"
 
 namespace EmberNs
 {
 template<> unique_ptr<QTIsaac<ISAAC_SIZE, ISAAC_INT>> QTIsaac<ISAAC_SIZE, ISAAC_INT>::GlobalRand = unique_ptr<QTIsaac<ISAAC_SIZE, ISAAC_INT>>(new QTIsaac<ISAAC_SIZE, ISAAC_INT>());
 template<> unique_ptr<recursive_mutex> QTIsaac<ISAAC_SIZE, ISAAC_INT>::s_CS = unique_ptr<recursive_mutex>(new recursive_mutex());
 template EMBER_API class QTIsaac<ISAAC_SIZE, ISAAC_INT>;
+bool Compat::m_Compat = false;
 }
 
 #include "Curves.h"
 #include "Ember.h"
-#include "Utils.h"
 #include "Iterator.h"
 #include "Palette.h"
 #include "PaletteList.h"
 #include "Point.h"
 #include "VarFuncs.h"
 #include "Variation.h"
-#ifdef FLAM3_COMPAT
-	#include "Variations01_flam3_compat.h"//Do this instead if you want full compatibility with flam3.
-#else
-	#include "Variations01.h"
-#endif
+#include "Variations01.h"
 #include "Variations02.h"
 #include "Variations03.h"
 #include "Variations04.h"

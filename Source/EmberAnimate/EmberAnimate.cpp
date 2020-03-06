@@ -46,6 +46,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 	vector<string> errorReport;
 	std::recursive_mutex verboseCs;
 	auto fullpath = GetExePath(argv[0]);
+	Compat::m_Compat = opt.Flam3Compat();
 
 	if (opt.EmberCL())
 	{

@@ -268,16 +268,15 @@ public:
 		m_HasPost = false;
 		m_HasPreOrRegularVars = false;
 		m_ParentEmber = nullptr;
-		m_PreVariations.reserve(MAX_VARS_PER_XFORM);
-		m_Variations.reserve(MAX_VARS_PER_XFORM);
-		m_PostVariations.reserve(MAX_VARS_PER_XFORM);
+		m_PreVariations.reserve(8);
+		m_Variations.reserve(8);
+		m_PostVariations.reserve(8);
 		CacheColorVals();
 		count++;
 	}
 
 	/// <summary>
 	/// Add a pointer to a variation which will be deleted on destruction so the caller should not delete.
-	/// This checks if the total number of variations is less than or equal to MAX_VARS_PER_XFORM.
 	/// It also checks if the variation is already present, in which case it doesn't add.
 	/// If add, set all precalcs.
 	/// </summary>
@@ -299,23 +298,63 @@ public:
 			else
 				vec = &m_Variations;
 
-			if (vec->size() < MAX_VARS_PER_XFORM)
+			vec->push_back(variation);
+
+			//Flatten must always be last.
+			for (size_t i = 0; i < vec->size(); i++)
 			{
-				vec->push_back(variation);
-
-				//Flatten must always be last.
-				for (size_t i = 0; i < vec->size(); i++)
+				if ((i != vec->size() - 1) && ((*vec)[i]->Name().find("flatten") != string::npos))
 				{
-					if ((i != vec->size() - 1) && ((*vec)[i]->Name().find("flatten") != string::npos))
-					{
-						std::swap((*vec)[i], (*vec)[vec->size() - 1]);
-						break;
-					}
+					std::swap((*vec)[i], (*vec)[vec->size() - 1]);
+					break;
 				}
-
-				SetPrecalcFlags();
-				return true;
 			}
+
+			SetPrecalcFlags();
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// Insert a pointer to a variation, at the specified location, which will be deleted on destruction so the caller should not delete.
+	/// It also checks if the variation is already present, in which case it doesn't add.
+	/// If add, set all precalcs.
+	/// </summary>
+	/// <param name="variation">Pointer to a varation to add</param>
+	/// <param name="index">The index to insert at</param>
+	/// <returns>True if the successful, else false.</returns>
+	bool InsertVariation(Variation<T>* variation, size_t index)
+	{
+		if (variation && (GetVariationById(variation->VariationId()) == nullptr))
+		{
+			string name = variation->Name();
+			bool pre = name.find("pre_") == 0;
+			bool post = name.find("post_") == 0;
+			vector<Variation<T>*>* vec;
+
+			if (pre)
+				vec = &m_PreVariations;
+			else if (post)
+				vec = &m_PostVariations;
+			else
+				vec = &m_Variations;
+
+			vec->insert(vec->begin() + index, variation);
+
+			//Flatten must always be last.
+			for (size_t i = 0; i < vec->size(); i++)
+			{
+				if ((i != vec->size() - 1) && ((*vec)[i]->Name().find("flatten") != string::npos))
+				{
+					std::swap((*vec)[i], (*vec)[vec->size() - 1]);
+					break;
+				}
+			}
+
+			SetPrecalcFlags();
+			return true;
 		}
 
 		return false;
@@ -441,6 +480,36 @@ public:
 			SetPrecalcFlags();
 
 		return found;
+	}
+
+	/// <summary>
+	/// Remove the variation with the matching ID, but instead of deleting it, return it.
+	/// Update precalcs if deletion successful.
+	/// </summary>
+	/// <param name="id">The ID to search for</param>
+	/// <returns>The variation if found, else nullptr.</returns>
+	Variation<T>* RemoveVariationById(eVariationId id)
+	{
+		bool found = false;
+		Variation<T>* var = nullptr;
+		AllVarsFunc([&](vector<Variation<T>*>& variations, bool & keepGoing)
+		{
+			for (size_t i = 0; i < variations.size(); i++)
+			{
+				if (variations[i] && variations[i]->VariationId() == id)
+				{
+					var = variations[i];
+					variations.erase(variations.begin() + i);
+					keepGoing = false;
+					break;
+				}
+			}
+		});
+
+		if (var)
+			SetPrecalcFlags();
+
+		return var;
 	}
 
 	/// <summary>

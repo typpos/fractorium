@@ -27,3 +27,28 @@ protected:
 
 	Fractorium* m_Fractorium = nullptr;
 };
+
+
+class InfoTreeWidget : public QTreeWidget
+{
+	Q_OBJECT
+public:
+	/// <summary>
+	/// Constructor that passes p to the parent.
+	/// </summary>
+	/// <param name="p">The parent widget</param>
+	explicit InfoTreeWidget(QWidget* p = nullptr)
+		: QTreeWidget(p)
+	{
+	}
+
+	void SetMainWindow(Fractorium* f);
+	const QString& LastNonVarField() const { return m_LastNonVarField; }
+
+protected:
+	virtual void dropEvent(QDropEvent* de) override;
+	virtual void dragMoveEvent(QDragMoveEvent* dme) override;
+
+	Fractorium* m_Fractorium = nullptr;
+	QString m_LastNonVarField = "Direct color";//It is critical to update this if any more fields are ever added before the variations start.
+};

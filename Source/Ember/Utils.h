@@ -286,6 +286,16 @@ protected:
 	const x& operator=(const x& other) = delete
 
 /// <summary>
+/// The calculations in some variations were changed from what they were in flam3/Apophysis to match Chaotica.
+/// Some users prefer the old functionality, so provide an option to retain it.
+/// </summary>
+class EMBER_API Compat
+{
+public:
+	static bool m_Compat;
+};
+
+/// <summary>
 /// Open a file in binary mode and read its entire contents into a vector of bytes. Optionally null terminate.
 /// </summary>
 /// <param name="filename">The full path to the file to read</param>

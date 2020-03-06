@@ -6540,7 +6540,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QTreeWidget" name="SummaryTree">
+                <widget class="InfoTreeWidget" name="SummaryTree">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
                    <horstretch>0</horstretch>
@@ -6561,6 +6561,12 @@
                  </property>
                  <property name="showDropIndicator" stdset="0">
                   <bool>false</bool>
+                 </property>
+                 <property name="dragDropMode">
+                  <enum>QAbstractItemView::InternalMove</enum>
+                 </property>
+                 <property name="defaultDropAction">
+                  <enum>Qt::MoveAction</enum>
                  </property>
                  <property name="selectionMode">
                   <enum>QAbstractItemView::SingleSelection</enum>
@@ -8724,6 +8730,11 @@
   </customwidget>
   <customwidget>
    <class>LibraryTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>LibraryTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>InfoTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>LibraryTreeWidget.h</header>
   </customwidget>

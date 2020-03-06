@@ -1076,12 +1076,15 @@ void Fractorium::OnActionOptions(bool checked)
 	bool ec = m_Settings->EarlyClip();
 	bool yup = m_Settings->YAxisUp();
 	bool trans = m_Settings->Transparency();
+	bool compat = m_Settings->Flam3Compat();
 
 	if (m_OptionsDialog->exec())
 	{
 		bool updatePreviews = ec != m_Settings->EarlyClip() ||
 							  yup != m_Settings->YAxisUp() ||
-							  trans != m_Settings->Transparency();
+							  trans != m_Settings->Transparency() ||
+							  compat != m_Settings->Flam3Compat();
+		Compat::m_Compat = m_Settings->Flam3Compat();
 		SyncOptionsToToolbar();//This won't trigger a recreate, the call below handles it.
 		ShutdownAndRecreateFromOptions(updatePreviews);//This will recreate the controller and/or the renderer from the options if necessary, then start the render timer.
 	}

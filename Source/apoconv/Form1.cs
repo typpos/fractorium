@@ -46,29 +46,23 @@ namespace apoconv
 			{ "sinh(", "std::sinh(" },
 			{ "asin(", "std::asin(" },
 			{ "asinh(", "std::asinh(" },
-
 			{ "cos(", "std::cos(" },
 			{ "cosh(", "std::cosh(" },
 			{ "acos(", "std::acos(" },
 			{ "acosh(", "std::acosh(" },
-
 			{ "tan(", "std::tan(" },
 			{ "tanh(", "std::tanh(" },
 			{ "atan(", "std::atan(" },
 			{ "atan2(", "std::atan2(" },
 			{ "atanh(", "std::atanh(" },
-
 			{ "sqrt(", "std::sqrt(" },
 			{ "pow(", "std::pow(" },
 			{ "fabs(", "std::abs(" },
 			{ "abs(", "std::abs(" },
 			{ "log(", "std::log(" },
 			{ "exp(", "std::exp(" },
-
 			{ "sqr(", "Sqr(" },
-
 			{ "random01()", "rand.Frand01<T>()" },
-
 			{ "M_E", "T(M_E)" },
 			{ "M_LOG2E", "T(M_LOG2E)" },
 			{ "M_LOG10E", "T(M_LOG10E)" },
@@ -82,7 +76,6 @@ namespace apoconv
 			{ "M_2_SQRTPI", "T(M_2_SQRTPI)" },
 			{ "M_SQRT2", "T(M_SQRT2)" },
 			{ "M_SQRT1_2", "T(M_SQRT1_2)" },
-
 		};
 
 		public Form1()
@@ -98,7 +91,6 @@ namespace apoconv
 				return "";
 
 			//doexport = false;
-
 			bool isparvar = false;
 			string pluginname = "";
 			string varclassname = "";
@@ -107,7 +99,6 @@ namespace apoconv
 			m_PrecalcFuncLines.Clear();
 			m_CalcFuncLines.Clear();
 			m_FinalCalcFuncLines.Clear();
-
 			bool structstart = false;
 
 			foreach (var line in lines)
@@ -150,7 +141,6 @@ namespace apoconv
 							Name = split.Trim(),
 							MemberName = "m_" + split.RemoveFirst(pluginname + "_").FirstCharToUpper().Replace("_", "").Trim(),
 						});
-
 						isparvar = true;
 					}
 				}
@@ -383,7 +373,6 @@ namespace apoconv
 
 			final += "\t\thelper.Out.z = DefaultZ(helper);\r\n";
 			final += "\t}\r\n";
-
 			final += "\r\n\tvirtual string OpenCLString() const override\r\n";
 			final += "\t{\r\n";
 			final += "\t	ostringstream ss, ss2;\r\n";
@@ -477,7 +466,6 @@ namespace apoconv
 
 			if (isparvar)
 			{
-
 				final += "\r\nprotected:\r\n";
 				final += "\tvoid Init()\r\n";
 				final += "\t{\r\n";
@@ -539,7 +527,6 @@ namespace apoconv
 		private void textBox1_TextChanged(object sender, EventArgs e)
 		{
 			textBox2.Text = Apo2Fractorium(textBox1.Lines, true);
-
 		}
 
 		private void textBox1_DragDrop(object sender, DragEventArgs e)
@@ -557,6 +544,13 @@ namespace apoconv
 					var lines = File.ReadAllLines(file);
 					tb1lines.AddRange(lines.ToList());
 					final += Apo2Fractorium(lines, true);
+					/*
+					    var guid = Guid.NewGuid();
+					    var fileonly = System.IO.Path.GetFileName(file);
+					    final += "<Component Id=\"" + fileonly + "\" Guid=\"" + guid + "\">\n";
+					    final += "\t<File Id=\"" + fileonly + "\" Source = \"$(var.SolutionDir)..\\..\\..\\Data\\" + fileonly + "\" KeyPath=\"yes\" Checksum=\"yes\" ReadOnly=\"yes\"/>\n";
+					    final += "</Component>\n\n";
+					*/
 				}
 
 				textBox1.Lines = tb1lines.ToArray();

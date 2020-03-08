@@ -552,6 +552,7 @@ void Fractorium::SyncFileCountToSequenceCount()
 	if (auto top = ui.LibraryTree->topLevelItem(0))
 	{
 		int count = top->childCount() - 1;
+		ui.LibraryTree->headerItem()->setText(0, "Current Flame File (" + QString::number(top->childCount()) + ")");
 		ui.SequenceStartFlameSpinBox->setMinimum(0);
 		ui.SequenceStartFlameSpinBox->setMaximum(count);
 		ui.SequenceStartFlameSpinBox->setValue(0);

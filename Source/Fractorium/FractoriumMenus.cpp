@@ -13,7 +13,7 @@ void Fractorium::InitMenusUI()
 	connect(ui.ActionCopyFlameInCurrentFile,	  SIGNAL(triggered(bool)), this, SLOT(OnActionCopyFlameInCurrentFile(bool)),	  Qt::QueuedConnection);
 	connect(ui.ActionCreateReferenceFile,         SIGNAL(triggered(bool)), this, SLOT(OnActionCreateReferenceFile(bool)),         Qt::QueuedConnection);
 	connect(ui.ActionOpen,						  SIGNAL(triggered(bool)), this, SLOT(OnActionOpen(bool)),						  Qt::QueuedConnection);
-    connect(ui.ActionOpenExamples,                SIGNAL(triggered(bool)), this, SLOT(OnActionOpenExamples(bool)),				  Qt::QueuedConnection);
+	connect(ui.ActionOpenExamples,                SIGNAL(triggered(bool)), this, SLOT(OnActionOpenExamples(bool)),				  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentAsXml,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentAsXml(bool)),			  Qt::QueuedConnection);
 	connect(ui.ActionSaveEntireFileAsXml,		  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveEntireFileAsXml(bool)),		  Qt::QueuedConnection);
 	connect(ui.ActionSaveCurrentScreen,			  SIGNAL(triggered(bool)), this, SLOT(OnActionSaveCurrentScreen(bool)),			  Qt::QueuedConnection);

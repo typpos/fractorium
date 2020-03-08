@@ -369,6 +369,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	static int gcount = 0;
 	static int hcount = 0;
 	static int pcount = 0;
+	static int commacount = 0;
+	static int periodcount = 0;
 	static int lcount = 0;
 
 	if (o == ui.GLParentScrollArea && e->type() == QEvent::Resize)
@@ -429,6 +431,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				unsigned int index = combo->currentIndex();
 				double vdist = 0.01;
 				double hdist = 0.01;
+				double zoom = 1;
 				double rot = 1;
 				double grow = 0.01;
 				bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
@@ -446,6 +449,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 						vdist *= 0.1;
 						rot *= 0.1;
 						grow *= 0.1;
+						zoom *= 0.1;
 					}
 					else if (ctrl)
 					{
@@ -453,6 +457,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 						vdist *= 10;
 						rot *= 10;
 						grow *= 10;
+						zoom *= 10;
 					}
 				}
 
@@ -541,6 +546,30 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 
 						return true;
 					}
+				}
+				else if (ke->key() == Qt::Key_Comma || ke->key() == Qt::Key_Less)
+				{
+					commacount++;
+
+					if (commacount >= times)
+					{
+						commacount = 0;
+						m_ScaleSpin->setValue(m_ScaleSpin->value() - zoom);
+					}
+
+					return true;
+				}
+				else if (ke->key() == Qt::Key_Period || ke->key() == Qt::Key_Greater)
+				{
+					periodcount++;
+
+					if (periodcount >= times)
+					{
+						periodcount = 0;
+						m_ScaleSpin->setValue(m_ScaleSpin->value() + zoom);
+					}
+
+					return true;
 				}
 				else if ((!DrawPreAffines() && pre) || (!DrawPostAffines() && !pre))//Everything below this must be for editing xforms via key press.
 				{
@@ -695,6 +724,7 @@ void Fractorium::closeEvent(QCloseEvent* e)
 /// <summary>
 /// Examine the files dragged when it first enters the window area.
 /// Ok if at least one file is .flam3, .flam3 or .xml, else not ok.
+/// Also traverse folders recursively if a folder is included in the list of dragged items.
 /// Called when the user first drags files in.
 /// </summary>
 /// <param name="e">The event</param>
@@ -706,14 +736,36 @@ void Fractorium::dragEnterEvent(QDragEnterEvent* e)
 
 		for (auto& url : urls)
 		{
-			QString localFile = url.toLocalFile();
-			QFileInfo fileInfo(localFile);
-			QString suf = fileInfo.suffix();
+			auto localFile = url.toLocalFile();
 
-			if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
+			if (QDir(localFile).exists())
 			{
-				e->accept();
-				break;
+				QDirIterator it(localFile, QDirIterator::Subdirectories);
+
+				while (it.hasNext())
+				{
+					auto next = it.next();
+					qDebug() << next;
+					QFileInfo fileInfo(next);
+					auto suf = fileInfo.suffix();
+
+					if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
+					{
+						e->accept();
+						return;
+					}
+				}
+			}
+			else
+			{
+				QFileInfo fileInfo(localFile);
+				auto suf = fileInfo.suffix();
+
+				if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
+				{
+					e->accept();
+					break;
+				}
 			}
 		}
 	}
@@ -729,8 +781,8 @@ void Fractorium::dragMoveEvent(QDragMoveEvent* e)
 }
 
 /// <summary>
-/// Examine and open the dropped files.
-/// Called when the user drops a file in.
+/// Examine and open the dropped files and/or folders.
+/// Called when the user drops a file or folder in.
 /// </summary>
 /// <param name="e">The event</param>
 void Fractorium::dropEvent(QDropEvent* e)
@@ -745,12 +797,35 @@ void Fractorium::dropEvent(QDropEvent* e)
 
 		for (auto& url : urls)
 		{
-			QString localFile = url.toLocalFile();
-			QFileInfo fileInfo(localFile);
-			QString suf = fileInfo.suffix();
+			auto localFile = url.toLocalFile();
 
-			if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
-				filenames << localFile;
+			if (QDir(localFile).exists())
+			{
+				QDirIterator it(localFile, QDirIterator::Subdirectories);
+
+				while (it.hasNext())
+				{
+					auto next = it.next();
+					qDebug() << next;
+					QFileInfo fileInfo(next);
+
+					if (fileInfo.isFile() && fileInfo.exists())
+					{
+						auto suf = fileInfo.suffix();
+
+						if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
+							filenames << next;
+					}
+				}
+			}
+			else
+			{
+				QFileInfo fileInfo(localFile);
+				auto suf = fileInfo.suffix();
+
+				if (suf == "flam3" || suf == "flame" || suf == "xml" || suf == "chaos")
+					filenames << localFile;
+			}
 		}
 	}
 
@@ -819,46 +894,46 @@ QStringList Fractorium::SetupOpenXmlDialog(bool openExamples)
 
 	QStringList filenames;
 
-    if(openExamples)
-    {
-        m_OpenFileDialog->selectFile("*");
-        m_OpenFileDialog->setDirectory(QCoreApplication::applicationDirPath() + "/FlameExamples");
-        m_OpenFileDialog->selectNameFilter("flame (*.flame)");
-    }
-    else
-    {
-        m_OpenFileDialog->setDirectory(m_Settings->OpenFolder());
-        m_OpenFileDialog->selectNameFilter(m_Settings->OpenXmlExt());
-    }
+	if (openExamples)
+	{
+		m_OpenFileDialog->selectFile("*");
+		m_OpenFileDialog->setDirectory(QCoreApplication::applicationDirPath() + "/FlameExamples");
+		m_OpenFileDialog->selectNameFilter("flame (*.flame)");
+	}
+	else
+	{
+		m_OpenFileDialog->setDirectory(m_Settings->OpenFolder());
+		m_OpenFileDialog->selectNameFilter(m_Settings->OpenXmlExt());
+	}
 
 	if (m_OpenFileDialog->exec() == QDialog::Accepted)
 	{
 		filenames = m_OpenFileDialog->selectedFiles();
 
-        if (!openExamples && !filenames.empty())
+		if (!openExamples && !filenames.empty())
 			m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
-        else
-            m_OpenFileDialog->selectFile("*");
-	}   
+		else
+			m_OpenFileDialog->selectFile("*");
+	}
 
 #else
-    QString defaultFilter;
-    QStringList filenames;
+	QString defaultFilter;
+	QStringList filenames;
 
-    if(openExamples)
-    {
-        defaultFilter = "flame (*.flame)";
-        filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), QCoreApplication::applicationDirPath() + "/FlameExamples", tr("flame(*.flame)"), &defaultFilter);
-    }
-    else
-    {
-        defaultFilter = m_Settings->OpenXmlExt();
-        filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; xml(*.xml);; chaos (*.chaos)"), &defaultFilter);
-        m_Settings->OpenXmlExt(defaultFilter);
+	if (openExamples)
+	{
+		defaultFilter = "flame (*.flame)";
+		filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), QCoreApplication::applicationDirPath() + "/FlameExamples", tr("flame(*.flame)"), &defaultFilter);
+	}
+	else
+	{
+		defaultFilter = m_Settings->OpenXmlExt();
+		filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; xml(*.xml);; chaos (*.chaos)"), &defaultFilter);
+		m_Settings->OpenXmlExt(defaultFilter);
 
-        if (!filenames.empty())
-            m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
-    }
+		if (!filenames.empty())
+			m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
+	}
 
 #endif
 	return filenames;

@@ -76,6 +76,10 @@ $$ASSETS_DIR/tatasz_pack_02_colder.gradient \
 $$ASSETS_DIR/tatasz_pack_02_dark.gradient \
 $$ASSETS_DIR/tatasz_pack_02_warmer.gradient \
 $$ASSETS_DIR/tatasz_pack_03.gradient \
+$$ASSETS_DIR/tatasz_pack_04.gradient \
+$$ASSETS_DIR/tatasz_pack_05.gradient \
+$$ASSETS_DIR/tatasz_pack_06.gradient \
+$$ASSETS_DIR/tatasz_pack_07.gradient \
 $$ASSETS_DIR/Amphibole_Supergroup.ugr \
 $$ASSETS_DIR/Apatite_Supergroup.ugr \
 $$ASSETS_DIR/Feldspar_Group.ugr \
@@ -224,136 +228,8 @@ RESOURCES += \
 DISTFILES += \
     ../../../Data/FlameExamples/b33rheart_examples.flame \
     ../../../Data/FlameExamples/b33rheart_sierpinski.flame \
+    ../../../Data/FlameExamples/pillemaster_hexagonal_tilings.flame \
     ../../../Data/FlameExamples/plangkye_examples.flame \
     ../../../Data/FlameExamples/tatasz_examples.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[a.b-d.d-c.d-a.c] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[a.b2.b2-c.a-b.a] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[a.b2.b2-c.c-a.c] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[a2.b-a.b2.b2.a2] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[a2.b-b.a.a2] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[b.b-a.a3.b3.a2] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[b.b.a-b.a2] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[b2.b-a.a.b2] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[b3.a-a.a.a.a.b] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x/[b3.b3.a-a.a.b] -x^3+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x^2+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x^2+x/[b.b.b-a.a3.b4]C12[-x^3+x^2+x].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x^2+x/[b.b.b-a.b2] -x^3+x^2+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/-x^3+x^2+x/[b2.b-a.a.b2] -x^3+x^2+x.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4/[3a.b-2a.2b] x^2-x+4.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4/[a.a.a.b.b-a.b.b] x^2-x+4.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4/[a.a.b.b-a.a.b.b] x^2-x+4.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4/[b.b-a0.b.b]B2[x^2-x+4].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4/[b0.b0-a.b.c-a.a]B2[x^2-x+4].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^2-x+4/[b0.c0-a.b.c-a.a]B2[x^2-x+4].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.a2.b-a2.b.a2] x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.b-a.b.c-c.b2]B2[x^3+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.b.a2-a.a2.a3] x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.b.a2-b.a2.a2]B2[x^3+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.b2-a.a.b.b2]B2[x^3+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.c-a.a.b-c.c2.a2.a2]B2[x^3+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a.c2.c2-a.b.c-a.b] x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[a3.b.b-a3.a.b] x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[b.a-a.a.a3.a2] x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[b.a.b2-a.b2.a2]B2[x^3+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-1/[b.a.c2-a.b-a.c] x^3+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-2/[b.b-b.b.a2.a2] x^3+2x-2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+2x-2/[b.b.a.a-a2.a2] x^3+2x-2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a.b2-a3.b4.a4]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a.b3.a4-b3.a4]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a.b3.b4-a2.b4]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a.b3.b4-a3.b2]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a2.a2.a7]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a2.a3.a4] x^3+x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a2.a4.a4.a6]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a3.a3.a4.a5]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a3.b3-a.a.a3.a2]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[a3.b3-a.a3.b3.a2]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[b.b.b3-a3.b2]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[b.b2-a2.b4.a4]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[b.b2.a2-b.a5]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3+x-1/[b.b3.a4-a3.a2]B2[x^3+x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+2x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+2x+1/[b.a.a-a.a.a2] x^3-2x^2+2x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+2x+1/[b.b2-a.b.b.b2]B2[x^3-2x^2+2x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+3x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+3x-1/[a.a.b2-a.b2.a2]B2[x^3-2x^2+3x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+3x-1/[a.b-a.b.c-b.a2]B2[x^3-2x^2+3x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+3x-1/[a.b2-b.b.b3.a2]B2[x^3-2x^2+3x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+3x-1/[b.a.a2-a.a.a4]B2[x^3-2x^2+3x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+3x-1/[b2.a2-a.b.b.a2] x^3-2x^2+3x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.a.b-b.b2.a4]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.a.b2-a3.a2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.a2.b-a2.b.b2] x^3-2x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.b-a.a.c-c.b2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.b-a.b.c-b2.c2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.b.a2-b.b2.a2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[a.d-b.c-a.b-a.b.c] x^3-2x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[b.a-a.a2.a2.b2] x^3-2x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[b.a.a2-b.b.a4]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[b.a.b2-a.a3.a2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[b.a3-a.a.b.a3] x^3-2x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[b.b.b2-a.b2.a2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-2x^2+x+1/[b0.b-a.b3.b2]B2[x^3-2x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+1/[a2.a3] x^3-x^2+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+1/[a2.a6.a5]B2[x^3-x^2+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+1/[a3.a4.a5] x^3-x^2+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+1/[a3.a4.a5]B2[x^3-x^2+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x+1/[a.b.b3-a2.b2.b4]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x+1/[b.a-a.a.b.a2] x^3-x^2+2x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x+1/[b.a.a-a.a2] x^3-x^2+2x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a.a2.b2-b.b4.a4]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a.a3.b4-a.b.b3]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a.b2-a.b2.a2]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a.b2-b3.b2.a2.a2]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a.b3-a.b.b3] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a2.b2-b.b3.a3.a2]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a4.a2.a] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[a5.a3.a3.a] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[b.a-a3.a2.b2] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[b.a-a3.a3.b3.b2] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[b.b.b3-b.a3.b3]B2[x^3-x^2+2x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[b.b3-b.b3.a2] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+2x-1/[b3.b-a.a2.b2] x^3-x^2+2x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-1/[a.a.b2.a2-a.a.b] x^3-x^2+3x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-1/[b.b.a-b.b.b2.a2] x^3-x^2+3x-1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-1/[b.b2.a2-a.b.b.a2]B2[x^3-x^2+3x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-1/[b0.a-b.a.a3]B2[x^3-x^2+3x-1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-2/[b.b.a-b.b.a2.a2] x^3-x^2+3x-2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+3x-2/[b.b.a.a-b.a2.a2] x^3-x^2+3x-2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1 1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1 2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b.b2-b.a3.a4]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b.b2-b.a3.b3]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b.b2-b.b3.a3]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b.b2-b2.a2.a4]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b.b3-a3.b2.a2]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b2-a.b.a3]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b2-b.b3.a3.a2]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b2.b2-b3.b3.b2.a2]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[a.b3-a.b.b3.a2] x^3-x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[b.a-b3.a3.b2.a2] x^3-x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[b.a.a3-b.a3.b3]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[b.a3-a.a.a3.a2] x^3-x^2+x+1.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+1/[b.b2.b2-a.b2.b4]B2[x^3-x^2+x+1].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+2/[a3.a3.b-a.b.b] x^3-x^2+x+2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+2/[b.b-a.b.a2.a2] x^3-x^2+x+2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+2/[b.b-a.b.c-a.a]B2[x^3-x^2+x+2].flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+2/[b.b.a-a.a2.a2] x^3-x^2+x+2.flame \
-    ../../../Data/FlameExamples/tatasz_tiled_swirls_param_pack/x^3-x^2+x+2/[c0.b-a.a2.a2-a.b]B2[x^3-x^2+x+2].flame \
-    ../../../Data/tatasz_pack_04.gradient \
-    ../../../Data/tatasz_pack_05.gradient \
-    ../../../Data/tatasz_pack_06.gradient \
-    ../../../Data/tatasz_pack_07.gradient
+    ../../../Data/FlameExamples/tatasz_substitution.flame \
+    ../../../Data/FlameExamples/tyrantwave_base_forms.flame

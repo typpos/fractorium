@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -544,12 +543,13 @@ namespace apoconv
 					var lines = File.ReadAllLines(file);
 					tb1lines.AddRange(lines.ToList());
 					final += Apo2Fractorium(lines, true);
-					/*
-					    var guid = Guid.NewGuid();
-					    var fileonly = System.IO.Path.GetFileName(file);
-					    final += "<Component Id=\"" + fileonly + "\" Guid=\"" + guid + "\">\n";
-					    final += "\t<File Id=\"" + fileonly + "\" Source = \"$(var.SolutionDir)..\\..\\..\\Data\\" + fileonly + "\" KeyPath=\"yes\" Checksum=\"yes\" ReadOnly=\"yes\"/>\n";
-					    final += "</Component>\n\n";
+/*
+
+					var guid = Guid.NewGuid();
+					var fileonly = System.IO.Path.GetFileName(file);
+					final += "<Component Id=\"" + fileonly + "\" Guid=\"" + guid + "\">\n";
+					final += "\t<File Id=\"" + fileonly + "\" Source = \"$(var.SolutionDir)..\\..\\..\\Data\\" + fileonly + "\" KeyPath=\"yes\" Checksum=\"yes\" ReadOnly=\"yes\"/>\n";
+					final += "</Component>\n\n";
 					*/
 				}
 

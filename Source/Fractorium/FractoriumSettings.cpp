@@ -202,7 +202,7 @@ void FractoriumSettings::LoadLast(bool b)                        { setValue(LOAD
 bool FractoriumSettings::RotateAndScale()                        { return value(ROTSCALE).toBool();                                        }
 void FractoriumSettings::RotateAndScale(bool b)                  { setValue(ROTSCALE, b);                                                  }
 
-bool FractoriumSettings::Flam3Compat()                           { return value(FLAM3COMPAT).toBool();                                     }
+bool FractoriumSettings::Flam3Compat()                           { return value(FLAM3COMPAT, true).toBool();                               }
 void FractoriumSettings::Flam3Compat(bool b)                     { setValue(FLAM3COMPAT, b);                                               }
 
 /// <summary>

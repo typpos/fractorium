@@ -2,6 +2,10 @@
 #include "FinalRenderDialog.h"
 #include "Fractorium.h"
 
+QString FractoriumFinalRenderDialog::m_Prefix = "";
+QString FractoriumFinalRenderDialog::m_Suffix = "";
+
+
 /// <summary>
 /// Constructor which sets up the GUI for the final rendering dialog.
 /// Settings used to populate widgets with initial values.
@@ -83,8 +87,10 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	connect(m_Tbcw->m_Button2, SIGNAL(clicked(bool)),			 this, SLOT(OnShowFolderButtonClicked(bool)),   Qt::QueuedConnection);
 	connect(m_Tbcw->m_Combo,   SIGNAL(currentIndexChanged(int)), this, SLOT(OnExtIndexChanged(int)), Qt::QueuedConnection);
 	m_PrefixEdit = new QLineEdit(table);
+	m_PrefixEdit->setText(m_Prefix);
 	table->setCellWidget(row++, 1, m_PrefixEdit);
 	m_SuffixEdit = new QLineEdit(table);
+	m_SuffixEdit->setText(m_Suffix);
 	table->setCellWidget(row++, 1, m_SuffixEdit);
 	connect(m_PrefixEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnPrefixChanged(const QString&)), Qt::QueuedConnection);
 	connect(m_SuffixEdit, SIGNAL(textChanged(const QString&)), this, SLOT(OnSuffixChanged(const QString&)), Qt::QueuedConnection);
@@ -272,6 +278,12 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	w = SetTabOrder(this, w, ui.FinalRenderPauseButton);
 	w = SetTabOrder(this, w, ui.FinalRenderStopButton);
 	w = SetTabOrder(this, w, ui.FinalRenderCloseButton);
+}
+
+FractoriumFinalRenderDialog::~FractoriumFinalRenderDialog()
+{
+	m_Prefix = m_PrefixEdit->text();
+	m_Suffix = m_SuffixEdit->text();
 }
 
 /// <summary>

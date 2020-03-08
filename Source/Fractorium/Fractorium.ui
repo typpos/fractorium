@@ -7219,6 +7219,7 @@
     <addaction name="ActionCreateReferenceFile"/>
     <addaction name="separator"/>
     <addaction name="ActionOpen"/>
+    <addaction name="ActionOpenExamples"/>
     <addaction name="separator"/>
     <addaction name="ActionSaveCurrentAsXml"/>
     <addaction name="ActionSaveEntireFileAsXml"/>
@@ -8163,6 +8164,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="ActionOpenExamples">
+   <property name="icon">
+    <iconset resource="Fractorium.qrc">
+     <normaloff>:/Fractorium/Icons/folder-visiting-4.png</normaloff>:/Fractorium/Icons/folder-visiting-4.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Examples</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Examples</string>
    </property>
   </action>
   <action name="ActionExit">

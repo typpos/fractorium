@@ -797,8 +797,9 @@ void Fractorium::SetFixedTableHeader(QHeaderView* header, QHeaderView::ResizeMod
 /// Setup and show the open XML dialog.
 /// This will perform lazy instantiation.
 /// </summary>
+/// <param name="openExamples">true to open files in examples folder</param>
 /// <returns>The list of filenames selected</returns>
-QStringList Fractorium::SetupOpenXmlDialog()
+QStringList Fractorium::SetupOpenXmlDialog(bool openExamples)
 {
 #ifndef __APPLE__
 
@@ -817,24 +818,47 @@ QStringList Fractorium::SetupOpenXmlDialog()
 	}
 
 	QStringList filenames;
-	m_OpenFileDialog->setDirectory(m_Settings->OpenFolder());
-	m_OpenFileDialog->selectNameFilter(m_Settings->OpenXmlExt());
+
+    if(openExamples)
+    {
+        m_OpenFileDialog->selectFile("*");
+        m_OpenFileDialog->setDirectory(QCoreApplication::applicationDirPath() + "/FlameExamples");
+        m_OpenFileDialog->selectNameFilter("flame (*.flame)");
+    }
+    else
+    {
+        m_OpenFileDialog->setDirectory(m_Settings->OpenFolder());
+        m_OpenFileDialog->selectNameFilter(m_Settings->OpenXmlExt());
+    }
 
 	if (m_OpenFileDialog->exec() == QDialog::Accepted)
 	{
 		filenames = m_OpenFileDialog->selectedFiles();
 
-		if (!filenames.empty())
+        if (!openExamples && !filenames.empty())
 			m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
-	}
+        else
+            m_OpenFileDialog->selectFile("*");
+	}   
 
 #else
-	auto defaultFilter(m_Settings->OpenXmlExt());
-	auto filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; xml(*.xml);; chaos (*.chaos)"), &defaultFilter);
-	m_Settings->OpenXmlExt(defaultFilter);
+    QString defaultFilter;
+    QStringList filenames;
 
-	if (!filenames.empty())
-		m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
+    if(openExamples)
+    {
+        defaultFilter = "flame (*.flame)";
+        filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), QCoreApplication::applicationDirPath() + "/FlameExamples", tr("flame(*.flame)"), &defaultFilter);
+    }
+    else
+    {
+        defaultFilter = m_Settings->OpenXmlExt();
+        filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), m_Settings->OpenFolder(), tr("flam3(*.flam3);; flame(*.flame);; xml(*.xml);; chaos (*.chaos)"), &defaultFilter);
+        m_Settings->OpenXmlExt(defaultFilter);
+
+        if (!filenames.empty())
+            m_Settings->OpenFolder(QFileInfo(filenames[0]).canonicalPath());
+    }
 
 #endif
 	return filenames;

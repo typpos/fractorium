@@ -897,7 +897,16 @@ QStringList Fractorium::SetupOpenXmlDialog(bool openExamples)
 	if (openExamples)
 	{
 		m_OpenFileDialog->selectFile("*");
-		m_OpenFileDialog->setDirectory(QCoreApplication::applicationDirPath() + "/FlameExamples");
+#ifndef _WIN32
+
+		if (QDir("/usr/share/fractorium/examples").exists())
+			m_OpenFileDialog->setDirectory("/usr/share/fractorium/examples");
+		else
+			m_OpenFileDialog->setDirectory(QCoreApplication::applicationDirPath() + "/examples");
+
+#else
+		m_OpenFileDialog->setDirectory(QCoreApplication::applicationDirPath() + "/examples");
+#endif
 		m_OpenFileDialog->selectNameFilter("flame (*.flame)");
 	}
 	else
@@ -923,7 +932,7 @@ QStringList Fractorium::SetupOpenXmlDialog(bool openExamples)
 	if (openExamples)
 	{
 		defaultFilter = "flame (*.flame)";
-		filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), QCoreApplication::applicationDirPath() + "/FlameExamples", tr("flame(*.flame)"), &defaultFilter);
+		filenames = QFileDialog::getOpenFileNames(this, tr("Open Flame"), QCoreApplication::applicationDirPath() + "/Examples", tr("flame(*.flame)"), &defaultFilter);
 	}
 	else
 	{

@@ -540,16 +540,16 @@ namespace apoconv
 
 				foreach (var file in files)
 				{
-					var lines = File.ReadAllLines(file);
+					var lines = System.IO.File.ReadAllLines(file);
 					tb1lines.AddRange(lines.ToList());
 					final += Apo2Fractorium(lines, true);
-/*
+					/*
 
-					var guid = Guid.NewGuid();
-					var fileonly = System.IO.Path.GetFileName(file);
-					final += "<Component Id=\"" + fileonly + "\" Guid=\"" + guid + "\">\n";
-					final += "\t<File Id=\"" + fileonly + "\" Source = \"$(var.SolutionDir)..\\..\\..\\Data\\" + fileonly + "\" KeyPath=\"yes\" Checksum=\"yes\" ReadOnly=\"yes\"/>\n";
-					final += "</Component>\n\n";
+					                    var guid = Guid.NewGuid();
+					                    var fileonly = System.IO.Path.GetFileName(file);
+					                    final += "<Component Id=\"" + fileonly + "\" Guid=\"" + guid + "\">\n";
+					                    final += "\t<File Id=\"" + fileonly + "\" Source = \"$(var.SolutionDir)..\\..\\..\\Data\\" + fileonly + "\" KeyPath=\"yes\" Checksum=\"yes\" ReadOnly=\"yes\"/>\n";
+					                    final += "</Component>\n\n";
 					*/
 				}
 

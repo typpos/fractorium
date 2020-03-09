@@ -225,11 +225,27 @@ OTHER_FILES += \
 RESOURCES += \
     $$PRJ_SRC_DIR/Fractorium.qrc
 
-DISTFILES += \
-    ../../../Data/FlameExamples/b33rheart_examples.flame \
-    ../../../Data/FlameExamples/b33rheart_sierpinski.flame \
-    ../../../Data/FlameExamples/pillemaster_hexagonal_tilings.flame \
-    ../../../Data/FlameExamples/plangkye_examples.flame \
-    ../../../Data/FlameExamples/tatasz_examples.flame \
-    ../../../Data/FlameExamples/tatasz_substitution.flame \
-    ../../../Data/FlameExamples/tyrantwave_base_forms.flame
+bench.path = $$SHARE_INSTALL_DIR/bench
+bench.files += \
+    $$ASSETS_DIR/Bench/EmberBench.ps1 \
+    $$ASSETS_DIR/Bench/golubaja_rippingfrominside_complexcode.flame \
+    $$ASSETS_DIR/Bench/mfeemster_basicmemory.flame \
+    $$ASSETS_DIR/Bench/tatasz_springcrown_manysimplexforms.flame \
+    $$ASSETS_DIR/Bench/tyrantwave_flippeddisc_normal.flame \
+    $$ASSETS_DIR/Bench/zy0rg_six_bigcomplexcode.flame
+
+#message(BENCH INSTALL SOURCE: $$bench.files)
+INSTALLS += bench
+
+examples.path = $$SHARE_INSTALL_DIR/examples
+examples.files += \
+    $$ASSETS_DIR/Examples/b33rheart_examples.flame \
+    $$ASSETS_DIR/Examples/b33rheart_sierpinski.flame \
+    $$ASSETS_DIR/Examples/pillemaster_hexagonal_tilings.flame \
+    $$ASSETS_DIR/Examples/plangkye_examples.flame \
+    $$ASSETS_DIR/Examples/tatasz_examples.flame \
+    $$ASSETS_DIR/Examples/tatasz_substitution.flame \
+    $$ASSETS_DIR/Examples/tyrantwave_base_forms.flame
+
+#message(EXAMPLES INSTALL SOURCE: $$examples.files)
+INSTALLS += examples

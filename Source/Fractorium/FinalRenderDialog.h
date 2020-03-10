@@ -51,6 +51,7 @@ class FractoriumFinalRenderDialog : public QDialog
 
 public:
 	FractoriumFinalRenderDialog(QWidget* p, Qt::WindowFlags f = 0);
+	~FractoriumFinalRenderDialog();
 	void Show(bool fromSequence);
 	bool EarlyClip();
 	bool YAxisUp();
@@ -125,6 +126,8 @@ protected:
 private:
 	bool CreateControllerFromGUI(bool createRenderer);
 	bool SetMemory();
+	static QString m_Prefix;
+	static QString m_Suffix;
 
 	bool m_FromSequence;
 	int m_MemoryCellIndex;

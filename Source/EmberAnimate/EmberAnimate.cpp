@@ -190,8 +190,10 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			return false;
 		}
 
-		opt.FirstFrame(opt.Frame());
-		opt.LastFrame(opt.Frame() + 1);
+		if (opt.Frame())
+			opt.FirstFrame(opt.Frame() - 1);
+
+		opt.LastFrame(opt.FirstFrame() + 1);
 	}
 
 	//Prep all embers, by ensuring they:
@@ -513,7 +515,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 			if (opt.WriteGenome())
 			{
-				auto flameName = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), ".flame", padding, ftime);
+				auto flameName = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), ".flame", padding, size_t(localTime));
 
 				if (opt.Verbose())
 				{
@@ -548,7 +550,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			//when running with OpenCL. Call join() to ensure the previous thread call has completed.
 			Join(writeThread);
 			auto threadVecIndex = finalImageIndex;//Cache before launching thread.
-			auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, ftime);
+			auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, size_t(localTime));
 
 			if (opt.ThreadedWrite())//Copies of all but the first parameter are passed to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
 			{

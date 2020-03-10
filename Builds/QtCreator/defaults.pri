@@ -173,7 +173,7 @@ win32 {
 	QMAKE_CXXFLAGS_DEBUG += /Od #Optimization disabled.
 	QMAKE_CXXFLAGS_DEBUG += /D "_DEBUG" #Debug mode.
 	QMAKE_CXXFLAGS_DEBUG += /RTC1 #Basic runtime checks: stack frames and uninitialized variables.
-        QMAKE_CXXFLAGS_DEBUG += /Ob2 #Inline function expansion: any suitable.
+    QMAKE_CXXFLAGS_DEBUG += /Ob2 #Inline function expansion: any suitable.
 }
 
 !win32 {

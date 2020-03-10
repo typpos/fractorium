@@ -3261,7 +3261,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t a = vIn.x + " << r << ";\n"
 		   << "\t\treal_t b = vIn.y;\n"
-		   << "\t\treal_t c = " << r << " * vIn.x + 1;\n"
+		   << "\t\treal_t c = fma(" << r << ", vIn.x, (real_t)(1.0));\n"
 		   << "\t\treal_t d = " << r << " * vIn.y;\n"
 		   << "\t\treal_t x = fma(a, c, b * d);\n"
 		   << "\t\treal_t y = fma(b, c, -(a * d));\n"

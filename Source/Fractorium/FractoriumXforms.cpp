@@ -216,82 +216,76 @@ void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->Add
 template <typename T>
 void FractoriumEmberController<T>::AddXformsWithXaos(Ember<T>& ember, std::vector<std::pair<Xform<T>, size_t>>& xforms, bool preserveXaos, eXaosPasteStyle pastestyle)
 {
-	if (ember.XaosPresent())
+	auto oldxfcount = ember.XformCount();
+
+	for (auto& it : xforms)
 	{
-		auto oldxfcount = ember.XformCount();
+		ember.AddXform(it.first);
+		auto newxfcount = ember.XformCount() - 1;
+		auto* newxform = ember.GetXform(newxfcount);
 
-		for (auto& it : xforms)
-		{
-			ember.AddXform(it.first);
-			auto newxfcount = ember.XformCount() - 1;
-			auto* newxform = ember.GetXform(newxfcount);
-
-			for (size_t i = 0; i < oldxfcount; i++)
-			{
-				if (auto xform = ember.GetXform(i))
-				{
-					switch (pastestyle)
-					{
-						case EmberCommon::eXaosPasteStyle::NONE:
-							newxform->SetXaos(i, 1);
-							xform->SetXaos(newxfcount, 1);
-							break;
-
-						case EmberCommon::eXaosPasteStyle::ZERO_TO_ONE:
-						case EmberCommon::eXaosPasteStyle::ZERO_TO_VALS:
-							newxform->SetXaos(i, 0);
-							xform->SetXaos(newxfcount, 0);
-							break;
-
-						case EmberCommon::eXaosPasteStyle::ONE_TO_VALS:
-							newxform->SetXaos(i, 1);
-							xform->SetXaos(newxfcount, 1);
-							break;
-
-						case EmberCommon::eXaosPasteStyle::VALS_TO_ONE:
-							newxform->SetXaos(i, it.first.Xaos(i));
-							xform->SetXaos(newxfcount, xform->Xaos(it.second));
-							break;
-
-						default:
-							break;
-					}
-				}
-			}
-		}
-
-		for (size_t i = oldxfcount; i < ember.XformCount(); i++)
+		for (size_t i = 0; i < oldxfcount; i++)
 		{
 			if (auto xform = ember.GetXform(i))
 			{
-				for (size_t j = oldxfcount; j < ember.XformCount(); j++)
+				switch (pastestyle)
 				{
-					switch (pastestyle)
-					{
-						case EmberCommon::eXaosPasteStyle::NONE:
-						case EmberCommon::eXaosPasteStyle::ZERO_TO_ONE:
-							xform->SetXaos(j, 1);
-							break;
+					case EmberCommon::eXaosPasteStyle::NONE:
+						newxform->SetXaos(i, 1);
+						xform->SetXaos(newxfcount, 1);
+						break;
 
-						case EmberCommon::eXaosPasteStyle::ZERO_TO_VALS:
-						case EmberCommon::eXaosPasteStyle::ONE_TO_VALS:
-							xform->SetXaos(j, xforms[i - oldxfcount].first.Xaos(j - oldxfcount));
-							break;
+					case EmberCommon::eXaosPasteStyle::ZERO_TO_ONE:
+					case EmberCommon::eXaosPasteStyle::ZERO_TO_VALS:
+						newxform->SetXaos(i, 0);
+						xform->SetXaos(newxfcount, 0);
+						break;
 
-						case EmberCommon::eXaosPasteStyle::VALS_TO_ONE:
-							xform->SetXaos(j, 1);
-							break;
+					case EmberCommon::eXaosPasteStyle::ONE_TO_VALS:
+						newxform->SetXaos(i, 1);
+						xform->SetXaos(newxfcount, 1);
+						break;
 
-						default:
-							break;
-					}
+					case EmberCommon::eXaosPasteStyle::VALS_TO_ONE:
+						newxform->SetXaos(i, it.first.Xaos(i));
+						xform->SetXaos(newxfcount, xform->Xaos(it.second));
+						break;
+
+					default:
+						break;
 				}
 			}
 		}
 	}
-	else
-		for (auto& it : xforms)
-			ember.AddXform(it.first);
+
+	for (size_t i = oldxfcount; i < ember.XformCount(); i++)
+	{
+		if (auto xform = ember.GetXform(i))
+		{
+			for (size_t j = oldxfcount; j < ember.XformCount(); j++)
+			{
+				switch (pastestyle)
+				{
+					case EmberCommon::eXaosPasteStyle::NONE:
+					case EmberCommon::eXaosPasteStyle::ZERO_TO_ONE:
+						xform->SetXaos(j, 1);
+						break;
+
+					case EmberCommon::eXaosPasteStyle::ZERO_TO_VALS:
+					case EmberCommon::eXaosPasteStyle::ONE_TO_VALS:
+						xform->SetXaos(j, xforms[i - oldxfcount].first.Xaos(j - oldxfcount));
+						break;
+
+					case EmberCommon::eXaosPasteStyle::VALS_TO_ONE:
+						xform->SetXaos(j, 1);
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
+	}
 }
 
 /// <summary>

@@ -340,31 +340,35 @@
 	<Fragment>
 		<ComponentGroup Id="ExampleComponents" Directory="INSTALLFOLDEREXAMPLES">
 			<Component Id="pillemaster_hexagonal_tilings.flame" Guid="a0b85758-30b2-49e7-85ca-438046cb83e8">
-				<File Id="pillemaster_hexagonal_tilings.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\pillemaster_hexagonal_tilings.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="pillemaster_hexagonal_tilings.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\pillemaster_hexagonal_tilings.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 
 			<Component Id="plangkye_examples.flame" Guid="aa6c81a6-28e4-49e7-bef6-fdebfe21e47c">
-				<File Id="plangkye_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\plangkye_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="plangkye_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\plangkye_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 
 			<Component Id="tatasz_examples.flame" Guid="27d621ec-88b7-4957-ae5f-9b3cc8c8f21a">
-				<File Id="tatasz_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\tatasz_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="tatasz_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\tatasz_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 
 			<Component Id="tatasz_substitution.flame" Guid="bb1cb196-e5d9-4250-843a-1e649c896ba8">
-				<File Id="tatasz_substitution.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\tatasz_substitution.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="tatasz_substitution.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\tatasz_substitution.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
+
+			<Component Id="triptychaos_examples.flame" Guid="ded3e790-29ee-40c8-a279-49bf354a41ae">
+				<File Id="triptychaos_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\triptychaos_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 
 			<Component Id="tyrantwave_base_forms.flame" Guid="8773ff3a-d29f-4a41-acb4-e06cafb236ad">
-				<File Id="tyrantwave_base_forms.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\tyrantwave_base_forms.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="tyrantwave_base_forms.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\tyrantwave_base_forms.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 
 			<Component Id="b33rheart_examples.flame" Guid="c014f5b0-d45f-4bb5-9af7-ac98326dcef1">
-				<File Id="b33rheart_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\b33rheart_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="b33rheart_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\b33rheart_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 
 			<Component Id="b33rheart_sierpinski.flame" Guid="535430de-6878-41b2-913e-cb35e915cb4f">
-				<File Id="b33rheart_sierpinski.flame" Source="$(var.SolutionDir)..\..\..\Data\Examples\b33rheart_sierpinski.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="b33rheart_sierpinski.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\b33rheart_sierpinski.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 		</ComponentGroup>
 	</Fragment>

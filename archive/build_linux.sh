@@ -101,7 +101,7 @@ cp $DATA_PATH/uranium.qss $FRACTORIUM_BIN
 cp $DATA_PATH/flam3-palettes.xml $FRACTORIUM_BIN
 cp $DATA_PATH/*.gradient $FRACTORIUM_BIN
 cp $DATA_PATH/*.ugr $FRACTORIUM_BIN
-cp -ar $DATA_PATH/FlameExamples $FRACTORIUM_BIN
+cp -ar $DATA_PATH/examples $FRACTORIUM_BIN
 cp $ICON_PATH/Fractorium.png $FRACTORIUM_ICO/fractorium.png
 cp $DATA_PATH/fractorium.appimage.desktop $FRACTORIUM_SHR/fractorium.desktop
 

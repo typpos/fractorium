@@ -1867,7 +1867,7 @@
       <rect>
        <x>550</x>
        <y>0</y>
-       <width>252</width>
+       <width>310</width>
        <height>881</height>
       </rect>
      </property>
@@ -1879,8 +1879,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>252</width>
-       <height>409</height>
+       <width>310</width>
+       <height>428</height>
       </size>
      </property>
      <property name="floating">
@@ -1902,9 +1902,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0">
        <property name="spacing">
-        <number>4</number>
+        <number>1</number>
        </property>
        <property name="leftMargin">
         <number>4</number>
@@ -2001,6 +2001,86 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="XaosPasteGroupBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="title">
+          <string>Paste Style</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="XaosPasteNoneRadio">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All values in the new xaos rows and columns will be 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>None</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="XaosPaste0to1Radio">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All values in the new xaos rows and columns before the bottom right square will be 0, and those in the square will be 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>0-&gt;1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="XaosPaste0toValsRadio">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All values in the new xaos rows and columns before the bottom right square will be 0, and those in the square will be the original xaos values starting from the top of the new xforms&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>0-&gt;Vals</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="XaosPaste1toValsRadio">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All values in the new xaos rows and columns before the bottom right square will be 1, and those in the square will be the original xaos values starting from the top of the new xforms&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>1-&gt;Vals</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="XaosPasteValsTo1Radio">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;All values in the new xaos rows and columns before the bottom right square will be the original xaos values starting from the top of the new xforms, and those in the square will be 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Vals-&gt;1</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
         <widget class="QTableView" name="XaosTableView">
@@ -2226,7 +2306,7 @@
           <bool>false</bool>
          </attribute>
          <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
+          <bool>true</bool>
          </attribute>
          <attribute name="verticalHeaderCascadingSectionResizes">
           <bool>false</bool>
@@ -2316,7 +2396,7 @@
     <widget class="QDockWidget" name="PaletteDockWidget">
      <property name="geometry">
       <rect>
-       <x>800</x>
+       <x>860</x>
        <y>10</y>
        <width>295</width>
        <height>700</height>

@@ -207,6 +207,94 @@ void FractoriumEmberController<T>::AddLinkedXform()
 void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->AddLinkedXform(); }
 
 /// <summary>
+/// Add a vector of xforms to the passed in ember, and optionally preserve the xaos based on position.
+/// </summary>
+/// <param name="ember">The ember to add xforms to</param>
+/// <param name="xforms">The vector of xforms to add</param>
+/// <param name="preserveXaos">True to preserve xaos else false.</param>
+/// <param name="eXaosPasteStyle">The method which governs how the copying of xaos values is handles</param>
+template <typename T>
+void FractoriumEmberController<T>::AddXformsWithXaos(Ember<T>& ember, std::vector<std::pair<Xform<T>, size_t>>& xforms, bool preserveXaos, eXaosPasteStyle pastestyle)
+{
+	if (ember.XaosPresent())
+	{
+		auto oldxfcount = ember.XformCount();
+
+		for (auto& it : xforms)
+		{
+			ember.AddXform(it.first);
+			auto newxfcount = ember.XformCount() - 1;
+			auto* newxform = ember.GetXform(newxfcount);
+
+			for (size_t i = 0; i < oldxfcount; i++)
+			{
+				if (auto xform = ember.GetXform(i))
+				{
+					switch (pastestyle)
+					{
+						case EmberCommon::eXaosPasteStyle::NONE:
+							newxform->SetXaos(i, 1);
+							xform->SetXaos(newxfcount, 1);
+							break;
+
+						case EmberCommon::eXaosPasteStyle::ZERO_TO_ONE:
+						case EmberCommon::eXaosPasteStyle::ZERO_TO_VALS:
+							newxform->SetXaos(i, 0);
+							xform->SetXaos(newxfcount, 0);
+							break;
+
+						case EmberCommon::eXaosPasteStyle::ONE_TO_VALS:
+							newxform->SetXaos(i, 1);
+							xform->SetXaos(newxfcount, 1);
+							break;
+
+						case EmberCommon::eXaosPasteStyle::VALS_TO_ONE:
+							newxform->SetXaos(i, it.first.Xaos(i));
+							xform->SetXaos(newxfcount, xform->Xaos(it.second));
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+		}
+
+		for (size_t i = oldxfcount; i < ember.XformCount(); i++)
+		{
+			if (auto xform = ember.GetXform(i))
+			{
+				for (size_t j = oldxfcount; j < ember.XformCount(); j++)
+				{
+					switch (pastestyle)
+					{
+						case EmberCommon::eXaosPasteStyle::NONE:
+						case EmberCommon::eXaosPasteStyle::ZERO_TO_ONE:
+							xform->SetXaos(j, 1);
+							break;
+
+						case EmberCommon::eXaosPasteStyle::ZERO_TO_VALS:
+						case EmberCommon::eXaosPasteStyle::ONE_TO_VALS:
+							xform->SetXaos(j, xforms[i - oldxfcount].first.Xaos(j - oldxfcount));
+							break;
+
+						case EmberCommon::eXaosPasteStyle::VALS_TO_ONE:
+							xform->SetXaos(j, 1);
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+		}
+	}
+	else
+		for (auto& it : xforms)
+			ember.AddXform(it.first);
+}
+
+/// <summary>
 /// Duplicate the specified xforms in the current ember, and set the last one as the current xform.
 /// If xaos is present in the ember, the duplicated xforms will be added with xaos preserved, else they'll just be added normally.
 /// The manner in which xaos is preserved is altered when ctrl is pressed.
@@ -227,37 +315,7 @@ void FractoriumEmberController<T>::DuplicateXform()
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
 	Update([&]()
 	{
-		if (m_Ember.XaosPresent())
-		{
-			if (!ctrl)
-			{
-				auto oldxfcount = m_Ember.XformCount();
-
-				for (auto& it : vec)
-				{
-					m_Ember.AddXform(it.first);
-					auto newxfcount = m_Ember.XformCount() - 1;
-					auto* newxform = m_Ember.GetXform(newxfcount);
-
-					for (size_t i = 0; i < oldxfcount; i++)
-					{
-						if (auto xform = m_Ember.GetXform(i))
-						{
-							newxform->SetXaos(i, it.first.Xaos(i));
-							xform->SetXaos(newxfcount, xform->Xaos(it.second));
-						}
-					}
-				}
-			}
-			else
-			{
-				AddXformsWithXaos(m_Ember, vec, true);
-			}
-		}
-		else
-			for (auto& it : vec)
-				m_Ember.AddXform(it.first);
-
+		AddXformsWithXaos(m_Ember, vec, true, m_Fractorium->GetXaosPasteStyleType());
 		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);//Handles xaos.
 	});

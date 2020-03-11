@@ -489,6 +489,7 @@ public:
 	void FillWithXform(Xform<T>* xform);
 	Xform<T>* CurrentXform();
 	void UpdateXform(std::function<void(Xform<T>*, size_t, size_t)> func, eXformUpdate updateType = eXformUpdate::UPDATE_CURRENT, bool updateRender = true, eProcessAction action = eProcessAction::FULL_RENDER, size_t index = 0);
+	static void AddXformsWithXaos(Ember<T>& ember, std::vector<std::pair<Xform<T>, size_t>>& xforms, bool preserveXaos, eXaosPasteStyle pastestyle);
 
 	//Xforms Affine.
 	virtual void AffineSetHelper(double d, int index, bool pre) override;

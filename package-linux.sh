@@ -123,6 +123,14 @@ tar --exclude='package-linux.sh' \
 	./Data/dark_linux.qss \
 	./Data/lightdark.qss \
 	./Data/uranium.qss \
+	./Data/examples/b33rheart_examples.flame \
+	./Data/examples/b33rheart_sierpinski.flame \
+	./Data/examples/pillemaster_hexagonal_tilings.flame \
+	./Data/examples/plangkye_examples.flame \
+	./Data/examples/tatasz_examples.flame \
+	./Data/examples/tatasz_substitution.flame \
+	./Data/examples/triptychaos_examples \
+	./Data/examples/tyrantwave_base_forms.flame \
 	.
 
 [ $? -ne 0 ] && echo "Tar command failed." && exit 2

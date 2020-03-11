@@ -12,10 +12,11 @@ QTimer DoubleSpinBox::s_Timer;
 /// <param name="p">The parent widget. Default: nullptr.</param>
 /// <param name="height">The height of the spin box. Default: 16.</param>
 /// <param name="step">The step used to increment/decrement the spin box when using the mouse wheel. Default: 0.05.</param>
-DoubleSpinBox::DoubleSpinBox(QWidget* p, int h, double step)
+DoubleSpinBox::DoubleSpinBox(QWidget* p, int h, double step, bool clearSel)
 	: QDoubleSpinBox(p)
 {
 	m_DoubleClick = false;
+	m_ClearSel = clearSel;
 	m_DoubleClickLowVal = 0;
 	m_DoubleClickNonZero = 0;
 	m_DoubleClickZero = 1;
@@ -135,7 +136,8 @@ QLineEdit* DoubleSpinBox::lineEdit()
 /// </summary>
 void DoubleSpinBox::OnSpinBoxValueChanged(double)
 {
-	lineEdit()->deselect();//Gets rid of nasty "feature" that always has text selected.
+	if (m_ClearSel)
+		lineEdit()->deselect();//Gets rid of nasty "feature" that always has text selected.
 }
 
 /// <summary>

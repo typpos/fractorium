@@ -19,7 +19,7 @@ class DoubleSpinBox : public QDoubleSpinBox
 	Q_OBJECT
 
 public:
-	explicit DoubleSpinBox(QWidget* parent = nullptr, int height = 16, double step = 0.05);
+	explicit DoubleSpinBox(QWidget* parent = nullptr, int height = 16, double step = 0.05, bool clearsel = true);
 	virtual ~DoubleSpinBox() { }
 	void SetValueStealth(double d);
 	void DoubleClick(bool b);
@@ -45,6 +45,7 @@ protected:
 	virtual void leaveEvent(QEvent* e) override;
 
 	bool m_DoubleClick;
+	bool m_ClearSel;
 	shared_ptr<FractoriumSettings> m_Settings;
 
 private:

@@ -11,7 +11,7 @@ void Fractorium::InitXaosUI()
 	int spinHeight = 20;
 	ui.XaosTableView->verticalHeader()->setSectionsClickable(true);
 	ui.XaosTableView->horizontalHeader()->setSectionsClickable(true);
-	m_XaosSpinBox = new DoubleSpinBox(nullptr, spinHeight, 0.1);
+	m_XaosSpinBox = new DoubleSpinBox(nullptr, spinHeight, 0.1, false);
 	m_XaosSpinBox->DoubleClick(true);
 	m_XaosSpinBox->DoubleClickZero(1);
 	m_XaosSpinBox->DoubleClickNonZero(0);
@@ -265,7 +265,7 @@ void FractoriumEmberController<T>::AddLayer(int xforms)
 	Update([&]
 	{
 		std::vector<std::pair<Xform<T>, size_t>> vec(xforms);
-		AddXformsWithXaos(m_Ember, vec, false);
+		AddXformsWithXaos(m_Ember, vec, false, eXaosPasteStyle::ZERO_TO_ONE);
 
 	});
 	FillXforms();
@@ -369,6 +369,26 @@ void Fractorium::OnXaosVScrollValueChanged(int value)
 {
 	ui.XaosDistVizTableWidget->verticalScrollBar()->setValue(value);
 	ui.XaosAppliedTableView->verticalScrollBar()->setValue(value);
+}
+
+/// <summary>
+/// Get an enum value corresponding to the currently selected xaos pasting mode.
+/// </summary>
+/// <returns>The xaos pasting mode enum</returns>
+eXaosPasteStyle Fractorium::GetXaosPasteStyleType()
+{
+	if (ui.XaosPasteNoneRadio->isChecked())
+		return eXaosPasteStyle::NONE;
+	else if (ui.XaosPaste0to1Radio->isChecked())
+		return eXaosPasteStyle::ZERO_TO_ONE;
+	else if (ui.XaosPaste0toValsRadio->isChecked())
+		return eXaosPasteStyle::ZERO_TO_VALS;
+	else if (ui.XaosPaste1toValsRadio->isChecked())
+		return eXaosPasteStyle::ONE_TO_VALS;
+	else if (ui.XaosPasteValsTo1Radio->isChecked())
+		return eXaosPasteStyle::VALS_TO_ONE;
+	else
+		return eXaosPasteStyle::NONE;
 }
 
 template class FractoriumEmberController<float>;

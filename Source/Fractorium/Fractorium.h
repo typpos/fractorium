@@ -129,6 +129,9 @@ public:
 	bool DrawAllPost();
 	bool LocalPivot();
 
+	//Xaos.
+	eXaosPasteStyle GetXaosPasteStyleType();
+
 	//Info.
 	void ReorderVariations(QTreeWidgetItem* item);
 
@@ -144,7 +147,7 @@ public slots:
 	void OnActionCopyFlameInCurrentFile(bool checked);
 	void OnActionCreateReferenceFile(bool checked);
 	void OnActionOpen(bool checked);
-    void OnActionOpenExamples(bool checked);
+	void OnActionOpenExamples(bool checked);
 	void OnActionSaveCurrentAsXml(bool checked);
 	void OnActionSaveEntireFileAsXml(bool checked);
 	void OnActionSaveCurrentScreen(bool checked);
@@ -470,7 +473,7 @@ private:
 	void EnableRenderControls(bool enable);
 
 	//Dialogs.
-    QStringList SetupOpenXmlDialog(bool openExamples = false);
+	QStringList SetupOpenXmlDialog(bool openExamples = false);
 	QString SetupSaveXmlDialog(const QString& defaultFilename);
 	QString SetupSaveImageDialog(const QString& defaultFilename);
 	QString SetupSaveFolderDialog();

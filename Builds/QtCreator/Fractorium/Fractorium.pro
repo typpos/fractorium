@@ -239,13 +239,15 @@ INSTALLS += bench
 
 examples.path = $$SHARE_INSTALL_DIR/examples
 examples.files += \
-    $$ASSETS_DIR/Examples/b33rheart_examples.flame \
-    $$ASSETS_DIR/Examples/b33rheart_sierpinski.flame \
-    $$ASSETS_DIR/Examples/pillemaster_hexagonal_tilings.flame \
-    $$ASSETS_DIR/Examples/plangkye_examples.flame \
-    $$ASSETS_DIR/Examples/tatasz_examples.flame \
-    $$ASSETS_DIR/Examples/tatasz_substitution.flame \
-    $$ASSETS_DIR/Examples/tyrantwave_base_forms.flame
+    $$ASSETS_DIR/examples/b33rheart_examples.flame \
+    $$ASSETS_DIR/examples/b33rheart_sierpinski.flame \
+    $$ASSETS_DIR/examples/pillemaster_hexagonal_tilings.flame \
+    $$ASSETS_DIR/examples/plangkye_examples.flame \
+    $$ASSETS_DIR/examples/tatasz_examples.flame \
+    $$ASSETS_DIR/examples/tatasz_substitution.flame \
+    $$ASSETS_DIR/examples/triptychaos_examples.flame \
+    $$ASSETS_DIR/examples/tyrantwave_base_forms.flame
 
 #message(EXAMPLES INSTALL SOURCE: $$examples.files)
 INSTALLS += examples
+

@@ -891,7 +891,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 				m_DragState = eDragState::DragNone;
 			}
 		}
-		else if (e->button() == Qt::MiddleButton)//Middle button does whole image translation.
+        else if (e->button() == Qt::MiddleButton || (e->button() == Qt::RightButton && e->modifiers() & Qt::ShiftModifier))//Middle button or right button with shift key, do whole image translation.
 		{
 			m_CenterDownX = ember->m_CenterX;//Capture where the center of the image is because this value will change when panning.
 			m_CenterDownY = ember->m_CenterY;

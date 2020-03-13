@@ -211,10 +211,9 @@ void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->Add
 /// </summary>
 /// <param name="ember">The ember to add xforms to</param>
 /// <param name="xforms">The vector of xforms to add</param>
-/// <param name="preserveXaos">True to preserve xaos else false.</param>
 /// <param name="eXaosPasteStyle">The method which governs how the copying of xaos values is handles</param>
 template <typename T>
-void FractoriumEmberController<T>::AddXformsWithXaos(Ember<T>& ember, std::vector<std::pair<Xform<T>, size_t>>& xforms, bool preserveXaos, eXaosPasteStyle pastestyle)
+void FractoriumEmberController<T>::AddXformsWithXaos(Ember<T>& ember, std::vector<std::pair<Xform<T>, size_t>>& xforms, eXaosPasteStyle pastestyle)
 {
 	auto oldxfcount = ember.XformCount();
 
@@ -309,7 +308,7 @@ void FractoriumEmberController<T>::DuplicateXform()
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL, false);
 	Update([&]()
 	{
-		AddXformsWithXaos(m_Ember, vec, true, m_Fractorium->GetXaosPasteStyleType());
+		AddXformsWithXaos(m_Ember, vec, m_Fractorium->GetXaosPasteStyleType());
 		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);//Handles xaos.
 	});

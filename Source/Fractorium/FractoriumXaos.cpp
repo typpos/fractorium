@@ -265,7 +265,7 @@ void FractoriumEmberController<T>::AddLayer(int xforms)
 	Update([&]
 	{
 		std::vector<std::pair<Xform<T>, size_t>> vec(xforms);
-		AddXformsWithXaos(m_Ember, vec, false, eXaosPasteStyle::ZERO_TO_ONE);
+		AddXformsWithXaos(m_Ember, vec, eXaosPasteStyle::ZERO_TO_ONE);
 
 	});
 	FillXforms();

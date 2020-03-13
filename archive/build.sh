@@ -2,8 +2,8 @@
 
 OSX_BUILD_PATH=$PWD
 FRACTORIUM_RELEASE_ROOT=$PWD/../Bin/release
-# replace 5.11.2 by your QT version, and ensure the installation path is the same
-QT_MACDEPLOY=~/Qt/5.12.2/clang_64/bin/macdeployqt
+# replace 5.11.3 by your QT version, and ensure the installation path is the same
+QT_MACDEPLOY=~/Qt/5.11.3/clang_64/bin/macdeployqt
 
 cd $FRACTORIUM_RELEASE_ROOT
 
@@ -40,9 +40,9 @@ cp ./emberrender.app/Contents/MacOS/emberrender $FRACTORIUM_FINAL_ROOT
 
 #solving macdeployqt bug
 cd $FRACTORIUM_FINAL_FRAMEWORKS
-install_name_tool -change /usr/local/Cellar/ilmbase/2.2.1/lib/libIex-2_2.23.dylib @executable_path/../Frameworks/libIex-2_2.23.dylib libIexMath-2_2.23.dylib
-install_name_tool -change /usr/local/Cellar/ilmbase/2.2.1/lib/libIex-2_2.23.dylib @executable_path/../Frameworks/libIex-2_2.23.dylib libIlmThread-2_2.23.dylib
-install_name_tool -change /usr/local/Cellar/ilmbase/2.2.1/lib/libIex-2_2.23.dylib @executable_path/../Frameworks/libIex-2_2.23.dylib libImath-2_2.23.dylib
+install_name_tool -change /usr/local/Cellar/ilmbase/2.3.0/lib/libIex-2_3.24.dylib @executable_path/../Frameworks/libIex-2_3.24.dylib libIexMath-2_3.24.dylib
+install_name_tool -change /usr/local/Cellar/ilmbase/2.3.0/lib/libIex-2_3.24.dylib @executable_path/../Frameworks/libIex-2_3.24.dylib libIlmThread-2_3.24.dylib
+install_name_tool -change /usr/local/Cellar/ilmbase/2.3.0/lib/libIex-2_3.24.dylib @executable_path/../Frameworks/libIex-2_3.24.dylib libImath-2_3.24.dylib
 
 cd $OSX_BUILD_PATH
 

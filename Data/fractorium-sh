@@ -1,0 +1,23 @@
+#!/bin/bash
+
+CONFIG_PATH=~/.config/fractorium
+DARK_MAC=~/.config/fractorium/dark_mac.qss
+LIGHT_DARK=~/.config/fractorium/lightdark.qss
+URANIUM=~/.config/fractorium/uranium.qss
+
+#./fractorium
+
+if [ ! -e "$DARK_LINUX" ] ; then
+  mkdir -p $CONFIG_PATH
+  cp dark_mac.qss $CONFIG_PATH
+fi
+
+if [ ! -e "$LIGHT_DARK" ] ; then
+  mkdir -p $CONFIG_PATH
+  cp lightdark.qss $CONFIG_PATH
+fi
+
+if [ ! -e "$URANIUM" ] ; then
+  mkdir -p $CONFIG_PATH
+  cp uranium.qss $CONFIG_PATH
+fi

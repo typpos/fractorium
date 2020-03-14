@@ -54,6 +54,7 @@ cp uranium.qss $FRACTORIUM_FINAL_ROOT
 cp flam3-palettes.xml $FRACTORIUM_FINAL_ROOT
 cp *.gradient $FRACTORIUM_FINAL_ROOT
 cp *.ugr $FRACTORIUM_FINAL_ROOT
+cp fractorium-sh $FRACTORIUM_FINAL_ROOT
 cp Info.plist $FRACTORIUM_FINAL_ROOT/../
 cp -r Bench $FRACTORIUM_FINAL_ROOT
 cp -r examples $FRACTORIUM_FINAL_ROOT

@@ -1,3 +1,31 @@
+1.0.0.19 3/13/2020
+--User changes
+ -Add backward compatibility option for the following variations: cos, cosh, cot, coth, csc, csch, sec, sech, sin, sinh, tan, tanh.
+ -Add the ability to re-order variations by dragging them in the Info tab.
+ -Add menu item to create a reference file using all variations in both a grid and bars pattern.
+ -Add menu item to open example flames files form many artists which are now included.
+ -Allow dragging in folders which will be recursively traversed for flame files.
+ -Allow for adjusting scale via keyboard with the < and > keys.
+ -Show the count of opened flames on the header of the library tree.
+ -Add radio buttons on the xaos tab to specify how pasting or duplicating xforms should preserve xaos.
+ -Preserve prefix and suffix fields between open/close of the Final Render dialog.
+ -Entering xaos cells will always select the entire cell to make editing easier.
+ -Allow right mouse drag + shift perform panning the same way middle mouse button drag does, for users without middle mouse buttons.
+ 
+--Bug fixes
+ -Fix crash on palette editor when opening it with certain palette files in a particular order.
+ -An xform with only a post variation in it might have rendered wrong.
+ -The xforms combo box was obscuring the name of the xforms by not being wide enough.
+ -Make variation state preservation be a little bit more correct in OpenCL.
+ -Custom palettes were not being read correctly on non ANSI machines.
+ -EmberAnimate.exe was using 1-based indexing for filenames, but Fractorium and all of the documentation was using 0-based indexing. Make all use 0-based indexing.
+ -The left header column in the xaos visualization table had somehow disappeared.
+
+--Code changes
+ -Make all iterators on the CPU use a temporary point.
+ -DoubleSpinBox now has a boolean which specifies whether it clears its selection on enter. Default true.
+ -Make AddXformsWithXaos() be a static member of FractoriumEmberController for quicker build times.
+
 1.0.0.18 1/31/2020
 --User changes
  -Add entries for 1 and 101 in the affine rotation and scale combo boxes.

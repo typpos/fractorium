@@ -64,28 +64,28 @@
 #endif
 
 #ifdef __APPLE__
-	#include <OpenEXR/ImfRgbaFile.h>
-	#include <OpenEXR/ImfStringAttribute.h>
-	#include <OpenEXR/half.h>
-	#include <OpenEXR/ImfChannelList.h>
-	#include <OpenEXR/ImfOutputFile.h>
-	#define ENUM_DYLD_BOOL
-	#include <mach-o/dyld.h>
+#include <OpenEXR/ImfRgbaFile.h>
+#include <OpenEXR/ImfStringAttribute.h>
+#include <OpenEXR/half.h>
+#include <OpenEXR/ImfChannelList.h>
+#include <OpenEXR/ImfOutputFile.h>
+#define ENUM_DYLD_BOOL
+#include <mach-o/dyld.h>
 
-    #define _MM_DENORMALS_ZERO_MASK   0x0040
-    #define _MM_DENORMALS_ZERO_ON     0x0040
-    #define _MM_DENORMALS_ZERO_OFF    0x0000
+#define _MM_DENORMALS_ZERO_MASK   0x0040
+#define _MM_DENORMALS_ZERO_ON     0x0040
+#define _MM_DENORMALS_ZERO_OFF    0x0000
 
-    #define _MM_SET_DENORMALS_ZERO_MODE(mode)                                   \
-        _mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (mode))
-    #define _MM_GET_DENORMALS_ZERO_MODE()                                       \
-        (_mm_getcsr() & _MM_DENORMALS_ZERO_MASK)
+#define _MM_SET_DENORMALS_ZERO_MODE(mode)                                   \
+	_mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (mode))
+#define _MM_GET_DENORMALS_ZERO_MODE()                                       \
+	(_mm_getcsr() & _MM_DENORMALS_ZERO_MASK)
 #else
-	#include <ImfRgbaFile.h>
-	#include <ImfStringAttribute.h>
-	#include <ImfChannelList.h>
-	#include <ImfOutputFile.h>
-	#include <half.h>
+#include <ImfRgbaFile.h>
+#include <ImfStringAttribute.h>
+#include <ImfChannelList.h>
+#include <ImfOutputFile.h>
+#include <half.h>
 #endif
 
 using namespace Imf;

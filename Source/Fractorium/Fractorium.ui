@@ -912,7 +912,7 @@
                <string>Center X</string>
               </property>
               <property name="toolTip">
-               <string>Horizontal center of the image. Drag with the middle mouse button to pan.</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Horizontal center of the image. Drag with the middle mouse button, or the right mouse button while holding Shift to pan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="2" column="1">
@@ -925,7 +925,7 @@
                <string>Center Y</string>
               </property>
               <property name="toolTip">
-               <string>Vertical center of the image. Drag with the middle mouse button to pan.</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vertical center of the image. Drag with the middle mouse button, or the right mouse button while holding Shift to pan.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="3" column="1">
@@ -938,7 +938,7 @@
                <string>Scale</string>
               </property>
               <property name="toolTip">
-               <string>Zoom level of the image. Adjust by scrolling the mouse wheel or dragging with the right mouse button.</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom level of the image. Adjust by scrolling the mouse wheel, pressing &amp;lt; or &amp;gt;, or dragging with the right mouse button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="4" column="1">
@@ -8252,10 +8252,10 @@
      <normaloff>:/Fractorium/Icons/folder-visiting-4.png</normaloff>:/Fractorium/Icons/folder-visiting-4.png</iconset>
    </property>
    <property name="text">
-    <string>Open Examples</string>
+    <string>Open examples</string>
    </property>
    <property name="toolTip">
-    <string>Open Examples</string>
+    <string>Open examples</string>
    </property>
   </action>
   <action name="ActionExit">

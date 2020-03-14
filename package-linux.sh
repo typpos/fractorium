@@ -133,7 +133,7 @@ tar --exclude='package-linux.sh' \
 	./Data/examples/plangkye_examples.flame \
 	./Data/examples/tatasz_examples.flame \
 	./Data/examples/tatasz_substitution.flame \
-	./Data/examples/triptychaos_examples \
+	./Data/examples/triptychaos_examples.flame \
 	./Data/examples/tyrantwave_base_forms.flame \
 	.
 

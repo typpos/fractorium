@@ -2,6 +2,18 @@
 #include "Fractorium.h"
 #include <QtWidgets/QApplication>
 
+#ifdef __APPLE__
+/// <summary>
+/// Export default user data to ./config/fractorium
+/// </summary>
+void ExportUserData()
+{
+	QProcess exec;
+	exec.setWorkingDirectory(QCoreApplication::applicationDirPath());
+	exec.start("/bin/sh", QStringList() << "fractorium-sh");    
+}
+#endif
+
 /// <summary>
 /// Main program entry point for Fractorium.exe.
 /// </summary>
@@ -43,6 +55,10 @@ int main(int argc, char* argv[])
 #endif
 		Fractorium w;
 		w.show();
+#ifdef __APPLE__
+        // exporting user data
+        ExportUserData();
+#endif
 		a.installEventFilter(&w);
 		rv = a.exec();
 	}

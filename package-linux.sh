@@ -129,6 +129,7 @@ tar --exclude='package-linux.sh' \
 	./Data/uranium.qss \
 	./Data/examples/b33rheart_examples.flame \
 	./Data/examples/b33rheart_sierpinski.flame \
+	./Data/examples/c-91_examples.flame \
 	./Data/examples/pillemaster_hexagonal_tilings.flame \
 	./Data/examples/plangkye_examples.flame \
 	./Data/examples/tatasz_examples.flame \

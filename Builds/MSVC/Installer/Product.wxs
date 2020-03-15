@@ -370,6 +370,10 @@
 			<Component Id="b33rheart_sierpinski.flame" Guid="535430de-6878-41b2-913e-cb35e915cb4f">
 				<File Id="b33rheart_sierpinski.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\b33rheart_sierpinski.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
+
+			<Component Id="c-91_examples.flame" Guid="4155dcda-ba38-4211-b894-77c85d57bc9d">
+				<File Id="c-91_examples.flame" Source="$(var.SolutionDir)..\..\..\Data\examples\c-91_examples.flame" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+			</Component>
 		</ComponentGroup>
 	</Fragment>
 	

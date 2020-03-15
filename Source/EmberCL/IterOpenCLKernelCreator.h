@@ -36,6 +36,7 @@ public:
 	static void SharedDataIndexDefines(const Ember<T>& ember, pair<string, vector<T>>& params, bool doVals = true, bool doString = true);
 	static string VariationStateString(const Ember<T>& ember);
 	static string VariationStateInitString(const Ember<T>& ember);
+	static bool AnyZeroOpacity(const Ember<T>& ember);
 	static bool IsBuildRequired(const Ember<T>& ember1, const Ember<T>& ember2, bool optAffine);
 
 private:

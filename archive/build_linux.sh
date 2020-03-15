@@ -185,7 +185,7 @@ mv rpmbuild/RPMS/x86_64/* ./
 
 emberVersion=$(grep '#define EMBER_VERSION' ../Source/Ember/EmberDefines.h | sed 's/^.*EMBER_VERSION "\([^"]\+\)".*/\1/')
 
-mv Fractorium.deb Fractorium-$emberVersion-.x86_64.deb
+mv Fractorium.deb Fractorium-$emberVersion.x86_64.deb
 mv Fractorium-$emberVersion-1.x86_64.rpm Fractorium-$emberVersion.x86_64.rpm
 
 echo ""

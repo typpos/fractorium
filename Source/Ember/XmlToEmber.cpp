@@ -1379,7 +1379,6 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 							istringstream istr(pos);
 							istr >> currentEmber.m_CenterX >> currentEmber.m_CenterY;
 							currentEmber.m_CenterY *= -1;
-							currentEmber.m_RotCenterY = currentEmber.m_CenterY;
 						}
 						else
 						{
@@ -1669,7 +1668,6 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		{
 			istringstream is(attStr);
 			is >> currentEmber.m_CenterX >> currentEmber.m_CenterY;
-			currentEmber.m_RotCenterY = currentEmber.m_CenterY;
 		}
 		else if (!Compare(curAtt->name, "filter_shape"))
 		{

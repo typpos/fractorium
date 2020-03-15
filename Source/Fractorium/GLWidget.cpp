@@ -891,7 +891,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 				m_DragState = eDragState::DragNone;
 			}
 		}
-        else if (e->button() == Qt::MiddleButton || (e->button() == Qt::RightButton && e->modifiers() & Qt::ShiftModifier))//Middle button or right button with shift key, do whole image translation.
+		else if (e->button() == Qt::MiddleButton || (e->button() == Qt::RightButton && e->modifiers() & Qt::ShiftModifier))//Middle button or right button with shift key, do whole image translation.
 		{
 			m_CenterDownX = ember->m_CenterX;//Capture where the center of the image is because this value will change when panning.
 			m_CenterDownY = ember->m_CenterY;
@@ -1043,7 +1043,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		v2T v1(x, y);
 		v2T v2 = rotMat.TransformVector(v1);
 		ember->m_CenterX = v2.x;
-		ember->m_CenterY = ember->m_RotCenterY = v2.y;
+		ember->m_CenterY = v2.y;
 		m_FractoriumEmberController->SetCenter(ember->m_CenterX, ember->m_CenterY);//Will restart the rendering process.
 	}
 	else if (m_DragState == eDragState::DragRotateScale)//Rotating and scaling the whole image.

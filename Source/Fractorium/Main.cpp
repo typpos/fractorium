@@ -8,9 +8,9 @@
 /// </summary>
 void ExportUserData()
 {
-	QProcess exec;
-	exec.setWorkingDirectory(QCoreApplication::applicationDirPath());
-	exec.start("/bin/sh", QStringList() << "fractorium-sh");    
+    auto exec = new QProcess();
+    exec->setWorkingDirectory(QCoreApplication::applicationDirPath());
+    exec->start("/bin/sh", QStringList() << "fractorium-sh");
 }
 #endif
 

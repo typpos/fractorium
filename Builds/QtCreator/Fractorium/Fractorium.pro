@@ -241,6 +241,7 @@ examples.path = $$SHARE_INSTALL_DIR/examples
 examples.files += \
     $$ASSETS_DIR/examples/b33rheart_examples.flame \
     $$ASSETS_DIR/examples/b33rheart_sierpinski.flame \
+    $$ASSETS_DIR/examples/c-91_examples.flame \
     $$ASSETS_DIR/examples/pillemaster_hexagonal_tilings.flame \
     $$ASSETS_DIR/examples/plangkye_examples.flame \
     $$ASSETS_DIR/examples/tatasz_examples.flame \

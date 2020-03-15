@@ -3,6 +3,8 @@
 #include "EmberCLPch.h"
 #include "EmberCLStructs.h"
 
+#define USEFMA 1
+
 /// <summary>
 /// OpenCL global function strings.
 /// </summary>
@@ -185,13 +187,21 @@ static const char* RandFunctionString =
 	"inline real_t MwcNextFRange(uint2* s, real_t lower, real_t upper)\n"
 	"{\n"
 	"	real_t f = (real_t)MwcNext(s) / (real_t)UINT_MAX;\n"
+#ifdef USEFMA
 	"	return fma(f, upper - lower, lower);\n"
+#else
+	"	return (f * (upper - lower) + lower);\n"
+#endif
 	"}\n"
 	"\n"
 	"inline real_t MwcNextNeg1Pos1(uint2* s)\n"
 	"{\n"
 	"	real_t f = (real_t)MwcNext(s) / (real_t)UINT_MAX;\n"
+#ifdef USEFMA
 	"	return fma(f, (real_t)2.0, (real_t)-1.0);\n"
+#else
+	"	return (f * (real_t)2.0 + (real_t)-1.0);\n"
+#endif
 	"}\n"
 	"\n"
 	"inline real_t MwcNext0505(uint2* s)\n"
@@ -218,7 +228,11 @@ static const char* AddToAccumWithCheckFunctionString =
 static const char* CarToRasFunctionString =
 	"inline void CarToRasConvertPointToSingle(__constant CarToRasCL* carToRas, Point* point, uint* singleBufferIndex)\n"
 	"{\n"
+#ifdef USEFMA
 	"	*singleBufferIndex = (uint)fma(carToRas->m_PixPerImageUnitW, point->m_X, carToRas->m_RasLlX) + (carToRas->m_RasWidth * (uint)fma(carToRas->m_PixPerImageUnitH, point->m_Y, carToRas->m_RasLlY));\n"
+#else
+	"	*singleBufferIndex = (uint)(carToRas->m_PixPerImageUnitW * point->m_X + carToRas->m_RasLlX) + (carToRas->m_RasWidth * (uint)(carToRas->m_PixPerImageUnitH * point->m_Y + carToRas->m_RasLlY));\n"
+#endif
 	"}\n"
 	"\n"
 	"inline bool CarToRasInBounds(__constant CarToRasCL* carToRas, Point* point)\n"

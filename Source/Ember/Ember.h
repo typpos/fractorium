@@ -1237,10 +1237,10 @@ public:
 		z = m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z;
 		zr = Zeps(1 - m_CamPerspective * z);
 		sincos(t, &dsin, &dcos);
-		T prcx = (point.m_X - ctr.CarCenterX()) / ctr.CarHalfX();
-		T prcy = (y - ctr.CarCenterY()) / ctr.CarHalfY();
+		T prcx = point.m_X / ctr.CarHalfX();
+		T prcy = y / ctr.CarHalfY();
 		T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
-		T scale = m_BlurCurve ? std::min<T>(T(1), Sqr(dist) / (4 * m_BlurCurve)) : T(1);
+		T scale = m_BlurCurve ? (Sqr(dist) / (4 * m_BlurCurve)) : T(1);
 		T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
 		point.m_X = (point.m_X + dr * dcos) / zr;
 		point.m_Y = (y + dr * dsin) / zr;
@@ -1261,10 +1261,10 @@ public:
 		T y = m_CamMat[0][1] * point.m_X + m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
 		z = m_CamMat[0][2] * point.m_X + m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z;
 		T zr = Zeps(1 - m_CamPerspective * z);
-		T prcx = (x - ctr.CarCenterX()) / ctr.CarHalfX();
-		T prcy = (y - ctr.CarCenterY()) / ctr.CarHalfY();
+		T prcx = x / ctr.CarHalfX();
+		T prcy = y / ctr.CarHalfY();
 		T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
-		T scale = m_BlurCurve ? std::min<T>(T(1), Sqr(dist) / (4 * m_BlurCurve)) : T(1);
+		T scale = m_BlurCurve ? (Sqr(dist) / (4 * m_BlurCurve)) : T(1);
 		T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
 		sincos(t, &dsin, &dcos);
 		point.m_X = (x + dr * dcos) / zr;

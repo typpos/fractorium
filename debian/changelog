@@ -1,3 +1,15 @@
+fractorium (1.0.0.19b-0ubuntu1) bionic; urgency=low
+
+  * release 1.0.0.19
+
+ -- Matt Feemster <matt.feemster@gmail.com>  Sun, 15 Mar 2020 23:42:24 -0700
+
+fractorium (1.0.0.19a-0ubuntu1) bionic; urgency=low
+
+  * release 1.0.0.19
+
+ -- Matt Feemster <matt.feemster@gmail.com>  Sun, 15 Mar 2020 15:18:06 -0700
+
 fractorium (1.0.0.19-0ubuntu1) bionic; urgency=low
 
   * release 1.0.0.19

@@ -1043,7 +1043,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		v2T v1(x, y);
 		v2T v2 = rotMat.TransformVector(v1);
 		ember->m_CenterX = v2.x;
-		ember->m_CenterY = v2.y;
+		ember->m_CenterY = ember->m_RotCenterY = v2.y;
 		m_FractoriumEmberController->SetCenter(ember->m_CenterX, ember->m_CenterY);//Will restart the rendering process.
 	}
 	else if (m_DragState == eDragState::DragRotateScale)//Rotating and scaling the whole image.

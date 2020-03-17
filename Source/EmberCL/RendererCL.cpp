@@ -1837,7 +1837,7 @@ void RendererCL<T, bucketT>::ConvertEmber(Ember<T>& ember, EmberCL<T>& emberCL, 
 	emberCL.m_BlurCoef		 = ember.BlurCoef();
 	emberCL.m_CamMat		 = ember.m_CamMat;
 	emberCL.m_CenterX        = ember.m_CenterX;
-	emberCL.m_CenterY		 = ember.m_CenterY;
+	emberCL.m_CenterY		 = ember.m_RotCenterY;
 	emberCL.m_RotA           = m_RotMat.A();
 	emberCL.m_RotB           = m_RotMat.B();
 	emberCL.m_RotD           = m_RotMat.D();

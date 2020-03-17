@@ -1527,9 +1527,9 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 				if (Rotate() != 0)
 				{
 					T p00 = p.m_X - m_Ember.m_CenterX;
-					T p11 = p.m_Y - m_Ember.m_CenterY;
+					T p11 = p.m_Y - m_Ember.m_RotCenterY;
 					p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + m_Ember.m_CenterX;
-					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_CenterY;
+					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
 				}
 
 				//Checking this first before converting gives better performance than converting and checking a single value, which the original did.
@@ -1600,9 +1600,9 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 				if (Rotate() != 0)
 				{
 					T p00 = p.m_X - m_Ember.m_CenterX;
-					T p11 = p.m_Y - m_Ember.m_CenterY;
+					T p11 = p.m_Y - m_Ember.m_RotCenterY;
 					p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + m_Ember.m_CenterX;
-					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_CenterY;
+					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
 				}
 
 				if (m_CarToRas.InBounds(p))

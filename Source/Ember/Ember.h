@@ -126,6 +126,7 @@ public:
 		m_CamMat			  = ember.m_CamMat;
 		m_CenterX			  = T(ember.m_CenterX);
 		m_CenterY			  = T(ember.m_CenterY);
+		m_RotCenterY		  = T(ember.m_RotCenterY);
 		m_Rotate			  = T(ember.m_Rotate);
 		m_Brightness		  = T(ember.m_Brightness);
 		m_Gamma				  = T(ember.m_Gamma);
@@ -1403,6 +1404,7 @@ public:
 		m_Palette.m_Index = -1;
 		m_CenterX = 0;
 		m_CenterY = 0;
+		m_RotCenterY = 0;
 		m_Gamma = 4;
 		m_Vibrancy = 1;
 		m_Brightness = 4;
@@ -1537,6 +1539,7 @@ public:
 		   << "Depth Blur: " << m_CamDepthBlur << "\n"
 		   << "CenterX: " << m_CenterX << "\n"
 		   << "CenterY: " << m_CenterY << "\n"
+		   << "RotCenterY: " << m_RotCenterY << "\n"
 		   << "Rotate: " << m_Rotate << "\n"
 		   << "Brightness: " << m_Brightness << "\n"
 		   << "Gamma: " << m_Gamma << "\n"
@@ -1677,6 +1680,7 @@ public:
 	//Xml field: "center".
 	T m_CenterX = 0;
 	T m_CenterY = 0;
+	T m_RotCenterY = 0;
 
 	//Rotate the camera by this many degrees. Since this is a camera rotation, the final output image will be rotated counter-clockwise.
 	//Xml field: "rotate".

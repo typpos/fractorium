@@ -850,7 +850,7 @@ public:
 		adjustedEmber.m_FinalRasH = static_cast<size_t>(std::ceil(ember.m_FinalRasH  * scalar));
 		adjustedEmber.m_PixelsPerUnit *= scalar;
 		adjustedEmber.m_TemporalSamples = 1;
-		m_Renderer->SetEmber(adjustedEmber);
+		m_Renderer->SetEmber(adjustedEmber, eProcessAction::FULL_RENDER, true);
 		m_Renderer->EarlyClip(true);
 
 		if (m_Renderer->Run(m_FinalImage) != eRenderStatus::RENDER_OK)

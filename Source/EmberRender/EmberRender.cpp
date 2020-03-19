@@ -219,7 +219,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 		}
 
 		stats.Clear();
-		renderer->SetEmber(ember);
+		renderer->SetEmber(ember, eProcessAction::FULL_RENDER, true);
 		renderer->PrepFinalAccumVector(finalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 
 		if (opt.Strips() > 1)

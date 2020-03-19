@@ -43,6 +43,7 @@ void Renderer<T, bucketT>::AddEmber(Ember<T>& ember)
 		if (m_Embers.size() == 1)
 			m_Ember = m_Embers[0];
 	}, eProcessAction::FULL_RENDER);
+	Prepare();
 }
 
 /// <summary>
@@ -72,6 +73,21 @@ bool Renderer<T, bucketT>::AssignIterator()
 /// <summary>
 /// Virtual processing functions overriden from RendererBase.
 /// </summary>
+
+/// <summary>
+/// Prepare values for the filters, bounds, quality and camera.
+/// </summary>
+template <typename T, typename bucketT>
+void Renderer<T, bucketT>::Prepare()
+{
+	bool b = false;
+	CreateSpatialFilter(b);
+	CreateTemporalFilter(b);
+	ComputeBounds();
+	ComputeQuality();
+	ComputeCamera();
+	m_CarToRas.UpdateCachedHalf(m_CarToRas.CarHalfX(), m_CarToRas.CarHalfY());
+}
 
 /// <summary>
 /// Compute the bounds of the histogram and density filtering buffers.
@@ -156,14 +172,7 @@ void Renderer<T, bucketT>::SetEmber(const Ember<T>& ember, eProcessAction action
 	}, action);
 
 	if (prep)
-	{
-		bool b = false;
-		CreateSpatialFilter(b);
-		CreateTemporalFilter(b);
-		ComputeBounds();
-		ComputeQuality();
-		ComputeCamera();
-	}
+		Prepare();
 }
 
 /// <summary>
@@ -183,7 +192,9 @@ void Renderer<T, bucketT>::SetEmber(const C& embers)
 
 		if (!m_Embers.empty())
 			m_Ember = m_Embers[0];
+
 	}, eProcessAction::FULL_RENDER);
+	Prepare();//Always prepare with a collection.
 }
 
 /// <summary>
@@ -204,7 +215,9 @@ void Renderer<T, bucketT>::MoveEmbers(vector<Ember<T>>& embers)
 
 		if (!m_Embers.empty())
 			m_Ember = m_Embers[0];
+
 	}, eProcessAction::FULL_RENDER);
+	Prepare();
 }
 
 template <typename T, typename bucketT>
@@ -217,7 +230,9 @@ void Renderer<T, bucketT>::SetExternalEmbersPointer(vector<Ember<T>>* embers)
 
 		if (!m_EmbersP->empty())
 			m_Ember = (*m_EmbersP)[0];
+
 	}, eProcessAction::FULL_RENDER);
+	Prepare();
 }
 
 /// <summary>
@@ -511,6 +526,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 		{
 			ComputeQuality();
 			ComputeCamera();
+			//m_CarToRas.UpdateCachedHalf(m_CarToRas.CarHalfX(), m_CarToRas.CarHalfY());
 			MakeDmap(colorScalar);//For each temporal sample, the palette m_Dmap needs to be re-created with color scalar. 1 if no temporal samples.
 		}
 

@@ -121,6 +121,7 @@ public:
 	virtual bool CreateDEFilter(bool& newAlloc) = 0;
 	virtual bool CreateSpatialFilter(bool& newAlloc) = 0;
 	virtual bool CreateTemporalFilter(bool& newAlloc) = 0;
+	virtual void Prepare() = 0;
 	virtual void ComputeBounds() = 0;
 	virtual void ComputeQuality() = 0;
 	virtual void ComputeCamera() = 0;

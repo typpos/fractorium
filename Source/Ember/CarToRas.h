@@ -143,6 +143,20 @@ public:
 	}
 
 	/// <summary>
+	/// Assign values to the cached half width/height fields.
+	/// This is only done manually here and is used when rendering strips
+	/// because a cached copy of these is required because the real values
+	/// change with the assignment of each temporary strip ember object.
+	/// </summary>
+	/// <param name="x">The cached value equal to half of the cartesian width of the x plane</param>
+	/// <param name="y">The cached value equal to half of the cartesian width of the y plane</param>
+	void UpdateCachedHalf(T x, T y)
+	{
+		m_CachedCarHalfX = x;
+		m_CachedCarHalfY = y;
+	}
+
+	/// <summary>
 	/// Convert a cartesian x, y coordinate to a raster x, y coordinate.
 	/// This will flip the Y coordinate, so points that hit the bottom of the cartesian plane will
 	/// be mapped to the top of the histogram and vice versa.
@@ -237,6 +251,8 @@ public:
 	inline T PadCarUrY() const { return m_PadCarUrY; }
 	inline T CarHalfX() const { return m_CarHalfX; }
 	inline T CarHalfY() const { return m_CarHalfY; }
+	inline T CachedCarHalfX() const { return m_CachedCarHalfX; }
+	inline T CachedCarHalfY() const { return m_CachedCarHalfY; }
 	inline T CarCenterX() const { return m_CarCenterX; }
 	inline T CarCenterY() const { return m_CarCenterY; }
 
@@ -251,6 +267,7 @@ private:
 	T m_CarLlX, m_CarLlY, m_CarUrX, m_CarUrY;//The bounds of the cartesian plane.
 	T m_PadCarLlX, m_PadCarLlY, m_PadCarUrX, m_PadCarUrY;//The bounds of the cartesian plane padded by one raster row and column on each side.
 	T m_CarHalfX, m_CarHalfY;//The distance from the center of the of the cartesian plane to the edges.
+	T m_CachedCarHalfX, m_CachedCarHalfY;//The cahced distance from the center of the of the cartesian plane to the edges, needed when rendering strips.
 	T m_CarCenterX, m_CarCenterY;//The center of the cartesian plane.
 };
 }

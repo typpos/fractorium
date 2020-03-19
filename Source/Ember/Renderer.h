@@ -55,6 +55,7 @@ public:
 	bool AssignIterator();
 
 	//Virtual processing functions overriden from RendererBase.
+	virtual void Prepare() override;
 	virtual void ComputeBounds() override;
 	virtual void ComputeQuality() override;
 	virtual void ComputeCamera() override;

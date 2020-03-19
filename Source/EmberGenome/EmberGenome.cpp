@@ -781,7 +781,7 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 				orig.m_Edits = emberToXml.CreateNewEditdoc(aselp0, aselp1, os.str(), opt.Nick(), opt.Url(), opt.Id(), opt.Comment(), opt.SheepGen(), opt.SheepId());
 				save = orig;
 				SetDefaultTestValues(orig);
-				renderer->SetEmber(orig);
+				renderer->SetEmber(orig, eProcessAction::FULL_RENDER, true);
 
 				if (renderer->Run(finalImage) != eRenderStatus::RENDER_OK)
 				{

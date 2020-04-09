@@ -46,7 +46,7 @@ Compile the binaries, they will be created in the `Bin/release` folder.
 
 ```
 cd fractorium
-qmake main.pro -r -spec linux-g++-64 CONFIG+=release
+qmake main.pro -r -spec linux-g++-64 CONFIG+="release native"
 make
 ```
 

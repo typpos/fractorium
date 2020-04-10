@@ -229,13 +229,18 @@ private:
 		for (i = 0; i < m_Filter.size(); i++)
 			t += m_Filter[i];
 
-		if (t == 0.0)
+		if (t == 0.0 || std::isinf(t) || std::isnan(t) || !std::isnormal(t))
 			return false;
 
-		t = T(1.0) / t;
+		t = T(1.0 / t);
 
 		for (i = 0; i < m_Filter.size(); i++)
+		{
 			m_Filter[i] *= t;
+
+			if (std::isinf(t) || std::isnan(t) || !std::isnormal(t))
+				return false;
+		}
 
 		return true;
 	}
@@ -271,9 +276,9 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
-		return std::exp(-2 * t * t) * std::sqrt(2 / T(M_PI));
+		return T(std::exp(-2 * t * t) * std::sqrt(2 / M_PI));
 	}
 };
 
@@ -300,13 +305,13 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if (t < 0)
 			t = -t;
 
 		if (t < 1)
-			return ((T(2.0) * t - T(3.0)) * t * t + T(1.0));
+			return T((2.0 * t - 3.0) * t * t + 1.0);
 
 		return 0;
 	}
@@ -334,7 +339,7 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if ((t > T(-0.5)) && (t <= T(0.5)))
 			return 1;
@@ -365,7 +370,7 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if (t < 0)
 			t = -t;
@@ -399,19 +404,19 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		//box (*) box (*) box.
 		if (t < 0)
 			t = -t;
 
 		if (t < T(0.5))
-			return (T(0.75) - (t * t));
+			return T(0.75 - (t * t));
 
 		if (t < T(1.5))
 		{
-			t = (t - T(1.5));
-			return (T(0.5) * (t * t));
+			t = T(t - 1.5);
+			return T(0.5 * (t * t));
 		}
 
 		return 0;
@@ -440,7 +445,7 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		//box (*) box (*) box (*) box.
 		T tt;
@@ -451,12 +456,12 @@ public:
 		if (t < 1)
 		{
 			tt = t * t;
-			return ((T(0.5) * tt * t) - tt + (T(2.0) / T(3.0)));
+			return T((0.5 * tt * t) - tt + (2.0 / 3.0));
 		}
 		else if (t < 2)
 		{
 			t = 2 - t;
-			return ((T(1.0) / T(6.0)) * (t * t * t));
+			return T((1.0 / 6.0) * (t * t * t));
 		}
 
 		return 0;
@@ -485,7 +490,7 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if (t < 0)
 			t = -t;
@@ -519,7 +524,7 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if (t < 0)
 			t = -t;
@@ -553,28 +558,28 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		T tt = t * t;
-		const T b = T(1) / T(3);
-		const T c = T(1) / T(3);
+		const T b = T(1.0 / 3.0);
+		const T c = T(1.0 / 3.0);
 
 		if (t < 0)
 			t = -t;
 
 		if (t < 1)
 		{
-			t = (((T(12.0) - T(9.0) * b - T(6.0) * c) * (t * tt))
-				 + ((T(-18.0) + T(12.0) * b + T(6.0) * c) * tt)
-				 + (T(6.0) - 2 * b));
+			t = T(((12.0 - 9.0 * b - 6.0 * c) * (t * tt))
+				  + ((-18.0 + 12.0 * b + 6.0 * c) * tt)
+				  + (6.0 - 2 * b));
 			return t / 6;
 		}
 		else if (t < 2)
 		{
-			t = (((T(-1.0) * b - T(6.0) * c) * (t * tt))
-				 + ((T(6.0) * b + T(30.0) * c) * tt)
-				 + ((T(-12.0) * b - T(48.0) * c) * t)
-				 + (T(8.0) * b + 24 * c));
+			t = T(((-1.0 * b - 6.0 * c) * (t * tt))
+				  + ((6.0 * b + 30.0 * c) * tt)
+				  + ((-12.0 * b - 48.0 * c) * t)
+				  + (8.0 * b + 24 * c));
 			return t / 6;
 		}
 
@@ -604,9 +609,9 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
-		return (T(0.42) + T(0.5) * std::cos(T(M_PI) * t) + T(0.08) * std::cos(2 * T(M_PI) * t));
+		return T(0.42 + 0.5 * std::cos(M_PI * t) + 0.08 * std::cos(2 * M_PI * t));
 	}
 };
 
@@ -632,22 +637,22 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if (t < 0)
 			return 0;
 
 		if (t < -1)
-			return T(0.5) * (4 + t * (8 + t * (5 + t)));
+			return T(0.5 * (4 + t * (8 + t * (5 + t))));
 
 		if (t < 0)
-			return T(0.5) * (2 + t * t * (-5 - 3 * t));
+			return T(0.5 * (2 + t * t * (-5 - 3 * t)));
 
 		if (t < 1)
-			return T(0.5) * (2 + t * t * (-5 + 3 * t));
+			return T(0.5 * (2 + t * t * (-5 + 3 * t)));
 
 		if (t < 2)
-			return T(0.5) * (4 + t * (-8 + t * (5 - t)));
+			return T(0.5 * (4 + t * (-8 + t * (5 - t))));
 
 		return 0;
 	}
@@ -675,9 +680,9 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
-		return T(0.54) + T(0.46) * std::cos(T(M_PI) * t);
+		return T(0.54 + 0.46 * std::cos(M_PI * t));
 	}
 };
 
@@ -703,9 +708,9 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
-		return T(0.5) + T(0.5) * std::cos(T(M_PI) * t);
+		return T(0.5 + 0.5 * std::cos(M_PI * t));
 	}
 };
 
@@ -731,19 +736,19 @@ public:
 	/// </summary>
 	/// <param name="t">The value to apply the filter to</param>
 	/// <returns>The filtered value</returns>
-	virtual T Filter(T t) const
+	virtual T Filter(T t) const override
 	{
 		if (t < -1.5)
 			return 0.0;
 
 		if (t < -0.5)
-			return T(0.5) * (t + T(1.5)) * (t + T(1.5));
+			return T(0.5 * (t + 1.5) * (t + 1.5));
 
 		if (t < 0.5)
-			return T(0.75) - (t * t);
+			return T(0.75 - (t * t));
 
 		if (t < 1.5)
-			return T(0.5) * (t - T(1.5)) * (t - T(1.5));
+			return T(0.5 * (t - 1.5) * (t - 1.5));
 
 		return 0;
 	}

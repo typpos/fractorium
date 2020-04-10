@@ -391,7 +391,7 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 			m_PreviewEmber.m_TemporalSamples = 1;
 			m_PreviewEmber.m_Quality = 25;
 			m_PreviewEmber.m_Supersample = 1;
-			m_PreviewRenderer.SetEmber(m_PreviewEmber);
+			m_PreviewRenderer.SetEmber(m_PreviewEmber, eProcessAction::FULL_RENDER, true);
 
 			if (m_PreviewRenderer.Run(m_PreviewFinalImage) == eRenderStatus::RENDER_OK)
 			{

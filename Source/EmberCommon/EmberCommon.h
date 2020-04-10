@@ -597,6 +597,9 @@ static vector<unique_ptr<Renderer<T, float>>> CreateRenderers(eRendererType rend
 /// <summary>
 /// Perform a render which allows for using strips or not.
 /// If an error occurs while rendering any strip, the rendering process stops.
+/// Note this must be called after SetEmber(ember, eProcessAction::FULL_RENDER, true) is called on the renderer.
+/// The last parameter to SetEmber must be true to compute the camera, because is caches certain values that need to be
+/// retained between strips.
 /// </summary>
 /// <param name="renderer">The renderer to use</param>
 /// <param name="ember">The ember to render</param>

@@ -22,13 +22,14 @@
  -Custom palettes were not being read correctly on non ANSI machines.
  -EmberAnimate.exe was using 1-based indexing for filenames, but Fractorium and all of the documentation was using 0-based indexing. Make all use 0-based indexing.
  -The left header column in the xaos visualization table had somehow disappeared.
- -Fix  OpenCL compilation bug when using Depth Blur with AMD on Mac.
+ -Fix OpenCL compilation bug when using Depth Blur with AMD on Mac.
+ -Blur Cuve never worked with strips.
+ -Images with temporal filter width values below 0.6 would sometimes create blank images.
 
 --Code changes
  -Make all iterators on the CPU use a temporary point.
  -DoubleSpinBox now has a boolean which specifies whether it clears its selection on enter. Default true.
  -Make AddXformsWithXaos() be a static member of FractoriumEmberController for quicker build times.
- -Remove the unused field m_RotCenterY from Ember.
  -Make a #define for fma() testing, but seems to make no difference.
  -Optimize some of the OpenCL iteration kernel generation code.
 

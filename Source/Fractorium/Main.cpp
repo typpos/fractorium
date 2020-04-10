@@ -8,9 +8,9 @@
 /// </summary>
 void ExportUserData()
 {
-    auto exec = new QProcess();
-    exec->setWorkingDirectory(QCoreApplication::applicationDirPath());
-    exec->start("/bin/sh", QStringList() << "fractorium-sh");
+	auto exec = new QProcess();
+	exec->setWorkingDirectory(QCoreApplication::applicationDirPath());
+	exec->start("/bin/sh", QStringList() << "fractorium-sh");
 }
 #endif
 
@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
 		Fractorium w;
 		w.show();
 #ifdef __APPLE__
-        // exporting user data
-        ExportUserData();
+		// exporting user data
+		ExportUserData();
 #endif
 		a.installEventFilter(&w);
 		rv = a.exec();

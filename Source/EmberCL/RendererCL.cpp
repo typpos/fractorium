@@ -1884,8 +1884,8 @@ void RendererCL<T, bucketT>::ConvertCarToRas(const CarToRas<T>& carToRas)
 	m_CarToRasCL.m_CarLlY = carToRas.CarLlY();
 	m_CarToRasCL.m_CarUrX = carToRas.CarUrX();
 	m_CarToRasCL.m_CarUrY = carToRas.CarUrY();
-	m_CarToRasCL.m_CarHalfX   = carToRas.CarHalfX();
-	m_CarToRasCL.m_CarHalfY   = carToRas.CarHalfY();
+	m_CarToRasCL.m_CarHalfX   = carToRas.CachedCarHalfX();
+	m_CarToRasCL.m_CarHalfY   = carToRas.CachedCarHalfY();
 	m_CarToRasCL.m_CarCenterX = carToRas.CarCenterX();
 	m_CarToRasCL.m_CarCenterY = carToRas.CarCenterY();
 }

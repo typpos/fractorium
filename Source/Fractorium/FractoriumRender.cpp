@@ -373,7 +373,7 @@ bool FractoriumEmberController<T>::Render()
 		}
 
 		i = 0;
-		m_Renderer->SetEmber(m_Ember, action);
+		m_Renderer->SetEmber(m_Ember, action, true);
 
 		if (solo != -1)
 			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))

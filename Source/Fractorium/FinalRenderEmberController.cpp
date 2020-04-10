@@ -267,7 +267,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 
 					Output("Image " + ToString<qulonglong>(m_FinishedImageCount.load() + 1) + ":\n" + ComposePath(QString::fromStdString(it.m_Name)));
 					it.m_TemporalSamples = 1;//No temporal sampling.
-					m_Renderer->SetEmber(it);
+					m_Renderer->SetEmber(it, eProcessAction::FULL_RENDER, true);
 					m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 					m_Stats.Clear();
 					m_RenderTimer.Tic();//Toc() is called in RenderComplete().
@@ -298,7 +298,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
 			m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true);//Update color and filter params from the main window controls, which only affect the filter and/or final accumulation stage.
-			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER);
+			m_Renderer->SetEmber(*m_Ember, isBump ? eProcessAction::KEEP_ITERATING : eProcessAction::FULL_RENDER, true);
 			m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 			m_Stats.Clear();
 			Output(ComposePath(QString::fromStdString(m_Ember->m_Name)));
@@ -1130,7 +1130,7 @@ void FinalRenderPreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	m_PreviewRenderer.EarlyClip(d->EarlyClip());
 	m_PreviewRenderer.YAxisUp(d->YAxisUp());
 	m_PreviewRenderer.Callback(nullptr);
-	m_PreviewRenderer.SetEmber(m_PreviewEmber);
+	m_PreviewRenderer.SetEmber(m_PreviewEmber, eProcessAction::FULL_RENDER, true);
 	m_PreviewRenderer.PrepFinalAccumVector(m_PreviewFinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 	auto strips = VerifyStrips(m_PreviewEmber.m_FinalRasH, d->Strips(),
 	[&](const string & s) {}, [&](const string & s) {}, [&](const string & s) {});

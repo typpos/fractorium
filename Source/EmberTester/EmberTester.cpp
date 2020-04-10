@@ -1745,7 +1745,7 @@ bool TestAllVarsCLBuild(size_t platform, size_t device, bool printSuccess = true
 
 	for (auto& it : embers)
 	{
-		renderer.SetEmber(it);
+		renderer.SetEmber(it, eProcessAction::FULL_RENDER, true);
 
 		//if (platform != 0 &&
 		//		((it.GetXform(0)->GetVariationById(eVariationId::VAR_SYNTH) != nullptr) ||//Nvidia OpenCL driver crashes when building too many synths.

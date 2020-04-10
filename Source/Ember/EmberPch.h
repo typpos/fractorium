@@ -66,9 +66,11 @@
 	#include "libxml2/libxml/parser.h"
 #endif
 
-//Intel's Threading Building Blocks is what's used for all threading.
-#include <tbb/parallel_for.h>
-#include <tbb/task_scheduler_init.h>
+#if !defined(Q_MOC_RUN)
+	//Intel's Threading Building Blocks is what's used for all threading.
+	#include <tbb/parallel_for.h>
+	#include <tbb/task_scheduler_init.h>
+#endif
 
 #define GLM_FORCE_RADIANS 1
 #define GLM_ENABLE_EXPERIMENTAL 1

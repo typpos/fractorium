@@ -25,7 +25,7 @@ https://bitbucket.org/mfeemster/fractorium
 
 News and updates at the above or on Matt Feemster's DeviantArt page:
 
-http://mfeemster.deviantart.com/
+https://www.deviantart.com/mfeemster
 
 
 %files

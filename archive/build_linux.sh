@@ -11,8 +11,8 @@ FRACTORIUM_PACKAGE=$BUILD_PATH/../Bin/Fractorium
 FRACTORIUM_RPM_PACKAGE=$BUILD_PATH/../Bin/rpmbuild
 EXTRA_LIBS=/usr/lib/x86_64-linux-gnu
 
-# replace 5.11.2 by your QT version, and ensure the installation path is the same
-QT_PATH=/home/$USER/Dev/Qt/5.11.2/gcc_64/bin
+# replace 5.12.8 by your QT version, and ensure the installation path is the same
+QT_PATH=/home/$USER/Dev/Qt/5.12.8/gcc_64/bin
 
 LINUX_DEPLOY_QT=/home/$USER/Dev/linuxdeployqt-6-x86_64.AppImage
 APP_IMAGE_TOOL=/home/$USER/Dev/appimagetool-x86_64.AppImage

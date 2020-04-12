@@ -310,6 +310,7 @@ public:
 		   << "\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 2:\n"
+		   << "\t\t	default:\n"
 		   << "\t\t		x = " << weight << " * p;\n"
 		   << "\t\t		y = " << weight << " * q;\n"
 		   << "\t\t		z = " << weight << " * (j ? -1 : 1);\n"

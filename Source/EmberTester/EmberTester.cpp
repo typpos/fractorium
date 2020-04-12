@@ -1588,7 +1588,8 @@ void TestArbitrary()
 	vector<string> stringVec, withoutVec;
 	auto varList = VariationList<float>::Instance();
 	auto& vars = varList->AllVars();
-	stringVec.push_back("if (!");
+	stringVec.push_back("switch");
+	//stringVec.push_back("if (!");
 	withoutVec.push_back("=");
 	withoutVec.push_back("<");
 	withoutVec.push_back(">");
@@ -1599,8 +1600,8 @@ void TestArbitrary()
 	//stringVec.push_back("sin(");
 	//stringVec.push_back("cos(");
 	//stringVec.push_back("sincos(");
-	//auto varVec = FindVarsWith<float>(vars, stringVec, true, true);
-	auto varVec = FindVarsWithWithout<float>(vars, stringVec, withoutVec);
+	auto varVec = FindVarsWith<float>(vars, stringVec, true, true);
+	//auto varVec = FindVarsWithWithout<float>(vars, stringVec, withoutVec);
 
 	for (auto& it : varVec)
 	{

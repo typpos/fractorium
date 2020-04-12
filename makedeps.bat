@@ -52,7 +52,7 @@ set "curdir=%cd%"
 devenv.exe makefile.sln /upgrade
 cd %curdir%
 REM Change PlatformToolset and WindowsTargetPlatformVersion to match whatever your version of Visual Studio supports. You can find this by opening makefile.sln in tbb\build\vs2013
-msbuild tbb.vcxproj /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v141 /p:WindowsTargetPlatformVersion=10.0.17134.0
+msbuild tbb.vcxproj /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v142 /p:WindowsTargetPlatformVersion=10.0.18362.0
 copy X64\Release\tbb.dll ..\..\..\fractorium\Deps
 copy X64\Release\tbb.lib ..\..\..\fractorium\Deps
 cd ..\..\..
@@ -65,9 +65,8 @@ if not exist ".\output" mkdir .\output
 
 cd ..\OpenEXR
 
-REM use -G "Visual Studio 16 2019" if building in Visual Studio 2019
-
-cmake -G "Visual Studio 15 2017 Win64"^
+cmake -G "Visual Studio 16 2019"^
+      -A x64^
       -DCMAKE_PREFIX_PATH="%current%\output"^
       -DCMAKE_INSTALL_PREFIX="%current%\output"^
       -DILMBASE_PACKAGE_PREFIX="%current%\output" ^

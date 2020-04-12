@@ -1,3 +1,12 @@
+1.0.0.20 4/11/2020
+--Bug fixes
+ -ETA time was wrong with incremental final renders after waiting for a period of time.
+ -Fix possible OpenCL bugs in cubic3D, cubicLattice_3D, dc_cube, falloff, falloff2, falloff3, waffle.
+
+--Code changes
+ -Small change to prevent parsing error when using tbb on some systems.
+ -Upgrade to Visual Studio 2019.
+
 1.0.0.19 3/13/2020
 --User changes
  -Add backward compatibility option for the following variations: cos, cosh, cot, coth, csc, csch, sec, sech, sin, sinh, tan, tanh.

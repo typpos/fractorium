@@ -257,3 +257,5 @@ Builds/include/GL
 /.vs/slnx.sqlite
 /Deps/Include/OpenEXR
 /main.pro.user.294b646
+/Builds/MSVC/VS2019/.vs/Fractorium
+/Builds/MSVC/VS2017/.vs/config

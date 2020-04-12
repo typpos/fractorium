@@ -16,7 +16,7 @@ git clone -b v2.3.0 https://github.com/openexr/openexr.git
 REM libjpeg
 copy fractorium\Builds\MSVC\WIN32.MAK libjpeg
 cd libjpeg
-nmake /f makefile.vc setup-v15 CPU=i386
+nmake /f makefile.vc setup-v16 CPU=i386
 nmake nodebug=1 /f makefile.vc libjpeg.lib CPU=i386
 copy libjpeg.lib ..\fractorium\Deps
 cd ..

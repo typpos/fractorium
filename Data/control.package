@@ -8,7 +8,7 @@ Homepage: http://fractorium.com/
 Vcs-Git: https://bitbucket.org/mfeemster/fractorium
 Vcs-Browser: https://bitbucket.org/mfeemster/fractorium
 Package: Fractorium
-Version: 1.0.0.19
+Version: 1.0.0.20
 Architecture: amd64
 Description: A fractal flame editor with GPU support
  Fractorium
@@ -23,4 +23,5 @@ Description: A fractal flame editor with GPU support
  .
  News and updates at the above or on Matt Feemster's DeviantArt page:
  .
- http://mfeemster.deviantart.com/
+ https://www.deviantart.com/mfeemster
+ 

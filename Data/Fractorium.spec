@@ -2,7 +2,7 @@
 %define buildroot     %{_topdir}/BUILDROOT
 
 Name:           Fractorium
-Version:        1.0.0.19
+Version:        1.0.0.20
 Release:        1
 Summary:        A fractal flame editor with GPU support
 
@@ -25,7 +25,7 @@ https://bitbucket.org/mfeemster/fractorium
 
 News and updates at the above or on Matt Feemster's DeviantArt page:
 
-http://mfeemster.deviantart.com/
+https://www.deviantart.com/mfeemster
 
 
 %files

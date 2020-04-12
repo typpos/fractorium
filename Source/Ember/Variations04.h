@@ -1778,6 +1778,7 @@ public:
 		   << "\t\t		r = fma(MwcNext01(mwc), 1 - " << yThickness << ", MwcNextRange(mwc, (int)" << slices << ") + " << yThickness << ") / " << slices << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 4:\n"
+		   << "\t\t	default:\n"
 		   << "\t\t		a = fma(MwcNext01(mwc), (1 - " << xThickness << "), MwcNextRange(mwc, (int)" << slices << ") + " << xThickness << ") / " << slices << ";\n"
 		   << "\t\t		r = MwcNext01(mwc);\n"
 		   << "\t\t		break;\n"

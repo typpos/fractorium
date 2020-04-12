@@ -1,7 +1,6 @@
 #include "FractoriumPch.h"
 #include "Fractorium.h"
 #include <QtWidgets/QApplication>
-
 #include <xmmintrin.h>
 #include <immintrin.h>
 #include <pmmintrin.h>

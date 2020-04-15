@@ -41,7 +41,7 @@ Download: [Fractorium-1.0.0.20.x86_64.deb](https://drive.google.com/open?id=1pdF
 
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-1.0.0.19.x86_64.deb
+sudo dpkg -i Fractorium-1.0.0.20.x86_64.deb
 ```
 
 ### Install from App Image .rpm

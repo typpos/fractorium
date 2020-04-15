@@ -9,11 +9,11 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_1.0.0.19.msi](https://drive.google.com/open?id=1GerFr8VRLFtfvV57acJawZg0bJVfhac-)
+Download: [Fractorium_1.0.0.20.msi](https://drive.google.com/open?id=1IdYwa3msokLzdfng5deZ_Xg5hr-wOvk2)
 
 ## Mac
 
-Download: [Fractorium_1.0.0.19.dmg](https://drive.google.com/open?id=1YH49dE858cUrPXl92jfclB00LDPQfBtY)
+Download: [Fractorium_1.0.0.20.dmg](https://drive.google.com/open?id=1X_Ncbt2zfwbd3VgWwdHWe8xm6D2sVq2z)
 
 ## Linux
 
@@ -37,7 +37,7 @@ sudo apt-get install fractorium
 
 Install ubuntu.
 
-Download: [Fractorium-1.0.0.19.x86_64.deb](https://drive.google.com/open?id=1sYoLK27-w7RERxmh10GK4eTcwI2wuagO)
+Download: [Fractorium-1.0.0.20.x86_64.deb](https://drive.google.com/open?id=1pdFNAn8CVkRqNbPXVA1LH_9LBoUCBAPv)
 
 ```
 cd ~/Downloads
@@ -46,7 +46,7 @@ sudo dpkg -i Fractorium-1.0.0.19.x86_64.deb
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-1.0.0.19.x86_64.rpm](https://drive.google.com/open?id=17zHmJghSM_hCjSNRXyf5PL6oWoy--Sq4)
+Download: [Fractorium-1.0.0.20.x86_64.rpm](https://drive.google.com/open?id=1jdQvZ1scpZADGdBWn_LU6j3msgmGKrCY)
 
 # Building from git
 
@@ -54,7 +54,7 @@ All builds are 64-bit.
 
 ## Windows
 
-[Build Guide for Visual Studio 2017 or Qt Creator](Data/BuildGuideQtCreator.md)
+[Build Guide for Visual Studio 2019 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 

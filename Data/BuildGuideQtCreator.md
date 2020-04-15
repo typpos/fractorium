@@ -107,7 +107,7 @@ This will download and build `glm libopenexr libpng libxml tbb zlib`. You will h
 
 ###Begin build with Qt Creator
 
-Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2017 64bit*.
+Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2019 64bit*.
 Make sure *Shadow build* in *Edit build configuration* for both *Debug* and *Release* is unchecked.
 
 Switch to the *Release* configuration.
@@ -136,7 +136,7 @@ The name "Qt5" must match exactly and this step must be completed before the Fra
 
 Set the default version to the newly created Qt version and click *Ok*.
 
-Open the file Fractorium.sln under Builds/MSVC/2017
+Open the file Fractorium.sln under Builds/MSVC/2019
 
 Set the configuration to release, and build all.
 

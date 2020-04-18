@@ -1,4 +1,4 @@
-#Build Guide For Visual Studio 2017 or Qt Creator
+#Build Guide For Visual Studio 2019 or Qt Creator
 ##Tools
 
 ###git
@@ -7,15 +7,15 @@ Install [git](https://git-scm.com/downloads).
 
 ###Visual Studio
 
-Install [Microsoft Visual Studio 2017 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
+Install [Microsoft Visual Studio 2019 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
 
 ###Qt
 
-Install Qt for Windows 64-bit (VS 2017) 5.8 or later (http://www.qt.io/download/). 
+Install Qt for Windows 64-bit (VS 2017) 5.12.8 or later (http://www.qt.io/download/). 
 
 Add system environment variable named `QTPATH` and point it to the location of the Qt folder. On a default install, this will be something like:
 
-`C:\Qt\5.8\msvc2017_64`
+`C:\Qt\5.12.8\msvc2017_64`
 
 ###Wix
 
@@ -107,7 +107,7 @@ This will download and build `glm libopenexr libpng libxml tbb zlib`. You will h
 
 ###Begin build with Qt Creator
 
-Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2017 64bit*.
+Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2019 64bit*.
 Make sure *Shadow build* in *Edit build configuration* for both *Debug* and *Release* is unchecked.
 
 Switch to the *Release* configuration.
@@ -130,13 +130,13 @@ Run Visual Studio and verify there is a menu item named *Qt5*. Click on it and c
 
 Add a new Qt version to the list with the exact name of "Qt5", and set its path to the same as `$QTPATH`, which will be something like:
 
-`C:\Qt\5.9.1\msvc2017_64`
+`C:\Qt\5.12.8\msvc2017_64`
 
 The name "Qt5" must match exactly and this step must be completed before the Fractorium solution is opened. If not, the Qt add-in will completely ruin all solution and project files that use Qt.
 
 Set the default version to the newly created Qt version and click *Ok*.
 
-Open the file Fractorium.sln under Builds/MSVC/2017
+Open the file Fractorium.sln under Builds/MSVC/2019
 
 Set the configuration to release, and build all.
 
@@ -207,13 +207,14 @@ Double click fractorium.exe to run it, and use the command line to run the other
 To run on a computer without Visual Studio 2017, these files also need to be in the folder:
 
 ```
-MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\msvcp140.dll
-MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\vcruntime140.dll
-MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\vccorlib140.dll
-MSVC2017\VC\Redist\MSVC\14.11.25325\x64\Microsoft.VC141.CRT\concrt140.dll
+2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\msvcp140.dll
+2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vcruntime140.dll
+2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vcruntime140_1.dll
+2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vccorlib140.dll
+2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\concrt140.dll
 ```
 
-or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (64 bit)](https://www.visualstudio.com/downloads/)
+or you can install [Visual C++ Redistributable Packages for Visual Studio 2019 (64 bit)](https://www.visualstudio.com/downloads/)
 
 ##Final file structure for distribution
 
@@ -262,6 +263,7 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2017 (
  │
  ├─ msvcp140.dll (optional)
  ├─ vcruntime140.dll (optional)
+ ├─ vcruntime140_1.dll (optional)
  ├─ vccorlib140.dll (optional)
  ├─ concrt140.dll (optional)
  │  

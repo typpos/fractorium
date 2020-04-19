@@ -85,6 +85,7 @@ size_t FractoriumEmberController<T>::InitPaletteList(const QString& s)
 		}
 	}
 
+    m_Fractorium->ui.PaletteFilenameCombo->model()->sort(0);
 	return m_PaletteList->Size();
 }
 

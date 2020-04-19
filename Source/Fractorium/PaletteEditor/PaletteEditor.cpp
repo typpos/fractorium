@@ -58,6 +58,8 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 		ui->PaletteFilenameCombo->addItem(info.fileName());
 	}
 
+    ui->PaletteFilenameCombo->model()->sort(0);
+
 	if (ui->PaletteFilenameCombo->count() > 0)
 		m_CurrentPaletteFilePath = ui->PaletteFilenameCombo->itemText(0).toStdString();
 }

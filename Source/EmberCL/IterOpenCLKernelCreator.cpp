@@ -359,7 +359,13 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	os <<
 	   "	uint histSize,\n"
 	   "	__read_only image2d_t palette,\n"
-	   "	__global Point* points\n"
+       "	__global Point* points"
+#ifndef KNL_USE_GLOBAL_CONSEC
+       "\n"
+#else
+       ",\n"
+       "	__global uchar* consec\n"
+#endif
 	   "\t)\n"
 	   "{\n"
 	   "	bool fuse, ok;\n"
@@ -368,7 +374,9 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	uint blockStartIndex = BLOCK_START_INDEX_IN_GRID_2D;\n"
 	   "	uint blockStartThreadIndex = blockStartIndex + threadIndex;\n"
 	   "	uint i, itersToDo;\n"
+#ifndef KNL_USE_GLOBAL_CONSEC
 	   "	uint consec = 0;\n"
+#endif
 	   //"	int badvals = 0;\n"
 	   "	uint histIndex;\n"
 	   "	real_t p00, p01;\n"
@@ -454,35 +462,41 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "\n"
 	   "	for (i = 0; i < itersToDo; i++)\n"
 	   "	{\n"
-	   "		consec = 0;\n"
-	   "\n"
+#ifndef KNL_USE_GLOBAL_CONSEC
+       "		consec = 0;\n"
+#else
+       "		consec[blockStartThreadIndex] = 0;\n"
+#endif
+       "\n";
+
+    if (ember.XformCount() > 1)
+    {
+        //If xaos is present, the a hybrid of the cuburn method is used.
+        //This makes each thread in a row pick the same offset into a distribution, using xfsel.
+        //However, the distribution the offset is in, is determined by firstPoint.m_LastXfUsed.
+        if (ember.XaosPresent())
+        {
+            os <<
+#ifdef STRAIGHT_RAND
+               "		secondPoint.m_LastXfUsed = xformDistributions[(MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u) + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";
+#else
+               "		secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y] + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";//Partial cuburn hybrid.
+#endif
+        }
+        else
+        {
+            os <<
+#ifdef STRAIGHT_RAND
+               "		secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u];\n\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
+#else
+               "		secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y]];\n\n";
+#endif
+        }
+    }
+
+    os <<
 	   "		do\n"
 	   "		{\n";
-
-	if (ember.XformCount() > 1)
-	{
-		//If xaos is present, the a hybrid of the cuburn method is used.
-		//This makes each thread in a row pick the same offset into a distribution, using xfsel.
-		//However, the distribution the offset is in, is determined by firstPoint.m_LastXfUsed.
-		if (ember.XaosPresent())
-		{
-			os <<
-#ifdef STRAIGHT_RAND
-			   "			secondPoint.m_LastXfUsed = xformDistributions[(MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u) + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";
-#else
-			   "			secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y] + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";//Partial cuburn hybrid.
-#endif
-		}
-		else
-		{
-			os <<
-#ifdef STRAIGHT_RAND
-			   "			secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u];\n\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
-#else
-			   "			secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y]];\n\n";
-#endif
-		}
-	}
 
 	for (i = 0; i < ember.XformCount(); i++)
 	{
@@ -525,11 +539,19 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "				firstPoint.m_Y = MwcNextFRange(&mwc, -ember->m_RandPointRange, ember->m_RandPointRange);\n"
 	   "				firstPoint.m_Z = 0.0;\n"
 	   "				firstPoint.m_ColorX = secondPoint.m_ColorX;\n"
+#ifndef KNL_USE_GLOBAL_CONSEC
 	   "				consec++;\n"
+#else
+       "				consec[blockStartThreadIndex]++;\n"
+#endif
 	   //"				badvals++;\n"
 	   "			}\n"
 	   "		}\n"
+#ifndef KNL_USE_GLOBAL_CONSEC
 	   "		while (!ok && consec < 5);\n"
+#else
+       "		while (!ok && consec[blockStartThreadIndex] < 5);\n"
+#endif
 	   "\n"
 	   "		if (!ok)\n"
 	   "		{\n"
@@ -771,7 +793,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 
 #endif
 	   os <<
-	   "	barrier(CLK_GLOBAL_MEM_FENCE);\n"
+       "	barrier(CLK_GLOBAL_MEM_FENCE);\n"
+       //"	printf(\"Global ID0: %d Global ID1: %d WorkDim: %d ThreadIndex: %d\\n\", get_global_id(0), get_global_id(1), get_work_dim(), blockStartThreadIndex);\n"
 	   "}\n";
 	return os.str();
 }

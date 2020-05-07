@@ -53,3 +53,7 @@ using namespace std;
 using namespace EmberNs;
 //#define TEST_CL 1
 //#define TEST_CL_BUFFERS 1
+
+#ifdef __APPLE__
+    #define KNL_USE_GLOBAL_CONSEC
+#endif

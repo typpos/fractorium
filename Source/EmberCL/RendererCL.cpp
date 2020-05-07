@@ -727,7 +727,9 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 		if (b && !(b = device->m_Wrapper.AddBuffer(m_HistBufferName, size)))                                           { ErrorStr(loc, "Failed to set histogram buffer", device.get()); break; }//Histogram. Will memset to zero later.
 
 		if (b && !(b = device->m_Wrapper.AddBuffer(m_PointsBufferName, IterGridKernelCount() * sizeof(PointCL<T>))))   { ErrorStr(loc, "Failed to set points buffer", device.get()); break; }//Points between iter calls.
-
+#ifdef KNL_USE_GLOBAL_CONSEC
+        if (b && !(b = device->m_Wrapper.AddBuffer(m_ConsecBufferName, IterGridKernelCount() * sizeof(cl_uchar))))                     { ErrorStr(loc, "Failed to set consec buffer", device.get()); break; }//Global sequence.
+#endif
 		if (m_VarStates.size())
 			if (b && !(b = device->m_Wrapper.AddBuffer(m_VarStateBufferName, SizeOf(m_VarStates))))                        { ErrorStr(loc, "Failed to set variation state buffer", device.get()); break; }//Points between iter calls.
 
@@ -1085,8 +1087,8 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			//Similar to what's done in the base class.
 			//The number of iters per thread must be adjusted if they've requested less iters than is normally ran in a grid (256 * 256 * 64 * 2 = 32,768).
 			uint iterCountPerKernel = std::min<uint>(uint(adjustedIterCountPerKernel), uint(ceil(double(itersRemaining) / IterGridKernelCount())));
-			size_t iterCountThisLaunch = iterCountPerKernel * IterGridKernelWidth() * IterGridKernelHeight();
-			//cout << "itersRemaining " << itersRemaining << ", iterCountPerKernel " << iterCountPerKernel << ", iterCountThisLaunch " << iterCountThisLaunch << "\n";
+            size_t iterCountThisLaunch = iterCountPerKernel * IterGridKernelWidth() * IterGridKernelHeight();
+            //cout << "itersRemaining " << itersRemaining << ", iterCountPerKernel " << iterCountPerKernel << ", iterCountThisLaunch " << iterCountThisLaunch << "\n";
 
 			if (b && !(b = wrapper.SetArg	   (kernelIndex, argIndex++, iterCountPerKernel)))        { ErrorStr(loc, "Setting iter count argument failed", m_Devices[dev].get()); }//Number of iters for each thread to run.
 
@@ -1116,7 +1118,9 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 			if (b && !(b = wrapper.SetImageArg (kernelIndex, argIndex++, false, "Palette")))          { ErrorStr(loc, "Setting palette argument failed", m_Devices[dev].get()); }//Palette.
 
 			if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_PointsBufferName)))        { ErrorStr(loc, "Setting points buffer argument failed", m_Devices[dev].get()); }//Random start points.
-
+#ifdef KNL_USE_GLOBAL_CONSEC
+            if (b && !(b = wrapper.SetBufferArg(kernelIndex, argIndex++, m_ConsecBufferName)))        { ErrorStr(loc, "Setting consec buffer argument failed", m_Devices[dev].get()); }//Global sequence.
+#endif
 			if (b && !(b = wrapper.RunKernel(kernelIndex,
 											 IterGridKernelWidth(),//Total grid dims.
 											 IterGridKernelHeight(),

@@ -359,12 +359,12 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	os <<
 	   "	uint histSize,\n"
 	   "	__read_only image2d_t palette,\n"
-       "	__global Point* points"
+	   "	__global Point* points"
 #ifndef KNL_USE_GLOBAL_CONSEC
-       "\n"
+	   "\n"
 #else
-       ",\n"
-       "	__global uchar* consec\n"
+	   ",\n"
+	   "	__global uchar* consec\n"
 #endif
 	   "\t)\n"
 	   "{\n"
@@ -463,38 +463,38 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   "	for (i = 0; i < itersToDo; i++)\n"
 	   "	{\n"
 #ifndef KNL_USE_GLOBAL_CONSEC
-       "		consec = 0;\n"
+	   "		consec = 0;\n"
 #else
-       "		consec[blockStartThreadIndex] = 0;\n"
+	   "		consec[blockStartThreadIndex] = 0;\n"
 #endif
-       "\n";
+	   ;
 
-    if (ember.XformCount() > 1)
-    {
-        //If xaos is present, the a hybrid of the cuburn method is used.
-        //This makes each thread in a row pick the same offset into a distribution, using xfsel.
-        //However, the distribution the offset is in, is determined by firstPoint.m_LastXfUsed.
-        if (ember.XaosPresent())
-        {
-            os <<
+	if (ember.XformCount() > 1)
+	{
+		//If xaos is present, the a hybrid of the cuburn method is used.
+		//This makes each thread in a row pick the same offset into a distribution, using xfsel.
+		//However, the distribution the offset is in, is determined by firstPoint.m_LastXfUsed.
+		if (ember.XaosPresent())
+		{
+			os <<
 #ifdef STRAIGHT_RAND
-               "		secondPoint.m_LastXfUsed = xformDistributions[(MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u) + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";
+			   "		secondPoint.m_LastXfUsed = xformDistributions[(MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u) + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";
 #else
-               "		secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y] + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";//Partial cuburn hybrid.
+			   "		secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y] + (" << CHOOSE_XFORM_GRAIN << "u * (firstPoint.m_LastXfUsed + 1u))];\n\n";//Partial cuburn hybrid.
 #endif
-        }
-        else
-        {
-            os <<
+		}
+		else
+		{
+			os <<
 #ifdef STRAIGHT_RAND
-               "		secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u];\n\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
+			   "		secondPoint.m_LastXfUsed = xformDistributions[MwcNext(&mwc) & " << CHOOSE_XFORM_GRAIN_M1 << "u];\n\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
 #else
-               "		secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y]];\n\n";
+			   "		secondPoint.m_LastXfUsed = xformDistributions[xfsel[THREAD_ID_Y]];\n\n";
 #endif
-        }
-    }
+		}
+	}
 
-    os <<
+	os <<
 	   "		do\n"
 	   "		{\n";
 
@@ -542,7 +542,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 #ifndef KNL_USE_GLOBAL_CONSEC
 	   "				consec++;\n"
 #else
-       "				consec[blockStartThreadIndex]++;\n"
+	   "				consec[blockStartThreadIndex]++;\n"
 #endif
 	   //"				badvals++;\n"
 	   "			}\n"
@@ -550,7 +550,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 #ifndef KNL_USE_GLOBAL_CONSEC
 	   "		while (!ok && consec < 5);\n"
 #else
-       "		while (!ok && consec[blockStartThreadIndex] < 5);\n"
+	   "		while (!ok && consec[blockStartThreadIndex] < 5);\n"
 #endif
 	   "\n"
 	   "		if (!ok)\n"
@@ -793,8 +793,8 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 
 #endif
 	   os <<
-       "	barrier(CLK_GLOBAL_MEM_FENCE);\n"
-       //"	printf(\"Global ID0: %d Global ID1: %d WorkDim: %d ThreadIndex: %d\\n\", get_global_id(0), get_global_id(1), get_work_dim(), blockStartThreadIndex);\n"
+	   "	barrier(CLK_GLOBAL_MEM_FENCE);\n"
+	   //"	printf(\"Global ID0: %d Global ID1: %d WorkDim: %d ThreadIndex: %d\\n\", get_global_id(0), get_global_id(1), get_work_dim(), blockStartThreadIndex);\n"
 	   "}\n";
 	return os.str();
 }

@@ -2395,8 +2395,8 @@ public:
 	{
 		m_Ang = M_2PI / Zeps(m_Divisor);
 		T a = std::atan2((m_D < 0 ? -std::log(-m_D) : std::log(m_D)) * m_R, M_2PI);
-		m_PrecalcC = std::cos(a) * m_R * std::cos(a) / m_Divisor;
-		m_PrecalcD = std::cos(a) * m_R * std::sin(a) / m_Divisor;
+		m_PrecalcC = std::cos(a) * m_R * std::cos(a) / Zeps(m_Divisor);
+		m_PrecalcD = std::cos(a) * m_R * std::sin(a) / Zeps(m_Divisor);
 		m_HalfC = m_PrecalcC / 2;
 		m_HalfD = m_PrecalcD / 2;
 		m_Coeff = m_PrecalcD == 0 ? 0 : T(-0.095) * m_Spread / m_PrecalcD;

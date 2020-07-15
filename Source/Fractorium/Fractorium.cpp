@@ -382,8 +382,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	{
 		auto combo = ui.CurrentXformCombo;
 		bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-		int times = 3;
-		int ftimes = 2;
+		const int times = 3;
+		const int ftimes = 2;
 
 		if (ke->key() >= Qt::Key_F1 && ke->key() <= Qt::Key_F32)
 		{
@@ -391,7 +391,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 
 			if (fcount >= ftimes)
 			{
-				int val = ke->key() - (int)Qt::Key_F1;
+				const int val = ke->key() - (int)Qt::Key_F1;
 
 				if (val < combo->count())
 					combo->setCurrentIndex(val);
@@ -417,10 +417,10 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 		}
 		else if (o == this)
 		{
-			auto focusedctrlEdit = dynamic_cast<QLineEdit*>(this->focusWidget());
-			auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
-			auto focusedctrlDblSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
-			auto focusedctrlCombo = dynamic_cast<QComboBox*>(this->focusWidget());
+			const auto focusedctrlEdit = dynamic_cast<QLineEdit*>(this->focusWidget());
+			const auto focusedctrlSpin = dynamic_cast<QSpinBox*>(this->focusWidget());
+			const auto focusedctrlDblSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
+			const auto focusedctrlCombo = dynamic_cast<QComboBox*>(this->focusWidget());
 
 			if (!focusedctrlEdit &&
 					!focusedctrlSpin &&
@@ -434,11 +434,11 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 				double zoom = 1;
 				double rot = 1;
 				double grow = 0.01;
-				bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-				bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+				const bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+				const bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 				bool pre = true;
 
-				if (auto r = m_Controller->Renderer())
+				if (const auto r = m_Controller->Renderer())
 				{
 					hdist = std::abs(r->UpperRightX() - r->LowerLeftX()) * 0.01 * m_Controller->AffineScaleLockedToCurrent();
 					vdist = std::abs(r->UpperRightY() - r->LowerLeftY()) * 0.01 * m_Controller->AffineScaleLockedToCurrent();

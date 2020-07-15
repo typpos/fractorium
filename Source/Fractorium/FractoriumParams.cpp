@@ -58,7 +58,7 @@ void Fractorium::InitParamsUI()
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_CenterYSpin,     spinHeight, -dmax,    dmax,  0.05, SIGNAL(valueChanged(double)), SLOT(OnCenterYChanged(double)),     true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ScaleSpin,       spinHeight,    10,    dmax,    20, SIGNAL(valueChanged(double)), SLOT(OnScaleChanged(double)),	     true,  240, 240, 240);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZoomSpin,        spinHeight,     0,      25,   0.2, SIGNAL(valueChanged(double)), SLOT(OnZoomChanged(double)),	     true,	  0,   0,	0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight,  -180,     180,    10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
+    SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotateSpin,      spinHeight, -dmax,    dmax,    10, SIGNAL(valueChanged(double)), SLOT(OnRotateChanged(double)),      true,	  0,   0,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_ZPosSpin,        spinHeight, -1000,    1000,   0.1, SIGNAL(valueChanged(double)), SLOT(OnZPosChanged(double)),        true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PerspectiveSpin, spinHeight,  -500,     500,  0.01, SIGNAL(valueChanged(double)), SLOT(OnPerspectiveChanged(double)), true,	  0,   1,	0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_PitchSpin,       spinHeight, -dmax,    dmax,     1, SIGNAL(valueChanged(double)), SLOT(OnPitchChanged(double)),       true,	  0,  45,	0);
@@ -421,7 +421,15 @@ template <typename T> void FractoriumEmberController<T>::RotateChanged(double d)
 		ember.m_Rotate = d;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
-void Fractorium::OnRotateChanged(double d) { m_Controller->RotateChanged(d); }
+void Fractorium::OnRotateChanged(double d)
+{
+    if(d < -180)
+        d = 180 - ((-d + m_RotateSpin->value()) - (180 + m_RotateSpin->value()));
+    else if(d > 180)
+        d = -180 + ((d - m_RotateSpin->value()) - (180 - m_RotateSpin->value()));
+
+    m_Controller->RotateChanged(d); // d is ever between -180 and +180
+}
 
 template <typename T> void FractoriumEmberController<T>::ZPosChanged(double d)
 {

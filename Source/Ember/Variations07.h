@@ -7564,6 +7564,199 @@ private:
 	T m_Yfact001;//Precalc.
 };
 
+/// <summary>
+/// vignette by Bezo97.
+/// </summary>
+template <typename T>
+class VignetteVariation : public ParametricVariation<T>
+{
+public:
+	VignetteVariation(T weight = 1.0) : ParametricVariation<T>("vignette", eVariationId::VAR_VIGNETTE, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(VignetteVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T px = helper.In.x;
+		T py = helper.In.y;
+		T dist = std::sqrt((px - m_Posx) * (px - m_Posx) + (py - m_Posy) * (py - m_Posy));
+
+		if (dist < m_InnerabsPrecalc)
+		{
+			helper.Out.z = DefaultZ(helper);
+
+			//middle part
+			if (m_Innerradius < 0.0)
+			{
+				helper.Out.x = 0;
+				helper.Out.y = 0;
+				return;
+			}
+
+			helper.Out.x = px * m_Weight;
+			helper.Out.y = py * m_Weight;
+			return;
+		}
+
+		//map to 0-1
+		dist = (dist - m_InnerabsPrecalc) / m_FadeabsPrecalc;
+		T fade = T(1.0) - std::pow(rand.Frand01<T>(), m_PowerhelperPrecalc);
+		T blur_r = m_Blur * std::pow(dist * rand.Frand01<T>(), T(2.0));
+		T blur_a = rand.Frand01<T>() * M_2PI;
+
+		if (m_Faderadius > 0)
+		{
+			//vignette
+			if (fade < dist)
+			{
+				px = 0;
+				py = 0;
+			}
+			else
+			{
+				px += blur_r * std::cos(blur_a);
+				py += blur_r * std::sin(blur_a);
+			}
+		}
+		else
+		{
+			//inverse vignette
+			if (1 - fade > dist)
+			{
+				px = 0;
+				py = 0;
+			}
+			else
+			{
+				px += blur_r * std::cos(blur_a);
+				py += blur_r * std::sin(blur_a);
+			}
+		}
+
+		helper.Out.x = px * m_Weight;
+		helper.Out.y = py * m_Weight;
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0, varIndex = IndexInXform();
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index              = ss2.str();
+		string weight             = WeightDefineString();
+		string posx               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string posy               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string innerradius        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string faderadius         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power              = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string blur               = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string innerabsprecalc    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string fadeabsprecalc     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string powerhelperprecalc = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t px = vIn.x;\n"
+		   << "\t\treal_t py = vIn.y;\n"
+		   << "\t\treal_t dist = sqrt((px - " << posx << ") * (px - " << posx << ") + (py - " << posy << ") * (py - " << posy << "));\n"
+		   << "\n"
+		   << "\t\tif (dist < " << innerabsprecalc << ")\n"
+		   << "\t\t{\n"
+		   << "\t\t\tvOut.z = " << DefaultZCl()
+		   << "\n"
+		   << "\t\t\tif (" << innerradius << " < (real_t)(0.0))\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tvOut.x = (real_t)(0.0);\n"
+		   << "\t\t\t\tvOut.y = (real_t)(0.0);\n"
+		   << "\t\t\t\treturn;\n"
+		   << "\t\t\t}\n"
+		   << "\n"
+		   << "\t\t\tvOut.x = px * " << weight << ";\n"
+		   << "\t\t\tvOut.y = py * " << weight << ";\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tdist = (dist - " << innerabsprecalc << ") / " << fadeabsprecalc << ";\n"
+		   << "\n"
+		   << "\t\treal_t fade = (real_t)(1.0) - pow(MwcNext01(mwc), " << powerhelperprecalc << ");\n"
+		   << "\t\treal_t blur_r = " << blur << " * pow(dist * MwcNext01(mwc), (real_t)(2.0));\n"
+		   << "\t\treal_t blur_a = MwcNext01(mwc) * M_2PI;\n"
+		   << "\n"
+		   << "\t\tif (" << faderadius << " > 0.0)\n"
+		   << "\t\t{\n"
+		   << "\t\t\tif (fade < dist)\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tpx = (real_t)(0.0);\n"
+		   << "\t\t\t\tpy = (real_t)(0.0);\n"
+		   << "\t\t\t}\n"
+		   << "\t\t\telse\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tpx += blur_r * cos(blur_a);\n"
+		   << "\t\t\t\tpy += blur_r * sin(blur_a);\n"
+		   << "\t\t\t}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t\tif (1 - fade > dist)\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tpx = (real_t)(0.0);\n"
+		   << "\t\t\t\tpy = (real_t)(0.0);\n"
+		   << "\t\t\t}\n"
+		   << "\t\t\telse\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tpx += blur_r * cos(blur_a);\n"
+		   << "\t\t\t\tpy += blur_r * sin(blur_a);\n"
+		   << "\t\t\t}\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\tvOut.x = px * " << weight << ";\n"
+		   << "\t\tvOut.y = py * " << weight << ";\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_InnerabsPrecalc = std::abs(m_Innerradius);
+		m_FadeabsPrecalc = std::abs(m_Faderadius);
+		m_PowerhelperPrecalc = T(1.0) / std::abs(m_Power);
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Zeps" };
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_Posx, prefix + "vignette_posx"));
+		m_Params.push_back(ParamWithName<T>(&m_Posy, prefix + "vignette_posy"));
+		m_Params.push_back(ParamWithName<T>(&m_Innerradius, prefix + "vignette_inner_radius", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_Faderadius, prefix + "vignette_fade_radius", T(0.5), eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "vignette_power", T(4.0), eParamType::REAL_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Blur, prefix + "vignette_blur", T(1.0)));
+		m_Params.push_back(ParamWithName<T>(true, &m_InnerabsPrecalc, prefix + "vignette_inner_abs_precalc"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_FadeabsPrecalc, prefix + "vignette_fade_abs_precalc"));
+		m_Params.push_back(ParamWithName<T>(true, &m_PowerhelperPrecalc, prefix + "vignette_power_helper_precalc"));
+	}
+
+private:
+	T m_Posx;
+	T m_Posy;
+	T m_Innerradius;
+	T m_Faderadius;
+	T m_Power;
+	T m_Blur;
+	T m_InnerabsPrecalc;//Precalc.
+	T m_FadeabsPrecalc;
+	T m_PowerhelperPrecalc;
+};
+
 MAKEPREPOSTPARVAR(Splits3D, splits3D, SPLITS3D)
 MAKEPREPOSTPARVAR(Waves2B, waves2b, WAVES2B)
 MAKEPREPOSTPARVAR(JacCn, jac_cn, JAC_CN)
@@ -7634,4 +7827,5 @@ MAKEPREPOSTPARVAR(Waves23, waves23, WAVES23)
 MAKEPREPOSTPARVAR(Waves42, waves42, WAVES42)
 MAKEPREPOSTPARVAR(Waves3, waves3, WAVES3)
 MAKEPREPOSTPARVAR(Waves4, waves4, WAVES4)
+MAKEPREPOSTPARVAR(Vignette, vignette, VIGNETTE)
 }

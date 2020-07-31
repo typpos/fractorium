@@ -439,6 +439,7 @@ VariationList<T>::VariationList()
 	ADDPREPOSTREGVAR(Gnarly)
 	ADDPREPOSTREGVAR(Inkdrop)
 	ADDPREPOSTREGVAR(HexModulus)
+	ADDPREPOSTREGVAR(Vignette)
 	//ADDPREPOSTREGVAR(LinearXZ)
 	//ADDPREPOSTREGVAR(LinearYZ)
 	//DC are special.

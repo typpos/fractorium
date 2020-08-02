@@ -7583,11 +7583,10 @@ public:
 		T px = helper.In.x;
 		T py = helper.In.y;
 		T dist = std::sqrt((px - m_Posx) * (px - m_Posx) + (py - m_Posy) * (py - m_Posy));
+		helper.Out.z = DefaultZ(helper);
 
 		if (dist < m_InnerabsPrecalc)
 		{
-			helper.Out.z = DefaultZ(helper);
-
 			//middle part
 			if (m_Innerradius < 0.0)
 			{
@@ -7638,7 +7637,6 @@ public:
 
 		helper.Out.x = px * m_Weight;
 		helper.Out.y = py * m_Weight;
-		helper.Out.z = DefaultZ(helper);
 	}
 
 	virtual string OpenCLString() const override
@@ -7662,57 +7660,59 @@ public:
 		   << "\t\treal_t py = vIn.y;\n"
 		   << "\t\treal_t dist = sqrt((px - " << posx << ") * (px - " << posx << ") + (py - " << posy << ") * (py - " << posy << "));\n"
 		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\n"
 		   << "\t\tif (dist < " << innerabsprecalc << ")\n"
 		   << "\t\t{\n"
-		   << "\t\t\tvOut.z = " << DefaultZCl()
-		   << "\n"
 		   << "\t\t\tif (" << innerradius << " < (real_t)(0.0))\n"
 		   << "\t\t\t{\n"
 		   << "\t\t\t\tvOut.x = (real_t)(0.0);\n"
 		   << "\t\t\t\tvOut.y = (real_t)(0.0);\n"
-		   << "\t\t\t\treturn;\n"
+		   << "\t\t\t}\n"
+		   << "\t\t\telse\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tvOut.x = px * " << weight << ";\n"
+		   << "\t\t\t\tvOut.y = py * " << weight << ";\n"
+		   << "\t\t\t}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t\tdist = (dist - " << innerabsprecalc << ") / " << fadeabsprecalc << ";\n"
+		   << "\n"
+		   << "\t\t\treal_t fade = (real_t)(1.0) - pow(MwcNext01(mwc), " << powerhelperprecalc << ");\n"
+		   << "\t\t\treal_t blur_r = " << blur << " * pow(dist * MwcNext01(mwc), (real_t)(2.0));\n"
+		   << "\t\t\treal_t blur_a = MwcNext01(mwc) * M_2PI;\n"
+		   << "\n"
+		   << "\t\t\tif (" << faderadius << " > 0.0)\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tif (fade < dist)\n"
+		   << "\t\t\t\t{\n"
+		   << "\t\t\t\t\tpx = (real_t)(0.0);\n"
+		   << "\t\t\t\t\tpy = (real_t)(0.0);\n"
+		   << "\t\t\t\t}\n"
+		   << "\t\t\t\telse\n"
+		   << "\t\t\t\t{\n"
+		   << "\t\t\t\t\tpx += blur_r * cos(blur_a);\n"
+		   << "\t\t\t\t\tpy += blur_r * sin(blur_a);\n"
+		   << "\t\t\t\t}\n"
+		   << "\t\t\t}\n"
+		   << "\t\t\telse\n"
+		   << "\t\t\t{\n"
+		   << "\t\t\t\tif (1 - fade > dist)\n"
+		   << "\t\t\t\t{\n"
+		   << "\t\t\t\t\tpx = (real_t)(0.0);\n"
+		   << "\t\t\t\t\tpy = (real_t)(0.0);\n"
+		   << "\t\t\t\t}\n"
+		   << "\t\t\t\telse\n"
+		   << "\t\t\t\t{\n"
+		   << "\t\t\t\t\tpx += blur_r * cos(blur_a);\n"
+		   << "\t\t\t\t\tpy += blur_r * sin(blur_a);\n"
+		   << "\t\t\t\t}\n"
 		   << "\t\t\t}\n"
 		   << "\n"
 		   << "\t\t\tvOut.x = px * " << weight << ";\n"
 		   << "\t\t\tvOut.y = py * " << weight << ";\n"
 		   << "\t\t}\n"
-		   << "\n"
-		   << "\t\tdist = (dist - " << innerabsprecalc << ") / " << fadeabsprecalc << ";\n"
-		   << "\n"
-		   << "\t\treal_t fade = (real_t)(1.0) - pow(MwcNext01(mwc), " << powerhelperprecalc << ");\n"
-		   << "\t\treal_t blur_r = " << blur << " * pow(dist * MwcNext01(mwc), (real_t)(2.0));\n"
-		   << "\t\treal_t blur_a = MwcNext01(mwc) * M_2PI;\n"
-		   << "\n"
-		   << "\t\tif (" << faderadius << " > 0.0)\n"
-		   << "\t\t{\n"
-		   << "\t\t\tif (fade < dist)\n"
-		   << "\t\t\t{\n"
-		   << "\t\t\t\tpx = (real_t)(0.0);\n"
-		   << "\t\t\t\tpy = (real_t)(0.0);\n"
-		   << "\t\t\t}\n"
-		   << "\t\t\telse\n"
-		   << "\t\t\t{\n"
-		   << "\t\t\t\tpx += blur_r * cos(blur_a);\n"
-		   << "\t\t\t\tpy += blur_r * sin(blur_a);\n"
-		   << "\t\t\t}\n"
-		   << "\t\t}\n"
-		   << "\t\telse\n"
-		   << "\t\t{\n"
-		   << "\t\t\tif (1 - fade > dist)\n"
-		   << "\t\t\t{\n"
-		   << "\t\t\t\tpx = (real_t)(0.0);\n"
-		   << "\t\t\t\tpy = (real_t)(0.0);\n"
-		   << "\t\t\t}\n"
-		   << "\t\t\telse\n"
-		   << "\t\t\t{\n"
-		   << "\t\t\t\tpx += blur_r * cos(blur_a);\n"
-		   << "\t\t\t\tpy += blur_r * sin(blur_a);\n"
-		   << "\t\t\t}\n"
-		   << "\t\t}\n"
-		   << "\n"
-		   << "\t\tvOut.x = px * " << weight << ";\n"
-		   << "\t\tvOut.y = py * " << weight << ";\n"
-		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}

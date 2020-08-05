@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<?define ProductVersion="1.0.0.20" ?>
+	<?define ProductVersion="1.0.0.21" ?>
 	<?define ProductName="Fractorium $(var.ProductVersion) ($(var.GpuType))" ?>
 	<?define UpgradeCode="{4714cd15-bfba-44f6-8059-9e1466ebfa6e}"?>
 	<?define Manufacturer="Fractorium"?>
@@ -13,7 +13,7 @@
 	<!--
 	Change this for every release.
 	-->
-	<?define ProductCode="{A91C2097-2043-4A70-B3E9-F93426567195}"?>
+	<?define ProductCode="{3BDFCE16-0944-4463-B475-82748BDC0AF1}"?>
 	
 	<Product Id="$(var.ProductCode)" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package
@@ -168,19 +168,19 @@
 				<File Id="tbb.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\tbb.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
 			<Component Id="msvcp140.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
-				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.26.28720\x64\Microsoft.VC142.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="vcruntime140.dll" Guid="50c9bc27-c547-4a03-9f6c-cd416f449dd8">
-				<File Id="vcruntime140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="vcruntime140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.26.28720\x64\Microsoft.VC142.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="vcruntime140_1.dll" Guid="a02507f8-326b-45b2-b734-e5091921559f">
-				<File Id="vcruntime140_1.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vcruntime140_1.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="vcruntime140_1.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.26.28720\x64\Microsoft.VC142.CRT\vcruntime140_1.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="vccorlib140.dll" Guid="affe33e7-1e64-4bb0-a062-2b56f77459b4">
-				<File Id="vccorlib140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="vccorlib140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.26.28720\x64\Microsoft.VC142.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="concrt140.dll" Guid="7fb716a1-1b4f-42fb-89c7-4d216ebd6e2e">
-				<File Id="concrt140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="concrt140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.26.28720\x64\Microsoft.VC142.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="flam3palettes.xml" Guid="d3adb0bb-14ef-4923-99d9-a5784b7ef04e">
 				<File Id="flam3palettes.xml" Source="$(var.SolutionDir)..\..\..\Data\flam3-palettes.xml" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>

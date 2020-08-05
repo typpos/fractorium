@@ -1198,7 +1198,15 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 			std::string periterweights;
 
 			if (auto baseWeightChildNode = GetChildNode(weightsChildNode, "base_weight"))
-				if (ParseAndAssignContent(baseWeightChildNode, "name", "base_weight", weight)) { xf.m_Weight = weight; }
+			{
+				if (ParseAndAssignContent(baseWeightChildNode, "name", "base_weight", weight))
+					xf.m_Weight = weight;
+			}
+			else if (auto baseWeightChildNode = GetChildNode(weightsChildNode, "Base weight"))
+			{
+				if (ParseAndAssignContent(baseWeightChildNode, "name", "Base weight", weight))
+					xf.m_Weight = weight;
+			}
 
 			if (auto periterweightsChildNode = GetChildNode(weightsChildNode, "per_iterator_weights"))
 			{

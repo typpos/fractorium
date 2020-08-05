@@ -7,10 +7,11 @@
 void Fractorium::InitLibraryUI()
 {
 	ui.LibraryTree->SetMainWindow(this);
-	connect(ui.LibraryTree,  SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemChanged(QTreeWidgetItem*, int)),	    Qt::QueuedConnection);
+	//Making the TreeItemChanged() events use a direct connection is absolutely critical.
+	connect(ui.LibraryTree,  SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemChanged(QTreeWidgetItem*, int)),	    Qt::DirectConnection);
 	connect(ui.LibraryTree,  SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
 	connect(ui.LibraryTree,  SIGNAL(itemActivated(QTreeWidgetItem*, int)),	   this, SLOT(OnEmberTreeItemDoubleClicked(QTreeWidgetItem*, int)), Qt::QueuedConnection);
-	connect(ui.SequenceTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnSequenceTreeItemChanged(QTreeWidgetItem*, int)),	Qt::QueuedConnection);
+	connect(ui.SequenceTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)),	   this, SLOT(OnSequenceTreeItemChanged(QTreeWidgetItem*, int)),	Qt::DirectConnection);
 	connect(ui.SequenceStartPreviewsButton, SIGNAL(clicked(bool)), this, SLOT(OnSequenceStartPreviewsButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.SequenceStopPreviewsButton,  SIGNAL(clicked(bool)), this, SLOT(OnSequenceStopPreviewsButtonClicked(bool)),  Qt::QueuedConnection);
 	connect(ui.SequenceAllButton,           SIGNAL(clicked(bool)), this, SLOT(OnSequenceAllButtonClicked(bool)),           Qt::QueuedConnection);
@@ -68,7 +69,7 @@ void Fractorium::InitLibraryUI()
 /// <param name="index">The 0-based index of the item in the library tree to select</param>
 void Fractorium::SelectLibraryItem(size_t index)
 {
-	if (auto top = ui.LibraryTree->topLevelItem(0))
+	if (const auto top = ui.LibraryTree->topLevelItem(0))
 	{
 		for (int i = 0; i < top->childCount(); i++)
 		{
@@ -89,10 +90,10 @@ vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex()
 {
 	int index = 0;
 	QTreeWidgetItem* item = nullptr;
-	auto tree = ui.LibraryTree;
+	const auto tree = ui.LibraryTree;
 	vector<pair<size_t, QTreeWidgetItem*>> v;
 
-	if (auto top = tree->topLevelItem(0))
+	if (const auto top = tree->topLevelItem(0))
 	{
 		for (int i = 0; i < top->childCount(); i++)//Iterate through all of the children, which will represent the open embers.
 		{
@@ -117,7 +118,7 @@ vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex()
 /// <param name="h">The height of the bitmap</param>
 void Fractorium::SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h)
 {
-	m_PreviewVec.resize(w * h * 4);
+	m_PreviewVec.resize(size_t(w) * size_t(h) * 4);
 	Rgba32ToRgba8(v.data(), m_PreviewVec.data(), w, h, m_Settings->Transparency());
 	item->SetImage(m_PreviewVec, w, h);
 }
@@ -131,9 +132,9 @@ template <typename T>
 void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 {
 	auto it = m_EmberFile.m_Embers.begin();
-	auto tree = m_Fractorium->ui.LibraryTree;
+	const auto tree = m_Fractorium->ui.LibraryTree;
 
-	if (auto top = tree->topLevelItem(0))
+	if (const auto top = tree->topLevelItem(0))
 	{
 		for (int i = 0; i < top->childCount() && it != m_EmberFile.m_Embers.end(); ++i, ++it)//Iterate through all of the children, which will represent the open embers.
 		{
@@ -166,11 +167,10 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 {
 	uint size = 64;
 	uint i = 0;
-	auto tree = m_Fractorium->ui.LibraryTree;
+	const auto tree = m_Fractorium->ui.LibraryTree;
 	vector<byte> v(size * size * 4);
 	StopAllPreviewRenderers();
 	tree->clear();
-	QCoreApplication::processEvents();
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_EmberFile.m_Filename);
 	fileItem->setText(0, info.fileName());
@@ -205,13 +205,13 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 template <typename T>
 void FractoriumEmberController<T>::UpdateLibraryTree()
 {
-	uint size = 64;
+	const uint size = 64;
 	vector<byte> v(size * size * 4);
-	auto tree = m_Fractorium->ui.LibraryTree;
+	const auto tree = m_Fractorium->ui.LibraryTree;
 
 	if (auto top = tree->topLevelItem(0))
 	{
-		int origChildCount = top->childCount();
+		const int origChildCount = top->childCount();
 		int i = origChildCount;
 
 		for (auto it = Advance(m_EmberFile.m_Embers.begin(), i); it != m_EmberFile.m_Embers.end(); ++it)
@@ -249,24 +249,23 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 {
 	try
 	{
-		auto tree = m_Fractorium->ui.LibraryTree;
+		const auto tree = m_Fractorium->ui.LibraryTree;
 
 		if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item))
 		{
-			if (!emberItem->isSelected())//Checking/unchecking other items shouldn't perform the processing below.
+			auto oldName = emberItem->GetEmber()->m_Name;//First preserve the previous name.
+			auto newName = emberItem->text(0).toStdString();
+
+			//Checking/unchecking other items shouldn't perform the processing below.
+			//If nothing changed, nothing to do.
+			if (!emberItem->isSelected() && newName == oldName)
 				return;
 
-			if (emberItem->text(0).isEmpty())//Prevent empty string.
+			if (newName.empty())//Prevent empty string.
 			{
 				emberItem->UpdateEditText();
 				return;
 			}
-
-			string oldName = emberItem->GetEmber()->m_Name;//First preserve the previous name.
-			string newName = emberItem->text(0).toStdString();
-
-			if (oldName == newName)//If nothing changed, nothing to do.
-				return;
 
 			emberItem->UpdateEmberName();//Copy edit text to the ember's name variable.
 			m_EmberFile.MakeNamesUnique();//Ensure all names remain unique.
@@ -281,7 +280,7 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 		}
 		else if (auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
 		{
-			QString text = parentItem->text(0);
+			auto text = parentItem->text(0);
 
 			if (text != "")
 			{
@@ -298,7 +297,7 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 
 void Fractorium::OnEmberTreeItemChanged(QTreeWidgetItem* item, int col)
 {
-	if (ui.LibraryTree->topLevelItemCount())//This can sometimes be spurriously called even when the tree is empty.
+	if (item && ui.LibraryTree->topLevelItemCount())//This can sometimes be spurriously called even when the tree is empty.
 		m_Controller->EmberTreeItemChanged(item, col);
 }
 
@@ -334,9 +333,9 @@ template <typename T>
 void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items, int destRow)
 {
 	int i = 0;
-	auto startRow = items[0].row();
-	auto tree = m_Fractorium->ui.LibraryTree;
-	auto top = tree->topLevelItem(0);
+	const auto startRow = items[0].row();
+	const auto tree = m_Fractorium->ui.LibraryTree;
+	const auto top = tree->topLevelItem(0);
 	list<string> names;
 
 	for (auto& item : items)
@@ -344,7 +343,7 @@ void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items
 			names.push_back(temp->m_Name);
 
 	auto b = m_EmberFile.m_Embers.begin();
-	auto result = Gather(b, m_EmberFile.m_Embers.end(), Advance(b, destRow), [&](const Ember<T>& ember)
+	const auto result = Gather(b, m_EmberFile.m_Embers.end(), Advance(b, destRow), [&](const Ember<T>& ember)
 	{
 		auto position = std::find(names.begin(), names.end(), ember.m_Name);
 
@@ -387,7 +386,7 @@ void FractoriumEmberController<T>::Delete(const vector<pair<size_t, QTreeWidgetI
 	}
 
 	//Select the next item in the tree closest to the last one that was deleted.
-	if (auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
+	if (const auto top = m_Fractorium->ui.LibraryTree->topLevelItem(0))
 	{
 		last = std::min<uint>(top->childCount() - 1, last);
 
@@ -421,9 +420,9 @@ void FractoriumEmberController<T>::RenderPreviews(QTreeWidget* tree, TreePreview
 
 	if (start == UINT_MAX && end == UINT_MAX)
 	{
-		if (auto top = tree->topLevelItem(0))
+		if (const auto top = tree->topLevelItem(0))
 		{
-			int childCount = top->childCount();
+			const auto childCount = top->childCount();
 			vector<byte> emptyPreview(PREVIEW_SIZE * PREVIEW_SIZE * 4);
 
 			for (int i = 0; i < childCount; i++)
@@ -469,13 +468,12 @@ void FractoriumEmberController<T>::StopAllPreviewRenderers()
 template <typename T>
 void FractoriumEmberController<T>::FillSequenceTree()
 {
-	uint size = 64;
+	const uint size = 64;
 	uint i = 0;
-	auto tree = m_Fractorium->ui.SequenceTree;
+	const auto tree = m_Fractorium->ui.SequenceTree;
 	vector<byte> v(size * size * 4);
 	m_SequencePreviewRenderer->Stop();
 	tree->clear();
-	QCoreApplication::processEvents();//Having to flush events is usually a sign of poor design. However, in this case, it's critical to have this here, else rapid button clicks will crash.
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_SequenceFile.m_Filename);
 	fileItem->setText(0, info.fileName());
@@ -512,7 +510,7 @@ void FractoriumEmberController<T>::SequenceTreeItemChanged(QTreeWidgetItem* item
 {
 	if (item == m_Fractorium->ui.SequenceTree->topLevelItem(0))
 	{
-		QString text = item->text(0);
+		auto text = item->text(0);
 
 		if (text != "")
 			m_SequenceFile.m_Filename = text;
@@ -521,7 +519,7 @@ void FractoriumEmberController<T>::SequenceTreeItemChanged(QTreeWidgetItem* item
 
 void Fractorium::OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col)
 {
-	if (ui.SequenceTree->topLevelItemCount())
+	if (item && ui.SequenceTree->topLevelItemCount())
 		m_Controller->SequenceTreeItemChanged(item, col);
 }
 
@@ -549,9 +547,9 @@ void Fractorium::OnSequenceStopPreviewsButtonClicked(bool checked) { m_Controlle
 /// </summary>
 void Fractorium::SyncFileCountToSequenceCount()
 {
-	if (auto top = ui.LibraryTree->topLevelItem(0))
+	if (const auto top = ui.LibraryTree->topLevelItem(0))
 	{
-		int count = top->childCount() - 1;
+		const int count = top->childCount() - 1;
 		ui.LibraryTree->headerItem()->setText(0, "Current Flame File (" + QString::number(top->childCount()) + ")");
 		ui.SequenceStartFlameSpinBox->setMinimum(0);
 		ui.SequenceStartFlameSpinBox->setMaximum(count);
@@ -581,33 +579,33 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	auto& ui = m_Fractorium->ui;
 	auto s = m_Fractorium->m_Settings;
 	//Bools for determining whether to use hard coded vs. random values.
-	bool randStagger = ui.SequenceRandomizeStaggerCheckBox->isChecked();
-	bool randFramesRot = ui.SequenceRandomizeFramesPerRotCheckBox->isChecked();
-	bool randRot = ui.SequenceRandomizeRotationsCheckBox->isChecked();
-	bool randBlend = ui.SequenceRandomizeBlendFramesCheckBox->isChecked();
-	bool randBlendRot = ui.SequenceRandomizeRotationsPerBlendCheckBox->isChecked();
+	const bool randStagger = ui.SequenceRandomizeStaggerCheckBox->isChecked();
+	const bool randFramesRot = ui.SequenceRandomizeFramesPerRotCheckBox->isChecked();
+	const bool randRot = ui.SequenceRandomizeRotationsCheckBox->isChecked();
+	const bool randBlend = ui.SequenceRandomizeBlendFramesCheckBox->isChecked();
+	const bool randBlendRot = ui.SequenceRandomizeRotationsPerBlendCheckBox->isChecked();
 	//The direction to rotate the loops.
-	bool loopsCw = ui.SequenceRotationsCWCheckBox->isChecked();
-	bool loopsBlendCw = ui.SequenceRotationsPerBlendCWCheckBox->isChecked();
+	const bool loopsCw = ui.SequenceRotationsCWCheckBox->isChecked();
+	const bool loopsBlendCw = ui.SequenceRotationsPerBlendCWCheckBox->isChecked();
 	//Whether to stagger, default is 1 which means no stagger.
-	double stagger = ui.SequenceStaggerSpinBox->value();
-	double staggerMax = ui.SequenceRandomStaggerMaxSpinBox->value();
+	const double stagger = ui.SequenceStaggerSpinBox->value();
+	const double staggerMax = ui.SequenceRandomStaggerMaxSpinBox->value();
 	//Rotations on keyframes.
-	double rots = ui.SequenceRotationsSpinBox->value();
-	double rotsMax = ui.SequenceRandomRotationsMaxSpinBox->value();
+	const double rots = ui.SequenceRotationsSpinBox->value();
+	const double rotsMax = ui.SequenceRandomRotationsMaxSpinBox->value();
 	//Number of frames it takes to rotate a keyframe.
-	int framesPerRot = ui.SequenceFramesPerRotSpinBox->value();
-	int framesPerRotMax = ui.SequenceRandomFramesPerRotMaxSpinBox->value();
+	const int framesPerRot = ui.SequenceFramesPerRotSpinBox->value();
+	const int framesPerRotMax = ui.SequenceRandomFramesPerRotMaxSpinBox->value();
 	//Number of frames it takes to interpolate.
-	int framesBlend = ui.SequenceBlendFramesSpinBox->value();
-	int framesBlendMax = ui.SequenceRandomBlendMaxFramesSpinBox->value();
+	const int framesBlend = ui.SequenceBlendFramesSpinBox->value();
+	const int framesBlendMax = ui.SequenceRandomBlendMaxFramesSpinBox->value();
 	//Number of rotations performed during interpolation.
-	int rotsPerBlend = ui.SequenceRotationsPerBlendSpinBox->value();
-	int rotsPerBlendMax = ui.SequenceRotationsPerBlendMaxSpinBox->value();
-	size_t start = ui.SequenceStartFlameSpinBox->value();
-	size_t stop = ui.SequenceStopFlameSpinBox->value();
-	size_t startCount = ui.SequenceStartCountSpinBox->value();
-	size_t keyFrames = (stop - start) + 1;
+	const int rotsPerBlend = ui.SequenceRotationsPerBlendSpinBox->value();
+	const int rotsPerBlendMax = ui.SequenceRotationsPerBlendMaxSpinBox->value();
+	const size_t start = ui.SequenceStartFlameSpinBox->value();
+	const size_t stop = ui.SequenceStopFlameSpinBox->value();
+	const size_t startCount = ui.SequenceStartCountSpinBox->value();
+	const size_t keyFrames = (stop - start) + 1;
 	size_t frameCount = 0;
 	double frames = 0;
 	vector<pair<size_t, size_t>> devices;//Dummy.
@@ -674,18 +672,18 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	double blend;
 	size_t frame;
 	Ember<T> embers[2];//Spin needs contiguous array below, and this will also get modified, so a copy is needed to avoid modifying the embers in the original file.
-	auto padding = streamsize(std::log10(frames)) + 1;
+	const auto padding = streamsize(std::log10(frames)) + 1;
 	auto it = Advance(m_EmberFile.m_Embers.begin(), start);
 
 	for (size_t i = start; i <= stop && it != m_EmberFile.m_Embers.end(); i++, ++it)
 	{
-		double rotations = randRot ? m_Rand.Frand<double>(rots, rotsMax) : rots;
+		const auto rotations = randRot ? m_Rand.Frand<double>(rots, rotsMax) : rots;
 		embers[0] = *it;
 
 		if (rotations > 0)
 		{
-			double rotFrames = randFramesRot ? m_Rand.Frand<double>(framesPerRot, framesPerRotMax) : framesPerRot;
-			size_t roundFrames = size_t(std::round(rotFrames * rotations));
+			const auto rotFrames = randFramesRot ? m_Rand.Frand<double>(framesPerRot, framesPerRotMax) : framesPerRot;
+			const auto roundFrames = size_t(std::round(rotFrames * rotations));
 
 			for (frame = 0; frame < roundFrames; frame++)
 			{
@@ -711,9 +709,9 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 
 			auto it2 = it;//Need a quick temporary to avoid modifying it which is used in the loop.
 			embers[1] = *(++it2);//Get the next ember to be used with blending below.
-			size_t blendFrames = randBlend ? m_Rand.Frand<double>(framesBlend, framesBlendMax) : framesBlend;
-			double d = randBlendRot ? m_Rand.Frand<double>(rotsPerBlend, rotsPerBlendMax) : double(rotsPerBlend);
-			size_t rpb = size_t(std::round(d));
+			const auto blendFrames = randBlend ? m_Rand.Frand<double>(framesBlend, framesBlendMax) : framesBlend;
+			const auto d = randBlendRot ? m_Rand.Frand<double>(rotsPerBlend, rotsPerBlendMax) : double(rotsPerBlend);
+			const auto rpb = size_t(std::round(d));
 
 			if (randStagger)
 				tools.Stagger(m_Rand.Frand<double>(stagger, staggerMax));
@@ -722,7 +720,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 			{
 				//if (frame == 43)
 				//	cout << frame << endl;
-				bool seqFlag = frame == 0 || (frame == blendFrames - 1);
+				const auto seqFlag = frame == 0 || (frame == blendFrames - 1);
 				blend = frame / double(blendFrames);
 				result.Clear();
 				tools.SpinInter(&embers[0], nullptr, result, startCount + frameCount++, seqFlag, blend, rpb, loopsBlendCw);

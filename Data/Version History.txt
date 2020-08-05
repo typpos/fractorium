@@ -1,4 +1,4 @@
-1.0.0.20 4/11/2020
+1.0.0.21 4/11/2020
 --Bug fixes
  -ETA time was wrong with incremental final renders after waiting for a period of time.
  -Fix possible OpenCL bugs in cubic3D, cubicLattice_3D, dc_cube, falloff, falloff2, falloff3, waffle.

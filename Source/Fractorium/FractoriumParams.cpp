@@ -928,6 +928,26 @@ void Fractorium::SetScale(double scale)
 	m_ScaleSpin->setValue(scale);
 }
 
+/// <summary>
+/// Set the pitch.
+/// This updates the spinner
+/// </summary>
+/// <param name="pitch">The pitch value</param>
+void Fractorium::SetPitch(double pitch)
+{
+    m_PitchSpin->setValue(pitch);
+}
+
+/// <summary>
+/// Set the yaw.
+/// This updates the spinner
+/// </summary>
+/// <param name="yaw">The yaw value</param>
+void Fractorium::SetYaw(double yaw)
+{
+    m_YawSpin->setValue(yaw);
+}
+
 template class FractoriumEmberController<float>;
 
 #ifdef DO_DOUBLE

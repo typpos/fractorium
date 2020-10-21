@@ -19,7 +19,7 @@ enum class eHoverType : et { HoverNone, HoverXAxis, HoverYAxis, HoverTranslation
 /// <summary>
 /// Dragging an affine transform or panning, rotating or scaling the image.
 /// </summary>
-enum class eDragState : et { DragNone, DragSelect, DragPanning, DragDragging, DragRotateScale };
+enum class eDragState : et { DragNone, DragSelect, DragPanning, DragDragging, DragRotateScale, DragPitchYaw };
 
 /// <summary>
 /// Dragging with no keys pressed, shift, control or alt.
@@ -137,6 +137,8 @@ private:
 	T m_CenterDownY;
 	T m_RotationDown;
 	T m_ScaleDown;
+    T m_PitchDown;
+    T m_YawDown;
 	v4T m_BoundsDown;
 
 	v3T m_MouseWorldPos;

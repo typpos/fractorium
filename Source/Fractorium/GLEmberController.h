@@ -137,8 +137,8 @@ private:
 	T m_CenterDownY;
 	T m_RotationDown;
 	T m_ScaleDown;
-    T m_PitchDown;
-    T m_YawDown;
+	T m_PitchDown;
+	T m_YawDown;
 	v4T m_BoundsDown;
 
 	v3T m_MouseWorldPos;

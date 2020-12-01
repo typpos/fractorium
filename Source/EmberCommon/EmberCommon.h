@@ -310,6 +310,22 @@ static void Rgba32ToRgba32Exr(v4F* rgba, float* r, float* g, float* b, float* a,
 }
 
 /// <summary>
+/// Returns a string with all illegal file path characters removed.
+/// </summary>
+/// <param name="filename">The path to remove illegal characters from</param>
+/// <returns>The cleaned full file path and name.</returns>
+static string CleanPath(const string& filename)
+{
+	static string illegalChars = "\\/:*?\"<>|";
+	auto tempfilename = filename;
+
+	for (auto& ch : illegalChars)
+		tempfilename.erase(remove(tempfilename.begin(), tempfilename.end(), ch), tempfilename.end());
+
+	return tempfilename;
+}
+
+/// <summary>
 /// Make a filename for a single render. This is used in EmberRender.
 /// </summary>
 /// <param name="path">The path portion of where to save the file</param>
@@ -340,7 +356,7 @@ static string MakeSingleFilename(const string& path, const string& out, const st
 		filename = fnstream.str();
 	}
 
-	return filename;
+	return CleanPath(filename);
 }
 
 /// <summary>
@@ -356,7 +372,7 @@ static string MakeAnimFilename(const string& path, const string& prefix, const s
 {
 	ostringstream fnstream;
 	fnstream << path << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << suffix << format;
-	return fnstream.str();
+	return CleanPath(fnstream.str());
 }
 
 /// <summary>

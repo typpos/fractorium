@@ -85,7 +85,7 @@ void FractoriumEmberController<T>::NewFlock(size_t count)
 		m_SheepTools->Random(ember, *filteredVariationsRef, static_cast<intmax_t>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedFrand<T>(-2, 2)), 0, 8);
 		ParamsToEmber(ember);
 		ember.m_Index = i;
-		ember.m_Name = m_EmberFile.m_Filename.toStdString() + "_" + ToString(i + 1ULL).toStdString();
+		ember.m_Name = CleanPath(m_EmberFile.m_Filename.toStdString() + "_" + ToString(i + 1ULL).toStdString());
 		m_EmberFile.m_Embers.push_back(ember);
 	}
 
@@ -311,6 +311,8 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 					//Also ensure it has a name.
 					if (embers[i].m_Name == "" || embers[i].m_Name == "No name")
 						embers[i].m_Name = ToString<qulonglong>(i).toStdString();
+					else
+						embers[i].m_Name = CleanPath(embers[i].m_Name);
 
 					embers[i].m_Quality = m_Fractorium->m_QualitySpin->value();
 					embers[i].m_Supersample = m_Fractorium->m_SupersampleSpin->value();
@@ -710,6 +712,8 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 			//Also ensure it has a name.
 			if (embers[i].m_Name == "" || embers[i].m_Name == "No name")
 				embers[i].m_Name = ToString<qulonglong>(embers[i].m_Index).toStdString();
+			else
+				embers[i].m_Name = CleanPath(embers[i].m_Name);
 
 			m_EmberFile.m_Embers.push_back(embers[i]);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
 		}
@@ -767,6 +771,8 @@ void FractoriumEmberController<T>::PasteXmlOver()
 			//Also ensure it has a name.
 			if (it.m_Name == "" || it.m_Name == "No name")
 				it.m_Name = ToString<qulonglong>(it.m_Index).toStdString();
+			else
+				it.m_Name = CleanPath(it.m_Name);
 		}
 
 		m_EmberFile.MakeNamesUnique();

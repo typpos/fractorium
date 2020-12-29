@@ -1819,7 +1819,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T tempr = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(ISAAC_INT(m_Rn))) / m_Power;
+		T tempr = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(size_t(m_Rn))) / m_Power;
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
 		helper.Out.x = r * std::cos(tempr);
 		helper.Out.y = r * std::sin(tempr);
@@ -2199,7 +2199,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		int sl = int(rand.Frand01<T>() * m_Slices + T(0.5));
+		auto sl = rand.Rand(size_t(m_Slices));
 		T a = m_Rotation + m_Pi2Slices * (sl + m_Thickness * rand.Frand01<T>());
 		T r = m_Weight * rand.Frand01<T>();
 		helper.Out.x = r * std::cos(a);
@@ -2219,7 +2219,7 @@ public:
 		string thickness = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string pi2Slices = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tint sl = (int)(fma(MwcNext01(mwc), " << slices << ", (real_t)(0.5)));\n"
+		   << "\t\tuint sl = MwcNextRange(mwc, (uint)" << slices << ");\n"
 		   << "\t\treal_t a = fma(" << pi2Slices << ", fma(" << thickness << ", MwcNext01(mwc), sl), " << rotation << ");\n"
 		   << "\t\treal_t r = " << weight << " * MwcNext01(mwc);\n"
 		   << "\n"
@@ -4003,7 +4003,7 @@ public:
 	{
 		T a = helper.m_PrecalcAtanyx;
 		T lnr = T(0.5) * std::log(helper.m_PrecalcSumSquares);
-		T angle = m_C * a + m_D * lnr + m_Ang * Floor<T>(m_Power * rand.Frand01<T>());
+		T angle = m_C * a + m_D * lnr + m_Ang * rand.Rand(size_t(m_Power));
 		T m = m_Weight * std::exp(m_C * lnr - m_D * a);
 		helper.Out.x = m * std::cos(angle);
 		helper.Out.y = m * std::sin(angle);
@@ -4026,7 +4026,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanyx;\n"
 		   << "\t\treal_t lnr = (real_t)(0.5) * log(precalcSumSquares);\n"
-		   << "\t\treal_t angle = fma(" << c << ", a, fma(" << d << ", lnr, " << ang << " * floor(" << power << " * MwcNext01(mwc))));\n"
+		   << "\t\treal_t angle = fma(" << c << ", a, fma(" << d << ", lnr, " << ang << " * (real_t)MwcNextRange(mwc, (uint)" << power << ")));\n"
 		   << "\t\treal_t m = " << weight << " * exp(fma(" << c << ", lnr, -(" << d << " * a)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = m * cos(angle);\n"
@@ -5776,7 +5776,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
-		int tRand = int(m_Rn * rand.Frand01<T>());
+		auto tRand = rand.Rand(size_t(m_Rn));
 		T a = (helper.m_PrecalcAtanyx + M_2PI * tRand) / m_Power;
 		T c = T(Floor<T>((m_Count * a + T(M_PI)) * T(M_1_PI) * T(0.5)));
 		a = a * m_Cf + c * m_Angle;
@@ -5801,7 +5801,7 @@ public:
 		string cf    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
-		   << "\t\tint tRand = (int)(" << rn << " * MwcNext01(mwc));\n"
+		   << "\t\tuint tRand = MwcNextRange(mwc, (uint)" << rn << ");\n"
 		   << "\t\treal_t a = fma(M_2PI, (real_t)tRand, precalcAtanyx) / " << power << ";\n"
 		   << "\t\treal_t c = floor(fma(" << count << ", a, MPI) * M1PI * (real_t)(0.5));\n"
 		   << "\n"

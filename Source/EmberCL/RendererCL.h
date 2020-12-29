@@ -240,7 +240,7 @@ private:
 	string m_FinalImageName = "Final";
 	string m_PointsBufferName = "Points";
 #ifdef KNL_USE_GLOBAL_CONSEC
-    string m_ConsecBufferName = "Consec";
+	string m_ConsecBufferName = "Consec";
 #endif
 	string m_VarStateBufferName = "VarState";
 

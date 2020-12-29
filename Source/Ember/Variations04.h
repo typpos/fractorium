@@ -1712,28 +1712,28 @@ public:
 		switch (rand.Rand(5))
 		{
 			case 0:
-				a = (rand.Rand(ISAAC_INT(m_Slices)) + rand.Frand01<T>() * m_XThickness) / m_Slices;
-				r = (rand.Rand(ISAAC_INT(m_Slices)) + rand.Frand01<T>() * m_YThickness) / m_Slices;
+				a = (rand.Rand(size_t(m_Slices)) + rand.Frand01<T>() * m_XThickness) / m_Slices;
+				r = (rand.Rand(size_t(m_Slices)) + rand.Frand01<T>() * m_YThickness) / m_Slices;
 				break;
 
 			case 1:
-				a = (rand.Rand(ISAAC_INT(m_Slices)) + rand.Frand01<T>()) / m_Slices;
-				r = (rand.Rand(ISAAC_INT(m_Slices)) + m_YThickness) / m_Slices;
+				a = (rand.Rand(size_t(m_Slices)) + rand.Frand01<T>()) / m_Slices;
+				r = (rand.Rand(size_t(m_Slices)) + m_YThickness) / m_Slices;
 				break;
 
 			case 2:
-				a = (rand.Rand(ISAAC_INT(m_Slices)) + m_XThickness) / m_Slices;
-				r = (rand.Rand(ISAAC_INT(m_Slices)) + rand.Frand01<T>()) / m_Slices;
+				a = (rand.Rand(size_t(m_Slices)) + m_XThickness) / m_Slices;
+				r = (rand.Rand(size_t(m_Slices)) + rand.Frand01<T>()) / m_Slices;
 				break;
 
 			case 3:
 				a = rand.Frand01<T>();
-				r = (rand.Rand(ISAAC_INT(m_Slices)) + m_YThickness + rand.Frand01<T>() * (1 - m_YThickness)) / m_Slices;
+				r = (rand.Rand(size_t(m_Slices)) + m_YThickness + rand.Frand01<T>() * (1 - m_YThickness)) / m_Slices;
 				break;
 
 			case 4:
 			default:
-				a = (rand.Rand(ISAAC_INT(m_Slices)) + m_XThickness + rand.Frand01<T>() * (1 - m_XThickness)) / m_Slices;
+				a = (rand.Rand(size_t(m_Slices)) + m_XThickness + rand.Frand01<T>() * (1 - m_XThickness)) / m_Slices;
 				r = rand.Frand01<T>();
 				break;
 		}
@@ -1759,27 +1759,27 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t a = 0, r = 0;\n"
 		   << "\n"
-		   << "\t\tswitch (MwcNextRange(mwc, 5))\n"
+		   << "\t\tswitch (MwcNextRange(mwc, 5u))\n"
 		   << "\t\t{\n"
 		   << "\t\t	case 0:\n"
-		   << "\t\t		a = (MwcNextRange(mwc, (int)" << slices << ") + MwcNext01(mwc) * " << xThickness << ") / " << slices << ";\n"
-		   << "\t\t		r = (MwcNextRange(mwc, (int)" << slices << ") + MwcNext01(mwc) * " << yThickness << ") / " << slices << ";\n"
+		   << "\t\t		a = (MwcNextRange(mwc, (uint)" << slices << ") + MwcNext01(mwc) * " << xThickness << ") / " << slices << ";\n"
+		   << "\t\t		r = (MwcNextRange(mwc, (uint)" << slices << ") + MwcNext01(mwc) * " << yThickness << ") / " << slices << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 1:\n"
-		   << "\t\t		a = (MwcNextRange(mwc, (int)" << slices << ") + MwcNext01(mwc)) / " << slices << ";\n"
-		   << "\t\t		r = (MwcNextRange(mwc, (int)" << slices << ") + " << yThickness << ") / " << slices << ";\n"
+		   << "\t\t		a = (MwcNextRange(mwc, (uint)" << slices << ") + MwcNext01(mwc)) / " << slices << ";\n"
+		   << "\t\t		r = (MwcNextRange(mwc, (uint)" << slices << ") + " << yThickness << ") / " << slices << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 2:\n"
-		   << "\t\t		a = (MwcNextRange(mwc, (int)" << slices << ") + " << xThickness << ") / " << slices << ";\n"
-		   << "\t\t		r = (MwcNextRange(mwc, (int)" << slices << ") + MwcNext01(mwc)) / " << slices << ";\n"
+		   << "\t\t		a = (MwcNextRange(mwc, (uint)" << slices << ") + " << xThickness << ") / " << slices << ";\n"
+		   << "\t\t		r = (MwcNextRange(mwc, (uint)" << slices << ") + MwcNext01(mwc)) / " << slices << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 3:\n"
 		   << "\t\t		a = MwcNext01(mwc);\n"
-		   << "\t\t		r = fma(MwcNext01(mwc), 1 - " << yThickness << ", MwcNextRange(mwc, (int)" << slices << ") + " << yThickness << ") / " << slices << ";\n"
+		   << "\t\t		r = fma(MwcNext01(mwc), 1 - " << yThickness << ", MwcNextRange(mwc, (uint)" << slices << ") + " << yThickness << ") / " << slices << ";\n"
 		   << "\t\t		break;\n"
 		   << "\t\t	case 4:\n"
 		   << "\t\t	default:\n"
-		   << "\t\t		a = fma(MwcNext01(mwc), (1 - " << xThickness << "), MwcNextRange(mwc, (int)" << slices << ") + " << xThickness << ") / " << slices << ";\n"
+		   << "\t\t		a = fma(MwcNext01(mwc), (1 - " << xThickness << "), MwcNextRange(mwc, (uint)" << slices << ") + " << xThickness << ") / " << slices << ";\n"
 		   << "\t\t		r = MwcNext01(mwc);\n"
 		   << "\t\t		break;\n"
 		   << "\t\t}\n"
@@ -5292,8 +5292,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T arg = helper.m_PrecalcAtanyx + fmod(T(rand.Rand()), T(1 / m_ReInv)) * M_2PI;
-		T lnmod = m_Dist * T(0.5) * std::log(helper.m_PrecalcSumSquares);
+		T arg = helper.m_PrecalcAtanyx + fmod(T(rand.Rand()), m_OneOverReInv) * M_2PI;
+		T lnmod = m_HalfDist * std::log(helper.m_PrecalcSumSquares);
 		T temp = arg * m_ReInv + lnmod * m_Im100;
 		T mod2 = std::exp(lnmod * m_ReInv - arg * m_Im100);
 		helper.Out.x = m_Weight * mod2 * std::cos(temp);
@@ -5308,14 +5308,16 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string re    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string im    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string reInv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string im100 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string re           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string im           = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string dist         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string halfDist     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string reInv        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneOverReInv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string im100        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t arg = fma(fmod((real_t)MwcNext(mwc), (real_t)((real_t)(1.0) / " << reInv << ")), M_2PI, precalcAtanyx);\n"
-		   << "\t\treal_t lnmod = " << dist << " * (real_t)(0.5) * log(precalcSumSquares);\n"
+		   << "\t\treal_t arg = fma(fmod((real_t)MwcNext(mwc), (real_t)(" << oneOverReInv << ")), M_2PI, precalcAtanyx);\n"
+		   << "\t\treal_t lnmod = " << halfDist << " * log(precalcSumSquares);\n"
 		   << "\t\treal_t temp = fma(arg, " << reInv << ", lnmod * " << im100 << ");\n"
 		   << "\t\treal_t mod2 = exp(fma(lnmod, " << reInv << ", -(arg * " << im100 << ")));\n"
 		   << "\n"
@@ -5328,7 +5330,9 @@ public:
 
 	virtual void Precalc() override
 	{
+		m_HalfDist = m_Dist * T(0.5);
 		m_ReInv = 1 / Zeps(m_Re);
+		m_OneOverReInv = 1 / m_ReInv;
 		m_Im100 = m_Im * T(0.01);
 	}
 
@@ -5340,15 +5344,19 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Re, prefix + "Juliac_re", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Im, prefix + "Juliac_im", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "Juliac_dist", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_ReInv, prefix + "Juliac_re_inv"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Im100, prefix + "Juliac_im100"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfDist, prefix     + "Juliac_half_dist"));
+		m_Params.push_back(ParamWithName<T>(true, &m_ReInv, prefix        + "Juliac_re_inv"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverReInv, prefix + "Juliac_one_over_re_inv"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Im100, prefix        + "Juliac_im100"));
 	}
 
 private:
 	T m_Re;
 	T m_Im;
 	T m_Dist;
+	T m_HalfDist;
 	T m_ReInv;
+	T m_OneOverReInv;
 	T m_Im100;
 };
 

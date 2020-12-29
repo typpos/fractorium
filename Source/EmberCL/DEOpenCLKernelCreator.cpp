@@ -3,6 +3,16 @@
 
 namespace EmberCLns
 {
+
+/// <summary>
+/// Empty constructor.
+/// This is needed because this class will need to be empty before it's initialized in RendererCL
+/// with specific arguments.
+/// </summary>
+DEOpenCLKernelCreator::DEOpenCLKernelCreator()
+{
+}
+
 /// <summary>
 /// Constructor that sets all kernel entry points as well as composes
 /// all kernel source strings.
@@ -330,77 +340,81 @@ string DEOpenCLKernelCreator::CreateGaussianDEKernel(size_t ss)
 	   "\n"
 	   "	barrier(CLK_LOCAL_MEM_FENCE);\n"
 	   "\n"
-	   "	if (threadHistRow < botBound && threadHistCol < rightBound)\n"
-	   "	{\n"
+	   "	if (threadHistRow < botBound && threadHistCol < rightBound)\n"//This is done to avoid putting barriers inside of conidtionals.
 	   "		bucket = histogram[(threadHistRow * densityFilter->m_SuperRasW) + threadHistCol];\n"
+	   "	else\n"
+	   "		bucket = 0.0;\n"
 	   "\n"
-	   "		if (bucket.w != 0)\n"
-	   "		{\n"
-	   "			cacheLog = (densityFilter->m_K1 * log((real_bucket_t)fma(bucket.w, densityFilter->m_K2, (real_bucket_t)1.0))) / bucket.w;\n";
+	   "	if (bucket.w != 0)\n"//This is done to avoid putting barriers inside of conidtionals.
+	   "	{\n"
+	   "		cacheLog = (densityFilter->m_K1 * log((real_bucket_t)fma(bucket.w, densityFilter->m_K2, (real_bucket_t)1.0))) / bucket.w;\n";
 
 	if (doSS)
 	{
 		os <<
-		   "			filterSelect = 0;\n"
-		   "			densityBoxLeftX = threadHistCol - min(threadHistCol, ss);\n"
-		   "			densityBoxRightX = threadHistCol + min(ss, (densityFilter->m_SuperRasW - threadHistCol) - 1);\n"
-		   "			densityBoxTopY = threadHistRow - min(threadHistRow, ss);\n"
-		   "			densityBoxBottomY = threadHistRow + min(ss, (densityFilter->m_SuperRasH - threadHistRow) - 1);\n"
+		   "		filterSelect = 0;\n"
+		   "		densityBoxLeftX = threadHistCol - min(threadHistCol, ss);\n"
+		   "		densityBoxRightX = threadHistCol + min(ss, (densityFilter->m_SuperRasW - threadHistCol) - 1);\n"
+		   "		densityBoxTopY = threadHistRow - min(threadHistRow, ss);\n"
+		   "		densityBoxBottomY = threadHistRow + min(ss, (densityFilter->m_SuperRasH - threadHistRow) - 1);\n"
 		   "\n"
-		   "			for (j = densityBoxTopY; j <= densityBoxBottomY; j++)\n"
+		   "		for (j = densityBoxTopY; j <= densityBoxBottomY; j++)\n"
+		   "		{\n"
+		   "			for (i = densityBoxLeftX; i <= densityBoxRightX; i++)\n"
 		   "			{\n"
-		   "				for (i = densityBoxLeftX; i <= densityBoxRightX; i++)\n"
-		   "				{\n"
-		   "					filterSelect += histogram[i + (j * densityFilter->m_SuperRasW)].w;\n"
-		   "				}\n"
+		   "				filterSelect += histogram[i + (j * densityFilter->m_SuperRasW)].w;\n"
 		   "			}\n"
+		   "		}\n"
 		   "\n";
 
 		if (doScf)
 			os <<
-			   "			filterSelect *= scfact;\n";
+			   "		filterSelect *= scfact;\n";
 	}
 	else
 	{
 		os <<
-		   "			filterSelect = bucket.w;\n";
+		   "		filterSelect = bucket.w;\n";
 	}
 
 	os <<
+	   "	}\n"
+	   "	else\n"
+	   "	{\n"
+	   "		cacheLog = 0.0;\n"
+	   "		filterSelect = 1.0;\n"//Will subtract 1 to be 0 below.
+	   "	}\n"
 	   "\n"
-	   "			if (filterSelect > densityFilter->m_MaxFilteredCounts)\n"
-	   "				filterSelectInt = densityFilter->m_MaxFilterIndex;\n"
-	   "			else if (filterSelect <= DE_THRESH)\n"
-	   "				filterSelectInt = (int)ceil(filterSelect) - 1;\n"
-	   "			else\n"
-	   "				filterSelectInt = (int)DE_THRESH + (int)floor(pow((real_bucket_t)(filterSelect - DE_THRESH), densityFilter->m_Curve));\n"
+	   "	if (filterSelect > densityFilter->m_MaxFilteredCounts)\n"
+	   "		filterSelectInt = densityFilter->m_MaxFilterIndex;\n"
+	   "	else if (filterSelect <= DE_THRESH)\n"
+	   "		filterSelectInt = (int)ceil(filterSelect) - 1;\n"
+	   "	else\n"
+	   "		filterSelectInt = (int)DE_THRESH + (int)floor(pow((real_bucket_t)(filterSelect - DE_THRESH), densityFilter->m_Curve));\n"
 	   "\n"
-	   "			if (filterSelectInt > densityFilter->m_MaxFilterIndex)\n"
-	   "				filterSelectInt = densityFilter->m_MaxFilterIndex;\n"
+	   "	if (filterSelectInt > densityFilter->m_MaxFilterIndex)\n"
+	   "		filterSelectInt = densityFilter->m_MaxFilterIndex;\n"
 	   "\n"
-	   "			filterCoefIndex = filterSelectInt * densityFilter->m_KernelSize;\n"
+	   "	filterCoefIndex = filterSelectInt * densityFilter->m_KernelSize;\n"
 	   "\n"
 	   //With this new method, only accumulate to the temp local buffer first. Write to the final accumulator last.
 	   //For each loop through, note that there is a local memory barrier call inside of each call to AddToAccumNoCheck().
 	   //If this isn't done, pixel errors occurr and even an out of resources error occurrs because too many writes are done to the same place in memory at once.
-	   "			k = (int)densityFilter->m_FilterWidth;\n"//Need a signed int to use below, really is filter width, but reusing a variable to save space.
+	   "	k = (int)densityFilter->m_FilterWidth;\n"//Need a signed int to use below, really is filter width, but reusing a variable to save space.
 	   "\n"
-	   "			for (j = -k; j <= k; j++)\n"
+	   "	for (j = -k; j <= k; j++)\n"
+	   "	{\n"
+	   "		for (i = -k; i <= k; i++)\n"
+	   "		{\n"
+	   "			filterSelectInt = filterCoefIndex + coefIndices[(abs(j) * (densityFilter->m_FilterWidth + 1)) + abs(i)];\n"//Really is filterCoeffIndexPlusOffset, but reusing a variable to save space.
+	   "\n"
+	   "			if (filterCoefs[filterSelectInt] != 0)\n"//This conditional actually improves speed, despite SIMT being bad at conditionals.
 	   "			{\n"
-	   "				for (i = -k; i <= k; i++)\n"
-	   "				{\n"
-	   "					filterSelectInt = filterCoefIndex + coefIndices[(abs(j) * (densityFilter->m_FilterWidth + 1)) + abs(i)];\n"//Really is filterCoeffIndexPlusOffset, but reusing a variable to save space.
-	   "\n"
-	   "					if (filterCoefs[filterSelectInt] != 0)\n"//This conditional actually improves speed, despite SIMT being bad at conditionals.
-	   "					{\n"
-	   "						filterBox[(i + boxCol) + ((j + boxRow) * fullTempBoxWidth)].m_Real4 += (bucket * (filterCoefs[filterSelectInt] * cacheLog));\n"
-	   "					}\n"
-	   "				}\n"
-	   "				barrier(CLK_LOCAL_MEM_FENCE);\n"//If this is the only barrier and the block size is exactly 16, it works perfectly. Otherwise, no chunks occur, but a many streaks.
+	   "				filterBox[(i + boxCol) + ((j + boxRow) * fullTempBoxWidth)].m_Real4 += (bucket * (filterCoefs[filterSelectInt] * cacheLog));\n"
 	   "			}\n"
-	   "		}\n"//bucket.w != 0.
-	   "	}\n"//In bounds.
-	   "\n"
+	   "		}\n"
+	   "		barrier(CLK_LOCAL_MEM_FENCE);\n"//If this is the only barrier and the block size is exactly 16, it works perfectly. Otherwise, no chunks occur, but a many streaks.
+	   "	}\n"
 	   "\n"
 	   "	barrier(CLK_LOCAL_MEM_FENCE | CLK_GLOBAL_MEM_FENCE);\n"
 	   "\n"

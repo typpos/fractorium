@@ -1089,14 +1089,14 @@ public:
 			static intmax_t symDistrib[] =
 			{
 				-4, -3,
-				-2, -2, -2,
-				-1, -1, -1,
-				2,  2,  2,
-				3,  3,
-				4,  4,
-			};
+					-2, -2, -2,
+					-1, -1, -1,
+					2,  2,  2,
+					3,  3,
+					4,  4,
+				};
 
-			if (rand.Rand() & 1)
+			if (rand.RandBit())
 				sym = symDistrib[rand.Rand(Vlen(symDistrib))];
 			else if (rand.Rand() & 31)
 				sym = intmax_t(rand.Rand(13)) - 6;

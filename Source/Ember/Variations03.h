@@ -2697,7 +2697,7 @@ public:
 	{
 		T preX = helper.In.x * (m_XDistort + 1);
 		T preY = helper.In.y * (m_YDistort + 1);
-		T temp = std::atan2(preY, preX) * m_InvN + rand.Rand() * m_Inv2PiN;
+		T temp = std::atan2(preY, preX) * m_InvN + rand.Crand() * m_Inv2PiN;
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
 		helper.Out.x = r * std::cos(temp);
 		helper.Out.y = r * std::sin(temp);
@@ -2721,7 +2721,7 @@ public:
 		ss << "\t{\n"
 		   << "\t\treal_t preX = vIn.x * (" << xDistort << " + 1);\n"
 		   << "\t\treal_t preY = vIn.y * (" << yDistort << " + 1);\n"
-		   << "\t\treal_t temp = fma(atan2(preY, preX), " << invN << ", MwcNext(mwc) * " << inv2PiN << ");\n"
+		   << "\t\treal_t temp = fma(atan2(preY, preX), " << invN << ", MwcNextCrand(mwc) * " << inv2PiN << ");\n"
 		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cN << ");\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
@@ -2744,7 +2744,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "phoenix_julia_power", 2));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "phoenix_julia_power", 2));//Original omitted _julia.
 		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "phoenix_julia_dist", 1));
 		m_Params.push_back(ParamWithName<T>(&m_XDistort, prefix + "phoenix_julia_x_distort", T(-0.5)));//Original omitted phoenix_ prefix.
 		m_Params.push_back(ParamWithName<T>(&m_YDistort, prefix + "phoenix_julia_y_distort"));

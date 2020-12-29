@@ -1275,7 +1275,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T temp = helper.m_PrecalcAtanyx * m_InvPower + rand.Rand() * m_InvPower2pi;
+		T temp = helper.m_PrecalcAtanyx * m_InvPower + rand.Crand() * m_InvPower2pi;
 		T sina = std::sin(temp);
 		T cosa = std::cos(temp);
 		T z = helper.In.z * m_AbsInvPower;
@@ -1301,7 +1301,7 @@ public:
 		string halfInvPower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string invPower2pi  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t temp = fma(precalcAtanyx, " << invPower << ", MwcNext(mwc) * " << invPower2pi << ");\n"
+		   << "\t\treal_t temp = fma(precalcAtanyx, " << invPower << ", MwcNextCrand(mwc) * " << invPower2pi << ");\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\t\treal_t z = vIn.z * " << absInvPower << ";\n"
@@ -3198,7 +3198,7 @@ public:
 		   << "\t\t{\n"//InverseTrilinear function extracted out here.
 		   << "\t\t	real_t inx = fma(alpha - " << radius << ", " << cosC << ", beta - " << radius << ") / " << sinC << ";\n"
 		   << "\t\t	real_t iny = alpha - " << radius << ";\n"
-		   << "\t\t	real_t angle = fma(M_2PI, (real_t)MwcNextRange(mwc, (int)" << absN << "), atan2(iny, inx)) / " << power << ";\n"
+		   << "\t\t	real_t angle = fma(M_2PI, (real_t)MwcNextRange(mwc, (uint)" << absN << "), atan2(iny, inx)) / " << power << ";\n"
 		   << "\t\t	real_t r = " << weight << " * pow(fma(inx, inx, SQR(iny)), " << cn << ");\n"
 		   << "\n"
 		   << "\t\t	x = r * cos(angle);\n"
@@ -3434,7 +3434,7 @@ private:
 	{
 		T inx = (be - m_Radius + (al - m_Radius) * m_CosC) / m_SinC;
 		T iny = al - m_Radius;
-		T angle = (std::atan2(iny, inx) + M_2PI * (rand.Rand(int(m_AbsN)))) / m_Power;
+		T angle = (std::atan2(iny, inx) + M_2PI * (rand.Rand(size_t(m_AbsN)))) / m_Power;
 		T r = m_Weight * std::pow(SQR(inx) + SQR(iny), m_Cn);
 		x = r * std::cos(angle);
 		y = r * std::sin(angle);
@@ -4037,7 +4037,7 @@ public:
 				<< "\n"
 				<< "\t\tif (" << rswtch << ")\n"
 				<< "\t\t{\n"
-				<< "\t\t	uint loc = MwcNextRange(mwc, 6);\n"
+				<< "\t\t	uint loc = MwcNextRange(mwc, 6u);\n"
 				<< "\t\t	tempx = parVars[" << seg60xStartIndex << " + loc];\n"
 				<< "\t\t	tempy = parVars[" << seg60yStartIndex << " + loc];\n"
 				<< "\t\t	scale3 = 1;\n"
@@ -4045,7 +4045,7 @@ public:
 				<< "\t\t}\n"
 				<< "\t\telse\n"
 				<< "\t\t{\n"
-				<< "\t\t	uint loc = MwcNextRange(mwc, 3);\n"
+				<< "\t\t	uint loc = MwcNextRange(mwc, 3u);\n"
 				<< "\t\t	tempx = parVars[" << seg120xStartIndex << " + loc];\n"
 				<< "\t\t	tempy = parVars[" << seg120yStartIndex << " + loc];\n"
 				<< "\t\t	scale3 = " << side3 << ";\n"

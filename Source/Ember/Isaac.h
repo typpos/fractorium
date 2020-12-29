@@ -144,6 +144,26 @@ public:
 	}
 
 	/// <summary>
+	/// Legacy rand() in the C language returns a number in the range of (0, RAND_MAX], which yields 0-32766.
+	/// This function is used to simulate that behavior.
+	/// </summary>
+	/// <returns>The next random integer in the range of 0-32766 inclusive</returns>
+	inline T Crand()
+	{
+		return Rand(32767);
+	}
+
+	/// <summary
+	/// Locked version of Crand().
+	/// </summary>
+	inline T LockedCrand()
+	{
+		rlg l(*s_CS.get());
+		T t = GlobalRand->Crand();
+		return t;
+	}
+
+	/// <summary>
 	/// Return the next random integer between 0 and the value passed in minus 1.
 	/// </summary>
 	/// <param name="upper">A value one greater than the maximum value that will be returned</param>

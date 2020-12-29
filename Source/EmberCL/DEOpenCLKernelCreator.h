@@ -29,6 +29,7 @@ namespace EmberCLns
 class EMBERCL_API DEOpenCLKernelCreator
 {
 public:
+	DEOpenCLKernelCreator();
 	DEOpenCLKernelCreator(bool doublePrecision, bool nVidia);
 
 	//Accessors.

@@ -56,7 +56,7 @@ using namespace EmberNs;
 
 //This special define is made to fix buggy OpenCL compilers on Mac.
 //Rendering is much slower there for unknown reasons. Michel traced it down
-//to the consec variable which keeps track of how many tries are needed to computer
+//to the consec variable which keeps track of how many tries are needed to compute
 //a point which is not a bad value. Strangely, keeping this as a local variable
 //is slower than keeping it as an element in a global array.
 //This is counterintuitive, and lends further weight to the idea that OpenCL on Mac

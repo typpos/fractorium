@@ -26,7 +26,6 @@ template <typename T, typename bucketT>
 RendererCL<T, bucketT>::RendererCL(const vector<pair<size_t, size_t>>& devices, bool shared, GLuint outputTexID)
 	:
 	m_IterOpenCLKernelCreator(),
-	m_DEOpenCLKernelCreator(typeid(T) == typeid(double), false),
 	m_FinalAccumOpenCLKernelCreator(typeid(T) == typeid(double))
 {
 	m_PaletteFormat.image_channel_order = CL_RGBA;
@@ -114,7 +113,7 @@ bool RendererCL<T, bucketT>::Init(const vector<pair<size_t, size_t>>& devices, b
 	if (b && (m_Devices.size() == devices.size()))
 	{
 		auto& firstWrapper = m_Devices[0]->m_Wrapper;
-		m_DEOpenCLKernelCreator = DEOpenCLKernelCreator(m_DoublePrecision, m_Devices[0]->Nvidia());
+		m_DEOpenCLKernelCreator = DEOpenCLKernelCreator(m_DoublePrecision, m_Devices[0]->Nvidia());//This will cause it to be created a second time, because it was already done once in the constructor.
 
 		//Build a simple program to ensure OpenCL is working right.
 		if (b && !(b = firstWrapper.AddProgram(m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint(), m_DEOpenCLKernelCreator.LogScaleAssignDEKernel(), m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint(), m_DoublePrecision))) { ErrorStr(loc, "failed to init log scale program", m_Devices[0].get()); }

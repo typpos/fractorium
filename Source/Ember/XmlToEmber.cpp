@@ -250,7 +250,11 @@ XmlToEmber<T>::XmlToEmber()
 			{ "mode", "unicorngaloshen_mode" },
 			{ "d_spher_weight", "d_spherical_weight" },
 			{ "poincare_p", "poincare2_p" },
-			{ "poincare_q", "poincare2_q" }
+			{ "poincare_q", "poincare2_q" },
+			{ "phoenix_power", "phoenix_julia_power"},
+			{ "phoenix_dist", "phoenix_julia_dist" },
+			{ "x_distort", "phoenix_julia_x_distort"},
+			{ "y_distort", "phoenix_julia_y_distort" }
 		};
 		m_FlattenNames =
 		{

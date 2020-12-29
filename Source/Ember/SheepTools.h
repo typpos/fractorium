@@ -906,13 +906,13 @@ public:
 		auto xform0 = RandomXform(ember, -1);
 		auto xform1 = RandomXform(ember, ember.GetXformIndex(xform0));
 
-		if (xform0 && (m_Rand.Rand() & 1))
+		if (xform0 && (m_Rand.RandBit()))
 		{
 			xform0->m_ColorX = 0;
 			xform0->m_ColorY = 0;
 		}
 
-		if (xform1 && (m_Rand.Rand() & 1))
+		if (xform1 && (m_Rand.RandBit()))
 		{
 			xform1->m_ColorX = 1;
 			xform1->m_ColorY = 1;

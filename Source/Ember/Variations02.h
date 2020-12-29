@@ -3141,7 +3141,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T temp = Floor<T>(rand.Frand01<T>() * m_IP) * m_Pa;
+		T temp = rand.Crand() * m_Pa;
 		T sina = std::sin(temp);
 		T cosa = std::cos(temp);
 		T re = m_R * cosa;
@@ -3169,7 +3169,7 @@ public:
 		string r  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ip = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t temp = floor(MwcNext01(mwc) * " << ip << ") * " << pa << ";\n"
+		   << "\t\treal_t temp = MwcNextCrand(mwc) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\t\treal_t re = " << r << " * cosa;\n"
@@ -3190,9 +3190,9 @@ public:
 	virtual void Precalc() override
 	{
 		m_Pa = M_2PI / Zeps(m_P);
-		T cs = cos(m_Pa);
-		T r2 = T(1) - (cs - 1) / (cs + cos(M_2PI / Zeps(m_Q)));
-		m_R  = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
+		T cs = std::cos(m_Pa);
+		T r2 = T(1) - (cs - 1) / (cs + std::cos(M_2PI / Zeps(m_Q)));
+		m_R  = (r2 > 0) ? T(1) / std::sqrt(r2) : T(1);
 		m_IP = T((int)m_P);
 	}
 
@@ -3239,7 +3239,7 @@ public:
 		T x = (a * c + b * d);
 		T y = (b * c - a * d);
 		T vr   = m_Weight / (SQR(c) + SQR(d));
-		T temp = Floor<T>(rand.Frand01<T>() * 32767) * m_Pa;
+		T temp = rand.Crand() * m_Pa;
 		T sina = std::sin(temp);
 		T cosa = std::cos(temp);
 		helper.Out.x = vr * (x * cosa + y * sina);
@@ -3266,7 +3266,7 @@ public:
 		   << "\t\treal_t x = fma(a, c, b * d);\n"
 		   << "\t\treal_t y = fma(b, c, -(a * d));\n"
 		   << "\t\treal_t vr = " << weight << " / fma(c, c, SQR(d));\n"
-		   << "\t\treal_t temp = floor(MwcNext01(mwc) * 32767) * " << pa << ";\n"
+		   << "\t\treal_t temp = MwcNextCrand(mwc) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\n"
@@ -3280,8 +3280,8 @@ public:
 	virtual void Precalc() override
 	{
 		m_Pa = T(M_2PI) / Zeps(m_P);
-		T cs = cos(m_Pa);
-		T r2 = T(1) - (cs - T(1)) / (cs + cos(T(M_2PI) / Zeps(m_Q)));
+		T cs = std::cos(m_Pa);
+		T r2 = T(1) - (cs - T(1)) / (cs + std::cos(T(M_2PI) / Zeps(m_Q)));
 		m_R = (r2 > 0) ? T(1) / sqrt(r2) : T(1);
 	}
 
@@ -3440,14 +3440,14 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T temp = rand.Rand() * m_Pa;
+		T temp = rand.Crand() * m_Pa;
 		T cx = m_R * std::cos(temp);
 		T cy = m_R * std::sin(temp);
 		T s2x = 1 + SQR(cx) - SQR(cy);
 		T s2y = 1 + SQR(cy) - SQR(cx);
 		T r2 = helper.m_PrecalcSumSquares + SQR(helper.In.z);
 		T x2cx = 2 * cx * helper.In.x;
-		T y2cy = 2 * cy * helper.In.x;
+		T y2cy = 2 * cy * helper.In.y;
 		T d = m_Weight / Zeps(m_C2 * r2 + x2cx - y2cy + 1);
 		helper.Out.x = d * (helper.In.x * s2x - cx * (y2cy - r2 - 1));
 		helper.Out.y = d * (helper.In.y * s2y + cy * (-x2cx - r2 - 1));
@@ -3468,14 +3468,14 @@ public:
 		string c2  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string s2z = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t temp = MwcNext(mwc) * " << pa << ";\n"
+		   << "\t\treal_t temp = MwcNextCrand(mwc) * " << pa << ";\n"
 		   << "\t\treal_t cx = " << r << " * cos(temp);\n"
 		   << "\t\treal_t cy = " << r << " * sin(temp);\n"
 		   << "\t\treal_t s2x = fma(cx, cx, (real_t)(1.0)) - SQR(cy);\n"
 		   << "\t\treal_t s2y = fma(cy, cy, (real_t)(1.0)) - SQR(cx);\n"
 		   << "\t\treal_t r2 = precalcSumSquares + SQR(vIn.z);\n"
 		   << "\t\treal_t x2cx = 2 * cx * vIn.x;\n"
-		   << "\t\treal_t y2cy = 2 * cy * vIn.x;\n"
+		   << "\t\treal_t y2cy = 2 * cy * vIn.y;\n"
 		   << "\t\treal_t d = " << weight << " / Zeps(fma(" << c2 << ", r2, (x2cx - y2cy) + 1)); \n"
 		   << "\n"
 		   << "\t\tvOut.x = d * fma(vIn.x, s2x, -(cx * (y2cy - r2 - 1)));\n"
@@ -3550,7 +3550,7 @@ public:
 		T x = helper.In.x * m_S2x - m_Cx * (-r2 - 1);
 		T y = helper.In.y * m_S2y;
 		T vr = m_Weight / (m_C2 * r2 + x2cx + 1);
-		T temp = rand.Rand() * m_Pa;
+		T temp = rand.Crand() * m_Pa;
 		T sina = std::sin(temp);
 		T cosa = std::cos(temp);
 		helper.Out.x = vr * (x * cosa + y * sina);
@@ -3580,7 +3580,7 @@ public:
 		   << "\t\treal_t x = fma(vIn.x, " << s2x << ", -(" << cx << " * (-r2 - (real_t)(1.0))));\n"
 		   << "\t\treal_t y = vIn.y * " << s2y << ";\n"
 		   << "\t\treal_t vr = " << weight << " / fma(" << c2 << ", r2, x2cx + (real_t)(1.0));\n"
-		   << "\t\treal_t temp = MwcNext(mwc) * " << pa << ";\n"
+		   << "\t\treal_t temp = MwcNextCrand(mwc) * " << pa << ";\n"
 		   << "\t\treal_t sina = sin(temp);\n"
 		   << "\t\treal_t cosa = cos(temp);\n"
 		   << "\n"
@@ -3720,7 +3720,7 @@ public:
 	{
 		T x = m_A * helper.In.x + m_B * helper.In.y + m_E;
 		T y = m_C * helper.In.x + m_D * helper.In.y + m_F;
-		T angle = (std::atan2(y, x) + M_2PI * rand.Rand(int(m_AbsN))) / m_Power;
+		T angle = (std::atan2(y, x) + M_2PI * rand.Rand(size_t(m_AbsN))) / m_Power;
 		T sina = std::sin(angle);
 		T cosa = std::cos(angle);
 		T r = m_Weight * std::pow(SQR(x) + SQR(y), m_Cn);
@@ -3816,7 +3816,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T a = helper.m_PrecalcAtanyx * m_InvPower + rand.Rand() * m_InvPower2pi;
+		T a = helper.m_PrecalcAtanyx * m_InvPower + rand.Crand() * m_InvPower2pi;
 		T sina = std::sin(a);
 		T cosa = std::cos(a);
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_HalfInvPower);
@@ -3838,7 +3838,7 @@ public:
 		string invPower     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string invPower2Pi  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t a = fma(precalcAtanyx, " << invPower << ", MwcNext(mwc) * " << invPower2Pi << ");\n"
+		   << "\t\treal_t a = fma(precalcAtanyx, " << invPower << ", MwcNextCrand(mwc) * " << invPower2Pi << ");\n"
 		   << "\t\treal_t sina = sin(a);\n"
 		   << "\t\treal_t cosa = cos(a);\n"
 		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << halfInvPower << ");\n"
@@ -4085,14 +4085,27 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T x = (m_IsOdd != 0) ? helper.In.x : m_Vvar * helper.m_PrecalcAtanxy;
-		T y = (m_IsOdd != 0) ? helper.In.y : m_Vvar2 * std::log(helper.m_PrecalcSumSquares);
-		T angle = (std::atan2(y, x) + M_2PI * rand.Rand(int(m_AbsN))) / m_Nnz;
-		T r = m_Weight * std::pow(SQR(x) + SQR(y), m_Cn) * ((m_IsOdd == 0) ? 1 : m_Parity);
-		T sina = std::sin(angle) * r;
-		T cosa = std::cos(angle) * r;
-		x = (m_IsOdd != 0) ? cosa : (m_Vvar2 * std::log(SQR(cosa) + SQR(sina)));
-		y = (m_IsOdd != 0) ? sina : (m_Vvar * std::atan2(cosa, sina));
+		T x, y;
+
+		if (m_IsOdd != 0)
+		{
+			T angle = (std::atan2(helper.In.y, helper.In.x) + M_2PI * rand.Rand(size_t(m_AbsN))) * m_Nnz;
+			T r = m_Weight * std::pow(SQR(helper.In.x) + SQR(helper.In.y), m_Cn) * m_Parity;
+			x = std::cos(angle) * r;
+			y = std::sin(angle) * r;
+		}
+		else
+		{
+			x = m_Vvar * helper.m_PrecalcAtanxy;
+			y = m_Vvar2 * std::log(helper.m_PrecalcSumSquares);
+			T angle = (std::atan2(y, x) + M_2PI * rand.Rand(size_t(m_AbsN))) * m_Nnz;
+			T r = m_Weight * std::pow(SQR(x) + SQR(y), m_Cn);
+			T sina = std::sin(angle) * r;
+			T cosa = std::cos(angle) * r;
+			x = m_Vvar2 * std::log(SQR(cosa) + SQR(sina));
+			y = m_Vvar * std::atan2(cosa, sina);
+		}
+
 		helper.Out.x = x;
 		helper.Out.y = y;
 		helper.Out.z = DefaultZ(helper);
@@ -4114,15 +4127,27 @@ public:
 		string cn     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string isOdd  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t x = (" << isOdd << " != 0) ? vIn.x : " << vvar << " * precalcAtanxy;\n"
-		   << "\t\treal_t y = (" << isOdd << " != 0) ? vIn.y : " << vvar2 << " * log(precalcSumSquares);\n"
-		   << "\t\treal_t angle = fma(M_2PI, MwcNextRange(mwc, (uint)" << absn << "), atan2(y, x)) / " << nnz << ";\n"
-		   << "\t\treal_t r = " << weight << " * pow(fma(x, x, SQR(y)), " << cn << ") * ((" << isOdd << " == 0) ? 1 : " << parity << ");\n"
-		   << "\t\treal_t sina = sin(angle) * r;\n"
-		   << "\t\treal_t cosa = cos(angle) * r;\n"
+		   << "\t\treal_t x, y;\n"
 		   << "\n"
-		   << "\t\tx = (" << isOdd << " != 0) ? cosa : (" << vvar2 << " * log(fma(cosa, cosa, SQR(sina))));\n"
-		   << "\t\ty = (" << isOdd << " != 0) ? sina : (" << vvar << " * atan2(cosa, sina));\n"
+		   << "\t\tif (" << isOdd << " != 0)\n"
+		   << "\t\t{\n"
+		   << "\t\t	real_t angle = (atan2(vIn.y, vIn.x) + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) * " << nnz << ";\n"
+		   << "\t\t	real_t r = " << weight << " * pow(SQR(vIn.x) + SQR(vIn.y), " << cn << ") * " << parity << ";\n"
+		   << "\t\t	x = cos(angle) * r;\n"
+		   << "\t\t	y = sin(angle) * r;\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	x = " << vvar << " * precalcAtanxy;\n"
+		   << "\t\t	y = " << vvar2 << " * log(precalcSumSquares);\n"
+		   << "\t\t	real_t angle = (atan2(y, x) + M_2PI * MwcNextRange(mwc, (uint)" << absn << ")) * " << nnz << ";\n"
+		   << "\t\t	real_t r = " << weight << " * pow(SQR(x) + SQR(y), " << cn << ");\n"
+		   << "\t\t	real_t sina = sin(angle) * r;\n"
+		   << "\t\t	real_t cosa = cos(angle) * r;\n"
+		   << "\t\t	x = " << vvar2 << " * log(SQR(cosa) + SQR(sina));\n"
+		   << "\t\t	y = " << vvar << " * atan2(cosa, sina);\n"
+		   << "\t\t}\n"
+		   << "\n"
 		   << "\t\tvOut.x = x;\n"
 		   << "\t\tvOut.y = y;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -4132,7 +4157,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_Nnz = (m_N == 0) ? 1 : m_N;
+		m_Nnz = 1 / ((m_N == 0) ? 1 : m_N);
 		m_Vvar = m_Weight / T(M_PI);
 		m_Vvar2 = m_Vvar * T(0.5);
 		m_AbsN = abs(m_Nnz);
@@ -5508,7 +5533,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T angle = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(int(m_AbsN))) / m_Power;
+		T angle = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(size_t(m_AbsN))) / m_Power;
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
 		T sina = std::sin(angle);
 		T cosa = std::cos(angle);
@@ -5959,12 +5984,12 @@ public:
 
 		a += M_2PI * n;
 
-		if (std::cos(a * m_InvSpread) < rand.Rand() * T(2) / 0xFFFFFFFF - T(1))//Rand max.
+		if (std::cos(a * m_InvSpread) < rand.Frand11<T>())
 			a -= m_FullSpread;
 
 		T lnr2 = std::log(helper.m_PrecalcSumSquares);
 		T r = m_Weight * std::exp(m_HalfC * lnr2 - m_D * a);
-		T temp = m_C * a + m_HalfD * lnr2 + m_Ang * rand.Rand();
+		T temp = m_C * a + m_HalfD * lnr2 + m_Ang * rand.Crand();
 		helper.Out.x = r * std::cos(temp);
 		helper.Out.y = r * std::sin(temp);
 		helper.Out.z = DefaultZ(helper);
@@ -5997,12 +6022,12 @@ public:
 		   << "\n"
 		   << "\t\ta += M_2PI * n;\n"
 		   << "\n"
-		   << "\t\tif (cos(a * " << invSpread << ") < MwcNext(mwc) * (real_t)2.0 / 0xFFFFFFFF - (real_t)1.0)\n"
+		   << "\t\tif (cos(a * " << invSpread << ") < MwcNextNeg1Pos1(mwc))\n"
 		   << "\t\t	a -= " << fullSpread << ";\n"
 		   << "\n"
 		   << "\t\treal_t lnr2 = log(precalcSumSquares);\n"
 		   << "\t\treal_t r = " << weight << " * exp(fma(" << halfC << ", lnr2, -(" << d << " * a)));\n"
-		   << "\t\treal_t temp = fma(" << c << ", a, fma(" << halfD << ", lnr2, " << ang << " * MwcNext(mwc)));\n"
+		   << "\t\treal_t temp = fma(" << c << ", a, fma(" << halfD << ", lnr2, " << ang << " * MwcNextCrand(mwc)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
 		   << "\t\tvOut.y = r * sin(temp);\n"

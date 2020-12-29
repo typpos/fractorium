@@ -919,7 +919,7 @@ public:
 		   << "\n"
 		   << "\t\tfor (i = 0; i < 7; i++)\n"
 		   << "\t\t{\n"
-		   << "\t\t	adp = MwcNextRange(mwc, 10) - 5;\n"
+		   << "\t\t	adp = MwcNextRange(mwc, 10u) - 5;\n"
 		   << "\n"
 		   << "\t\t	if (abs(adp) >= 3)\n"
 		   << "\t\t		adp = 0;\n"
@@ -1108,7 +1108,7 @@ public:
 		T temp, x = helper.In.x / m_Width;
 		bool pos = x > 0;
 
-		if (std::cos((pos ? x - (int)x : x + (int)x) * T(M_PI)) < rand.Frand01<T>() * 2 - 1)
+		if (std::cos((pos ? x - (int)x : x + (int)x) * T(M_PI)) < rand.Frand11<T>())
 			temp = pos ? -m_Vwidth : m_Vwidth;
 		else
 			temp = 0;
@@ -1131,7 +1131,7 @@ public:
 		   << "\t\treal_t temp, x = vIn.x / Zeps(" << width << ");\n"
 		   << "\t\tbool pos = x > 0;\n"
 		   << "\n"
-		   << "\t\tif (cos((pos ? x - (int)x : x + (int)x) * MPI) < MwcNext01(mwc) * 2 - 1)\n"
+		   << "\t\tif (cos((pos ? x - (int)x : x + (int)x) * MPI) < MwcNextNeg1Pos1(mwc))\n"
 		   << "\t\t	temp = pos ? -" << vwidth << " : " << vwidth << ";\n"
 		   << "\t\telse\n"
 		   << "\t\t	temp = 0;\n"
@@ -1183,7 +1183,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T temp = Round(std::log(rand.Frand01<T>()) * (rand.Rand() & 1 ? m_Spread : -m_Spread));
+		T temp = Round(std::log(rand.Frand01<T>()) * (rand.RandBit() ? m_Spread : -m_Spread));
 		helper.Out.x = m_Weight * (helper.In.x + temp);
 		helper.Out.y = m_Weight * helper.In.y;
 		helper.Out.z = DefaultZ(helper);
@@ -2349,7 +2349,7 @@ public:
 		a += (rand.RandBit() ? M_2PI : -M_2PI) * std::round(std::log(rand.Frand01<T>()) * m_Coeff);
 		T lnr2 = std::log(helper.m_PrecalcSumSquares);
 		T r = m_Weight * std::exp(m_HalfC * lnr2 - m_PrecalcD * a);
-		T temp = m_PrecalcC * a + m_HalfD * lnr2 + m_Ang * rand.Rand();
+		T temp = m_PrecalcC * a + m_HalfD * lnr2 + m_Ang * rand.Crand();
 		helper.Out.x = r * std::cos(temp);
 		helper.Out.y = r * std::sin(temp);
 		helper.Out.z = DefaultZ(helper);
@@ -2383,7 +2383,7 @@ public:
 		   << "\t\ta += ((MwcNext(mwc) & 1) ? M_2PI : -M_2PI) * round(log(MwcNext01(mwc)) * " << coeff << ");\n"
 		   << "\t\treal_t lnr2 = log(precalcSumSquares);\n"
 		   << "\t\treal_t r = " << weight << " * exp(fma(" << halfc << ", lnr2, -(" << precalcd << " * a)));\n"
-		   << "\t\treal_t temp = fma(" << precalcc << ", a, fma(" << halfd << ", lnr2, " << ang << " * MwcNext(mwc)));\n"
+		   << "\t\treal_t temp = fma(" << precalcc << ", a, fma(" << halfd << ", lnr2, " << ang << " * MwcNextCrand(mwc)));\n"
 		   << "\t\tvOut.x = r * cos(temp);\n"
 		   << "\t\tvOut.y = r * sin(temp);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -7722,11 +7722,6 @@ public:
 		m_InnerabsPrecalc = std::abs(m_Innerradius);
 		m_FadeabsPrecalc = std::abs(m_Faderadius);
 		m_PowerhelperPrecalc = T(1.0) / std::abs(m_Power);
-	}
-
-	virtual vector<string> OpenCLGlobalFuncNames() const override
-	{
-		return vector<string> { "Zeps" };
 	}
 
 protected:

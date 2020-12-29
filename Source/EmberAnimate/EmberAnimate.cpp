@@ -340,7 +340,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		bool doOnlyExr16 = doExr16 && !doExr32;
 		vector<byte> rgb8Image;
 		vector<std::thread> writeFileThreads;
-		writeFileThreads.reserve(5);
+		writeFileThreads.reserve(6);
 
 		if (doBmp || doJpg)
 		{

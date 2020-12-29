@@ -310,6 +310,22 @@ static void Rgba32ToRgba32Exr(v4F* rgba, float* r, float* g, float* b, float* a,
 }
 
 /// <summary>
+/// Returns a string with all illegal file path characters removed.
+/// </summary>
+/// <param name="filename">The path to remove illegal characters from</param>
+/// <returns>The cleaned full file path and name.</returns>
+static string CleanPath(const string& filename)
+{
+	static string illegalChars = "\\/:*?\"<>|";
+	auto tempfilename = filename;
+
+	for (auto& ch : illegalChars)
+		tempfilename.erase(remove(tempfilename.begin(), tempfilename.end(), ch), tempfilename.end());
+
+	return tempfilename;
+}
+
+/// <summary>
 /// Make a filename for a single render. This is used in EmberRender.
 /// </summary>
 /// <param name="path">The path portion of where to save the file</param>
@@ -331,13 +347,13 @@ static string MakeSingleFilename(const string& path, const string& out, const st
 	}
 	else if (useFinalName)
 	{
-		filename = path + prefix + finalName + suffix + "." + format;
+		filename = path + CleanPath(prefix + finalName + suffix + "." + format);
 	}
 	else
 	{
 		ostringstream fnstream;
-		fnstream << path << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << i << suffix << "." << format;
-		filename = fnstream.str();
+		fnstream << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << i << suffix << "." << format;
+		filename = path + CleanPath(fnstream.str());
 	}
 
 	return filename;
@@ -355,8 +371,8 @@ static string MakeSingleFilename(const string& path, const string& out, const st
 static string MakeAnimFilename(const string& path, const string& prefix, const string& suffix, const string& format, glm::uint padding, size_t ftime)
 {
 	ostringstream fnstream;
-	fnstream << path << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << suffix << format;
-	return fnstream.str();
+	fnstream << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << suffix << format;
+	return path + CleanPath(fnstream.str());
 }
 
 /// <summary>

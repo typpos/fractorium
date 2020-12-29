@@ -891,7 +891,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 				m_DragState = eDragState::DragNone;
 			}
 		}
-        else if (e->button() == Qt::MiddleButton || (e->button() == Qt::RightButton && e->modifiers() & Qt::ShiftModifier && !(e->modifiers() & Qt::AltModifier)))//Middle button or right button with shift key, do whole image translation.
+		else if (e->button() == Qt::MiddleButton || (e->button() == Qt::RightButton && e->modifiers() & Qt::ShiftModifier && !(e->modifiers() & Qt::AltModifier)))//Middle button or right button with shift key, do whole image translation.
 		{
 			m_CenterDownX = ember->m_CenterX;//Capture where the center of the image is because this value will change when panning.
 			m_CenterDownY = ember->m_CenterY;
@@ -901,21 +901,21 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 		{
 			if (m_Fractorium->DrawImage())
 			{
-                m_CenterDownX = ember->m_CenterX;//Capture these because they will change when rotating and scaling.
-                m_CenterDownY = ember->m_CenterY;
+				m_CenterDownX = ember->m_CenterX;//Capture these because they will change when rotating and scaling.
+				m_CenterDownY = ember->m_CenterY;
 
-                if(GetAlt() && GetShift())
-                {
-                    m_PitchDown = ember->m_CamPitch * RAD_2_DEG_T;
-                    m_YawDown = ember->m_CamYaw * RAD_2_DEG_T;
-                    m_DragState = eDragState::DragPitchYaw;
-                }
-                else
-                {
-                    m_RotationDown = ember->m_Rotate;
-                    m_ScaleDown = ember->m_PixelsPerUnit;
-                    m_DragState = eDragState::DragRotateScale;
-                }
+				if (GetAlt() && GetShift())
+				{
+					m_PitchDown = ember->m_CamPitch * RAD_2_DEG_T;
+					m_YawDown = ember->m_CamYaw * RAD_2_DEG_T;
+					m_DragState = eDragState::DragPitchYaw;
+				}
+				else
+				{
+					m_RotationDown = ember->m_Rotate;
+					m_ScaleDown = ember->m_PixelsPerUnit;
+					m_DragState = eDragState::DragRotateScale;
+				}
 			}
 		}
 	}
@@ -1064,26 +1064,26 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		m_Fractorium->SetRotation(ember->m_Rotate, true);
 		m_Fractorium->SetScale(std::max(T(10), m_ScaleDown + scale));//Will restart the rendering process.
 	}
-    else if (m_DragState == eDragState::DragPitchYaw)//Pitching and yawing the whole image.
-    {
-        T pitch;
-        T yaw;
-        auto rotate = ember->m_Rotate;
+	else if (m_DragState == eDragState::DragPitchYaw)//Pitching and yawing the whole image.
+	{
+		T pitch;
+		T yaw;
+		auto rotate = ember->m_Rotate;
 
-        if((rotate <= 45 && rotate >= -45) || (rotate >= 135) || (rotate <= -135))
-        {
-            pitch = m_PitchDown + (m_MouseWorldPos.y - m_MouseDownWorldPos.y) * 100;
-            yaw   = m_YawDown + (m_MouseWorldPos.x - m_MouseDownWorldPos.x) * 100;
-        }
-        else
-        {
-            pitch = m_PitchDown + (m_MouseWorldPos.x - m_MouseDownWorldPos.x) * 100;
-            yaw   = m_YawDown + (m_MouseWorldPos.y - m_MouseDownWorldPos.y) * 100;
-        }
+		if ((rotate <= 45 && rotate >= -45) || (rotate >= 135) || (rotate <= -135))
+		{
+			pitch = m_PitchDown + (m_MouseWorldPos.y - m_MouseDownWorldPos.y) * 100;
+			yaw   = m_YawDown + (m_MouseWorldPos.x - m_MouseDownWorldPos.x) * 100;
+		}
+		else
+		{
+			pitch = m_PitchDown + (m_MouseWorldPos.x - m_MouseDownWorldPos.x) * 100;
+			yaw   = m_YawDown + (m_MouseWorldPos.y - m_MouseDownWorldPos.y) * 100;
+		}
 
-        m_Fractorium->SetPitch(pitch);
-        m_Fractorium->SetYaw(yaw);
-    }
+		m_Fractorium->SetPitch(pitch);
+		m_Fractorium->SetYaw(yaw);
+	}
 	else
 	{
 		//If the user doesn't already have a key down, and they aren't dragging, clear the keys to be safe.
@@ -1392,21 +1392,21 @@ void GLWidget::DrawUnitSquare()
 	GLfloat vertices[] =//Should these be of type T?//TODO
 	{
 		-1, -1,
-		1, -1,
-		-1, 1,
-		1, 1,
-		-1, -1,
-		-1, 1,
-		1, -1,
-		1, 1
-	};
+			1, -1,
+			-1, 1,
+			1, 1,
+			-1, -1,
+			-1, 1,
+			1, -1,
+			1, 1
+		};
 	QVector4D col(1.0f, 1.0f, 1.0f, 0.25f);
 	DrawPointOrLine(col, vertices, 8, GL_LINES);
 	GLfloat vertices2[] =//Should these be of type T?//TODO
 	{
 		-1, 0,
-		1, 0
-	};
+			1, 0
+		};
 	QVector4D col2(1.0f, 0.0f, 0.0f, 0.5f);
 	DrawPointOrLine(col2, vertices2, 2, GL_LINES);
 	GLfloat vertices3[] =//Should these be of type T?//TODO

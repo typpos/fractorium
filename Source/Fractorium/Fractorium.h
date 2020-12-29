@@ -114,8 +114,8 @@ public:
 	bool ApplyAll();
 	void SetRotation(double rot, bool stealth);
 	void SetScale(double scale);
-    void SetPitch(double pitch);
-    void SetYaw(double yaw);
+	void SetPitch(double pitch);
+	void SetYaw(double yaw);
 	void SetCoordinateStatus(int rasX, int rasY, float worldX, float worldY);
 	void CenterScrollbars();
 

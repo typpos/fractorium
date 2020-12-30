@@ -310,6 +310,13 @@ void DoubleSpinBox::keyPressEvent(QKeyEvent* ke)
 
 		ke->accept();
 	}
+	else if (ke->key() == Qt::Key_Space)
+	{
+		if (IsClose(m_DoubleClickLowVal, value()))
+			setValue(m_DoubleClickZero);
+		else
+			setValue(m_DoubleClickNonZero);
+	}
 	else
 		QDoubleSpinBox::keyPressEvent(ke);
 }

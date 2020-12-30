@@ -306,6 +306,19 @@ void SpinBox::keyPressEvent(QKeyEvent* ke)
 
 		ke->accept();
 	}
+	else if (ke->key() == Qt::Key_Space)
+	{
+		if (m_DoubleClickLowVal == value())
+		{
+			m_DoubleClickZeroEvent(this, m_DoubleClickZero);
+			setValue(m_DoubleClickZero);
+		}
+		else
+		{
+			m_DoubleClickNonZeroEvent(this, m_DoubleClickNonZero);
+			setValue(m_DoubleClickNonZero);
+		}
+	}
 	else
 		QSpinBox::keyPressEvent(ke);
 }

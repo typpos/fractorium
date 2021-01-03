@@ -1569,7 +1569,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T xl, yl;
-		sincos(m_Rad, &xl, &yl);
+		sincos(m_Rad, &yl, &xl);
 		auto blockx = (int)Floor(helper.In.x * m_Width);//Calculate which block we're in.
 		blockx += int(2 - 4 * VarFuncs<T>::Hash(int(blockx * m_Seed + 1)));//Varying width and length.
 		auto blocky = (int)Floor(helper.In.y * m_Width);
@@ -1600,7 +1600,7 @@ public:
 		string rad   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t xl, yl;\n"
-		   << "\t\txl = sincos(" << rad << ", &yl);\n"
+		   << "\t\tyl = sincos(" << rad << ", &xl);\n"
 		   << "\t\tint blockx = (int)floor(vIn.x * " << width << ");\n"
 		   << "\t\tblockx += (int)(2 - 4 * Hash((int)(blockx * (int)" << seed << " + 1)));\n"
 		   << "\t\tint blocky = (int)floor(vIn.y * " << width << ");\n"

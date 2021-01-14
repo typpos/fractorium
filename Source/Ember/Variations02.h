@@ -907,6 +907,11 @@ public:
 				helper.Out.x = m_Weight * px;
 				helper.Out.y = m_Weight * py;
 			}
+			else
+			{
+				helper.Out.x = 0;
+				helper.Out.y = 0;
+			}
 		}
 
 		helper.Out.z = DefaultZ(helper);
@@ -946,6 +951,11 @@ public:
 		   << "\n"
 		   << "\t\t		vOut.x = " << weight << " * px;\n"
 		   << "\t\t		vOut.y = " << weight << " * py;\n"
+		   << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = (real_t)0.0;\n"
+		   << "\t\t		vOut.y = (real_t)0.0;\n"
 		   << "\t\t	}\n"
 		   << "\t\t}\n"
 		   << "\n"

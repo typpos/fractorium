@@ -1267,7 +1267,6 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 	//Timing t2(4);
 	m_IterTimer.Tic();
 	size_t totalItersPerThread = size_t(ceil(double(iterCount) / double(m_ThreadsToUse)));
-	double percent, etaMs;
 	EmberStats stats;
 	//vector<double> accumTimes(4);
 
@@ -1334,25 +1333,28 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 
 			if (m_Callback && threadIndex == 0)
 			{
-				percent = 100.0 *
-						  double
-						  (
-							  double
-							  (
-								  double
-								  (
-									  //Takes progress of current thread and multiplies by thread count.
-									  //This assumes the threads progress at roughly the same speed.
-									  double(m_LastIter + (m_SubBatch[threadIndex] * m_ThreadsToUse)) / double(ItersPerTemporalSample())
-								  ) + temporalSample
-							  ) / double(TemporalSamples())
-						  );
+				auto percent = 100.0 *
+							   double
+							   (
+								   double
+								   (
+									   double
+									   (
+										   //Takes progress of current thread and multiplies by thread count.
+										   //This assumes the threads progress at roughly the same speed.
+										   //Adding m_LastIter is done so that an incremental render still gives an accurate percentage.
+										   double(m_LastIter + (m_SubBatch[threadIndex] * m_ThreadsToUse)) / double(ItersPerTemporalSample())
+									   ) + temporalSample
+								   ) / double(TemporalSamples())
+							   );
 				double percentDiff = percent - m_LastIterPercent;
 				double toc = m_ProgressTimer.Toc();
 
 				if (percentDiff >= 10 || (toc > 1000 && percentDiff >= 1))//Call callback function if either 10% has passed, or one second (and 1%).
 				{
-					etaMs = ((100.0 - percent) / percent) * m_RenderTimer.Toc();
+					auto startingpercent = 100.0 * (m_LastIter / double(ItersPerTemporalSample()));//This is done to support incremental renders, starting from the percentage it left off on.
+					auto currentpercent = percent - startingpercent;//Current percent in terms of starting percentage. So starting at 50% and progressing 5% will give a value of 5%, not 55%.
+					auto etaMs = currentpercent == 0 ? 0 : (((100.0 - startingpercent) - currentpercent) / currentpercent) * m_RenderTimer.Toc();//Subtract startingpercent from 100% so that it's properly scaled, meaning rendering from 50% - 100% will be treated as 0% - 100%.
 
 					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 0, etaMs))
 						Abort();

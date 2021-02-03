@@ -174,18 +174,11 @@ public:
 	void Init()
 	{
 		for (size_t i = 0; i < 4; i++)
-		{
-			m_Points[i].resize(5);
-			m_Points[i][0] = v2T(0);
-			m_Points[i][1] = v2T(T(0.25));
-			m_Points[i][2] = v2T(T(0.50));
-			m_Points[i][3] = v2T(T(0.75));
-			m_Points[i][4] = v2T(1);
-		}
+			Init(i);
 	}
 
 	/// <summary>
-	/// Set the a specific curve and its weight value to their default state.
+	/// Set a specific curve and its weight value to their default state.
 	/// </summary>
 	void Init(size_t i)
 	{

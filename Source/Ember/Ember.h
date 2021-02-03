@@ -801,6 +801,8 @@ public:
 		//At this point, all of the curves at a given curve index (0 - 3) should have the same number of spline points across all embers.
 		for (size_t i = 0; i < embers[0].m_Curves.m_Points.size(); i++)//4 point arrays.
 		{
+			m_Curves.m_Points[i].clear();
+
 			while (m_Curves.m_Points[i].size() < embers[0].m_Curves.m_Points[i].size())
 				m_Curves.m_Points[i].push_back(v2F(0));
 

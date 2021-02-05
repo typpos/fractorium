@@ -3148,7 +3148,7 @@ public:
 	{
 		T bx = 0;
 		T by = 0;
-		T rad = std::sqrt(Sqr((helper.In.x - m_X0) / m_OneOverMulXSq) + Sqr((helper.In.y - m_Y0) / m_OneOverMulYSq));
+		T rad = std::sqrt(Sqr((helper.In.x - m_X0) * m_OneOverMulX) + Sqr((helper.In.y - m_Y0) * m_OneOverMulY));
 
 		if (rad > m_Radius)
 		{
@@ -3159,14 +3159,15 @@ public:
 			T z = std::sqrt(1 + SQR(x) - 2 * x * std::cos(m_Alpha));
 			int iangle = int(int_angle);
 
-			if (!(iangle & 1))
+			if (iangle & 1)
 				int_angle = m_2piOverPower * (iangle / 2) + std::asin(std::sin(m_Alpha) * x / Zeps(z));
 			else
 				int_angle = m_2piOverPower * (iangle / 2) - std::asin(std::sin(m_Alpha) * x / Zeps(z));
 
 			z *= std::sqrt(rand.Frand01<T>());
-			by = std::sin(int_angle - T(M_PI_2));
-			bx = std::cos(int_angle - T(M_PI_2));
+			auto temp = int_angle - T(M_PI_2);
+			by = std::sin(temp);
+			bx = std::cos(temp);
 			T aux = z * m_BlurOver10 * std::exp(std::log(rad - m_Radius) * m_Exp);
 			by = aux * by;
 			bx = aux * bx;
@@ -3198,12 +3199,12 @@ public:
 		string blurover10     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power2         = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string twopioverpower = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string oneovermulsqx  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string oneovermulsqy  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermulx    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string oneovermuly    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t bx = 0;\n"
 		   << "\t\treal_t by = 0;\n"
-		   << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << oneovermulsqx << ") + Sqr((vIn.y - " << y0 << ") / " << oneovermulsqy << "));\n"
+		   << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") * " << oneovermulx << ") + Sqr((vIn.y - " << y0 << ") * " << oneovermuly << "));\n"
 		   << "\n"
 		   << "\t\tif (rad > " << radius << ")\n"
 		   << "\t\t{\n"
@@ -3214,14 +3215,15 @@ public:
 		   << "\t\t	real_t z = sqrt(1 + SQR(x) - 2 * x * cos(" << alpha << "));\n"
 		   << "\t\t	int iangle = (int)int_angle;\n"
 		   << "\n"
-		   << "\t\t	if (!(iangle & 1))\n"
+		   << "\t\t	if (iangle & 1)\n"
 		   << "\t\t		int_angle = " << twopioverpower << " * (iangle / 2) + asin(sin(" << alpha << ") * x / Zeps(z));\n"
 		   << "\t\t	else\n"
 		   << "\t\t		int_angle = " << twopioverpower << " * (iangle / 2) - asin(sin(" << alpha << ") * x / Zeps(z));\n"
 		   << "\n"
 		   << "\t\t	z *= sqrt(MwcNext01(mwc));\n"
-		   << "\t\t	by = sin(int_angle - MPI2);\n"
-		   << "\t\t	bx = cos(int_angle - MPI2);\n"
+		   << "\t\t	real_t temp = int_angle - MPI2;\n"
+		   << "\t\t	by = sin(temp);\n"
+		   << "\t\t	bx = cos(temp);\n"
 		   << "\t\t	real_t aux = z * " << blurover10 << " * exp(log(rad - " << radius << ") * " << exp << ");\n"
 		   << "\t\t	by = aux * by;\n"
 		   << "\t\t	bx = aux * bx;\n"
@@ -3242,8 +3244,8 @@ public:
 		m_BlurOver10 = m_Blur / 10;
 		m_Power2 = m_Power * 2;
 		m_2piOverPower = M_2PI / Zeps(m_Power);
-		m_OneOverMulXSq = 1 / Zeps(SQR(m_MulX));
-		m_OneOverMulYSq = 1 / Zeps(SQR(m_MulY));
+		m_OneOverMulX = 1 / Zeps(m_MulX);
+		m_OneOverMulY = 1 / Zeps(m_MulY);
 	}
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
@@ -3270,8 +3272,8 @@ protected:
 		m_Params.push_back(ParamWithName<T>(true, &m_BlurOver10,    prefix + "depth_blur2_blur_over_10"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Power2,        prefix + "depth_blur2_power2"));
 		m_Params.push_back(ParamWithName<T>(true, &m_2piOverPower,  prefix + "depth_blur2_2pi_over_power"));
-		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulXSq, prefix + "depth_blur2_one_over_mulx_sq"));
-		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulYSq, prefix + "depth_blur2_one_over_muly_sq"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulX,   prefix + "depth_blur2_one_over_mulx"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverMulY,   prefix + "depth_blur2_one_over_muly"));
 	}
 
 private:
@@ -3289,8 +3291,8 @@ private:
 	T m_BlurOver10;
 	T m_Power2;
 	T m_2piOverPower;
-	T m_OneOverMulXSq;
-	T m_OneOverMulYSq;
+	T m_OneOverMulX;
+	T m_OneOverMulY;
 };
 
 /// <summary>

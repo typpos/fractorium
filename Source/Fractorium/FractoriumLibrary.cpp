@@ -85,8 +85,9 @@ void Fractorium::SelectLibraryItem(size_t index)
 /// <summary>
 /// Get the index of the currently selected ember in the library tree.
 /// </summary>
+/// <param name="isChecked">Whether to search for items that are checked or items that are only selected</param>
 /// <returns>A pair containing the index of the item clicked and a pointer to the item</param>
-vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex()
+vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex(bool isChecked)
 {
 	int index = 0;
 	QTreeWidgetItem* item = nullptr;
@@ -100,7 +101,15 @@ vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex()
 			item = top->child(index);
 
 			if (item && item->isSelected())
-				v.push_back(make_pair(index, item));
+			{
+				if (isChecked)
+				{
+					if (item->checkState(0) == Qt::Checked)
+						v.push_back(make_pair(index, item));
+				}
+				else
+					v.push_back(make_pair(index, item));
+			}
 
 			index++;
 		}

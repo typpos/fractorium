@@ -436,7 +436,7 @@ private:
 
 	//Library.
 	void SelectLibraryItem(size_t index);
-	vector<pair<size_t, QTreeWidgetItem*>> GetCurrentEmberIndex();
+	vector<pair<size_t, QTreeWidgetItem*>> GetCurrentEmberIndex(bool isChecked);
 	void SyncSequenceSettings();
 
 	//Params.

@@ -372,6 +372,8 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	static int commacount = 0;
 	static int periodcount = 0;
 	static int lcount = 0;
+	const bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	const bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
 	if (o == ui.GLParentScrollArea && e->type() == QEvent::Resize)
 	{
@@ -393,7 +395,12 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			{
 				const int val = ke->key() - (int)Qt::Key_F1;
 
-				if (val < combo->count())
+				if (shift)
+				{
+					if (val < ui.LibraryTree->topLevelItem(0)->childCount())
+						m_Controller->SetEmber(val, true);
+				}
+				else if (val < combo->count())
 					combo->setCurrentIndex(val);
 
 				fcount = 0;
@@ -407,7 +414,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			//Require shift for deleting to prevent it from triggering when the user enters delete in the edit box.
 			if (ke->key() == Qt::Key_Delete && e->type() == QEvent::KeyRelease && shift)
 			{
-				auto v = GetCurrentEmberIndex();
+				auto v = GetCurrentEmberIndex(false);
 
 				if (ui.LibraryTree->topLevelItem(0)->childCount() > 1)
 					OnDelete(v);
@@ -428,15 +435,25 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					!focusedctrlCombo &&
 					!QGuiApplication::keyboardModifiers().testFlag(Qt::AltModifier))//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform. Also exclude alt.
 			{
-				unsigned int index = combo->currentIndex();
+				unsigned int index;
 				double vdist = 0.01;
 				double hdist = 0.01;
 				double zoom = 1;
 				double rot = 1;
 				double grow = 0.01;
-				const bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-				const bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 				bool pre = true;
+
+				if (shift)
+				{
+					auto v = GetCurrentEmberIndex(true);
+
+					if (v.size() > 0)
+						index = v[0].first;
+					else
+						index = 0;
+				}
+				else
+					index = combo->currentIndex();
 
 				if (const auto r = m_Controller->Renderer())
 				{
@@ -471,7 +488,12 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					if (xfupcount >= times)
 					{
 						xfupcount = 0;
-						combo->setCurrentIndex((index + 1) % combo->count());
+
+						if (shift)
+							m_Controller->SetEmber((index + 1) % ui.LibraryTree->topLevelItem(0)->childCount(), true);
+						else
+							combo->setCurrentIndex((index + 1) % combo->count());
+
 						//qDebug() << "global arrow plus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
 					}
 
@@ -485,10 +507,21 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					{
 						xfdncount = 0;
 
-						if (index == 0)
-							index = combo->count();
+						if (shift)
+						{
+							if (index == 0)
+								index = ui.LibraryTree->topLevelItem(0)->childCount();
 
-						combo->setCurrentIndex((index - 1) % combo->count());
+							m_Controller->SetEmber((index - 1) % ui.LibraryTree->topLevelItem(0)->childCount(), true);
+						}
+						else
+						{
+							if (index == 0)
+								index = combo->count();
+
+							combo->setCurrentIndex((index - 1) % combo->count());
+						}
+
 						//qDebug() << "global arrow minus key press: " << ke->key() << " " << o->metaObject()->className() << " " << o->objectName();
 					}
 

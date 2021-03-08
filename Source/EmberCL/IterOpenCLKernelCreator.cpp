@@ -589,6 +589,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 
 #else
 	os <<
+	   "\n"
 	   "		firstPoint = secondPoint;\n";//For testing, using straight rand flam4/fractron style instead of cuburn.
 #endif
 	os <<

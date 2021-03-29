@@ -435,7 +435,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					!focusedctrlCombo &&
 					!QGuiApplication::keyboardModifiers().testFlag(Qt::AltModifier))//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform. Also exclude alt.
 			{
-				unsigned int index;
+				size_t index;
 				double vdist = 0.01;
 				double hdist = 0.01;
 				double zoom = 1;
@@ -1233,6 +1233,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendCWCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendMaxSpinBox);
+	w = SetTabOrder(this, w, ui.SequenceLinearCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceGenerateButton);
 	w = SetTabOrder(this, w, ui.SequenceRenderButton);
 	w = SetTabOrder(this, w, ui.SequenceSaveButton);

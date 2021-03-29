@@ -42,6 +42,7 @@
 #define BLENDFRAMESMAX		 "sequence/blendframesmax"
 #define ROTATIONSPERBLEND	 "sequence/rotationsperblend"
 #define ROTATIONSPERBLENDMAX "sequence/rotationsperblendmax"
+#define LINEAR				 "sequence/linear"
 
 #define VARFILTERSUM         "varfilter/sumcheckbox"
 #define VARFILTERASSIGN      "varfilter/assigncheckbox"
@@ -213,6 +214,9 @@ public:
 
 	uint RotationsPerBlendMax();
 	void RotationsPerBlendMax(uint i);
+
+	bool Linear();
+	void Linear(bool b);
 
 	int VarFilterSum();
 	void VarFilterSum(int i);

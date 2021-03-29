@@ -80,8 +80,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1277</width>
-      <height>985</height>
+      <width>1279</width>
+      <height>980</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -173,7 +173,7 @@
             <x>0</x>
             <y>0</y>
             <width>230</width>
-            <height>934</height>
+            <height>931</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -263,14 +263,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -278,14 +278,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -455,14 +455,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -470,14 +470,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -536,14 +536,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -551,14 +551,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -636,14 +636,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -651,14 +651,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -773,14 +773,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>120</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -788,14 +788,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -1123,14 +1123,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1138,14 +1138,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -1299,14 +1299,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1314,14 +1314,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <column>
               <property name="text">
@@ -1408,14 +1408,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>145</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1423,14 +1423,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <row>
               <property name="text">
@@ -1463,7 +1463,7 @@
                <string>Interpolation</string>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method to use when interpolating flames during sequence generation. Linear uses basic linear interpolation when generating all of the steps between key frames, while Smooth uses log interpolation.&lt;/p&gt;&lt;p&gt;The first and last key frames in a sequence must use Linear.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method used when interpolating flame parameters between keyframes during sequence generation.&lt;/p&gt;&lt;p&gt;Linear: use basic linear interpolation. Requires two keyframes.&lt;/p&gt;&lt;p&gt;Smooth: use Catmull-Rom interpolation. Requires four keyframes.&lt;/p&gt;&lt;p&gt;The first and last keyframes in a sequence will automatically use Linear.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="1" column="0">
@@ -1471,7 +1471,7 @@
                <string>Affine Interpolation</string>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method to use when interpolating affine transforms during sequence generation.&lt;/p&gt;&lt;p&gt;Linear uses basic linear interpolation for each coefficient of affines, while Log converts to polar coordinates before interpolating.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method used when interpolating affine transforms between keyframes during sequence generation.&lt;/p&gt;&lt;p&gt;Linear: move each affine coordinate in a straight line from one keyframe to the next.&lt;/p&gt;&lt;p&gt;Log: rotate each affine coordinate from one keyframe to the next.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="2" column="0">
@@ -1572,14 +1572,14 @@
              <attribute name="horizontalHeaderCascadingSectionResizes">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>35</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>120</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>35</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1587,14 +1587,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -1821,14 +1821,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>15</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>15</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -1836,14 +1836,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>16</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>16</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>16</number>
              </attribute>
              <column>
               <property name="text">
@@ -1880,7 +1880,7 @@
      <property name="minimumSize">
       <size>
        <width>310</width>
-       <height>428</height>
+       <height>439</height>
       </size>
      </property>
      <property name="floating">
@@ -2173,26 +2173,26 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>35</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>35</number>
-         </attribute>
          <attribute name="verticalHeaderCascadingSectionResizes">
           <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
          </attribute>
         </widget>
        </item>
@@ -2296,10 +2296,10 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
+         <attribute name="horizontalHeaderMinimumSectionSize">
           <number>35</number>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
+         <attribute name="horizontalHeaderDefaultSectionSize">
           <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderStretchLastSection">
@@ -2311,10 +2311,10 @@
          <attribute name="verticalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
+         <attribute name="verticalHeaderMinimumSectionSize">
           <number>22</number>
          </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
+         <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <row/>
@@ -2370,23 +2370,23 @@
          <property name="cornerButtonEnabled">
           <bool>true</bool>
          </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>35</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>35</number>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
          </attribute>
         </widget>
        </item>
@@ -2554,10 +2554,10 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
-             <attribute name="horizontalHeaderDefaultSectionSize">
+             <attribute name="horizontalHeaderMinimumSectionSize">
               <number>62</number>
              </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
+             <attribute name="horizontalHeaderDefaultSectionSize">
               <number>62</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
@@ -2566,14 +2566,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>22</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>22</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>22</number>
              </attribute>
              <row/>
              <row/>
@@ -2793,10 +2793,10 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
-             <attribute name="verticalHeaderDefaultSectionSize">
+             <attribute name="verticalHeaderMinimumSectionSize">
               <number>20</number>
              </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
+             <attribute name="verticalHeaderDefaultSectionSize">
               <number>20</number>
              </attribute>
              <row/>
@@ -2905,14 +2905,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>16</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>16</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>16</number>
              </attribute>
              <attribute name="verticalHeaderStretchLastSection">
               <bool>false</bool>
@@ -3140,7 +3140,7 @@
             <x>0</x>
             <y>0</y>
             <width>291</width>
-            <height>876</height>
+            <height>874</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -3489,14 +3489,14 @@
              <attribute name="horizontalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>27</number>
+             </attribute>
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>110</number>
              </attribute>
              <attribute name="horizontalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="horizontalHeaderMinimumSectionSize">
-              <number>27</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -3504,14 +3504,14 @@
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>21</number>
+             </attribute>
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>21</number>
              </attribute>
              <attribute name="verticalHeaderHighlightSections">
               <bool>false</bool>
-             </attribute>
-             <attribute name="verticalHeaderMinimumSectionSize">
-              <number>21</number>
              </attribute>
              <row/>
              <column>
@@ -3707,11 +3707,11 @@
                  <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="horizontalHeaderHighlightSections">
-                  <bool>false</bool>
-                 </attribute>
                  <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>27</number>
+                 </attribute>
+                 <attribute name="horizontalHeaderHighlightSections">
+                  <bool>false</bool>
                  </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
@@ -3719,14 +3719,14 @@
                  <attribute name="verticalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>21</number>
+                 </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
                   <number>21</number>
                  </attribute>
                  <attribute name="verticalHeaderHighlightSections">
                   <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
-                  <number>21</number>
                  </attribute>
                  <attribute name="verticalHeaderStretchLastSection">
                   <bool>false</bool>
@@ -4043,14 +4043,14 @@
                  <attribute name="horizontalHeaderCascadingSectionResizes">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="horizontalHeaderMinimumSectionSize">
+                  <number>27</number>
+                 </attribute>
                  <attribute name="horizontalHeaderDefaultSectionSize">
                   <number>125</number>
                  </attribute>
                  <attribute name="horizontalHeaderHighlightSections">
                   <bool>false</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderMinimumSectionSize">
-                  <number>27</number>
                  </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
                   <bool>true</bool>
@@ -4058,14 +4058,14 @@
                  <attribute name="verticalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
+                 <attribute name="verticalHeaderMinimumSectionSize">
+                  <number>22</number>
+                 </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
                   <number>22</number>
                  </attribute>
                  <attribute name="verticalHeaderHighlightSections">
                   <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
-                  <number>22</number>
                  </attribute>
                  <attribute name="verticalHeaderStretchLastSection">
                   <bool>false</bool>
@@ -4310,14 +4310,14 @@
                     <attribute name="horizontalHeaderVisible">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>40</number>
+                    </attribute>
                     <attribute name="horizontalHeaderDefaultSectionSize">
                      <number>100</number>
                     </attribute>
                     <attribute name="horizontalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderMinimumSectionSize">
-                     <number>40</number>
                     </attribute>
                     <attribute name="horizontalHeaderStretchLastSection">
                      <bool>true</bool>
@@ -4328,14 +4328,14 @@
                     <attribute name="verticalHeaderCascadingSectionResizes">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="verticalHeaderMinimumSectionSize">
+                     <number>22</number>
+                    </attribute>
                     <attribute name="verticalHeaderDefaultSectionSize">
                      <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderMinimumSectionSize">
-                     <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
@@ -5115,14 +5115,14 @@
                     <attribute name="horizontalHeaderVisible">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>40</number>
+                    </attribute>
                     <attribute name="horizontalHeaderDefaultSectionSize">
                      <number>100</number>
                     </attribute>
                     <attribute name="horizontalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderMinimumSectionSize">
-                     <number>40</number>
                     </attribute>
                     <attribute name="horizontalHeaderStretchLastSection">
                      <bool>true</bool>
@@ -5133,14 +5133,14 @@
                     <attribute name="verticalHeaderCascadingSectionResizes">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="verticalHeaderMinimumSectionSize">
+                     <number>22</number>
+                    </attribute>
                     <attribute name="verticalHeaderDefaultSectionSize">
                      <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderMinimumSectionSize">
-                     <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
@@ -6035,14 +6035,14 @@
                  <property name="columnCount">
                   <number>3</number>
                  </property>
+                 <attribute name="headerMinimumSectionSize">
+                  <number>10</number>
+                 </attribute>
                  <attribute name="headerDefaultSectionSize">
                   <number>70</number>
                  </attribute>
                  <attribute name="headerHighlightSections">
                   <bool>true</bool>
-                 </attribute>
-                 <attribute name="headerMinimumSectionSize">
-                  <number>10</number>
                  </attribute>
                  <attribute name="headerShowSortIndicator" stdset="0">
                   <bool>true</bool>
@@ -6268,7 +6268,7 @@
                        <x>0</x>
                        <y>0</y>
                        <width>267</width>
-                       <height>670</height>
+                       <height>656</height>
                       </rect>
                      </property>
                      <property name="sizePolicy">
@@ -6398,7 +6398,7 @@
             <x>0</x>
             <y>0</y>
             <width>291</width>
-            <height>856</height>
+            <height>854</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -6528,10 +6528,10 @@
                  <attribute name="horizontalHeaderVisible">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="horizontalHeaderDefaultSectionSize">
+                 <attribute name="horizontalHeaderMinimumSectionSize">
                   <number>22</number>
                  </attribute>
-                 <attribute name="horizontalHeaderMinimumSectionSize">
+                 <attribute name="horizontalHeaderDefaultSectionSize">
                   <number>22</number>
                  </attribute>
                  <attribute name="horizontalHeaderStretchLastSection">
@@ -6543,10 +6543,10 @@
                  <attribute name="verticalHeaderCascadingSectionResizes">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="verticalHeaderDefaultSectionSize">
+                 <attribute name="verticalHeaderMinimumSectionSize">
                   <number>21</number>
                  </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
+                 <attribute name="verticalHeaderDefaultSectionSize">
                   <number>21</number>
                  </attribute>
                  <attribute name="verticalHeaderStretchLastSection">
@@ -6669,11 +6669,11 @@
                  <attribute name="headerCascadingSectionResizes">
                   <bool>false</bool>
                  </attribute>
-                 <attribute name="headerDefaultSectionSize">
-                  <number>100</number>
-                 </attribute>
                  <attribute name="headerMinimumSectionSize">
                   <number>30</number>
+                 </attribute>
+                 <attribute name="headerDefaultSectionSize">
+                  <number>100</number>
                  </attribute>
                  <attribute name="headerShowSortIndicator" stdset="0">
                   <bool>false</bool>
@@ -6794,7 +6794,7 @@
                <bool>true</bool>
               </property>
               <attribute name="title">
-               <string>Bounds</string>
+               <string>Bounds &amp;&amp; Log</string>
               </attribute>
               <attribute name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Information that is only useful as an engineering interest, and a log output in the event something went wrong&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -7073,14 +7073,14 @@
                     <attribute name="horizontalHeaderCascadingSectionResizes">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="horizontalHeaderMinimumSectionSize">
+                     <number>27</number>
+                    </attribute>
                     <attribute name="horizontalHeaderDefaultSectionSize">
                      <number>110</number>
                     </attribute>
                     <attribute name="horizontalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="horizontalHeaderMinimumSectionSize">
-                     <number>27</number>
                     </attribute>
                     <attribute name="horizontalHeaderStretchLastSection">
                      <bool>true</bool>
@@ -7088,14 +7088,14 @@
                     <attribute name="verticalHeaderVisible">
                      <bool>false</bool>
                     </attribute>
+                    <attribute name="verticalHeaderMinimumSectionSize">
+                     <number>22</number>
+                    </attribute>
                     <attribute name="verticalHeaderDefaultSectionSize">
                      <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderHighlightSections">
                      <bool>false</bool>
-                    </attribute>
-                    <attribute name="verticalHeaderMinimumSectionSize">
-                     <number>22</number>
                     </attribute>
                     <attribute name="verticalHeaderStretchLastSection">
                      <bool>false</bool>
@@ -7282,7 +7282,7 @@
      <x>0</x>
      <y>0</y>
      <width>1712</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">
@@ -7515,8 +7515,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>424</width>
-           <height>574</height>
+           <width>422</width>
+           <height>587</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -7546,255 +7546,6 @@
             <property name="spacing">
              <number>4</number>
             </property>
-            <item row="6" column="1">
-             <layout class="QGridLayout" name="SequenceBlendRotationsGridLayout" columnstretch="2,1">
-              <property name="spacing">
-               <number>4</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QSpinBox" name="SequenceRotationsPerBlendSpinBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>95</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times the xforms will do a 360 degree rotation while interpolating from one keyframe to the next. Note that only xforms which have the animate flag set to true will be rotated.&lt;/p&gt;&lt;p&gt;Set to 0 to omit rotation while interpolating.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="buttonSymbols">
-                 <enum>QAbstractSpinBox::NoButtons</enum>
-                </property>
-                <property name="prefix">
-                 <string>Rot per blend: </string>
-                </property>
-                <property name="maximum">
-                 <number>100</number>
-                </property>
-                <property name="value">
-                 <number>1</number>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="SequenceRotationsPerBlendCWCheckBox">
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Direction of rotation during interpolation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="text">
-                 <string>CW</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="6" column="0">
-             <widget class="QCheckBox" name="SequenceRandomizeRotationsPerBlendCheckBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0" alignment="Qt::AlignLeft">
-             <widget class="QCheckBox" name="SequenceRandomizeStaggerCheckBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check any checkbox to have the value corresponding to its row be randomly selected between the values of first and second controls on that row&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-              <property name="text">
-               <string>Random</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QSpinBox" name="SequenceBlendFramesSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of frames used to interpolate from one keyframe to the next. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="suffix">
-               <string/>
-              </property>
-              <property name="prefix">
-               <string>Blend frames: </string>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>120</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0" alignment="Qt::AlignLeft">
-             <widget class="QCheckBox" name="SequenceRandomizeBlendFramesCheckBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QSpinBox" name="SequenceStartFlameSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>125</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 0-based index of the first flame in the file to start the sequence with&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Start flame: </string>
-              </property>
-              <property name="maximum">
-               <number>999999999</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="2">
-             <widget class="QSpinBox" name="SequenceRandomBlendMaxFramesSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Blend frames max: </string>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>120</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QDoubleSpinBox" name="SequenceRandomRotationsMaxSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Rotations max: </string>
-              </property>
-              <property name="maximum">
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>3.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QSpinBox" name="SequenceStartCountSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The starting number to use as the name of the first flame in the sequence. This is useful when using an animation program that expects a certain number for the filename.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Start count: </string>
-              </property>
-              <property name="maximum">
-               <number>999999999</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QSpinBox" name="SequenceStopFlameSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 0-based index of the last flame in the file to end the sequence on&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Stop flame: </string>
-              </property>
-              <property name="maximum">
-               <number>999999999</number>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="2">
              <widget class="QPushButton" name="SequenceAllButton">
               <property name="sizePolicy">
@@ -7820,19 +7571,6 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QPushButton" name="SequenceStartPreviewsButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Start Previews</string>
-              </property>
-             </widget>
-            </item>
             <item row="2" column="2">
              <widget class="QDoubleSpinBox" name="SequenceRandomStaggerMaxSpinBox">
               <property name="enabled">
@@ -7852,6 +7590,19 @@
               </property>
               <property name="value">
                <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QCheckBox" name="SequenceRandomizeRotationsCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -7880,112 +7631,21 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="SequenceStopPreviewsButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Stop Previews</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="2">
-             <widget class="QSpinBox" name="SequenceRotationsPerBlendMaxSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Rot per blend max: </string>
-              </property>
-              <property name="minimum">
-               <number>0</number>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QSpinBox" name="SequenceFramesPerRotSpinBox">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of frames for each rotation specified by Rotations. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Frames per rot: </string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>30</number>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QCheckBox" name="SequenceRandomizeFramesPerRotCheckBox">
+            <item row="6" column="0">
+             <widget class="QCheckBox" name="SequenceRandomizeRotationsPerBlendCheckBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
-            <item row="4" column="2">
-             <widget class="QSpinBox" name="SequenceRandomFramesPerRotMaxSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="buttonSymbols">
-               <enum>QAbstractSpinBox::NoButtons</enum>
-              </property>
-              <property name="prefix">
-               <string>Frames per rot max: </string>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>10000</number>
-              </property>
-              <property name="value">
-               <number>30</number>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QCheckBox" name="SequenceRandomizeRotationsCheckBox">
+            <item row="5" column="0" alignment="Qt::AlignLeft">
+             <widget class="QCheckBox" name="SequenceRandomizeBlendFramesCheckBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -8041,6 +7701,356 @@
                </widget>
               </item>
              </layout>
+            </item>
+            <item row="1" column="0">
+             <widget class="QSpinBox" name="SequenceStartFlameSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>125</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 0-based index of the first flame in the file to start the sequence with&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Start flame: </string>
+              </property>
+              <property name="maximum">
+               <number>999999999</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="QSpinBox" name="SequenceRandomFramesPerRotMaxSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Frames per rot max: </string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>30</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QSpinBox" name="SequenceRotationsPerBlendMaxSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Rot per blend max: </string>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <layout class="QGridLayout" name="SequenceBlendRotationsGridLayout" columnstretch="2,1">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QSpinBox" name="SequenceRotationsPerBlendSpinBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>95</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of times the xforms will do a 360 degree rotation while interpolating from one keyframe to the next. Note that only xforms which have the animate flag set to true will be rotated.&lt;/p&gt;&lt;p&gt;Set to 0 to omit rotation while interpolating.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="buttonSymbols">
+                 <enum>QAbstractSpinBox::NoButtons</enum>
+                </property>
+                <property name="prefix">
+                 <string>Rot per blend: </string>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="SequenceRotationsPerBlendCWCheckBox">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Direction of rotation during interpolation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="text">
+                 <string>CW</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="0">
+             <widget class="QCheckBox" name="SequenceRandomizeFramesPerRotCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="SequenceStopFlameSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 0-based index of the last flame in the file to end the sequence on&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Stop flame: </string>
+              </property>
+              <property name="maximum">
+               <number>999999999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QDoubleSpinBox" name="SequenceRandomRotationsMaxSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Rotations max: </string>
+              </property>
+              <property name="maximum">
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QSpinBox" name="SequenceRandomBlendMaxFramesSpinBox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Blend frames max: </string>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>120</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="SequenceStopPreviewsButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Stop Previews</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QSpinBox" name="SequenceBlendFramesSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of frames used to interpolate from one keyframe to the next. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="suffix">
+               <string/>
+              </property>
+              <property name="prefix">
+               <string>Blend frames: </string>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>120</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" alignment="Qt::AlignLeft">
+             <widget class="QCheckBox" name="SequenceRandomizeStaggerCheckBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check any checkbox to have the value corresponding to its row be randomly selected between the values of first and second controls on that row&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Random</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QSpinBox" name="SequenceFramesPerRotSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of frames for each rotation specified by Rotations. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Frames per rot: </string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10000</number>
+              </property>
+              <property name="value">
+               <number>30</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="SequenceStartPreviewsButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Start Previews</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QSpinBox" name="SequenceStartCountSpinBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The starting number to use as the name of the first flame in the sequence. This is useful when using an animation program that expects a certain number for the filename.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="buttonSymbols">
+               <enum>QAbstractSpinBox::NoButtons</enum>
+              </property>
+              <property name="prefix">
+               <string>Start count: </string>
+              </property>
+              <property name="maximum">
+               <number>999999999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QCheckBox" name="SequenceLinearCheckBox">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method used to compute the blending distance for each step between keyframes.&lt;/p&gt;&lt;p&gt;Checked: Each step will be a linear interpolation.&lt;/p&gt;&lt;p&gt;Unchecked: Steps in the beginning and end of the interpolation between keyframes will be smaller and those in the middle will be larger. This has the effect of slowing down the beginning and end portions, and speeding up the middle.&lt;/p&gt;&lt;p&gt;This option is the equivalend of the --unsmoother flag in EmberGenome.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Linear</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

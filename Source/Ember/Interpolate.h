@@ -667,13 +667,13 @@ public:
 	/// </summary>
 	/// <param name="embers">The vector of embers whose affine transforms will be copied and converted</param>
 	/// <param name="xfi">The xform index in each ember to convert</param>
-	/// <param name="cflag">If 0 convert pre affine, else post affine.</param>
+	/// <param name="post">True to convert post affine, else convert pre affine.</param>
 	/// <param name="cxAng">The vec2 vector to store the polar angular values</param>
 	/// <param name="cxMag">The vec2 vector to store the polar magnitude values</param>
 	/// <param name="cxTrn">The vec2 vector to store the polar translation values</param>
-	static void ConvertLinearToPolar(const vector<Ember<T>>& embers, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
+	static void ConvertLinearToPolar(const vector<Ember<T>>& embers, size_t xfi, bool post, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
 	{
-		ConvertLinearToPolar(embers.data(), embers.size(), xfi, cflag, cxAng, cxMag, cxTrn);
+		ConvertLinearToPolar(embers.data(), embers.size(), xfi, post, cxAng, cxMag, cxTrn);
 	}
 
 	/// <summary>
@@ -683,11 +683,11 @@ public:
 	/// <param name="embers">The array of embers whose affine transforms will be copied and converted</param>
 	/// <param name="size">The size of the embers array</param>
 	/// <param name="xfi">The xform index in each ember to convert</param>
-	/// <param name="cflag">If 0 convert pre affine, else post affine.</param>
+	/// <param name="post">True to convert post affine, else convert pre affine.</param>
 	/// <param name="cxAng">The vec2 vector to store the polar angular values</param>
 	/// <param name="cxMag">The vec2 vector to store the polar magnitude values</param>
 	/// <param name="cxTrn">The vec2 vector to store the polar translation values</param>
-	static void ConvertLinearToPolar(const Ember<T>* embers, size_t size, size_t xfi, size_t cflag, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
+	static void ConvertLinearToPolar(const Ember<T>* embers, size_t size, size_t xfi, bool post, vector<v2T>& cxAng, vector<v2T>& cxMag, vector<v2T>& cxTrn)
 	{
 		const auto LOCALEPS = T(1e-10);//Even though EPS is defined elsewhere, need this here for full compatibility with flam3.
 
@@ -710,7 +710,7 @@ public:
 				{
 					for (col = 0; col < 2; col++)
 					{
-						if (cflag == 0)
+						if (!post)
 						{
 							c1[0] = xform->m_Affine.m_Mat[0][col];//a or b.
 							c1[1] = xform->m_Affine.m_Mat[1][col];//d or e.
@@ -752,7 +752,7 @@ public:
 					if (auto xform = embers[k].GetTotalXform(xfi))
 					{
 						//Adjust angles differently if an asymmetric case.
-						if (xform->m_Wind[col] > 0 && cflag == 0)
+						if (xform->m_Wind[col] > 0 && !post)
 						{
 							//Adjust the angles to make sure that it's within wind : wind + 2pi.
 							refang = xform->m_Wind[col] - M_2PI;
@@ -880,7 +880,6 @@ public:
 				else
 					accmag[col] += coefs[i] * (cxMag[i][col]);
 
-				//Translation is ready to go.
 				store.m_Mat[col][2] += coefs[i] * cxTrn[i][col];
 			}
 		}

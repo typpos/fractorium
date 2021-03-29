@@ -239,6 +239,9 @@ void FractoriumSettings::RotationsPerBlend(uint i)    { setValue(ROTATIONSPERBLE
 uint FractoriumSettings::RotationsPerBlendMax()       { return value(ROTATIONSPERBLENDMAX).toUInt(); }
 void FractoriumSettings::RotationsPerBlendMax(uint i) { setValue(ROTATIONSPERBLENDMAX, i);           }
 
+bool FractoriumSettings::Linear()                     { return value(LINEAR).toBool();               }
+void FractoriumSettings::Linear(bool b)               { setValue(LINEAR, b);                         }
+
 /// <summary>
 /// Variations filter settings.
 /// </summary>

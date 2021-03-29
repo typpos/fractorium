@@ -61,6 +61,8 @@ void Fractorium::InitLibraryUI()
 	ui.SequenceRotationsPerBlendSpinBox->setMaximum(std::numeric_limits<int>::max());//Lower max = upper.
 	ui.SequenceRotationsPerBlendMaxSpinBox->setValue(m_Settings->RotationsPerBlendMax());//Upper.
 	ui.SequenceRotationsPerBlendMaxSpinBox->setMinimum(m_Settings->RotationsPerBlend());//Upper min = lower max.
+	//Linear.
+	ui.SequenceLinearCheckBox->setChecked(m_Settings->Linear());
 }
 
 /// <summary>
@@ -614,6 +616,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	const size_t start = ui.SequenceStartFlameSpinBox->value();
 	const size_t stop = ui.SequenceStopFlameSpinBox->value();
 	const size_t startCount = ui.SequenceStartCountSpinBox->value();
+	const bool linear = ui.SequenceLinearCheckBox->isChecked();
 	const size_t keyFrames = (stop - start) + 1;
 	size_t frameCount = 0;
 	double frames = 0;
@@ -647,7 +650,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 	}
 
 	SheepTools<T, float> tools(palettePath, EmberCommon::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
-	tools.SetSpinParams(true,
+	tools.SetSpinParams(!linear,
 						stagger,//Will be set again below if random is used.
 						0,
 						0,
@@ -918,6 +921,7 @@ void Fractorium::SyncSequenceSettings()
 	m_Settings->BlendFramesMax(ui.SequenceRandomBlendMaxFramesSpinBox->value());
 	m_Settings->RotationsPerBlend(ui.SequenceRotationsPerBlendSpinBox->value());
 	m_Settings->RotationsPerBlendMax(ui.SequenceRotationsPerBlendMaxSpinBox->value());
+	m_Settings->Linear(ui.SequenceLinearCheckBox->isChecked());
 }
 
 template class FractoriumEmberController<float>;

@@ -922,7 +922,7 @@ public:
 				vector<v2T> cxTrn(size);
 				thisXform->m_Affine.m_Mat = m23T(0);
 				//Affine part.
-				Interpolater<T>::ConvertLinearToPolar(embers, size, i, 0, cxAng, cxMag, cxTrn);
+				Interpolater<T>::ConvertLinearToPolar(embers, size, i, false, cxAng, cxMag, cxTrn);
 				Interpolater<T>::InterpAndConvertBack(coefs, cxAng, cxMag, cxTrn, thisXform->m_Affine);
 				//Post part.
 				allID = true;
@@ -945,7 +945,7 @@ public:
 				}
 				else
 				{
-					Interpolater<T>::ConvertLinearToPolar(embers, size, i, 1, cxAng, cxMag, cxTrn);
+					Interpolater<T>::ConvertLinearToPolar(embers, size, i, true, cxAng, cxMag, cxTrn);
 					Interpolater<T>::InterpAndConvertBack(coefs, cxAng, cxMag, cxTrn, thisXform->m_Post);
 				}
 			}

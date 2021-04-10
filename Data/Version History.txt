@@ -4,8 +4,8 @@
  -Sort palette filename combo box.
  -GPU rendering improvement on Mac.
  -Fix misaligned menu icons in uranium.css stylesheet, requires reload.
- -Rotate field now allows continues adjustment and will loop around when reaching 180/-180.
- -Tooltip for the show/hide affine toolbar buttons show the keyboard shortcut.
+ -Rotate field now allows continuous adjustment and will loop around when reaching 180/-180.
+ -Tooltips for the show/hide affine toolbar buttons show the keyboard shortcut.
  -Add vignette variation.
  -Pitch and yaw can now be changed by dragging with the right mouse button while holding Shift and Alt.
  -Allow for an opacity greater than 1, which can have the effect of highlighting a specific xform.

@@ -41,7 +41,7 @@ Download: [Fractorium-21.21.4.1.x86_64.deb](https://drive.google.com/file/d/1Lfa
 
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-1.0.0.20.x86_64.deb
+sudo dpkg -i Fractorium-21.21.4.1.x86_64.deb
 ```
 
 ### Install from App Image .rpm

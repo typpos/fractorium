@@ -36,7 +36,7 @@ bool PaletteList<T>::AddPaletteFile(const string& filename, const vector<Palette
 {
 	if (!GetPaletteListByFullPath(filename))
 	{
-		auto item = s_Palettes.insert(make_pair(filename, palettes));
+		const auto item = s_Palettes.insert(make_pair(filename, palettes));
 		Save(filename);
 		return true;
 	}
@@ -55,7 +55,7 @@ bool PaletteList<T>::AddEmptyPaletteFile(const string& filename)
 {
 	if (!GetPaletteListByFullPath(filename))
 	{
-		auto item = s_Palettes.insert(make_pair(filename, vector<Palette<T>>()));
+		const auto item = s_Palettes.insert(make_pair(filename, vector<Palette<T>>()));
 		Palette<T> p;
 		p.m_Index = 0;
 		p.m_Name = "empty-default";
@@ -82,11 +82,11 @@ bool PaletteList<T>::AddEmptyPaletteFile(const string& filename)
 template <typename T>
 bool PaletteList<T>::AddPaletteToFile(const string& filename, const Palette<T>& palette)
 {
-	if (auto p = GetPaletteListByFullPathOrFilename(filename))
+	if (const auto p = GetPaletteListByFullPathOrFilename(filename))
 	{
 		p->push_back(palette);
 		p->back().m_Filename = make_shared<string>(filename);//Ensure the filename matches because this could have been duplicated from another palette file.
-		p->back().m_Index = int(p->size()) - 1;
+		p->back().m_Index = static_cast<int>(p->size()) - 1;
 		Save(filename);
 		return true;
 	}
@@ -105,13 +105,13 @@ bool PaletteList<T>::AddPaletteToFile(const string& filename, const Palette<T>& 
 template <typename T>
 bool PaletteList<T>::Replace(const string& filename, const Palette<T>& palette)
 {
-	if (auto p = GetPaletteListByFullPathOrFilename(filename))
+	if (const auto p = GetPaletteListByFullPathOrFilename(filename))
 	{
 		for (auto& pal : *p)
 		{
 			if (pal.m_Name == palette.m_Name)
 			{
-				auto index = pal.m_Index;
+				const auto index = pal.m_Index;
 				pal = palette;
 				pal.m_Index = index;
 				Save(filename);
@@ -134,7 +134,7 @@ bool PaletteList<T>::Replace(const string& filename, const Palette<T>& palette)
 template <typename T>
 bool PaletteList<T>::Replace(const string& filename, const Palette<T>& palette, int index)
 {
-	if (auto p = GetPaletteListByFullPathOrFilename(filename))
+	if (const auto p = GetPaletteListByFullPathOrFilename(filename))
 	{
 		if (index < p->size())
 		{
@@ -160,7 +160,7 @@ bool PaletteList<T>::Delete(const string& filename, int index)
 {
 	int i = 0;
 
-	if (auto p = GetPaletteListByFullPathOrFilename(filename))
+	if (const auto p = GetPaletteListByFullPathOrFilename(filename))
 	{
 		if (index < p->size())
 		{
@@ -188,13 +188,13 @@ template <typename T>
 bool PaletteList<T>::Add(const string& filename, bool force)
 {
 	bool added = true;
-	bool contains = GetPaletteListByFullPathOrFilename(filename) != nullptr;
-	auto filenameonly = GetFilename(filename);
+	const auto contains = GetPaletteListByFullPathOrFilename(filename) != nullptr;
+	const auto filenameonly = GetFilename(filename);
 
 	if (contains && !force)//Don't allow any palettes with the same name, even if they reside in different paths.
 		return false;
 
-	auto palettes = s_Palettes.insert(make_pair(filename, vector<Palette<T>>()));
+	const auto palettes = s_Palettes.insert(make_pair(filename, vector<Palette<T>>()));
 
 	if (force || palettes.second)
 	{
@@ -203,12 +203,12 @@ bool PaletteList<T>::Add(const string& filename, bool force)
 
 		if (ReadFile(filename.c_str(), buf))
 		{
-			auto lower = ToLower(filename);
-			auto pfilename = shared_ptr<string>(new string(filename));
+			const auto lower = ToLower(filename);
+			const auto pfilename = shared_ptr<string>(new string(filename));
 
 			if (EndsWith(lower, ".xml"))
 			{
-				xmlDocPtr doc = xmlReadMemory(static_cast<const char*>(buf.data()), int(buf.size()), filename.c_str(), nullptr, XML_PARSE_NONET);
+				const auto doc = xmlReadMemory(static_cast<const char*>(buf.data()), static_cast<int>(buf.size()), filename.c_str(), nullptr, XML_PARSE_NONET);
 
 				if (doc)
 				{
@@ -270,7 +270,7 @@ Palette<T>* PaletteList<T>::GetRandomPalette()
 	while (attempts < Size() * 10)
 	{
 		auto p = s_Palettes.begin();
-		auto paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(Size());
+		const auto paletteFileIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(Size());
 		size_t i = 0;
 
 		//Move p forward i elements.
@@ -282,7 +282,7 @@ Palette<T>* PaletteList<T>::GetRandomPalette()
 
 		if (i < Size())
 		{
-			size_t paletteIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(p->second.size());
+			const size_t paletteIndex = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(p->second.size());
 
 			if (paletteIndex < p->second.size() && !p->second[paletteIndex].IsEmpty())
 				return &p->second[paletteIndex];
@@ -303,7 +303,7 @@ Palette<T>* PaletteList<T>::GetRandomPalette()
 template <typename T>
 Palette<T>* PaletteList<T>::GetPaletteByFilename(const string& filename, size_t i)
 {
-	if (auto palettes = GetPaletteListByFilename(filename))
+	if (const auto palettes = GetPaletteListByFilename(filename))
 		if (i < palettes->size())
 			return &(*palettes)[i];
 
@@ -319,7 +319,7 @@ Palette<T>* PaletteList<T>::GetPaletteByFilename(const string& filename, size_t 
 template <typename T>
 Palette<T>* PaletteList<T>::GetPaletteByFullPath(const string& filename, size_t i)
 {
-	if (auto palettes = GetPaletteListByFullPath(filename))
+	if (const auto palettes = GetPaletteListByFullPath(filename))
 		if (i < palettes->size())
 			return &(*palettes)[i];
 
@@ -335,7 +335,7 @@ Palette<T>* PaletteList<T>::GetPaletteByFullPath(const string& filename, size_t 
 template <typename T>
 Palette<T>* PaletteList<T>::GetPaletteByName(const string& filename, const string& name)
 {
-	if (auto palettes = GetPaletteListByFullPathOrFilename(filename))
+	if (const auto palettes = GetPaletteListByFullPathOrFilename(filename))
 		for (auto& palette : *palettes)
 			if (palette.m_Name == name)
 				return &palette;
@@ -351,7 +351,7 @@ Palette<T>* PaletteList<T>::GetPaletteByName(const string& filename, const strin
 template <typename T>
 vector<Palette<T>>* PaletteList<T>::GetPaletteListByFilename(const string& filename)
 {
-	auto filenameonly = GetFilename(filename);
+	const auto filenameonly = GetFilename(filename);
 
 	for (auto& palettes : s_Palettes)
 		if (GetFilename(palettes.first) == filenameonly)
@@ -368,7 +368,7 @@ vector<Palette<T>>* PaletteList<T>::GetPaletteListByFilename(const string& filen
 template <typename T>
 vector<Palette<T>>* PaletteList<T>::GetPaletteListByFullPath(const string& filename)
 {
-	auto palettes = s_Palettes.find(filename);
+	const auto palettes = s_Palettes.find(filename);
 
 	if (palettes != s_Palettes.end() && !palettes->second.empty())
 		return &palettes->second;
@@ -401,7 +401,7 @@ vector<Palette<T>>* PaletteList<T>::GetPaletteListByFullPathOrFilename(const str
 template <typename T>
 string PaletteList<T>::GetFullPathFromFilename(const string& filename)
 {
-	auto filenameonly = GetFilename(filename);
+	const auto filenameonly = GetFilename(filename);
 
 	for (auto& palettes : s_Palettes)
 		if (GetFilename(palettes.first) == filenameonly)
@@ -422,7 +422,7 @@ string PaletteList<T>::GetFullPathFromFilename(const string& filename)
 template <typename T>
 bool PaletteList<T>::GetHueAdjustedPalette(const string& filename, size_t i, T hue, Palette<T>& palette)
 {
-	if (auto unadjustedPal = GetPaletteByFullPath(filename, i))
+	if (const auto unadjustedPal = GetPaletteByFullPath(filename, i))
 	{
 		unadjustedPal->MakeHueAdjustedPalette(palette, hue);
 		return true;
@@ -508,7 +508,7 @@ const string& PaletteList<T>::Name(size_t index)
 template <typename T>
 bool PaletteList<T>::IsModifiable(const string& filename)
 {
-	if (auto palFile = GetPaletteListByFullPathOrFilename(filename))
+	if (const auto palFile = GetPaletteListByFullPathOrFilename(filename))
 		for (auto& pal : *palFile)
 			if (pal.m_SourceColors.empty())
 				return false;
@@ -534,14 +534,14 @@ const map<string, vector<Palette<T>>>& PaletteList<T>::Palettes() const
 template <typename T>
 bool PaletteList<T>::Save(const string& filename)
 {
-	auto fullpath = GetFullPathFromFilename(filename);
+	const auto fullpath = GetFullPathFromFilename(filename);
 
 	try
 	{
 		size_t index = 0;
 		ostringstream os;
 
-		if (auto palFile = GetPaletteListByFullPathOrFilename(filename))
+		if (const auto palFile = GetPaletteListByFullPathOrFilename(filename))
 		{
 			ofstream f(fullpath);
 			os << "<palettes>\n";
@@ -568,11 +568,11 @@ bool PaletteList<T>::Save(const string& filename)
 					{
 						for (int j = 0; j < 8; j++)
 						{
-							size_t idx = 8 * i + j;
+							const size_t idx = 8 * i + j;
 							os << "00";
-							os << hex << setw(2) << setfill('0') << int(std::rint(pal[idx][0] * 255));
-							os << hex << setw(2) << setfill('0') << int(std::rint(pal[idx][1] * 255));
-							os << hex << setw(2) << setfill('0') << int(std::rint(pal[idx][2] * 255));
+							os << hex << setw(2) << setfill('0') << static_cast<int>(std::rint(pal[idx][0] * 255));
+							os << hex << setw(2) << setfill('0') << static_cast<int>(std::rint(pal[idx][1] * 255));
+							os << hex << setw(2) << setfill('0') << static_cast<int>(std::rint(pal[idx][2] * 255));
 						}
 
 						os << "\n";
@@ -651,7 +651,7 @@ void PaletteList<T>::ParsePalettes(xmlNode* node, const shared_ptr<string>& file
 							ss.clear();//Reset and fill the string stream.
 							ss.str(tmpStr);
 							ss >> tmp;//Do the conversion.
-							palette.m_Entries[colorCount][i] = T(tmp) / T(255);//Hex palette is [0..255], convert to [0..1].
+							palette.m_Entries[colorCount][i] = static_cast<T>(tmp) / static_cast<T>(255);//Hex palette is [0..255], convert to [0..1].
 						}
 
 						colorCount++;
@@ -659,12 +659,12 @@ void PaletteList<T>::ParsePalettes(xmlNode* node, const shared_ptr<string>& file
 				}
 				else if (!Compare(attr->name, "source_colors"))
 				{
-					string s(val);
-					auto vec1 = Split(s, ' ');
+					const string s(val);
+					const auto vec1 = Split(s, ' ');
 
 					for (auto& v : vec1)
 					{
-						auto vec2 = Split(v, ',');
+						const auto vec2 = Split(v, ',');
 
 						if (vec2.size() == 4)
 						{

@@ -1004,8 +1004,8 @@ public:
 		if (a.m_ColorSpeed < b.m_ColorSpeed) return false;
 
 		//Original did this every time, even though it's only needed if the color speeds are equal.
-		m2T aMat2 = a.m_Affine.ToMat2ColMajor();
-		m2T bMat2 = b.m_Affine.ToMat2ColMajor();
+		const auto aMat2 = a.m_Affine.ToMat2ColMajor();
+		const auto bMat2 = b.m_Affine.ToMat2ColMajor();
 		T ad = glm::determinant(aMat2);
 		T bd = glm::determinant(bMat2);
 

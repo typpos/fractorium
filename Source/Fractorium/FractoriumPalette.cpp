@@ -85,7 +85,7 @@ size_t FractoriumEmberController<T>::InitPaletteList(const QString& s)
 		}
 	}
 
-    m_Fractorium->ui.PaletteFilenameCombo->model()->sort(0);
+	m_Fractorium->ui.PaletteFilenameCombo->model()->sort(0);
 	return m_PaletteList->Size();
 }
 
@@ -140,12 +140,12 @@ void Fractorium::OnPaletteFilenameComboChanged(const QString& text)
 template <typename T>
 void FractoriumEmberController<T>::ApplyPaletteToEmber()
 {
-	uint blur = m_Fractorium->m_PaletteBlurSpin->value();
-	uint freq = m_Fractorium->m_PaletteFrequencySpin->value();
-	double sat = double(m_Fractorium->m_PaletteSaturationSpin->value() / 100.0);
-	double brightness = double(m_Fractorium->m_PaletteBrightnessSpin->value() / 255.0);
-	double contrast = double(m_Fractorium->m_PaletteContrastSpin->value() > 0 ? (m_Fractorium->m_PaletteContrastSpin->value() * 2) : m_Fractorium->m_PaletteContrastSpin->value()) / 100.0;
-	double hue = double(m_Fractorium->m_PaletteHueSpin->value()) / 360.0;
+	const uint blur = m_Fractorium->m_PaletteBlurSpin->value();
+	const uint freq = m_Fractorium->m_PaletteFrequencySpin->value();
+	const auto sat = m_Fractorium->m_PaletteSaturationSpin->value() / 100.0;
+	const auto brightness = m_Fractorium->m_PaletteBrightnessSpin->value() / 255.0;
+	const auto contrast = m_Fractorium->m_PaletteContrastSpin->value() > 0 ? m_Fractorium->m_PaletteContrastSpin->value() * 2.0 : m_Fractorium->m_PaletteContrastSpin->value() / 100.0;
+	const auto hue = m_Fractorium->m_PaletteHueSpin->value() / 360.0;
 	//Use the temp palette as the base and apply the adjustments gotten from the GUI and save the result in the ember palette.
 	m_TempPalette.MakeAdjustedPalette(m_Ember.m_Palette, m_Fractorium->m_PreviewPaletteRotation, hue, sat, brightness, contrast, blur, freq);
 }
@@ -159,10 +159,10 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 template <typename T>
 void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<float>& palette)
 {
-	auto xform = CurrentXform();
-	auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
+	const auto xform = CurrentXform();
+	const auto palettePreviewTable = m_Fractorium->ui.PalettePreviewTable;
+	const auto paletteName = QString::fromStdString(m_Ember.m_Palette.m_Name);
 	auto previewPaletteItem = palettePreviewTable->item(0, 1);
-	auto paletteName = QString::fromStdString(m_Ember.m_Palette.m_Name);
 
 	if (previewPaletteItem)//This can be null if the palette file was moved or corrupted.
 	{
@@ -173,9 +173,12 @@ void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<float>& pale
 		QPixmap pixmap(QPixmap::fromImage(m_FinalPaletteImage));//Create a QPixmap out of the QImage.
 		previewPaletteItem->setData(Qt::DecorationRole, pixmap.scaled(QSize(pixmap.width(), palettePreviewTable->rowHeight(0) + 2), Qt::IgnoreAspectRatio, Qt::SmoothTransformation));//Set the pixmap on the palette tab.
 		m_Fractorium->SetPaletteTableItem(&pixmap, m_Fractorium->ui.XformPaletteRefTable, m_Fractorium->m_PaletteRefItem, 0, 0);//Set the palette ref table on the xforms | color tab.
-		auto previewNameItem = palettePreviewTable->item(0, 0);
-		previewNameItem->setText(paletteName);//Finally, set the name of the palette to be both the text and the tooltip.
-		previewNameItem->setToolTip(paletteName);
+
+		if (auto previewNameItem = palettePreviewTable->item(0, 0))
+		{
+			previewNameItem->setText(paletteName);//Finally, set the name of the palette to be both the text and the tooltip.
+			previewNameItem->setToolTip(paletteName);
+		}
 	}
 
 	//Update the current xform's color and reset the rendering process.
@@ -232,7 +235,7 @@ void FractoriumEmberController<T>::SetBasePaletteAndAdjust(const Palette<float>&
 template <typename T>
 void FractoriumEmberController<T>::PaletteCellClicked(int row, int col)
 {
-	if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+	if (const auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		SetBasePaletteAndAdjust(*palette);
 }
 
@@ -246,9 +249,9 @@ void FractoriumEmberController<T>::PaletteCellClicked(int row, int col)
 /// <param name="col">The table column clicked, ignored</param>
 void Fractorium::OnPaletteCellClicked(int row, int col)
 {
-	if (auto item = dynamic_cast<PaletteTableWidgetItem*>(ui.PaletteListTable->item(row, 1)))
+	if (const auto item = dynamic_cast<PaletteTableWidgetItem*>(ui.PaletteListTable->item(row, 1)))
 	{
-		auto index = int(item->Index());
+		const auto index = int(item->Index());
 
 		if (m_PreviousPaletteRow != index)
 		{
@@ -338,10 +341,10 @@ void Fractorium::OnPaletteCellDoubleClicked(int row, int col)
 void Fractorium::OnPaletteRandomSelectButtonClicked(bool checked)
 {
 	uint i = 0;
-	int rowCount = ui.PaletteListTable->rowCount();
+	const auto rowCount = ui.PaletteListTable->rowCount();
 
 	if (rowCount > 1)//If only one palette in the current palette file, just use it.
-		while (((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow)) || i >= uint(rowCount));
+		while (((i = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(rowCount)) == uint(m_PreviousPaletteRow)) || i >= static_cast<uint>(rowCount));
 
 	if (checked)
 		OnPaletteCellDoubleClicked(i, 1);//Will clear the adjustments.
@@ -384,9 +387,9 @@ template <typename T>
 void FractoriumEmberController<T>::PaletteEditorButtonClicked()
 {
 	size_t i = 0;
-	auto ed = m_Fractorium->m_PaletteEditor;
+	const auto ed = m_Fractorium->m_PaletteEditor.get();
 	map<size_t, float> colorIndices;
-	bool forceFinal = m_Fractorium->HaveFinal();
+	const auto forceFinal = m_Fractorium->HaveFinal();
 	m_PreviousTempPalette = m_TempPalette; // it's necessary because m_TempPalette is changed when the user make changes in palette editor
 	ed->SetPalette(m_TempPalette);
 
@@ -419,14 +422,14 @@ bool Fractorium::PaletteChanged()
 /// <param name="checked">Ignored</param>
 void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 {
-	if (!m_PaletteEditor)
+	if (!m_PaletteEditor.get())
 	{
-		m_PaletteEditor = new PaletteEditor(this);
-		connect(m_PaletteEditor, SIGNAL(PaletteChanged()),                 this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
-		connect(m_PaletteEditor, SIGNAL(PaletteFileChanged()),             this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
-		connect(m_PaletteEditor, SIGNAL(ColorIndexChanged(size_t, float)), this, SLOT(OnPaletteEditorColorIndexChanged(size_t, float)), Qt::QueuedConnection);
+		m_PaletteEditor = std::make_unique<PaletteEditor>(this);
+		connect(m_PaletteEditor.get(), SIGNAL(PaletteChanged()),                 this, SLOT(OnPaletteEditorColorChanged()), Qt::QueuedConnection);
+		connect(m_PaletteEditor.get(), SIGNAL(PaletteFileChanged()),             this, SLOT(OnPaletteEditorFileChanged()), Qt::QueuedConnection);
+		connect(m_PaletteEditor.get(), SIGNAL(ColorIndexChanged(size_t, float)), this, SLOT(OnPaletteEditorColorIndexChanged(size_t, float)), Qt::QueuedConnection);
 #ifdef __linux__
-		connect(m_PaletteEditor, SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection);
+		connect(m_PaletteEditor.get(), SIGNAL(finished(int)),                    this, SLOT(OnPaletteEditorFinished(int)), Qt::QueuedConnection);
 #endif
 	}
 
@@ -441,12 +444,11 @@ void Fractorium::OnPaletteEditorButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::SyncPalette(bool accepted)
 {
-	size_t i = 0;
-	auto ed = m_Fractorium->m_PaletteEditor;
+	const auto ed = m_Fractorium->m_PaletteEditor.get();
 	Palette<float> edPal;
 	Palette<float> prevPal = m_PreviousTempPalette;
 	map<size_t, float> colorIndices;
-	bool forceFinal = m_Fractorium->HaveFinal();
+	const auto forceFinal = m_Fractorium->HaveFinal();
 
 	if (accepted)
 	{
@@ -457,7 +459,7 @@ void FractoriumEmberController<T>::SyncPalette(bool accepted)
 			if (auto xform = m_Ember.GetTotalXform(index.first, forceFinal))
 				xform->m_ColorX = index.second;
 
-		edPal = ed->GetPalette(int(prevPal.Size()));
+		edPal = ed->GetPalette(static_cast<int>(prevPal.Size()));
 		SetBasePaletteAndAdjust(edPal);//This will take care of updating the color index controls.
 
 		if (edPal.m_Filename.get() && !edPal.m_Filename->empty())
@@ -485,7 +487,7 @@ void FractoriumEmberController<T>::SyncPalette(bool accepted)
 template <typename T>
 void FractoriumEmberController<T>::PaletteEditorColorChanged()
 {
-	SetBasePaletteAndAdjust(m_Fractorium->m_PaletteEditor->GetPalette(int(m_TempPalette.Size())));
+	SetBasePaletteAndAdjust(m_Fractorium->m_PaletteEditor->GetPalette(static_cast<int>(m_TempPalette.Size())));
 }
 
 void Fractorium::OnPaletteEditorColorChanged()

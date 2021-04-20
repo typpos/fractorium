@@ -48,7 +48,7 @@ public:
 	double Toc(const char* str = nullptr, bool fullString = false)
 	{
 		m_EndTime = NowMsD();
-		double ms = ElapsedTime();
+		const auto ms = ElapsedTime();
 
 		if (str)
 		{
@@ -91,13 +91,13 @@ public:
 	{
 		stringstream ss;
 		double x = ms / 1000;
-		double secs = fmod(x, 60);
+		const auto secs = fmod(x, 60);
 		x /= 60;
-		double mins = fmod(x, 60);
+		const auto mins = fmod(x, 60);
 		x /= 60;
-		double hours = fmod(x, 24);
+		const auto hours = fmod(x, 24);
 		x /= 24;
-		double days = x;
+		const auto days = x;
 
 		if (days >= 1)
 			ss << static_cast<int>(days) << "d ";

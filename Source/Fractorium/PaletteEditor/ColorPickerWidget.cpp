@@ -78,7 +78,7 @@ void ColorPickerWidget::resizeEvent(QResizeEvent* event)
 void ColorPickerWidget::OnColorViewerClicked()
 {
 	m_ColorDialog->setCurrentColor(m_ColorPanel->Color());
-	auto newColor = m_ColorDialog->getColor(m_ColorPanel->Color(), this);
+	const auto newColor = m_ColorDialog->getColor(m_ColorPanel->Color(), this);
 	SetColorPanelColor(newColor);
 }
 

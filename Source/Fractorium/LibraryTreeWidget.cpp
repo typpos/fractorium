@@ -17,8 +17,8 @@ void LibraryTreeWidget::SetMainWindow(Fractorium* f)
 /// <param name="de">Pointer to the QDropEvent object</param>
 void LibraryTreeWidget::dropEvent(QDropEvent* de)
 {
-	QModelIndex droppedIndex = indexAt(de->pos());
-	auto items = selectionModel()->selectedRows();
+	const auto droppedIndex = indexAt(de->pos());
+	const auto items = selectionModel()->selectedRows();
 
 	if (!droppedIndex.isValid())//Don't process drop because it's outside of the droppable area.
 	{
@@ -35,7 +35,7 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 		if (dp == QAbstractItemView::BelowItem)
 			row++;
 
-		auto itemat = this->itemFromIndex(droppedIndex);
+		const auto itemat = this->itemFromIndex(droppedIndex);
 		QTreeWidget::dropEvent(de);//This internally changes the order of the items.
 
 		//Qt has a long standing major bug that rearranges the order of disjoint selections when
@@ -43,15 +43,15 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 		//This is an attempt to correct for that bug by removing the dropped items, then re-inserting them
 		//in the order they were selected.
 		//This bug remains present as of Qt 5.8: https://bugreports.qt.io/browse/QTBUG-45320
-		if (auto top = topLevelItem(0))
+		if (const auto top = topLevelItem(0))
 		{
 			if (itemat)
 			{
-				auto offsetitem = this->indexFromItem(itemat);
+				const auto offsetitem = this->indexFromItem(itemat);
 
 				if (dp == QAbstractItemView::BelowItem)
 				{
-					auto itemrow = offsetitem.row() + 1;
+					const auto itemrow = offsetitem.row() + 1;
 
 					for (i = 0; i < dragItems.size(); i++)
 					{
@@ -61,7 +61,7 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 
 					for (i = 0; i < dragItems.size(); i++)
 					{
-						auto offset = i + itemrow;
+						const auto offset = i + itemrow;
 
 						if (offset <= top->childCount())
 							top->insertChild(offset, dragItems[i]);
@@ -69,7 +69,7 @@ void LibraryTreeWidget::dropEvent(QDropEvent* de)
 				}
 				else
 				{
-					auto itemrow = offsetitem.row();//Will be at least 1 if dropped above it.
+					const auto itemrow = offsetitem.row();//Will be at least 1 if dropped above it.
 					auto offset = itemrow;
 
 					for (i = 0; i < dragItems.size() && offset > 0; i++)

@@ -178,7 +178,7 @@ public:
 		size_t num = 0;
 		QString endSection;
 		QString ret = str;
-		int lastUnderscore = str.lastIndexOf('_');
+		const auto lastUnderscore = str.lastIndexOf('_');
 
 		if (lastUnderscore != -1)
 		{
@@ -205,9 +205,9 @@ public:
 
 		QString newPath;
 		QFileInfo original(filename);
-		QString path = original.absolutePath() + '/';
 		QString base = original.completeBaseName();
-		QString extension = original.suffix();
+		const QString path = original.absolutePath() + '/';
+		const QString extension = original.suffix();
 
 		do
 		{

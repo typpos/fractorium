@@ -28,9 +28,9 @@ public:
 	size_t DeviceIndex() const;
 
 	//Public virtual functions overridden from base classes.
-	virtual void ClearErrorReport() override;
-	virtual string ErrorReportString() override;
-	virtual vector<string> ErrorReport() override;
+	void ClearErrorReport() override;
+	string ErrorReportString() override;
+	vector<string> ErrorReport() override;
 
 	size_t m_Calls;
 	OpenCLWrapper m_Wrapper;

@@ -50,11 +50,11 @@ public slots:
 	void OnOpenCLCheckBoxStateChanged(int state);
 	void OnDeviceTableCellChanged(int row, int col);
 	void OnDeviceTableRadioToggled(bool checked);
-	virtual void accept() override;
-	virtual void reject() override;
+	void accept() override;
+	void reject() override;
 
 protected:
-	virtual void showEvent(QShowEvent* e) override;
+	void showEvent(QShowEvent* e) override;
 
 private:
 	Ui::OptionsDialog ui;

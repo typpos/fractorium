@@ -37,9 +37,9 @@ void Fractorium::InitXaosUI()
 template <typename T>
 void FractoriumEmberController<T>::FillXaos()
 {
-	for (int i = 0, count = int(XformCount()); i < count; i++)//Column.
+	for (int i = 0, count = static_cast<int>(XformCount()); i < count; i++)//Column.
 	{
-		if (auto xform = m_Ember.GetXform(i))
+		if (const auto xform = m_Ember.GetXform(i))
 		{
 			for (int j = 0; j < count; j++)//Row.
 			{
@@ -63,7 +63,7 @@ void FractoriumEmberController<T>::FillAppliedXaos()
 
 	for (int i = 0, count = int(XformCount()); i < count; i++)//Column.
 	{
-		if (auto xform = m_Ember.GetXform(i))
+		if (const auto xform = m_Ember.GetXform(i))
 		{
 			T norm = 0;
 			double start = 0, offset = 0;
@@ -78,11 +78,11 @@ void FractoriumEmberController<T>::FillAppliedXaos()
 
 			QPixmap pixmap(m_Fractorium->ui.XaosAppliedTableView->columnWidth(i) - 8, m_Fractorium->ui.XaosTableView->rowHeight(0) * count);
 			QPainter painter(&pixmap);
-			auto twi = new QTableWidgetItem();
+			auto twi = std::make_unique<QTableWidgetItem>();
 
 			for (auto& w : tempweights) norm += w;
 
-			for (auto& w : tempweights) w = norm == T(0) ? T(0) : w / norm;
+			for (auto& w : tempweights) w = norm == static_cast<T>(0) ? static_cast<T>(0) : w / norm;
 
 			if (norm)
 			{
@@ -99,7 +99,7 @@ void FractoriumEmberController<T>::FillAppliedXaos()
 			}
 
 			twi->setData(Qt::DecorationRole, pixmap);
-			m_Fractorium->ui.XaosDistVizTableWidget->setItem(0, i, twi);
+			m_Fractorium->ui.XaosDistVizTableWidget->setItem(0, i, twi.release());
 		}
 	}
 
@@ -153,7 +153,7 @@ void Fractorium::OnXaosTableModelDataChanged(const QModelIndex& indexA, const QM
 /// </summary>
 void Fractorium::FillXaosTable()
 {
-	int count = int(m_Controller->XformCount());
+	int count = static_cast<int>(m_Controller->XformCount());
 	QStringList hl, vl, blanks;
 	auto oldModel = std::make_unique<QStandardItemModel>(m_XaosTableModel);
 	hl.reserve(count);
@@ -235,9 +235,9 @@ void FractoriumEmberController<T>::RandomXaos()
 			for (size_t j = 0; j < m_Ember.XformCount(); j++)
 			{
 				if (!ctrl)
-					xform->SetXaos(j, T(m_Rand.RandBit()));
+					xform->SetXaos(j, static_cast<T>(m_Rand.RandBit()));
 				else if (m_Rand.RandBit())
-					xform->SetXaos(j, T(m_Rand.RandBit()));
+					xform->SetXaos(j, static_cast<T>(m_Rand.RandBit()));
 				else
 					xform->SetXaos(j, TruncPrecision(m_Rand.Frand<T>(0, 3), 3));
 			}
@@ -287,7 +287,7 @@ void FractoriumEmberController<T>::TransposeXaos()
 		vector<vector<double>> tempxaos;
 		tempxaos.reserve(m_Ember.XformCount());
 
-		while (auto xform = m_Ember.GetXform(i++))
+		while (const auto xform = m_Ember.GetXform(i++))
 		{
 			vector<double> tempvec;
 			tempvec.reserve(m_Ember.XformCount());
@@ -301,7 +301,7 @@ void FractoriumEmberController<T>::TransposeXaos()
 		for (j = 0; j < tempxaos.size(); j++)
 			for (i = 0; i < tempxaos[j].size(); i++)
 				if (auto xform = m_Ember.GetXform(i))
-					xform->SetXaos(j, T(tempxaos[j][i]));
+					xform->SetXaos(j, static_cast<T>(tempxaos[j][i]));
 	});
 	FillXaos();
 	FillAppliedXaos();
@@ -317,7 +317,7 @@ void Fractorium::OnTransposeXaosButtonClicked(bool checked) { m_Controller->Tran
 /// <param name="logicalIndex">The index of the row that was double clicked</param>
 void Fractorium::OnXaosRowDoubleClicked(int logicalIndex)
 {
-	auto btn = QApplication::mouseButtons();
+	const auto btn = QApplication::mouseButtons();
 
 	if (!btn.testFlag(Qt::RightButton))
 		ToggleTableRow(ui.XaosTableView, logicalIndex);
@@ -335,7 +335,7 @@ void Fractorium::OnXaosRowDoubleClicked(int logicalIndex)
 /// <param name="logicalIndex">The index of the column that was double clicked</param>
 void Fractorium::OnXaosColDoubleClicked(int logicalIndex)
 {
-	auto btn = QApplication::mouseButtons();
+	const auto btn = QApplication::mouseButtons();
 
 	if (!btn.testFlag(Qt::RightButton))
 		ToggleTableCol(ui.XaosTableView, logicalIndex);

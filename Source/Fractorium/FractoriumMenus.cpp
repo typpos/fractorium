@@ -384,26 +384,29 @@ void Fractorium::OnActionOpenExamples(bool checked) { m_Controller->OpenAndPrepF
 /// This will first save the current ember back to the opened file in memory before
 /// saving it to disk.
 /// </summary>
+/// <param name="filename">The filename to save the ember to. If empty, use internal variables to determine the filename.</param>
 template <typename T>
-void FractoriumEmberController<T>::SaveCurrentAsXml()
+void FractoriumEmberController<T>::SaveCurrentAsXml(QString filename)
 {
-	QString filename;
 	auto s = m_Fractorium->m_Settings;
 
-	if (s->SaveAutoUnique() && m_LastSaveCurrent != "")
+	if (filename == "")
 	{
-		filename = EmberFile<T>::UniqueFilename(m_LastSaveCurrent);
-	}
-	else if (QFile::exists(m_LastSaveCurrent))
-	{
-		filename = m_LastSaveCurrent;
-	}
-	else
-	{
-		if (m_EmberFile.Size() == 1)
-			filename = m_Fractorium->SetupSaveXmlDialog(m_EmberFile.m_Filename);//If only one ember present, just use parent filename.
+		if (s->SaveAutoUnique() && m_LastSaveCurrent != "")
+		{
+			filename = EmberFile<T>::UniqueFilename(m_LastSaveCurrent);
+		}
+		else if (QFile::exists(m_LastSaveCurrent))
+		{
+			filename = m_LastSaveCurrent;
+		}
 		else
-			filename = m_Fractorium->SetupSaveXmlDialog(QString::fromStdString(m_Ember.m_Name));//More than one ember present, use individual ember name.
+		{
+			if (m_EmberFile.Size() == 1)
+				filename = m_Fractorium->SetupSaveXmlDialog(m_EmberFile.m_Filename);//If only one ember present, just use parent filename.
+			else
+				filename = m_Fractorium->SetupSaveXmlDialog(QString::fromStdString(m_Ember.m_Name));//More than one ember present, use individual ember name.
+		}
 	}
 
 	if (filename != "")
@@ -1053,7 +1056,7 @@ void Fractorium::OnActionFinalRender(bool checked)
 	m_RenderStatusLabel->setText("Renderer stopped.");
 	SetupFinalRenderDialog();
 
-	if (m_FinalRenderDialog)
+	if (m_FinalRenderDialog.get())
 		m_FinalRenderDialog->Show(false);
 }
 
@@ -1067,8 +1070,7 @@ void Fractorium::OnFinalRenderClose(int result)
 	StartRenderTimer(false);//Re-create the renderer and start rendering again.
 	ui.ActionStartStopRenderer->setChecked(false);//Re-enable any controls that might have been disabled.
 	OnActionStartStopRenderer(false);
-	delete m_FinalRenderDialog;
-	m_FinalRenderDialog = nullptr;
+	m_FinalRenderDialog.reset();
 }
 
 /// <summary>

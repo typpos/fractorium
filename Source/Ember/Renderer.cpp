@@ -11,7 +11,7 @@ Renderer<T, bucketT>::Renderer()
 {
 	//Use a very large number regardless of the size of the output pixels. This should be sufficient granularity, even though
 	//it's technically less than the number of distinct values representable by a 32-bit float.
-	m_Csa.resize(size_t(CURVES_LENGTH));
+	m_Csa.resize(static_cast<size_t>(CURVES_LENGTH));
 	//Ensure the renderer at least has sane values for the camera upon startup.
 	//This is needed because due to timing/threading disconnects, the GUI can use the camera
 	//values before the render has started, which will lead to corrupt values.
@@ -114,7 +114,7 @@ void Renderer<T, bucketT>::ComputeBounds()
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::ComputeQuality()
 {
-	m_Scale = std::pow(T(2.0), Zoom());
+	m_Scale = std::pow(static_cast<T>(2), Zoom());
 	m_ScaledQuality = Quality() * SQR(m_Scale);
 }
 
@@ -130,11 +130,11 @@ void Renderer<T, bucketT>::ComputeCamera()
 	m_PixelsPerUnitY = m_PixelsPerUnitX;
 	m_PixelsPerUnitX /= PixelAspectRatio();
 	T shift = 0;
-	T t0 = T(m_GutterWidth) / (Supersample() * m_PixelsPerUnitX);
-	T t1 = T(m_GutterWidth) / (Supersample() * m_PixelsPerUnitY);
+	T t0 = static_cast<T>(m_GutterWidth) / (Supersample() * m_PixelsPerUnitX);
+	T t1 = static_cast<T>(m_GutterWidth) / (Supersample() * m_PixelsPerUnitY);
 	//These go from ll to ur, moving from negative to positive.
-	m_LowerLeftX = CenterX() - FinalRasW() / m_PixelsPerUnitX / T(2.0);
-	m_LowerLeftY = CenterY() - FinalRasH() / m_PixelsPerUnitY / T(2.0);
+	m_LowerLeftX = CenterX() - FinalRasW() / m_PixelsPerUnitX / static_cast<T>(2);
+	m_LowerLeftY = CenterY() - FinalRasH() / m_PixelsPerUnitY / static_cast<T>(2);
 	m_UpperRightX = m_LowerLeftX + FinalRasW() / m_PixelsPerUnitX;
 	m_UpperRightY = m_LowerLeftY + FinalRasH() / m_PixelsPerUnitY;
 	T carLlX = m_LowerLeftX - t0;
@@ -258,7 +258,8 @@ bool Renderer<T, bucketT>::CreateDEFilter(bool& newAlloc)
 				(m_Ember.m_CurveDE != m_DensityFilter->Curve()) ||
 				(m_Ember.m_Supersample != m_DensityFilter->Supersample()))
 		{
-			m_DensityFilter = make_unique<DensityFilter<bucketT>>(bucketT(m_Ember.m_MinRadDE), bucketT(m_Ember.m_MaxRadDE), bucketT(m_Ember.m_CurveDE), m_Ember.m_Supersample);
+			m_DensityFilter = make_unique<DensityFilter<bucketT>>(static_cast<bucketT>(m_Ember.m_MinRadDE), static_cast<bucketT>(m_Ember.m_MaxRadDE),
+							  static_cast<bucketT>(m_Ember.m_CurveDE), m_Ember.m_Supersample);
 			newAlloc = true;
 		}
 
@@ -297,7 +298,8 @@ bool Renderer<T, bucketT>::CreateSpatialFilter(bool& newAlloc)
 			(m_PixelAspectRatio != m_SpatialFilter->PixelAspectRatio()))
 	{
 		m_SpatialFilter = unique_ptr<SpatialFilter<bucketT>>(
-							  SpatialFilterCreator<bucketT>::Create(m_Ember.m_SpatialFilterType, bucketT(m_Ember.m_SpatialFilterRadius), m_Ember.m_Supersample, bucketT(m_PixelAspectRatio)));
+							  SpatialFilterCreator<bucketT>::Create(m_Ember.m_SpatialFilterType,
+									  static_cast<bucketT>(m_Ember.m_SpatialFilterRadius), m_Ember.m_Supersample, static_cast<bucketT>(m_PixelAspectRatio)));
 		m_Ember.m_SpatialFilterRadius = m_SpatialFilter->FilterRadius();//It may have been changed internally if it was too small, so ensure they're synced.
 		newAlloc = true;
 	}
@@ -315,6 +317,7 @@ template <typename T, typename bucketT>
 bool Renderer<T, bucketT>::CreateTemporalFilter(bool& newAlloc)
 {
 	newAlloc = false;
+	//static int i = 0;
 
 	//Use intelligent testing so it isn't created every time a new ember is passed in.
 	if ((!m_TemporalFilter.get()) ||
@@ -326,6 +329,14 @@ bool Renderer<T, bucketT>::CreateTemporalFilter(bool& newAlloc)
 		m_TemporalFilter = unique_ptr<TemporalFilter<T>>(
 							   TemporalFilterCreator<T>::Create(m_Ember.m_TemporalFilterType, m_Ember.m_TemporalSamples, m_Ember.m_TemporalFilterWidth, m_Ember.m_TemporalFilterExp));
 		newAlloc = true;
+		//auto name = TemporalFilterCreator<T>::ToString(m_TemporalFilter->FilterType());
+		//ostringstream os;
+		//os << "./" << ++i << "_" << name << "_filter.txt";
+		//ofstream of (os.str());
+		//auto str = m_TemporalFilter->ToString();
+		//
+		//if (of.is_open())
+		//	of << str;
 	}
 
 	return m_TemporalFilter.get() != nullptr;
@@ -421,7 +432,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 	}
 
 	//Make sure values are within valid range.
-	ClampGteRef(m_Ember.m_Supersample, size_t(1));
+	ClampGteRef(m_Ember.m_Supersample, static_cast<size_t>(1));
 
 	//Make sure to get most recent update since loop won't be entered to call Interp().
 	//Vib, gam and background are normally summed for each temporal sample. However if iteration is skipped, make sure to get the latest.
@@ -442,7 +453,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 	//it.Tic();
 	//Interpolate.
 	if (m_EmbersP->size() > 1)
-		m_Interpolater.Interpolate(*m_EmbersP, T(time), 0, m_Ember);
+		m_Interpolater.Interpolate(*m_EmbersP, static_cast<T>(time), 0, m_Ember);
 
 	//it.Toc("Interp 1");
 
@@ -480,7 +491,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 		}
 	}
 
-	deTime = T(time) + *m_TemporalFilter->Deltas();
+	deTime = static_cast<T>(time) + *m_TemporalFilter->Deltas();
 
 	//Interpolate and get an ember for DE purposes.
 	//Additional interpolation will be done in the temporal samples loop.
@@ -506,7 +517,7 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 	for (; (temporalSample < TemporalSamples()) && !m_Abort;)
 	{
 		T colorScalar = m_TemporalFilter->Filter()[temporalSample];
-		T temporalTime = T(time) + m_TemporalFilter->Deltas()[temporalSample];
+		T temporalTime = static_cast<T>(time) + m_TemporalFilter->Deltas()[temporalSample];
 
 		//Interpolate again.
 		//it.Tic();
@@ -573,9 +584,9 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 		{
 			m_Vibrancy += Vibrancy();
 			m_Gamma += Gamma();
-			m_Background.r += bucketT(m_Ember.m_Background.r);
-			m_Background.g += bucketT(m_Ember.m_Background.g);
-			m_Background.b += bucketT(m_Ember.m_Background.b);
+			m_Background.r += static_cast<bucketT>(m_Ember.m_Background.r);
+			m_Background.g += static_cast<bucketT>(m_Ember.m_Background.g);
+			m_Background.b += static_cast<bucketT>(m_Ember.m_Background.b);
 			m_VibGamCount++;
 			m_LastIter = 0;
 			temporalSample++;
@@ -617,14 +628,14 @@ FilterAndAccum:
 			//to be very dark. Correct it by pretending the number of iters done is the exact quality desired and then scale according to that.
 			if (forceOutput)
 			{
-				T quality = (T(m_Stats.m_Iters) / T(FinalDimensions())) * (m_Scale * m_Scale);
-				m_K2 = bucketT((Supersample() * Supersample()) / (area * quality * m_TemporalFilter->SumFilt()));
+				T quality = (static_cast<T>(m_Stats.m_Iters) / static_cast<T>(FinalDimensions())) * (m_Scale * m_Scale);
+				m_K2 = static_cast<bucketT>((Supersample() * Supersample()) / (area * quality * m_TemporalFilter->SumFilt()));
 			}
 			else
-				m_K2 = bucketT((Supersample() * Supersample()) / (area * m_ScaledQuality * m_TemporalFilter->SumFilt()));
+				m_K2 = static_cast<bucketT>((Supersample() * Supersample()) / (area * m_ScaledQuality * m_TemporalFilter->SumFilt()));
 		}
 		else
-			m_K2 = bucketT(m_Ember.m_K2);
+			m_K2 = static_cast<bucketT>(m_Ember.m_K2);
 
 		if (!ResetBuckets(false, true))//Only the histogram was reset above, now reset the density filtering buffer.
 		{
@@ -692,7 +703,7 @@ AccumOnly:
 
 		//Make sure a filter has been created.
 		CreateSpatialFilter(newFilterAlloc);
-		m_DensityFilterOffset = m_GutterWidth - size_t(Clamp<T>((T(m_SpatialFilter->FinalFilterWidth()) - T(Supersample())) / 2, 0, T(m_GutterWidth)));
+		m_DensityFilterOffset = m_GutterWidth - static_cast<size_t>(Clamp<T>((static_cast<T>(m_SpatialFilter->FinalFilterWidth()) - static_cast<T>(Supersample())) / 2, 0, static_cast<T>(m_GutterWidth)));
 		m_CurvesSet = m_Ember.m_Curves.CurvesSet();
 		ComputeCurves();//Color curves must be re-calculated as well.
 
@@ -747,7 +758,7 @@ EmberImageComments Renderer<T, bucketT>::ImageComments(const EmberStats& stats, 
 	EmberImageComments comments;
 	ss.imbue(std::locale(""));
 	comments.m_Genome = m_EmberToXml.ToString(m_Ember, "", printEditDepth, false, hexPalette);
-	ss << (double(stats.m_Badvals) / double(stats.m_Iters));//Percentage of bad values to iters.
+	ss << (static_cast<double>(stats.m_Badvals) / static_cast<double>(stats.m_Iters));//Percentage of bad values to iters.
 	comments.m_Badvals = ss.str(); ss.str("");
 	ss << stats.m_Iters;
 	comments.m_NumIters = ss.str(); ss.str("");//Total iters.
@@ -767,7 +778,7 @@ EmberImageComments Renderer<T, bucketT>::ImageComments(const EmberStats& stats, 
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::MakeDmap(T colorScalar)
 {
-	m_Ember.m_Palette.template MakeDmap<bucketT>(m_Dmap, bucketT(colorScalar));
+	m_Ember.m_Palette.template MakeDmap<bucketT>(m_Dmap, static_cast<bucketT>(colorScalar));
 }
 
 /// <summary>
@@ -778,8 +789,8 @@ void Renderer<T, bucketT>::MakeDmap(T colorScalar)
 template <typename T, typename bucketT>
 bool Renderer<T, bucketT>::Alloc(bool histOnly)
 {
-	bool b = true;
-	bool lock =
+	auto b = true;
+	const auto lock =
 		(m_SuperSize         != m_HistBuckets.size())        ||
 		(m_SuperSize         != m_AccumulatorBuckets.size()) ||
 		(m_ThreadsToUse      != m_Samples.size())            ||
@@ -888,14 +899,14 @@ bool Renderer<T, bucketT>::ResetBuckets(bool resetHist, bool resetAccum)
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::VectorizedLogScale(size_t row, size_t rowEnd)
 {
-	float k1 = float(m_K1);//All types must be float.
-	float k2 = float(m_K2);
+	const auto k1 = static_cast<float>(m_K1);//All types must be float.
+	const auto k2 = static_cast<float>(m_K2);
 	auto* __restrict hist = m_HistBuckets.data();//Vectorizer can't tell these point to different locations.
 	auto* __restrict acc = m_AccumulatorBuckets.data();
 
 	for (size_t i = row; i < rowEnd; i++)
 	{
-		float logScale = (k1 * std::log(1.0f + hist[i].a * k2)) / (hist[i].a + std::numeric_limits<float>::epsilon());
+		const float logScale = (k1 * std::log(1.0f + hist[i].a * k2)) / (hist[i].a + std::numeric_limits<float>::epsilon());
 		acc[i].r = hist[i].r * logScale;//Must break these out individually. Vectorizer can't reason about vec4's overloaded * operator.
 		acc[i].g = hist[i].g * logScale;
 		acc[i].b = hist[i].b * logScale;
@@ -919,7 +930,7 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 	//Timing t(4);
 	//Original didn't parallelize this, doing so gives a 50-75% speedup.
 	//The value can be directly assigned, which is quicker than summing.
-	parallel_for(startRow, endRow, size_t(1), [&](size_t j)
+	parallel_for(startRow, endRow, static_cast<size_t>(1), [&](size_t j)
 	{
 		size_t row = j * m_SuperRasW;
 		size_t rowEnd = row + endCol;
@@ -931,7 +942,7 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 				//Check for visibility first before doing anything else to avoid all possible unnecessary calculations.
 				if (m_HistBuckets[i].a != 0)
 				{
-					bucketT logScale = (m_K1 * std::log(1 + m_HistBuckets[i].a * m_K2)) / m_HistBuckets[i].a;
+					const bucketT logScale = (m_K1 * std::log(1 + m_HistBuckets[i].a * m_K2)) / m_HistBuckets[i].a;
 					//Original did a temporary assignment, then *= logScale, then passed the result to bump_no_overflow().
 					//Combine here into one operation for a slight speedup.
 					//Vectorized version:
@@ -969,30 +980,30 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 {
 	Timing totalTime, localTime;
 	bool scf = !(Supersample() & 1);
-	intmax_t ss = Floor<T>(Supersample() / T(2));
-	T scfact = std::pow(Supersample() / (Supersample() + T(1)), T(2));
+	intmax_t ss = Floor<T>(Supersample() / static_cast<T>(2));
+	T scfact = std::pow(Supersample() / (Supersample() + static_cast<T>(1)), static_cast<T>(2));
 	size_t threads = m_ThreadsToUse;
 	size_t startRow = Supersample() - 1;
 	size_t endRow = m_SuperRasH - (Supersample() - 1);//Original did + which is most likely wrong.
 	intmax_t startCol = Supersample() - 1;
 	intmax_t endCol = m_SuperRasW - (Supersample() - 1);
-	size_t chunkSize = size_t(ceil(double(endRow - startRow) / double(threads)));
+	size_t chunkSize = static_cast<size_t>(std::ceil(static_cast<double>(endRow - startRow) / static_cast<double>(threads)));
 	//parallel_for scales very well, dividing the work almost perfectly among all processors.
-	parallel_for(size_t(0), threads, size_t(1), [&] (size_t threadIndex)
+	parallel_for(static_cast<size_t>(0), threads, static_cast<size_t>(1), [&] (size_t threadIndex)
 	{
 		size_t pixelNumber = 0;
-		int localStartRow = int(std::min<size_t>(startRow + (threadIndex * chunkSize), endRow - 1));
-		int localEndRow = int(std::min<size_t>(localStartRow + chunkSize, endRow));
-		size_t pixelsThisThread = size_t(localEndRow - localStartRow) * m_SuperRasW;
+		const auto localStartRow = static_cast<intmax_t>(std::min<size_t>(startRow + (threadIndex * chunkSize), endRow - 1));
+		const auto localEndRow = static_cast<intmax_t>(std::min<size_t>(localStartRow + chunkSize, endRow));
+		const size_t pixelsThisThread = static_cast<size_t>(localEndRow - localStartRow) * m_SuperRasW;
 		double lastPercent = 0;
 		tvec4<bucketT, glm::defaultp> logScaleBucket;
 
 		for (intmax_t j = localStartRow; (j < localEndRow) && !m_Abort; j++)
 		{
-			auto buckets = m_HistBuckets.data();
-			auto bucketRowStart = buckets + (j * m_SuperRasW);//Pull out of inner loop for optimization.
-			auto filterCoefs = m_DensityFilter->Coefs();
-			auto filterWidths = m_DensityFilter->Widths();
+			const auto buckets = m_HistBuckets.data();
+			const auto bucketRowStart = buckets + (j * m_SuperRasW);//Pull out of inner loop for optimization.
+			const auto filterCoefs = m_DensityFilter->Coefs();
+			const auto filterWidths = m_DensityFilter->Widths();
 
 			for (intmax_t i = startCol; i < endCol; i++)
 			{
@@ -1005,7 +1016,7 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 				if (bucket->a == 0)
 					continue;
 
-				bucketT cacheLog = (m_K1 * std::log(1 + bucket->a * m_K2)) / bucket->a;//Caching this calculation gives a 30% speedup.
+				const bucketT cacheLog = (m_K1 * std::log(1 + bucket->a * m_K2)) / bucket->a;//Caching this calculation gives a 30% speedup.
 
 				if (ss == 0)
 				{
@@ -1016,10 +1027,10 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 					//The original contained a glaring flaw as it would run past the boundaries of the buffers
 					//when calculating the density for a box centered on the last row or column.
 					//Clamp here to not run over the edge.
-					intmax_t densityBoxLeftX = (i - std::min(i, ss));
-					intmax_t densityBoxRightX = (i + std::min(ss, intmax_t(m_SuperRasW) - i - 1));
-					intmax_t densityBoxTopY = (j - std::min(j, ss));
-					intmax_t densityBoxBottomY = (j + std::min(ss, intmax_t(m_SuperRasH) - j - 1));
+					const intmax_t densityBoxLeftX = (i - std::min(i, ss));
+					const intmax_t densityBoxRightX = (i + std::min(ss, static_cast<intmax_t>(m_SuperRasW) - i - 1));
+					const intmax_t densityBoxTopY = (j - std::min(j, ss));
+					const intmax_t densityBoxBottomY = (j + std::min(ss, static_cast<intmax_t>(m_SuperRasH) - j - 1));
 
 					//Count density in ssxss area.
 					//Original went one col at a time, which is cache inefficient. Go one row at at time here for a slight speedup.
@@ -1035,9 +1046,9 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 				if (filterSelect > m_DensityFilter->MaxFilteredCounts())
 					filterSelectInt = m_DensityFilter->MaxFilterIndex();
 				else if (filterSelect <= DE_THRESH)
-					filterSelectInt = size_t(ceil(filterSelect)) - 1;
+					filterSelectInt = static_cast<size_t>(std::ceil(filterSelect)) - 1;
 				else
-					filterSelectInt = DE_THRESH + size_t(Floor<T>(std::pow(filterSelect - DE_THRESH, m_DensityFilter->Curve())));
+					filterSelectInt = DE_THRESH + static_cast<size_t>(Floor<T>(std::pow(filterSelect - DE_THRESH, m_DensityFilter->Curve())));
 
 				//If the filter selected below the min specified clamp it to the min.
 				if (filterSelectInt > m_DensityFilter->MaxFilterIndex())
@@ -1045,7 +1056,7 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 
 				//Only have to calculate the values for ~1/8 of the square.
 				filterCoefIndex = filterSelectInt * m_DensityFilter->KernelSize();
-				arrFilterWidth = intmax_t(ceil(filterWidths[filterSelectInt])) - 1;
+				arrFilterWidth = static_cast<intmax_t>(std::ceil(filterWidths[filterSelectInt])) - 1;
 
 				for (jj = 0; jj <= arrFilterWidth; jj++)
 				{
@@ -1096,13 +1107,13 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 			if (m_Callback && threadIndex == 0)
 			{
 				pixelNumber += m_SuperRasW;
-				double percent = (double(pixelNumber) / double(pixelsThisThread)) * 100.0;
-				double percentDiff = percent - lastPercent;
-				double toc = localTime.Toc();
+				const auto percent = (static_cast<double>(pixelNumber) / static_cast<double>(pixelsThisThread)) * 100.0;
+				const auto percentDiff = percent - lastPercent;
+				const auto toc = localTime.Toc();
 
 				if (percentDiff >= 10 || (toc > 1000 && percentDiff >= 1))
 				{
-					double etaMs = ((100.0 - percent) / percent) * totalTime.Toc();
+					const auto etaMs = ((100.0 - percent) / percent) * totalTime.Toc();
 
 					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 1, etaMs))
 						Abort();
@@ -1144,7 +1155,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 	}
 
 	//Timing t(4);
-	size_t filterWidth = m_SpatialFilter->FinalFilterWidth();
+	const size_t filterWidth = m_SpatialFilter->FinalFilterWidth();
 	bucketT g, linRange, vibrancy;
 	Color<bucketT> background;
 	auto p = pixels.data();
@@ -1155,10 +1166,10 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 	//The original does it this way as well and it's roughly 11 times faster to do it this way than inline below with each pixel.
 	if (EarlyClip())
 	{
-		parallel_for(size_t(0), m_SuperRasH, size_t(1), [&](size_t j)
+		parallel_for(static_cast<size_t>(0), m_SuperRasH, static_cast<size_t>(1), [&](size_t j)
 		{
 			auto rowStart = m_AccumulatorBuckets.data() + (j * m_SuperRasW);//Pull out of inner loop for optimization.
-			auto rowEnd = rowStart + m_SuperRasW;
+			const auto rowEnd = rowStart + m_SuperRasW;
 
 			while (rowStart < rowEnd && !m_Abort)//Use the pointer itself as the offset to save an extra addition per iter.
 			{
@@ -1182,7 +1193,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 	//otherwise artifacts that resemble page tearing will occur in an interactive run. It's
 	//critical to never exit this loop prematurely.
 	//for (size_t j = 0; j < FinalRasH(); j++)//Keep around for debugging.
-	parallel_for(size_t(0), FinalRasH(), size_t(1), [&](size_t j)
+	parallel_for(static_cast<size_t>(0), FinalRasH(), static_cast<size_t>(1), [&](size_t j)
 	{
 		Color<bucketT> newBucket;
 		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRasW();//Pull out of inner loop for optimization.
@@ -1193,8 +1204,8 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 		for (size_t i = 0; i < FinalRasW(); i++, pv4T++)
 		{
 			size_t ii, jj;
-			size_t x = m_DensityFilterOffset + (i * Supersample());//Start at the beginning column of each super sample block.
-			size_t clampedFilterW = std::min(filterWidth, m_SuperRasW - x);//Make sure the filter doesn't go past the right of the gutter.
+			const size_t x = m_DensityFilterOffset + (i * Supersample());//Start at the beginning column of each super sample block.
+			const size_t clampedFilterW = std::min(filterWidth, m_SuperRasW - x);//Make sure the filter doesn't go past the right of the gutter.
 			newBucket.Clear();
 
 			//Original was iterating column-wise, which is slow.
@@ -1233,7 +1244,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 		{
 			for (i = 0; i < FinalRasW(); i++)
 			{
-				auto pp = p + (i + j * FinalRasW());
+				const auto pp = p + (i + j * FinalRasW());
 				pp->r = m_TempEmber.m_Palette[i * 256 / FinalRasW()][0];
 				pp->g = m_TempEmber.m_Palette[i * 256 / FinalRasW()][1];
 				pp->b = m_TempEmber.m_Palette[i * 256 / FinalRasW()][2];
@@ -1266,7 +1277,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 {
 	//Timing t2(4);
 	m_IterTimer.Tic();
-	size_t totalItersPerThread = size_t(ceil(double(iterCount) / double(m_ThreadsToUse)));
+	const size_t totalItersPerThread = static_cast<size_t>(std::ceil(static_cast<double>(iterCount) / static_cast<double>(m_ThreadsToUse)));
 	EmberStats stats;
 	//vector<double> accumTimes(4);
 
@@ -1277,16 +1288,16 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 		m_ThreadEmbers.insert(m_ThreadEmbers.begin(), m_ThreadsToUse, m_Ember);
 	}
 
-	parallel_for(size_t(0), m_ThreadsToUse, size_t(1), [&] (size_t threadIndex)
+	parallel_for(static_cast<size_t>(0), m_ThreadsToUse, static_cast<size_t>(1), [&] (size_t threadIndex)
 	{
 #if defined(_WIN32)
-		SetThreadPriority(GetCurrentThread(), int(m_Priority));
+		SetThreadPriority(GetCurrentThread(), static_cast<int>(m_Priority));
 #elif defined(__APPLE__)
 		sched_param sp = {0};
-		sp.sched_priority = int(m_Priority);
+		sp.sched_priority = static_cast<int>(m_Priority);
 		pthread_setschedparam(pthread_self(), SCHED_RR, &sp);
 #else
-		pthread_setschedprio(pthread_self(), int(m_Priority));
+		pthread_setschedprio(pthread_self(), static_cast<int>(m_Priority));
 #endif
 		//Timing t;
 		IterParams<T> params;
@@ -1334,27 +1345,27 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 			if (m_Callback && threadIndex == 0)
 			{
 				auto percent = 100.0 *
-							   double
+							   static_cast<double>
 							   (
-								   double
+								   static_cast<double>
 								   (
-									   double
+									   static_cast<double>
 									   (
 										   //Takes progress of current thread and multiplies by thread count.
 										   //This assumes the threads progress at roughly the same speed.
 										   //Adding m_LastIter is done so that an incremental render still gives an accurate percentage.
-										   double(m_LastIter + (m_SubBatch[threadIndex] * m_ThreadsToUse)) / double(ItersPerTemporalSample())
+										   static_cast<double>(m_LastIter + (m_SubBatch[threadIndex] * m_ThreadsToUse)) / static_cast<double>(ItersPerTemporalSample())
 									   ) + temporalSample
-								   ) / double(TemporalSamples())
+								   ) / static_cast<double>(TemporalSamples())
 							   );
-				double percentDiff = percent - m_LastIterPercent;
-				double toc = m_ProgressTimer.Toc();
+				const auto percentDiff = percent - m_LastIterPercent;
+				const auto toc = m_ProgressTimer.Toc();
 
 				if (percentDiff >= 10 || (toc > 1000 && percentDiff >= 1))//Call callback function if either 10% has passed, or one second (and 1%).
 				{
-					auto startingpercent = 100.0 * (m_LastIter / double(ItersPerTemporalSample()));//This is done to support incremental renders, starting from the percentage it left off on.
-					auto currentpercent = percent - startingpercent;//Current percent in terms of starting percentage. So starting at 50% and progressing 5% will give a value of 5%, not 55%.
-					auto etaMs = currentpercent == 0 ? 0 : (((100.0 - startingpercent) - currentpercent) / currentpercent) * m_RenderTimer.Toc();//Subtract startingpercent from 100% so that it's properly scaled, meaning rendering from 50% - 100% will be treated as 0% - 100%.
+					const auto startingpercent = 100.0 * (m_LastIter / static_cast<double>(ItersPerTemporalSample()));//This is done to support incremental renders, starting from the percentage it left off on.
+					const auto currentpercent = percent - startingpercent;//Current percent in terms of starting percentage. So starting at 50% and progressing 5% will give a value of 5%, not 55%.
+					const auto etaMs = currentpercent == 0 ? 0 : (((100.0 - startingpercent) - currentpercent) / currentpercent) * m_RenderTimer.Toc();//Subtract startingpercent from 100% so that it's properly scaled, meaning rendering from 50% - 100% will be treated as 0% - 100%.
 
 					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 0, etaMs))
 						Abort();
@@ -1418,11 +1429,11 @@ template <typename T, typename bucketT> TemporalFilter<T>*			   Renderer<T, buck
 /// Virtual renderer properties overridden from RendererBase, getters only.
 /// </summary>
 
-template <typename T, typename bucketT> double			   Renderer<T, bucketT>::ScaledQuality()		  const { return double(m_ScaledQuality); }
-template <typename T, typename bucketT> double			   Renderer<T, bucketT>::LowerLeftX(bool  gutter) const { return double(gutter ? m_CarToRas.CarLlX() : m_LowerLeftX); }
-template <typename T, typename bucketT> double			   Renderer<T, bucketT>::LowerLeftY(bool  gutter) const { return double(gutter ? m_CarToRas.CarLlY() : m_LowerLeftY); }
-template <typename T, typename bucketT> double			   Renderer<T, bucketT>::UpperRightX(bool gutter) const { return double(gutter ? m_CarToRas.CarUrX() : m_UpperRightX); }
-template <typename T, typename bucketT> double			   Renderer<T, bucketT>::UpperRightY(bool gutter) const { return double(gutter ? m_CarToRas.CarUrY() : m_UpperRightY); }
+template <typename T, typename bucketT> double			   Renderer<T, bucketT>::ScaledQuality()		  const { return static_cast<double>(m_ScaledQuality); }
+template <typename T, typename bucketT> double			   Renderer<T, bucketT>::LowerLeftX(bool  gutter) const { return static_cast<double>(gutter ? m_CarToRas.CarLlX() : m_LowerLeftX); }
+template <typename T, typename bucketT> double			   Renderer<T, bucketT>::LowerLeftY(bool  gutter) const { return static_cast<double>(gutter ? m_CarToRas.CarLlY() : m_LowerLeftY); }
+template <typename T, typename bucketT> double			   Renderer<T, bucketT>::UpperRightX(bool gutter) const { return static_cast<double>(gutter ? m_CarToRas.CarUrX() : m_UpperRightX); }
+template <typename T, typename bucketT> double			   Renderer<T, bucketT>::UpperRightY(bool gutter) const { return static_cast<double>(gutter ? m_CarToRas.CarUrY() : m_UpperRightY); }
 template <typename T, typename bucketT> DensityFilterBase* Renderer<T, bucketT>::GetDensityFilter()			    { return m_DensityFilter.get(); }
 
 /// <summary>
@@ -1440,11 +1451,11 @@ template <typename T, typename bucketT> T                     Renderer<T, bucket
 template <typename T, typename bucketT> T                     Renderer<T, bucketT>::CenterX()             const { return m_Ember.m_CenterX; }
 template <typename T, typename bucketT> T                     Renderer<T, bucketT>::CenterY()             const { return m_Ember.m_CenterY; }
 template <typename T, typename bucketT> T                     Renderer<T, bucketT>::Rotate()              const { return m_Ember.m_Rotate; }
-template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Brightness()		  const { return bucketT(m_Ember.m_Brightness); }
-template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Gamma()				  const { return bucketT(m_Ember.m_Gamma); }
-template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Vibrancy()			  const { return bucketT(m_Ember.m_Vibrancy); }
-template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::GammaThresh()		  const { return bucketT(m_Ember.m_GammaThresh); }
-template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::HighlightPower()	  const { return bucketT(m_Ember.m_HighlightPower); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Brightness()		  const { return static_cast<bucketT>(m_Ember.m_Brightness); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Gamma()				  const { return static_cast<bucketT>(m_Ember.m_Gamma); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::Vibrancy()			  const { return static_cast<bucketT>(m_Ember.m_Vibrancy); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::GammaThresh()		  const { return static_cast<bucketT>(m_Ember.m_GammaThresh); }
+template <typename T, typename bucketT> bucketT               Renderer<T, bucketT>::HighlightPower()	  const { return static_cast<bucketT>(m_Ember.m_HighlightPower); }
 template <typename T, typename bucketT> Color<T>		      Renderer<T, bucketT>::Background()		  const { return m_Ember.m_Background; }
 template <typename T, typename bucketT> const Xform<T>*       Renderer<T, bucketT>::Xforms()			  const { return m_Ember.Xforms(); }
 template <typename T, typename bucketT> Xform<T>*             Renderer<T, bucketT>::NonConstXforms()			{ return m_Ember.NonConstXforms(); }
@@ -1491,13 +1502,13 @@ void Renderer<T, bucketT>::PrepFinalAccumVals(Color<bucketT>& background, bucket
 	//sample, which means the values will be zero.
 	vibrancy = m_Vibrancy == 0 ? Vibrancy() : m_Vibrancy;
 	size_t vibGamCount = m_VibGamCount == 0 ? 1 : m_VibGamCount;
-	bucketT gamma = m_Gamma == 0 ? Gamma() : m_Gamma;
-	g = 1 / ClampGte<bucketT>(gamma / vibGamCount, bucketT(0.01));//Ensure a divide by zero doesn't occur.
+	const bucketT gamma = m_Gamma == 0 ? Gamma() : m_Gamma;
+	g = 1 / ClampGte<bucketT>(gamma / vibGamCount, static_cast<bucketT>(0.01));//Ensure a divide by zero doesn't occur.
 	linRange = GammaThresh();
 	vibrancy /= vibGamCount;
-	background.x = (IsNearZero(m_Background.r) ? bucketT(m_Ember.m_Background.r) : m_Background.r) / vibGamCount;
-	background.y = (IsNearZero(m_Background.g) ? bucketT(m_Ember.m_Background.g) : m_Background.g) / vibGamCount;
-	background.z = (IsNearZero(m_Background.b) ? bucketT(m_Ember.m_Background.b) : m_Background.b) / vibGamCount;
+	background.x = (IsNearZero(m_Background.r) ? static_cast<bucketT>(m_Ember.m_Background.r) : m_Background.r) / vibGamCount;
+	background.y = (IsNearZero(m_Background.g) ? static_cast<bucketT>(m_Ember.m_Background.g) : m_Background.g) / vibGamCount;
+	background.z = (IsNearZero(m_Background.b) ? static_cast<bucketT>(m_Ember.m_Background.b) : m_Background.b) / vibGamCount;
 }
 
 /// <summary>
@@ -1516,7 +1527,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 {
 	size_t histIndex, intColorIndex, histSize = m_HistBuckets.size();
 	bucketT colorIndex, colorIndexFrac;
-	auto psm1 = m_Ember.m_Palette.Size() - 1;
+	const auto psm1 = m_Ember.m_Palette.Size() - 1;
 
 	//Linear is a linear scale for when the color index is not a whole number, which is most of the time.
 	//It uses a portion of the value of the index, and the remainder of the next index.
@@ -1526,7 +1537,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 	//Use overloaded addition and multiplication operators in vec4 to perform the accumulation.
 	if (PaletteMode() == ePaletteMode::PALETTE_LINEAR)
 	{
-		auto psm2 = psm1 - 1;
+		const auto psm2 = psm1 - 1;
 
 		//It's critical to understand what's going on here as it's one of the most important parts of the algorithm.
 		//A color value gets retrieved from the palette and
@@ -1564,8 +1575,8 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 					//This will result in a few points at the very edges getting discarded, but prevents a crash and doesn't seem to make a speed difference.
 					if (histIndex < histSize)
 					{
-						colorIndex = bucketT(p.m_ColorX) * psm1;
-						intColorIndex = size_t(colorIndex);
+						colorIndex = static_cast<bucketT>(p.m_ColorX) * psm1;
+						intColorIndex = static_cast<size_t>(colorIndex);
 
 						if (intColorIndex < 0)
 						{
@@ -1579,13 +1590,13 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						}
 						else
 						{
-							colorIndexFrac = colorIndex - bucketT(intColorIndex);//Interpolate between intColorIndex and intColorIndex + 1.
+							colorIndexFrac = colorIndex - static_cast<bucketT>(intColorIndex);//Interpolate between intColorIndex and intColorIndex + 1.
 						}
 
 						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
 						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
 						const bucketT* __restrict pal2 = glm::value_ptr(palette->m_Entries[intColorIndex + 1]);
-						auto cifm1 = bucketT(1) - colorIndexFrac;
+						const auto cifm1 = static_cast<bucketT>(1) - colorIndexFrac;
 
 						//Loops are unrolled to allow auto vectorization.
 						if (p.m_Opacity == 1)
@@ -1597,7 +1608,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						}
 						else
 						{
-							auto va = bucketT(p.m_Opacity);
+							const auto va = static_cast<bucketT>(p.m_Opacity);
 							hist[0] += ((pal[0] * cifm1) + (pal2[0] * colorIndexFrac)) * va;
 							hist[1] += ((pal[1] * cifm1) + (pal2[1] * colorIndexFrac)) * va;
 							hist[2] += ((pal[2] * cifm1) + (pal2[2] * colorIndexFrac)) * va;
@@ -1618,8 +1629,8 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 			{
 				if (Rotate() != 0)
 				{
-					T p00 = p.m_X - m_Ember.m_CenterX;
-					T p11 = p.m_Y - m_Ember.m_RotCenterY;
+					const T p00 = p.m_X - m_Ember.m_CenterX;
+					const T p11 = p.m_Y - m_Ember.m_RotCenterY;
 					p.m_X = (p00 * m_RotMat.A()) + (p11 * m_RotMat.B()) + m_Ember.m_CenterX;
 					p.m_Y = (p00 * m_RotMat.D()) + (p11 * m_RotMat.E()) + m_Ember.m_RotCenterY;
 				}
@@ -1630,7 +1641,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 
 					if (histIndex < histSize)
 					{
-						intColorIndex = Clamp<size_t>(size_t(p.m_ColorX * psm1), 0, psm1);
+						intColorIndex = Clamp<size_t>(static_cast<size_t>(p.m_ColorX * psm1), 0, psm1);
 						bucketT* __restrict hist = glm::value_ptr(m_HistBuckets[histIndex]);//Vectorizer can't tell these point to different locations.
 						const bucketT* __restrict pal = glm::value_ptr(palette->m_Entries[intColorIndex]);
 
@@ -1643,7 +1654,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 						}
 						else
 						{
-							auto va = bucketT(p.m_Opacity);
+							auto va = static_cast<bucketT>(p.m_Opacity);
 							hist[0] += pal[0] * va;
 							hist[1] += pal[1] * va;
 							hist[2] += pal[2] * va;
@@ -1667,7 +1678,7 @@ void Renderer<T, bucketT>::Accumulate(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, Poin
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::AddToAccum(const tvec4<bucketT, glm::defaultp>& bucket, intmax_t i, intmax_t ii, intmax_t j, intmax_t jj)
 {
-	if (j + jj >= 0 && j + jj < intmax_t(m_SuperRasH) && i + ii >= 0 && i + ii < intmax_t(m_SuperRasW))
+	if (j + jj >= 0 && j + jj < static_cast<intmax_t>(m_SuperRasH) && i + ii >= 0 && i + ii < static_cast<intmax_t>(m_SuperRasW))
 	{
 		auto* __restrict accum = m_AccumulatorBuckets.data() + ((i + ii) + ((j + jj) * m_SuperRasW));//For vectorizer, results in a 33% speedup.
 		accum->r += bucket.r;
@@ -1695,7 +1706,7 @@ template <typename T, typename bucketT>
 template <typename accumT>
 void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket, Color<bucketT>& background, bucketT g, bucketT linRange, bucketT vibrancy, bool scale, accumT* correctedChannels)
 {
-	auto bt1 = bucketT(1);
+	auto bt1 = static_cast<bucketT>(1);
 
 	if (scale && EarlyClip())
 	{
@@ -1706,10 +1717,10 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 			CurveAdjust(bucket.b, 3);
 		}
 
-		correctedChannels[0] = accumT(Clamp<bucketT>(bucket.r, 0, bt1));
-		correctedChannels[1] = accumT(Clamp<bucketT>(bucket.g, 0, bt1));
-		correctedChannels[2] = accumT(Clamp<bucketT>(bucket.b, 0, bt1));
-		correctedChannels[3] = accumT(Clamp<bucketT>(bucket.a, 0, bt1));
+		correctedChannels[0] = static_cast<accumT>(Clamp<bucketT>(bucket.r, 0, bt1));
+		correctedChannels[1] = static_cast<accumT>(Clamp<bucketT>(bucket.g, 0, bt1));
+		correctedChannels[2] = static_cast<accumT>(Clamp<bucketT>(bucket.b, 0, bt1));
+		correctedChannels[3] = static_cast<accumT>(Clamp<bucketT>(bucket.a, 0, bt1));
 	}
 	else
 	{
@@ -1737,10 +1748,10 @@ void Renderer<T, bucketT>::GammaCorrection(tvec4<bucketT, glm::defaultp>& bucket
 			if (scale && m_CurvesSet)
 				CurveAdjust(a, rgbi + 1);
 
-			correctedChannels[rgbi] = accumT(Clamp<bucketT>(a, 0, bt1));//Early clip, just assign directly.
+			correctedChannels[rgbi] = static_cast<accumT>(Clamp<bucketT>(a, 0, bt1));//Early clip, just assign directly.
 		}
 
-		correctedChannels[3] = accumT(alpha);
+		correctedChannels[3] = static_cast<accumT>(alpha);
 	}
 }
 
@@ -1775,8 +1786,8 @@ void Renderer<T, bucketT>::ComputeCurves()
 template <typename T, typename bucketT>
 void Renderer<T, bucketT>::CurveAdjust(bucketT& a, const glm::length_t& index)
 {
-	size_t tempIndex = size_t(Clamp<bucketT>(a * CURVES_LENGTH_M1, 0, CURVES_LENGTH_M1));
-	size_t tempIndex2 = size_t(Clamp<bucketT>(m_Csa[tempIndex].x * CURVES_LENGTH_M1, 0, CURVES_LENGTH_M1));
+	size_t tempIndex = static_cast<size_t>(Clamp<bucketT>(a * CURVES_LENGTH_M1, 0, CURVES_LENGTH_M1));
+	size_t tempIndex2 = static_cast<size_t>(Clamp<bucketT>(m_Csa[tempIndex].x * CURVES_LENGTH_M1, 0, CURVES_LENGTH_M1));
 	a = m_Csa[tempIndex2][index];
 }
 

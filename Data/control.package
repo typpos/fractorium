@@ -8,7 +8,7 @@ Homepage: http://fractorium.com/
 Vcs-Git: https://bitbucket.org/mfeemster/fractorium
 Vcs-Browser: https://bitbucket.org/mfeemster/fractorium
 Package: Fractorium
-Version: 21.21.4.1
+Version: 22.21.4.2
 Architecture: amd64
 Description: A fractal flame editor with GPU support
  Fractorium

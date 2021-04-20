@@ -185,11 +185,11 @@ public:
 		if (i < 4)
 		{
 			m_Points[i].resize(5);
-			m_Points[i][0] = v2T(0);
-			m_Points[i][1] = v2T(T(0.25));
-			m_Points[i][2] = v2T(T(0.50));
-			m_Points[i][3] = v2T(T(0.75));
-			m_Points[i][4] = v2T(1);
+			m_Points[i][0] = v2T{ 0 };
+			m_Points[i][1] = v2T{ static_cast<T>(0.25) };
+			m_Points[i][2] = v2T{ static_cast<T>(0.50) };
+			m_Points[i][3] = v2T{ static_cast<T>(0.75) };
+			m_Points[i][4] = v2T{ 1 };
 		}
 	}
 
@@ -219,9 +219,9 @@ public:
 			}
 
 			if ((m_Points[i][0] != v2T(0)) ||
-					(m_Points[i][1] != v2T(T(0.25))) ||
-					(m_Points[i][2] != v2T(T(0.50))) ||
-					(m_Points[i][3] != v2T(T(0.75))) ||
+					(m_Points[i][1] != v2T(static_cast<T>(0.25))) ||
+					(m_Points[i][2] != v2T(static_cast<T>(0.50))) ||
+					(m_Points[i][3] != v2T(static_cast<T>(0.75))) ||
 					(m_Points[i][4] != v2T(1))
 			   )
 			{

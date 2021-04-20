@@ -70,7 +70,7 @@ public:
 	MotionParam& operator = (const MotionParam<U>& other)
 	{
 		this->first = other.first;
-		this->second = T(other.second);
+		this->second = static_cast<T>(other.second);
 		return *this;
 	}
 };

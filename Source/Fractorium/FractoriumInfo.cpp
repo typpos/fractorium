@@ -6,8 +6,8 @@
 /// </summary>
 void Fractorium::InitInfoUI()
 {
-	auto treeHeader = ui.SummaryTree->header();
-	auto tableHeader = ui.SummaryTable->horizontalHeader();
+	const auto treeHeader = ui.SummaryTree->header();
+	const auto tableHeader = ui.SummaryTable->horizontalHeader();
 	treeHeader->setVisible(true);
 	treeHeader->setSectionsClickable(true);
 	treeHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -44,12 +44,13 @@ void Fractorium::OnSummaryTableHeaderResized(int logicalIndex, int oldSize, int 
 /// <param name="logicalIndex">The column which was clicked</param>
 void Fractorium::OnSummaryTreeHeaderSectionClicked(int logicalIndex)
 {
-	auto tree = ui.SummaryTree;
-
-	if (logicalIndex)
-		tree->expandAll();
-	else
-		tree->collapseAll();
+	if (const auto tree = ui.SummaryTree)
+	{
+		if (logicalIndex)
+			tree->expandAll();
+		else
+			tree->collapseAll();
+	}
 }
 
 /// <summary>
@@ -66,18 +67,19 @@ void Fractorium::OnSummaryTreeHeaderSectionClicked(int logicalIndex)
 template <typename T>
 void FractoriumEmberController<T>::FillSummary()
 {
-	int p = 3;
-	int vp = 4;
-	int vlen = 7;
-	char pc = 'f';
-	bool forceFinal = m_Fractorium->HaveFinal();
-	size_t x = 0, total = m_Ember.TotalXformCount(forceFinal);
+	const auto p = 3;
+	const auto vp = 4;
+	const auto vlen = 7;
+	const auto pc = 'f';
+	const auto forceFinal = m_Fractorium->HaveFinal();
+	const auto total = m_Ember.TotalXformCount(forceFinal);
+	const auto table = m_Fractorium->ui.SummaryTable;
+	const auto nondraggable = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	const auto draggable = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
+	size_t x = 0;
 	Xform<T>* xform = nullptr;
 	QColor color;
-	auto table = m_Fractorium->ui.SummaryTable;
 	auto tree = m_Fractorium->ui.SummaryTree;
-	auto nondraggable = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	auto draggable = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled;
 	tree->blockSignals(true);
 	tree->clear();
 	m_Fractorium->m_InfoNameItem->setText(m_Ember.m_Name.c_str());
@@ -162,7 +164,7 @@ void FractoriumEmberController<T>::FillSummary()
 			vitem->setText(1, QLocale::system().toString(var->m_Weight, pc, vp).rightJustified(vlen, ' '));
 			vitem->setFlags(draggable);
 
-			if (auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
+			if (const auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
 			{
 				auto params = parVar->Params();
 
@@ -179,7 +181,7 @@ void FractoriumEmberController<T>::FillSummary()
 			}
 		}
 
-		auto item2 = new QTreeWidgetItem(tree);//Empty item in between xforms.
+		const auto item2 = new QTreeWidgetItem(tree);//Empty item in between xforms.
 	}
 
 	tree->expandAll();
@@ -203,8 +205,8 @@ void Fractorium::FillSummary()
 template <typename T>
 void FractoriumEmberController<T>::ReorderVariations(QTreeWidgetItem* item)
 {
-	auto tree = m_Fractorium->ui.SummaryTree;
-	auto xfindex = tree->indexOfTopLevelItem(item) / 2;//Blank lines each count as one.
+	const auto tree = m_Fractorium->ui.SummaryTree;
+	const auto xfindex = tree->indexOfTopLevelItem(item) / 2;//Blank lines each count as one.
 
 	if (auto xform = m_Ember.GetTotalXform(xfindex))
 	{
@@ -214,7 +216,7 @@ void FractoriumEmberController<T>::ReorderVariations(QTreeWidgetItem* item)
 		{
 			int i = 0;
 
-			while (auto ch = item->child(i))
+			while (const auto ch = item->child(i))
 			{
 				if (ch->text(0) == tree->LastNonVarField())
 				{
@@ -258,7 +260,7 @@ void Fractorium::UpdateHistogramBounds()
 		lr.sprintf("LR: %3.3f, %3.3f", r->UpperRightX(), r->LowerLeftY());
 		ll.sprintf("LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
 		wh.sprintf("W x H: %4u x %4u", r->SuperRasW(), r->SuperRasH());
-		g.sprintf("%u", (uint)r->GutterWidth());
+		g.sprintf("%u", static_cast<uint>(r->GutterWidth()));
 		ui.InfoBoundsLabelUL->setText(ul);
 		ui.InfoBoundsLabelUR->setText(ur);
 		ui.InfoBoundsLabelLR->setText(lr);
@@ -268,7 +270,7 @@ void Fractorium::UpdateHistogramBounds()
 
 		if (r->GetDensityFilter())
 		{
-			auto deWidth = (r->GetDensityFilter()->FilterWidth() * 2) + 1;
+			const auto deWidth = (r->GetDensityFilter()->FilterWidth() * 2) + 1;
 			de.sprintf("%d x %d", deWidth, deWidth);
 			ui.InfoBoundsTable->item(1, 1)->setText(de);
 		}

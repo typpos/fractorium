@@ -46,7 +46,8 @@ public:
 	/// <param name="filterType">Type of the filter.</param>
 	/// <param name="temporalSamples">The number of temporal samples in the ember being rendered</param>
 	/// <param name="filterWidth">The width of the filter.</param>
-	TemporalFilter(eTemporalFilterType filterType, size_t temporalSamples, T filterWidth)
+	/// <param name="filterExp">The filter exponent. Unused except with ExpTemporalFilter, but needed to prevent equality tests from failing.</param>
+	TemporalFilter(eTemporalFilterType filterType, size_t temporalSamples, T filterWidth, T filterExp)
 	{
 		size_t i, steps = temporalSamples;
 		m_TemporalSamples = temporalSamples;
@@ -54,7 +55,7 @@ public:
 		m_Deltas.resize(steps);
 		m_Filter.resize(steps);
 		m_FilterType = filterType;
-		m_FilterExp = 1;
+		m_FilterExp = filterExp;//Always assign this to prevent excessive recreates in Renderer::CreateTemporalFilter().
 
 		if (steps == 1)
 		{
@@ -66,7 +67,7 @@ public:
 		{
 			//Define the temporal deltas.
 			for (i = 0; i < steps; i++)
-				m_Deltas[i] = (T(i) / T(steps - 1) - T(0.5)) * filterWidth;
+				m_Deltas[i] = (static_cast<T>(i) / static_cast<T>(steps - 1) - static_cast<T>(0.5)) * filterWidth;
 		}
 	}
 
@@ -131,6 +132,7 @@ public:
 		for (i = 0; i < m_Filter.size(); i++)
 		{
 			ss << "Filter[" << i << "]: " << m_Filter[i] << "\n";
+			//ss << m_Filter[i] << "\n";
 		}
 
 		return ss.str();
@@ -166,7 +168,7 @@ protected:
 		m_SumFilt /= Size();
 	}
 
-	T m_SumFilt;//The sum of all filter values.
+	T m_SumFilt = 1;//The sum of all filter values.
 	T m_FilterWidth;
 	T m_FilterExp;
 	size_t m_TemporalSamples;
@@ -188,9 +190,9 @@ public:
 	/// </summary>
 	/// <param name="temporalSamples">The number of temporal samples in the ember being rendered</param>
 	/// <param name="filterWidth">The width of the filter.</param>
-	/// <param name="filterExp">The filter exp.</param>
-	ExpTemporalFilter(size_t temporalSamples, T filterWidth, T filterExp)
-		: TemporalFilter<T>(eTemporalFilterType::BOX_TEMPORAL_FILTER, temporalSamples, filterWidth)
+	/// <param name="filterExp">The filter exponent.</param>
+	ExpTemporalFilter(size_t temporalSamples, T filterWidth, T filterExp = 1)
+		: TemporalFilter<T>(eTemporalFilterType::EXP_TEMPORAL_FILTER, temporalSamples, filterWidth, filterExp)
 	{
 		if (Size() > 1)
 		{
@@ -199,9 +201,9 @@ public:
 			for (size_t i = 0; i < Size(); i++)
 			{
 				if (filterExp >= 0)
-					slpx = (T(i) + 1) / Size();
+					slpx = (static_cast<T>(i) + 1) / Size();
 				else
-					slpx = T(Size() - i) / Size();
+					slpx = static_cast<T>(Size() - i) / Size();
 
 				//Scale the color based on these values.
 				m_Filter[i] = std::pow(slpx, fabs(filterExp));
@@ -211,7 +213,6 @@ public:
 					maxFilt = m_Filter[i];
 			}
 
-			m_FilterExp = filterExp;
 			FinishFilter(maxFilt);
 		}
 	}
@@ -230,12 +231,13 @@ public:
 	/// </summary>
 	/// <param name="temporalSamples">The number of temporal samples in the ember being rendered</param>
 	/// <param name="filterWidth">The width of the filter.</param>
-	GaussianTemporalFilter(size_t temporalSamples, T filterWidth)
-		: TemporalFilter<T>(eTemporalFilterType::GAUSSIAN_TEMPORAL_FILTER, temporalSamples, filterWidth)
+	/// <param name="filterExp">Unused, but needed to prevent equality tests from failing.</param>
+	GaussianTemporalFilter(size_t temporalSamples, T filterWidth, T filterExp)
+		: TemporalFilter<T>(eTemporalFilterType::GAUSSIAN_TEMPORAL_FILTER, temporalSamples, filterWidth, filterExp)
 	{
 		if (Size() > 1)
 		{
-			T maxFilt = 0, halfSteps = T(Size()) / T(2);
+			T maxFilt = 0, halfSteps = static_cast<T>(Size()) / static_cast<T>(2);
 			GaussianFilter<T> gaussian(1, 1);//Just pass dummy values, they are unused in this case.
 
 			for (size_t i = 0; i < Size(); i++)
@@ -265,8 +267,9 @@ public:
 	/// </summary>
 	/// <param name="temporalSamples">The number of temporal samples in the ember being rendered</param>
 	/// <param name="filterWidth">The width of the filter.</param>
-	BoxTemporalFilter(size_t temporalSamples, T filterWidth)
-		: TemporalFilter<T>(eTemporalFilterType::BOX_TEMPORAL_FILTER, temporalSamples, filterWidth)
+	/// <param name="filterExp">Unused, but needed to prevent equality tests from failing.</param>
+	BoxTemporalFilter(size_t temporalSamples, T filterWidth, T filterExp)
+		: TemporalFilter<T>(eTemporalFilterType::BOX_TEMPORAL_FILTER, temporalSamples, filterWidth, filterExp)
 	{
 		if (Size() > 1)
 		{
@@ -291,20 +294,20 @@ public:
 	/// <param name="filterType">Type of the filter</param>
 	/// <param name="temporalSamples">The number of temporal samples in the ember being rendered</param>
 	/// <param name="filterWidth">The width of the filter</param>
-	/// <param name="filterExp">The filter exp, only used with Exp filter, otherwise ignored.</param>
+	/// <param name="filterExp">The filter exp, only used with Exp filter, otherwise unused but needed to prevent equality tests from failing.</param>
 	/// <returns>A pointer to the newly created filter object</returns>
-	static TemporalFilter<T>* Create(eTemporalFilterType filterType, size_t temporalSamples, T filterWidth, T filterExp = 1)
+	static TemporalFilter<T>* Create(eTemporalFilterType filterType, size_t temporalSamples, T filterWidth, T filterExp)
 	{
 		TemporalFilter<T>* filter = nullptr;
 
 		switch (filterType)
 		{
 			case EmberNs::eTemporalFilterType::BOX_TEMPORAL_FILTER:
-				filter = new BoxTemporalFilter<T>(temporalSamples, filterWidth);
+				filter = new BoxTemporalFilter<T>(temporalSamples, filterWidth, filterExp);
 				break;
 
 			case EmberNs::eTemporalFilterType::GAUSSIAN_TEMPORAL_FILTER:
-				filter = new GaussianTemporalFilter<T>(temporalSamples, filterWidth);
+				filter = new GaussianTemporalFilter<T>(temporalSamples, filterWidth, filterExp);
 				break;
 
 			case EmberNs::eTemporalFilterType::EXP_TEMPORAL_FILTER:
@@ -312,7 +315,7 @@ public:
 				break;
 
 			default:
-				filter = new BoxTemporalFilter<T>(temporalSamples, filterWidth);//Default to box if bad enum passed in.
+				filter = new BoxTemporalFilter<T>(temporalSamples, filterWidth, filterExp);//Default to box if bad enum passed in.
 				break;
 		}
 

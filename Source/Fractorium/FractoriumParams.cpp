@@ -47,7 +47,7 @@ void Fractorium::InitParamsUI()
 	comboVals.push_back("Step");
 	comboVals.push_back("Linear");
 	SetupCombo(table, this, row, 1, m_PaletteModeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnPaletteModeComboCurrentIndexChanged(int)));
-	m_PaletteModeCombo->SetCurrentIndexStealth(int(ePaletteMode::PALETTE_LINEAR));
+	m_PaletteModeCombo->SetCurrentIndexStealth(static_cast<int>(ePaletteMode::PALETTE_LINEAR));
 	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	//Geometry.
 	row = 0;
@@ -114,17 +114,18 @@ void Fractorium::InitParamsUI()
 	comboVals.push_back("Linear");
 	comboVals.push_back("Smooth");
 	SetupCombo(table, this, row, 1, m_InterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnInterpTypeComboCurrentIndexChanged(int)));
-	m_InterpTypeCombo->SetCurrentIndexStealth(int(eInterp::EMBER_INTERP_SMOOTH));
+	m_InterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(eInterp::EMBER_INTERP_SMOOTH));
 	comboVals.clear();
 	comboVals.push_back("Linear");
 	comboVals.push_back("Log");
 	SetupCombo(                         table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
-	m_AffineInterpTypeCombo->SetCurrentIndexStealth(int(eAffineInterp::AFFINE_INTERP_LOG));
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1);
+	m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(eAffineInterp::AFFINE_INTERP_LOG));
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1, 1, 1);
 	comboVals = TemporalFilterCreator<float>::FilterTypes();
 	SetupCombo(                         table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
-	m_TemporalFilterTypeCombo->SetCurrentIndexStealth(int(eTemporalFilterType::GAUSSIAN_TEMPORAL_FILTER));
+	m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(eTemporalFilterType::BOX_TEMPORAL_FILTER));
 	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterExpSpin, spinHeight, 0,  5, 0.1, SIGNAL(valueChanged(double)), SLOT(OnExpChanged(double)),     true, 1, 1, 0);
 }
 
 /// <summary>
@@ -254,12 +255,12 @@ void Fractorium::OnBackgroundColorButtonClicked(bool checked)
 template <typename T>
 void FractoriumEmberController<T>::BackgroundChanged(const QColor& color)
 {
-	auto itemRow = m_Fractorium->m_BgRow;
-	auto colorTable = m_Fractorium->ui.ColorTable;
+	const auto itemRow = m_Fractorium->m_BgRow;
+	const auto colorTable = m_Fractorium->ui.ColorTable;
+	const auto r = ToString(color.red());
+	const auto g = ToString(color.green());
+	const auto b = ToString(color.blue());
 	colorTable->item(itemRow, 1)->setBackgroundColor(color);
-	auto r = ToString(color.red());
-	auto g = ToString(color.green());
-	auto b = ToString(color.blue());
 	colorTable->item(itemRow, 1)->setTextColor(VisibleColor(color));
 	colorTable->item(itemRow, 1)->setText("rgb(" + r + ", " + g + ", " + b + ")");
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -742,7 +743,7 @@ void FractoriumEmberController<T>::TemporalFilterWidthChanged(double d)
 		if (!m_Fractorium->ApplyAll())
 			if (m_EmberFilePointer)
 				m_EmberFilePointer->m_TemporalFilterWidth = d;
-	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 void Fractorium::OnTemporalFilterWidthChanged(double d) { m_Controller->TemporalFilterWidthChanged(d); }
 
@@ -763,9 +764,30 @@ void FractoriumEmberController<T>::TemporalFilterTypeChanged(const QString& text
 		if (!m_Fractorium->ApplyAll())
 			if (m_EmberFilePointer)
 				m_EmberFilePointer->m_TemporalFilterType = filter;
-	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());//Don't do anything until animation is implemented.
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
 void Fractorium::OnTemporalFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->TemporalFilterTypeChanged(text); }
+
+/// <summary>
+/// Set the exponent value for the Exp temporal filter type to be used with animation.
+/// Called when the exp value combo box index is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="text">The name of the temporal filter</param>
+template <typename T>
+void FractoriumEmberController<T>::ExpChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_TemporalFilterExp = d;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_TemporalFilterExp = d;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+
+void Fractorium::OnExpChanged(double d) { m_Controller->ExpChanged(d); }
 
 /// <summary>
 /// Set the center.
@@ -802,7 +824,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_ColorDialog->setCurrentColor(QColor(m_Ember.m_Background.r * 255, m_Ember.m_Background.g * 255, m_Ember.m_Background.b * 255));
 	m_Fractorium->ui.ColorTable->item(m_Fractorium->m_BgRow, 1)->setBackgroundColor(m_Fractorium->m_ColorDialog->currentColor());
 	BackgroundChanged(m_Fractorium->m_ColorDialog->currentColor());
-	m_Fractorium->m_PaletteModeCombo->SetCurrentIndexStealth(int(m_Ember.m_PaletteMode));
+	m_Fractorium->m_PaletteModeCombo->SetCurrentIndexStealth(int{ m_Ember.m_PaletteMode });
 	m_Fractorium->m_WidthSpin->SetValueStealth(m_Ember.m_FinalRasW);//Geometry.
 	m_Fractorium->m_HeightSpin->SetValueStealth(m_Ember.m_FinalRasH);
 	m_Fractorium->m_CenterXSpin->SetValueStealth(m_Ember.m_CenterX);
@@ -812,14 +834,15 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_RotateSpin->SetValueStealth(m_Ember.m_Rotate);
 	m_Fractorium->m_ZPosSpin->SetValueStealth(m_Ember.m_CamZPos);
 	m_Fractorium->m_PerspectiveSpin->SetValueStealth(m_Ember.m_CamPerspective);
-	m_Fractorium->m_PitchSpin->SetValueStealth(m_Ember.m_CamPitch * RAD_2_DEG_T);
-	m_Fractorium->m_YawSpin->SetValueStealth(m_Ember.m_CamYaw * RAD_2_DEG_T);
+	m_Fractorium->m_PitchSpin->SetValueStealth(double{ m_Ember.m_CamPitch } * RAD_2_DEG_T);
+	m_Fractorium->m_YawSpin->SetValueStealth(double {m_Ember.m_CamYaw} * RAD_2_DEG_T);
 	m_Fractorium->m_DepthBlurSpin->SetValueStealth(m_Ember.m_CamDepthBlur);
 	m_Fractorium->m_BlurCurveSpin->SetValueStealth(m_Ember.m_BlurCurve);
 	m_Fractorium->m_SpatialFilterWidthSpin->SetValueStealth(m_Ember.m_SpatialFilterRadius);//Filter.
-	m_Fractorium->m_SpatialFilterTypeCombo->SetCurrentIndexStealth(int(m_Ember.m_SpatialFilterType));
+	m_Fractorium->m_SpatialFilterTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_SpatialFilterType });
 	m_Fractorium->m_TemporalFilterWidthSpin->SetValueStealth(m_Ember.m_TemporalFilterWidth);
-	m_Fractorium->m_TemporalFilterTypeCombo->SetCurrentIndexStealth(int(m_Ember.m_TemporalFilterType));
+	m_Fractorium->m_TemporalFilterTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_TemporalFilterType });
+	m_Fractorium->m_TemporalFilterExpSpin->SetValueStealth(m_Ember.m_TemporalFilterExp);
 	m_Fractorium->m_DEFilterMinRadiusSpin->SetValueStealth(m_Ember.m_MinRadDE);
 	m_Fractorium->m_DEFilterMaxRadiusSpin->SetValueStealth(m_Ember.m_MaxRadDE);
 	m_Fractorium->m_DECurveSpin->SetValueStealth(m_Ember.m_CurveDE);
@@ -828,8 +851,8 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_RandRangeSpin->SetValueStealth(m_Ember.m_RandPointRange);
 	m_Fractorium->m_QualitySpin->SetValueStealth(m_Ember.m_Quality);
 	m_Fractorium->m_SupersampleSpin->SetValueStealth(m_Ember.m_Supersample);
-	m_Fractorium->m_AffineInterpTypeCombo->SetCurrentIndexStealth(int(m_Ember.m_AffineInterp));
-	m_Fractorium->m_InterpTypeCombo->SetCurrentIndexStealth(int(m_Ember.m_Interp));
+	m_Fractorium->m_AffineInterpTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_AffineInterp });
+	m_Fractorium->m_InterpTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_Interp });
 	auto temp = m_Ember.m_Palette.m_Filename;
 
 	if (temp.get())
@@ -863,7 +886,7 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 	ember.m_HighlightPower = m_Fractorium->m_HighlightSpin->value();
 	ember.m_K2 = m_Fractorium->m_K2Spin->value();
 	ember.m_SpatialFilterRadius = m_Fractorium->m_SpatialFilterWidthSpin->value();//Filter.
-	ember.m_SpatialFilterType = eSpatialFilterType(m_Fractorium->m_SpatialFilterTypeCombo->currentIndex());
+	ember.m_SpatialFilterType = static_cast<eSpatialFilterType>(m_Fractorium->m_SpatialFilterTypeCombo->currentIndex());
 	ember.m_MinRadDE = m_Fractorium->m_DEFilterMinRadiusSpin->value();
 	ember.m_MaxRadDE = m_Fractorium->m_DEFilterMaxRadiusSpin->value();
 	ember.m_CurveDE  = m_Fractorium->m_DECurveSpin->value();
@@ -872,12 +895,13 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 		return;
 
 	ember.m_TemporalFilterWidth = m_Fractorium->m_TemporalFilterWidthSpin->value();
-	ember.m_TemporalFilterType = eTemporalFilterType(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
-	auto color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
+	ember.m_TemporalFilterType = static_cast<eTemporalFilterType>(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
+	ember.m_TemporalFilterExp = m_Fractorium->m_TemporalFilterExpSpin->value();
+	auto const color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
 	ember.m_Background.r = color.red() / 255.0;
 	ember.m_Background.g = color.green() / 255.0;
 	ember.m_Background.b = color.blue() / 255.0;
-	ember.m_PaletteMode = ePaletteMode(m_Fractorium->m_PaletteModeCombo->currentIndex());
+	ember.m_PaletteMode = static_cast<ePaletteMode>(m_Fractorium->m_PaletteModeCombo->currentIndex());
 	ember.m_FinalRasW = m_Fractorium->m_WidthSpin->value();//Geometry.
 	ember.m_FinalRasH = m_Fractorium->m_HeightSpin->value();
 	ember.m_CenterX = m_Fractorium->m_CenterXSpin->value();
@@ -896,8 +920,8 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 	ember.m_RandPointRange = m_Fractorium->m_RandRangeSpin->value();
 	ember.m_Quality = m_Fractorium->m_QualitySpin->value();
 	ember.m_Supersample = m_Fractorium->m_SupersampleSpin->value();
-	ember.m_AffineInterp = eAffineInterp(m_Fractorium->m_AffineInterpTypeCombo->currentIndex());
-	ember.m_Interp = eInterp(m_Fractorium->m_InterpTypeCombo->currentIndex());
+	ember.m_AffineInterp = static_cast<eAffineInterp>(m_Fractorium->m_AffineInterpTypeCombo->currentIndex());
+	ember.m_Interp = static_cast<eInterp>(m_Fractorium->m_InterpTypeCombo->currentIndex());
 	ember.SyncSize();
 }
 

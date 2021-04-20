@@ -114,7 +114,7 @@ public:
 
 		//First clear out any xforms that are not the final, and have a density of less than 0.001.
 
-		while (auto xform = ember.GetXform(i))
+		while (const auto xform = ember.GetXform(i))
 		{
 			if (xform->m_Weight < T(0.001))
 			{
@@ -130,18 +130,17 @@ public:
 		//Now consider all xforms, including final.
 		i = 0;
 
-		while (auto xform = ember.GetTotalXform(i))
+		while (const auto xform = ember.GetTotalXform(i))
 		{
 			do
 			{
-				Variation<T>* var = nullptr;
 				Variation<T>* smallestVar = nullptr;
 				numVars = 0;
 				smallest = -1;
 
 				for (j = 0; j < xform->TotalVariationCount(); j++)
 				{
-					var = xform->GetVariation(j);
+					const auto var = xform->GetVariation(j);
 
 					if (var && var->m_Weight != 0.0)
 					{
@@ -224,15 +223,15 @@ public:
 
 				for (size_t i = 0; i < ember.TotalXformCount(); i++)
 				{
-					auto xform1 = ember.GetTotalXform(i);
-					auto xform2 = mutation.GetTotalXform(i);
+					const auto xform1 = ember.GetTotalXform(i);
+					const auto xform2 = mutation.GetTotalXform(i);
 
 					if (xform1 && xform2)
 					{
 						for (size_t j = 0; j < xform1->TotalVariationCount(); j++)
 						{
-							Variation<T>* var1 = xform1->GetVariation(j);
-							Variation<T>* var2 = xform2->GetVariationById(var1->VariationId());
+							const auto var1 = xform1->GetVariation(j);
+							const auto var2 = xform2->GetVariationById(var1->VariationId());
 
 							if ((var1 == nullptr) ^ (var2 == nullptr))//If any of them are different, clear the first and copy all of the second and exit the while loop.
 							{
@@ -255,8 +254,8 @@ public:
 			Random(mutation, useVars, sym, 2, maxVars);
 			//Which xform to mutate?
 			modXform = m_Rand.Rand(ember.TotalXformCount());
-			auto xform1 = ember.GetTotalXform(modXform);
-			auto xform2 = mutation.GetTotalXform(0);
+			const auto xform1 = ember.GetTotalXform(modXform);
+			const auto xform2 = mutation.GetTotalXform(0);
 			os << "mutate xform " << modXform << " coefs";
 
 			//If less than 3 xforms, then change only the translation part.
@@ -279,14 +278,14 @@ public:
 		}
 		else if (mode == eMutateMode::MUTATE_POST_XFORMS)
 		{
-			bool same = (m_Rand.Rand() & 3) > 0;//25% chance of using the same post for all of them.
+			const auto same = (m_Rand.Rand() & 3) > 0;//25% chance of using the same post for all of them.
 			size_t b = 1 + m_Rand.Rand(6);
 			os << "mutate post xforms " << b << (same ? " same" : "");
 
 			for (size_t i = 0; i < ember.TotalXformCount(); i++)
 			{
-				bool copy = (i > 0) && same;
-				auto xform = ember.GetTotalXform(i);
+				const auto copy = (i > 0) && same;
+				const auto xform = ember.GetTotalXform(i);
 
 				if (copy)//Copy the post from the first xform to the rest of them.
 				{
@@ -297,7 +296,7 @@ public:
 					//50% chance.
 					if (b & 1)
 					{
-						T f = T(M_PI) * m_Rand.Frand11<T>();
+						auto f = static_cast<T>(M_PI) * m_Rand.Frand11<T>();
 						T ra, rb, rd, re;
 						ra = (xform->m_Affine.A() * std::cos(f) + xform->m_Affine.B() * -std::sin(f));
 						rd = (xform->m_Affine.A() * std::sin(f) + xform->m_Affine.D() *  std::cos(f));
@@ -321,8 +320,8 @@ public:
 					//33% chance.
 					if (b & 2)
 					{
-						T f = T(0.2) + m_Rand.Frand01<T>();
-						T g = T(0.2) + m_Rand.Frand01<T>();
+						auto f = static_cast<T>(0.2) + m_Rand.Frand01<T>();
+						auto g = static_cast<T>(0.2) + m_Rand.Frand01<T>();
 
 						if (m_Rand.RandBit())
 							f = 1 / f;
@@ -344,8 +343,8 @@ public:
 
 					if (b & 4)//16% chance.
 					{
-						T f = m_Rand.Frand11<T>();
-						T g = m_Rand.Frand11<T>();
+						const auto f = m_Rand.Frand11<T>();
+						const auto g = m_Rand.Frand11<T>();
 						xform->m_Affine.C(xform->m_Affine.C() - f);
 						xform->m_Affine.F(xform->m_Affine.F() - g);
 						xform->m_Post.C(xform->m_Post.C() + f);
@@ -356,7 +355,7 @@ public:
 		}
 		else if (mode == eMutateMode::MUTATE_COLOR_PALETTE)
 		{
-			T s = m_Rand.Frand01<T>();
+			const auto s = m_Rand.Frand01<T>();
 
 			if (s < T(0.4))//Randomize xform color coords.
 			{
@@ -401,8 +400,8 @@ public:
 			//Change all the coefs by a fraction of the random.
 			for (size_t x = 0; x < ember.TotalXformCount(); x++)
 			{
-				auto xform1 = ember.GetTotalXform(x);
-				auto xform2 = mutation.GetTotalXform(x);
+				const auto xform1 = ember.GetTotalXform(x);
+				const auto xform2 = mutation.GetTotalXform(x);
 
 				for (glm::length_t i = 0; i < 2; i++)
 					for (glm::length_t j = 0; j < 3; j++)
@@ -432,7 +431,7 @@ public:
 
 		if (crossMode == eCrossMode::CROSS_NOT_SPECIFIED)
 		{
-			T s = m_Rand.Frand01<T>();
+			const auto s = m_Rand.Frand01<T>();
 
 			if (s < 0.1)
 				crossMode = eCrossMode::CROSS_UNION;
@@ -558,7 +557,7 @@ public:
 		{
 			//Select the starting parent.
 			size_t ci;
-			uint startParent = m_Rand.RandBit();
+			auto startParent = m_Rand.RandBit();
 			os << " cmap_cross " << startParent << ":";
 
 			//Loop over the entries, switching to the other parent 1% of the time.
@@ -651,7 +650,7 @@ public:
 		//Loop over xforms.
 		for (i = 0; i < ember.TotalXformCount(); i++)
 		{
-			auto xform = ember.GetTotalXform(i);
+			const auto xform = ember.GetTotalXform(i);
 			xform->m_Weight = T(1) / ember.TotalXformCount();
 			xform->m_ColorX = m_Rand.Frand01<T>();//Original pingponged between 0 and 1, which gives bad coloring. Ember does random instead.
 			xform->m_ColorY = m_Rand.Frand01<T>();//Will need to update this if 2D coordinates are ever supported.
@@ -722,7 +721,7 @@ public:
 								if (var != -2)
 								{
 									//Pick a random variation and use a random weight from 0-1.
-									Variation<T>* v = m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand(varCount)), m_Rand.Frand<T>(T(0.001), 1));
+									auto v = m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand(varCount)), m_Rand.Frand<T>(static_cast<T>(0.001), 1));
 
 									if (v && !xform->AddVariation(v))
 										delete v;//It already existed and therefore was not added.
@@ -730,7 +729,7 @@ public:
 								else
 								{
 									//Pick a random variation from the suppled IDs and use a random weight from 0-1.
-									Variation<T>* v = m_VariationList->GetVariationCopy(useVars[m_Rand.Rand(useVars.size())], m_Rand.Frand<T>(T(0.001), 1));
+									auto v = m_VariationList->GetVariationCopy(useVars[m_Rand.Rand(useVars.size())], m_Rand.Frand<T>(static_cast<T>(0.001), 1));
 
 									if (v && !xform->AddVariation(v))
 										delete v;
@@ -760,12 +759,12 @@ public:
 						if (var != -2)
 						{
 							//Pick a random variation and use a random weight from 0-1.
-							xform->AddVariation(m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand(varCount)), m_Rand.Frand<T>(T(0.001), 1)));
+							xform->AddVariation(m_VariationList->GetVariationCopy(static_cast<size_t>(m_Rand.Rand(varCount)), m_Rand.Frand<T>(static_cast<T>(0.001), 1)));
 						}
 						else
 						{
 							//Pick a random variation from the suppled IDs and use a random weight from 0-1.
-							xform->AddVariation(m_VariationList->GetVariationCopy(useVars[m_Rand.Rand(useVars.size())], m_Rand.Frand<T>(T(0.001), 1)));
+							xform->AddVariation(m_VariationList->GetVariationCopy(useVars[m_Rand.Rand(useVars.size())], m_Rand.Frand<T>(static_cast<T>(0.001), 1)));
 						}
 					}
 				}
@@ -865,16 +864,16 @@ public:
 		for (i = 0; i < m_FinalImage.size(); i++)
 		{
 			auto& p = m_FinalImage[i];
-			m_Hist[size_t((p.r * res) +
-									  (p.g * res) * res +
-									  (p.b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
+			m_Hist[static_cast<size_t>((p.r * res) +
+																(p.g * res) * res +
+																(p.b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
 		}
 
 		for (i = 0; i < res3; i++)
 			if (m_Hist[i])//The greater range of RGB values used...
 				hits++;
 
-		return T(hits / res3);//...the higher this returned ratio will be.
+		return static_cast<T>(hits / res3);//...the higher this returned ratio will be.
 	}
 
 	/// <summary>
@@ -903,8 +902,8 @@ public:
 			ember.GetTotalXform(i)->m_ColorY = m_Rand.Frand01<T>();
 		}
 
-		auto xform0 = RandomXform(ember, -1);
-		auto xform1 = RandomXform(ember, ember.GetXformIndex(xform0));
+		const auto xform0 = RandomXform(ember, -1);
+		const auto xform1 = RandomXform(ember, ember.GetXformIndex(xform0));
 
 		if (xform0 && (m_Rand.RandBit()))
 		{
@@ -936,10 +935,9 @@ public:
 
 			if (i != excluded)
 			{
-				auto xform = ember.GetTotalXform(i);
-
-				if (xform->m_Weight > 0)
-					return xform;
+				if (const auto xform = ember.GetTotalXform(i))
+					if (xform->m_Weight > 0)
+						return xform;
 			}
 		}
 
@@ -963,10 +961,10 @@ public:
 		//the result xforms before rotate is called.
 		for (size_t i = 0; i < ember.TotalXformCount(); i++)
 		{
-			auto xform1 = ember.GetTotalXform(i);
-			auto xform2 = rotated.GetTotalXform(i);
+			const auto xform1 = ember.GetTotalXform(i);
+			const auto xform2 = rotated.GetTotalXform(i);
 
-			if (!xform1->m_Motion.empty())
+			if (xform1 && xform2 && !xform1->m_Motion.empty())
 				xform2->ApplyMotion(*xform1, blend);
 		}
 
@@ -998,10 +996,10 @@ public:
 
 			for (i = 0; i < m_EdgePrealign[si].TotalXformCount(); i++)
 			{
-				auto xform = embers[si].GetTotalXform(i);
-				auto prealignxform = m_EdgePrealign[si].GetTotalXform(i);
+				const auto xform = embers[si].GetTotalXform(i);
+				const auto prealignxform = m_EdgePrealign[si].GetTotalXform(i);
 
-				if (!xform->m_Motion.empty())
+				if (xform && prealignxform && !xform->m_Motion.empty())
 					prealignxform->ApplyMotion(*xform, blend);//Apply motion parameters to result.xform[i] using blend parameter.
 			}
 		}
@@ -1024,7 +1022,7 @@ public:
 			//Rotate the aligned xforms.
 			if (rotations)
 			{
-				auto cwblend = cw ? blend : -blend;
+				const auto cwblend = cw ? blend : -blend;
 				m_EdgeSpun[0].RotateAffines(cwblend * (360 * rotations));
 				m_EdgeSpun[1].RotateAffines(cwblend * (360 * rotations));
 			}
@@ -1050,8 +1048,8 @@ public:
 	/// <param name="cw">True to rotate clockwise, else rotate counter clockwise. Ignored if rotations is 0.</param>
 	void Spin(Ember<T>& parent, Ember<T>* templ, Ember<T>& result, size_t frame, T blend, bool cw)
 	{
-		auto cwblend = cw ? blend : -blend;
-		string temp = "rotate " + std::to_string(cwblend * 360.0);
+		const auto cwblend = cw ? blend : -blend;
+		const string temp = "rotate " + std::to_string(cwblend * 360.0);
 		//Spin the parent blend degrees.
 		Loop(parent, result, blend, cw);
 
@@ -1068,6 +1066,8 @@ public:
 		result.m_Edits = m_EmberToXml.CreateNewEditdoc(&parent, nullptr, temp, m_Nick, m_Url, m_Id, m_Comment, m_SheepGen, m_SheepId);
 		//Subpixel jitter.
 		Offset(result, m_OffsetX, m_OffsetY);
+		//Need to set these to be equal so rendering works correctly for off center embers.
+		result.m_RotCenterY = result.m_CenterY;
 		//Make the name of the flame the time.
 		result.m_Name = std::to_string(result.m_Time);
 	}
@@ -1088,8 +1088,8 @@ public:
 	/// <param name="cw">True to rotate clockwise, else rotate counter clockwise. Ignored if rotations is 0.</param>
 	void SpinInter(Ember<T>* parents, Ember<T>* templ, Ember<T>& result, size_t frame, bool seqFlag, T blend, size_t rotations, bool cw)
 	{
-		auto cwblend = cw ? blend : -blend;
-		string temp = "interpolate " + std::to_string(cwblend * 360.0);
+		const auto cwblend = cw ? blend : -blend;
+		const string temp = "interpolate " + std::to_string(cwblend * 360.0);
 		//Interpolate between spun parents.
 		Edge(parents, result, blend, rotations, cw, seqFlag);
 
@@ -1106,6 +1106,8 @@ public:
 		result.m_Edits = m_EmberToXml.CreateNewEditdoc(&parents[0], &parents[1], temp, m_Nick, m_Url, m_Id, m_Comment, m_SheepGen, m_SheepId);
 		//Subpixel jitter.
 		Offset(result, m_OffsetX, m_OffsetY);
+		//Need to set these to be equal so rendering works correctly for off center embers.
+		result.m_RotCenterY = result.m_CenterY;
 		//Make the name of the flame the time.
 		result.m_Name = std::to_string(result.m_Time);
 	}
@@ -1216,9 +1218,9 @@ public:
 	void RotateOldCenterBy(T& newCenterX, T& newCenterY, T oldCenterX, T oldCenterY, T by)
 	{
 		T r[2];
-		T th = by * 2 * T(M_PI) / 360;
-		T c = std::cos(th);
-		T s = -std::sin(th);
+		const T th = by * 2 * static_cast<T>(M_PI) / 360;
+		const T c = std::cos(th);
+		const T s = -std::sin(th);
 		newCenterX -= oldCenterX;
 		newCenterY -= oldCenterY;
 		r[0] = c * newCenterX - s * newCenterY;
@@ -1258,11 +1260,11 @@ public:
 		//params.m_OneRowDiv2 = m_Renderer->CoordMap().OneRow() / 2;
 		size_t bv = m_Iterator->Iterate(ember, params, ctr, m_Samples.data(), m_Rand);//Use a special fuse of 20, all other calls to this will use 15, or 100.
 
-		if (bv / T(samples) > eps)
+		if (bv / static_cast<T>(samples) > eps)
 			eps = 3 * bv / T(samples);
 
-		if (eps > T(0.3))
-			eps = T(0.3);
+		if (eps > static_cast<T>(0.3))
+			eps = static_cast<T>(0.3);
 
 		lowTarget = static_cast<size_t>(samples * eps);
 		highTarget = samples - lowTarget;

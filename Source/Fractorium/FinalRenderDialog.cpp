@@ -18,8 +18,9 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	: QDialog(p, f)
 {
 	ui.setupUi(this);
-	int row = 0, spinHeight = 20;
-	double dmax = numeric_limits<double>::max();
+	int row = 0;
+	const auto spinHeight = 20;
+	const auto dmax = numeric_limits<double>::max();
 	QTableWidget* table = ui.FinalRenderParamsTable;
 	m_Info = OpenCLInfo::Instance();
 	m_Fractorium = qobject_cast<Fractorium*>(p);
@@ -169,12 +170,12 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_SupersampleSpin->setValue(m_Settings->FinalSupersample());
 	m_StripsSpin->setValue(int(m_Settings->FinalStrips()));
 	Scale(eScaleType(m_Settings->FinalScale()));
-	auto bumpmenu = new QMenu(this);
-	auto add10 = new QAction("Add 10% Quality", this); add10->setProperty("tag", QVariant(0.10));
-	auto add25 = new QAction("Add 25% Quality", this); add25->setProperty("tag", QVariant(0.25));
-	auto add50 = new QAction("Add 50% Quality", this); add50->setProperty("tag", QVariant(0.50));
-	auto add100 = new QAction("Add 100% Quality", this); add100->setProperty("tag", QVariant(1.0));
-	auto add200 = new QAction("Add 200% Quality", this); add200->setProperty("tag", QVariant(2.0));
+	const auto bumpmenu = new QMenu(this);
+	const auto add10 = new QAction("Add 10% Quality", this); add10->setProperty("tag", QVariant(0.10));
+	const auto add25 = new QAction("Add 25% Quality", this); add25->setProperty("tag", QVariant(0.25));
+	const auto add50 = new QAction("Add 50% Quality", this); add50->setProperty("tag", QVariant(0.50));
+	const auto add100 = new QAction("Add 100% Quality", this); add100->setProperty("tag", QVariant(1.0));
+	const auto add200 = new QAction("Add 200% Quality", this); add200->setProperty("tag", QVariant(2.0));
 	bumpmenu->addAction(add10);
 	bumpmenu->addAction(add25);
 	bumpmenu->addAction(add50);
@@ -184,15 +185,15 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	ui.FinalRenderBumpQualityStartButton->setProperty("tag", add25->property("tag"));
 	ui.FinalRenderBumpQualityStartButton->setText(add25->text());
 	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
-	auto saamenu = new QMenu(this);
+	const auto saamenu = new QMenu(this);
 #ifdef _WIN32
-	auto saabmp = new QAction("bmp", this);
+	const auto saabmp = new QAction("bmp", this);
 	saamenu->addAction(saabmp);
 	connect(saabmp, SIGNAL(triggered()), this, SLOT(OnSaveAgainAsClicked()));
 #endif
-	auto saajpg = new QAction("jpg", this);
-	auto saapng = new QAction("png", this);
-	auto saaexr = new QAction("exr", this);
+	const auto saajpg = new QAction("jpg", this);
+	const auto saapng = new QAction("png", this);
+	const auto saaexr = new QAction("exr", this);
 	saamenu->addAction(saajpg);
 	saamenu->addAction(saapng);
 	saamenu->addAction(saaexr);
@@ -237,11 +238,11 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	OnDoAllCheckBoxStateChanged(ui.FinalRenderDoAllCheckBox->isChecked());
 	OnDoSequenceCheckBoxStateChanged(ui.FinalRenderDoSequenceCheckBox->isChecked());
 	QSize s = size();
-	int desktopHeight = qApp->desktop()->availableGeometry().height();
+	const auto desktopHeight = qApp->desktop()->availableGeometry().height();
 	s.setHeight(std::min(s.height(), int(double(desktopHeight * 0.90))));
 	setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, s, qApp->desktop()->availableGeometry()));
 	//Update these with new controls.
-	QWidget* w = SetTabOrder(this, ui.FinalRenderEarlyClipCheckBox, ui.FinalRenderYAxisUpCheckBox);
+	auto w = SetTabOrder(this, ui.FinalRenderEarlyClipCheckBox, ui.FinalRenderYAxisUpCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderTransparencyCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderOpenCLCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderPng16BitCheckBox);
@@ -459,7 +460,7 @@ void FractoriumFinalRenderDialog::OnTransparencyCheckBoxStateChanged(int state)
 /// <param name="state">Use OpenCL if state == Qt::Checked, else don't.</param>
 void FractoriumFinalRenderDialog::OnOpenCLCheckBoxStateChanged(int state)
 {
-	bool checked = state == Qt::Checked;
+	const auto checked = state == Qt::Checked;
 	ui.FinalRenderDeviceTable->setEnabled(checked);
 	ui.FinalRenderOpenCLSubBatchPctSpin->setEnabled(checked);
 	ui.FinalRenderThreadCountSpin->setEnabled(!checked);
@@ -502,7 +503,7 @@ void FractoriumFinalRenderDialog::OnDoAllCheckBoxStateChanged(int state)
 /// <param name="state">The state of the checkbox</param>
 void FractoriumFinalRenderDialog::OnDoSequenceCheckBoxStateChanged(int state)
 {
-	bool checked = ui.FinalRenderDoSequenceCheckBox->isChecked();
+	const auto checked = ui.FinalRenderDoSequenceCheckBox->isChecked();
 	m_TemporalSamplesSpin->setEnabled(checked);
 
 	if (checked)
@@ -654,7 +655,7 @@ void FractoriumFinalRenderDialog::OnScaleRadioButtonChanged(bool checked)//This 
 /// <param name="col">The column of the cell</param>
 void FractoriumFinalRenderDialog::OnDeviceTableCellChanged(int row, int col)
 {
-	if (auto item = ui.FinalRenderDeviceTable->item(row, col))
+	if (const auto item = ui.FinalRenderDeviceTable->item(row, col))
 	{
 		HandleDeviceTableCheckChanged(ui.FinalRenderDeviceTable, row, col);
 		SetMemory();
@@ -670,8 +671,8 @@ void FractoriumFinalRenderDialog::OnDeviceTableCellChanged(int row, int col)
 void FractoriumFinalRenderDialog::OnDeviceTableRadioToggled(bool checked)
 {
 	int row;
-	auto s = sender();
-	auto table = ui.FinalRenderDeviceTable;
+	const auto s = sender();
+	const auto table = ui.FinalRenderDeviceTable;
 	QRadioButton* radio = nullptr;
 
 	if (s)
@@ -732,7 +733,7 @@ void FractoriumFinalRenderDialog::OnStripsChanged(int d)
 /// <param name="checked">Ignored</param>
 void FractoriumFinalRenderDialog::OnFileButtonClicked(bool checked)
 {
-	QString s = m_Fractorium->SetupSaveFolderDialog();
+	const auto s = m_Fractorium->SetupSaveFolderDialog();
 
 	if (Exists(s))
 	{
@@ -748,7 +749,7 @@ void FractoriumFinalRenderDialog::OnFileButtonClicked(bool checked)
 /// <param name="checked">Ignored</param>
 void FractoriumFinalRenderDialog::OnShowFolderButtonClicked(bool checked)
 {
-	QString s = m_Settings->SaveFolder();
+	const auto s = m_Settings->SaveFolder();
 
 	if (Exists(s))
 		QDesktopServices::openUrl(QUrl::fromLocalFile(s));
@@ -791,8 +792,8 @@ void FractoriumFinalRenderDialog::OnSuffixChanged(const QString& s)
 /// </summary>
 void FractoriumFinalRenderDialog::OnQualityBumpClicked()
 {
-	auto act = qobject_cast<QAction*>(sender());
-	auto tbtn = qobject_cast<QToolButton*>(sender());
+	const auto act = qobject_cast<QAction*>(sender());
+	const auto tbtn = qobject_cast<QToolButton*>(sender());
 
 	if (tbtn)
 	{
@@ -818,18 +819,18 @@ void FractoriumFinalRenderDialog::OnQualityBumpClicked()
 /// </summary>
 void FractoriumFinalRenderDialog::OnSaveAgainAsClicked()
 {
-	auto act = qobject_cast<QAction*>(sender());
-	auto tbtn = qobject_cast<QToolButton*>(sender());
+	const auto act = qobject_cast<QAction*>(sender());
+	const auto tbtn = qobject_cast<QToolButton*>(sender());
 
 	if (tbtn)
 	{
 		if (m_Controller.get())
 		{
-			auto s = tbtn->property("tag").toString();
+			const auto s = tbtn->property("tag").toString();
 			m_Tbcw->m_Combo->blockSignals(true);
 			m_Tbcw->m_Combo->setCurrentText(s);
 			m_Tbcw->m_Combo->blockSignals(false);
-			auto filename = m_Controller->SaveCurrentAgain();
+			const auto filename = m_Controller->SaveCurrentAgain();
 			ui.FinalRenderTextOutput->append("\nSaved again as " + filename);
 		}
 	}
@@ -913,7 +914,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 
 	if (CreateControllerFromGUI(true))//Create controller if it does not exist, or if it does and the renderer is not running.
 	{
-		int index = int(m_Fractorium->m_Controller->Index()) + 1;
+		const auto index = static_cast<int>(m_Fractorium->m_Controller->Index()) + 1;
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efi;
@@ -938,7 +939,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 		firstfile = efi.m_Filename;
 #endif
 		m_Controller->SetEmberFile(efi, true);//Move the temp file into the final render controller.
-		ui.FinalRenderCurrentSpin->setMaximum(int(efi.Size()));
+		ui.FinalRenderCurrentSpin->setMaximum(static_cast<int>(efi.Size()));
 		ui.FinalRenderCurrentSpin->blockSignals(true);
 		ui.FinalRenderCurrentSpin->setValue(index);//Set the currently selected ember to the one that was being edited.
 		ui.FinalRenderCurrentSpin->blockSignals(false);
@@ -986,7 +987,7 @@ void FractoriumFinalRenderDialog::reject()
 /// <returns>True if successful, else false.</returns>
 bool FractoriumFinalRenderDialog::CreateControllerFromGUI(bool createRenderer)
 {
-	int index = Current() - 1;
+	const auto index = Current() - 1;
 #ifdef DO_DOUBLE
 	size_t elementSize = Double() ? sizeof(double) : sizeof(float);
 #else
@@ -1054,8 +1055,7 @@ bool FractoriumFinalRenderDialog::SetMemory()
 {
 	if (isVisible() && CreateControllerFromGUI(true))
 	{
-		QString s;
-		auto p = m_Controller->SyncAndComputeMemory();
+		const auto p = m_Controller->SyncAndComputeMemory();
 		ui.FinalRenderParamsTable->item(m_MemoryCellIndex, 1)->setText(ToString<qulonglong>(get<1>(p)));
 		ui.FinalRenderParamsTable->item(m_ItersCellIndex, 1)->setText(ToString<qulonglong>(get<2>(p)));
 

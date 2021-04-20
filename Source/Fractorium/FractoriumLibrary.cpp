@@ -205,7 +205,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 		m_Fractorium->SelectLibraryItem(selectIndex);
 
 	m_Fractorium->SyncFileCountToSequenceCount();
-	RenderLibraryPreviews(0, uint(m_EmberFile.Size()));
+	RenderLibraryPreviews(0, static_cast<uint>(m_EmberFile.Size()));
 	tree->expandAll();
 }
 
@@ -241,7 +241,7 @@ void FractoriumEmberController<T>::UpdateLibraryTree()
 		//When adding elements, ensure all indices are sequential.
 		SyncLibrary(eLibraryUpdate::INDEX);
 		m_Fractorium->SyncFileCountToSequenceCount();
-		RenderLibraryPreviews(origChildCount, uint(m_EmberFile.Size()));
+		RenderLibraryPreviews(origChildCount, static_cast<uint>(m_EmberFile.Size()));
 	}
 }
 
@@ -289,9 +289,9 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 				m_LastSaveCurrent = "";//Reset will force the dialog to show on the next save current since the user probably wants a different name.
 			}
 		}
-		else if (auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
+		else if (const auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
 		{
-			auto text = parentItem->text(0);
+			const auto text = parentItem->text(0);
 
 			if (text != "")
 			{
@@ -719,7 +719,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 			if (rotations > 0)//Store the last result as the flame to interpolate from. This applies for whole or fractional values of opt.Loops().
 				embers[0] = result;
 
-			auto it2 = it;//Need a quick temporary to avoid modifying it which is used in the loop.
+			auto it2 = it;//Need a quick temporary to avoid modifying it, which is used in the loop.
 			embers[1] = *(++it2);//Get the next ember to be used with blending below.
 			const auto blendFrames = randBlend ? m_Rand.Frand<double>(framesBlend, framesBlendMax) : framesBlend;
 			const auto d = randBlendRot ? m_Rand.Frand<double>(rotsPerBlend, rotsPerBlendMax) : double(rotsPerBlend);

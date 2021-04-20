@@ -53,7 +53,7 @@ bool EmberToXml<T>::Save(const string& filename, C<Ember<T>, Alloc>& embers, siz
 
 		if (f.is_open())
 		{
-			auto prev = embers.begin();
+			const auto prev = embers.begin();
 
 			//Always ensure times make sense.
 			for (auto& ember : embers)
@@ -280,7 +280,7 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 
 		os << ">\n";
 		os << std::uppercase;
-		auto rows = ember.m_Palette.Size() / 8;
+		const auto rows = ember.m_Palette.Size() / 8;
 
 		for (i = 0; i < rows; i++)
 		{
@@ -289,9 +289,9 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 			for (j = 0; j < 8; j++)
 			{
 				size_t idx = 8 * i + j;
-				os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][0] * 255));
-				os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][1] * 255));
-				os << hex << setw(2) << setfill('0') << int(std::rint(ember.m_Palette[idx][2] * 255));
+				os << hex << setw(2) << setfill('0') << static_cast<int>(std::rint(ember.m_Palette[idx][0] * 255));
+				os << hex << setw(2) << setfill('0') << static_cast<int>(std::rint(ember.m_Palette[idx][1] * 255));
+				os << hex << setw(2) << setfill('0') << static_cast<int>(std::rint(ember.m_Palette[idx][2] * 255));
 			}
 
 			os << "\n";
@@ -304,10 +304,10 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 	{
 		for (i = 0; i < ember.m_Palette.Size(); i++)
 		{
-			double r = ember.m_Palette[i][0] * 255;
-			double g = ember.m_Palette[i][1] * 255;
-			double b = ember.m_Palette[i][2] * 255;
-			double a = ember.m_Palette[i][3] * 255;
+			const double r = ember.m_Palette[i][0] * 255;
+			const double g = ember.m_Palette[i][1] * 255;
+			const double b = ember.m_Palette[i][2] * 255;
+			const double a = ember.m_Palette[i][3] * 255;
 			os << "   ";
 
 			//The original used a precision of 6 which is totally unnecessary, use 2.
@@ -463,7 +463,7 @@ xmlDocPtr EmberToXml<T>::CreateNewEditdoc(Ember<T>* parent0, Ember<T>* parent1, 
 	{
 		os << "<comm>" << comment << "</comm>";
 		s = os.str();
-		commentDoc = xmlReadMemory(s.c_str(), int(s.length()), "comment.env", nullptr, XML_PARSE_NONET);
+		commentDoc = xmlReadMemory(s.c_str(), static_cast<int>(s.length()), "comment.env", nullptr, XML_PARSE_NONET);
 		os.str("");
 
 		//Check for errors.

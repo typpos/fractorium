@@ -263,6 +263,7 @@ public slots:
 	void OnSupersampleChanged(int d);
 	void OnAffineInterpTypeComboCurrentIndexChanged(int index);
 	void OnInterpTypeComboCurrentIndexChanged(int index);
+	void OnExpChanged(double d);
 
 	//Xforms.
 	void OnCurrentXformComboChanged(int index);
@@ -400,13 +401,13 @@ public:
 	static void SetFixedTableHeader(QHeaderView* header, QHeaderView::ResizeMode mode = QHeaderView::Fixed);
 
 protected:
-	virtual bool eventFilter(QObject* o, QEvent* e) override;
-	virtual void resizeEvent(QResizeEvent* e) override;
-	virtual void closeEvent(QCloseEvent* e) override;
-	virtual void dragEnterEvent(QDragEnterEvent* e) override;
-	virtual void dragMoveEvent(QDragMoveEvent* e) override;
-	virtual void dropEvent(QDropEvent* e) override;
-	virtual void showEvent(QShowEvent* e) override;
+	bool eventFilter(QObject* o, QEvent* e) override;
+	void resizeEvent(QResizeEvent* e) override;
+	void closeEvent(QCloseEvent* e) override;
+	void dragEnterEvent(QDragEnterEvent* e) override;
+	void dragMoveEvent(QDragMoveEvent* e) override;
+	void dropEvent(QDropEvent* e) override;
+	void showEvent(QShowEvent* e) override;
 
 private:
 	void InitMenusUI();
@@ -481,11 +482,11 @@ private:
 	QString SetupSaveFolderDialog();
 	bool SetupFinalRenderDialog();
 	QColorDialog* m_ColorDialog = nullptr;
-	FractoriumFinalRenderDialog* m_FinalRenderDialog = nullptr;
+	std::unique_ptr<FractoriumFinalRenderDialog> m_FinalRenderDialog;
 	FractoriumOptionsDialog* m_OptionsDialog = nullptr;
 	FractoriumVariationsDialog* m_VarDialog = nullptr;
 	FractoriumAboutDialog* m_AboutDialog = nullptr;
-	PaletteEditor*  m_PaletteEditor = nullptr;
+	std::unique_ptr<PaletteEditor> m_PaletteEditor;
 
 	//Params.
 	DoubleSpinBox* m_BrightnessSpin;//Color.
@@ -523,6 +524,7 @@ private:
 	SpinBox* m_SupersampleSpin;
 	StealthComboBox* m_AffineInterpTypeCombo;
 	StealthComboBox* m_InterpTypeCombo;
+	DoubleSpinBox* m_TemporalFilterExpSpin;
 
 	//Xforms.
 	DoubleSpinBox* m_XformWeightSpin;
@@ -588,10 +590,10 @@ private:
 	//Files.
 	QList<QUrl> m_Urls;
 #ifndef __APPLE__
-	QFileDialog* m_SaveFileDialog = nullptr;
-	QFileDialog* m_SaveImageDialog = nullptr;
-	QFileDialog* m_OpenFileDialog = nullptr;
-	QFileDialog* m_FolderDialog = nullptr;
+	std::unique_ptr<QFileDialog> m_SaveFileDialog;
+	std::unique_ptr<QFileDialog> m_SaveImageDialog;
+	std::unique_ptr<QFileDialog> m_OpenFileDialog;
+	std::unique_ptr<QFileDialog> m_FolderDialog;
 #endif
 	QssDialog* m_QssDialog = nullptr;
 	QString m_LastSaveAll;

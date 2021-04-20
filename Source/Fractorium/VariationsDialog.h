@@ -31,11 +31,11 @@ public slots:
 	void OnSelectNoneButtonClicked(bool checked);
 	void OnSelectionCheckBoxStateChanged(int i);
 	void OnVariationsTableItemChanged(QTableWidgetItem* item);
-	virtual void accept() override;
-	virtual void reject() override;
+	void accept() override;
+	void reject() override;
 
 protected:
-	virtual void showEvent(QShowEvent* e) override;
+	void showEvent(QShowEvent* e) override;
 
 private:
 	void ClearTypesStealth();

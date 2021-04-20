@@ -258,15 +258,15 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			else if (ToLower(opt.ScaleType()) != "none")
 				cout << "Scale type must be width height or none. Setting to none.\n";
 
-			auto w = std::max<size_t>(size_t(ember.m_OrigFinalRasW * opt.WidthScale()), 10);
-			auto h = std::max<size_t>(size_t(ember.m_OrigFinalRasH * opt.HeightScale()), 10);
+			const auto w = std::max<size_t>(size_t(ember.m_OrigFinalRasW * opt.WidthScale()), 10);
+			const auto h = std::max<size_t>(size_t(ember.m_OrigFinalRasH * opt.HeightScale()), 10);
 			ember.SetSizeAndAdjustScale(w, h, false, scaleType);
 		}
 
 		//Cast to double in case the value exceeds 2^32.
-		double imageMem = 4 * double(ember.m_FinalRasW)
-						  * double(ember.m_FinalRasH) * double(renderers[0]->BytesPerChannel());
-		double maxMem = pow(2.0, double((sizeof(void*) * 8) - 1));
+		const auto imageMem = 4 * static_cast<double>(ember.m_FinalRasW)
+							  * static_cast<double>(ember.m_FinalRasH) * static_cast<double>(renderers[0]->BytesPerChannel());
+		const auto maxMem = pow(2.0, static_cast<double>((sizeof(void*) * 8) - 1));
 
 		if (imageMem > maxMem)//Ensure the max amount of memory for a process isn't exceeded.
 		{
@@ -328,16 +328,16 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			size_t h,
 			size_t chan)
 	{
-		auto finalImagep = finalImage.data();
-		auto size = w * h;
-		bool doBmp = Find(opt.Format(), "bmp");
-		bool doJpg = Find(opt.Format(), "jpg");
-		bool doExr16 = Find(opt.Format(), "exr");
-		bool doExr32 = Find(opt.Format(), "exr32");
-		bool doPng8 = Find(opt.Format(), "png");
-		bool doPng16 = Find(opt.Format(), "png16");
-		bool doOnlyPng8 = doPng8 && !doPng16;
-		bool doOnlyExr16 = doExr16 && !doExr32;
+		const auto finalImagep = finalImage.data();
+		const auto size = w * h;
+		const auto doBmp = Find(opt.Format(), "bmp");
+		const auto doJpg = Find(opt.Format(), "jpg");
+		const auto doExr16 = Find(opt.Format(), "exr");
+		const auto doExr32 = Find(opt.Format(), "exr32");
+		const auto doPng8 = Find(opt.Format(), "png");
+		const auto doPng16 = Find(opt.Format(), "png16");
+		const auto doOnlyPng8 = doPng8 && !doPng16;
+		const auto doOnlyExr16 = doExr16 && !doExr32;
 		vector<byte> rgb8Image;
 		vector<std::thread> writeFileThreads;
 		writeFileThreads.reserve(6);
@@ -351,9 +351,9 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				writeFileThreads.push_back(std::thread([&]()
 				{
-					auto fn = baseFilename + ".bmp";
+					const auto fn = baseFilename + ".bmp";
 					VerbosePrint("Writing " + fn);
-					auto writeSuccess = WriteBmp(fn.c_str(), rgb8Image.data(), w, h);
+					const auto writeSuccess = WriteBmp(fn.c_str(), rgb8Image.data(), w, h);
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";
@@ -364,9 +364,9 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				writeFileThreads.push_back(std::thread([&]()
 				{
-					auto fn = baseFilename + ".jpg";
+					const auto fn = baseFilename + ".jpg";
 					VerbosePrint("Writing " + fn);
-					auto writeSuccess = WriteJpeg(fn.c_str(), rgb8Image.data(), w, h, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					const auto writeSuccess = WriteJpeg(fn.c_str(), rgb8Image.data(), w, h, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";
@@ -382,11 +382,11 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				writeFileThreads.push_back(std::thread([&]()
 				{
-					auto fn = baseFilename + ".png";
+					const auto fn = baseFilename + ".png";
 					VerbosePrint("Writing " + fn);
 					vector<byte> rgba8Image(size * 4);
 					Rgba32ToRgba8(finalImagep, rgba8Image.data(), w, h, opt.Transparency());
-					auto writeSuccess = WritePng(fn.c_str(), rgba8Image.data(), w, h, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					const auto writeSuccess = WritePng(fn.c_str(), rgba8Image.data(), w, h, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";
@@ -397,7 +397,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				writeFileThreads.push_back(std::thread([&]()
 				{
-					auto suffix = opt.Suffix();
+					const auto suffix = opt.Suffix();
 					auto fn = baseFilename;
 
 					if (doBothPng)//Add suffix if they specified both PNG.
@@ -410,7 +410,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 					VerbosePrint("Writing " + fn);
 					vector<glm::uint16> rgba16Image(size * 4);
 					Rgba32ToRgba16(finalImagep, rgba16Image.data(), w, h, opt.Transparency());
-					auto writeSuccess = WritePng(fn.c_str(), (byte*)rgba16Image.data(), w, h, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					const auto writeSuccess = WritePng(fn.c_str(), (byte*)rgba16Image.data(), w, h, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";
@@ -426,11 +426,11 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				writeFileThreads.push_back(std::thread([&]()
 				{
-					auto fn = baseFilename + ".exr";
+					const auto fn = baseFilename + ".exr";
 					VerbosePrint("Writing " + fn);
 					vector<Rgba> rgba32Image(size);
 					Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), w, h, opt.Transparency());
-					auto writeSuccess = WriteExr16(fn.c_str(), rgba32Image.data(), w, h, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					const auto writeSuccess = WriteExr16(fn.c_str(), rgba32Image.data(), w, h, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";
@@ -441,7 +441,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			{
 				writeFileThreads.push_back(std::thread([&]()
 				{
-					auto suffix = opt.Suffix();
+					const auto suffix = opt.Suffix();
 					auto fn = baseFilename;
 
 					if (doBothExr)//Add suffix if they specified both EXR.
@@ -457,12 +457,12 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 					vector<float> b(size);
 					vector<float> a(size);
 					Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), w, h, opt.Transparency());
-					auto writeSuccess = WriteExr32(fn.c_str(),
-												   r.data(),
-												   g.data(),
-												   b.data(),
-												   a.data(),
-												   w, h, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					const auto writeSuccess = WriteExr32(fn.c_str(),
+														 r.data(),
+														 g.data(),
+														 b.data(),
+														 a.data(),
+														 w, h, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";
@@ -498,7 +498,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		//		that it was first incremented before comparing.
 		while ((ftime = (atomfTime.fetch_add(opt.Dtime()) + opt.Dtime())) <= opt.LastFrame())
 		{
-			T localTime = T(ftime) - opt.Dtime();
+			const auto localTime = static_cast<T>(ftime) - opt.Dtime();
 
 			if (opt.Verbose() && ((opt.LastFrame() - opt.FirstFrame()) / opt.Dtime() >= 1))
 			{
@@ -518,7 +518,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 			if (opt.WriteGenome())
 			{
-				auto flameName = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), ".flame", padding, size_t(localTime));
+				const auto flameName = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), ".flame", padding, size_t(localTime));
 
 				if (opt.Verbose())
 				{
@@ -534,8 +534,8 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			stats = renderer->Stats();
 			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), true);
 			os.str("");
-			size_t iterCount = renderer->TotalIterCount(1);
-			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((double(stats.m_Iters) / double(iterCount)) * 100) << "%)";
+			const auto iterCount = renderer->TotalIterCount(1);
+			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((static_cast<double>(stats.m_Iters) / static_cast<double>(iterCount)) * 100) << "%)";
 
 			if (opt.Verbose())
 			{
@@ -552,8 +552,8 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			//Run image writing in a thread. Although doing it this way duplicates the final output memory, it saves a lot of time
 			//when running with OpenCL. Call join() to ensure the previous thread call has completed.
 			Join(writeThread);
-			auto threadVecIndex = finalImageIndex;//Cache before launching thread.
-			auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, size_t(localTime));
+			const auto threadVecIndex = finalImageIndex;//Cache before launching thread.
+			const auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, size_t(localTime));
 
 			if (opt.ThreadedWrite())//Copies of all but the first parameter are passed to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
 			{
@@ -603,7 +603,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	if (!opt.Populate(argc, argv, eOptionUse::OPT_USE_ANIMATE))
 	{
-		auto palf = PaletteList<float>::Instance();
+		const auto palf = PaletteList<float>::Instance();
 #ifdef DO_DOUBLE
 
 		if (!opt.Sp())

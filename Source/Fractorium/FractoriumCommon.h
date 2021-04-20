@@ -33,7 +33,7 @@
 template<typename spinType, typename valType>
 static void SetupSpinner(QTableWidget* table, const QObject* receiver, int& row, int col, spinType*& spinBox, int height, valType min, valType max, valType step, const char* signal, const char* slot, bool incRow = true, valType val = 0, valType doubleClickZero = -999, valType doubleClickNonZero = -999)
 {
-	auto settings = FractoriumSettings::DefInstance();
+	const auto settings = FractoriumSettings::DefInstance();
 	spinBox = new spinType(table, height, step);
 	spinBox->setRange(min, max);
 	spinBox->setValue(val);
@@ -47,8 +47,8 @@ static void SetupSpinner(QTableWidget* table, const QObject* receiver, int& row,
 	if (doubleClickNonZero != -999 && doubleClickZero != -999)
 	{
 		spinBox->DoubleClick(true);
-		spinBox->DoubleClickZero(valType(doubleClickZero));
-		spinBox->DoubleClickNonZero(valType(doubleClickNonZero));
+		spinBox->DoubleClickZero(static_cast<valType>(doubleClickZero));
+		spinBox->DoubleClickNonZero(static_cast<valType>(doubleClickNonZero));
 	}
 
 	if (incRow)
@@ -78,7 +78,7 @@ static QWidget* SetTabOrder(QWidget* p, QWidget* w1, QWidget* w2)
 /// <returns>The truncated value</returns>
 static double TruncPrecision(double val, uint digits)
 {
-	double mult = std::pow(10, digits);
+	const auto mult = std::pow(10, digits);
 	return std::round(mult * val) / mult;
 }
 
@@ -136,12 +136,11 @@ static bool Exists(const QString& s)
 /// <returns>The converted color</returns>
 static QColor VisibleColor(const QColor& color)
 {
-	int threshold = 105;
-	int delta = (color.red()   * 0.299) + //Magic numbers gotten from a Stack Overflow post.
-				(color.green() * 0.587) +
-				(color.blue()  * 0.114);
-	QColor textColor = (255 - delta < threshold) ? QColor(0, 0, 0) : QColor(255, 255, 255);
-	return textColor;
+	const auto threshold = 105;
+	const auto delta = (color.red()   * 0.299) + //Magic numbers gotten from a Stack Overflow post.
+					   (color.green() * 0.587) +
+					   (color.blue()  * 0.114);
+	return (255 - delta < threshold) ? QColor(0, 0, 0) : QColor(255, 255, 255);
 }
 
 /// <summary>
@@ -154,8 +153,8 @@ static QColor VisibleColor(const QColor& color)
 template <typename T>
 static intmax_t IsXformLinked(Ember<T>& ember, Xform<T>* xform)
 {
-	auto count = ember.XformCount();
-	auto index = ember.GetXformIndex(xform);
+	const auto count = ember.XformCount();
+	const auto index = ember.GetXformIndex(xform);
 	intmax_t linked = -1;
 	size_t toOneCount = 0;
 	size_t toZeroCount = 0;
@@ -217,7 +216,7 @@ static vector<pair<size_t, size_t>> Devices(const QList<QVariant>& selectedDevic
 
 	for (int i = 0; i < selectedDevices.size(); i++)
 	{
-		auto index = selectedDevices[i].toUInt();
+		const auto index = selectedDevices[i].toUInt();
 
 		if (index < devices.size())
 			vec.push_back(devices[index]);
@@ -239,13 +238,13 @@ static void SetupDeviceTable(QTableWidget* table, const QList<QVariant>& setting
 	bool primary = false;
 	auto& deviceNames = OpenCLInfo::Instance()->AllDeviceNames();
 	table->clearContents();
-	table->setRowCount(int(deviceNames.size()));
+	table->setRowCount(static_cast<int>(deviceNames.size()));
 
 	for (int i = 0; i < deviceNames.size(); i++)
 	{
-		auto checkItem = new QTableWidgetItem();
-		auto radio = new QRadioButton();
-		auto deviceItem = new QTableWidgetItem(QString::fromStdString(deviceNames[i]));
+		const auto checkItem = new QTableWidgetItem();
+		const auto radio = new QRadioButton();
+		const auto deviceItem = new QTableWidgetItem(QString::fromStdString(deviceNames[i]));
 		table->setItem(i, 0, checkItem);
 		table->setCellWidget(i, 1, radio);
 		table->setItem(i, 2, deviceItem);
@@ -277,29 +276,29 @@ static void SetupDeviceTable(QTableWidget* table, const QList<QVariant>& setting
 /// </summary>
 /// <param name="table">The QTableWidget to copy values to</param>
 /// <param name="settingsDevices">The absolute indices of the devices to use, with the first being the primary.</param>
-static void SettingsToDeviceTable(QTableWidget* table, QList<QVariant>& settingsDevices)
+static void SettingsToDeviceTable(QTableWidget* table, const QList<QVariant>& settingsDevices)
 {
 	if (settingsDevices.empty() && table->rowCount() > 0)
 	{
 		table->item(0, 0)->setCheckState(Qt::Checked);
 		qobject_cast<QRadioButton*>(table->cellWidget(0, 1))->setChecked(true);
 
-		for (int row = 1; row < table->rowCount(); row++)
+		for (auto row = 1; row < table->rowCount(); row++)
 			if (auto item = table->item(row, 0))
 				item->setCheckState(Qt::Unchecked);
 	}
 	else
 	{
-		for (int row = 0; row < table->rowCount(); row++)
+		for (auto row = 0; row < table->rowCount(); row++)
 		{
-			if (auto item = table->item(row, 0))
+			if (const auto item = table->item(row, 0))
 			{
 				if (settingsDevices.contains(row))
 				{
 					item->setCheckState(Qt::Checked);
 
 					if (!settingsDevices.indexOf(QVariant::fromValue(row)))
-						if (auto radio = qobject_cast<QRadioButton*>(table->cellWidget(row, 1)))
+						if (const auto radio = qobject_cast<QRadioButton*>(table->cellWidget(row, 1)))
 							radio->setChecked(true);
 				}
 				else
@@ -320,12 +319,12 @@ static void SettingsToDeviceTable(QTableWidget* table, QList<QVariant>& settings
 static QList<QVariant> DeviceTableToSettings(QTableWidget* table)
 {
 	QList<QVariant> devices;
-	auto rows = table->rowCount();
+	const auto rows = table->rowCount();
 
 	for (int row = 0; row < rows; row++)
 	{
-		auto checkItem = table->item(row, 0);
-		auto radio = qobject_cast<QRadioButton*>(table->cellWidget(row, 1));
+		const auto checkItem = table->item(row, 0);
+		const auto radio = qobject_cast<QRadioButton*>(table->cellWidget(row, 1));
 
 		if (checkItem->checkState() == Qt::Checked)
 		{
@@ -347,12 +346,12 @@ static QList<QVariant> DeviceTableToSettings(QTableWidget* table)
 /// <param name="col">The column of the cell</param>
 static void HandleDeviceTableCheckChanged(QTableWidget* table, int row, int col)
 {
-	int primaryRow = -1;
+	auto primaryRow = -1;
 	QRadioButton* primaryRadio = nullptr;
 
-	for (int i = 0; i < table->rowCount(); i++)
+	for (auto i = 0; i < table->rowCount(); i++)
 	{
-		if (auto radio = qobject_cast<QRadioButton*>(table->cellWidget(i, 1)))
+		if (const auto radio = qobject_cast<QRadioButton*>(table->cellWidget(i, 1)))
 		{
 			if (radio->isChecked())
 			{
@@ -365,7 +364,7 @@ static void HandleDeviceTableCheckChanged(QTableWidget* table, int row, int col)
 
 	if (primaryRow == -1) primaryRow = 0;
 
-	if (auto primaryItem = table->item(primaryRow, 0))
+	if (const auto primaryItem = table->item(primaryRow, 0))
 		if (primaryItem->checkState() == Qt::Unchecked)
 			primaryItem->setCheckState(Qt::Checked);
 }
@@ -380,17 +379,17 @@ static void HandleDeviceTableCheckChanged(QTableWidget* table, int row, int col)
 /// <param name="row">The row to write the palette to</param>
 static void AddPaletteToTable(QTableWidget* paletteTable, Palette<float>* palette, int row)
 {
-	auto v = palette->MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);
-	auto nameCol = new QTableWidgetItem(palette->m_Name.c_str());
+	const auto v = palette->MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);
+	auto nameCol = std::make_unique<QTableWidgetItem>(palette->m_Name.c_str());
 	nameCol->setToolTip(palette->m_Name.c_str());
 	nameCol->setFlags(palette->m_SourceColors.empty() ? (Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 					  : (Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable));
-	paletteTable->setItem(row, 0, nameCol);
-	QImage image(v.data(), int(palette->Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
-	auto paletteItem = new PaletteTableWidgetItem(palette);
+	paletteTable->setItem(row, 0, nameCol.release());
+	const QImage image(v.data(), static_cast<int>(palette->Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);
+	auto paletteItem = std::make_unique<PaletteTableWidgetItem>(palette);
 	paletteItem->setData(Qt::DecorationRole, QPixmap::fromImage(image));
 	paletteItem->setFlags(paletteItem->flags() & ~Qt::ItemIsEditable);
-	paletteTable->setItem(row, 1, paletteItem);
+	paletteTable->setItem(row, 1, paletteItem.release());
 }
 
 /// <summary>
@@ -406,22 +405,22 @@ static bool FillPaletteTable(const string& s, QTableWidget* paletteTable, shared
 {
 	if (!s.empty())//This occasionally seems to get called with an empty string for reasons unknown.
 	{
-		if (auto palettes = paletteList->GetPaletteListByFilename(s))
+		if (const auto palettes = paletteList->GetPaletteListByFilename(s))
 		{
 			paletteTable->clear();
 			paletteTable->blockSignals(true);
-			paletteTable->setRowCount(int(palettes->size()));
+			paletteTable->setRowCount(static_cast<int>(palettes->size()));
 			//Headers get removed when clearing, so must re-create here.
-			auto nameHeader = new QTableWidgetItem("Name");
-			auto paletteHeader = new QTableWidgetItem("Palette");
+			auto nameHeader = std::make_unique<QTableWidgetItem>("Name");
+			auto paletteHeader = std::make_unique<QTableWidgetItem>("Palette");
 			nameHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 			paletteHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-			paletteTable->setHorizontalHeaderItem(0, nameHeader);
-			paletteTable->setHorizontalHeaderItem(1, paletteHeader);
+			paletteTable->setHorizontalHeaderItem(0, nameHeader.release());
+			paletteTable->setHorizontalHeaderItem(1, paletteHeader.release());
 
 			//Palette list table.
 			for (auto i = 0; i < palettes->size(); i++)
-				if (auto palette = &(*palettes)[i])
+				if (const auto palette = &(*palettes)[i])
 					AddPaletteToTable(paletteTable, palette, i);
 
 			paletteTable->blockSignals(false);
@@ -471,11 +470,11 @@ static QString GetDefaultUserPath()
 /// <returns>The full path and filename if found, else empty string.</returns>
 static QString FindFirstDefaultPalette()
 {
-	auto paths = GetDefaultPaths();
+	const auto paths = GetDefaultPaths();
 
 	for (auto& path : paths)
 	{
-		auto full = path + "/flam3-palettes.xml";
+		const auto full = path + "/flam3-palettes.xml";
 
 		if (QFile::exists(full))
 			return full;
@@ -573,9 +572,9 @@ static QList<T> GetAllParents(QWidget* widget)
 {
 	QList<T> parents;
 
-	while (auto parent = qobject_cast<QWidget*>(widget->parent()))
+	while (const auto parent = qobject_cast<QWidget*>(widget->parent()))
 	{
-		if (auto parentT = qobject_cast<T>(parent))
+		if (const auto parentT = qobject_cast<T>(parent))
 			parents.push_back(parentT);
 
 		widget = parent;

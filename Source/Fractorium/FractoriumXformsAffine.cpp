@@ -6,8 +6,11 @@
 /// </summary>
 void Fractorium::InitXformsAffineUI()
 {
-	int affinePrec = 6, spinHeight = 20;
-	double affineStep = 0.01, affineMin = std::numeric_limits<double>::lowest(), affineMax = std::numeric_limits<double>::max();
+	const auto affinePrec = 6;
+	const auto spinHeight = 20;
+	const auto affineStep = 0.01;
+	const auto affineMin = std::numeric_limits<double>::lowest();
+	const auto affineMax = std::numeric_limits<double>::max();
 	auto table = ui.PreAffineTable;
 	table->verticalHeader()->setVisible(true);//The designer continually clobbers these values, so must manually set them here.
 	table->horizontalHeader()->setVisible(true);
@@ -394,9 +397,9 @@ void Fractorium::OnRotate90CcButtonClicked(bool checked) { m_Controller->RotateX
 void Fractorium::OnRotateCButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreRotateCButton;
-	auto combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreRotateCButton;
+	const auto combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->RotateXformsByAngle(d, pre);
@@ -411,9 +414,9 @@ void Fractorium::OnRotateCButtonClicked(bool checked)
 void Fractorium::OnRotateCcButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreRotateCcButton;
-	auto combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreRotateCcButton;
+	const auto combo = pre ? ui.PreRotateCombo : ui.PostRotateCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->RotateXformsByAngle(-d, pre);
@@ -447,9 +450,9 @@ void FractoriumEmberController<T>::MoveXforms(double x, double y, bool pre)
 void Fractorium::OnMoveUpButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreMoveUpButton;
-	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreMoveUpButton;
+	const auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->MoveXforms(0, m_Settings->YAxisUp() ? d : -d, pre);
@@ -464,9 +467,9 @@ void Fractorium::OnMoveUpButtonClicked(bool checked)
 void Fractorium::OnMoveDownButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreMoveDownButton;
-	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreMoveDownButton;
+	const auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->MoveXforms(0, m_Settings->YAxisUp() ? -d : d, pre);
@@ -481,9 +484,9 @@ void Fractorium::OnMoveDownButtonClicked(bool checked)
 void Fractorium::OnMoveLeftButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreMoveLeftButton;
-	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreMoveLeftButton;
+	const auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->MoveXforms(-d, 0, pre);
@@ -498,9 +501,9 @@ void Fractorium::OnMoveLeftButtonClicked(bool checked)
 void Fractorium::OnMoveRightButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreMoveRightButton;
-	auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreMoveRightButton;
+	const auto combo = pre ? ui.PreMoveCombo : ui.PostMoveCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->MoveXforms(d, 0, pre);
@@ -535,9 +538,9 @@ void FractoriumEmberController<T>::ScaleXforms(double scale, bool pre)
 void Fractorium::OnScaleDownButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreScaleDownButton;
-	auto combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreScaleDownButton;
+	const auto combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->ScaleXforms(1.0 / (d / 100.0), pre);
@@ -552,9 +555,9 @@ void Fractorium::OnScaleDownButtonClicked(bool checked)
 void Fractorium::OnScaleUpButtonClicked(bool checked)
 {
 	bool ok;
-	bool pre = sender() == ui.PreScaleUpButton;
-	auto combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
-	double d = ToDouble(combo->currentText(), &ok);
+	const auto pre = sender() == ui.PreScaleUpButton;
+	const auto combo = pre ? ui.PreScaleCombo : ui.PostScaleCombo;
+	const auto d = ToDouble(combo->currentText(), &ok);
 
 	if (ok)
 		m_Controller->ScaleXforms(d / 100.0, pre);
@@ -586,7 +589,7 @@ void Fractorium::OnResetAffineButtonClicked(bool checked) { m_Controller->ResetX
 template <typename T>
 void FractoriumEmberController<T>::CopyXformsAffine(bool pre)
 {
-	if (auto xform = CurrentXform())
+	if (const auto xform = CurrentXform())
 		m_CopiedAffine = pre ? xform->m_Affine : xform->m_Post;
 }
 
@@ -707,8 +710,8 @@ void FractoriumEmberController<T>::SwapAffines()
 {
 	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
-		auto pre = xform->m_Affine;
-		auto post = xform->m_Post;
+		const auto pre = xform->m_Affine;
+		const auto post = xform->m_Post;
 		xform->m_Affine = post;
 		xform->m_Post = pre;
 	}, eXformUpdate::UPDATE_SELECTED);
@@ -739,10 +742,10 @@ void Fractorium::OnAffineDrawAllCurrentRadioButtonToggled(bool checked)
 /// <param name="state">The state of the checkbox</param>
 void Fractorium::OnPolarAffineCheckBoxStateChanged(int state)
 {
-	double mult = state ? 100 : 0.01;
-	double step = m_PreX1Spin->Step() * mult;
-	double small = m_PreX1Spin->SmallStep() * mult;
-	double click = state ? 90 : 1;
+	const auto mult = state ? 100 : 0.01;
+	const auto step = m_PreX1Spin->Step() * mult;
+	const auto small = m_PreX1Spin->SmallStep() * mult;
+	const auto click = state ? 90 : 1;
 
 	for (int i = 0; i < 3; i++)
 	{

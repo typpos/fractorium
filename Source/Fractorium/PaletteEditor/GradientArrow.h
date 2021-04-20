@@ -102,10 +102,10 @@ public:
 	TopArrow(int width, size_t index)
 	{
 		QPolygon area;
-		int center = 10;
-		int mid = width / 2;
-		int left = center - mid;
-		int right = center + mid;
+		const auto center = 10;
+		const auto mid = width / 2;
+		const auto left = center - mid;
+		const auto right = center + mid;
 		area << QPoint(left, 0) << QPoint(right, 0) << QPoint(right, 10) << QPoint(center, 15) << QPoint(left, 10) << QPoint(left, 0);
 		Area(area);
 		m_Index = index;

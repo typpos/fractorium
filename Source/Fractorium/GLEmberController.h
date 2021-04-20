@@ -99,17 +99,17 @@ class GLEmberController : public GLEmberControllerBase
 public:
 	GLEmberController(Fractorium* fractorium, GLWidget* glWidget, FractoriumEmberController<T>* controller);
 	virtual ~GLEmberController();
-	virtual void DrawImage() override;
-	virtual void DrawAffines(bool pre, bool post) override;
-	virtual void ClearWindow() override;
-	virtual void MousePress(QMouseEvent* e) override;
-	virtual void MouseRelease(QMouseEvent* e) override;
-	virtual void MouseMove(QMouseEvent* e) override;
-	virtual void Wheel(QWheelEvent* e) override;
-	virtual void QueryMatrices(bool print) override;
-	virtual bool SizesMatch() override;
-	virtual bool CheckForSizeMismatch(int w, int h) override;
-	virtual void ResetMouseState() override;
+	void DrawImage() override;
+	void DrawAffines(bool pre, bool post) override;
+	void ClearWindow() override;
+	void MousePress(QMouseEvent* e) override;
+	void MouseRelease(QMouseEvent* e) override;
+	void MouseMove(QMouseEvent* e) override;
+	void Wheel(QWheelEvent* e) override;
+	void QueryMatrices(bool print) override;
+	bool SizesMatch() override;
+	bool CheckForSizeMismatch(int w, int h) override;
+	void ResetMouseState() override;
 
 	T CalcScale();
 	T CalcRotation();
@@ -124,10 +124,10 @@ public:
 	bool CheckXformHover(const Xform<T>* xform, const v3T& glCoords, T& bestDist, bool pre, bool post);
 
 private:
-	v2T SnapToGrid(v2T& vec);
-	v3T SnapToGrid(v3T& vec);
-	v3T SnapToNormalizedAngle(v3T& vec, uint divisions);
-	v3T WindowToWorld(v3T& v, bool flip);
+	v2T SnapToGrid(const v2T& vec) const;
+	v3T SnapToGrid(const v3T& vec) const;
+	v3T SnapToNormalizedAngle(const v3T& vec, uint divisions) const;
+	v3T WindowToWorld(const v3T& v, bool flip) const;
 	void QueryVMP();
 #ifndef USE_GLSL
 	void MultMatrix(m4T& mat);

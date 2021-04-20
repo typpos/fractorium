@@ -73,8 +73,8 @@ struct Vertex
 
 	Vertex(const DoubleColor& c, const QPointF& p) : color(c), point(p) {}
 	Vertex(const QColor& c, const QPointF& p)
-		: color(DoubleColor((double)c.red(), (double)c.green(),
-							(double)c.blue())), point(p) {}
+		: color(DoubleColor(static_cast<double>(c.red()), static_cast<double>(c.green()),
+							static_cast<double>(c.blue()))), point(p) {}
 };
 
 /// <summary>
@@ -94,19 +94,19 @@ public:
 	QColor Color() const;
 	void Color(const QColor& col);
 
-	virtual int heightForWidth(int w) const override;
-	virtual QSize sizeHint() const override;
+	int heightForWidth(int w) const override;
+	QSize sizeHint() const override;
 
 Q_SIGNALS:
 	void ColorChanged(const QColor& col);
 
 protected:
-	virtual void paintEvent(QPaintEvent*) override;
-	virtual void mouseMoveEvent(QMouseEvent*) override;
-	virtual void mousePressEvent(QMouseEvent*) override;
-	virtual void mouseReleaseEvent(QMouseEvent*) override;
-	virtual void keyPressEvent(QKeyEvent* e) override;
-	virtual void resizeEvent(QResizeEvent*) override;
+	void paintEvent(QPaintEvent*) override;
+	void mouseMoveEvent(QMouseEvent*) override;
+	void mousePressEvent(QMouseEvent*) override;
+	void mouseReleaseEvent(QMouseEvent*) override;
+	void keyPressEvent(QKeyEvent* e) override;
+	void resizeEvent(QResizeEvent*) override;
 
 private:
 	void GenBackground();

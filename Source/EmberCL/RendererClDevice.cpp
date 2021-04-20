@@ -74,7 +74,7 @@ void RendererClDevice::ClearErrorReport()
 /// <returns>The concatenated error report string</returns>
 string RendererClDevice::ErrorReportString()
 {
-	auto s = EmberReport::ErrorReportString();
+	const auto s = EmberReport::ErrorReportString();
 	return s + m_Wrapper.ErrorReportString();
 }
 
@@ -86,7 +86,7 @@ string RendererClDevice::ErrorReportString()
 vector<string> RendererClDevice::ErrorReport()
 {
 	auto ours = EmberReport::ErrorReport();
-	auto s = m_Wrapper.ErrorReport();
+	const auto s = m_Wrapper.ErrorReport();
 	ours.insert(ours.end(), s.begin(), s.end());
 	return ours;
 }

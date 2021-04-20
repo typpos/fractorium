@@ -52,7 +52,7 @@ void FractoriumSettings::EnsureDefaults()
 	if (FinalThreadCount() == 0 || FinalThreadCount() > Timing::ProcessorCount())
 		FinalThreadCount(Timing::ProcessorCount());
 
-	FinalThreadPriority(Clamp<int>(FinalThreadPriority(), (int)eThreadPriority::LOWEST, (int)eThreadPriority::HIGHEST));
+	FinalThreadPriority(Clamp<int>(FinalThreadPriority(), static_cast<int>(eThreadPriority::LOWEST), static_cast<int>(eThreadPriority::HIGHEST)));
 	CpuSubBatch(std::max(1u, CpuSubBatch()));
 	OpenCLSubBatch(std::max(1u, OpenCLSubBatch()));
 
@@ -73,7 +73,7 @@ void FractoriumSettings::EnsureDefaults()
 	if (OpenClQuality() == 0)
 		OpenClQuality(30);
 
-	if (FinalScale() > int(eScaleType::SCALE_HEIGHT))
+	if (FinalScale() > static_cast<int>(eScaleType::SCALE_HEIGHT))
 		FinalScale(0);
 
 	if (OpenXmlExt() == "")
@@ -332,7 +332,7 @@ uint FractoriumSettings::FinalSupersample()							  { return value(FINALSUPERSAM
 void FractoriumSettings::FinalSupersample(uint i)					  { setValue(FINALSUPERSAMPLE, i);                   }
 
 size_t FractoriumSettings::FinalStrips()							  { return value(FINALSTRIPS).toULongLong();	     }
-void FractoriumSettings::FinalStrips(size_t i)						  { setValue(FINALSTRIPS, uint(i));				     }
+void FractoriumSettings::FinalStrips(size_t i)                        { setValue(FINALSTRIPS, static_cast<uint>(i));     }
 
 /// <summary>
 /// Xml file saving settings.

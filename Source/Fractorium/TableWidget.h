@@ -39,11 +39,11 @@ protected:
 	/// <param name="obj">The object sending the event</param>
 	/// <param name="e">The event</param>
 	/// <returns>The result of calling the base fucntion.</returns>
-	bool eventFilter(QObject* obj, QEvent* e)
+	bool eventFilter(QObject* obj, QEvent* e) override
 	{
 		if (e->type() == QEvent::MouseMove)
 		{
-			if (auto me = dynamic_cast<QMouseEvent*>(e))
+			if (const auto me = dynamic_cast<QMouseEvent*>(e))
 			{
 				emit MouseDragged(me->localPos(), me->globalPos());
 			}

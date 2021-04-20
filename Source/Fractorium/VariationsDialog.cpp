@@ -13,7 +13,7 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(QWidget* p, Qt::WindowFla
 	  m_VariationList(VariationList<float>::Instance())
 {
 	ui.setupUi(this);
-	auto table = ui.VariationsTable;
+	const auto table = ui.VariationsTable;
 	m_Settings = FractoriumSettings::DefInstance();
 	m_Vars = m_Settings->Variations();
 	Populate();
@@ -26,22 +26,22 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(QWidget* p, Qt::WindowFla
 	m_CheckBoxes.push_back(ui.StateCheckBox);
 	m_CheckBoxes.push_back(ui.ParamCheckBox);
 	m_CheckBoxes.push_back(ui.NonParamCheckBox);
-	ui.SumCheckBox->setCheckState     (Qt::CheckState(m_Settings->VarFilterSum     ()));
-	ui.AssignCheckBox->setCheckState  (Qt::CheckState(m_Settings->VarFilterAssign  ()));
-	ui.PpSumCheckBox->setCheckState   (Qt::CheckState(m_Settings->VarFilterPpsum   ()));
-	ui.PpAssignCheckBox->setCheckState(Qt::CheckState(m_Settings->VarFilterPpassign()));
-	ui.DcCheckBox->setCheckState      (Qt::CheckState(m_Settings->VarFilterSdc     ()));
-	ui.StateCheckBox->setCheckState   (Qt::CheckState(m_Settings->VarFilterState   ()));
-	ui.ParamCheckBox->setCheckState   (Qt::CheckState(m_Settings->VarFilterParam   ()));
-	ui.NonParamCheckBox->setCheckState(Qt::CheckState(m_Settings->VarFilterNonparam()));
+	ui.SumCheckBox->setCheckState     (static_cast<Qt::CheckState>(m_Settings->VarFilterSum     ()));
+	ui.AssignCheckBox->setCheckState  (static_cast<Qt::CheckState>(m_Settings->VarFilterAssign  ()));
+	ui.PpSumCheckBox->setCheckState   (static_cast<Qt::CheckState>(m_Settings->VarFilterPpsum   ()));
+	ui.PpAssignCheckBox->setCheckState(static_cast<Qt::CheckState>(m_Settings->VarFilterPpassign()));
+	ui.DcCheckBox->setCheckState      (static_cast<Qt::CheckState>(m_Settings->VarFilterSdc     ()));
+	ui.StateCheckBox->setCheckState   (static_cast<Qt::CheckState>(m_Settings->VarFilterState   ()));
+	ui.ParamCheckBox->setCheckState   (static_cast<Qt::CheckState>(m_Settings->VarFilterParam   ()));
+	ui.NonParamCheckBox->setCheckState(static_cast<Qt::CheckState>(m_Settings->VarFilterNonparam()));
 
 	for (auto& cb : m_CheckBoxes)
 	{
 		if (cb->checkState() == Qt::CheckState::PartiallyChecked)
 		{
-			auto f = cb->font();
-			f.setStrikeOut(true);
-			cb->setFont(f);
+			auto font = cb->font();
+			font.setStrikeOut(true);
+			cb->setFont(font);
 		}
 	}
 
@@ -52,13 +52,13 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(QWidget* p, Qt::WindowFla
 	connect(ui.SelectAllButton,		  SIGNAL(clicked(bool)),				  this, SLOT(OnSelectAllButtonClicked(bool)),				   Qt::QueuedConnection);
 	connect(ui.InvertSelectionButton, SIGNAL(clicked(bool)),				  this, SLOT(OnInvertSelectionButtonClicked(bool)),			   Qt::QueuedConnection);
 	connect(ui.SelectNoneButton,	  SIGNAL(clicked(bool)),				  this, SLOT(OnSelectNoneButtonClicked(bool)),				   Qt::QueuedConnection);
-	connect(ui.SumCheckBox     , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui.AssignCheckBox  , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui.PpSumCheckBox   , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.SumCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.AssignCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.PpSumCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	connect(ui.PpAssignCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui.DcCheckBox      , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui.StateCheckBox   , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui.ParamCheckBox   , SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.DcCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.StateCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
+	connect(ui.ParamCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	connect(ui.NonParamCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSelectionCheckBoxStateChanged(int)), Qt::QueuedConnection);
 }
 
@@ -68,14 +68,14 @@ FractoriumVariationsDialog::FractoriumVariationsDialog(QWidget* p, Qt::WindowFla
 /// <param name="func">Function to call on each object</param>
 void FractoriumVariationsDialog::ForEachCell(std::function<void(QTableWidgetItem* cb)> func)
 {
-	auto table = ui.VariationsTable;
-	auto rows = table->rowCount();
-	auto cols = table->columnCount();
+	const auto table = ui.VariationsTable;
+	const auto rows = table->rowCount();
+	const auto cols = table->columnCount();
 	table->model()->blockSignals(true);
 
 	for (auto row = 0; row < rows; row++)
 		for (auto col = 0; col < cols; col++)
-			if (auto cb = table->item(row, col))
+			if (const auto cb = table->item(row, col))
 				func(cb);
 
 	table->model()->blockSignals(false);
@@ -88,8 +88,8 @@ void FractoriumVariationsDialog::ForEachCell(std::function<void(QTableWidgetItem
 /// <param name="func">Function to call on each object</param>
 void FractoriumVariationsDialog::ForEachSelectedCell(std::function<void(QTableWidgetItem* cb)> func)
 {
-	auto table = ui.VariationsTable;
-	QList<QTableWidgetItem*> selectedItems = table->selectedItems();
+	const auto table = ui.VariationsTable;
+	const auto selectedItems = table->selectedItems();
 	table->model()->blockSignals(true);
 
 	for (auto item : selectedItems)
@@ -112,14 +112,14 @@ void FractoriumVariationsDialog::SyncSettings()
 			m[cb->text()] = cb->checkState() == Qt::CheckState::Checked;
 	});
 	m_Settings->Variations(m);
-	m_Settings->VarFilterSum     (int(ui.SumCheckBox->checkState()));
-	m_Settings->VarFilterAssign  (int(ui.AssignCheckBox->checkState()));
-	m_Settings->VarFilterPpsum   (int(ui.PpSumCheckBox->checkState()));
-	m_Settings->VarFilterPpassign(int(ui.PpAssignCheckBox->checkState()));
-	m_Settings->VarFilterSdc     (int(ui.DcCheckBox->checkState()));
-	m_Settings->VarFilterState   (int(ui.StateCheckBox->checkState()));
-	m_Settings->VarFilterParam   (int(ui.ParamCheckBox->checkState()));
-	m_Settings->VarFilterNonparam(int(ui.NonParamCheckBox->checkState()));
+	m_Settings->VarFilterSum     (static_cast<int>(ui.SumCheckBox->checkState()));
+	m_Settings->VarFilterAssign  (static_cast<int>(ui.AssignCheckBox->checkState()));
+	m_Settings->VarFilterPpsum   (static_cast<int>(ui.PpSumCheckBox->checkState()));
+	m_Settings->VarFilterPpassign(static_cast<int>(ui.PpAssignCheckBox->checkState()));
+	m_Settings->VarFilterSdc     (static_cast<int>(ui.DcCheckBox->checkState()));
+	m_Settings->VarFilterState   (static_cast<int>(ui.StateCheckBox->checkState()));
+	m_Settings->VarFilterParam   (static_cast<int>(ui.ParamCheckBox->checkState()));
+	m_Settings->VarFilterNonparam(static_cast<int>(ui.NonParamCheckBox->checkState()));
 }
 
 /// <summary>
@@ -197,7 +197,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 	static std::set<eVariationId> excluded;
 	excluded.clear();
 
-	if (auto s = dynamic_cast<QCheckBox*>(sender()))
+	if (const auto s = dynamic_cast<QCheckBox*>(sender()))
 	{
 		auto f = s->font();
 		f.setStrikeOut(s->checkState() == Qt::CheckState::PartiallyChecked);
@@ -207,7 +207,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 	ForEachCell([&](QTableWidgetItem * cb) { cb->setCheckState(Qt::CheckState::Unchecked); });
 	ForEachCell([&](QTableWidgetItem * cb)
 	{
-		if (auto var = m_VariationList->GetVariation(cb->text().toStdString()))
+		if (const auto var = m_VariationList->GetVariation(cb->text().toStdString()))
 		{
 			if (ui.StateCheckBox->checkState() != Qt::CheckState::Unchecked)
 			{
@@ -282,7 +282,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 
 		if (ui.PpSumCheckBox->isChecked() != Qt::CheckState::Unchecked)
 		{
-			if (auto pre = m_VariationList->GetPreVariation(cb->text().toStdString()))
+			if (const auto pre = m_VariationList->GetPreVariation(cb->text().toStdString()))
 			{
 				if (pre->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
 				{
@@ -296,7 +296,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 				}
 			}
 
-			if (auto post = m_VariationList->GetPostVariation(cb->text().toStdString()))
+			if (const auto post = m_VariationList->GetPostVariation(cb->text().toStdString()))
 			{
 				if (post->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
 				{
@@ -313,7 +313,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 
 		if (ui.PpAssignCheckBox->isChecked() != Qt::CheckState::Unchecked)
 		{
-			if (auto pre = m_VariationList->GetPreVariation(cb->text().toStdString()))
+			if (const auto pre = m_VariationList->GetPreVariation(cb->text().toStdString()))
 			{
 				if (pre->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
 				{
@@ -327,7 +327,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 				}
 			}
 
-			if (auto post = m_VariationList->GetPostVariation(cb->text().toStdString()))
+			if (const auto post = m_VariationList->GetPostVariation(cb->text().toStdString()))
 			{
 				if (post->AssignType() == eVariationAssignType::ASSIGNTYPE_SET)
 				{
@@ -344,7 +344,7 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 
 		if (ui.ParamCheckBox->isChecked() != Qt::CheckState::Unchecked)
 		{
-			if (auto parVar = m_VariationList->GetParametricVariation(cb->text().toStdString()))
+			if (const auto parVar = m_VariationList->GetParametricVariation(cb->text().toStdString()))
 			{
 				if (ui.ParamCheckBox->checkState() == Qt::CheckState::PartiallyChecked)
 				{
@@ -363,29 +363,29 @@ void FractoriumVariationsDialog::OnSelectionCheckBoxStateChanged(int i)
 /// </summary>
 void FractoriumVariationsDialog::Populate()
 {
-	auto table = ui.VariationsTable;
-	int size = int(std::max<size_t>(std::max<size_t>(m_VariationList->RegSize(), m_VariationList->PreSize()), m_VariationList->PostSize()));
+	const auto table = ui.VariationsTable;
+	const auto size = static_cast<int>(std::max<size_t>(std::max<size_t>(m_VariationList->RegSize(), m_VariationList->PreSize()), m_VariationList->PostSize()));
 	table->setRowCount(size);
 
 	for (auto i = 0; i < size; i++)
 	{
-		if (auto pre = m_VariationList->GetVariation(i, eVariationType::VARTYPE_PRE))
+		if (const auto pre = m_VariationList->GetVariation(i, eVariationType::VARTYPE_PRE))
 		{
-			auto cb = new QTableWidgetItem(pre->Name().c_str());
+			const auto cb = new QTableWidgetItem(pre->Name().c_str());
 			table->setItem(i, 0, cb);
 			SetCheckFromMap(cb, pre);
 		}
 
-		if (auto reg = m_VariationList->GetVariation(i, eVariationType::VARTYPE_REG))
+		if (const auto reg = m_VariationList->GetVariation(i, eVariationType::VARTYPE_REG))
 		{
-			auto cb = new QTableWidgetItem(reg->Name().c_str());
+			const auto cb = new QTableWidgetItem(reg->Name().c_str());
 			table->setItem(i, 1, cb);
 			SetCheckFromMap(cb, reg);
 		}
 
-		if (auto post = m_VariationList->GetVariation(i, eVariationType::VARTYPE_POST))
+		if (const auto post = m_VariationList->GetVariation(i, eVariationType::VARTYPE_POST))
 		{
-			auto cb = new QTableWidgetItem(post->Name().c_str());
+			const auto cb = new QTableWidgetItem(post->Name().c_str());
 			table->setItem(i, 2, cb);
 			SetCheckFromMap(cb, post);
 		}
@@ -401,7 +401,7 @@ void FractoriumVariationsDialog::Populate()
 /// <param name="item"></param>
 void FractoriumVariationsDialog::OnVariationsTableItemChanged(QTableWidgetItem* item)
 {
-	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+	const auto ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
 	if (ctrl)
 		ForEachSelectedCell([&](QTableWidgetItem * cb) { cb->setCheckState(item->checkState()); });
@@ -445,7 +445,7 @@ void FractoriumVariationsDialog::DataToGui()
 {
 	ForEachCell([&](QTableWidgetItem * cb)
 	{
-		if (auto var = m_VariationList->GetVariation(cb->text().toStdString()))
+		if (const auto var = m_VariationList->GetVariation(cb->text().toStdString()))
 			SetCheckFromMap(cb, var);
 	});
 }
@@ -457,7 +457,7 @@ void FractoriumVariationsDialog::GuiToData()
 {
 	ForEachCell([&](QTableWidgetItem * cb)
 	{
-		if (auto var = m_VariationList->GetVariation(cb->text().toStdString()))
+		if (const auto var = m_VariationList->GetVariation(cb->text().toStdString()))
 			m_Vars[cb->text()] = (cb->checkState() == Qt::Checked);
 	});
 }
@@ -476,7 +476,7 @@ void FractoriumVariationsDialog::SetCheckFromMap(QTableWidgetItem* cb, const Var
 	}
 	else
 	{
-		bool chk = m_Vars[var->Name().c_str()].toBool();
+		const auto chk = m_Vars[var->Name().c_str()].toBool();
 		cb->setCheckState(chk ? Qt::Checked : Qt::Unchecked);
 	}
 }

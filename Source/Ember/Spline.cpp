@@ -115,11 +115,11 @@ T Spline<T>::Interpolate(T newX)
 	while (j < n && newX > vals[j + 1].x)
 		j++;
 
-	auto xmxj = newX - vals[j].x;
-	auto output = a[j] * (xmxj * xmxj * xmxj) +
-				  b[j] * (xmxj * xmxj) +
-				  c[j] * xmxj +
-				  d[j];
+	const auto xmxj = newX - vals[j].x;
+	const auto output = a[j] * (xmxj * xmxj * xmxj) +
+						b[j] * (xmxj * xmxj) +
+						c[j] * xmxj +
+						d[j];
 	return output;
 }
 

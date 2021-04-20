@@ -56,8 +56,8 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		jpeg_stdio_dest(&info, file);
 		info.in_color_space = JCS_RGB;
 		info.input_components = 3;
-		info.image_width = JDIMENSION(width);
-		info.image_height = JDIMENSION(height);
+		info.image_width = static_cast<JDIMENSION>(width);
+		info.image_height = static_cast<JDIMENSION>(height);
 		jpeg_set_defaults(&info);
 #if defined(_WIN32) || defined(__APPLE__)
 		jpeg_set_quality(&info, quality, static_cast<boolean>(TRUE));
@@ -73,14 +73,14 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		if (enableComments)
 		{
 			string s;
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(verString.c_str()), uint(verString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(verString.c_str()), static_cast<uint>(verString.size()));
 
 			if (nick != "")
 			{
 				os.str("");
 				os << "nickname: " << nick;
 				s = os.str();
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), uint(s.size()));
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), static_cast<uint>(s.size()));
 			}
 
 			if (url != "")
@@ -88,7 +88,7 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 				os.str("");
 				os << "url: " << url;
 				s = os.str();
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), uint(s.size()));
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), static_cast<uint>(s.size()));
 			}
 
 			if (id != "")
@@ -96,13 +96,13 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 				os.str("");
 				os << "id: " << id;
 				s = os.str();
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), uint(s.size()));
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), static_cast<uint>(s.size()));
 			}
 
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(bvString.c_str()), uint(bvString.size()));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(niString.c_str()), uint(niString.size()));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(rtString.c_str()), uint(rtString.size()));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(genomeString.c_str()), uint(genomeString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(bvString.c_str()), static_cast<uint>(bvString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(niString.c_str()), static_cast<uint>(niString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(rtString.c_str()), static_cast<uint>(rtString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(genomeString.c_str()), static_cast<uint>(genomeString.size()));
 		}
 
 		for (i = 0; i < height; i++)
@@ -200,7 +200,7 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 		}
 
 		png_init_io(png_ptr, file);
-		png_set_IHDR(png_ptr, info_ptr, png_uint_32(width), png_uint_32(height), 8 * png_uint_32(bytesPerChannel),
+		png_set_IHDR(png_ptr, info_ptr, static_cast<png_uint_32>(width), static_cast<png_uint_32>(height), 8 * static_cast<png_uint_32>(bytesPerChannel),
 					 PNG_COLOR_TYPE_RGBA,
 					 PNG_INTERLACE_NONE,
 					 PNG_COMPRESSION_TYPE_BASE,
@@ -241,12 +241,12 @@ static vector<byte> ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t hei
 		return vector<byte>();
 
 	size_t padding = 0;
-	size_t scanlinebytes = width * 3;
+	const auto scanlinebytes = width * 3;
 
 	while ((scanlinebytes + padding ) % 4 != 0)
 		padding++;
 
-	size_t psw = scanlinebytes + padding;
+	const auto psw = scanlinebytes + padding;
 	newSize = height * psw;
 	vector<byte> newBuf(newSize);
 	size_t bufpos = 0;
@@ -292,11 +292,11 @@ static bool SaveBmp(const char* filename, const byte* image, size_t width, size_
 	bmfh.bfType = 0x4d42;       // 0x4d42 = 'BM'
 	bmfh.bfReserved1 = 0;
 	bmfh.bfReserved2 = 0;
-	bmfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (DWORD)paddedSize;
+	bmfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + static_cast<DWORD>(paddedSize);
 	bmfh.bfOffBits = 0x36;
 	info.biSize = sizeof(BITMAPINFOHEADER);
-	info.biWidth = (LONG)width;
-	info.biHeight = (LONG)height;
+	info.biWidth = static_cast<LONG>(width);
+	info.biHeight = static_cast<LONG>(height);
 	info.biPlanes = 1;
 	info.biBitCount = 24;
 	info.biCompression = BI_RGB;
@@ -335,7 +335,7 @@ static bool SaveBmp(const char* filename, const byte* image, size_t width, size_
 		return false;
 	}
 
-	if (WriteFile(file, image, (DWORD)paddedSize, &bwritten, NULL) == false)
+	if (WriteFile(file, image, static_cast<DWORD>(paddedSize), &bwritten, NULL) == false)
 	{
 		CloseHandle(file);
 		return false;
@@ -382,8 +382,8 @@ static bool WriteExr16(const char* filename, Rgba* image, size_t width, size_t h
 {
 	try
 	{
-		int iw = int(width);
-		int ih = int(height);
+		const auto iw = static_cast<int>(width);
+		const auto ih = static_cast<int>(height);
 		std::unique_ptr<RgbaOutputFile> file;
 
 		try
@@ -442,8 +442,8 @@ static bool WriteExr32(const char* filename, float* r, float* g, float* b, float
 {
 	try
 	{
-		int iw = int(width);
-		int ih = int(height);
+		const auto iw = static_cast<int>(width);
+		const auto ih = static_cast<int>(height);
 		std::unique_ptr<OutputFile> file;
 
 		try

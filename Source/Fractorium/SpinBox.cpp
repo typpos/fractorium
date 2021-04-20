@@ -46,7 +46,7 @@ void SpinBox::SetValueStealth(int d)
 	blockSignals(false);
 }
 
-void SpinBox::SetValueStealth(size_t d) { SetValueStealth(int(d)); }
+void SpinBox::SetValueStealth(size_t d) { SetValueStealth(static_cast<int>(d)); }
 
 /// <summary>
 /// Set whether to respond to double click events.
@@ -166,7 +166,7 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 	if (!isEnabled())
 		return QSpinBox::eventFilter(o, e);
 
-	auto me = dynamic_cast<QMouseEvent*>(e);
+	const auto me = dynamic_cast<QMouseEvent*>(e);
 
 	if (me)
 	{
@@ -221,8 +221,8 @@ bool SpinBox::eventFilter(QObject* o, QEvent* e)
 		{
 			if (QWheelEvent* we = dynamic_cast<QWheelEvent*>(e))
 			{
-				bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-				bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+				const auto shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+				const auto ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
 				if (we->angleDelta().ry() > 0)
 				{

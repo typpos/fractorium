@@ -52,7 +52,7 @@ private:
 	/// <returns>True if this is less than other, else false.</returns>
 	bool operator < (const QTreeWidgetItem& other) const
 	{
-		int column = treeWidget()->sortColumn();
+		const auto column = treeWidget()->sortColumn();
 		auto itemWidget1 = treeWidget()->itemWidget(const_cast<VariationTreeWidgetItem*>(this), 1);//Get the widget for the second column.
 
 		if (auto spinBox1 = dynamic_cast<VariationTreeDoubleSpinBox*>(itemWidget1))//Cast the widget to the VariationTreeDoubleSpinBox type.
@@ -64,10 +64,10 @@ private:
 				if (spinBox1->IsParam() || spinBox2->IsParam())//Do not sort params, their order will always remain the same.
 					return false;
 
-				auto weight1 = spinBox1->value();
-				auto weight2 = spinBox2->value();
-				auto index1 = spinBox1->GetVariationId();
-				auto index2 = spinBox2->GetVariationId();
+				const auto weight1 = spinBox1->value();
+				const auto weight2 = spinBox2->value();
+				const auto index1 = spinBox1->GetVariationId();
+				const auto index2 = spinBox2->GetVariationId();
 
 				if (column == 0)//First column clicked, sort by variation index.
 				{

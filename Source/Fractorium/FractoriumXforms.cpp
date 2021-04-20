@@ -6,7 +6,8 @@
 /// </summary>
 void Fractorium::InitXformsUI()
 {
-	int spinHeight = 20, row = 0;
+	const int spinHeight = 20;
+	auto row = 0;
 	connect(ui.AddXformButton,		 SIGNAL(clicked(bool)),			   this, SLOT(OnAddXformButtonClicked(bool)),	    Qt::QueuedConnection);
 	connect(ui.AddLinkedXformButton, SIGNAL(clicked(bool)),			   this, SLOT(OnAddLinkedXformButtonClicked(bool)),	Qt::QueuedConnection);
 	connect(ui.DuplicateXformButton, SIGNAL(clicked(bool)),			   this, SLOT(OnDuplicateXformButtonClicked(bool)),	Qt::QueuedConnection);
@@ -55,8 +56,7 @@ void Fractorium::InitXformsUI()
 template <typename T>
 Xform<T>* FractoriumEmberController<T>::CurrentXform()
 {
-	bool hasFinal = m_Fractorium->HaveFinal();
-	return m_Ember.GetTotalXform(m_Fractorium->ui.CurrentXformCombo->currentIndex(), hasFinal);//Need to force final for the special case they created a final, then cleared it, but did not delete it.
+	return m_Ember.GetTotalXform(m_Fractorium->ui.CurrentXformCombo->currentIndex(), m_Fractorium->HaveFinal());//Need to force final for the special case they created a final, then cleared it, but did not delete it.
 }
 
 /// <summary>
@@ -65,7 +65,7 @@ Xform<T>* FractoriumEmberController<T>::CurrentXform()
 /// <param name="i">The index to set the current xform to</param>
 void Fractorium::CurrentXform(uint i)
 {
-	if (i < uint(ui.CurrentXformCombo->count()))
+	if (i < static_cast<uint>(ui.CurrentXformCombo->count()))
 		ui.CurrentXformCombo->setCurrentIndex(i);
 }
 /// <summary>
@@ -82,11 +82,10 @@ void FractoriumEmberController<T>::CurrentXformComboChanged(int index)
 	{
 		FillWithXform(xform);
 		m_GLController->SetSelectedXform(xform);
-		int solo = m_Ember.m_Solo;
 		m_Fractorium->ui.SoloXformCheckBox->blockSignals(true);
-		m_Fractorium->ui.SoloXformCheckBox->setChecked(solo == index);
+		m_Fractorium->ui.SoloXformCheckBox->setChecked(m_Ember.m_Solo == index);
 		m_Fractorium->ui.SoloXformCheckBox->blockSignals(false);
-		bool enable = !IsFinal(CurrentXform());
+		const bool enable = !IsFinal(CurrentXform());
 		m_Fractorium->ui.DuplicateXformButton->setEnabled(enable);
 		m_Fractorium->m_XformWeightSpin->setEnabled(enable);
 		m_Fractorium->ui.SoloXformCheckBox->setEnabled(enable);
@@ -114,7 +113,7 @@ void FractoriumEmberController<T>::AddXform()
 		newXform.m_ColorX = m_Rand.Frand01<T>();
 		newXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 		m_Ember.AddXform(newXform);
-		int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
+		const int index = static_cast<int>(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 		FillXforms(index);
 	});
 }
@@ -138,7 +137,7 @@ template <typename T>
 void FractoriumEmberController<T>::AddLinkedXform()
 {
 	bool hasAdded = false;
-	bool forceFinal = m_Fractorium->HaveFinal();
+	const auto forceFinal = m_Fractorium->HaveFinal();
 	auto selCount = m_Fractorium->SelectedXformCount(false);
 
 	if (!selCount)//If none explicitly selected, use current.
@@ -199,7 +198,7 @@ void FractoriumEmberController<T>::AddLinkedXform()
 		}
 	}, eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL);
 	//Now update the GUI.
-	int index = int(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
+	const auto index = static_cast<int>(m_Ember.TotalXformCount(forceFinal) - (forceFinal ? 2 : 1));//Set index to the last item before final.
 	FillXforms(index);
 	FillXaos();
 }
@@ -215,12 +214,12 @@ void Fractorium::OnAddLinkedXformButtonClicked(bool checked) { m_Controller->Add
 template <typename T>
 void FractoriumEmberController<T>::AddXformsWithXaos(Ember<T>& ember, std::vector<std::pair<Xform<T>, size_t>>& xforms, eXaosPasteStyle pastestyle)
 {
-	auto oldxfcount = ember.XformCount();
+	const auto oldxfcount = ember.XformCount();
 
 	for (auto& it : xforms)
 	{
 		ember.AddXform(it.first);
-		auto newxfcount = ember.XformCount() - 1;
+		const auto newxfcount = ember.XformCount() - 1;
 		auto* newxform = ember.GetXform(newxfcount);
 
 		for (size_t i = 0; i < oldxfcount; i++)
@@ -299,7 +298,7 @@ template <typename T>
 void FractoriumEmberController<T>::DuplicateXform()
 {
 	bool forceFinal = m_Fractorium->HaveFinal();
-	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+	const bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 	vector<std::pair<Xform<T>, size_t>> vec;
 	vec.reserve(m_Ember.XformCount());
 	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
@@ -347,8 +346,8 @@ void FractoriumEmberController<T>::DeleteXforms()
 {
 	bool removed = false;
 	bool anyChecked = false;
-	bool haveFinal = m_Fractorium->HaveFinal();
-	auto combo = m_Fractorium->ui.CurrentXformCombo;
+	const bool haveFinal = m_Fractorium->HaveFinal();
+	const auto combo = m_Fractorium->ui.CurrentXformCombo;
 	Xform<T>* finalXform = nullptr;
 	vector<Xform<T>> xformsToKeep;
 	xformsToKeep.reserve(m_Ember.TotalXformCount());
@@ -363,16 +362,16 @@ void FractoriumEmberController<T>::DeleteXforms()
 		{
 			if (isFinal)
 				finalXform = m_Ember.NonConstFinalXform();
-			else if (auto xform = m_Ember.GetXform(i))
+			else if (const auto xform = m_Ember.GetXform(i))
 				xformsToKeep.push_back(*xform);
 		}
 		else
 			anyChecked = true;//At least one was selected for removal.
 	});
 	//They might not have selected any checkboxes, in which case just delete the current.
-	auto current = combo->currentIndex();
-	auto totalCount = m_Ember.TotalXformCount();
-	bool keepFinal = finalXform && haveFinal;
+	const auto current = combo->currentIndex();
+	const auto totalCount = m_Ember.TotalXformCount();
+	const auto keepFinal = finalXform && haveFinal;
 
 	//Nothing was selected, so just delete current.
 	if (!anyChecked)
@@ -413,7 +412,7 @@ void FractoriumEmberController<T>::DeleteXforms()
 
 	if (removed)
 	{
-		int index = int(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final. Note final is requeried one last time.
+		const auto index = static_cast<int>(m_Ember.TotalXformCount() - (m_Ember.UseFinalXform() ? 2 : 1));//Set index to the last item before final. Note final is requeried one last time.
 		FillXforms(index);
 		UpdateRender();
 		m_Fractorium->ui.GLDisplay->repaint();//Force update because for some reason it doesn't always happen.
@@ -444,7 +443,7 @@ void FractoriumEmberController<T>::AddFinalXform()
 				final.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));//Just a placeholder so other parts of the code don't see it as being empty.
 
 			m_Ember.SetFinalXform(final);
-			int index = int(m_Ember.TotalXformCount() - 1);//Set index to the last item.
+			const auto index = static_cast<int>(m_Ember.TotalXformCount() - 1);//Set index to the last item.
 			FillXforms(index);
 		});
 	}
@@ -494,11 +493,11 @@ void Fractorium::OnEqualWeightButtonClicked(bool checked) { m_Controller->Equali
 template <typename T>
 void FractoriumEmberController<T>::XformNameChanged(const QString& s)
 {
-	bool forceFinal = m_Fractorium->HaveFinal();
+	const auto forceFinal = m_Fractorium->HaveFinal();
 	UpdateXform([&] (Xform<T>* xform, size_t xfindex, size_t selIndex)
 	{
 		xform->m_Name = s.toStdString();
-		XformCheckboxAt(int(xfindex), [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(xfindex)); });
+		XformCheckboxAt(static_cast<int>(xfindex), [&](QCheckBox * checkbox) { checkbox->setText(MakeXformCaption(xfindex)); });
 	}, eXformUpdate::UPDATE_CURRENT, false);
 	FillSummary();//Manually update because this does not trigger a render, which is where this would normally be called.
 	m_Fractorium->FillXaosTable();
@@ -567,7 +566,7 @@ void FractoriumEmberController<T>::FillWithXform(Xform<T>* xform)
 	m_Fractorium->ui.AnimateXformCheckBox->setChecked(xform->m_Animate > 0 ? true : false);
 	m_Fractorium->ui.AnimateXformCheckBox->blockSignals(false);
 
-	if (auto item = m_Fractorium->ui.XformWeightNameTable->item(0, 1))
+	if (const auto item = m_Fractorium->ui.XformWeightNameTable->item(0, 1))
 	{
 		m_Fractorium->m_XformNameEdit->blockSignals(true);
 		m_Fractorium->m_XformNameEdit->setText(QString::fromStdString(xform->m_Name));
@@ -588,11 +587,11 @@ void FractoriumEmberController<T>::SetNormalizedWeightText(Xform<T>* xform)
 {
 	if (xform)
 	{
-		int index = m_Ember.GetXformIndex(xform);
+		const auto index = m_Ember.GetXformIndex(xform);
 		m_Ember.CalcNormalizedWeights(m_NormalizedWeights);
 
-		if (index != -1 && index < m_NormalizedWeights.size())
-			m_Fractorium->m_XformWeightSpinnerButtonWidget->m_Label->setText(QString(" (") + QLocale::system().toString(double(m_NormalizedWeights[index]), 'g', 3) + ")");
+		if (index != -1 && index < static_cast<intmax_t>(m_NormalizedWeights.size()))
+			m_Fractorium->m_XformWeightSpinnerButtonWidget->m_Label->setText(QString(" (") + QLocale::system().toString(static_cast<double>(m_NormalizedWeights[index]), 'g', 3) + ")");
 	}
 }
 /// <summary>
@@ -603,7 +602,7 @@ void FractoriumEmberController<T>::SetNormalizedWeightText(Xform<T>* xform)
 template <typename T>
 bool FractoriumEmberController<T>::IsFinal(Xform<T>* xform)
 {
-	return (m_Fractorium->HaveFinal() && (xform == m_Ember.FinalXform()));
+	return m_Fractorium->HaveFinal() && (xform == m_Ember.FinalXform());
 }
 /// <summary>
 /// Fill the xforms combo box with the xforms in the current ember.
@@ -615,7 +614,8 @@ bool FractoriumEmberController<T>::IsFinal(Xform<T>* xform)
 template <typename T>
 void FractoriumEmberController<T>::FillXforms(int index)
 {
-	int i = 0, count = int(XformCount());
+	int i = 0;
+	const auto count = static_cast<int>(XformCount());
 	auto combo = m_Fractorium->ui.CurrentXformCombo;
 	combo->blockSignals(true);
 	combo->clear();
@@ -637,8 +637,8 @@ void FractoriumEmberController<T>::FillXforms(int index)
 	{
 		if (i < count - 1)
 		{
-			auto cb1 = new QCheckBox(MakeXformCaption(i), m_Fractorium);
-			auto cb2 = new QCheckBox(MakeXformCaption(i + 1), m_Fractorium);
+			const auto cb1 = new QCheckBox(MakeXformCaption(i), m_Fractorium);
+			const auto cb2 = new QCheckBox(MakeXformCaption(i + 1), m_Fractorium);
 			QObject::connect(cb1, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });//Ensure circles are drawn immediately after toggle.
 			QObject::connect(cb2, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });
 			m_Fractorium->m_XformSelections.push_back(cb1);
@@ -648,7 +648,7 @@ void FractoriumEmberController<T>::FillXforms(int index)
 		}
 		else if (i < count)
 		{
-			auto cb = new QCheckBox(MakeXformCaption(i), m_Fractorium);
+			const auto cb = new QCheckBox(MakeXformCaption(i), m_Fractorium);
 			QObject::connect(cb, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });
 			m_Fractorium->m_XformSelections.push_back(cb);
 			m_Fractorium->m_XformsSelectionLayout->addRow(cb, new QWidget(m_Fractorium));
@@ -659,7 +659,7 @@ void FractoriumEmberController<T>::FillXforms(int index)
 	//Special case for final xform.
 	if (UseFinalXform())
 	{
-		auto cb = new QCheckBox(MakeXformCaption(i), m_Fractorium);
+		const auto cb = new QCheckBox(MakeXformCaption(i), m_Fractorium);
 		QObject::connect(cb, &QCheckBox::stateChanged, [&](int state) { m_Fractorium->ui.GLDisplay->update(); });
 		m_Fractorium->m_XformSelections.push_back(cb);
 		m_Fractorium->m_XformsSelectionLayout->addRow(cb, new QWidget(m_Fractorium));
@@ -694,20 +694,20 @@ void FractoriumEmberController<T>::FillXforms(int index)
 template<typename T>
 void FractoriumEmberController<T>::UpdateXformName(int index)
 {
-	bool forceFinal = m_Fractorium->HaveFinal();
-	bool isFinal = m_Ember.FinalXform() == m_Ember.GetTotalXform(index, forceFinal);
+	const auto forceFinal = m_Fractorium->HaveFinal();
+	const auto isFinal = m_Ember.FinalXform() == m_Ember.GetTotalXform(index, forceFinal);
 	QString name = isFinal ? "Final" : QString::number(index + 1);
 
-	if (auto xform = m_Ember.GetTotalXform(index, forceFinal))
+	if (const auto xform = m_Ember.GetTotalXform(index, forceFinal))
 	{
 		if (!xform->m_Name.empty())
 			name += "    " + QString::fromStdString(xform->m_Name);
 
 		m_Fractorium->ui.CurrentXformCombo->setItemText(index, name);
-		auto view = m_Fractorium->ui.CurrentXformCombo->view();
-		auto fontMetrics1 = view->fontMetrics();
+		const auto view = m_Fractorium->ui.CurrentXformCombo->view();
+		const auto fontMetrics1 = view->fontMetrics();
+		const auto ww = fontMetrics1.width("WW") * 3;
 		auto textWidth = m_Fractorium->ui.CurrentXformCombo->width();
-		auto ww = fontMetrics1.width("WW") * 3;
 
 		for (int i = 0; i < m_Fractorium->ui.CurrentXformCombo->count(); ++i)
 			textWidth = std::max(fontMetrics1.width(m_Fractorium->ui.CurrentXformCombo->itemText(i)) + ww, textWidth);

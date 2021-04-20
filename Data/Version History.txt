@@ -1,3 +1,18 @@
+22.21.4.2 4/19/2021
+
+--User changes
+ -Allow users to set the Exp value when using the Exp temporal filter type.
+ -Set the default temporal filter type to be Box, which does not alter the palette values at all during animation. This is done to avoid confusion when using Gaussian or Exp which can produce darkened images.
+
+--Bug fixes
+ -Sending a sequence to the final render dialog when the keyframes had non zero rotate and center Y values would produce off center animations when rendered.
+ -Temporal filters were being unnecessarily recreated many times when rendering or generating sequences.
+ -Exp filter was always treated like a Box filter.
+
+--Code changes
+ -Add a new member function SaveCurrentAsXml(QString filename = "") to the controllers which is only used for testing.
+ -Modernize some C++ code.
+
 21.21.4.1 4/7/2021
 
 --User changes

@@ -69,7 +69,7 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 	m_Fractorium->ui.PaletteFilenameCombo->clear();
 	//Initial combo change event to fill the palette table will be called automatically later.
 	//Look hard for a palette.
-	auto paths = GetDefaultPaths();
+	const auto paths = GetDefaultPaths();
 
 	for (auto& path : paths)
 		b |= InitPaletteList(path);
@@ -227,11 +227,11 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, siz
 {
 	int i = 0;
 	size_t selIndex = 0;
-	auto current = CurrentXform();
-	auto currentIndex = m_Fractorium->ui.CurrentXformCombo->currentIndex();
-	bool forceFinal = m_Fractorium->HaveFinal();
-	bool isCurrentFinal = m_Ember.IsFinalXform(current);
-	bool doFinal = updateType != eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL && updateType != eXformUpdate::UPDATE_ALL_EXCEPT_FINAL;
+	const auto current = CurrentXform();
+	const auto currentIndex = m_Fractorium->ui.CurrentXformCombo->currentIndex();
+	const bool forceFinal = m_Fractorium->HaveFinal();
+	const bool isCurrentFinal = m_Ember.IsFinalXform(current);
+	const bool doFinal = updateType != eXformUpdate::UPDATE_SELECTED_EXCEPT_FINAL && updateType != eXformUpdate::UPDATE_ALL_EXCEPT_FINAL;
 
 	switch (updateType)
 	{
@@ -253,7 +253,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, siz
 		{
 			bool currentDone = false;
 
-			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
+			while (const auto xform = m_Ember.GetTotalXform(i, forceFinal))
 			{
 				if (m_Fractorium->IsXformSelected(i))
 				{
@@ -276,7 +276,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, siz
 		{
 			bool anyUpdated = false;
 
-			while (auto xform = (doFinal ? m_Ember.GetTotalXform(i, forceFinal) : m_Ember.GetXform(i)))
+			while (const auto xform = (doFinal ? m_Ember.GetTotalXform(i, forceFinal) : m_Ember.GetXform(i)))
 			{
 				if (m_Fractorium->IsXformSelected(i))
 				{
@@ -296,7 +296,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, siz
 
 		case eXformUpdate::UPDATE_ALL:
 		{
-			while (auto xform = m_Ember.GetTotalXform(i, forceFinal))
+			while (const auto xform = m_Ember.GetTotalXform(i, forceFinal))
 				func(xform, i++, selIndex++);
 		}
 		break;
@@ -304,7 +304,7 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, siz
 		case eXformUpdate::UPDATE_ALL_EXCEPT_FINAL:
 		default:
 		{
-			while (auto xform = m_Ember.GetXform(i))
+			while (const auto xform = m_Ember.GetXform(i))
 				func(xform, i++, selIndex++);
 		}
 		break;
@@ -330,8 +330,8 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	if (ember.m_Name != m_Ember.m_Name)
 		m_LastSaveCurrent = "";
 
-	size_t w = m_Ember.m_FinalRasW;//Cache values for use below.
-	size_t h = m_Ember.m_FinalRasH;
+	const auto w = m_Ember.m_FinalRasW;//Cache values for use below.
+	const auto h = m_Ember.m_FinalRasH;
 	m_Ember = ember;
 
 	if (updatePointer && (typeid(T) == typeid(U)))
@@ -345,13 +345,13 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	}
 
 	static EmberToXml<T> writer;//Save parameters of last full render just in case there is a crash.
-	auto path = GetDefaultUserPath();
-	QDir dir(path);
+	const auto path = GetDefaultUserPath();
+	const QDir dir(path);
 
 	if (!dir.exists())
 		dir.mkpath(".");
 
-	string filename = path.toStdString() + "/last.flame";
+	const auto filename = path.toStdString() + "/last.flame";
 	writer.Save(filename, m_Ember, 0, true, true, false, true, true);
 	m_GLController->ResetMouseState();
 	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
@@ -374,12 +374,12 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 template <typename T>
 void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 {
-	auto f = m_Controller->m_Fractorium;
+	const auto f = m_Controller->m_Fractorium;
 	m_PreviewRenderer.EarlyClip(f->m_Settings->EarlyClip());
 	m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());
 	m_PreviewRenderer.ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Leave one processor free so the GUI can breathe.
 
-	if (auto top = m_Tree->topLevelItem(0))
+	if (const auto top = m_Tree->topLevelItem(0))
 	{
 		size_t i = start;
 
@@ -395,7 +395,7 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 
 			if (m_PreviewRenderer.Run(m_PreviewFinalImage) == eRenderStatus::RENDER_OK)
 			{
-				if (auto treeItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(int(i))))
+				if (const auto treeItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(int(i))))
 				{
 					//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
 					//This ensures the events are processed in order as each preview is updated, and that control does not return here

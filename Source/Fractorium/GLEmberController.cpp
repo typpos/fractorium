@@ -35,7 +35,7 @@ template <typename T>
 GLEmberController<T>::GLEmberController(Fractorium* fractorium, GLWidget* glWidget, FractoriumEmberController<T>* controller)
 	: GLEmberControllerBase(fractorium, glWidget)
 {
-	GridStep = T(1.0 / 4.0); // michel, needs to insert on GUI to be flexible//TODO
+	GridStep = static_cast<T>(1.0 / 4.0); // michel, needs to insert on GUI to be flexible//TODO
 	m_FractoriumEmberController = controller;
 	m_HoverXform = nullptr;
 	m_SelectedXform = nullptr;
@@ -58,7 +58,7 @@ GLEmberController<T>::~GLEmberController() { }
 template <typename T>
 bool GLEmberController<T>::CheckForSizeMismatch(int w, int h)
 {
-	return (m_FractoriumEmberController->FinalRasW() != w || m_FractoriumEmberController->FinalRasH() != h);
+	return m_FractoriumEmberController->FinalRasW() != w || m_FractoriumEmberController->FinalRasH() != h;
 }
 
 /// <summary>
@@ -82,11 +82,11 @@ T GLEmberController<T>::CalcScale()
 {
 	//Can't operate using world coords here because every time scale changes, the world bounds change.
 	//So must instead calculate distance traveled based on window coords, which do not change outside of resize events.
-	auto windowCenter = ScrolledCenter(false);
-	v2T windowMousePosDistanceFromCenter(m_MousePos.x - windowCenter.x, m_MousePos.y - windowCenter.y);
-	v2T windowMouseDownDistanceFromCenter(m_MouseDownPos.x - windowCenter.x, m_MouseDownPos.y - windowCenter.y);
-	T lengthMousePosFromCenterInPixels = glm::length(windowMousePosDistanceFromCenter);
-	T lengthMouseDownFromCenterInPixels = glm::length(windowMouseDownDistanceFromCenter);
+	const auto windowCenter = ScrolledCenter(false);
+	const v2T windowMousePosDistanceFromCenter(m_MousePos.x - windowCenter.x, m_MousePos.y - windowCenter.y);
+	const v2T windowMouseDownDistanceFromCenter(m_MouseDownPos.x - windowCenter.x, m_MouseDownPos.y - windowCenter.y);
+	const T lengthMousePosFromCenterInPixels = glm::length(windowMousePosDistanceFromCenter);
+	const T lengthMouseDownFromCenterInPixels = glm::length(windowMouseDownDistanceFromCenter);
 	return lengthMousePosFromCenterInPixels - lengthMouseDownFromCenterInPixels;
 }
 
@@ -98,9 +98,9 @@ T GLEmberController<T>::CalcScale()
 template <typename T>
 T GLEmberController<T>::CalcRotation()
 {
-	auto scrolledWorldCenter = ScrolledCenter(true);
-	T rotStart = NormalizeDeg180<T>((std::atan2(m_MouseDownWorldPos.y - scrolledWorldCenter.y, m_MouseDownWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
-	T rot = NormalizeDeg180<T>((std::atan2(m_MouseWorldPos.y - scrolledWorldCenter.y, m_MouseWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
+	const auto scrolledWorldCenter = ScrolledCenter(true);
+	const T rotStart = NormalizeDeg180<T>((std::atan2(m_MouseDownWorldPos.y - scrolledWorldCenter.y, m_MouseDownWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
+	const T rot = NormalizeDeg180<T>((std::atan2(m_MouseWorldPos.y - scrolledWorldCenter.y, m_MouseWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
 	return rotStart - rot;
 }
 
@@ -113,11 +113,11 @@ T GLEmberController<T>::CalcRotation()
 template <typename T>
 v3T GLEmberController<T>::ScrolledCenter(bool toWorld)
 {
-	auto dprf = m_GL->devicePixelRatioF();
-	auto wpsa = m_Fractorium->ui.GLParentScrollArea->width();
-	auto hpsa = m_Fractorium->ui.GLParentScrollArea->height();
-	auto hpos = m_Fractorium->ui.GLParentScrollArea->horizontalScrollBar()->value();
-	auto vpos = m_Fractorium->ui.GLParentScrollArea->verticalScrollBar()->value();
+	const auto dprf = m_GL->devicePixelRatioF();
+	const auto wpsa = m_Fractorium->ui.GLParentScrollArea->width();
+	const auto hpsa = m_Fractorium->ui.GLParentScrollArea->height();
+	const auto hpos = m_Fractorium->ui.GLParentScrollArea->horizontalScrollBar()->value();
+	const auto vpos = m_Fractorium->ui.GLParentScrollArea->verticalScrollBar()->value();
 	v3T v;
 
 	if (!m_Fractorium->ui.GLParentScrollArea->horizontalScrollBar()->isVisible() && !m_Fractorium->ui.GLParentScrollArea->verticalScrollBar()->isVisible())
@@ -141,12 +141,9 @@ v3T GLEmberController<T>::ScrolledCenter(bool toWorld)
 /// <param name="vec">The world cartesian coordinate to be snapped</param>
 /// <returns>The snapped world cartesian coordinate</returns>
 template <typename T>
-typename v2T GLEmberController<T>::SnapToGrid(v2T& vec)
+typename v2T GLEmberController<T>::SnapToGrid(const v2T& vec) const
 {
-	v2T ret;
-	ret.x = glm::round(vec.x / GridStep) * GridStep;
-	ret.y = glm::round(vec.y / GridStep) * GridStep;
-	return ret;
+	return v2T(glm::round(vec.x / GridStep) * GridStep, glm::round(vec.y / GridStep) * GridStep);
 }
 
 /// <summary>
@@ -155,13 +152,11 @@ typename v2T GLEmberController<T>::SnapToGrid(v2T& vec)
 /// <param name="vec">The world cartesian coordinate to be snapped</param>
 /// <returns>The snapped world cartesian coordinate</returns>
 template <typename T>
-typename v3T GLEmberController<T>::SnapToGrid(v3T& vec)
+typename v3T GLEmberController<T>::SnapToGrid(const v3T& vec) const
 {
-	v3T ret;
-	ret.x = glm::round(vec.x / GridStep) * GridStep;
-	ret.y = glm::round(vec.y / GridStep) * GridStep;
-	ret.z = vec.z;
-	return ret;
+	return v3T(glm::round(vec.x / GridStep) * GridStep,
+			   glm::round(vec.y / GridStep) * GridStep,
+			   vec.z);
 }
 
 /// <summary>
@@ -171,9 +166,8 @@ typename v3T GLEmberController<T>::SnapToGrid(v3T& vec)
 /// <param name="divisions">The divisions of a circle to use for snapping</param>
 /// <returns>The snapped world cartesian coordinate</returns>
 template <typename T>
-typename v3T GLEmberController<T>::SnapToNormalizedAngle(v3T& vec, uint divisions)
+typename v3T GLEmberController<T>::SnapToNormalizedAngle(const v3T& vec, uint divisions) const
 {
-	T rsq, theta;
 	T bestRsq = numeric_limits<T>::max();
 	v3T c(0, 0, 0), best;
 	best.x = 1;
@@ -181,10 +175,10 @@ typename v3T GLEmberController<T>::SnapToNormalizedAngle(v3T& vec, uint division
 
 	for (uint i = 0; i < divisions; i++)
 	{
-		theta = 2.0 * M_PI * T(i) / T(divisions);
+		const auto theta = 2.0 * M_PI * static_cast<T>(i) / static_cast<T>(divisions);
 		c.x = std::cos(theta);
 		c.y = std::sin(theta);
-		rsq = glm::distance(vec, c);
+		const auto rsq = glm::distance(vec, c);
 
 		if (rsq < bestRsq)
 		{
@@ -203,9 +197,9 @@ typename v3T GLEmberController<T>::SnapToNormalizedAngle(v3T& vec, uint division
 /// <param name="flip">True to flip vertically, else don't.</param>
 /// <returns>The converted world cartesian coordinates</returns>
 template <typename T>
-typename v3T GLEmberController<T>::WindowToWorld(v3T& v, bool flip)
+typename v3T GLEmberController<T>::WindowToWorld(const v3T& v, bool flip) const
 {
-	v3T mouse(v.x, flip ? m_Viewport[3] - v.y : v.y, 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+	const v3T mouse(v.x, flip ? m_Viewport[3] - v.y : v.y, 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	v3T newCoords = glm::unProject(mouse, m_Modelview, m_Projection, m_Viewport);//Perform the calculation.
 	newCoords.z = 0;//For some reason, unProject() always comes back with the z coordinate as something other than 0. It should be 0 at all times.
 	return newCoords;
@@ -287,9 +281,7 @@ void GLEmberController<double>::MultMatrix(tmat4x4<double, glm::defaultp>& mat)
 template <typename T>
 void GLEmberController<T>::QueryMatrices(bool print)
 {
-	auto renderer = m_FractoriumEmberController->Renderer();
-
-	if (renderer)
+	if (const auto renderer = m_FractoriumEmberController->Renderer())
 	{
 		QueryVMP();
 

@@ -58,7 +58,7 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 		ui->PaletteFilenameCombo->addItem(info.fileName());
 	}
 
-    ui->PaletteFilenameCombo->model()->sort(0);
+	ui->PaletteFilenameCombo->model()->sort(0);
 
 	if (ui->PaletteFilenameCombo->count() > 0)
 		m_CurrentPaletteFilePath = ui->PaletteFilenameCombo->itemText(0).toStdString();
@@ -91,7 +91,7 @@ Palette<float>& PaletteEditor::GetPalette(int size)
 /// <param name="palette">The palette to assign</param>
 void PaletteEditor::SetPalette(const Palette<float>& palette)
 {
-	auto combo = ui->PaletteFilenameCombo;
+	const auto combo = ui->PaletteFilenameCombo;
 	m_PaletteIndex = std::numeric_limits<int>::max();
 	m_GradientColorView->SetPalette(palette);
 	auto& arrows = m_GradientColorView->GetArrows();
@@ -241,7 +241,7 @@ void PaletteEditor::OnResetToDefaultButtonClicked()
 /// </summary>
 void PaletteEditor::OnCreatePaletteFromImageButtonClicked()
 {
-	auto filenames = SetupOpenImagesDialog();
+	const auto filenames = SetupOpenImagesDialog();
 
 	if (!filenames.empty())
 	{
@@ -317,7 +317,7 @@ void PaletteEditor::OnSyncCheckBoxStateChanged(int state)
 /// <param name="state">Ignored</param>
 void PaletteEditor::OnBlendCheckBoxStateChanged(int state)
 {
-	m_GradientColorView->Blend((bool)state);
+	m_GradientColorView->Blend(static_cast<bool>(state));
 	m_GradientColorView->update();
 	EmitPaletteChanged();
 }
@@ -331,10 +331,10 @@ void PaletteEditor::OnPaletteFilenameComboChanged(const QString& text)
 {
 	if (!text.isEmpty())//This occasionally seems to get called with an empty string for reasons unknown.
 	{
-		auto paletteTable = ui->PaletteListTable;
+		const auto paletteTable = ui->PaletteListTable;
 		m_CurrentPaletteFilePath = text.toStdString();
 		::FillPaletteTable(text.toStdString(), paletteTable, m_PaletteList);
-		auto fullname = m_PaletteList->GetFullPathFromFilename(m_CurrentPaletteFilePath);
+		const auto fullname = m_PaletteList->GetFullPathFromFilename(m_CurrentPaletteFilePath);
 		ui->PaletteFilenameCombo->setToolTip(QString::fromStdString(fullname));
 		EnablePaletteFileControls();
 	}
@@ -350,7 +350,7 @@ void PaletteEditor::OnPaletteCellClicked(int row, int col)
 {
 	if (col == 1)
 	{
-		if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+		if (const auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		{
 			SetPalette(*palette);
 			m_PaletteIndex = row;
@@ -368,7 +368,7 @@ void PaletteEditor::OnPaletteCellChanged(int row, int col)
 {
 	if (col == 0)
 	{
-		if (auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
+		if (const auto palette = m_PaletteList->GetPaletteByFilename(m_CurrentPaletteFilePath, row))
 		{
 			if (!palette->m_SourceColors.empty())
 			{
@@ -386,7 +386,7 @@ void PaletteEditor::OnPaletteCellChanged(int row, int col)
 /// </summary>
 void PaletteEditor::OnNewPaletteFileButtonClicked()
 {
-	auto filename = EmberFile<float>::UniqueFilename(GetDefaultUserPath() + "/user-palettes.xml");
+	const auto filename = EmberFile<float>::UniqueFilename(GetDefaultUserPath() + "/user-palettes.xml");
 
 	if (m_PaletteList->AddEmptyPaletteFile(filename.toStdString()))
 	{
@@ -404,18 +404,18 @@ void PaletteEditor::OnNewPaletteFileButtonClicked()
 void PaletteEditor::OnCopyPaletteFileButtonClicked()
 {
 	auto& paletteFiles = m_PaletteList->Palettes();
-	auto qscurr = QString::fromStdString(m_CurrentPaletteFilePath);
-	auto qfilename = EmberFile<float>::UniqueFilename(GetDefaultUserPath() + "/" + qscurr);
-	auto filename = qfilename.toStdString();
+	const auto qscurr = QString::fromStdString(m_CurrentPaletteFilePath);
+	const auto qfilename = EmberFile<float>::UniqueFilename(GetDefaultUserPath() + "/" + qscurr);
+	const auto filename = qfilename.toStdString();
 
 	if (m_PaletteList->GetPaletteListByFullPath(filename) == nullptr)//Ensure the new filename does not exist in the map.
 	{
 		//Get the list of palettes for the current filename, this will be added as a copy below.
-		if (auto currentPaletteFile = m_PaletteList->GetPaletteListByFilename(m_CurrentPaletteFilePath))//Ensure the list of palettes was properly retrieved.
+		if (const auto currentPaletteFile = m_PaletteList->GetPaletteListByFilename(m_CurrentPaletteFilePath))//Ensure the list of palettes was properly retrieved.
 		{
 			if (m_PaletteList->AddPaletteFile(filename, *currentPaletteFile))//Add the current vector of palettes to an entry with the new filename.
 			{
-				QFileInfo info(qfilename);
+				const QFileInfo info(qfilename);
 				ui->PaletteFilenameCombo->addItem(info.fileName());
 				ui->PaletteFilenameCombo->setCurrentIndex(ui->PaletteFilenameCombo->count() - 1);
 			}
@@ -435,7 +435,7 @@ void PaletteEditor::OnCopyPaletteFileButtonClicked()
 /// </summary>
 void PaletteEditor::OnAppendPaletteButtonClicked()
 {
-	auto& pal = GetPalette(256);
+	const auto& pal = GetPalette(256);
 	m_PaletteList->AddPaletteToFile(m_CurrentPaletteFilePath, pal);
 	::FillPaletteTable(m_CurrentPaletteFilePath, ui->PaletteListTable, m_PaletteList);
 	m_PaletteIndex = ui->PaletteListTable->rowCount() - 1;
@@ -448,7 +448,7 @@ void PaletteEditor::OnAppendPaletteButtonClicked()
 /// </summary>
 void PaletteEditor::OnOverwritePaletteButtonClicked()
 {
-	auto& pal = GetPalette(256);
+	const auto& pal = GetPalette(256);
 	m_PaletteList->Replace(m_CurrentPaletteFilePath, pal, m_PaletteIndex);
 	::FillPaletteTable(m_CurrentPaletteFilePath, ui->PaletteListTable, m_PaletteList);
 	emit PaletteFileChanged();
@@ -461,7 +461,7 @@ void PaletteEditor::OnOverwritePaletteButtonClicked()
 /// </summary>
 void PaletteEditor::OnDeletePaletteButtonClicked()
 {
-	auto table = ui->PaletteListTable;
+	const auto table = ui->PaletteListTable;
 
 	if (table->rowCount() > 1)
 	{
@@ -520,7 +520,7 @@ void PaletteEditor::EmitColorIndexChanged(size_t index, float value)
 QStringList PaletteEditor::SetupOpenImagesDialog()
 {
 	QStringList filenames;
-	auto settings = FractoriumSettings::Instance();
+	const auto settings = FractoriumSettings::Instance();
 #ifndef __APPLE__
 
 	if (!m_FileDialog)
@@ -547,19 +547,19 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 
 		if (!filenames.empty())
 		{
-			auto path = QFileInfo(filenames[0]).canonicalPath();
+			const auto path = QFileInfo(filenames[0]).canonicalPath();
 			m_FileDialog->setDirectory(path);
 			settings->OpenPaletteImageFolder(path);
 		}
 	}
 
 #else
-	auto filename = QFileDialog::getOpenFileName(this, tr("Open Image"), settings->OpenPaletteImageFolder(), tr("Image Files (*.jpg *.png)"));
+	const auto filename = QFileDialog::getOpenFileName(this, tr("Open Image"), settings->OpenPaletteImageFolder(), tr("Image Files (*.jpg *.png)"));
 
 	if (filename.size() > 0)
 	{
 		filenames.append(filename);
-		auto path = QFileInfo(filenames[0]).canonicalPath();
+		const auto path = QFileInfo(filenames[0]).canonicalPath();
 		settings->OpenPaletteImageFolder(path);
 	}
 
@@ -574,9 +574,9 @@ QStringList PaletteEditor::SetupOpenImagesDialog()
 /// <param name="color">The color to assign to the new arrow</param>
 void PaletteEditor::AddArrow(const QColor& color)
 {
-	auto count = std::min<int>(std::abs(256 - m_GradientColorView->ArrowCount()), ui->ArrowsSpinBox->value());
+	const auto count = std::min<int>(std::abs(256 - m_GradientColorView->ArrowCount()), ui->ArrowsSpinBox->value());
 
-	for (int i = 0; i < count; i++)
+	for (auto i = 0; i < count; i++)
 	{
 		m_GradientColorView->AddArrow(color);
 
@@ -594,18 +594,18 @@ void PaletteEditor::AddArrow(const QColor& color)
 map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filename, int numPoints)
 {
 	map<float, GradientArrow> colors;
-	QTime time = QTime::currentTime();
+	const auto time = QTime::currentTime();
 	qsrand((uint)time.msec());
-	QImage image(filename);
+	const QImage image(filename);
 	const qreal gSize = 512;
 	float off = 0.0f, inc = 1.0f / std::max(1, numPoints - 1);
 	QLinearGradient grad(QPoint(0, 0), QPoint(gSize, 1));
 
-	for (int i = 0; i < numPoints; i++)
+	for (auto i = 0; i < numPoints; i++)
 	{
-		int x = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(image.width());
-		int y = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(image.height());
-		QRgb rgb = image.pixel(x, y);
+		const auto x = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(image.width());
+		const auto y = QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRand(image.height());
+		const auto rgb = image.pixel(x, y);
 		GradientArrow arrow;
 		arrow.Color(QColor::fromRgb(rgb));
 		arrow.Focus(i == 0);
@@ -621,7 +621,7 @@ map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filena
 /// </summary>
 void PaletteEditor::EnablePaletteFileControls()
 {
-	bool b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
+	const auto b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
 	ui->DeletePaletteButton->setEnabled(b);
 	ui->CopyPaletteFileButton->setEnabled(b);
 	ui->AppendPaletteButton->setEnabled(b);
@@ -633,8 +633,8 @@ void PaletteEditor::EnablePaletteFileControls()
 /// </summary>
 void PaletteEditor::EnablePaletteControls()
 {
-	bool b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
-	auto& pal = GetPalette(256);
+	const auto b = IsCurrentPaletteAndFileEditable();//Both the file and the current palette must be editable.
+	const auto& pal = GetPalette(256);
 	ui->DeletePaletteButton->setEnabled(b);
 	ui->CopyPaletteFileButton->setEnabled(b);
 	ui->AppendPaletteButton->setEnabled(b);

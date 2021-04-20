@@ -12,6 +12,7 @@ QTimer DoubleSpinBox::s_Timer;
 /// <param name="p">The parent widget. Default: nullptr.</param>
 /// <param name="height">The height of the spin box. Default: 16.</param>
 /// <param name="step">The step used to increment/decrement the spin box when using the mouse wheel. Default: 0.05.</param>
+/// <param name="clearSel">True to clear the selection inside the spin box when changing values, else leave the text selected. Default: true.</param>
 DoubleSpinBox::DoubleSpinBox(QWidget* p, int h, double step, bool clearSel)
 	: QDoubleSpinBox(p)
 {

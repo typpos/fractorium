@@ -223,8 +223,8 @@ void Affine2D<T>::ScaleXY(T amount)
 template <typename T>
 void Affine2D<T>::Rotate(T rad)
 {
-	m4T origMat4 = ToMat4ColMajor(true);//Must center and use column major for glm to work.
-	m4T newMat4 = glm::rotate(origMat4, rad, v3T(0, 0, 1));//Assuming only rotating around z.
+	const m4T origMat4 = ToMat4ColMajor(true);//Must center and use column major for glm to work.
+	const m4T newMat4 = glm::rotate(origMat4, rad, v3T(0, 0, 1));//Assuming only rotating around z.
 	A(newMat4[0][0]);//Use direct assignments instead of constructor to skip assigning C and F.
 	B(newMat4[0][1]);
 	D(newMat4[1][0]);
@@ -234,8 +234,8 @@ void Affine2D<T>::Rotate(T rad)
 template <typename T>
 void Affine2D<T>::RotateTrans(T rad)
 {
-	m4T origMat4 = TransToMat4ColMajor();//Only put translation in this matrix.
-	m4T newMat4 = glm::rotate(origMat4, rad, v3T(0, 0, 1));//Assuming only rotating around z.
+	const m4T origMat4 = TransToMat4ColMajor();//Only put translation in this matrix.
+	const m4T newMat4 = glm::rotate(origMat4, rad, v3T(0, 0, 1));//Assuming only rotating around z.
 	C(newMat4[0][3]);//Use direct assignments instead of constructor to skip assigning A, B, D, E.
 	F(newMat4[1][3]);
 }
@@ -257,7 +257,7 @@ void Affine2D<T>::Translate(const v2T& v)
 template <typename T>
 void Affine2D<T>::RotateScaleXTo(const v2T& v)
 {
-	Affine2D<T> rs = CalcRotateScale(X(), v);
+	const Affine2D<T> rs = CalcRotateScale(X(), v);
 	X(rs.TransformNormal(X()));
 	Y(rs.TransformNormal(Y()));
 }
@@ -269,7 +269,7 @@ void Affine2D<T>::RotateScaleXTo(const v2T& v)
 template <typename T>
 void Affine2D<T>::RotateScaleYTo(const v2T& v)
 {
-	Affine2D<T> rs = CalcRotateScale(Y(), v);
+	const Affine2D<T> rs = CalcRotateScale(Y(), v);
 	X(rs.TransformNormal(X()));
 	Y(rs.TransformNormal(Y()));
 }
@@ -281,7 +281,7 @@ void Affine2D<T>::RotateScaleYTo(const v2T& v)
 template <typename T>
 Affine2D<T> Affine2D<T>::Inverse() const
 {
-	T det = A() * E() - D() * B();
+	const T det = A() * E() - D() * B();
 	return Affine2D<T>(E() / det, -D() / det,
 					   -B() / det,  A() / det,
 					   (F() * B() - C() * E()) / det, (C() * D() - F() * A()) / det);
@@ -341,10 +341,10 @@ typename m2T Affine2D<T>::ToMat2RowMajor() const
 template <typename T>
 typename m4T Affine2D<T>::ToMat4ColMajor(bool center) const
 {
-	m4T mat(A(), B(), 0, center ? 0 : C(), //Col0...
-			D(), E(), 0, center ? 0 : F(), //1
-			0,   0, 1,			    0, //2
-			0,   0, 0,			    1);//3
+	const m4T mat(A(), B(), 0, center ? 0 : C(), //Col0...
+				  D(), E(), 0, center ? 0 : F(), //1
+				  0,   0, 1,			    0, //2
+				  0,   0, 0,			    1);//3
 	return mat;
 }
 
@@ -356,20 +356,20 @@ typename m4T Affine2D<T>::ToMat4ColMajor(bool center) const
 template <typename T>
 typename m4T Affine2D<T>::ToMat4RowMajor(bool center) const
 {
-	m4T mat(A(), D(), 0, 0,
-			B(), E(), 0, 0,
-			0,   0, 1, 0,
-			center ? 0 : C(), center ? 0 : F(), 0, 1);
+	const m4T mat(A(), D(), 0, 0,
+				  B(), E(), 0, 0,
+				  0,   0, 1, 0,
+				  center ? 0 : C(), center ? 0 : F(), 0, 1);
 	return mat;
 }
 
 template <typename T>
 typename m4T Affine2D<T>::TransToMat4ColMajor() const
 {
-	m4T mat(1, 0, 0, C(), //Col0...
-			0, 1, 0, F(), //1
-			0, 0, 1, 0, //2
-			0, 0, 0, 1);//3
+	const m4T mat(1, 0, 0, C(), //Col0...
+				  0, 1, 0, F(), //1
+				  0, 0, 1, 0, //2
+				  0, 0, 0, 1);//3
 	return mat;
 }
 
@@ -436,7 +436,7 @@ Affine2D<T> Affine2D<T>::CalcRotateScale(const v2T& from, const v2T& to)
 template <typename T>
 void Affine2D<T>::CalcRSAC(const v2T& from, const v2T& to, T& a, T& c)
 {
-	T lsq = from.x * from.x + from.y * from.y;
+	const T lsq = from.x * from.x + from.y * from.y;
 	a = (from.y * to.y + from.x * to.x) / lsq;
 	c = (from.x * to.y - from.y * to.x) / lsq;
 }

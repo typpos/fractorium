@@ -47,7 +47,7 @@ public:
 	/// <param name="height">The height of the image in pixels</param>
 	void SetImage(vector<byte>& v, uint width, uint height)
 	{
-		int size = 64;
+		const auto size = 64;
 		m_Image = QImage(width, height, QImage::Format_RGBA8888);
 		memcpy(m_Image.scanLine(0), v.data(), SizeOf(v));//Memcpy the data in.
 		m_Pixmap = QPixmap::fromImage(m_Image).scaled(QSize(size, size), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);//Create a QPixmap out of the QImage, scaled to size.

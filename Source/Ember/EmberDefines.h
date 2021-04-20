@@ -37,7 +37,7 @@ static void sincos(float x, float* s, float* c)
 
 namespace EmberNs
 {
-#define EMBER_VERSION "21.21.4.1"
+#define EMBER_VERSION "22.21.4.2"
 //#define FLAM3_COMPAT 1//Uncomment this if you want full compatibility with flam3 regarding some of the trig-based variations in Variations01.h
 #define EPS6 T(1e-6)
 #define EPS std::numeric_limits<T>::epsilon()//Apoplugin.h uses -20, but it's more mathematically correct to do it this way.
@@ -46,12 +46,12 @@ namespace EmberNs
 #define DE_THRESH 100
 #define DEG_2_RAD (M_PI / 180)
 #define RAD_2_DEG (180 / M_PI)
-#define DEG_2_RAD_T (T(M_PI) / T(180))
-#define RAD_2_DEG_T (T(180) / T(M_PI))
-#define M_2PI (T(M_PI * 2))
-#define M_3PI (T(M_PI * 3))
-#define M_PI2 (T(M_PI_2))
-#define M_PI4 (T(M_PI_4))
+#define DEG_2_RAD_T (T{M_PI} / T{180})
+#define RAD_2_DEG_T (T{180} / T{M_PI})
+#define M_2PI (T{M_PI * 2})
+#define M_3PI (T{M_PI * 3})
+#define M_PI2 (T{M_PI_2})
+#define M_PI4 (T{M_PI_4})
 #define M_SQRT3 T(1.7320508075688772935274463415059)
 #define M_SQRT3_2 T(0.86602540378443864676372317075294)
 #define M_SQRT3_3 T(0.57735026918962576450914878050196)

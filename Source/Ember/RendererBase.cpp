@@ -174,7 +174,7 @@ bool RendererBase::RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec)
 bool RendererBase::PrepFinalAccumVector(vector<v4F>& pixels)
 {
 	EnterResize();
-	size_t size = FinalDimensions();
+	const auto size = FinalDimensions();
 
 	if (m_ReclaimOnResize)
 	{
@@ -264,8 +264,8 @@ size_t		   RendererBase::FinalBufferSize()			   const { return FinalRowSize() * 
 size_t		   RendererBase::PixelSize()				   const { return NumChannels() * BytesPerChannel(); }
 size_t		   RendererBase::GutterWidth()				   const { return m_GutterWidth; }
 size_t		   RendererBase::DensityFilterOffset()		   const { return m_DensityFilterOffset; }
-size_t         RendererBase::TotalIterCount(size_t strips) const { return size_t(size_t(Round(ScaledQuality())) * FinalRasW() * FinalRasH() * strips); }//Use Round() because there can be some roundoff error when interpolating.
-size_t         RendererBase::ItersPerTemporalSample()	   const { return size_t(ceil(double(TotalIterCount(1)) / double(TemporalSamples()))); }//Temporal samples is used with animation, which doesn't support strips, so pass 1.
+size_t         RendererBase::TotalIterCount(size_t strips) const { return static_cast<size_t>(static_cast<size_t>(Round(ScaledQuality())) * FinalRasW() * FinalRasH() * strips); }//Use Round() because there can be some roundoff error when interpolating.
+size_t         RendererBase::ItersPerTemporalSample()	   const { return static_cast<size_t>(std::ceil(static_cast<double>(TotalIterCount(1)) / static_cast<double>(TemporalSamples()))); }//Temporal samples is used with animation, which doesn't support strips, so pass 1.
 eProcessState  RendererBase::ProcessState()				   const { return m_ProcessState; }
 eProcessAction RendererBase::ProcessAction()			   const { return m_ProcessAction; }
 EmberStats     RendererBase::Stats()					   const { return m_Stats; }

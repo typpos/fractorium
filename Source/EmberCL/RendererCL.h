@@ -156,30 +156,30 @@ public:
 	virtual bool ClearFinal();
 
 	//Public virtual functions overridden from Renderer or RendererBase.
-	virtual size_t MemoryAvailable() override;
-	virtual bool Ok() const override;
-	virtual size_t SubBatchSize() const override;
-	virtual size_t ThreadCount() const override;
-	virtual bool CreateDEFilter(bool& newAlloc) override;
-	virtual bool CreateSpatialFilter(bool& newAlloc) override;
-	virtual eRendererType RendererType() const override;
-	virtual bool Shared() const override;
-	virtual void ClearErrorReport() override;
-	virtual string ErrorReportString() override;
-	virtual vector<string> ErrorReport() override;
-	virtual bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec) override;
-	virtual bool AnyNvidia() const override;
+	size_t MemoryAvailable() override;
+	bool Ok() const override;
+	size_t SubBatchSize() const override;
+	size_t ThreadCount() const override;
+	bool CreateDEFilter(bool& newAlloc) override;
+	bool CreateSpatialFilter(bool& newAlloc) override;
+	eRendererType RendererType() const override;
+	bool Shared() const override;
+	void ClearErrorReport() override;
+	string ErrorReportString() override;
+	vector<string> ErrorReport() override;
+	bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec) override;
+	bool AnyNvidia() const override;
 
 #ifndef TEST_CL
 protected:
 #endif
 	//Protected virtual functions overridden from Renderer.
-	virtual bool Alloc(bool histOnly = false) override;
-	virtual bool ResetBuckets(bool resetHist = true, bool resetAccum = true) override;
-	virtual eRenderStatus LogScaleDensityFilter(bool forceOutput = false) override;
-	virtual eRenderStatus GaussianDensityFilter() override;
-	virtual eRenderStatus AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset) override;
-	virtual EmberStats Iterate(size_t iterCount, size_t temporalSample) override;
+	bool Alloc(bool histOnly = false) override;
+	bool ResetBuckets(bool resetHist = true, bool resetAccum = true) override;
+	eRenderStatus LogScaleDensityFilter(bool forceOutput = false) override;
+	eRenderStatus GaussianDensityFilter() override;
+	eRenderStatus AccumulatorToFinalImage(vector<v4F>& pixels, size_t finalOffset) override;
+	EmberStats Iterate(size_t iterCount, size_t temporalSample) override;
 
 #ifndef TEST_CL
 private:

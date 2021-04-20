@@ -120,7 +120,7 @@ protected:
 	/// <param name="painter">Unused and just passed to QGraphicsEllipseItem::paint()</param>
 	/// <param name="option">Drawing options used which will have the QStyle::State_Selected flag unset</param>
 	/// <param name="widget">Unused and just passed to QGraphicsEllipseItem::paint()</param>
-	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
+	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
 	{
 		QStyleOptionGraphicsItem myOption(*option);
 		myOption.state &= ~QStyle::State_Selected;
@@ -134,13 +134,13 @@ protected:
 	/// <param name="change">Action is only taken if this value equals ItemPositionChange</param>
 	/// <param name="value">The new position. This will be clamped to the scene rect.</param>
 	/// <returns>The new position</returns>
-	virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override
+	QVariant itemChange(GraphicsItemChange change, const QVariant& value) override
 	{
 		if ((change == ItemPositionChange) && scene())
 		{
 			//Value is the new position.
-			QPointF newPos = value.toPointF();
-			QRectF rect = scene()->sceneRect();
+			auto newPos = value.toPointF();
+			const auto rect = scene()->sceneRect();
 
 			if (!rect.contains(newPos))
 			{

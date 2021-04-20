@@ -39,7 +39,7 @@ public:
 	QColor Color() const;
 
 protected:
-	virtual void paintEvent(QPaintEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
 
 private:
 	QPen m_Pen;

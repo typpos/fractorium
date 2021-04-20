@@ -278,12 +278,12 @@ public:
 	/// <param name="freq">Frequency 1 - 10</param>
 	void MakeAdjustedPalette(Palette<T>& palette, int rot, T hue, T sat, T bright, T cont, uint blur, uint freq)
 	{
-		T rgb[3], hsv[3];
+		T rgb[3] {}, hsv[3] {};
 		palette.m_Entries.resize(Size());
 
 		if (freq > 1)
 		{
-			size_t n = Size() / freq;
+			const size_t n = Size() / freq;
 
 			for (size_t j = 0; j <= freq; j++)
 			{

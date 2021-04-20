@@ -178,7 +178,7 @@ public:
 	EmberOptionEntry(eOptionUse optUsage, eOptionIDs optId, const CharT* arg, T defaultVal, ESOArgType argType, const string& docString)
 	{
 		m_OptionUse = optUsage;
-		m_Option.nId = int(optId);
+		m_Option.nId = static_cast<int>(optId);
 		m_Option.pszArg = arg;
 		m_Option.nArgType = argType;
 		m_DocString = docString;
@@ -478,11 +478,11 @@ public:
 		//Process args.
 		while (args.Next())
 		{
-			ESOError errorCode = args.LastError();
+			const auto errorCode = args.LastError();
 
 			if (errorCode == SO_SUCCESS)
 			{
-				eOptionIDs e = eOptionIDs(args.OptionId());
+				const auto e = eOptionIDs(args.OptionId());
 
 				switch (e)
 				{
@@ -656,15 +656,15 @@ public:
 		CSimpleOpt::SOption endOption = SO_END_OF_OPTIONS;
 		entries.reserve(75);
 
-		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) entries.push_back(entry->m_Option);
+		for (auto entry : m_BoolArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) entries.push_back(entry->m_Option);
 
-		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) entries.push_back(entry->m_Option);
+		for (auto entry : m_IntArgs)    if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) entries.push_back(entry->m_Option);
 
-		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) entries.push_back(entry->m_Option);
+		for (auto entry : m_UintArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) entries.push_back(entry->m_Option);
 
-		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) entries.push_back(entry->m_Option);
+		for (auto entry : m_DoubleArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) entries.push_back(entry->m_Option);
 
-		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) entries.push_back(entry->m_Option);
+		for (auto entry : m_StringArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) entries.push_back(entry->m_Option);
 
 		entries.push_back(endOption);
 		return entries;
@@ -679,15 +679,15 @@ public:
 	{
 		ostringstream os;
 
-		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
+		for (auto entry : m_BoolArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
+		for (auto entry : m_IntArgs)    if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
+		for (auto entry : m_UintArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
+		for (auto entry : m_DoubleArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_DocString << "\n";
 
-		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_DocString << "\n";
+		for (auto entry : m_StringArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_DocString << "\n";
 
 		return os.str();
 	}
@@ -702,15 +702,15 @@ public:
 		ostringstream os;
 		os << std::boolalpha;
 
-		for (auto entry : m_BoolArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_BoolArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_IntArgs)    if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_IntArgs)    if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_UintArgs)   if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_UintArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_DoubleArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_DoubleArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
-		for (auto entry : m_StringArgs) if (et(entry->m_OptionUse) & et(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_StringArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
 
 		return os.str();
 	}

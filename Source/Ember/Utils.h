@@ -954,20 +954,20 @@ static string Trim(const string& str, char ch = ' ')
 /// <returns>The vector containing the split tokens</returns>
 static vector<std::string> Split(const string& str, const string& del, bool removeEmpty = false)
 {
-	int current = 0;
-	int next = -1;
+	size_t current = 0;
+	size_t next = std::numeric_limits<size_t>::max();
 	vector<string> vec;
 
 	do
 	{
 		current = next + 1;
-		next = int(str.find_first_of(del, current));
+		next = str.find_first_of(del, current);
 		string ent(Trim(str.substr(current, next - current)));
 
 		if (!removeEmpty || ent.length() > 0)
 			vec.push_back(ent);
 	}
-	while (next != int(string::npos));
+	while (next != string::npos);
 
 	return vec;
 }

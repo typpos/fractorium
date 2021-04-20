@@ -131,7 +131,7 @@ uint DEOpenCLKernelCreator::MaxDEFilterSize() { return 9; }//The true max would 
 /// <returns>The maximum filter radius allowed</returns>
 double DEOpenCLKernelCreator::SolveMaxDERad(double desiredFilterSize, double ss)
 {
-	uint finalFilterSize = uint((ceil(desiredFilterSize) * ss) + (ss - 1.0));
+	auto finalFilterSize = static_cast<uint>((ceil(desiredFilterSize) * ss) + (ss - 1.0));
 
 	//Return the desired size if the final size of it will fit.
 	if (finalFilterSize <= MaxDEFilterSize())
@@ -149,7 +149,7 @@ double DEOpenCLKernelCreator::SolveMaxDERad(double desiredFilterSize, double ss)
 /// <returns>The maximum filter box size allowed</returns>
 uint DEOpenCLKernelCreator::SolveMaxBoxSize(uint localMem)
 {
-	return uint(std::floor(std::sqrt(Floor(localMem / 16.0))));//Divide by 16 because each element is float4.
+	return static_cast<uint>(std::floor(std::sqrt(Floor(localMem / 16.0))));//Divide by 16 because each element is float4.
 }
 
 /// <summary>

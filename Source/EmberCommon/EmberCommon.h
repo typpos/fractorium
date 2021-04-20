@@ -218,9 +218,9 @@ static void Rgba32ToRgb8(v4F* rgba, byte* rgb, size_t width, size_t height)
 {
 	for (size_t i = 0, j = 0; i < (width * height); i++)
 	{
-		rgb[j++] = byte(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = byte(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = byte(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
 	}
 }
 
@@ -237,10 +237,10 @@ static void Rgba32ToRgba8(v4F* rgba, byte* rgb, size_t width, size_t height, boo
 {
 	for (size_t i = 0, j = 0; i < (width * height); i++)
 	{
-		rgb[j++] = byte(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = byte(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = byte(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = doAlpha ? byte(Clamp<float>(rgba[i].a * 255.0f, 0.0f, 255.0f)) : 255;
+		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
+		rgb[j++] = doAlpha ? static_cast<byte>(Clamp<float>(rgba[i].a * 255.0f, 0.0f, 255.0f)) : 255;
 	}
 }
 
@@ -257,10 +257,10 @@ static void Rgba32ToRgba16(v4F* rgba, glm::uint16* rgb, size_t width, size_t hei
 {
 	for (size_t i = 0, j = 0; i < (width * height); i++)
 	{
-		rgb[j++] = glm::uint16(Clamp<float>(rgba[i].r * 65535.0f, 0.0f, 65535.0f));
-		rgb[j++] = glm::uint16(Clamp<float>(rgba[i].g * 65535.0f, 0.0f, 65535.0f));
-		rgb[j++] = glm::uint16(Clamp<float>(rgba[i].b * 65535.0f, 0.0f, 65535.0f));
-		rgb[j++] = doAlpha ? glm::uint16(Clamp<float>(rgba[i].a * 65535.0f, 0.0f, 65535.0f)) : glm::uint16(65535);
+		rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].r * 65535.0f, 0.0f, 65535.0f));
+		rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].g * 65535.0f, 0.0f, 65535.0f));
+		rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].b * 65535.0f, 0.0f, 65535.0f));
+		rgb[j++] = doAlpha ? static_cast<glm::uint16>(Clamp<float>(rgba[i].a * 65535.0f, 0.0f, 65535.0f)) : glm::uint16{ 65535 };
 	}
 }
 
@@ -385,8 +385,6 @@ static string MakeAnimFilename(const string& path, const string& prefix, const s
 /// <returns>The number of strips to use</returns>
 static uint CalcStrips(double memRequired, double memAvailable, double useMem)
 {
-	uint strips;
-
 	if (useMem > 0)
 		memAvailable = useMem;
 	else
@@ -395,8 +393,7 @@ static uint CalcStrips(double memRequired, double memAvailable, double useMem)
 	if (memAvailable >= memRequired)
 		return 1;
 
-	strips = uint(ceil(memRequired / memAvailable));
-	return strips;
+	return static_cast<uint>(ceil(memRequired / memAvailable));
 }
 
 /// <summary>

@@ -339,15 +339,15 @@ void RendererCL<T, bucketT>::InitStateVec()
 {
 	size_t count = 0, i = 0, j = 0, k = 0;
 
-	while (auto xform = m_Ember.GetTotalXform(i++))
+	while (const auto xform = m_Ember.GetTotalXform(i++))
 		for (j = 0; j < xform->TotalVariationCount(); j++)
-			if (auto var = xform->GetVariation(j))
+			if (const auto var = xform->GetVariation(j))
 				count += var->StateParamCount() * sizeof(T);
 
 	//Round to 16 and resize the buffer to be copied to OpenCL buffer here.
-	auto igkc = IterGridKernelCount();
+	const auto igkc = IterGridKernelCount();
 	size_t index = 0, count16 = ((count / 16) * 16) + (count % 16 > 0 ? 16 : 0);
-	auto elcount = count16 / sizeof(T);
+	const auto elcount = count16 / sizeof(T);
 	m_VarStates.resize(igkc * elcount);
 
 	if (count16)
@@ -357,9 +357,9 @@ void RendererCL<T, bucketT>::InitStateVec()
 			i = 0;
 			index = k * elcount;
 
-			while (auto xform = m_Ember.GetTotalXform(i++))
+			while (const auto xform = m_Ember.GetTotalXform(i++))
 				for (j = 0; j < xform->TotalVariationCount(); j++)
-					if (auto var = xform->GetVariation(j))
+					if (const auto var = xform->GetVariation(j))
 						var->InitStateVars(m_VarStates.data(), index);
 		}
 	}
@@ -447,7 +447,7 @@ bool RendererCL<T, bucketT>::ClearFinal()
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		uint index = wrapper.FindImageIndex(m_FinalImageName, wrapper.Shared());
+		const auto index = wrapper.FindImageIndex(m_FinalImageName, wrapper.Shared());
 
 		if (this->PrepFinalAccumVector(v))
 		{
@@ -626,7 +626,7 @@ vector<string> RendererCL<T, bucketT>::ErrorReport()
 
 	for (auto& device : m_Devices)
 	{
-		auto s = device->ErrorReport();
+		const auto s = device->ErrorReport();
 		ours.insert(ours.end(), s.begin(), s.end());
 	}
 
@@ -1148,25 +1148,25 @@ bool RendererCL<T, bucketT>::RunIter(size_t iterCount, size_t temporalSample, si
 
 			if (m_Callback && !dev)//Will only do callback on the first device, however it will report the progress of all devices.
 			{
-				double percent = 100.0 *
-								 double
-								 (
-									 double
+				const auto percent = 100.0 *
+									 static_cast<double>
 									 (
-										 double
+										 static_cast<double>
 										 (
-											 double(m_LastIter + atomItersRan.load()) / double(ItersPerTemporalSample())
-										 ) + temporalSample
-									 ) / double(TemporalSamples())
-								 );
-				double percentDiff = percent - m_LastIterPercent;
-				double toc = m_ProgressTimer.Toc();
+											 static_cast<double>
+											 (
+												 static_cast<double>(m_LastIter + atomItersRan.load()) / static_cast<double>(ItersPerTemporalSample())
+											 ) + temporalSample
+										 ) / static_cast<double>(TemporalSamples())
+									 );
+				const auto percentDiff = percent - m_LastIterPercent;
+				const auto toc = m_ProgressTimer.Toc();
 
 				if (percentDiff >= 10 || (toc > 1000 && percentDiff >= 1))//Call callback function if either 10% has passed, or one second (and 1%).
 				{
-					auto startingpercent = 100.0 * (m_LastIter / double(ItersPerTemporalSample()));//This is done to support incremental renders, starting from the percentage it left off on.
-					auto currentpercent = percent - startingpercent;//Current percent in terms of starting percentage. So starting at 50% and progressing 5% will give a value of 5%, not 55%.
-					auto etaMs = currentpercent == 0 ? 0 : (((100.0 - startingpercent) - currentpercent) / currentpercent) * m_RenderTimer.Toc();//Subtract startingpercent from 100% so that it's properly scaled, meaning rendering from 50% - 100% will be treated as 0% - 100%.
+					const auto startingpercent = 100.0 * (m_LastIter / static_cast<double>(ItersPerTemporalSample()));//This is done to support incremental renders, starting from the percentage it left off on.
+					const auto currentpercent = percent - startingpercent;//Current percent in terms of starting percentage. So starting at 50% and progressing 5% will give a value of 5%, not 55%.
+					const auto etaMs = currentpercent == 0 ? 0 : (((100.0 - startingpercent) - currentpercent) / currentpercent) * m_RenderTimer.Toc();//Subtract startingpercent from 100% so that it's properly scaled, meaning rendering from 50% - 100% will be treated as 0% - 100%.
 
 					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 0, etaMs))
 						Abort();
@@ -1229,7 +1229,7 @@ eRenderStatus RendererCL<T, bucketT>::RunLogScaleFilter()
 	if (b)
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		int kernelIndex = wrapper.FindKernelIndex(m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint());
+		const auto kernelIndex = wrapper.FindKernelIndex(m_DEOpenCLKernelCreator.LogScaleAssignDEEntryPoint());
 
 		if (kernelIndex != -1)
 		{
@@ -1305,10 +1305,10 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 		//that are far enough apart such that their filters do not overlap.
 		//Do the latter.
 		//Gap is in terms of blocks and specifies how many blocks must separate two blocks running at the same time.
-		uint gapW = uint(ceil(fw2 / blockSizeW));
-		uint chunkSizeW = gapW + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap to the right of it.
-		uint gapH = uint(ceil(fw2 / blockSizeH));
-		uint chunkSizeH = gapH + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap below it.
+		const auto gapW = static_cast<uint>(ceil(fw2 / blockSizeW));
+		const auto chunkSizeW = gapW + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap to the right of it.
+		const auto gapH = static_cast<uint>(ceil(fw2 / blockSizeH));
+		const auto chunkSizeH = gapH + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap below it.
 		double totalChunks = chunkSizeW * chunkSizeH;
 
 		if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { ErrorStr(loc, "Writing DE filter parameters buffer failed", m_Devices[0].get()); }
@@ -1364,8 +1364,8 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 
 				if (b && m_Callback)
 				{
-					double percent = (double((rowChunkPass * chunkSizeW) + (colChunkPass + 1)) / totalChunks) * 100.0;
-					double etaMs = ((100.0 - percent) / percent) * t.Toc();
+					const auto percent = (static_cast<double>((rowChunkPass * chunkSizeW) + (colChunkPass + 1)) / totalChunks) * 100.0;
+					const auto etaMs = ((100.0 - percent) / percent) * t.Toc();
 
 					if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, percent, 1, etaMs))
 						Abort();
@@ -1502,7 +1502,7 @@ bool RendererCL<T, bucketT>::ClearBuffer(size_t device, const string& bufferName
 	if (device < m_Devices.size())
 	{
 		auto& wrapper = m_Devices[device]->m_Wrapper;
-		int kernelIndex = wrapper.FindKernelIndex(m_IterOpenCLKernelCreator.ZeroizeEntryPoint());
+		const auto kernelIndex = wrapper.FindKernelIndex(m_IterOpenCLKernelCreator.ZeroizeEntryPoint());
 		cl_uint argIndex = 0;
 		static std::string loc = __FUNCTION__;
 
@@ -1604,7 +1604,7 @@ int RendererCL<T, bucketT>::MakeAndGetDensityFilterProgram(size_t ss, uint filte
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		auto& deEntryPoint = m_DEOpenCLKernelCreator.GaussianDEEntryPoint(ss, filterWidth);
+		const auto& deEntryPoint = m_DEOpenCLKernelCreator.GaussianDEEntryPoint(ss, filterWidth);
 		const char* loc = __FUNCTION__;
 
 		if ((kernelIndex = wrapper.FindKernelIndex(deEntryPoint)) == -1)//Has not been built yet.
@@ -1633,7 +1633,7 @@ int RendererCL<T, bucketT>::MakeAndGetFinalAccumProgram()
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		auto& finalAccumEntryPoint = m_FinalAccumOpenCLKernelCreator.FinalAccumEntryPoint(EarlyClip());
+		const auto& finalAccumEntryPoint = m_FinalAccumOpenCLKernelCreator.FinalAccumEntryPoint(EarlyClip());
 		const char* loc = __FUNCTION__;
 
 		if ((kernelIndex = wrapper.FindKernelIndex(finalAccumEntryPoint)) == -1)//Has not been built yet.
@@ -1660,13 +1660,13 @@ int RendererCL<T, bucketT>::MakeAndGetGammaCorrectionProgram()
 	if (!m_Devices.empty())
 	{
 		auto& wrapper = m_Devices[0]->m_Wrapper;
-		auto& gammaEntryPoint = m_FinalAccumOpenCLKernelCreator.GammaCorrectionEntryPoint();
-		int kernelIndex = wrapper.FindKernelIndex(gammaEntryPoint);
+		const auto& gammaEntryPoint = m_FinalAccumOpenCLKernelCreator.GammaCorrectionEntryPoint();
+		auto kernelIndex = wrapper.FindKernelIndex(gammaEntryPoint);
 		static std::string loc = __FUNCTION__;
 
 		if (kernelIndex == -1)//Has not been built yet.
 		{
-			auto& kernel = m_FinalAccumOpenCLKernelCreator.GammaCorrectionKernel();
+			const auto& kernel = m_FinalAccumOpenCLKernelCreator.GammaCorrectionKernel();
 			bool b = wrapper.AddProgram(gammaEntryPoint, kernel, gammaEntryPoint, m_DoublePrecision);
 
 			if (b)
@@ -1689,8 +1689,8 @@ int RendererCL<T, bucketT>::MakeAndGetGammaCorrectionProgram()
 template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::CreateHostBuffer()
 {
-	bool b = true;
-	size_t size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
+	auto b = true;
+	const auto size = SuperSize() * sizeof(v4bT);//Size of histogram and density filter buffer.
 	static std::string loc = __FUNCTION__;
 
 	if (b = Renderer<T, bucketT>::Alloc(true))//Allocate the histogram memory to point this HOST_PTR buffer to, other buffers not needed.
@@ -1717,15 +1717,15 @@ bool RendererCL<T, bucketT>::SumDeviceHist()
 	if (m_Devices.size() > 1)
 	{
 		//Timing t;
-		bool b = true;
+		auto b = true;
 		auto& wrapper = m_Devices[0]->m_Wrapper;
 		static std::string loc = __FUNCTION__;
-		size_t blockW = m_Devices[0]->Nvidia() ? 32 : 16;//Max work group size is 256 on AMD, which means 16x16.
-		size_t blockH = m_Devices[0]->Nvidia() ? 32 : 16;
+		const size_t blockW = m_Devices[0]->Nvidia() ? 32 : 16;//Max work group size is 256 on AMD, which means 16x16.
+		const size_t blockH = m_Devices[0]->Nvidia() ? 32 : 16;
 		size_t gridW = SuperRasW();
 		size_t gridH = SuperRasH();
 		OpenCLWrapper::MakeEvenGridDims(blockW, blockH, gridW, gridH);
-		int kernelIndex = wrapper.FindKernelIndex(m_IterOpenCLKernelCreator.SumHistEntryPoint());
+		const auto kernelIndex = wrapper.FindKernelIndex(m_IterOpenCLKernelCreator.SumHistEntryPoint());
 
 		if ((b = (kernelIndex != -1)))
 		{
@@ -1915,9 +1915,9 @@ void RendererCL<T, bucketT>::FillSeeds()
 {
 	if (!m_Devices.empty())
 	{
-		double start, delta = std::floor(double(std::numeric_limits<uint>::max()) / (IterGridKernelCount() * 2 * m_Devices.size()));
+		const auto delta = std::floor(double(std::numeric_limits<uint>::max()) / (IterGridKernelCount() * 2 * m_Devices.size()));
+		auto start = delta;
 		m_Seeds.resize(m_Devices.size());
-		start = delta;
 
 		for (size_t device = 0; device < m_Devices.size(); device++)
 		{
@@ -1944,11 +1944,11 @@ void RendererCL<T, bucketT>::FillSeeds()
 template <typename T, typename bucketT>
 std::string RendererCL<T, bucketT>::ErrorStr(const std::string& loc, const std::string& error, RendererClDevice* dev)
 {
-	std::string str = loc + "()"s + (dev ?
-									 "\n"s +
-									 dev->m_Wrapper.DeviceName() + "\nPlatform: " +
-									 std::to_string(dev->PlatformIndex()) + ", device: " + std::to_string(dev->DeviceIndex()) : "") + ", error:\n" +
-					  error + "\n";
+	const std::string str = loc + "()"s + (dev ?
+										   "\n"s +
+										   dev->m_Wrapper.DeviceName() + "\nPlatform: " +
+										   std::to_string(dev->PlatformIndex()) + ", device: " + std::to_string(dev->DeviceIndex()) : "") + ", error:\n" +
+							error + "\n";
 	AddToReport(str);
 	return str;
 }

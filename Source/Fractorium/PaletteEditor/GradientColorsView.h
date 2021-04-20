@@ -64,12 +64,12 @@ Q_SIGNALS:
 	void ColorIndexMove(size_t index, float value);
 
 protected:
-	virtual void paintEvent(QPaintEvent* e) override;
-	virtual void mousePressEvent(QMouseEvent* e) override;
-	virtual void mouseDoubleClickEvent(QMouseEvent* e) override;
-	virtual void mouseMoveEvent(QMouseEvent* e) override;
-	virtual void mouseReleaseEvent(QMouseEvent* e) override;
-	virtual void resizeEvent(QResizeEvent*) override;
+	void paintEvent(QPaintEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
+	void mouseDoubleClickEvent(QMouseEvent* e) override;
+	void mouseMoveEvent(QMouseEvent* e) override;
+	void mouseReleaseEvent(QMouseEvent* e) override;
+	void resizeEvent(QResizeEvent*) override;
 
 private:
 	int RectWidth();

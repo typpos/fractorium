@@ -55,21 +55,21 @@ public:
 	bool AssignIterator();
 
 	//Virtual processing functions overriden from RendererBase.
-	virtual void Prepare() override;
-	virtual void ComputeBounds() override;
-	virtual void ComputeQuality() override;
-	virtual void ComputeCamera() override;
-	virtual void SetEmber(const Ember<T>& ember, eProcessAction action = eProcessAction::FULL_RENDER, bool prep = false) override;
+	void Prepare() override;
+	void ComputeBounds() override;
+	void ComputeQuality() override;
+	void ComputeCamera() override;
+	void SetEmber(const Ember<T>& ember, eProcessAction action = eProcessAction::FULL_RENDER, bool prep = false) override;
 	template <typename C>
 	void SetEmber(const C& embers);
 	void MoveEmbers(vector<Ember<T>>& embers);
 	void SetExternalEmbersPointer(vector<Ember<T>>* embers);
-	virtual bool CreateDEFilter(bool& newAlloc) override;
-	virtual bool CreateSpatialFilter(bool& newAlloc) override;
-	virtual bool CreateTemporalFilter(bool& newAlloc) override;
-	virtual size_t HistBucketSize() const override { return sizeof(tvec4<bucketT, glm::defaultp>); }
-	virtual eRenderStatus Run(vector<v4F>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) override;
-	virtual EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool hexPalette = true) override;
+	bool CreateDEFilter(bool& newAlloc) override;
+	bool CreateSpatialFilter(bool& newAlloc) override;
+	bool CreateTemporalFilter(bool& newAlloc) override;
+	size_t HistBucketSize() const override { return sizeof(tvec4<bucketT, glm::defaultp>); }
+	eRenderStatus Run(vector<v4F>& finalImage, double time = 0, size_t subBatchCountOverride = 0, bool forceOutput = false, size_t finalOffset = 0) override;
+	EmberImageComments ImageComments(const EmberStats& stats, size_t printEditDepth = 0, bool hexPalette = true) override;
 
 protected:
 	//New virtual functions to be overridden in derived renderers that use the GPU, but not accessed outside.
@@ -100,12 +100,12 @@ public:
 	inline TemporalFilter<T>*             GetTemporalFilter();
 
 	//Virtual renderer properties overridden from RendererBase, getters only.
-	virtual double ScaledQuality()				   const override;
-	virtual double LowerLeftX(bool  gutter = true) const override;
-	virtual double LowerLeftY(bool  gutter = true) const override;
-	virtual double UpperRightX(bool gutter = true) const override;
-	virtual double UpperRightY(bool gutter = true) const override;
-	virtual DensityFilterBase* GetDensityFilter()        override;
+	double ScaledQuality()				   const override;
+	double LowerLeftX(bool  gutter = true) const override;
+	double LowerLeftY(bool  gutter = true) const override;
+	double UpperRightX(bool gutter = true) const override;
+	double UpperRightY(bool gutter = true) const override;
+	DensityFilterBase* GetDensityFilter()        override;
 
 	//Non-virtual ember wrappers, getters only.
 	inline bool                  XaosPresent()		   const;
@@ -135,11 +135,11 @@ public:
 	inline ePaletteMode          PaletteMode()         const;
 
 	//Virtual ember wrappers overridden from RendererBase, getters only.
-	virtual size_t TemporalSamples() const override;
-	virtual size_t FinalRasW()       const override;
-	virtual size_t FinalRasH()       const override;
-	virtual size_t SubBatchSize()    const override;
-	virtual size_t FuseCount()		 const override;
+	size_t TemporalSamples() const override;
+	size_t FinalRasW()       const override;
+	size_t FinalRasH()       const override;
+	size_t SubBatchSize()    const override;
+	size_t FuseCount()		 const override;
 
 	//Non-virtual iterator wrappers.
 	const byte* XformDistributions()		const;

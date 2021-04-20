@@ -32,11 +32,11 @@
 /// </summary>
 
 #ifndef __ISAAC64
-	typedef uint ISAAC_INT;
-	const ISAAC_INT GOLDEN_RATIO = ISAAC_INT(0x9e3779b9);
+typedef uint ISAAC_INT;
+const ISAAC_INT GOLDEN_RATIO = ISAAC_INT{ 0x9e3779b9 };
 #else
-	typedef size_t ISAAC_INT;
-	const ISAAC_INT GOLDEN_RATIO = ISAAC_INT(0x9e3779b97f4a7c13);
+typedef size_t ISAAC_INT;
+const ISAAC_INT GOLDEN_RATIO = ISAAC_INT{ 0x9e3779b97f4a7c13 };
 #endif
 
 namespace EmberNs
@@ -251,7 +251,7 @@ public:
 #ifdef ISAAC_FLAM3_DEBUG
 		return ((Rand() & 0xfffffff) - 0x7ffffff) / (floatType)0x7ffffff;
 #else
-		return Frand<floatType>(floatType(-1), floatType(1));
+		return Frand<floatType>(floatType { -1 }, floatType { 1 });
 #endif
 	}
 

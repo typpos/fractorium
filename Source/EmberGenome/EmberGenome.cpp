@@ -306,12 +306,12 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 		}
 	}
 
-	bool doMutate = opt.Mutate() != "";
-	bool doInter  = opt.Inter()  != "";
-	bool doRotate = opt.Rotate() != "";
-	bool doClone  = opt.Clone()  != "";
-	bool doCross0 = opt.Cross0() != "";
-	bool doCross1 = opt.Cross1() != "";
+	const auto doMutate = opt.Mutate() != "";
+	const auto doInter  = opt.Inter()  != "";
+	const auto doRotate = opt.Rotate() != "";
+	const auto doClone  = opt.Clone()  != "";
+	const auto doCross0 = opt.Cross0() != "";
+	const auto doCross1 = opt.Cross1() != "";
 	count += (doMutate ? 1 : 0);
 	count += (doInter  ? 1 : 0);
 	count += (doRotate ? 1 : 0);
@@ -483,14 +483,14 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 		frameCount = 0;
 		os.str("");
 		os << setfill('0') << setprecision(0) << fixed;
-		auto padding = opt.Padding() ? streamsize(opt.Padding()) : (streamsize(std::log10(opt.StartCount() + (((opt.LoopFrames() * opt.Loops()) + opt.InterpFrames()) * embers.size()))) + 1);
+		const auto padding = opt.Padding() ? streamsize(opt.Padding()) : (streamsize(std::log10(opt.StartCount() + (((opt.LoopFrames() * opt.Loops()) + opt.InterpFrames()) * embers.size()))) + 1);
 		t.Tic();
 
 		for (i = 0; i < embers.size(); i++)
 		{
 			if (opt.Loops() > 0)
 			{
-				size_t roundFrames = size_t(std::round(opt.LoopFrames() * opt.Loops()));
+				const auto roundFrames = static_cast<size_t>(std::round(opt.LoopFrames() * opt.Loops()));
 
 				for (frame = 0; frame < roundFrames; frame++)
 				{
@@ -504,7 +504,7 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 				//Rotate the next step and save in result, but do not print.
 				//result will be the starting point for the interp phase below.
 				frame = roundFrames;
-				blend = T(frame) / T(opt.LoopFrames());
+				blend = static_cast<T>(frame) / static_cast<T>(opt.LoopFrames());
 				tools.Spin(embers[i], pTemplate, result, opt.StartCount() + frameCount, blend, opt.CwLoops());//Do not increment frameCount here.
 				FormatName(result, os, padding);
 			}
@@ -517,7 +517,7 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 				for (frame = 0; frame < opt.InterpFrames(); frame++)
 				{
 					seqFlag = frame == 0 || (frame == opt.InterpFrames() - 1);
-					blend = frame / T(opt.InterpFrames());
+					blend = frame / static_cast<T>(opt.InterpFrames());
 					result.Clear();
 					tools.SpinInter(&embers[i], pTemplate, result, opt.StartCount() + frameCount++, seqFlag, blend, opt.InterpLoops(), opt.CwInterpLoops());
 					FormatName(result, os, padding);
@@ -548,8 +548,8 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 		}
 
 		frame = opt.Frame();
-		blend = frame / T(opt.InterpFrames());//Percentage between first and second flame to treat as the center flame.
-		spread = 1 / T(opt.InterpFrames());//Amount to move backward and forward from the center flame.
+		blend = frame / static_cast<T>(opt.InterpFrames());//Percentage between first and second flame to treat as the center flame.
+		spread = 1 / static_cast<T>(opt.InterpFrames());//Amount to move backward and forward from the center flame.
 
 		if (opt.Enclosed())
 			cout << "<pick version=\"EMBER-" << EmberVersion() << "\">\n";

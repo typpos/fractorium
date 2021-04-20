@@ -109,39 +109,40 @@ public:
 	virtual ~FinalRenderEmberController() { }
 
 	//Virtual functions overridden from FractoriumEmberControllerBase.
-	virtual void SetEmberFile(const EmberFile<float>& emberFile, bool move) override;
-	virtual void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
+	void SetEmberFile(const EmberFile<float>& emberFile, bool move) override;
+	void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
 #ifdef DO_DOUBLE
-	virtual void SetEmberFile(const EmberFile<double>& emberFile, bool move) override;
-	virtual void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
+	void SetEmberFile(const EmberFile<double>& emberFile, bool move) override;
+	void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 #endif
-	virtual void SetEmber(size_t index, bool verbatim) override;
-	virtual bool Render() override;
-	virtual bool BumpQualityRender(double d) override;
-	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
-	virtual int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
-	virtual size_t Index() const override { return m_Ember->m_Index; }
-	virtual uint SizeOfT() const override { return sizeof(T); }
+	void SetEmber(size_t index, bool verbatim) override;
+	void SaveCurrentAsXml(QString filename = "") override;
+	bool Render() override;
+	bool BumpQualityRender(double d) override;
+	bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
+	int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
+	size_t Index() const override { return m_Ember->m_Index; }
+	uint SizeOfT() const override { return sizeof(T); }
 
 	//Virtual functions overridden from FinalRenderEmberControllerBase.
-	virtual void SyncCurrentToGui() override;
-	virtual void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true) override;
-	virtual void SyncCurrentToSizeSpinners(bool scale, bool size, bool doWidth = true, bool doHeight = true) override;
-	virtual void ResetProgress(bool total = true)  override;
-	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory() override;
-	virtual double OriginalAspect() override { return double(m_Ember->m_OrigFinalRasW) / m_Ember->m_OrigFinalRasH; }
-	virtual QString Name() const override { return QString::fromStdString(m_Ember->m_Name); }
-	virtual QString ComposePath(const QString& name) override;
-	virtual QString SaveCurrentAgain() override;
-	virtual void CancelRender() override;
-	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) override;
+	void SyncCurrentToGui() override;
+	void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true) override;
+	void SyncCurrentToSizeSpinners(bool scale, bool size, bool doWidth = true, bool doHeight = true) override;
+	void ResetProgress(bool total = true)  override;
+	tuple<size_t, size_t, size_t> SyncAndComputeMemory() override;
+	double OriginalAspect() override { return double(m_Ember->m_OrigFinalRasW) / m_Ember->m_OrigFinalRasH; }
+	QString Name() const override { return QString::fromStdString(m_Ember->m_Name); }
+	QString ComposePath(const QString& name) override;
+	QString SaveCurrentAgain() override;
+	void CancelRender() override;
+	QString CheckMemory(const tuple<size_t, size_t, size_t>& p) override;
 
 	//Non Virtual functions.
 	EmberNs::Renderer<T, float>* FirstOrDefaultRenderer();
 
 protected:
-	virtual void Pause(bool pause) override;
-	virtual bool Paused() override;
+	void Pause(bool pause) override;
+	bool Paused() override;
 	void HandleFinishedProgress();
 	QString SaveCurrentRender(Ember<T>& ember);
 	QString SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
@@ -177,7 +178,7 @@ public:
 	{
 	}
 
-	virtual void PreviewRenderFunc(uint start, uint end) override;
+	void PreviewRenderFunc(uint start, uint end) override;
 
 private:
 	FinalRenderEmberController<T>* m_Controller;

@@ -22,10 +22,10 @@ public:
 	/// <param name="parent">The parent widget. Default: nullptr.</param>
 	explicit DoubleSpinBoxTableItemDelegate(DoubleSpinBox* spinBox, QObject* parent = nullptr)
 		: QItemDelegate(parent),
-		m_SpinBox(spinBox)
+		  m_SpinBox(spinBox)
 	{
 	}
-	
+
 	/// <summary>
 	/// Re-parent and return the DoubleSpinBox to display when the user clicks on a cell and it enters edit mode.
 	/// The re-parenting is done so that the DoubleSpinBox appears directly on top of the cell.
@@ -34,10 +34,9 @@ public:
 	/// <param name="option">Ignored</param>
 	/// <param name="index">Ignored</param>
 	/// <returns>The DoubleSpinBox member</returns>
-	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
 	{
 		m_SpinBox->setParent(parent);
-
 		return m_SpinBox;
 	}
 
@@ -46,7 +45,7 @@ public:
 	/// </summary>
 	/// <param name="editor">Ignored</param>
 	/// <param name="index">Ignored</param>
-	virtual void destroyEditor(QWidget* editor, const QModelIndex& index) const override
+	void destroyEditor(QWidget* editor, const QModelIndex& index) const override
 	{
 	}
 
@@ -55,11 +54,10 @@ public:
 	/// </summary>
 	/// <param name="editor">Ignored</param>
 	/// <param name="index">Ignored</param>
-	virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override
+	void setEditorData(QWidget* editor, const QModelIndex& index) const override
 	{
-		QPoint p(index.row(), index.column());
-		auto value = index.model()->data(index, Qt::EditRole).toDouble();
-
+		const QPoint p(index.row(), index.column());
+		const auto value = index.model()->data(index, Qt::EditRole).toDouble();
 		m_SpinBox->setProperty("tableindex", p);
 		m_SpinBox->setValue(value);
 	}
@@ -70,7 +68,7 @@ public:
 	/// <param name="editor">Ignored</param>
 	/// <param name="model">The model whose value will be set</param>
 	/// <param name="index">The cell index of the model</param>
-	virtual void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
+	void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override
 	{
 		model->setData(index, m_SpinBox->value(), Qt::EditRole);
 	}
@@ -81,7 +79,7 @@ public:
 	/// <param name="editor">The DoubleSpinBox member</param>
 	/// <param name="option">Contains the rectangle to be used for the geometry of the DoubleSpinBox</param>
 	/// <param name="index">Ignored</param>
-	virtual void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+	void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
 	{
 		editor->setGeometry(option.rect);
 	}

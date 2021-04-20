@@ -17,7 +17,7 @@
 Fractorium::Fractorium(QWidget* p)
 	: QMainWindow(p)
 {
-	int iconSize_ = 9;
+	const auto iconSize_ = 9;
 	size_t i = 0;
 	string s;
 	Timing t;
@@ -126,7 +126,7 @@ Fractorium::Fractorium(QWidget* p)
 	if (m_Info->Ok() && m_Settings->OpenCL() && m_QualitySpin->value() < (m_Settings->OpenClQuality() * m_Settings->Devices().size()))
 		m_QualitySpin->setValue(m_Settings->OpenClQuality() * m_Settings->Devices().size());
 
-	int statusBarHeight = 20;// *devicePixelRatio();
+	const auto statusBarHeight = 20;// *devicePixelRatio();
 	ui.StatusBar->setMinimumHeight(statusBarHeight);
 	ui.StatusBar->setMaximumHeight(statusBarHeight);
 	m_RenderStatusLabel = new QLabel(this);
@@ -138,8 +138,8 @@ Fractorium::Fractorium(QWidget* p)
 	m_CoordinateStatusLabel->setMaximumWidth(300);
 	m_CoordinateStatusLabel->setAlignment(Qt::AlignLeft);
 	ui.StatusBar->addWidget(m_CoordinateStatusLabel);
-	int progressBarHeight = 15;
-	int progressBarWidth = 300;
+	const auto progressBarHeight = 15;
+	const auto progressBarWidth = 300;
 	m_ProgressBar = new QProgressBar(this);
 	m_ProgressBar->setRange(0, 100);
 	m_ProgressBar->setValue(0);
@@ -271,10 +271,14 @@ void Fractorium::SetCoordinateStatus(int rasX, int rasY, float worldX, float wor
 /// </summary>
 void Fractorium::CenterScrollbars()
 {
-	QScrollBar* w = ui.GLParentScrollArea->horizontalScrollBar();
-	QScrollBar* h = ui.GLParentScrollArea->verticalScrollBar();
-	w->setValue(w->maximum() / 2);
-	h->setValue(h->maximum() / 2);
+	const auto w = ui.GLParentScrollArea->horizontalScrollBar();
+	const auto h = ui.GLParentScrollArea->verticalScrollBar();
+
+	if (w && h)
+	{
+		w->setValue(w->maximum() / 2);
+		h->setValue(h->maximum() / 2);
+	}
 }
 
 /// <summary>
@@ -297,7 +301,7 @@ void FractoriumEmberController<T>::ApplyXmlSavingTemplate(Ember<T>& ember)
 /// <returns>True if the current ember contains a final xform, else false.</returns>
 bool Fractorium::HaveFinal()
 {
-	auto combo = ui.CurrentXformCombo;
+	const auto combo = ui.CurrentXformCombo;
 	return (combo->count() > 0 && combo->itemText(combo->count() - 1) == "Final");
 }
 
@@ -380,12 +384,11 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 		m_WidthSpin->DoubleClickNonZero(ui.GLParentScrollArea->width() * ui.GLDisplay->devicePixelRatioF());
 		m_HeightSpin->DoubleClickNonZero(ui.GLParentScrollArea->height() * ui.GLDisplay->devicePixelRatioF());
 	}
-	else if (auto ke = dynamic_cast<QKeyEvent*>(e))
+	else if (const auto ke = dynamic_cast<QKeyEvent*>(e))
 	{
 		auto combo = ui.CurrentXformCombo;
-		bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-		const int times = 3;
-		const int ftimes = 2;
+		const auto times = 3;
+		const auto ftimes = 2;
 
 		if (ke->key() >= Qt::Key_F1 && ke->key() <= Qt::Key_F32)
 		{
@@ -393,7 +396,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 
 			if (fcount >= ftimes)
 			{
-				const int val = ke->key() - (int)Qt::Key_F1;
+				const auto val = ke->key() - (int)Qt::Key_F1;
 
 				if (shift)
 				{
@@ -435,7 +438,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 					!focusedctrlCombo &&
 					!QGuiApplication::keyboardModifiers().testFlag(Qt::AltModifier))//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform. Also exclude alt.
 			{
-				size_t index;
+				size_t index = 0;
 				double vdist = 0.01;
 				double hdist = 0.01;
 				double zoom = 1;
@@ -821,8 +824,8 @@ void Fractorium::dragMoveEvent(QDragMoveEvent* e)
 void Fractorium::dropEvent(QDropEvent* e)
 {
 	QStringList filenames;
-	Qt::KeyboardModifiers mod = e->keyboardModifiers();
-	bool append = mod.testFlag(Qt::ControlModifier) ? false : true;
+	const auto mod = e->keyboardModifiers();
+	const auto append = mod.testFlag(Qt::ControlModifier) ? false : true;
 
 	if (e->mimeData()->hasUrls())
 	{
@@ -912,12 +915,12 @@ QStringList Fractorium::SetupOpenXmlDialog(bool openExamples)
 #ifndef __APPLE__
 
 	//Lazy instantiate since it takes a long time.
-	if (!m_OpenFileDialog)
+	if (!m_OpenFileDialog.get())
 	{
-		m_OpenFileDialog = new QFileDialog(this);
+		m_OpenFileDialog = std::make_unique<QFileDialog>(this);
 		m_OpenFileDialog->setViewMode(QFileDialog::List);
 		m_OpenFileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
-		connect(m_OpenFileDialog, &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
+		connect(m_OpenFileDialog.get(), &QFileDialog::filterSelected, [&](const QString & filter) { m_Settings->OpenXmlExt(filter); });
 		m_OpenFileDialog->setFileMode(QFileDialog::ExistingFiles);
 		m_OpenFileDialog->setAcceptMode(QFileDialog::AcceptOpen);
 		m_OpenFileDialog->setNameFilter("flam3 (*.flam3);;flame (*.flame);;xml (*.xml);;chaos (*.chaos)");
@@ -993,16 +996,16 @@ QString Fractorium::SetupSaveXmlDialog(const QString& defaultFilename)
 
 	//Lazy instantiate since it takes a long time.
 	//QS
-	if (!m_SaveFileDialog)
+	if (!m_SaveFileDialog.get())
 	{
-		m_SaveFileDialog = new QFileDialog(this);
+		m_SaveFileDialog = std::make_unique<QFileDialog>(this);
 		m_SaveFileDialog->setViewMode(QFileDialog::List);
 		m_SaveFileDialog->setFileMode(QFileDialog::FileMode::AnyFile);
 		m_SaveFileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 		//This must be done once here because clears various internal states which allow the file text to be properly set.
 		//This is most likely a bug in QFileDialog.
 		m_SaveFileDialog->setAcceptMode(QFileDialog::AcceptSave);
-		connect(m_SaveFileDialog, &QFileDialog::filterSelected, [&](const QString & filter)
+		connect(m_SaveFileDialog.get(), &QFileDialog::filterSelected, [&](const QString & filter)
 		{
 			m_Settings->SaveXmlExt(filter);
 			m_SaveFileDialog->setDefaultSuffix(filter);
@@ -1045,16 +1048,16 @@ QString Fractorium::SetupSaveImageDialog(const QString& defaultFilename)
 #ifndef __APPLE__
 
 	//Lazy instantiate since it takes a long time.
-	if (!m_SaveImageDialog)
+	if (!m_SaveImageDialog.get())
 	{
-		m_SaveImageDialog = new QFileDialog(this);
+		m_SaveImageDialog = std::make_unique<QFileDialog>(this);
 		m_SaveImageDialog->setViewMode(QFileDialog::List);
 		m_SaveImageDialog->setFileMode(QFileDialog::FileMode::AnyFile);
 		m_SaveImageDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 		//This must be done once here because clears various internal states which allow the file text to be properly set.
 		//This is most likely a bug in QFileDialog.
 		m_SaveImageDialog->setAcceptMode(QFileDialog::AcceptSave);
-		connect(m_SaveImageDialog, &QFileDialog::filterSelected, [&](const QString & filter)
+		connect(m_SaveImageDialog.get(), &QFileDialog::filterSelected, [&](const QString & filter)
 		{
 			m_Settings->SaveImageExt(filter);
 			m_SaveImageDialog->setDefaultSuffix(filter);
@@ -1095,9 +1098,9 @@ QString Fractorium::SetupSaveFolderDialog()
 #ifndef __APPLE__
 
 	//Lazy instantiate since it takes a long time.
-	if (!m_FolderDialog)
+	if (!m_FolderDialog.get())
 	{
-		m_FolderDialog = new QFileDialog(this);
+		m_FolderDialog = std::make_unique<QFileDialog>(this);
 		m_FolderDialog->setViewMode(QFileDialog::List);
 		m_FolderDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 		//This must come first because it clears various internal states which allow the file text to be properly set.
@@ -1139,15 +1142,9 @@ QString Fractorium::SetupSaveFolderDialog()
 /// <returns>True if created successfully, else false</returns>
 bool Fractorium::SetupFinalRenderDialog()
 {
-	if (m_FinalRenderDialog)
+	if (m_FinalRenderDialog = std::make_unique<FractoriumFinalRenderDialog>(this))
 	{
-		delete m_FinalRenderDialog;
-		m_FinalRenderDialog = nullptr;
-	}
-
-	if (m_FinalRenderDialog = new FractoriumFinalRenderDialog(this))
-	{
-		connect(m_FinalRenderDialog, SIGNAL(finished(int)), this, SLOT(OnFinalRenderClose(int)), Qt::QueuedConnection);
+		connect(m_FinalRenderDialog.get(), SIGNAL(finished(int)), this, SLOT(OnFinalRenderClose(int)), Qt::QueuedConnection);
 		return true;
 	}
 
@@ -1210,6 +1207,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, m_AffineInterpTypeCombo);
 	w = SetTabOrder(this, w, m_TemporalFilterWidthSpin);
 	w = SetTabOrder(this, w, m_TemporalFilterTypeCombo);
+	w = SetTabOrder(this, w, m_TemporalFilterExpSpin);
 	w = SetTabOrder(this, ui.LibraryTree, ui.SequenceStartCountSpinBox);//Library.
 	w = SetTabOrder(this, w, ui.SequenceStartPreviewsButton);
 	w = SetTabOrder(this, w, ui.SequenceStopPreviewsButton);
@@ -1358,12 +1356,12 @@ void Fractorium::SetTabOrders()
 /// <param name="logicalIndex">The index of the row that was double clicked</param>
 void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 {
-	bool allZero = true;
-	auto model = table->model();
-	int cols = model->columnCount();
-	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
-	auto tableWidget = qobject_cast<QTableWidget*>(table);
+	auto allZero = true;
+	const auto model = table->model();
+	const auto cols = model->columnCount();
+	const auto shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	const auto ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+	const auto tableWidget = qobject_cast<QTableWidget*>(table);
 
 	if (tableWidget)
 	{
@@ -1382,12 +1380,12 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 		if (shift)
 			allZero = !allZero;
 
-		double val = allZero ? 1.0 : 0.0;
+		const auto val = allZero ? 1.0 : 0.0;
 
 		for (int i = 0; i < cols; i++)
 			if (auto spinBox = qobject_cast<DoubleSpinBox*>(tableWidget->cellWidget(logicalIndex, i)))
 				if (ctrl)
-					spinBox->setValue(double(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()));
+					spinBox->setValue(static_cast<double>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()));
 				else
 					spinBox->setValue(val);
 	}
@@ -1405,7 +1403,7 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 		if (shift)
 			allZero = !allZero;
 
-		double val = allZero ? 1.0 : 0.0;
+		const auto val = allZero ? 1.0 : 0.0;
 
 		for (int i = 0; i < cols; i++)
 			if (ctrl)
@@ -1427,12 +1425,12 @@ void Fractorium::ToggleTableRow(QTableView* table, int logicalIndex)
 /// <param name="logicalIndex">The index of the column that was double clicked</param>
 void Fractorium::ToggleTableCol(QTableView* table, int logicalIndex)
 {
-	bool allZero = true;
-	auto model = table->model();
-	int rows = model->rowCount();
-	bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
-	bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
-	auto tableWidget = qobject_cast<QTableWidget*>(table);
+	auto allZero = true;
+	const auto model = table->model();
+	const auto rows = model->rowCount();
+	const auto shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
+	const auto ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+	const auto tableWidget = qobject_cast<QTableWidget*>(table);
 
 	if (tableWidget)
 	{
@@ -1451,12 +1449,12 @@ void Fractorium::ToggleTableCol(QTableView* table, int logicalIndex)
 		if (shift)
 			allZero = !allZero;
 
-		double val = allZero ? 1.0 : 0.0;
+		const auto val = allZero ? 1.0 : 0.0;
 
 		for (int i = 0; i < rows; i++)
 			if (auto spinBox = qobject_cast<DoubleSpinBox*>(tableWidget->cellWidget(i, logicalIndex)))
 				if (ctrl)
-					spinBox->setValue(double(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()));
+					spinBox->setValue(static_cast<double>(QTIsaac<ISAAC_SIZE, ISAAC_INT>::LockedRandBit()));
 				else
 					spinBox->setValue(val);
 	}
@@ -1474,7 +1472,7 @@ void Fractorium::ToggleTableCol(QTableView* table, int logicalIndex)
 		if (shift)
 			allZero = !allZero;
 
-		double val = allZero ? 1.0 : 0.0;
+		const auto val = allZero ? 1.0 : 0.0;
 
 		for (int i = 0; i < rows; i++)
 			if (ctrl)

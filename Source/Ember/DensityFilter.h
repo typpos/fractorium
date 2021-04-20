@@ -52,7 +52,7 @@ public:
 
 		//Make sure the values make sense.
 		if (m_Curve <= 0.0)
-			m_Curve = T(0.5);
+			m_Curve = static_cast<T>(0.5);
 
 		if (m_MaxRad < m_MinRad)
 			m_MaxRad = m_MinRad + 1;
@@ -60,7 +60,7 @@ public:
 		//Ensure it's valid.
 		while (!Valid())
 		{
-			m_Curve += T(0.1);
+			m_Curve += static_cast<T>(0.1);
 		}
 	}
 
@@ -121,7 +121,7 @@ public:
 		//
 		//    num filters = (de_max_width / de_min_width)^(1 / estimator_curve)
 		//
-		decFilterCount = std::pow(finalMaxRad / finalMinRad, T(1.0) / m_Curve);
+		decFilterCount = std::pow(finalMaxRad / finalMinRad, static_cast<T>(1) / m_Curve);
 
 		if (decFilterCount > 1e7)//Too many filters.
 			return false;
@@ -131,8 +131,8 @@ public:
 		//Condense the smaller kernels to save space.
 		if (intFilterCount > keepThresh)
 		{
-			maxIndex = static_cast<int>(ceil(DE_THRESH + std::pow(T(intFilterCount - DE_THRESH), m_Curve))) + 1;
-			m_MaxFilteredCounts = static_cast<int>(std::pow(T(maxIndex - DE_THRESH), T(1.0) / m_Curve)) + DE_THRESH;
+			maxIndex = static_cast<int>(ceil(DE_THRESH + std::pow(static_cast<T>(intFilterCount - DE_THRESH), m_Curve))) + 1;
+			m_MaxFilteredCounts = static_cast<int>(std::pow(static_cast<T>(maxIndex - DE_THRESH), static_cast<T>(1) / m_Curve)) + DE_THRESH;
 		}
 		else
 		{
@@ -160,11 +160,11 @@ public:
 			//Calculate the filter width for this number of hits in a bin.
 			if (filterLoop < keepThresh)
 			{
-				filterHeight = (finalMaxRad / std::pow(T(filterLoop + 1), m_Curve));
+				filterHeight = (finalMaxRad / std::pow(static_cast<T>(filterLoop + 1), m_Curve));
 			}
 			else
 			{
-				loopAdjust = std::pow(T(filterLoop - keepThresh), (T(1.0) / m_Curve)) + keepThresh;
+				loopAdjust = std::pow(static_cast<T>(filterLoop - keepThresh), (static_cast<T>(1) / m_Curve)) + keepThresh;
 				filterHeight = (finalMaxRad / std::pow(loopAdjust + 1, m_Curve));
 			}
 
@@ -182,7 +182,7 @@ public:
 			{
 				for (dek = -m_FilterWidth; dek <= m_FilterWidth; dek++)
 				{
-					filterVal = std::sqrt(T(dej * dej + dek * dek)) / filterHeight;
+					filterVal = std::sqrt(static_cast<T>(dej * dej + dek * dek)) / filterHeight;
 
 					//Only populate the coefs within this radius.
 					if (filterVal <= 1.0)
@@ -197,7 +197,7 @@ public:
 			{
 				for (dek = 0; dek <= dej; dek++)
 				{
-					filterVal = std::sqrt(T(dej * dej + dek * dek)) / filterHeight;
+					filterVal = std::sqrt(static_cast<T>(dej * dej + dek * dek)) / filterHeight;
 
 					//Only populate the coefs within this radius.
 					if (filterVal > 1.0)
@@ -258,7 +258,7 @@ public:
 	{
 		T finalMaxRad = m_MaxRad * m_Supersample + 1;
 		T finalMinRad = m_MinRad * m_Supersample + 1;
-		return std::pow(finalMaxRad / finalMinRad, T(1.0) / m_Curve) <= 1e7;
+		return std::pow(finalMaxRad / finalMinRad, static_cast<T>(1) / m_Curve) <= 1e7;
 	}
 
 	/// <summary>

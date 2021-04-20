@@ -147,7 +147,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 	//Final setup steps before running.
 	os.imbue(std::locale(""));
-	padding = uint(std::log10(double(embers.size()))) + 1;
+	padding = uint(std::log10(static_cast<double>(embers.size()))) + 1;
 	renderer->EarlyClip(opt.EarlyClip());
 	renderer->YAxisUp(opt.YAxisUp());
 	renderer->LockAccum(opt.LockAccum());
@@ -210,9 +210,9 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 		}
 
 		//Cast to double in case the value exceeds 2^32.
-		double imageMem = double(renderer->NumChannels()) * double(ember.m_FinalRasW)
-						  * double(ember.m_FinalRasH) * double(renderer->BytesPerChannel());
-		double maxMem = pow(2.0, double((sizeof(void*) * 8) - 1));
+		const auto imageMem = static_cast<double>(renderer->NumChannels()) * static_cast<double>(ember.m_FinalRasW)
+							  * static_cast<double>(ember.m_FinalRasH) * static_cast<double>(renderer->BytesPerChannel());
+		const auto maxMem = pow(2.0, static_cast<double>((sizeof(void*) * 8) - 1));
 
 		if (imageMem > maxMem)//Ensure the max amount of memory for a process is not exceeded.
 		{
@@ -232,7 +232,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 		else
 		{
 			p = renderer->MemoryRequired(1, true, false);//No threaded write for render, only for animate.
-			strips = CalcStrips(double(p.second), double(renderer->MemoryAvailable()), opt.UseMem());
+			strips = CalcStrips(static_cast<double>(p.second), static_cast<double>(renderer->MemoryAvailable()), opt.UseMem());
 
 			if (strips > 1)
 				VerbosePrint("Setting strips to " << strips << " with specified memory usage of " << opt.UseMem());
@@ -281,7 +281,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 			iterCount = renderer->TotalIterCount(1);
 			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), true);
 			os.str("");
-			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((double(stats.m_Iters) / double(iterCount)) * 100) << "%)";
+			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((static_cast<double>(stats.m_Iters) / static_cast<double>(iterCount)) * 100) << "%)";
 			VerbosePrint("\nIters ran/requested: " + os.str());
 
 			if (!opt.EmberCL())
@@ -290,17 +290,17 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 			VerbosePrint("Render time: " + t.Format(stats.m_RenderMs));
 			VerbosePrint("Pure iter time: " + t.Format(stats.m_IterMs));
 			VerbosePrint("Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << "\n");
-			bool useName = opt.NameEnable() && !finalEmber.m_Name.empty();
-			auto finalImagep = finalImage.data();
-			auto size = finalEmber.m_FinalRasW * finalEmber.m_FinalRasH;
-			bool doBmp = Find(opt.Format(), "bmp");
-			bool doJpg = Find(opt.Format(), "jpg");
-			bool doExr16 = Find(opt.Format(), "exr");
-			bool doExr32 = Find(opt.Format(), "exr32");
-			bool doPng8 = Find(opt.Format(), "png");
-			bool doPng16 = Find(opt.Format(), "png16");
-			bool doOnlyPng8 = doPng8 && !doPng16;
-			bool doOnlyExr16 = doExr16 && !doExr32;
+			const auto useName = opt.NameEnable() && !finalEmber.m_Name.empty();
+			const auto finalImagep = finalImage.data();
+			const auto size = finalEmber.m_FinalRasW * finalEmber.m_FinalRasH;
+			const auto doBmp = Find(opt.Format(), "bmp");
+			const auto doJpg = Find(opt.Format(), "jpg");
+			const auto doExr16 = Find(opt.Format(), "exr");
+			const auto doExr32 = Find(opt.Format(), "exr32");
+			const auto doPng8 = Find(opt.Format(), "png");
+			const auto doPng16 = Find(opt.Format(), "png16");
+			const auto doOnlyPng8 = doPng8 && !doPng16;
+			const auto doOnlyExr16 = doExr16 && !doExr32;
 			vector<byte> rgb8Image;
 			vector<std::thread> writeFileThreads;
 			writeFileThreads.reserve(6);
@@ -314,9 +314,9 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 				{
 					writeFileThreads.push_back(std::thread([&]()
 					{
-						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "bmp", padding, i, useName);
+						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "bmp", padding, i, useName);
 						VerbosePrint("Writing " + filename);
-						auto writeSuccess = WriteBmp(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
+						const auto writeSuccess = WriteBmp(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -327,9 +327,9 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 				{
 					writeFileThreads.push_back(std::thread([&]()
 					{
-						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "jpg", padding, i, useName);
+						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "jpg", padding, i, useName);
 						VerbosePrint("Writing " + filename);
-						auto writeSuccess = WriteJpeg(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						const auto writeSuccess = WriteJpeg(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -345,11 +345,11 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 				{
 					writeFileThreads.push_back(std::thread([&]()
 					{
-						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "png", padding, i, useName);
+						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "png", padding, i, useName);
 						VerbosePrint("Writing " + filename);
 						vector<byte> rgba8Image(size * 4);
 						Rgba32ToRgba8(finalImagep, rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						auto writeSuccess = WritePng(filename.c_str(), rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						const auto writeSuccess = WritePng(filename.c_str(), rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -368,11 +368,11 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 							suffix += "_p16";
 						}
 
-						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "png", padding, i, useName);
+						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "png", padding, i, useName);
 						VerbosePrint("Writing " + filename);
 						vector<glm::uint16> rgba16Image(size * 4);
 						Rgba32ToRgba16(finalImagep, rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						auto writeSuccess = WritePng(filename.c_str(), (byte*)rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						const auto writeSuccess = WritePng(filename.c_str(), (byte*)rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -382,19 +382,19 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 			if (doExr16)
 			{
-				bool doBothExr = doExr32 && (opt.Format().find("exr") != opt.Format().rfind("exr"));
+				const auto doBothExr = doExr32 && (opt.Format().find("exr") != opt.Format().rfind("exr"));
 
 				if (doBothExr || doOnlyExr16)//16-bit EXR.
 				{
 					writeFileThreads.push_back(std::thread([&]()
 					{
-						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "exr", padding, i, useName);
+						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "exr", padding, i, useName);
 						VerbosePrint("Writing " + filename);
 						vector<Rgba> rgba32Image(size);
 						Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						auto writeSuccess = WriteExr16(filename.c_str(),
-													   rgba32Image.data(),
-													   finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						const auto writeSuccess = WriteExr16(filename.c_str(),
+															 rgba32Image.data(),
+															 finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -413,19 +413,19 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 							suffix += "_exr32";
 						}
 
-						auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "exr", padding, i, useName);
+						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "exr", padding, i, useName);
 						VerbosePrint("Writing " + filename);
 						vector<float> r(size);
 						vector<float> g(size);
 						vector<float> b(size);
 						vector<float> a(size);
 						Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						auto writeSuccess = WriteExr32(filename.c_str(),
-													   r.data(),
-													   g.data(),
-													   b.data(),
-													   a.data(),
-													   finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						const auto writeSuccess = WriteExr32(filename.c_str(),
+															 r.data(),
+															 g.data(),
+															 b.data(),
+															 a.data(),
+															 finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 						if (!writeSuccess)
 							cout << "Error writing " << filename << "\n";
@@ -438,7 +438,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 		if (opt.EmberCL() && opt.DumpKernel())
 		{
-			if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get()))
+			if (const auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get()))
 			{
 				cout << "Iteration kernel:\n" <<
 					 rendererCL->IterKernel() << "\n\n" <<

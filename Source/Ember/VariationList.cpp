@@ -661,7 +661,7 @@ int VariationList<T>::GetVariationIndex(const string& name) const
 {
 	for (size_t i = 0; i < m_Variations.size() && m_Variations[i]; i++)
 		if (!_stricmp(name.c_str(), m_Variations[i]->Name().c_str()))
-			return int(i);
+			return static_cast<int>(i);
 
 	return -1;
 }

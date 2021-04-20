@@ -2283,10 +2283,8 @@ public:
 		vec.reserve(m_Params.size());
 
 		for (auto& param : m_Params)
-		{
 			if ((includePrecalcs && param.IsPrecalc()) || !param.IsPrecalc())
 				vec.push_back(param.Name());
-		}
 
 		return vec;
 	}
@@ -2305,12 +2303,8 @@ public:
 		string index = os2.str();
 
 		for (auto& param : m_Params)
-		{
 			if (param.IsState())
-			{
 				os << "\n\treal_t " << param.Name() << index;
-			}
-		}
 
 		return os.str();
 	}
@@ -2324,12 +2318,8 @@ public:
 		size_t count = 0;
 
 		for (auto& param : m_Params)
-		{
 			if (param.IsState())
-			{
 				count++;
-			}
-		}
 
 		return count;
 	}
@@ -2344,12 +2334,8 @@ public:
 	virtual void InitStateVars(T* t, size_t& index) override
 	{
 		for (auto& param : m_Params)
-		{
 			if (param.IsState())
-			{
 				t[index++] = param.ParamVal();
-			}
-		}
 	}
 
 	/// <summary>

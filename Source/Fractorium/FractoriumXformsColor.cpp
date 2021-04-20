@@ -6,7 +6,8 @@
 /// </summary>
 void Fractorium::InitXformsColorUI()
 {
-	int spinHeight = 20, row = 0;
+	const auto spinHeight = 20;
+	auto row = 0;
 	m_XformColorValueItem = new QTableWidgetItem();
 	//Can't set this in the designer, so do it here.
 	m_XformColorValueItem->setToolTip("The index in the palette the current xform uses.\r\n\r\n"
@@ -47,7 +48,7 @@ void Fractorium::InitXformsColorUI()
 template <typename T>
 void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update, size_t index)
 {
-	bool updateGUI = update != eXformUpdate::UPDATE_SPECIFIC || index == m_Fractorium->ui.CurrentXformCombo->currentIndex();
+	const auto updateGUI = update != eXformUpdate::UPDATE_SPECIFIC || index == m_Fractorium->ui.CurrentXformCombo->currentIndex();
 
 	if (updateRender)//False when just updating GUI in response to a change elsewhere, true when in response to a GUI change so update values and reset renderer.
 	{
@@ -65,8 +66,8 @@ void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateR
 
 	if (updateScroll && updateGUI)
 	{
-		auto scroll = m_Fractorium->ui.XformColorScroll;
-		int scrollVal = d * scroll->maximum();
+		const auto scroll = m_Fractorium->ui.XformColorScroll;
+		const auto scrollVal = d * scroll->maximum();
 		scroll->blockSignals(true);
 		scroll->setValue(scrollVal);
 		scroll->blockSignals(false);
@@ -88,7 +89,7 @@ void Fractorium::OnXformColorIndexChanged(double d, bool updateRender, bool upda
 /// <param name="d">The color index, 0-1.</param>
 void Fractorium::OnXformScrollColorIndexChanged(int d)
 {
-	OnXformColorIndexChanged(d / double(ui.XformColorScroll->maximum()), true, true, false);//Update spinner, but not scrollbar. Trigger render update.
+	OnXformColorIndexChanged(d / static_cast<double>(ui.XformColorScroll->maximum()), true, true, false);//Update spinner, but not scrollbar. Trigger render update.
 }
 
 /// <summary>
@@ -113,7 +114,7 @@ template <typename T>
 void FractoriumEmberController<T>::ToggleColorIndicesButtonClicked()
 {
 	char ch = 1;
-	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorX = T(ch ^= 1); }, eXformUpdate::UPDATE_ALL, false);//Don't update renderer here...
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorX = static_cast<T>(ch ^= 1); }, eXformUpdate::UPDATE_ALL, false);//Don't update renderer here...
 	m_Fractorium->m_XformColorIndexSpin->setValue(CurrentXform()->m_ColorX);//...do it via GUI. This will set scrollbar value as well.
 }
 void Fractorium::OnToggleColorIndicesButtonClicked(bool b) { m_Controller->ToggleColorIndicesButtonClicked(); }
@@ -140,7 +141,7 @@ template <typename T>
 void FractoriumEmberController<T>::ToggleColorSpeedsButtonClicked()
 {
 	char ch = 1;
-	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorSpeed = (T(ch ^= 1) ? 0.5 : 0.0); }, eXformUpdate::UPDATE_ALL);
+	UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex) { xform->m_ColorSpeed = static_cast<T>((ch ^= 1) ? 0.5 : 0.0); }, eXformUpdate::UPDATE_ALL);
 	m_Fractorium->m_XformColorSpeedSpin->SetValueStealth(CurrentXform()->m_ColorSpeed);
 }
 void Fractorium::OnToggleColorSpeedsButtonClicked(bool b) { m_Controller->ToggleColorSpeedsButtonClicked(); }
@@ -233,7 +234,7 @@ QColor FractoriumEmberController<T>::ColorIndexToQColor(double d)
 	entry.r *= 255;
 	entry.g *= 255;
 	entry.b *= 255;
-	QRgb rgb = uint(entry.r) << 16 | uint(entry.g) << 8 | uint(entry.b);
+	QRgb rgb = static_cast<uint>(entry.r) << 16 | static_cast<uint>(entry.g) << 8 | static_cast<uint>(entry.b);
 	return QColor::fromRgb(rgb);
 }
 
@@ -264,7 +265,7 @@ void Fractorium::SetPaletteTableItem(QPixmap* pixmap, QTableWidget* table, QTabl
 {
 	if (pixmap && !pixmap->isNull())
 	{
-		QSize size(table->columnWidth(col), table->rowHeight(row) + 1);
+		const QSize size(table->columnWidth(col), table->rowHeight(row) + 1);
 		item->setData(Qt::DecorationRole, pixmap->scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	}
 }

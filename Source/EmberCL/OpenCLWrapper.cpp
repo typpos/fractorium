@@ -265,7 +265,7 @@ bool OpenCLWrapper::WriteBuffer(size_t bufferIndex, void* data, size_t size)
 	if (m_Init && (bufferIndex < m_Buffers.size()) && (GetBufferSize(bufferIndex) == size))
 	{
 		cl::Event e;
-		cl_int err = m_Queue.enqueueWriteBuffer(m_Buffers[bufferIndex].m_Buffer, CL_TRUE, 0, size, data, nullptr, &e);
+		const auto err = m_Queue.enqueueWriteBuffer(m_Buffers[bufferIndex].m_Buffer, CL_TRUE, 0, size, data, nullptr, &e);
 		e.wait();
 		m_Queue.finish();
 
@@ -301,7 +301,7 @@ bool OpenCLWrapper::ReadBuffer(size_t bufferIndex, void* data, size_t size)
 	if (m_Init && (bufferIndex < m_Buffers.size()) && (GetBufferSize(bufferIndex) == size))
 	{
 		cl::Event e;
-		cl_int err = m_Queue.enqueueReadBuffer(m_Buffers[bufferIndex].m_Buffer, CL_TRUE, 0, size, data, nullptr, &e);
+		const auto err = m_Queue.enqueueReadBuffer(m_Buffers[bufferIndex].m_Buffer, CL_TRUE, 0, size, data, nullptr, &e);
 		e.wait();
 		m_Queue.finish();
 
@@ -752,7 +752,7 @@ bool OpenCLWrapper::EnqueueAcquireGLObjects(cl::ImageGL& image)
 	{
 		vector<cl::Memory> images;
 		images.push_back(image);
-		cl_int err = m_Queue.enqueueAcquireGLObjects(&images);
+		const auto err = m_Queue.enqueueAcquireGLObjects(&images);
 		m_Queue.finish();
 		return m_Info->CheckCL(err, "cl::CommandQueue::enqueueAcquireGLObjects()");
 	}
@@ -786,7 +786,7 @@ bool OpenCLWrapper::EnqueueReleaseGLObjects(cl::ImageGL& image)
 	{
 		vector<cl::Memory> images;
 		images.push_back(image);
-		cl_int err = m_Queue.enqueueReleaseGLObjects(&images);
+		const auto err = m_Queue.enqueueReleaseGLObjects(&images);
 		m_Queue.finish();
 		return m_Info->CheckCL(err, "cl::CommandQueue::enqueueReleaseGLObjects()");
 	}
@@ -803,7 +803,7 @@ bool OpenCLWrapper::EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memO
 {
 	if (m_Init && m_Shared)
 	{
-		cl_int err = m_Queue.enqueueAcquireGLObjects(memObjects);
+		const auto err = m_Queue.enqueueAcquireGLObjects(memObjects);
 		m_Queue.finish();
 		return m_Info->CheckCL(err, "cl::CommandQueue::enqueueAcquireGLObjects()");
 	}
@@ -820,7 +820,7 @@ bool OpenCLWrapper::EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memO
 {
 	if (m_Init && m_Shared)
 	{
-		cl_int err = m_Queue.enqueueReleaseGLObjects(memObjects);
+		const auto err = m_Queue.enqueueReleaseGLObjects(memObjects);
 		m_Queue.finish();
 		return m_Info->CheckCL(err, "cl::CommandQueue::enqueueReleaseGLObjects()");
 	}
@@ -958,12 +958,12 @@ bool OpenCLWrapper::RunKernel(size_t kernelIndex, size_t totalGridWidth, size_t 
 	if (m_Init && kernelIndex < m_Programs.size())
 	{
 		cl::Event e;
-		cl_int err = m_Queue.enqueueNDRangeKernel(m_Programs[kernelIndex].m_Kernel,
-					 cl::NullRange,
-					 cl::NDRange(totalGridWidth, totalGridHeight, totalGridDepth),
-					 cl::NDRange(blockWidth, blockHeight, blockDepth),
-					 nullptr,
-					 &e);
+		const auto err = m_Queue.enqueueNDRangeKernel(m_Programs[kernelIndex].m_Kernel,
+						 cl::NullRange,
+						 cl::NDRange(totalGridWidth, totalGridHeight, totalGridDepth),
+						 cl::NDRange(blockWidth, blockHeight, blockDepth),
+						 nullptr,
+						 &e);
 		e.wait();
 		m_Queue.finish();
 		return m_Info->CheckCL(err, "cl::CommandQueue::enqueueNDRangeKernel()");

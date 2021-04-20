@@ -596,7 +596,7 @@ public:
 
 		for (auto& xform : m_Xforms) norm += xform.m_Weight;
 
-		for (auto& weight : normalizedWeights) { weight = (norm == T(0) ? T(0) : m_Xforms[i].m_Weight / norm); i++; }
+		for (auto& weight : normalizedWeights) { weight = (norm == static_cast<T>( 0 ) ? static_cast<T>( 0 ) : m_Xforms[i].m_Weight / norm); i++; }
 	}
 
 	/// <summary>
@@ -1082,8 +1082,8 @@ public:
 	/// <param name="rand">The random context to use for generating random symmetry</param>
 	void AddSymmetry(intmax_t sym, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand)
 	{
-		intmax_t k;
-		size_t i, result = 0;
+		intmax_t k = 0;
+		size_t i = 0, result = 0;
 		T a;
 
 		if (sym == 0)
@@ -1101,9 +1101,9 @@ public:
 			if (rand.RandBit())
 				sym = symDistrib[rand.Rand(Vlen(symDistrib))];
 			else if (rand.Rand() & 31)
-				sym = intmax_t(rand.Rand(13)) - 6;
+				sym = intmax_t{ rand.Rand(13) } - 6;
 			else
-				sym = intmax_t(rand.Rand(51)) - 25;
+				sym = intmax_t{ rand.Rand(51) } - 25;
 		}
 
 		if (sym == 1 || sym == 0)
@@ -1132,7 +1132,7 @@ public:
 			sym = -sym;
 		}
 
-		a = T(2 * M_PI / sym);
+		a = static_cast<T>(2 * M_PI / sym);
 
 		for (k = 1; k < sym; k++)
 		{
@@ -1142,7 +1142,7 @@ public:
 			m_Xforms[i].m_Weight = 1;
 			m_Xforms[i].m_ColorSpeed = 0;
 			m_Xforms[i].m_Animate = 0;
-			m_Xforms[i].m_ColorX = m_Xforms[i].m_ColorY = (sym < 3) ? 0 : (T(k - 1) / T(sym - 2));//Added Y.
+			m_Xforms[i].m_ColorX = m_Xforms[i].m_ColorY = (sym < 3) ? 0 : (static_cast<T>(k - 1) / static_cast<T>(sym - 2));//Added Y.
 			m_Xforms[i].m_Affine.A(Round6(std::cos(k * a)));
 			m_Xforms[i].m_Affine.D(Round6(std::sin(k * a)));
 			m_Xforms[i].m_Affine.B(Round6(-m_Xforms[i].m_Affine.D()));
@@ -1452,7 +1452,7 @@ public:
 			m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
 			m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
 			m_TemporalFilterWidth = 1;
-			m_TemporalFilterExp = 0;
+			m_TemporalFilterExp = 1;
 			m_PaletteMode = ePaletteMode::PALETTE_LINEAR;
 			m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 		}
@@ -1559,8 +1559,8 @@ public:
 		   << "Spatial Filter Type: " << m_SpatialFilterType << "\n"
 		   << "Spatial Filter Radius: " << m_SpatialFilterRadius << "\n"
 		   << "Temporal Filter Type: " << m_TemporalFilterType << "\n"
-		   << "Temporal Filter Exp: " << m_TemporalFilterExp << "\n"
 		   << "Temporal Filter Width: " << m_TemporalFilterWidth << "\n"
+		   << "Temporal Filter Exp: " << m_TemporalFilterExp << "\n"
 		   << "Palette Mode: " << m_PaletteMode << "\n"
 		   << "Palette Interp: " << m_PaletteInterp << "\n"
 		   << "Palette Index: " << m_Palette.m_Index << "\n"
@@ -1738,7 +1738,7 @@ public:
 
 	//Only used if temporal filter type is exp, else unused.
 	//Xml field: "temporal_filter_exp".
-	T m_TemporalFilterExp = 0;
+	T m_TemporalFilterExp = 1;
 
 	//The width of the temporal filter.
 	//Xml field: "temporal_filter_width".

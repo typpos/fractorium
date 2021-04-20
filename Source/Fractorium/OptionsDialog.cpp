@@ -11,11 +11,12 @@
 FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 	: QDialog(p, f)
 {
-	int i, row = 0, spinHeight = 20;
+	int row = 0;
+	const auto spinHeight = 20;
 	ui.setupUi(this);
 	m_Settings = FractoriumSettings::DefInstance();
 	m_Info = OpenCLInfo::Instance();
-	QTableWidget* table = ui.OptionsXmlSavingTable;
+	auto table = ui.OptionsXmlSavingTable;
 	ui.ThreadCountSpin->setRange(1, Timing::ProcessorCount());
 	connect(ui.OpenCLCheckBox, SIGNAL(stateChanged(int)),	  this, SLOT(OnOpenCLCheckBoxStateChanged(int)),  Qt::QueuedConnection);
 	connect(ui.DeviceTable,	   SIGNAL(cellChanged(int, int)), this, SLOT(OnDeviceTableCellChanged(int, int)), Qt::QueuedConnection);
@@ -38,7 +39,7 @@ FractoriumOptionsDialog::FractoriumOptionsDialog(QWidget* p, Qt::WindowFlags f)
 	{
 		SetupDeviceTable(table, m_Settings->Devices());
 
-		for (i = 0; i < table->rowCount(); i++)
+		for (auto i = 0; i < table->rowCount(); i++)
 			if (auto radio = qobject_cast<QRadioButton*>(table->cellWidget(i, 1)))
 				connect(radio, SIGNAL(toggled(bool)), this, SLOT(OnDeviceTableRadioToggled(bool)), Qt::QueuedConnection);
 	}
@@ -106,8 +107,8 @@ void FractoriumOptionsDialog::OnDeviceTableCellChanged(int row, int col)
 void FractoriumOptionsDialog::OnDeviceTableRadioToggled(bool checked)
 {
 	int row;
-	auto s = sender();
-	auto table = ui.DeviceTable;
+	const auto s = sender();
+	const auto table = ui.DeviceTable;
 	QRadioButton* radio = nullptr;
 
 	if (s)
@@ -129,7 +130,7 @@ void FractoriumOptionsDialog::OnDeviceTableRadioToggled(bool checked)
 /// <param name="state">The state of the checkbox</param>
 void FractoriumOptionsDialog::OnOpenCLCheckBoxStateChanged(int state)
 {
-	bool checked = state == Qt::Checked;
+	const auto checked = state == Qt::Checked;
 	ui.DeviceTable->setEnabled(checked);
 	ui.ThreadCountSpin->setEnabled(!checked);
 	ui.CpuSubBatchSpin->setEnabled(!checked);
@@ -223,7 +224,7 @@ void FractoriumOptionsDialog::GuiToData()
 void FractoriumOptionsDialog::DataToGui()
 {
 	//Interactive rendering.
-	auto devices = m_Settings->Devices();
+	const auto devices = m_Settings->Devices();
 	ui.EarlyClipCheckBox->setChecked(m_Settings->EarlyClip());
 	ui.YAxisUpCheckBox->setChecked(m_Settings->YAxisUp());
 	ui.TransparencyCheckBox->setChecked(m_Settings->Transparency());

@@ -224,7 +224,7 @@ public:
 #ifdef ISAAC_FLAM3_DEBUG
 		return (Rand() & 0xfffffff) / (floatType)0xfffffff;
 #else
-		return Frand<floatType>(floatType(0), floatType(1));
+		return Frand<floatType>(static_cast<floatType>(0), static_cast<floatType>(1));
 #endif
 	}
 

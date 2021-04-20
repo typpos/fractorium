@@ -58,12 +58,12 @@ public:
 	template <typename U>
 	Affine2D<T>& operator = (const Affine2D<U>& affine)
 	{
-		A(T(affine.A()));
-		B(T(affine.B()));
-		C(T(affine.C()));
-		D(T(affine.D()));
-		E(T(affine.E()));
-		F(T(affine.F()));
+		A(static_cast<T>(affine.A()));
+		B(static_cast<T>(affine.B()));
+		C(static_cast<T>(affine.C()));
+		D(static_cast<T>(affine.D()));
+		E(static_cast<T>(affine.E()));
+		F(static_cast<T>(affine.F()));
 		return *this;
 	}
 

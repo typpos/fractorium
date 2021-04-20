@@ -148,22 +148,22 @@ public:
 	{
 		m_Affine = xform.m_Affine;
 		m_Post = xform.m_Post;
-		m_Weight = T(xform.m_Weight);
-		m_ColorX = T(xform.m_ColorX);
-		m_ColorY = T(xform.m_ColorY);
-		m_DirectColor = T(xform.m_DirectColor);
-		m_ColorSpeed = T(xform.m_ColorSpeed);
-		m_Animate = T(xform.m_Animate);
-		m_Opacity = T(xform.m_Opacity);
+		m_Weight = static_cast<T>(xform.m_Weight);
+		m_ColorX = static_cast<T>(xform.m_ColorX);
+		m_ColorY = static_cast<T>(xform.m_ColorY);
+		m_DirectColor = static_cast<T>(xform.m_DirectColor);
+		m_ColorSpeed = static_cast<T>(xform.m_ColorSpeed);
+		m_Animate = static_cast<T>(xform.m_Animate);
+		m_Opacity = static_cast<T>(xform.m_Opacity);
 		CacheColorVals();
 		m_HasPre = xform.HasPre();
 		m_HasPost = xform.HasPost();
 		m_HasPreOrRegularVars = xform.PreVariationCount() > 0 || xform.VariationCount() > 0;
-		m_Wind[0] = T(xform.m_Wind[0]);
-		m_Wind[1] = T(xform.m_Wind[1]);
-		m_MotionFreq = T(xform.m_MotionFreq);
+		m_Wind[0] = static_cast<T>(xform.m_Wind[0]);
+		m_Wind[1] = static_cast<T>(xform.m_Wind[1]);
+		m_MotionFreq = static_cast<T>(xform.m_MotionFreq);
 		m_MotionFunc = xform.m_MotionFunc;
-		m_MotionOffset = T(xform.m_MotionOffset);
+		m_MotionOffset = static_cast<T>(xform.m_MotionOffset);
 		ClearAndDeleteVariations();
 
 		//Must manually add them via the AddVariation() function so that
@@ -207,9 +207,9 @@ public:
 		if (useDefaults)
 		{
 			m_Weight = 0;
-			m_ColorSpeed = T(0.5);
+			m_ColorSpeed = static_cast<T>(0.5);
 			m_Animate = 1;
-			m_ColorX = T(count & 1);
+			m_ColorX = static_cast<T>(count & 1);
 			m_ColorY = 0;
 			m_DirectColor = 1;
 			m_Opacity = 1;
@@ -562,7 +562,7 @@ public:
 		//m_ColorSpeedCache = m_ColorX * (1 - m_ColorSpeed) / 2;//Apo style.
 		//m_OneMinusColorCache = (1 + m_ColorSpeed) / 2;
 		m_ColorSpeedCache = m_ColorSpeed * m_ColorX;//Flam3 style.
-		m_OneMinusColorCache = T(1.0) - m_ColorSpeed;
+		m_OneMinusColorCache = static_cast<T>(1) - m_ColorSpeed;
 	}
 
 	/// <summary>

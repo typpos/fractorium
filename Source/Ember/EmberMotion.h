@@ -132,8 +132,8 @@ public:
 	{
 		CopyCont(m_MotionParams, other.m_MotionParams);
 		m_MotionFunc = other.m_MotionFunc;
-		m_MotionFreq = T(other.m_MotionFreq);
-		m_MotionOffset = T(other.m_MotionOffset);
+		m_MotionFreq = static_cast<T>(other.m_MotionFreq);
+		m_MotionOffset = static_cast<T>(other.m_MotionOffset);
 		return *this;
 	}
 

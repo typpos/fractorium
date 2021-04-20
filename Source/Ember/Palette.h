@@ -397,7 +397,7 @@ public:
 	/// <returns>A vector holding the color values</returns>
 	vector<byte> MakeRgbPaletteBlock(size_t height)
 	{
-		size_t width = Size();
+		const auto width = Size();
 		vector<byte> v(height * width * 3);
 
 		if (v.size() == (height * Size() * 3))
@@ -406,9 +406,9 @@ public:
 			{
 				for (size_t j = 0; j < width; j++)
 				{
-					v[(width * 3 * i) + (j * 3)]     = byte(m_Entries[j][0] * T(255));//Palettes are as [0..1], so convert to [0..255] here since it's for GUI display.
-					v[(width * 3 * i) + (j * 3) + 1] = byte(m_Entries[j][1] * T(255));
-					v[(width * 3 * i) + (j * 3) + 2] = byte(m_Entries[j][2] * T(255));
+					v[(width * 3 * i) + (j * 3)]     = static_cast<byte>(m_Entries[j][0] * T(255));//Palettes are as [0..1], so convert to [0..255] here since it's for GUI display.
+					v[(width * 3 * i) + (j * 3) + 1] = static_cast<byte>(m_Entries[j][1] * T(255));
+					v[(width * 3 * i) + (j * 3) + 2] = static_cast<byte>(m_Entries[j][2] * T(255));
 				}
 			}
 		}

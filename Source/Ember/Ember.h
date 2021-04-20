@@ -107,45 +107,45 @@ public:
 		m_FinalRasH			  = ember.m_FinalRasH;
 		m_OrigFinalRasW		  = ember.m_OrigFinalRasW;
 		m_OrigFinalRasH		  = ember.m_OrigFinalRasH;
-		m_OrigPixPerUnit	  = T(ember.m_OrigPixPerUnit);
-		m_RandPointRange      = T(ember.m_RandPointRange);
+		m_OrigPixPerUnit	  = static_cast<T>(ember.m_OrigPixPerUnit);
+		m_RandPointRange      = static_cast<T>(ember.m_RandPointRange);
 		m_SubBatchSize		  = ember.m_SubBatchSize;
 		m_FuseCount			  = ember.m_FuseCount;
 		m_Supersample		  = ember.m_Supersample;
 		m_TemporalSamples	  = ember.m_TemporalSamples;
 		m_Symmetry			  = ember.m_Symmetry;
-		m_Quality			  = T(ember.m_Quality);
-		m_PixelsPerUnit		  = T(ember.m_PixelsPerUnit);
-		m_Zoom				  = T(ember.m_Zoom);
-		m_CamZPos			  = T(ember.m_CamZPos);
-		m_CamPerspective	  = T(ember.m_CamPerspective);
-		m_CamYaw			  = T(ember.m_CamYaw);
-		m_CamPitch			  = T(ember.m_CamPitch);
-		m_CamDepthBlur		  = T(ember.m_CamDepthBlur);
-		m_BlurCurve           = T(ember.m_BlurCurve);
+		m_Quality			  = static_cast<T>(ember.m_Quality);
+		m_PixelsPerUnit		  = static_cast<T>(ember.m_PixelsPerUnit);
+		m_Zoom				  = static_cast<T>(ember.m_Zoom);
+		m_CamZPos			  = static_cast<T>(ember.m_CamZPos);
+		m_CamPerspective	  = static_cast<T>(ember.m_CamPerspective);
+		m_CamYaw			  = static_cast<T>(ember.m_CamYaw);
+		m_CamPitch			  = static_cast<T>(ember.m_CamPitch);
+		m_CamDepthBlur		  = static_cast<T>(ember.m_CamDepthBlur);
+		m_BlurCurve           = static_cast<T>(ember.m_BlurCurve);
 		m_CamMat			  = ember.m_CamMat;
-		m_CenterX			  = T(ember.m_CenterX);
-		m_CenterY			  = T(ember.m_CenterY);
-		m_RotCenterY		  = T(ember.m_RotCenterY);
-		m_Rotate			  = T(ember.m_Rotate);
-		m_Brightness		  = T(ember.m_Brightness);
-		m_Gamma				  = T(ember.m_Gamma);
-		m_Vibrancy			  = T(ember.m_Vibrancy);
-		m_GammaThresh		  = T(ember.m_GammaThresh);
-		m_HighlightPower	  = T(ember.m_HighlightPower);
-		m_K2                  = T(ember.m_K2);
-		m_Time				  = T(ember.m_Time);
+		m_CenterX			  = static_cast<T>(ember.m_CenterX);
+		m_CenterY			  = static_cast<T>(ember.m_CenterY);
+		m_RotCenterY		  = static_cast<T>(ember.m_RotCenterY);
+		m_Rotate			  = static_cast<T>(ember.m_Rotate);
+		m_Brightness		  = static_cast<T>(ember.m_Brightness);
+		m_Gamma				  = static_cast<T>(ember.m_Gamma);
+		m_Vibrancy			  = static_cast<T>(ember.m_Vibrancy);
+		m_GammaThresh		  = static_cast<T>(ember.m_GammaThresh);
+		m_HighlightPower	  = static_cast<T>(ember.m_HighlightPower);
+		m_K2                  = static_cast<T>(ember.m_K2);
+		m_Time				  = static_cast<T>(ember.m_Time);
 		m_Background		  = ember.m_Background;
 		m_Interp			  = ember.m_Interp;
 		m_AffineInterp		  = ember.m_AffineInterp;
-		m_MinRadDE			  = T(ember.m_MinRadDE);
-		m_MaxRadDE			  = T(ember.m_MaxRadDE);
-		m_CurveDE			  = T(ember.m_CurveDE);
+		m_MinRadDE			  = static_cast<T>(ember.m_MinRadDE);
+		m_MaxRadDE			  = static_cast<T>(ember.m_MaxRadDE);
+		m_CurveDE			  = static_cast<T>(ember.m_CurveDE);
 		m_SpatialFilterType	  = ember.m_SpatialFilterType;
-		m_SpatialFilterRadius = T(ember.m_SpatialFilterRadius);
+		m_SpatialFilterRadius = static_cast<T>(ember.m_SpatialFilterRadius);
 		m_TemporalFilterType  = ember.m_TemporalFilterType;
-		m_TemporalFilterExp	  = T(ember.m_TemporalFilterExp);
-		m_TemporalFilterWidth = T(ember.m_TemporalFilterWidth);
+		m_TemporalFilterExp	  = static_cast<T>(ember.m_TemporalFilterExp);
+		m_TemporalFilterWidth = static_cast<T>(ember.m_TemporalFilterWidth);
 		m_PaletteMode		  = ember.m_PaletteMode;
 		m_PaletteInterp		  = ember.m_PaletteInterp;
 		m_Name				  = ember.m_Name;
@@ -223,7 +223,7 @@ public:
 		for (size_t i = 0; i < count; i++)
 		{
 			Xform<T> xform;
-			xform.m_ColorX = T((oldsize + i) & 1);
+			xform.m_ColorX = static_cast<T>((oldsize + i) & 1);
 			xform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 			AddXform(xform);
 		}
@@ -381,7 +381,7 @@ public:
 
 		for (size_t i = 0; i < m_Xforms.size(); i++)
 			if (GetXform(i) == xform)
-				return intmax_t(i);
+				return static_cast<intmax_t>(i);
 
 		return index;
 	}
@@ -394,11 +394,11 @@ public:
 	/// <returns>The index of the matched xform if found, else -1.</returns>
 	intmax_t GetTotalXformIndex(const Xform<T>* xform, bool forceFinal = false) const
 	{
-		size_t totalXformCount = TotalXformCount(forceFinal);
+		const auto totalXformCount = TotalXformCount(forceFinal);
 
 		for (size_t i = 0; i < totalXformCount; i++)
 			if (GetTotalXform(i, forceFinal) == xform)
-				return intmax_t(i);
+				return static_cast<intmax_t>(i);
 
 		return -1;
 	}
@@ -483,16 +483,16 @@ public:
 			m_CamMat[1][2] =  std::sin(m_CamPitch) * std::cos(-m_CamYaw);
 			m_CamMat[2][2] =  std::cos(m_CamPitch);
 
-			if (projBits & et(eProjBits::PROJBITS_BLUR))
+			if (projBits & static_cast<et>(eProjBits::PROJBITS_BLUR))
 			{
-				if (projBits & et(eProjBits::PROJBITS_YAW))
+				if (projBits & static_cast<et>(eProjBits::PROJBITS_YAW))
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitchYawDepthBlur;
 				else
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitchDepthBlur;
 			}
-			else if ((projBits & et(eProjBits::PROJBITS_PITCH)) || (projBits & et(eProjBits::PROJBITS_YAW)))
+			else if ((projBits & static_cast<et>(eProjBits::PROJBITS_PITCH)) || (projBits & static_cast<et>(eProjBits::PROJBITS_YAW)))
 			{
-				if (projBits & et(eProjBits::PROJBITS_YAW))
+				if (projBits & static_cast<et>(eProjBits::PROJBITS_YAW))
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitchYaw;
 				else
 					m_ProjFunc = &EmberNs::Ember<T>::ProjectPitch;
@@ -503,7 +503,7 @@ public:
 			}
 		}
 
-		m_BlurCoef = T(0.1) * m_CamDepthBlur;
+		m_BlurCoef = static_cast<T>(0.1) * m_CamDepthBlur;
 	}
 
 	/// <summary>
@@ -540,9 +540,9 @@ public:
 		if ((onlyScaleIfNewIsSmaller && (width < m_OrigFinalRasW || height < m_OrigFinalRasH)) || !onlyScaleIfNewIsSmaller)
 		{
 			if (scaleType == eScaleType::SCALE_WIDTH)
-				m_PixelsPerUnit = m_OrigPixPerUnit * (T(width) / T(m_OrigFinalRasW));
+				m_PixelsPerUnit = m_OrigPixPerUnit * (static_cast<T>(width) / static_cast<T>(m_OrigFinalRasW));
 			else if (scaleType == eScaleType::SCALE_HEIGHT)
-				m_PixelsPerUnit = m_OrigPixPerUnit * (T(height) / T(m_OrigFinalRasH));
+				m_PixelsPerUnit = m_OrigPixPerUnit * (static_cast<T>(height) / static_cast<T> (m_OrigFinalRasH));
 			else
 				m_PixelsPerUnit = m_OrigPixPerUnit;
 		}
@@ -577,7 +577,7 @@ public:
 	/// </summary>
 	void EqualizeWeights()
 	{
-		T weight = T(1) / m_Xforms.size();
+		T weight = static_cast<T>(1) / m_Xforms.size();
 
 		for (auto& xform : m_Xforms) xform.m_Weight = weight;
 	}
@@ -648,9 +648,9 @@ public:
 	{
 		size_t count = 0, i = 0, j = 0;
 
-		while (auto xform = GetTotalXform(i++))
+		while (const auto xform = GetTotalXform(i++))
 			for (j = 0; j < xform->TotalVariationCount(); j++)
-				if (auto var = xform->GetVariation(j))
+				if (const auto var = xform->GetVariation(j))
 					count += var->StateParamCount();
 
 		return count;
@@ -735,9 +735,9 @@ public:
 					Palette<float>::RgbToHsv(glm::value_ptr(embers[k].m_Palette[i]), t);
 
 					for (size_t j = 0; j < 3; j++)
-						s[j] += float(coefs[k]) * t[j];
+						s[j] += static_cast<float>(coefs[k]) * t[j];
 
-					s[3] += float(coefs[k]) * embers[k].m_Palette[i][3];
+					s[3] += static_cast<float>(coefs[k]) * embers[k].m_Palette[i][3];
 				}
 
 				Palette<float>::HsvToRgb(s, glm::value_ptr(m_Palette[i]));
@@ -1165,15 +1165,15 @@ public:
 	{
 		size_t val = 0;
 
-		if (m_CamZPos != 0) val |= et(eProjBits::PROJBITS_ZPOS);
+		if (m_CamZPos != 0) val |= static_cast<et>(eProjBits::PROJBITS_ZPOS);
 
-		if (m_CamPerspective != 0) val |= et(eProjBits::PROJBITS_PERSP);
+		if (m_CamPerspective != 0) val |= static_cast<et>(eProjBits::PROJBITS_PERSP);
 
-		if (m_CamPitch != 0) val |= et(eProjBits::PROJBITS_PITCH);
+		if (m_CamPitch != 0) val |= static_cast<et>(eProjBits::PROJBITS_PITCH);
 
-		if (m_CamYaw != 0) val |= et(eProjBits::PROJBITS_YAW);
+		if (m_CamYaw != 0) val |= static_cast<et>(eProjBits::PROJBITS_YAW);
 
-		if (m_CamDepthBlur != 0) val |= et(eProjBits::PROJBITS_BLUR);
+		if (m_CamDepthBlur != 0) val |= static_cast<et>(eProjBits::PROJBITS_BLUR);
 
 		return val;
 	}
@@ -1240,11 +1240,11 @@ public:
 		z = m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z;
 		zr = Zeps(1 - m_CamPerspective * z);
 		sincos(t, &dsin, &dcos);
-		T prcx = point.m_X / ctr.CachedCarHalfX();
-		T prcy = y / ctr.CachedCarHalfY();
-		T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
-		T scale = m_BlurCurve ? (Sqr(dist) / (4 * m_BlurCurve)) : T(1);
-		T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
+		const T prcx = point.m_X / ctr.CachedCarHalfX();
+		const T prcy = y / ctr.CachedCarHalfY();
+		const T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
+		const T scale = m_BlurCurve ? (Sqr(dist) / (4 * m_BlurCurve)) : static_cast<T>(1);
+		const T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
 		point.m_X = (point.m_X + dr * dcos) / zr;
 		point.m_Y = (y + dr * dsin) / zr;
 		point.m_Z -= m_CamZPos;
@@ -1258,17 +1258,17 @@ public:
 	void ProjectPitchYawDepthBlur(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
 		T dsin, dcos;
-		T t = rand.Frand01<T>() * M_2PI;
+		const T t = rand.Frand01<T>() * M_2PI;
 		T z = point.m_Z - m_CamZPos;
-		T x = m_CamMat[0][0] * point.m_X + m_CamMat[1][0] * point.m_Y;
-		T y = m_CamMat[0][1] * point.m_X + m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
+		const T x = m_CamMat[0][0] * point.m_X + m_CamMat[1][0] * point.m_Y;
+		const T y = m_CamMat[0][1] * point.m_X + m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
 		z = m_CamMat[0][2] * point.m_X + m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z;
-		T zr = Zeps(1 - m_CamPerspective * z);
-		T prcx = x / ctr.CachedCarHalfX();
-		T prcy = y / ctr.CachedCarHalfY();
-		T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
-		T scale = m_BlurCurve ? (Sqr(dist) / (4 * m_BlurCurve)) : T(1);
-		T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
+		const T zr = Zeps(1 - m_CamPerspective * z);
+		const T prcx = x / ctr.CachedCarHalfX();
+		const T prcy = y / ctr.CachedCarHalfY();
+		const T dist = VarFuncs<T>::Hypot(prcx, prcy) * 10;
+		const T scale = m_BlurCurve ? (Sqr(dist) / (4 * m_BlurCurve)) : static_cast<T>(1);
+		const T dr = rand.Frand01<T>() * (m_BlurCoef * scale) * z;
 		sincos(t, &dsin, &dcos);
 		point.m_X = (x + dr * dcos) / zr;
 		point.m_Y = (y + dr * dsin) / zr;
@@ -1282,10 +1282,10 @@ public:
 	/// <param name="rand">Ignored</param>
 	void ProjectPitchYaw(Point<T>& point, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand, const CarToRas<T>& ctr)
 	{
-		T z = point.m_Z - m_CamZPos;
-		T x = m_CamMat[0][0] * point.m_X + m_CamMat[1][0] * point.m_Y;
-		T y = m_CamMat[0][1] * point.m_X + m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
-		T zr = Zeps(1 - m_CamPerspective * (m_CamMat[0][2] * point.m_X + m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z));
+		const T z = point.m_Z - m_CamZPos;
+		const T x = m_CamMat[0][0] * point.m_X + m_CamMat[1][0] * point.m_Y;
+		const T y = m_CamMat[0][1] * point.m_X + m_CamMat[1][1] * point.m_Y + m_CamMat[2][1] * z;
+		const T zr = Zeps(1 - m_CamPerspective * (m_CamMat[0][2] * point.m_X + m_CamMat[1][2] * point.m_Y + m_CamMat[2][2] * z));
 		point.m_X = x / zr;
 		point.m_Y = y / zr;
 		point.m_Z -= m_CamZPos;
@@ -1428,7 +1428,7 @@ public:
 			m_FinalRasW = 100;
 			m_FinalRasH = 100;
 			m_Supersample = 1;
-			m_SpatialFilterRadius = T(0.5);
+			m_SpatialFilterRadius = static_cast<T>(0.5);
 			m_Zoom = 0;
 			m_ProjFunc = &EmberNs::Ember<T>::ProjectNone;
 			m_CamZPos = 0;
@@ -1443,10 +1443,10 @@ public:
 			m_SubBatchSize = 10240;
 			m_RandPointRange = 1;
 			m_FuseCount = 15;
-			m_MaxRadDE = T(9.0);
+			m_MaxRadDE = static_cast<T>(9.0);
 			m_MinRadDE = 0;
-			m_CurveDE = T(0.4);
-			m_GammaThresh = T(0.01);
+			m_CurveDE = static_cast<T>(0.4);
+			m_GammaThresh = static_cast<T>(0.01);
 			m_TemporalSamples = 100;
 			m_SpatialFilterType = eSpatialFilterType::GAUSSIAN_SPATIAL_FILTER;
 			m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
@@ -1702,7 +1702,7 @@ public:
 
 	//Gamma threshold used in gamma correction during final accumulation.
 	//Xml field: "gamma_threshold".
-	T m_GammaThresh = T(0.01);
+	T m_GammaThresh = static_cast<T>(0.01);
 
 	//Value to control saturation of some pixels in gamma correction during final accumulation.
 	//Xml field: "highlight_power".
@@ -1760,13 +1760,13 @@ public:
 
 	//The shape of the curve that governs how quickly or slowly the filter drops off as it moves away from the center point.
 	//Xml field: "estimator_curve".
-	T m_CurveDE = T(0.4);
+	T m_CurveDE = static_cast<T>(0.4);
 
 	//Spatial Filter.
 
 	//The radius of the spatial filter used in final accumulation.
 	//Xml field: "filter".
-	T m_SpatialFilterRadius = T(0.5);
+	T m_SpatialFilterRadius = static_cast<T>(0.5);
 
 	//The type of spatial filter used in final accumulation:
 	//Gaussian, Hermite, Box, Triangle, Bell, Bspline, Lanczos3
@@ -1871,7 +1871,7 @@ private:
 		for (size_t k = 0; k < size; k++)
 			t += coefs[k] * embers[k].*m;
 
-		this->*m = size_t(std::rint(t));
+		this->*m = static_cast<size_t>(std::rint(t));
 	}
 
 	/// <summary>
@@ -1886,7 +1886,7 @@ private:
 	template <T Xform<T>::*m>
 	void InterpXform(Xform<T>* xform, size_t i, const Ember<T>* embers, const vector<T>& coefs, size_t size)
 	{
-		xform->*m = T(0);
+		xform->*m = static_cast<T>(0);
 
 		for (size_t k = 0; k < size; k++)
 			xform->*m += coefs[k] * embers[k].GetTotalXform(i)->*m;

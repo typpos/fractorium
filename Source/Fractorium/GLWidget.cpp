@@ -232,7 +232,7 @@ void GLWidget::DrawQuad()
 		//Only draw if the dimensions match exactly.
 		if (m_TexWidth == m_Fractorium->m_Controller->FinalRasW() &&
 				m_TexHeight == m_Fractorium->m_Controller->FinalRasH() &&
-				((m_TexWidth * m_TexHeight) == GLint(finalImage->size())))
+				((m_TexWidth * m_TexHeight) == static_cast<GLint>(finalImage->size())))
 		{
 			glMatrixMode(GL_PROJECTION);
 			glPushMatrix();
@@ -284,7 +284,7 @@ void GLWidget::DrawQuad()
 
 				if (finalImage &&//Make absolutely sure all image dimensions match when copying host side buffer to GL texture.
 						!finalImage->empty() &&
-						((m_TexWidth * m_TexHeight) == GLint(finalImage->size())) &&
+						((m_TexWidth * m_TexHeight) == static_cast<GLint>(finalImage->size())) &&
 						(finalImage->size() == renderer->FinalDimensions()))
 					this->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_FLOAT, finalImage->data());
 			}
@@ -1243,8 +1243,8 @@ bool GLWidget::Allocate(bool force)
 
 	if (doIt)
 	{
-		m_TexWidth = GLint(w);
-		m_TexHeight = GLint(h);
+		m_TexWidth = static_cast<GLint>(w);
+		m_TexHeight = static_cast<GLint>(h);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
@@ -1275,8 +1275,8 @@ bool GLWidget::Allocate(bool force)
 
 	if (doIt)
 	{
-		m_TexWidth = GLint(w);
-		m_TexHeight = GLint(h);
+		m_TexWidth = static_cast<GLint>(w);
+		m_TexHeight = static_cast<GLint>(h);
 		this->glEnable(GL_TEXTURE_2D);
 
 		if (doResize)
@@ -1335,7 +1335,7 @@ void GLWidget::SetViewport()
 {
 	if (m_Init && (m_ViewWidth != m_TexWidth || m_ViewHeight != m_TexHeight))
 	{
-		this->glViewport(0, 0, GLint(m_TexWidth), GLint(m_TexHeight));
+		this->glViewport(0, 0, static_cast<GLint>(m_TexWidth), static_cast<GLint>(m_TexHeight));
 #ifdef USE_GLSL
 		m_Viewport = glm::ivec4(0, 0, m_TexWidth, m_TexHeight);
 #endif

@@ -824,7 +824,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_ColorDialog->setCurrentColor(QColor(m_Ember.m_Background.r * 255, m_Ember.m_Background.g * 255, m_Ember.m_Background.b * 255));
 	m_Fractorium->ui.ColorTable->item(m_Fractorium->m_BgRow, 1)->setBackgroundColor(m_Fractorium->m_ColorDialog->currentColor());
 	BackgroundChanged(m_Fractorium->m_ColorDialog->currentColor());
-	m_Fractorium->m_PaletteModeCombo->SetCurrentIndexStealth(int{ m_Ember.m_PaletteMode });
+	m_Fractorium->m_PaletteModeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_PaletteMode));
 	m_Fractorium->m_WidthSpin->SetValueStealth(m_Ember.m_FinalRasW);//Geometry.
 	m_Fractorium->m_HeightSpin->SetValueStealth(m_Ember.m_FinalRasH);
 	m_Fractorium->m_CenterXSpin->SetValueStealth(m_Ember.m_CenterX);
@@ -839,9 +839,9 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_DepthBlurSpin->SetValueStealth(m_Ember.m_CamDepthBlur);
 	m_Fractorium->m_BlurCurveSpin->SetValueStealth(m_Ember.m_BlurCurve);
 	m_Fractorium->m_SpatialFilterWidthSpin->SetValueStealth(m_Ember.m_SpatialFilterRadius);//Filter.
-	m_Fractorium->m_SpatialFilterTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_SpatialFilterType });
+	m_Fractorium->m_SpatialFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_SpatialFilterType));
 	m_Fractorium->m_TemporalFilterWidthSpin->SetValueStealth(m_Ember.m_TemporalFilterWidth);
-	m_Fractorium->m_TemporalFilterTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_TemporalFilterType });
+	m_Fractorium->m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_TemporalFilterType));
 	m_Fractorium->m_TemporalFilterExpSpin->SetValueStealth(m_Ember.m_TemporalFilterExp);
 	m_Fractorium->m_DEFilterMinRadiusSpin->SetValueStealth(m_Ember.m_MinRadDE);
 	m_Fractorium->m_DEFilterMaxRadiusSpin->SetValueStealth(m_Ember.m_MaxRadDE);
@@ -851,8 +851,8 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_RandRangeSpin->SetValueStealth(m_Ember.m_RandPointRange);
 	m_Fractorium->m_QualitySpin->SetValueStealth(m_Ember.m_Quality);
 	m_Fractorium->m_SupersampleSpin->SetValueStealth(m_Ember.m_Supersample);
-	m_Fractorium->m_AffineInterpTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_AffineInterp });
-	m_Fractorium->m_InterpTypeCombo->SetCurrentIndexStealth(int{ m_Ember.m_Interp });
+	m_Fractorium->m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_AffineInterp));
+	m_Fractorium->m_InterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_Interp));
 	auto temp = m_Ember.m_Palette.m_Filename;
 
 	if (temp.get())

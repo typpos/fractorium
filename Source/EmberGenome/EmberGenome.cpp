@@ -878,6 +878,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		else
 #endif
 			b = EmberGenome<float>(argc, argv, opt);
+
+		cout << std::flush;
 	}
 
 	return b ? 0 : 1;

@@ -9,11 +9,11 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_21.21.4.1.msi](https://drive.google.com/file/d/1O-8Hh7rH1911teQDnc8iTeC1oCtn6320/view?usp=sharing)
+Download: [Fractorium_22.21.4.2.msi](https://drive.google.com/file/d/1eeUNoAvkrfSG6fCObAYE1e2vmvUQY6MR/view?usp=sharing)
 
 ## Mac
 
-Download: [Fractorium_21.21.4.1.dmg](https://drive.google.com/file/d/1dJB9uYA-JCjPOqe_0MjlaCE_oNX0KUPq/view?usp=sharing)
+Download: [Fractorium_22.21.4.2.dmg](https://drive.google.com/file/d/19cT7EyqmC-bMFl5PdBMaQE-qNbLz0wrR/view?usp=sharing)
 
 ## Linux
 
@@ -37,16 +37,16 @@ sudo apt-get install fractorium
 
 Install ubuntu.
 
-Download: [Fractorium-21.21.4.1.x86_64.deb](https://drive.google.com/file/d/1LfaHuWr5_Ns_V_NDiFy7H8OrlveJJG_e/view?usp=sharing)
+Download: [Fractorium-22.21.4.2.x86_64.deb](https://drive.google.com/file/d/1KJTQEh7Ll4fMTloTDPIZIJGkTL2eEbIj/view?usp=sharing)
 
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-21.21.4.1.x86_64.deb
+sudo dpkg -i Fractorium-22.21.4.2.x86_64.deb
 ```
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-21.21.4.1.x86_64.rpm](https://drive.google.com/file/d/1gGV55CP4KxY9vc42SGvWRWhlo4NkUXK9/view?usp=sharing)
+Download: [Fractorium-22.21.4.2.x86_64.rpm](https://drive.google.com/file/d/1VNT77_V51O4o01_Q_3SToZjr-L4SX_cy/view?usp=sharing)
 
 # Building from git
 

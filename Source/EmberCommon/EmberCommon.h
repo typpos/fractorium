@@ -347,13 +347,13 @@ static string MakeSingleFilename(const string& path, const string& out, const st
 	}
 	else if (useFinalName)
 	{
-		filename = path + CleanPath(prefix + finalName + suffix + "." + format);
+		filename = path + prefix + CleanPath(finalName + suffix + "." + format);
 	}
 	else
 	{
 		ostringstream fnstream;
-		fnstream << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << i << suffix << "." << format;
-		filename = path + CleanPath(fnstream.str());
+		fnstream << setfill('0') << setprecision(0) << fixed << setw(padding) << i << suffix << "." << format;
+		filename = path + prefix + CleanPath(fnstream.str());
 	}
 
 	return filename;
@@ -371,8 +371,8 @@ static string MakeSingleFilename(const string& path, const string& out, const st
 static string MakeAnimFilename(const string& path, const string& prefix, const string& suffix, const string& format, glm::uint padding, size_t ftime)
 {
 	ostringstream fnstream;
-	fnstream << prefix << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << suffix << format;
-	return path + CleanPath(fnstream.str());
+	fnstream << setfill('0') << setprecision(0) << fixed << setw(padding) << ftime << suffix << format;
+	return path + prefix + CleanPath(fnstream.str());
 }
 
 /// <summary>

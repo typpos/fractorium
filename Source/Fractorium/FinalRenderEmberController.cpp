@@ -124,9 +124,9 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		{
 			//Save backup Xml.
 			if (doAll)
-				m_XmlWriter.Save(backup.toStdString().c_str(), m_EmberFile.m_Embers, 0, true, false, true, false, false);
+				m_XmlWriter.Save(backup.toStdString().c_str(), m_EmberFile.m_Embers, 0, true, true, false, true, true);
 			else
-				m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, false, true, false, false);
+				m_XmlWriter.Save(backup.toStdString().c_str(), *m_Ember, 0, true, true, false, true, true);
 
 			SyncGuiToRenderer();
 			m_GuiState.m_Strips = VerifyStrips(m_Ember->m_FinalRasH, m_GuiState.m_Strips,

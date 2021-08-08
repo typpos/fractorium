@@ -733,11 +733,11 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 /// <param name="name">The base filename to compose a full path for</param>
 /// <returns>The fully composed path</returns>
 template <typename T>
-QString FinalRenderEmberController<T>::ComposePath(const QString& name)
+QString FinalRenderEmberController<T>::ComposePath(const QString& name, bool unique)
 {
 	const auto path = MakeEnd(m_Settings->SaveFolder(), '/');//Base path.
 	const auto full = path + m_FinalRenderDialog->Prefix() + name + m_FinalRenderDialog->Suffix() + "." + m_FinalRenderDialog->Ext();
-	return EmberFile<T>::UniqueFilename(full);
+	return unique ? EmberFile<T>::UniqueFilename(full) : full;
 }
 
 /// <summary>
@@ -939,14 +939,15 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 	rlg l(m_ProgressCs);
 	const auto renderTimeString = renderTimer.Format(renderTimer.Toc());
 	QString status;
-	const auto filename = ComposePath(QString::fromStdString(ember.m_Name));
+	const auto filename = ComposePath(QString::fromStdString(ember.m_Name), false);
 	const auto itersString = ToString<qulonglong>(stats.m_Iters);
 	const auto itersPerSecString = ToString<qulonglong>(static_cast<size_t>(stats.m_Iters / (stats.m_IterMs / 1000.0)));
 
 	if (m_GuiState.m_SaveXml)
 	{
 		const QFileInfo xmlFileInfo(filename);//Create another one in case it was modified for batch rendering.
-		const QString newPath = xmlFileInfo.absolutePath() + '/' + xmlFileInfo.completeBaseName() + ".flame";
+		QString newPath = xmlFileInfo.absolutePath() + '/' + xmlFileInfo.completeBaseName() + ".flame";
+		newPath = EmberFile<T>::UniqueFilename(newPath);
 		const xmlDocPtr tempEdit = ember.m_Edits;
 		ember.m_Edits = m_XmlWriter.CreateNewEditdoc(&ember, nullptr, "edit", m_Settings->Nick().toStdString(), m_Settings->Url().toStdString(), m_Settings->Id().toStdString(), "", 0, 0);
 		m_XmlWriter.Save(newPath.toStdString().c_str(), ember, 0, true, false, true);//Note that the ember passed is used, rather than m_Ember because it's what was actually rendered.

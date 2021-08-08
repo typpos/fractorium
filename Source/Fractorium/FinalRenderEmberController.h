@@ -68,7 +68,7 @@ public:
 	virtual void ResetProgress(bool total = true) { }
 	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory() { return tuple<size_t, size_t, size_t>(0, 0, 0); }
 	virtual double OriginalAspect() { return 1; }
-	virtual QString ComposePath(const QString& name) { return ""; }
+	virtual QString ComposePath(const QString& name, bool unique = true) { return ""; }
 	virtual bool BumpQualityRender(double d) { return false; }
 	virtual QString SaveCurrentAgain() { return ""; }
 	virtual void CancelRender() { }
@@ -132,7 +132,7 @@ public:
 	tuple<size_t, size_t, size_t> SyncAndComputeMemory() override;
 	double OriginalAspect() override { return double(m_Ember->m_OrigFinalRasW) / m_Ember->m_OrigFinalRasH; }
 	QString Name() const override { return QString::fromStdString(m_Ember->m_Name); }
-	QString ComposePath(const QString& name) override;
+	QString ComposePath(const QString& name, bool unique = true) override;
 	QString SaveCurrentAgain() override;
 	void CancelRender() override;
 	QString CheckMemory(const tuple<size_t, size_t, size_t>& p) override;

@@ -86,7 +86,7 @@ public:
 		string holesweight     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t theta = precalcAtanyx;\n"
-		   << "\t\treal_t t = (!" << thicknessweight << " ? " << weight << " : MwcNext01(mwc) * " << thicknessweight << ") / cos(" << n << " * theta) - " << holesweight << ";\n"
+		   << "\t\treal_t t = (" << thicknessweight << " == (real_t)(0.0) ? " << weight << " : MwcNext01(mwc) * " << thicknessweight << ") / cos(" << n << " * theta) - " << holesweight << ";\n"
 		   << "\n"
 		   << "\t\tif (fabs(t) != 0)\n"
 		   << "\t\t{\n"

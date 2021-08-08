@@ -208,13 +208,13 @@ public:
 		QString base = original.completeBaseName();
 		const QString path = original.absolutePath() + '/';
 		const QString extension = original.suffix();
+		newPath = path + base + "." + extension;
 
-		do
+		while (QFile::exists(newPath))
 		{
 			base = IncrementTrailingUnderscoreInt(base);
 			newPath = path + base + "." + extension;
 		}
-		while (QFile::exists(newPath));
 
 		return newPath;
 	}

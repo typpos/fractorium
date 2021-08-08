@@ -1597,8 +1597,8 @@ public:
 		   << "\n"
 		   << "\t\t//exponential to make a tiled circle\n"
 		   << "\t\treal_t rangle = floor(MwcNext01(mwc) * " << p3nprecalc << ") * M_2PI * " << p13nprecalc << ";\n"
-		   << "\t\treal_t y_aux = " << flipy << " ? (add ? vIn.y : -vIn.y) : vIn.y;\n"
-		   << "\t\treal_t x_aux = " << flipx << " ? (add ? vIn.x : -vIn.x) : vIn.x;\n"
+		   << "\t\treal_t y_aux = " << flipy << " != (real_t)(0.0) ? (add ? vIn.y : -vIn.y) : vIn.y;\n"
+		   << "\t\treal_t x_aux = " << flipx << " != (real_t)(0.0) ? (add ? vIn.x : -vIn.x) : vIn.x;\n"
 		   << "\t\treal_t FY = y_aux * " << p13nprecalc << ";\n"
 		   << "\t\treal_t FX = x_aux * " << p13nprecalc << ";\n"
 		   << "\t\treal_t ang = fma(FY, MPI, rangle);\n"
@@ -7303,7 +7303,7 @@ public:
 			sinx = T(0.5) * (T(1.0) + std::sin(helper.In.y * m_Freqx));
 		}
 
-		T offsetx = std::pow(sinx, px) * m_Scalex;
+		T offsetx = T(std::pow(sinx, px) * m_Scalex);
 
 		if (m_Modey < T(0.5))
 		{
@@ -7314,7 +7314,7 @@ public:
 			siny = T(0.5) * (T(1.0) + std::sin(helper.In.x * m_Freqy));
 		}
 
-		T offsety = std::pow(siny, py) * m_Scaley;
+		T offsety = T(std::pow(siny, py) * m_Scaley);
 		helper.Out.x = m_Weight * (helper.In.x + offsetx);
 		helper.Out.y = m_Weight * (helper.In.y + offsety);
 		helper.Out.z = DefaultZ(helper);

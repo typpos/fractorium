@@ -146,20 +146,17 @@
 			<Component Id="EmberCL.dll" Guid="21c0e372-c605-4e0d-9ba8-94e38949833b">
 				<File Id="EmberCL.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\$(var.Configuration)\EmberCL.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
-			<Component Id="Half2_3.dll" Guid="695cda02-1d6a-4e2a-8ccd-3a9600be2b96">
-				<File Id="Half2_3.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Half-2_3.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			<Component Id="Iex_3_1.dll" Guid="e485e9d1-c883-46f9-a898-5fdbbe6a83f8">
+				<File Id="Iex_3_1.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Iex-3_1.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
-			<Component Id="Iex2_3.dll" Guid="e485e9d1-c883-46f9-a898-5fdbbe6a83f8">
-				<File Id="Iex2_3.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Iex-2_3.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			<Component Id="OpenEXR_3_1.dll" Guid="911ec3b1-c2e2-439c-af3b-cd16a9280c7f">
+				<File Id="OpenEXR_3_1.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\OpenEXR-3_1.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
-			<Component Id="IlmImf2_3.dll" Guid="911ec3b1-c2e2-439c-af3b-cd16a9280c7f">
-				<File Id="IlmImf2_3.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\IlmImf-2_3.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			<Component Id="IlmThread_3_1.dll" Guid="89d0f2d4-7619-4bd2-8c22-6ae677d666b8">
+				<File Id="IlmThread_3_1.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\IlmThread-3_1.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
-			<Component Id="IlmThread2_3.dll" Guid="89d0f2d4-7619-4bd2-8c22-6ae677d666b8">
-				<File Id="IlmThread2_3.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\IlmThread-2_3.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
-			</Component>
-			<Component Id="Imath2_3.dll" Guid="16c3c309-18b7-4232-b19b-59e56d4b75bf">
-				<File Id="Imath2_3.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Imath-2_3.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
+			<Component Id="Imath_3_1.dll" Guid="16c3c309-18b7-4232-b19b-59e56d4b75bf">
+				<File Id="Imath_3_1.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\Imath-3_1.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
 			<Component Id="libxml2.dll" Guid="bb3aa687-7a3d-4d16-a27c-28529b472754">
 				<File Id="libxml2.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\libxml2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
@@ -168,19 +165,19 @@
 				<File Id="tbb.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\tbb.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
 			<Component Id="msvcp140.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
-				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30036\x64\Microsoft.VC142.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="vcruntime140.dll" Guid="50c9bc27-c547-4a03-9f6c-cd416f449dd8">
-				<File Id="vcruntime140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30036\x64\Microsoft.VC142.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="vcruntime140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="vcruntime140_1.dll" Guid="a02507f8-326b-45b2-b734-e5091921559f">
-				<File Id="vcruntime140_1.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30036\x64\Microsoft.VC142.CRT\vcruntime140_1.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="vcruntime140_1.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT\vcruntime140_1.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="vccorlib140.dll" Guid="affe33e7-1e64-4bb0-a062-2b56f77459b4">
-				<File Id="vccorlib140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30036\x64\Microsoft.VC142.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="vccorlib140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="concrt140.dll" Guid="7fb716a1-1b4f-42fb-89c7-4d216ebd6e2e">
-				<File Id="concrt140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30036\x64\Microsoft.VC142.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
+				<File Id="concrt140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>
 			<Component Id="flam3palettes.xml" Guid="d3adb0bb-14ef-4923-99d9-a5784b7ef04e">
 				<File Id="flam3palettes.xml" Source="$(var.SolutionDir)..\..\..\Data\flam3-palettes.xml" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>

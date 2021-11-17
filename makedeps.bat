@@ -11,7 +11,7 @@ git clone https://github.com/glennrp/libpng.git
 git clone https://github.com/GNOME/libxml2.git
 git clone https://github.com/g-truc/glm.git
 git clone -b tbb_2019 https://github.com/01org/tbb.git
-git clone -b v2.3.0 https://github.com/openexr/openexr.git
+git clone -b v3.1.3 https://github.com/AcademySoftwareFoundation/openexr.git
 
 REM libjpeg
 copy fractorium\Builds\MSVC\WIN32.MAK libjpeg
@@ -63,7 +63,7 @@ SET current=%cd%
 
 if not exist ".\output" mkdir .\output
 
-cd ..\OpenEXR
+REM cd ..\OpenEXR
 
 cmake -G "Visual Studio 16 2019"^
       -A x64^
@@ -82,19 +82,11 @@ cmake --build . --target install --config Release
 
 cd %current%
 
-copy %current%\output\lib\Half-2_3.lib %current%\..\fractorium\Deps\Half-2_3.lib
-copy %current%\output\lib\Iex-2_3.lib %current%\..\fractorium\Deps\Iex-2_3.lib
-copy %current%\output\lib\IexMath-2_3.lib %current%\..\fractorium\Deps\IexMath-2_3.lib
-copy %current%\output\lib\IlmImf-2_3.lib %current%\..\fractorium\Deps\IlmImf-2_3.lib
-copy %current%\output\lib\IlmImfUtil-2_3.lib %current%\..\fractorium\Deps\IlmImfUtil-2_3.lib
-copy %current%\output\lib\IlmThread-2_3.lib %current%\..\fractorium\Deps\IlmThread-2_3.lib
-copy %current%\output\lib\Imath-2_3.lib %current%\..\fractorium\Deps\Imath-2_3.lib
-copy %current%\OpenEXR\IlmImf\Release\IlmImf-2_3.dll %current%\..\fractorium\Deps\IlmImf-2_3.dll
-
 xcopy %current%\output\Include %current%\..\fractorium\Deps\Include\ /S /Y
-xcopy %current%\output\bin\*.dll %current%\..\fractorium\Deps\ /Y
-
-REM IlmImfUtil is not needed.
-del ..\fractorium\Deps\IlmImfUtil-2_3.dll
+xcopy %current%\output\bin\Iex-3_1.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\IlmThread-3_1.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\Imath-3_1.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\OpenEXR-3_1.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\lib\*.lib %current%\..\fractorium\Deps\ /Y
 
 cd ..\fractorium

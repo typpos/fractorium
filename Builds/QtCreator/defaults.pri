@@ -27,7 +27,7 @@ SRC_DIR = $$EMBER_ROOT/Source
 SRC_COMMON_DIR = $$absolute_path($$EMBER_ROOT/Source/EmberCommon)
 ASSETS_DIR = $$absolute_path($$EMBER_ROOT/Data)
 QTCREATOR_DIR = $$absolute_path($$EMBER_ROOT/Builds/QtCreator)
-win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2017)
+win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2019)
 
 #4) Add up all include paths.
 INCLUDEPATH += $$LOCAL_INCLUDE_DIR
@@ -42,7 +42,8 @@ win32 {
 	INCLUDEPATH += $$EXTERNAL_DIR/libxml2/include
 	INCLUDEPATH += $$EXTERNAL_DIR/tbb/include
 	INCLUDEPATH += $$EXTERNAL_DIR/zlib
-    INCLUDEPATH += $$absolute_path($$EXTERNAL_LIB)/include/OpenEXR
+	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/Imath
+    	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/OpenEXR
 }
 
 !win32 {
@@ -53,6 +54,7 @@ win32 {
 	INCLUDEPATH += /usr/local/include/GL
 	INCLUDEPATH += /usr/include/glm
 	INCLUDEPATH += /usr/include/tbb
+	INCLUDEPATH += /usr/include/Imath
     INCLUDEPATH += /usr/include/OpenEXR
 
         unix:!macx {
@@ -85,9 +87,10 @@ else {
         LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/tbb.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/Half-2_3.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-2_3.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmImf-2_3.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/Imath-3_1.lib
+		LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
 }
 
 !win32 {
@@ -95,9 +98,7 @@ else {
 	LIBS += -lpng
 	LIBS += -ltbb
 	LIBS += -lpthread
-    LIBS += -lHalf
-    LIBS += -lIex
-    LIBS += -lIlmImf
+    	LIBS += -lOpenEXR
 
         unix:!macx {
             LIBS += -lxml2
@@ -252,25 +253,21 @@ win32 {
 	tbb.files = $$absolute_path($$EMBER_ROOT/Deps/tbb.dll)
 	INSTALLS += tbb
 
-    half.path = $$BIN_INSTALL_DIR
-    half.files = $$absolute_path($$EMBER_ROOT/Deps/Half-2_3.dll)
-    INSTALLS += half
-
     iex.path = $$BIN_INSTALL_DIR
-    iex.files = $$absolute_path($$EMBER_ROOT/Deps/Iex-2_3.dll)
+    iex.files = $$absolute_path($$EMBER_ROOT/Deps/Iex-3_1.dll)
     INSTALLS += iex
 
     imath.path = $$BIN_INSTALL_DIR
-    imath.files = $$absolute_path($$EMBER_ROOT/Deps/Imath-2_3.dll)
+    imath.files = $$absolute_path($$EMBER_ROOT/Deps/Imath-3_1.dll)
     INSTALLS += imath
 
     ilmthread.path = $$BIN_INSTALL_DIR
-    ilmthread.files = $$absolute_path($$EMBER_ROOT/Deps/IlmThread-2_3.dll)
+    ilmthread.files = $$absolute_path($$EMBER_ROOT/Deps/IlmThread-3_1.dll)
     INSTALLS += ilmthread
 
-    ilmimf.path = $$BIN_INSTALL_DIR
-    ilmimf.files = $$absolute_path($$EMBER_ROOT/Deps/IlmImf-2_3.dll)
-    INSTALLS += ilmimf
+    openexr.path = $$BIN_INSTALL_DIR
+    openexr.files = $$absolute_path($$EMBER_ROOT/Deps/OpenEXR-3_1.dll)
+    INSTALLS += openexr
 }
 
 #11) Print values of relevant variables for debugging.

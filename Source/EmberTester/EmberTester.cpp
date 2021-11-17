@@ -9,6 +9,7 @@
 	#include <OpenEXR/ImfRgbaFile.h>
 	#include <OpenEXR/ImfStringAttribute.h>
 	#include <OpenEXR/half.h>
+	//#include <Imath/half.h>
 #else
 	#include <ImfRgbaFile.h>
 	#include <ImfStringAttribute.h>

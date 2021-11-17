@@ -67,6 +67,9 @@
 #include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImfStringAttribute.h>
 #include <OpenEXR/half.h>
+//May need these instead for openexr3
+//#include <Imath/half.h>
+//#include <Imath/ImathInt64.h>
 #include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfOutputFile.h>
 #define ENUM_DYLD_BOOL

@@ -40,7 +40,6 @@ win32 {
 	INCLUDEPATH += $$EXTERNAL_DIR/libjpeg
 	INCLUDEPATH += $$EXTERNAL_DIR/libpng
 	INCLUDEPATH += $$EXTERNAL_DIR/libxml2/include
-	INCLUDEPATH += $$EXTERNAL_DIR/tbb/include
 	INCLUDEPATH += $$EXTERNAL_DIR/zlib
 	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/Imath
     	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/OpenEXR
@@ -53,7 +52,6 @@ win32 {
 	INCLUDEPATH += /usr/include/GL
 	INCLUDEPATH += /usr/local/include/GL
 	INCLUDEPATH += /usr/include/glm
-	INCLUDEPATH += /usr/include/tbb
 	INCLUDEPATH += /usr/include/Imath
     INCLUDEPATH += /usr/include/OpenEXR
 
@@ -85,7 +83,6 @@ else {
         LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/tbb.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
@@ -96,7 +93,6 @@ else {
 !win32 {
 	LIBS += -ljpeg
 	LIBS += -lpng
-	LIBS += -ltbb
 	LIBS += -lpthread
     	LIBS += -lOpenEXR
 
@@ -248,10 +244,6 @@ win32 {
 	libxml.path = $$BIN_INSTALL_DIR
 	libxml.files = $$absolute_path($$EMBER_ROOT/Deps/libxml2.dll)
 	INSTALLS += libxml
-
-	tbb.path = $$BIN_INSTALL_DIR
-	tbb.files = $$absolute_path($$EMBER_ROOT/Deps/tbb.dll)
-	INSTALLS += tbb
 
     iex.path = $$BIN_INSTALL_DIR
     iex.files = $$absolute_path($$EMBER_ROOT/Deps/Iex-3_1.dll)

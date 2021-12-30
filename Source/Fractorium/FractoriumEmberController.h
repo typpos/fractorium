@@ -22,7 +22,7 @@ enum class eXformUpdate : et { UPDATE_SPECIFIC, UPDATE_CURRENT, UPDATE_SELECTED,
 /// An enum representing the type of synchronizing to do between the list of Embers kept in memory
 /// and the widgets in the library tree.
 /// </summary>
-enum eLibraryUpdate { INDEX = 1, NAME = 2, POINTER = 4 };
+enum class eLibraryUpdate { INDEX = 1, NAME = 2, POINTER = 4 };
 
 /// <summary>
 /// FractoriumEmberController and Fractorium need each other, but each can't include the other.
@@ -628,6 +628,10 @@ public:
 	{
 	}
 
+	virtual ~PreviewRenderer()
+	{
+	}
+
 	void Render(uint start, uint end)
 	{
 		Stop();
@@ -700,7 +704,7 @@ public:
 		m_Tree(tree),
 		m_EmberFile(emberFile)
 	{
-		auto f = m_Controller->m_Fractorium;
+		const auto f = m_Controller->m_Fractorium;
 		m_PreviewRenderer.Callback(nullptr);
 		m_PreviewRenderer.EarlyClip(f->m_Settings->EarlyClip());
 		m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());

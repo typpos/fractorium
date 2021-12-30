@@ -61,7 +61,7 @@
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\tbb\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include</AdditionalIncludeDirectories>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <PrecompiledHeaderFile>EmberPch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Precise</FloatingPointModel>
@@ -76,7 +76,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2.lib;tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -91,7 +91,7 @@
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\tbb\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PrecompiledHeaderFile>EmberPch.h</PrecompiledHeaderFile>
       <StringPooling>true</StringPooling>
@@ -108,7 +108,7 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libxml2.lib;tbb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

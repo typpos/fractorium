@@ -102,7 +102,7 @@ public:
 	TopArrow(int width, size_t index)
 	{
 		QPolygon area;
-		const auto center = 10;
+		constexpr int center = 10;
 		const auto mid = width / 2;
 		const auto left = center - mid;
 		const auto right = center + mid;

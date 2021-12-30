@@ -12,9 +12,29 @@
 /// <summary>
 /// Ember class.
 /// </summary>
-
 namespace EmberNs
 {
+static void parallel_for(size_t start, size_t end, size_t parlevel, std::function<void(size_t)> func)
+{
+	const auto ct = parlevel == 0 ? EmberNs::Timing::ProcessorCount() : parlevel;
+	std::vector<std::thread> threads(ct);
+	const auto chunkSize = (end - start) / ct;
+
+	for (size_t i = 0; i < ct; i++)
+	{
+		threads.push_back(std::thread([&, i]
+		{
+			const auto chunkStart = chunkSize* i;
+			const auto chunkEnd = std::min(chunkStart + chunkSize, end);
+
+			for (size_t j = chunkStart; j < chunkEnd; j++)
+				func(j);
+		}));
+	}
+
+	EmberNs::Join(threads);
+}
+
 template <typename T> class Interpolater;
 
 /// <summary>

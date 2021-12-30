@@ -163,6 +163,7 @@ private:
 		m_Option.nId = 0;
 		m_Option.pszArg = _T("--fillmein");
 		m_Option.nArgType = SO_NONE;
+		m_Val = T();
 	}
 
 public:

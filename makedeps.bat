@@ -10,7 +10,6 @@ git clone https://github.com/madler/zlib.git
 git clone https://github.com/glennrp/libpng.git
 git clone https://github.com/GNOME/libxml2.git
 git clone https://github.com/g-truc/glm.git
-git clone -b tbb_2019 https://github.com/01org/tbb.git
 git clone -b v3.1.3 https://github.com/AcademySoftwareFoundation/openexr.git
 
 REM libjpeg
@@ -45,17 +44,6 @@ copy ..\zlib\zconf.h zlib
 nmake -f scripts\makefile.vcwin32 all
 copy libpng.lib ..\fractorium\Deps
 cd ..
-
-REM tbb
-cd tbb\build\vs2013
-set "curdir=%cd%"
-devenv.exe makefile.sln /upgrade
-cd %curdir%
-REM Change PlatformToolset and WindowsTargetPlatformVersion to match whatever your version of Visual Studio supports. You can find this by opening makefile.sln in tbb\build\vs2013
-msbuild tbb.vcxproj /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v142 /p:WindowsTargetPlatformVersion=10.0.18362.0
-copy X64\Release\tbb.dll ..\..\..\fractorium\Deps
-copy X64\Release\tbb.lib ..\..\..\fractorium\Deps
-cd ..\..\..
 
 REM openexr
 cd openexr

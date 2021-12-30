@@ -44,14 +44,10 @@ protected:
 		if (e->type() == QEvent::MouseMove)
 		{
 			if (const auto me = dynamic_cast<QMouseEvent*>(e))
-			{
 				emit MouseDragged(me->localPos(), me->globalPos());
-			}
 		}
 		else if (e->type() == QEvent::MouseButtonRelease)
-		{
 			emit MouseReleased();
-		}
 
 		return QTableWidget::eventFilter(obj, e);
 	}

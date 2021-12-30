@@ -136,7 +136,7 @@ static bool Exists(const QString& s)
 /// <returns>The converted color</returns>
 static QColor VisibleColor(const QColor& color)
 {
-	const auto threshold = 105;
+	constexpr int threshold = 105;
 	const auto delta = (color.red()   * 0.299) + //Magic numbers gotten from a Stack Overflow post.
 					   (color.green() * 0.587) +
 					   (color.blue()  * 0.114);

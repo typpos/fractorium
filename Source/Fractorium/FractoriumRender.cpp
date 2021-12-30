@@ -125,7 +125,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 	if (filename != "")
 	{
 		bool ret = false;
-		auto size = width * height;
+		const auto size = width * height;
 		auto settings = m_Fractorium->m_Settings;
 		QFileInfo fileInfo(filename);
 		QString suffix = fileInfo.suffix();
@@ -245,7 +245,7 @@ template <typename T>
 int FractoriumEmberController<T>::ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs)
 {
 	QString status;
-	m_Fractorium->m_ProgressBar->setValue(int(fraction));//Only really applies to iter and filter, because final accum only gives progress 0 and 100.
+	QMetaObject::invokeMethod(m_Fractorium->m_ProgressBar, "setValue", Qt::QueuedConnection, Q_ARG(const int, int(fraction)));//Only really applies to iter and filter, because final accum only gives progress 0 and 100.
 
 	if (stage == 0)
 		status = "Iterating";
@@ -254,7 +254,7 @@ int FractoriumEmberController<T>::ProgressFunc(Ember<T>& ember, void* foo, doubl
 	else if (stage == 2)
 		status = "Spatial Filtering + Final Accumulation";
 
-	m_Fractorium->m_RenderStatusLabel->setText(status);
+	QMetaObject::invokeMethod(m_Fractorium->m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status));
 	return m_ProcessActions.empty() ? 1 : 0;//If they've done anything, abort.
 }
 
@@ -289,10 +289,10 @@ bool FractoriumEmberController<T>::SyncSizes()
 	auto gl = m_Fractorium->ui.GLDisplay;
 	RendererCL<T, float>* rendererCL = nullptr;
 
-	if (!m_GLController->SizesMatch())
+	if (gl && !m_GLController->SizesMatch())
 	{
 		m_GLController->ClearWindow();
-		gl->SetDimensions(int(m_Ember.m_FinalRasW), int(m_Ember.m_FinalRasH));
+		gl->SetDimensions(static_cast<int>(m_Ember.m_FinalRasW), static_cast<int>(m_Ember.m_FinalRasH));
 		gl->Allocate();
 		gl->SetViewport();
 
@@ -321,12 +321,12 @@ bool FractoriumEmberController<T>::Render()
 	bool success = true;
 	auto gl = m_Fractorium->ui.GLDisplay;
 	RendererCL<T, float>* rendererCL = nullptr;
-	eProcessAction qualityAction, action;
+	eProcessAction qualityAction = eProcessAction::NOTHING, action = eProcessAction::NOTHING;
 	//Quality is the only parameter we update inside the timer.
 	//This is to allow the user to rapidly increase the quality spinner
 	//without fully resetting the render. Instead, it will just keep iterating
 	//where it last left off in response to an increase.
-	T d = T(m_Fractorium->m_QualitySpin->value());
+	T d = static_cast<T>(m_Fractorium->m_QualitySpin->value());
 
 	if (d < m_Ember.m_Quality)//Full restart if quality decreased.
 	{
@@ -358,8 +358,8 @@ bool FractoriumEmberController<T>::Render()
 	if (action != eProcessAction::NOTHING)
 	{
 		size_t i = 0;
-		int solo = m_Ember.m_Solo;
-		bool forceFinal = m_Fractorium->HaveFinal();
+		const auto solo = m_Ember.m_Solo;
+		const bool forceFinal = m_Fractorium->HaveFinal();
 
 		if (solo != -1)
 		{
@@ -388,7 +388,7 @@ bool FractoriumEmberController<T>::Render()
 	}
 
 	//Determining if a completely new rendering process is being started.
-	bool iterBegin = ProcessState() == eProcessState::NONE;
+	const auto iterBegin = ProcessState() == eProcessState::NONE;
 
 	if (iterBegin)
 	{
@@ -398,14 +398,15 @@ bool FractoriumEmberController<T>::Render()
 			m_SubBatchCount = m_Fractorium->m_Settings->OpenCLSubBatch();
 
 		m_Fractorium->m_ProgressBar->setValue(0);
-		m_Fractorium->m_RenderStatusLabel->setText("Starting");
+		const QString status = "Starting";
+		QMetaObject::invokeMethod(m_Fractorium->m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status));
 	}
 
 	//If the rendering process hasn't finished, render with the current specified action.
 	if (ProcessState() != eProcessState::ACCUM_DONE)
 	{
 		//if (m_Renderer->Run(m_FinalImage, 0) == RENDER_OK)//Full, non-incremental render for debugging.
-		bool update = iterBegin || m_Fractorium->m_Settings->ContinuousUpdate();
+		const bool update = iterBegin || m_Fractorium->m_Settings->ContinuousUpdate();
 		eRenderStatus result;
 
 		if ((result = m_Renderer->Run(m_FinalImage, 0, m_SubBatchCount, update)) == eRenderStatus::RENDER_OK)//Force output on iterBegin or if the settings specify to always do it.
@@ -428,23 +429,25 @@ bool FractoriumEmberController<T>::Render()
 			//Rendering has finished, update final stats.
 			if (ProcessState() == eProcessState::ACCUM_DONE)
 			{
-				auto stats = m_Renderer->Stats();
+				const auto stats = m_Renderer->Stats();
 				auto iters = ToString<qulonglong>(stats.m_Iters);
-				auto scaledQuality = ToString(uint(m_Renderer->ScaledQuality()));
+				auto scaledQuality = ToString(static_cast<intmax_t>(m_Renderer->ScaledQuality()));
 				auto renderTime = m_RenderElapsedTimer.Format(m_RenderElapsedTimer.Toc());
 				m_Fractorium->m_ProgressBar->setValue(100);
 
 				//Only certain stats can be reported with OpenCL.
 				if (m_Renderer->RendererType() == eRendererType::OPENCL_RENDERER)
 				{
-					m_Fractorium->m_RenderStatusLabel->setText("Iters: " + iters + ". Scaled quality: " + scaledQuality + ". Total time: " + QString::fromStdString(renderTime) + ".");
+					const QString status = "Iters: " + iters + ". Scaled quality: " + scaledQuality + ". Total time: " + QString::fromStdString(renderTime) + ".";
+					QMetaObject::invokeMethod(m_Fractorium->m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status));
 				}
 				else
 				{
-					double percent = double(stats.m_Badvals) / double(stats.m_Iters);
+					const auto percent = static_cast<double>(stats.m_Badvals) / static_cast<double>(stats.m_Iters);
 					auto badVals = ToString<qulonglong>(stats.m_Badvals);
 					auto badPercent = QLocale::system().toString(percent * 100, 'f', 2);
-					m_Fractorium->m_RenderStatusLabel->setText("Iters: " + iters + ". Scaled quality: " + scaledQuality + ". Bad values: " + badVals + " (" + badPercent + "%). Total time: " + QString::fromStdString(renderTime) + ".");
+					const QString status = "Iters: " + iters + ". Scaled quality: " + scaledQuality + ". Bad values: " + badVals + " (" + badPercent + "%). Total time: " + QString::fromStdString(renderTime) + ".";
+					QMetaObject::invokeMethod(m_Fractorium->m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status));
 				}
 
 				if (m_LastEditWasUndoRedo && (m_UndoIndex == m_UndoList.size() - 1))//Traversing through undo list, reached the end, so put back in regular edit mode.
@@ -453,7 +456,7 @@ bool FractoriumEmberController<T>::Render()
 				}
 				else if (m_EditState == eEditUndoState::REGULAR_EDIT)//Regular edit, just add to the end of the undo list.
 				{
-					auto btn = QApplication::mouseButtons();
+					const auto btn = QApplication::mouseButtons();
 
 					if ((action == eProcessAction::ACCUM_ONLY || action == eProcessAction::FILTER_AND_ACCUM) ||
 							(!btn.testFlag(Qt::LeftButton) && !btn.testFlag(Qt::RightButton) && !btn.testFlag(Qt::MiddleButton)))
@@ -512,7 +515,8 @@ bool FractoriumEmberController<T>::Render()
 			auto errors = m_Renderer->ErrorReport();
 			success = false;
 			m_FailedRenders++;
-			m_Fractorium->m_RenderStatusLabel->setText("Rendering failed, see info tab. Try changing parameters.");
+			const QString status = "Rendering failed, see info tab. Try changing parameters.";
+			QMetaObject::invokeMethod(m_Fractorium->m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status));
 			m_Fractorium->ErrorReportToQTextEdit(errors, m_Fractorium->ui.InfoRenderingTextEdit);
 			m_Renderer->ClearErrorReport();
 
@@ -520,7 +524,8 @@ bool FractoriumEmberController<T>::Render()
 			{
 				m_Rendering = false;
 				StopRenderTimer(true);
-				m_Fractorium->m_RenderStatusLabel->setText("Rendering failed 3 or more times, stopping all rendering, see info tab. Try changing renderer types.");
+				const QString status2 = "Rendering failed 3 or more times, stopping all rendering, see info tab. Try changing renderer types.";
+				QMetaObject::invokeMethod(m_Fractorium->m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status2));
 				ClearFinalImages();
 				m_GLController->ClearWindow();
 
@@ -604,11 +609,11 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 				m_Fractorium->m_QualitySpin->setValue(val);
 
 			if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(m_Renderer.get()))
-				rendererCL->SubBatchPercentPerThread(float(s->OpenCLSubBatchPct()));
+				rendererCL->SubBatchPercentPerThread(static_cast<float>(s->OpenCLSubBatchPct()));
 		}
 		else
 		{
-			auto quality = m_Fractorium->m_Settings->CpuQuality();
+			const auto quality = m_Fractorium->m_Settings->CpuQuality();
 			m_Fractorium->m_QualitySpin->DoubleClickZero(quality);
 			m_Fractorium->m_QualitySpin->DoubleClickNonZero(quality);
 
@@ -684,9 +689,9 @@ void Fractorium::ShutdownAndRecreateFromOptions(bool updatePreviews)
 bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 {
 	bool ok = true;
-	bool useOpenCL = m_Info->Ok() && m_Settings->OpenCL();
+	const auto useOpenCL = m_Info->Ok() && m_Settings->OpenCL();
 	auto v = Devices(m_Settings->Devices());
-	bool doOpenCL = useOpenCL && !v.empty();
+	const auto doOpenCL = useOpenCL && !v.empty();
 	ui.ActionCopyKernel->setEnabled(doOpenCL);
 
 	//The most important option to process is what kind of renderer is desired, so do it first.
@@ -712,8 +717,9 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 	{
 		rendererCL->m_CompileBegun = [&]()
 		{
-			m_RenderStatusLabel->setText("Compiling OpenCL kernel...");
-			m_RenderStatusLabel->repaint();
+			const QString status = "Compiling OpenCL kernel...";
+			QMetaObject::invokeMethod(m_RenderStatusLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, status));
+			//m_RenderStatusLabel->repaint();
 			QApplication::processEvents();
 		};
 	}
@@ -728,7 +734,7 @@ bool Fractorium::CreateRendererFromOptions(bool updatePreviews)
 /// <returns>True if successful, else false.</returns>
 bool Fractorium::CreateControllerFromOptions()
 {
-	size_t elementSize =
+	const size_t elementSize =
 #ifdef DO_DOUBLE
 		m_Settings->Double() ? sizeof(double) :
 #endif
@@ -736,14 +742,14 @@ bool Fractorium::CreateControllerFromOptions()
 
 	if (!m_Controller.get() || (m_Controller->SizeOfT() != elementSize))
 	{
-		auto hue = m_PaletteHueSpin->value();
-		auto sat = m_PaletteSaturationSpin->value();
-		auto bright = m_PaletteBrightnessSpin->value();
-		auto con = m_PaletteContrastSpin->value();
-		auto blur = m_PaletteBlurSpin->value();
-		auto freq = m_PaletteFrequencySpin->value();
-		auto rot = m_PreviewPaletteRotation;
-		double scale;
+		const auto hue = m_PaletteHueSpin->value();
+		const auto sat = m_PaletteSaturationSpin->value();
+		const auto bright = m_PaletteBrightnessSpin->value();
+		const auto con = m_PaletteContrastSpin->value();
+		const auto blur = m_PaletteBlurSpin->value();
+		const auto freq = m_PaletteFrequencySpin->value();
+		const auto rot = m_PreviewPaletteRotation;
+		double scale = 0;
 		uint current = 0;
 #ifdef DO_DOUBLE
 		EmberFile<double> efd;
@@ -752,7 +758,7 @@ bool Fractorium::CreateControllerFromOptions()
 		EmberFile<float> efd;
 		Palette<float> tempPalette;
 #endif
-		QModelIndex index = ui.LibraryTree->currentIndex();
+		const QModelIndex index = ui.LibraryTree->currentIndex();
 		ui.LibraryTree->clear();//This must be here before FillLibraryTree() is called below, else a spurious EmberTreeItemChanged event will be called on a deleted object.
 
 		//First check if a controller has already been created, and if so, save its embers and gracefully shut it down.
@@ -822,7 +828,7 @@ void Fractorium::StartRenderTimer(bool updatePreviews)
 {
 	//Starting the render timer, either for the first time
 	//or from a paused state, such as resizing or applying new options.
-	bool newController = CreateControllerFromOptions();
+	const auto newController = CreateControllerFromOptions();
 
 	if (m_Controller.get())
 	{

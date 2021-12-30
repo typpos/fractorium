@@ -871,19 +871,12 @@ bool Renderer<T, bucketT>::Alloc(bool histOnly)
 template <typename T, typename bucketT>
 bool Renderer<T, bucketT>::ResetBuckets(bool resetHist, bool resetAccum)
 {
-	//parallel_invoke(
-	//[&]
-	//{
 	if (resetHist && !m_HistBuckets.empty())
 		Memset(m_HistBuckets);
 
-	//},
-	//[&]
-	//{
 	if (resetAccum && !m_AccumulatorBuckets.empty())
 		Memset(m_AccumulatorBuckets);
 
-	//});
 	return resetHist || resetAccum;
 }
 
@@ -930,7 +923,7 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 	//Timing t(4);
 	//Original didn't parallelize this, doing so gives a 50-75% speedup.
 	//The value can be directly assigned, which is quicker than summing.
-	parallel_for(startRow, endRow, static_cast<size_t>(1), [&](size_t j)
+	parallel_for(startRow, endRow, m_ThreadsToUse, [&](size_t j)
 	{
 		size_t row = j * m_SuperRasW;
 		size_t rowEnd = row + endCol;
@@ -954,11 +947,7 @@ eRenderStatus Renderer<T, bucketT>::LogScaleDensityFilter(bool forceOutput)
 				}
 			}
 		}
-	}
-#if defined(_WIN32) || defined(__APPLE__)
-	, tbb::static_partitioner()
-#endif
-				);
+	});
 
 	if (m_Callback && !m_Abort)
 		if (!m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0))
@@ -982,14 +971,13 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 	bool scf = !(Supersample() & 1);
 	intmax_t ss = Floor<T>(Supersample() / static_cast<T>(2));
 	T scfact = std::pow(Supersample() / (Supersample() + static_cast<T>(1)), static_cast<T>(2));
-	size_t threads = m_ThreadsToUse;
 	size_t startRow = Supersample() - 1;
 	size_t endRow = m_SuperRasH - (Supersample() - 1);//Original did + which is most likely wrong.
 	intmax_t startCol = Supersample() - 1;
 	intmax_t endCol = m_SuperRasW - (Supersample() - 1);
-	size_t chunkSize = static_cast<size_t>(std::ceil(static_cast<double>(endRow - startRow) / static_cast<double>(threads)));
+	size_t chunkSize = static_cast<size_t>(std::ceil(static_cast<double>(endRow - startRow) / static_cast<double>(m_ThreadsToUse)));
 	//parallel_for scales very well, dividing the work almost perfectly among all processors.
-	parallel_for(static_cast<size_t>(0), threads, static_cast<size_t>(1), [&] (size_t threadIndex)
+	parallel_for(static_cast<size_t>(0), m_ThreadsToUse, m_ThreadsToUse, [&] (size_t threadIndex)
 	{
 		size_t pixelNumber = 0;
 		const auto localStartRow = static_cast<intmax_t>(std::min<size_t>(startRow + (threadIndex * chunkSize), endRow - 1));
@@ -1123,11 +1111,7 @@ eRenderStatus Renderer<T, bucketT>::GaussianDensityFilter()
 				}
 			}
 		}
-	}
-#if defined(_WIN32) || defined(__APPLE__)
-	, tbb::static_partitioner()
-#endif
-				);
+	});
 
 	if (m_Callback && !m_Abort)
 		m_Callback->ProgressFunc(m_Ember, m_ProgressParameter, 100.0, 1, 0);
@@ -1166,7 +1150,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 	//The original does it this way as well and it's roughly 11 times faster to do it this way than inline below with each pixel.
 	if (EarlyClip())
 	{
-		parallel_for(static_cast<size_t>(0), m_SuperRasH, static_cast<size_t>(1), [&](size_t j)
+		parallel_for(static_cast<size_t>(0), m_SuperRasH, m_ThreadsToUse, [&](size_t j)
 		{
 			auto rowStart = m_AccumulatorBuckets.data() + (j * m_SuperRasW);//Pull out of inner loop for optimization.
 			const auto rowEnd = rowStart + m_SuperRasW;
@@ -1176,11 +1160,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 				GammaCorrection(*rowStart, background, g, linRange, vibrancy, false, glm::value_ptr(*rowStart));//Write back in place.
 				rowStart++;
 			}
-		}
-#if defined(_WIN32) || defined(__APPLE__)
-		, tbb::static_partitioner()
-#endif
-					);
+		});
 	}
 
 	if (m_Abort)
@@ -1193,7 +1173,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 	//otherwise artifacts that resemble page tearing will occur in an interactive run. It's
 	//critical to never exit this loop prematurely.
 	//for (size_t j = 0; j < FinalRasH(); j++)//Keep around for debugging.
-	parallel_for(static_cast<size_t>(0), FinalRasH(), static_cast<size_t>(1), [&](size_t j)
+	parallel_for(static_cast<size_t>(0), FinalRasH(), m_ThreadsToUse, [&](size_t j)
 	{
 		Color<bucketT> newBucket;
 		size_t pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRasW();//Pull out of inner loop for optimization.
@@ -1226,11 +1206,7 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 			auto pf = reinterpret_cast<float*>(pv4T);
 			GammaCorrection(*(reinterpret_cast<tvec4<bucketT, glm::defaultp>*>(&newBucket)), background, g, linRange, vibrancy, true, pf);
 		}
-	}
-#if defined(_WIN32) || defined(__APPLE__)
-	, tbb::static_partitioner()
-#endif
-				);
+	});
 
 	//Insert the palette into the image for debugging purposes. Not implemented on the GPU.
 	if (m_InsertPalette)
@@ -1288,7 +1264,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 		m_ThreadEmbers.insert(m_ThreadEmbers.begin(), m_ThreadsToUse, m_Ember);
 	}
 
-	parallel_for(static_cast<size_t>(0), m_ThreadsToUse, static_cast<size_t>(1), [&] (size_t threadIndex)
+	parallel_for(static_cast<size_t>(0), m_ThreadsToUse, m_ThreadsToUse, [&] (size_t threadIndex)
 	{
 #if defined(_WIN32)
 		SetThreadPriority(GetCurrentThread(), static_cast<int>(m_Priority));
@@ -1375,11 +1351,7 @@ EmberStats Renderer<T, bucketT>::Iterate(size_t iterCount, size_t temporalSample
 				}
 			}
 		}
-	}
-#if defined(_WIN32) || defined(__APPLE__)
-	, tbb::static_partitioner()
-#endif
-				);
+	});
 	stats.m_Iters = std::accumulate(m_SubBatch.begin(), m_SubBatch.end(), 0ULL);//Sum of iter count of all threads.
 	stats.m_Badvals = std::accumulate(m_BadVals.begin(), m_BadVals.end(), 0ULL);
 	stats.m_IterMs = m_IterTimer.Toc();

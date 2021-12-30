@@ -66,10 +66,10 @@ public:
 	virtual void SyncGuiToEmbers(size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true) { }
 	virtual void SyncCurrentToSizeSpinners(bool scale, bool size, bool doWidth = true, bool doHeight = true) { }
 	virtual void ResetProgress(bool total = true) { }
-	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory() { return tuple<size_t, size_t, size_t>(0, 0, 0); }
-	virtual double OriginalAspect() { return 1; }
+	virtual tuple<size_t, size_t, size_t> SyncAndComputeMemory()  { return tuple<size_t, size_t, size_t>(0, 0, 0); }
+	virtual double OriginalAspect()  { return 1; }
 	virtual QString ComposePath(const QString& name, bool unique = true) { return ""; }
-	virtual bool BumpQualityRender(double d) { return false; }
+	virtual bool BumpQualityRender(double d)  { return false; }
 	virtual QString SaveCurrentAgain() { return ""; }
 	virtual void CancelRender() { }
 	virtual QString CheckMemory(const tuple<size_t, size_t, size_t>& p) { return ""; }
@@ -118,7 +118,7 @@ public:
 	void SetEmber(size_t index, bool verbatim) override;
 	void SaveCurrentAsXml(QString filename = "") override;
 	bool Render() override;
-	bool BumpQualityRender(double d) override;
+	bool BumpQualityRender(double d)  override;
 	bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
 	int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
 	size_t Index() const override { return m_Ember->m_Index; }

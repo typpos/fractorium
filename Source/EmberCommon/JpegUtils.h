@@ -22,7 +22,7 @@ static std::recursive_mutex fileCs;
 static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t height, int quality, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
 {
 	bool b = false;
-	FILE* file;
+	FILE* file = nullptr;
 	errno_t fileResult;
 
 	//Just to be extra safe.
@@ -114,7 +114,10 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 
 		jpeg_finish_compress(&info);
 		jpeg_destroy_compress(&info);
-		fclose(file);
+
+		if (file != nullptr)
+			fclose(file);
+
 		b = true;
 	}
 
@@ -138,7 +141,7 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 static bool WritePng(const char* filename, byte* image, size_t width, size_t height, size_t bytesPerChannel, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
 {
 	bool b = false;
-	FILE* file;
+	FILE* file = nullptr;
 	errno_t fileResult;
 
 	//Just to be extra safe.
@@ -220,7 +223,10 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 		png_write_image(png_ptr, rows.data());
 		png_write_end(png_ptr, info_ptr);
 		png_destroy_write_struct(&png_ptr, &info_ptr);
-		fclose(file);
+
+		if (file != nullptr)
+			fclose(file);
+
 		b = true;
 	}
 
@@ -313,7 +319,9 @@ static bool SaveBmp(const char* filename, const byte* image, size_t width, size_
 
 		if ((file = CreateFileA(filename, GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL)) == NULL)
 		{
-			CloseHandle(file);
+			if (file != 0)
+				CloseHandle(file);
+
 			return false;
 		}
 	}
@@ -389,7 +397,7 @@ static bool WriteExr16(const char* filename, Rgba* image, size_t width, size_t h
 		try
 		{
 			rlg l(fileCs);
-			file = std::make_unique<RgbaOutputFile>(filename, iw, ih, WRITE_RGBA);
+			file = std::make_unique<RgbaOutputFile>(filename, iw, ih, RgbaChannels::WRITE_RGBA);
 		}
 		catch (std::exception)
 		{

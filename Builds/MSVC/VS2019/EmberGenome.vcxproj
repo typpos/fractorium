@@ -59,7 +59,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\tbb\include;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>
@@ -73,7 +73,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;opencl.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;opencl.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -91,7 +91,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\tbb\include;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>
@@ -106,7 +106,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libjpeg.lib;libpng.lib;libxml2.lib;tbb.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;opencl.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;opencl.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>

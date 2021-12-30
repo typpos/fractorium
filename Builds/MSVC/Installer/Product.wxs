@@ -161,9 +161,6 @@
 			<Component Id="libxml2.dll" Guid="bb3aa687-7a3d-4d16-a27c-28529b472754">
 				<File Id="libxml2.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\libxml2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
 			</Component>
-			<Component Id="tbb.dll" Guid="ffa1b2ec-32d5-41aa-9380-fb04d8139103">
-				<File Id="tbb.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\tbb.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes"/>
-			</Component>
 			<Component Id="msvcp140.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
 				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes"/>
 			</Component>

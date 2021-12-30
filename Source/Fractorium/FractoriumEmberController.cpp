@@ -397,7 +397,7 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 			{
 				if (const auto treeItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(int(i))))
 				{
-					//It is critical that Qt::BlockingQueuedConnection is passed because this is running on a different thread than the UI.
+					//It is critical that Qt::DirectConnection is passed because this is running on a different thread than the UI.
 					//This ensures the events are processed in order as each preview is updated, and that control does not return here
 					//until the update is complete.
 					if (m_PreviewRun)

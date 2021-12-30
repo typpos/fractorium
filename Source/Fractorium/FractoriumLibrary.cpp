@@ -151,13 +151,13 @@ void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 		{
 			if (auto item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))//Cast the child widget to the EmberTreeWidgetItem type.
 			{
-				if (update & eLibraryUpdate::INDEX)
+				if (static_cast<uint>(update) & static_cast<uint>(eLibraryUpdate::INDEX))
 					it->m_Index = i;
 
-				if (update & eLibraryUpdate::NAME)
+				if (static_cast<uint>(update) & static_cast<uint>(eLibraryUpdate::NAME))
 					item->setText(0, QString::fromStdString(it->m_Name));
 
-				if (update & eLibraryUpdate::POINTER)
+				if (static_cast<uint>(update) & static_cast<uint>(eLibraryUpdate::POINTER))
 					item->SetEmberPointer(&(*it));
 
 				if (item->checkState(0) == Qt::Checked)
@@ -367,7 +367,7 @@ void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items
 		return false;
 	});
 	tree->update();
-	SyncLibrary(eLibraryUpdate(eLibraryUpdate::INDEX | eLibraryUpdate::POINTER));
+	SyncLibrary(eLibraryUpdate(static_cast<uint>(eLibraryUpdate::INDEX) | static_cast<uint>(eLibraryUpdate::POINTER)));
 	//SyncLibrary(eLibraryUpdate(eLibraryUpdate::INDEX | eLibraryUpdate::POINTER | eLibraryUpdate::NAME));
 }
 

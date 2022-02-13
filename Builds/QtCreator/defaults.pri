@@ -50,10 +50,16 @@ win32 {
 	#INCLUDEPATH += /usr/include
 	INCLUDEPATH += /usr/local/include
 	INCLUDEPATH += /usr/include/GL
+exists( /usr/local/include/GL ) {
 	INCLUDEPATH += /usr/local/include/GL
+}
 	INCLUDEPATH += /usr/include/glm
+exists( /usr/local/include/GL ) {
 	INCLUDEPATH += /usr/include/Imath
+}
+exists( /usr/include/OpenEXR ) {
 	INCLUDEPATH += /usr/include/OpenEXR
+}
 
         unix:!macx {
             INCLUDEPATH += /usr/include/libxml2

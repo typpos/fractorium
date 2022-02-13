@@ -176,18 +176,18 @@ void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 template <typename T>
 void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 {
-	uint size = 64;
-	uint i = 0;
-	const auto tree = m_Fractorium->ui.LibraryTree;
+	const uint size = PREVIEW_SIZE;
 	vector<byte> v(size * size * 4);
-	StopAllPreviewRenderers();
+	const auto tree = m_Fractorium->ui.LibraryTree;
 	tree->clear();
+	StopAllPreviewRenderers();
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_EmberFile.m_Filename);
 	fileItem->setText(0, info.fileName());
 	fileItem->setToolTip(0, m_EmberFile.m_Filename);
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled);
 
+	uint i = 0;
 	for (auto& it : m_EmberFile.m_Embers)
 	{
 		auto emberItem = new EmberTreeWidgetItem<T>(&it, fileItem);
@@ -216,7 +216,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 template <typename T>
 void FractoriumEmberController<T>::UpdateLibraryTree()
 {
-	const uint size = 64;
+	const uint size = PREVIEW_SIZE;
 	vector<byte> v(size * size * 4);
 	const auto tree = m_Fractorium->ui.LibraryTree;
 
@@ -479,18 +479,18 @@ void FractoriumEmberController<T>::StopAllPreviewRenderers()
 template <typename T>
 void FractoriumEmberController<T>::FillSequenceTree()
 {
-	const uint size = 64;
-	uint i = 0;
-	const auto tree = m_Fractorium->ui.SequenceTree;
+	const uint size = PREVIEW_SIZE;
 	vector<byte> v(size * size * 4);
-	m_SequencePreviewRenderer->Stop();
+	const auto tree = m_Fractorium->ui.SequenceTree;
 	tree->clear();
+	StopAllPreviewRenderers();
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_SequenceFile.m_Filename);
 	fileItem->setText(0, info.fileName());
 	fileItem->setToolTip(0, m_SequenceFile.m_Filename);
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 
+	uint i = 0;
 	for (auto& it : m_SequenceFile.m_Embers)
 	{
 		auto emberItem = new EmberTreeWidgetItemBase(fileItem);

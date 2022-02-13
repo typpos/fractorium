@@ -32,7 +32,7 @@ class Fractorium;
 template <typename T> class PreviewRenderer;
 template <typename T> class TreePreviewRenderer;
 
-#define PREVIEW_SIZE 256
+#define PREVIEW_SIZE 128
 #define UNDO_SIZE 512
 
 /// <summary>

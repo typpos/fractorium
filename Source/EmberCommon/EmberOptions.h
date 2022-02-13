@@ -250,7 +250,6 @@ struct NoDelimiters : std::ctype<char>
 	static std::ctype_base::mask const* GetTable()
 	{
 		typedef std::ctype<char> cctype;
-		static const cctype::mask* const_rc = cctype::classic_table();
 		static cctype::mask rc[cctype::table_size];
 		std::memset(rc, 0, cctype::table_size * sizeof(cctype::mask));
 		return &rc[0];

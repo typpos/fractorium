@@ -36,7 +36,7 @@ bool PaletteList<T>::AddPaletteFile(const string& filename, const vector<Palette
 {
 	if (!GetPaletteListByFullPath(filename))
 	{
-		const auto item = s_Palettes.insert(make_pair(filename, palettes));
+		s_Palettes.insert(make_pair(filename, palettes));
 		Save(filename);
 		return true;
 	}

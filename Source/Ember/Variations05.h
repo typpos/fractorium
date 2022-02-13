@@ -3608,7 +3608,6 @@ public:
 		}
 
 		T tempx, tempy;
-		T boost = 1;//Boost is the separation distance between the two planes.
 		T sumX, sumY;
 
 		if (m_VarType == eVariationType::VARTYPE_REG)
@@ -3629,6 +3628,7 @@ public:
 		//Creating Z factors relative to the planes. These will be added, whereas x and y will be assigned.
 		//Original does += z *, so using z on the right side of = is intentional.
 		if (m_MajPlane == 2)
+		    //Boost is the separation distance between the two planes.
 			helper.Out.z = helper.In.z * T(0.5) * m_ZLift + (posNeg * m_Boost);
 		else
 			helper.Out.z = helper.In.z * T(0.5) * m_ZLift;

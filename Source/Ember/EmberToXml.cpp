@@ -53,8 +53,6 @@ bool EmberToXml<T>::Save(const string& filename, C<Ember<T>, Alloc>& embers, siz
 
 		if (f.is_open())
 		{
-			const auto prev = embers.begin();
-
 			//Always ensure times make sense.
 			for (auto& ember : embers)
 				ember.m_Time = t++;

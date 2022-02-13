@@ -490,7 +490,6 @@ public:
 	/// <returns>The variation if found, else nullptr.</returns>
 	Variation<T>* RemoveVariationById(eVariationId id)
 	{
-		bool found = false;
 		Variation<T>* var = nullptr;
 		AllVarsFunc([&](vector<Variation<T>*>& variations, bool & keepGoing)
 		{
@@ -736,9 +735,8 @@ public:
 		else
 		{
 			//There are no variations, so the affine transformed points can be assigned directly to the output points.
-			T inX = inPoint->m_X;
-			outPoint->m_X = 0;//(m_Affine.A() * inX) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
-			outPoint->m_Y = 0;//(m_Affine.D() * inX) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
+			outPoint->m_X = 0;//(m_Affine.A() * inPoint->m_X) + (m_Affine.B() * inPoint->m_Y) + m_Affine.C();
+			outPoint->m_Y = 0;//(m_Affine.D() * inPoint->m_X) + (m_Affine.E() * inPoint->m_Y) + m_Affine.F();
 			outPoint->m_Z = 0;//inPoint->m_Z;
 		}
 

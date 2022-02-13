@@ -185,7 +185,6 @@ template <typename T>
 void FractoriumEmberController<T>::CreateReferenceFile()
 {
 	bool nv = false;
-	size_t i;
 	StopAllPreviewRenderers();
 	auto temppal = m_Ember.m_Palette;
 	m_EmberFile.Clear();
@@ -258,6 +257,7 @@ void FractoriumEmberController<T>::CreateReferenceFile()
 		m_EmberFile.m_Embers.push_back(ember);
 	};
 
+	size_t i;
 	for (i = 0; i < count; i++)
 	{
 		addsquaresfunc(i, regVars[i]);

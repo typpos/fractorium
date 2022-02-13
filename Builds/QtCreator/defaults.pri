@@ -198,7 +198,10 @@ win32 {
 	QMAKE_CXXFLAGS += -Wmain
 	QMAKE_CXXFLAGS += -Wfatal-errors
 	QMAKE_CXXFLAGS += -Wall -fpermissive
-	QMAKE_CXXFLAGS += -Wold-style-cast
+
+        # CL has lots of old-style-cast which clogs up warning logs
+	#QMAKE_CXXFLAGS += -Wold-style-cast
+
 	QMAKE_CXXFLAGS += -Wno-unused-parameter
 	QMAKE_CXXFLAGS += -Wno-unused-function
 	QMAKE_CXXFLAGS += -Wold-style-cast

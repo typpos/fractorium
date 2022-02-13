@@ -17,6 +17,7 @@ void Fractorium::InitLibraryUI()
 	connect(ui.SequenceAllButton,           SIGNAL(clicked(bool)), this, SLOT(OnSequenceAllButtonClicked(bool)),           Qt::QueuedConnection);
 	connect(ui.SequenceGenerateButton,      SIGNAL(clicked(bool)), this, SLOT(OnSequenceGenerateButtonClicked(bool)),      Qt::QueuedConnection);
 	connect(ui.SequenceRenderButton,        SIGNAL(clicked(bool)), this, SLOT(OnSequenceRenderButtonClicked(bool)),        Qt::QueuedConnection);
+	connect(ui.SequenceClearButton,         SIGNAL(clicked(bool)), this, SLOT(OnSequenceClearButtonClicked(bool)),        Qt::QueuedConnection);
 	connect(ui.SequenceSaveButton,          SIGNAL(clicked(bool)), this, SLOT(OnSequenceSaveButtonClicked(bool)),          Qt::QueuedConnection);
 	connect(ui.SequenceOpenButton,          SIGNAL(clicked(bool)), this, SLOT(OnSequenceOpenButtonClicked(bool)),          Qt::QueuedConnection);
 	connect(ui.SequenceRandomizeStaggerCheckBox,           SIGNAL(stateChanged(int)),    this, SLOT(OnSequenceRandomizeStaggerCheckBoxStateChanged(int)),           Qt::QueuedConnection);
@@ -772,6 +773,19 @@ void Fractorium::OnSequenceRenderButtonClicked(bool checked)
 			m_FinalRenderDialog->Show(true);//Show with a bool specifying that it came from the sequence generator.
 	}
 }
+
+/// <summary>
+/// Clear the sequence.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::SequenceClearButtonClicked()
+{
+	const auto tree = m_Fractorium->ui.SequenceTree;
+	m_SequencePreviewRenderer->Stop();
+	tree->clear();
+}
+
+void Fractorium::OnSequenceClearButtonClicked(bool checked) { m_Controller->SequenceClearButtonClicked(); }
 
 /// <summary>
 /// Save the sequence to a file.

@@ -8098,6 +8098,16 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="SequenceClearButton">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear the sequence of generated thumbnails.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="SequenceSaveButton">
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the generated sequence out as a file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

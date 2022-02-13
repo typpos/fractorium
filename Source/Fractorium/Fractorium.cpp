@@ -1234,6 +1234,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.SequenceLinearCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceGenerateButton);
 	w = SetTabOrder(this, w, ui.SequenceRenderButton);
+	w = SetTabOrder(this, w, ui.SequenceClearButton);
 	w = SetTabOrder(this, w, ui.SequenceSaveButton);
 	w = SetTabOrder(this, w, ui.SequenceOpenButton);
 	w = SetTabOrder(this, w, ui.SequenceTree);

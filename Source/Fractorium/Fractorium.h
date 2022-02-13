@@ -206,6 +206,7 @@ public slots:
 	void OnSequenceAllButtonClicked(bool checked);
 	void OnSequenceGenerateButtonClicked(bool checked);
 	void OnSequenceRenderButtonClicked(bool checked);
+	void OnSequenceClearButtonClicked(bool checked);
 	void OnSequenceSaveButtonClicked(bool checked);
 	void OnSequenceOpenButtonClicked(bool checked);
 	void OnSequenceRandomizeStaggerCheckBoxStateChanged(int state);

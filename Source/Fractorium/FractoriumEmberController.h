@@ -136,6 +136,7 @@ public:
 	virtual void Delete(const vector<pair<size_t, QTreeWidgetItem*>>& v) { }
 	virtual void FillSequenceTree() { }
 	virtual void SequenceGenerateButtonClicked() { }
+	virtual void SequenceClearButtonClicked() { }
 	virtual void SequenceSaveButtonClicked() { }
 	virtual void SequenceOpenButtonClicked() { }
 
@@ -428,6 +429,7 @@ public:
 	void StopAllPreviewRenderers() override;
 	void FillSequenceTree() override;
 	void SequenceGenerateButtonClicked() override;
+	void SequenceClearButtonClicked() override;
 	void SequenceSaveButtonClicked() override;
 	void SequenceOpenButtonClicked() override;
 

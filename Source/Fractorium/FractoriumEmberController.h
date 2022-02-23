@@ -135,10 +135,13 @@ public:
 	virtual void MoveLibraryItems(const QModelIndexList& items, int destRow) { }
 	virtual void Delete(const vector<pair<size_t, QTreeWidgetItem*>>& v) { }
 	virtual void FillSequenceTree() { }
+	virtual void AddAnimationItem() { }
 	virtual void SequenceGenerateButtonClicked() { }
-	virtual void SequenceClearButtonClicked() { }
 	virtual void SequenceSaveButtonClicked() { }
 	virtual void SequenceOpenButtonClicked() { }
+	virtual void SequenceAnimateButtonClicked() { }
+	virtual void SequenceAnimateNextFrame() { }
+	virtual void SequenceClearButtonClicked() { }
 
 	//Params.
 	virtual void ParamsToEmber(Ember<float>& ember, bool imageParamsOnly = false) { };
@@ -325,8 +328,10 @@ protected:
 	Palette<float> m_TempPalette, m_PreviousTempPalette;
 	std::unique_ptr<QTimer> m_RenderTimer;
 	std::unique_ptr<QTimer> m_RenderRestartTimer;
+	std::unique_ptr<QTimer> m_AnimateTimer;
 	shared_ptr<PaletteList<float>> m_PaletteList;
 	shared_ptr<OpenCLInfo> m_Info = OpenCLInfo::Instance();
+	int m_AnimateFrame = 0;
 };
 
 /// <summary>
@@ -428,10 +433,13 @@ public:
 	void StopSequencePreviewRender() override;
 	void StopAllPreviewRenderers() override;
 	void FillSequenceTree() override;
+	void AddAnimationItem() override;
 	void SequenceGenerateButtonClicked() override;
-	void SequenceClearButtonClicked() override;
 	void SequenceSaveButtonClicked() override;
 	void SequenceOpenButtonClicked() override;
+	void SequenceAnimateButtonClicked() override;
+	void SequenceAnimateNextFrame() override;
+	void SequenceClearButtonClicked() override;
 
 	//Params.
 	void ParamsToEmber(Ember<float>& ember, bool imageParamsOnly = false) override;

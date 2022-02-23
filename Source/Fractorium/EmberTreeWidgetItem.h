@@ -2,6 +2,8 @@
 
 #include "FractoriumPch.h"
 
+template <typename T> class FractoriumEmberController;
+
 /// <summary>
 /// EmberTreeWidgetItem
 /// </summary>
@@ -14,6 +16,12 @@
 class EmberTreeWidgetItemBase : public QTreeWidgetItem
 {
 public:
+	friend FractoriumEmberController<float>;
+
+#ifdef DO_DOUBLE
+	friend FractoriumEmberController<double>;
+#endif
+
 	/// <summary>
 	/// Constructor that takes a pointer to a QTreeWidget as a parent widget.
 	/// This is meant to be a root level item.
@@ -54,9 +62,15 @@ public:
 		setData(0, Qt::DecorationRole, m_Pixmap);
 	}
 
+	void SetRendered()
+	{
+		m_Rendered = true;
+	}
+
 protected:
 	QImage m_Image;
 	QPixmap m_Pixmap;
+	bool m_Rendered;
 };
 
 /// <summary>

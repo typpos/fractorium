@@ -18,7 +18,12 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_RenderTimer->setInterval(0);
 	m_Fractorium->connect(m_RenderTimer.get(), SIGNAL(timeout()), SLOT(IdleTimer()));
 	m_RenderRestartTimer = make_unique<QTimer>(m_Fractorium);
+	m_AnimateTimer = make_unique<QTimer>(m_Fractorium);
+	m_AnimateTimer->stop();
+
 	m_Fractorium->connect(m_RenderRestartTimer.get(), &QTimer::timeout, [&]() { m_Fractorium->StartRenderTimer(false); });//It's ok to pass false for the first shot because creating the controller will start the preview renders.
+	// XXX: why not SLOT(SequenceAnimateNextFrame())?
+	m_Fractorium->connect(m_AnimateTimer.get(), &QTimer::timeout, [&]() { SequenceAnimateNextFrame(); });
 }
 
 /// <summary>
@@ -30,6 +35,7 @@ FractoriumEmberControllerBase::~FractoriumEmberControllerBase()
 	StopRenderTimer(true);
 	m_RenderTimer->stop();
 	m_RenderRestartTimer->stop();
+	m_AnimateTimer->stop();
 }
 
 /// <summary>
@@ -379,7 +385,8 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	m_PreviewRenderer.YAxisUp(f->m_Settings->YAxisUp());
 	m_PreviewRenderer.ThreadCount(std::max(1u, Timing::ProcessorCount() - 1));//Leave one processor free so the GUI can breathe.
 
-	if (const auto top = m_Tree->topLevelItem(0))
+	// Possible animate item at index 0
+	if (const auto top = m_Tree->topLevelItem(m_Tree->topLevelItemCount() - 1))
 	{
 		size_t i = start;
 
@@ -402,11 +409,12 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 					//until the update is complete.
 					if (m_PreviewRun)
 					{
-						QMetaObject::invokeMethod(f, "SetLibraryTreeItemData", Qt::DirectConnection,
+						QMetaObject::invokeMethod(f, "SetTreeItemData", Qt::DirectConnection,
 												  Q_ARG(EmberTreeWidgetItemBase*, treeItem),
 												  Q_ARG(vv4F&, m_PreviewFinalImage),
 												  Q_ARG(uint, PREVIEW_SIZE),
 												  Q_ARG(uint, PREVIEW_SIZE));
+						treeItem->SetRendered();
 					}
 				}
 			}

@@ -39,7 +39,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -192,7 +192,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -451,7 +451,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -668,7 +668,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -782,7 +782,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -844,7 +844,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t d = Zeps(precalcSumSquares);\n"
@@ -884,7 +883,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t d = Zeps(precalcSumSquares);\n"
@@ -1341,7 +1339,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -1420,7 +1418,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -1509,7 +1507,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -1596,7 +1594,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -1840,7 +1838,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\tvOut.x = " << weight << " * (MwcNext01(mwc) - (real_t)(0.5));\n"
@@ -1906,7 +1903,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2090,7 +2087,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2206,7 +2203,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2343,7 +2340,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2440,7 +2437,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2576,7 +2573,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2727,7 +2724,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2855,7 +2852,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -2924,7 +2921,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -3009,7 +3006,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -3301,7 +3298,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -3460,7 +3457,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -3510,7 +3506,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -3561,7 +3556,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -3613,7 +3607,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -3670,7 +3663,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = fma(vIn.y, vIn.y, SQR(vIn.z));\n"
@@ -3732,7 +3724,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = fma(vIn.y, vIn.y, SQR(vIn.z));\n"
@@ -3788,7 +3779,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -3838,7 +3828,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -3894,7 +3883,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = fma(vIn.y, vIn.y, SQR(vIn.z));\n"
@@ -3956,7 +3944,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t sysz = fma(vIn.y, vIn.y, SQR(vIn.z));\n"
@@ -4013,7 +4000,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -4065,7 +4051,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -4115,7 +4100,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t absV = Hypot(vIn.y, vIn.z);\n"
@@ -4163,7 +4147,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -4225,7 +4209,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\tvOut.x = " << weight << " / Zeps(precalcSqrtSumSquares);\n"
@@ -4270,7 +4253,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -4377,7 +4360,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -4793,7 +4776,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t wd = 0.5;\n"
@@ -4867,7 +4849,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -5050,7 +5032,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -5191,7 +5173,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -5304,7 +5286,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -5384,7 +5366,6 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss;
-		intmax_t varIndex = IndexInXform();
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t r = MwcNext01(mwc) * " << weight << " * precalcSqrtSumSquares;\n"
@@ -5424,7 +5405,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -5507,7 +5488,7 @@ public:
 	virtual string OpenCLString() const override
 	{
 		ostringstream ss, ss2;
-		intmax_t i = 0, varIndex = IndexInXform();
+		intmax_t i = 0;
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
@@ -5731,7 +5712,6 @@ MAKEPREPOSTPARVAR(Block, block, BLOCK)
 //	virtual string OpenCLString() const override
 //	{
 //		ostringstream ss;
-//		intmax_t varIndex = IndexInXform();
 // string weight = WeightDefineString();
 //
 //		ss << "\t{\n"
@@ -5763,7 +5743,6 @@ MAKEPREPOSTPARVAR(Block, block, BLOCK)
 //	virtual string OpenCLString() const override
 //	{
 //		ostringstream ss;
-//		intmax_t varIndex = IndexInXform();
 // string weight = WeightDefineString();
 //
 //		ss << "\t{\n"

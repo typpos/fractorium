@@ -2,6 +2,8 @@
 
 #include "FractoriumPch.h"
 
+template <typename T> class FractoriumEmberController;
+
 /// <summary>
 /// EmberTreeWidgetItem
 /// </summary>
@@ -14,6 +16,12 @@
 class EmberTreeWidgetItemBase : public QTreeWidgetItem
 {
 public:
+	friend FractoriumEmberController<float>;
+
+#ifdef DO_DOUBLE
+	friend FractoriumEmberController<double>;
+#endif
+
 	/// <summary>
 	/// Constructor that takes a pointer to a QTreeWidget as a parent widget.
 	/// This is meant to be a root level item.
@@ -47,16 +55,22 @@ public:
 	/// <param name="height">The height of the image in pixels</param>
 	void SetImage(vector<byte>& v, uint width, uint height)
 	{
-		constexpr auto size = 64;
+		constexpr auto size = PREVIEW_SIZE;
 		m_Image = QImage(width, height, QImage::Format_RGBA8888);
 		memcpy(m_Image.scanLine(0), v.data(), SizeOf(v));//Memcpy the data in.
 		m_Pixmap = QPixmap::fromImage(m_Image).scaled(QSize(size, size), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);//Create a QPixmap out of the QImage, scaled to size.
 		setData(0, Qt::DecorationRole, m_Pixmap);
 	}
 
+	void SetRendered()
+	{
+		m_Rendered = true;
+	}
+
 protected:
 	QImage m_Image;
 	QPixmap m_Pixmap;
+	bool m_Rendered;
 };
 
 /// <summary>

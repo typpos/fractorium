@@ -208,6 +208,8 @@ public slots:
 	void OnSequenceRenderButtonClicked(bool checked);
 	void OnSequenceSaveButtonClicked(bool checked);
 	void OnSequenceOpenButtonClicked(bool checked);
+	void OnSequenceAnimateButtonClicked(bool checked);
+	void OnSequenceClearButtonClicked(bool checked);
 	void OnSequenceRandomizeStaggerCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state);
 	void OnSequenceRandomizeRotationsCheckBoxStateChanged(int state);
@@ -391,7 +393,7 @@ public slots:
 	void ShowCritical(const QString& title, const QString& text, bool invokeRequired = false);
 
 	//Can't have a template function be a slot.
-	void SetLibraryTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h);
+	void SetTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h);
 
 public:
 	//template<typename spinType, typename valType>//See below.

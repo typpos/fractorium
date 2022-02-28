@@ -682,7 +682,7 @@ static const char* CheckNameVal(xmlNode* node, const char* name)
 	}
 
 	return nullptr;
-};
+}
 
 /// <summary>
 /// Helper function to verify that the name of a node
@@ -697,7 +697,7 @@ static xmlNode* CheckNodeName(xmlNode* node, const char* name)
 		return node;
 
 	return nullptr;
-};
+}
 
 /// <summary>
 /// Helper function to get the value of the name field of a node.
@@ -713,7 +713,7 @@ static const char* GetNameVal(xmlNode* node, const char* name = "name")
 				return CCX(attStr);
 
 	return nullptr;
-};
+}
 
 /// <summary>
 /// Helper function to get the child of a node based on the value of its name field.
@@ -729,7 +729,7 @@ static xmlNode* GetChildNode(xmlNode* node, const char* name)
 				return childNode;
 
 	return nullptr;
-};
+}
 
 /// <summary>
 /// Helper function to get the child of a node based on the name of the child node.
@@ -745,7 +745,7 @@ static xmlNode* GetChildNodeByNodeName(xmlNode* node, const char* name)
 				return node;
 
 	return nullptr;
-};
+}
 
 /// <summary>
 /// Helper function to parse the content of a field of a node and convert the string into a value of type T and store in the passed in val parameter.
@@ -849,7 +849,6 @@ void XmlToEmber<T>::ScanForChaosNodes(xmlNode* curNode, const char* parentFile, 
 				currentEmber.m_Name = embername;
 
 			const auto childNode = thisNode;
-			bool ret = true;
 			parseEmberSuccess = ParseEmberElementFromChaos(childNode, currentEmber);
 
 			if (!parseEmberSuccess)
@@ -888,10 +887,7 @@ void XmlToEmber<T>::ScanForChaosNodes(xmlNode* curNode, const char* parentFile, 
 template <typename T>
 bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& currentEmber)
 {
-	bool fromEmber = false, ret = true;
 	const char* loc = __FUNCTION__;
-	int soloXform = -1;
-	size_t count = 0, index = 0;
 	T sensorWidth = 2;
 	xmlAttrPtr att;
 	currentEmber.m_Palette.Clear();//Wipe out the current palette.
@@ -918,7 +914,6 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 
 						if (!varname.empty())
 						{
-							const T weight = 1;
 							const auto corrvarname = GetCorrectedVariationName(m_BadVariationNames, varname);
 							const auto corrwprefix = !StartsWith(corrvarname, prefix) ? prefix + corrvarname : corrvarname;
 
@@ -1264,7 +1259,6 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 
 				if (const auto curvesnode = GetChildNodeByNodeName(childNode, "curves"))
 				{
-					T val = 0;
 					auto curvenodesfunc = [&](xmlNode * node, int index)
 					{
 						float x, y;
@@ -1289,15 +1283,15 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						{
 							bool haveknots = false, havevals = false;
 
-							for (auto childNode = node->children; childNode; childNode = childNode->next)
+							for (auto innerChildNode = node->children; innerChildNode; innerChildNode = innerChildNode->next)
 							{
-								if (childNode->type == XML_ELEMENT_NODE)
+								if (innerChildNode->type == XML_ELEMENT_NODE)
 								{
-									if (const auto node = CheckNodeName(childNode, "table"))
+									if (const auto innernode = CheckNodeName(innerChildNode, "table"))
 									{
 										if (!haveknots)
 										{
-											if (const auto knotvalsnode = GetChildNodeByNodeName(node, "values"))
+											if (const auto knotvalsnode = GetChildNodeByNodeName(innernode, "values"))
 											{
 												if (knotvalsnode->children)
 												{
@@ -1310,7 +1304,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 										}
 										else if (!havevals)
 										{
-											if (const auto valvalsnode = GetChildNodeByNodeName(node, "values"))
+											if (const auto valvalsnode = GetChildNodeByNodeName(innernode, "values"))
 											{
 												if (valvalsnode->children)
 												{

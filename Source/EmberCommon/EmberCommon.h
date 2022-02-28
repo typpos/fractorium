@@ -137,7 +137,7 @@ static string GetExePath(const char* argv0)
 		cerr << "Could not discern full path from executable.\n";
 
 #else
-	auto fullsize = readlink("/proc/self/exe", v.data(), v.size());
+	readlink("/proc/self/exe", v.data(), v.size());
 	fullpath = string(v.data());
 #endif
 #endif

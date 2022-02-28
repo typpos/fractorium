@@ -95,7 +95,7 @@ std::vector<T> Spline<T>::Interpolate(const std::vector<T>& newX)
 {
 	std::vector<T> output; output.resize(newX.size());
 
-	for (int i = 0; i < newX.size(); i++)
+	for (size_t i = 0; i < newX.size(); i++)
 		output[i] = Interpolate(newX[i]);
 
 	return output;

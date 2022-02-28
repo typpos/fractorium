@@ -42,7 +42,7 @@ win32 {
 	INCLUDEPATH += $$EXTERNAL_DIR/libxml2/include
 	INCLUDEPATH += $$EXTERNAL_DIR/zlib
 	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/Imath
-    	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/OpenEXR
+	INCLUDEPATH += $$EXTERNAL_DIR/openexr/output/include/OpenEXR
 }
 
 !win32 {
@@ -50,10 +50,16 @@ win32 {
 	#INCLUDEPATH += /usr/include
 	INCLUDEPATH += /usr/local/include
 	INCLUDEPATH += /usr/include/GL
+exists( /usr/local/include/GL ) {
 	INCLUDEPATH += /usr/local/include/GL
+}
 	INCLUDEPATH += /usr/include/glm
+exists( /usr/local/include/GL ) {
 	INCLUDEPATH += /usr/include/Imath
-    INCLUDEPATH += /usr/include/OpenEXR
+}
+exists( /usr/include/OpenEXR ) {
+	INCLUDEPATH += /usr/include/OpenEXR
+}
 
         unix:!macx {
             INCLUDEPATH += /usr/include/libxml2
@@ -87,14 +93,14 @@ else {
         LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
         LIBS += $$absolute_path($$EXTERNAL_LIB)/Imath-3_1.lib
-		LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
+        LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
 }
 
 !win32 {
 	LIBS += -ljpeg
 	LIBS += -lpng
 	LIBS += -lpthread
-    	LIBS += -lOpenEXR
+	LIBS += -lOpenEXR
 
         unix:!macx {
             LIBS += -lxml2

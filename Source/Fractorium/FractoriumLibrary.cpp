@@ -179,19 +179,17 @@ template <typename T>
 void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 {
 	StopAllPreviewRenderers();
-
 	const uint size = PREVIEW_SIZE;
 	vector<byte> empy_preview(size * size * 4);
 	const auto tree = m_Fractorium->ui.LibraryTree;
 	tree->clear();
-
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_EmberFile.m_Filename);
 	fileItem->setText(0, info.fileName());
 	fileItem->setToolTip(0, m_EmberFile.m_Filename);
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled);
-
 	uint i = 0;
+
 	for (auto& it : m_EmberFile.m_Embers)
 	{
 		auto emberItem = new EmberTreeWidgetItem<T>(&it, fileItem);
@@ -432,6 +430,7 @@ template <typename T>
 void FractoriumEmberController<T>::RenderPreviews(QTreeWidget* tree, TreePreviewRenderer<T>* renderer, EmberFile<T>& file, uint start, uint end)
 {
 	renderer->Stop();
+
 	if (start == UINT_MAX && end == UINT_MAX)
 	{
 		// Animated item might be at index 0, previews go in last item.
@@ -482,11 +481,9 @@ void FractoriumEmberController<T>::AddAnimationItem()
 	fileItem->setText(0, "Rendered Animation");
 	fileItem->setToolTip(0, "Rendered frames can be animated here");
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-
 	auto emberItem = new EmberTreeWidgetItemBase(fileItem);
 	emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	emberItem->setToolTip(0, "Animated Frame");
-
 	const uint size = PREVIEW_SIZE;
 	vector<byte> empy_preview(size * size * 4);
 	emberItem->SetImage(empy_preview, size, size);
@@ -501,22 +498,19 @@ template <typename T>
 void FractoriumEmberController<T>::FillSequenceTree()
 {
 	StopAllPreviewRenderers();
-
 	const uint size = PREVIEW_SIZE;
 	vector<byte> empy_preview(size * size * 4);
 	const auto tree = m_Fractorium->ui.SequenceTree;
 	tree->clear();
-
 	// Add extra TreeWidget for animation at index 0
 	AddAnimationItem();
-
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_SequenceFile.m_Filename);
 	fileItem->setText(0, info.fileName());
 	fileItem->setToolTip(0, m_SequenceFile.m_Filename);
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
-
 	uint i = 0;
+
 	for (auto& it : m_SequenceFile.m_Embers)
 	{
 		auto emberItem = new EmberTreeWidgetItemBase(fileItem);
@@ -535,7 +529,6 @@ void FractoriumEmberController<T>::FillSequenceTree()
 	tree->expandAll();
 	// Hide the animation item
 	tree->collapseItem(tree->topLevelItem(0));
-
 	RenderSequencePreviews(0, uint(m_SequenceFile.Size()));
 }
 
@@ -570,11 +563,13 @@ void Fractorium::OnSequenceTreeItemChanged(QTreeWidgetItem* item, int col)
 /// <param name="start">Ignored, render all.</param>
 /// <param name="end">Ignored, render all.</param>
 template <typename T>
-void FractoriumEmberController<T>::RenderSequencePreviews(uint start, uint end) {
+void FractoriumEmberController<T>::RenderSequencePreviews(uint start, uint end)
+{
 	RenderPreviews(m_Fractorium->ui.SequenceTree, m_SequencePreviewRenderer.get(), m_SequenceFile, start, end);
 }
 
-void Fractorium::OnSequenceStartPreviewsButtonClicked(bool checked) {
+void Fractorium::OnSequenceStartPreviewsButtonClicked(bool checked)
+{
 	m_Controller->RenderSequencePreviews();
 }
 
@@ -812,6 +807,7 @@ template <typename T>
 void FractoriumEmberController<T>::SequenceAnimateNextFrame()
 {
 	const auto tree = m_Fractorium->ui.SequenceTree;
+
 	if (const auto renders = tree->topLevelItem(1))
 	{
 		if (renders->childCount())
@@ -819,6 +815,7 @@ void FractoriumEmberController<T>::SequenceAnimateNextFrame()
 			const auto animate = dynamic_cast<EmberTreeWidgetItemBase*>(tree->topLevelItem(0)->child(0));
 			const auto frame = m_AnimateFrame++ % renders->childCount();
 			const auto nth = dynamic_cast<EmberTreeWidgetItemBase*>(renders->child(frame));
+
 			if (animate && nth)
 			{
 				if (!nth->m_Rendered)
@@ -843,7 +840,7 @@ void FractoriumEmberController<T>::SequenceAnimateButtonClicked()
 {
 	if (const auto animation = m_Fractorium->ui.SequenceTree->topLevelItem(0))
 	{
-		if (animation->isExpanded())
+		if (animation->isExpanded() && m_AnimateTimer->isActive())
 		{
 			animation->setExpanded(false);
 			m_AnimateTimer->stop();
@@ -852,9 +849,7 @@ void FractoriumEmberController<T>::SequenceAnimateButtonClicked()
 		{
 			animation->setExpanded(true);
 			m_AnimateFrame = 0;
-
-			// TODO Make this a UI Parameter
-			const auto fps = 30;
+			const auto fps = 30;//TODO Make this a UI Parameter
 			m_AnimateTimer->start(1000 / fps);
 		}
 	}
@@ -868,9 +863,8 @@ void Fractorium::OnSequenceAnimateButtonClicked(bool checked) { m_Controller->Se
 template <typename T>
 void FractoriumEmberController<T>::SequenceClearButtonClicked()
 {
-	const auto tree = m_Fractorium->ui.SequenceTree;
 	m_SequencePreviewRenderer->Stop();
-	tree->clear();
+	m_Fractorium->ui.SequenceTree->clear();
 }
 
 void Fractorium::OnSequenceClearButtonClicked(bool checked) { m_Controller->SequenceClearButtonClicked(); }

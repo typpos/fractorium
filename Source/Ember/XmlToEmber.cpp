@@ -668,18 +668,10 @@ void XmlToEmber<T>::ScanForEmberNodes(xmlNode* curNode, const char* parentFile, 
 static const char* CheckNameVal(xmlNode* node, const char* name)
 {
 	if (const auto att = node->properties)
-	{
 		if (!Compare(att->name, "name"))
-		{
 			if (const auto attStr = XC(xmlGetProp(node, att->name)))
-			{
 				if (!Compare(attStr, name))
-				{
 					return CCX(attStr);
-				}
-			}
-		}
-	}
 
 	return nullptr;
 }

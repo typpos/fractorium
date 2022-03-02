@@ -43,6 +43,7 @@
 #define ROTATIONSPERBLEND	 "sequence/rotationsperblend"
 #define ROTATIONSPERBLENDMAX "sequence/rotationsperblendmax"
 #define LINEAR				 "sequence/linear"
+#define ANIMATION_FPS		 "sequence/animationfps"
 
 #define VARFILTERSUM         "varfilter/sumcheckbox"
 #define VARFILTERASSIGN      "varfilter/assigncheckbox"
@@ -217,6 +218,9 @@ public:
 
 	bool Linear();
 	void Linear(bool b);
+
+	uint AnimationFps();
+	void AnimationFps(uint i);
 
 	int VarFilterSum();
 	void VarFilterSum(int i);

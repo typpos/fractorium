@@ -65,7 +65,10 @@ void Fractorium::InitLibraryUI()
 	ui.SequenceRotationsPerBlendMaxSpinBox->setMinimum(m_Settings->RotationsPerBlend());//Upper min = lower max.
 	//Linear.
 	ui.SequenceLinearCheckBox->setChecked(m_Settings->Linear());
+	//Animation FPS.
+	ui.SequenceAnimationFpsSpinBox->setValue(m_Settings->AnimationFps());
 }
+
 
 /// <summary>
 /// Select the item in the library tree specified by the passed in index.
@@ -849,8 +852,8 @@ void FractoriumEmberController<T>::SequenceAnimateButtonClicked()
 		{
 			animation->setExpanded(true);
 			m_AnimateFrame = 0;
-			const auto fps = 30;//TODO Make this a UI Parameter
-			m_AnimateTimer->start(1000 / fps);
+			// TODO look at duration based instead of time
+			m_AnimateTimer->start(1000 / m_Fractorium->ui.SequenceAnimationFpsSpinBox->value());
 		}
 	}
 }
@@ -1018,6 +1021,7 @@ void Fractorium::SyncSequenceSettings()
 	m_Settings->RotationsPerBlend(ui.SequenceRotationsPerBlendSpinBox->value());
 	m_Settings->RotationsPerBlendMax(ui.SequenceRotationsPerBlendMaxSpinBox->value());
 	m_Settings->Linear(ui.SequenceLinearCheckBox->isChecked());
+	m_Settings->AnimationFps(ui.SequenceAnimationFpsSpinBox->value());
 }
 
 template class FractoriumEmberController<float>;

@@ -60,6 +60,9 @@ exists( /usr/local/include/GL ) {
 exists( /usr/include/OpenEXR ) {
 	INCLUDEPATH += /usr/include/OpenEXR
 }
+exists( /usr/include/Imath ) {
+	INCLUDEPATH += /usr/include/Imath
+}
 
         unix:!macx {
             INCLUDEPATH += /usr/include/libxml2

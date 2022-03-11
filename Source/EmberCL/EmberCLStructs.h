@@ -154,7 +154,7 @@ struct ALIGN PointCL
 /// It might seem better to use float4, however 2D palettes and even 3D coordinates may eventually
 /// be supported, which will make it more than 4 members.
 /// </summary>
-static const char* PointCLStructString =
+static constexpr char PointCLStructString[] =
 	"typedef struct __attribute__ " ALIGN_CL " _Point\n"
 	"{\n"
 	"	real_t m_X;\n"
@@ -183,7 +183,7 @@ struct ALIGN XformCL
 /// <summary>
 /// The xform structure used to iterate in OpenCL.
 /// </summary>
-static const char* XformCLStructString =
+static constexpr char XformCLStructString[] =
 	"typedef struct __attribute__ " ALIGN_CL " _XformCL\n"
 	"{\n"
 	"	real_t m_A, m_B, m_C, m_D, m_E, m_F;\n"
@@ -220,7 +220,7 @@ struct ALIGN EmberCL
 /// <summary>
 /// The ember structure used to iterate in OpenCL.
 /// </summary>
-static const char* EmberCLStructString =
+static constexpr char EmberCLStructString[] =
 	"typedef struct __attribute__ " ALIGN_CL " _EmberCL\n"
 	"{\n"
 	"	real_t m_RandPointRange;\n"
@@ -264,7 +264,7 @@ struct ALIGN CarToRasCL
 /// <summary>
 /// The cartesian to raster structure used to iterate in OpenCL.
 /// </summary>
-static const char* CarToRasCLStructString =
+static constexpr char CarToRasCLStructString[] =
 	"typedef struct __attribute__ " ALIGN_CL " _CarToRasCL\n"
 	"{\n"
 	"	real_t m_PixPerImageUnitW, m_RasLlX;\n"
@@ -299,7 +299,7 @@ struct ALIGN DensityFilterCL
 /// The density filtering structure used to iterate in OpenCL.
 /// Note that the actual filter buffer is held elsewhere.
 /// </summary>
-static const char* DensityFilterCLStructString =
+static constexpr char DensityFilterCLStructString[] =
 	"typedef struct __attribute__ " ALIGN_CL " _DensityFilterCL\n"
 	"{\n"
 	"	real_bucket_t m_Curve;\n"
@@ -341,7 +341,7 @@ struct ALIGN SpatialFilterCL
 /// The spatial filtering structure used to iterate in OpenCL.
 /// Note that the actual filter buffer is held elsewhere.
 /// </summary>
-static const char* SpatialFilterCLStructString =
+static constexpr char SpatialFilterCLStructString[] =
 	"typedef struct __attribute__ ((aligned (16))) _SpatialFilterCL\n"
 	"{\n"
 	"	uint m_SuperRasW;\n"
@@ -365,7 +365,7 @@ static const char* SpatialFilterCLStructString =
 /// their members as a buffer is not natively supported.
 /// Declaring them in a union with a buffer resolves this problem.
 /// </summary>
-static const char* UnionCLStructString =
+static constexpr char UnionCLStructString[] =
 	"typedef union\n"
 	"{\n"
 	"	uchar3 m_Uchar3;\n"

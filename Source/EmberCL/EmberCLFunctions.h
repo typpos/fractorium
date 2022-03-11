@@ -14,7 +14,7 @@ namespace EmberCLns
 /// <summary>
 /// OpenCL equivalent of Palette::RgbToHsv().
 /// </summary>
-static const char* RgbToHsvFunctionString =
+static constexpr char RgbToHsvFunctionString[] =
 	//rgb 0 - 1,
 	//h 0 - 6, s 0 - 1, v 0 - 1
 	"static inline void RgbToHsv(real4_bucket* rgb, real4_bucket* hsv)\n"
@@ -84,7 +84,7 @@ static const char* RgbToHsvFunctionString =
 /// <summary>
 /// OpenCL equivalent of Palette::HsvToRgb().
 /// </summary>
-static const char* HsvToRgbFunctionString =
+static constexpr char HsvToRgbFunctionString[] =
 	//h 0 - 6, s 0 - 1, v 0 - 1
 	//rgb 0 - 1
 	"static inline void HsvToRgb(real4_bucket* hsv, real4_bucket* rgb)\n"
@@ -120,7 +120,7 @@ static const char* HsvToRgbFunctionString =
 /// <summary>
 /// OpenCL equivalent of Palette::CalcAlpha().
 /// </summary>
-static const char* CalcAlphaFunctionString =
+static constexpr char CalcAlphaFunctionString[] =
 	"static inline real_t CalcAlpha(real_bucket_t density, real_bucket_t gamma, real_bucket_t linrange)\n"//Not the slightest clue what this is doing.//DOC
 	"{\n"
 	"	real_bucket_t frac, alpha, funcval = pow(linrange, gamma);\n"
@@ -148,7 +148,7 @@ static const char* CalcAlphaFunctionString =
 /// Only use float here instead of real_t because the output will be passed to write_imagef()
 /// during final accumulation, which only takes floats.
 /// </summary>
-static const char* CurveAdjustFunctionString =
+static constexpr char CurveAdjustFunctionString[] =
 	"static inline void CurveAdjust(__global real4reals_bucket* csa, float* a, uint index)\n"
 	"{\n"
 	"	uint tempIndex = (uint)clamp(*a * CURVES_LENGTH_M1, 0.0f, CURVES_LENGTH_M1);\n"
@@ -163,7 +163,7 @@ static const char* CurveAdjustFunctionString =
 /// random numbers in OpenCL, instead of ISAAC which was used
 /// for CPU rendering.
 /// </summary>
-static const char* RandFunctionString =
+static constexpr char RandFunctionString[] =
 	"enum { MWC64X_A = 4294883355u };\n\n"
 	"inline uint MwcNext(uint2* s)\n"
 	"{\n"
@@ -219,7 +219,7 @@ static const char* RandFunctionString =
 /// <summary>
 /// OpenCL equivalent Renderer::AddToAccum().
 /// </summary>
-static const char* AddToAccumWithCheckFunctionString =
+static constexpr char AddToAccumWithCheckFunctionString[] =
 	"inline bool AccumCheck(int superRasW, int superRasH, int i, int ii, int j, int jj)\n"
 	"{\n"
 	"	return (j + jj >= 0 && j + jj < superRasH && i + ii >= 0 && i + ii < superRasW);\n"
@@ -230,7 +230,7 @@ static const char* AddToAccumWithCheckFunctionString =
 /// OpenCL equivalent various CarToRas member functions.
 /// Normaly would subtract m_RasLlX and m_RasLlY, but they were negated in RendererCL before being passed in, so they could be used with fma().
 /// </summary>
-static const char* CarToRasFunctionString =
+static constexpr char CarToRasFunctionString[] =
 	"inline void CarToRasConvertPointToSingle(__constant CarToRasCL* carToRas, Point* point, uint* singleBufferIndex)\n"
 	"{\n"
 #ifdef USEFMA

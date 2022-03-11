@@ -1232,6 +1232,7 @@ void Fractorium::SetTabOrders()
 	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendCWCheckBox);
 	w = SetTabOrder(this, w, ui.SequenceRotationsPerBlendMaxSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceLinearCheckBox);
+	w = SetTabOrder(this, w, ui.SequenceAnimationFpsSpinBox);
 	w = SetTabOrder(this, w, ui.SequenceGenerateButton);
 	w = SetTabOrder(this, w, ui.SequenceRenderButton);
 	w = SetTabOrder(this, w, ui.SequenceSaveButton);

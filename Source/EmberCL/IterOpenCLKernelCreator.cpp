@@ -334,7 +334,7 @@ string IterOpenCLKernelCreator<T>::CreateIterKernelString(const Ember<T>& ember,
 	   CarToRasFunctionString;
 
 	if (lockAccum)
-		os << AtomicString();
+		os << AtomicString;
 
 	os <<
 	   xformFuncs.str() <<

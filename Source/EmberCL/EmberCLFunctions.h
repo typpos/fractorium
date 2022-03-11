@@ -249,30 +249,26 @@ static constexpr char CarToRasFunctionString[] =
 	"}\n"
 	"\n";
 
-static string AtomicString()
-{
-	ostringstream os;
-	os <<
-	   "void AtomicAdd(volatile __global real_bucket_t* source, const real_bucket_t operand)\n"
-	   "{\n"
-	   "	union\n"
-	   "	{\n"
-	   "		atomi intVal;\n"
-	   "		real_bucket_t realVal;\n"
-	   "	} newVal;\n"
-	   "\n"
-	   "	union\n"
-	   "	{\n"
-	   "		atomi intVal;\n"
-	   "		real_bucket_t realVal;\n"
-	   "	} prevVal;\n"
-	   "\n"
-	   "	do\n"
-	   "	{\n"
-	   "		prevVal.realVal = *source;\n"
-	   "		newVal.realVal = prevVal.realVal + operand;\n"
-	   "	} while (atomic_cmpxchg((volatile __global atomi*)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);\n"
-	   "}\n";
-	return os.str();
-}
+static constexpr char AtomicString[] =
+   "void AtomicAdd(volatile __global real_bucket_t* source, const real_bucket_t operand)\n"
+   "{\n"
+   "	union\n"
+   "	{\n"
+   "		atomi intVal;\n"
+   "		real_bucket_t realVal;\n"
+   "	} newVal;\n"
+   "\n"
+   "	union\n"
+   "	{\n"
+   "		atomi intVal;\n"
+   "		real_bucket_t realVal;\n"
+   "	} prevVal;\n"
+   "\n"
+   "	do\n"
+   "	{\n"
+   "		prevVal.realVal = *source;\n"
+   "		newVal.realVal = prevVal.realVal + operand;\n"
+   "	} while (atomic_cmpxchg((volatile __global atomi*)source, prevVal.intVal, newVal.intVal) != prevVal.intVal);\n"
+   "}\n";
+
 }

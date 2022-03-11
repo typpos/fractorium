@@ -95,6 +95,9 @@ void FractoriumSettings::EnsureDefaults()
 	   )
 		FinalExt("png");
 
+	if (AnimationFps() == 0)
+		AnimationFps(30);
+
 	auto s = OpenFolder();
 	QDir dir(s);
 

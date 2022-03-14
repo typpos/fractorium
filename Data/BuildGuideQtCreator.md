@@ -74,12 +74,6 @@ This will download and build `glm libopenexr libpng libxml tbb zlib`. You will h
     │
     ├─Deps
         │
-        ├─Include
-            │
-            ├─OpenEXR
-                │
-                ├─*.h
-        │
         ├─libjpeg.lib
         ├─libpng.lib
         ├─libxml2.lib

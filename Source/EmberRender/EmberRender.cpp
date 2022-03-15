@@ -201,6 +201,21 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 			auto h = std::max<size_t>(size_t(ember.m_OrigFinalRasH * opt.HeightScale()), 10);
 			ember.SetSizeAndAdjustScale(w, h, false, scaleType);
 		}
+		else if (opt.Width() || opt.Height())
+		{
+			auto scaleType = eScaleType::SCALE_NONE;
+
+			if (ToLower(opt.ScaleType()) == "width")
+				scaleType = eScaleType::SCALE_WIDTH;
+			else if (ToLower(opt.ScaleType()) == "height")
+				scaleType = eScaleType::SCALE_HEIGHT;
+			else if (ToLower(opt.ScaleType()) != "none")
+				cout << "Scale type must be width height or none. Setting to none.\n";
+
+			auto w = opt.Width() ? opt.Width() : ember.m_OrigFinalRasW;
+			auto h = opt.Height() ? opt.Height() : ember.m_OrigFinalRasH;
+			ember.SetSizeAndAdjustScale(w, h, false, scaleType);
+		}
 
 		if (ember.m_FinalRasW == 0 || ember.m_FinalRasH == 0)
 		{

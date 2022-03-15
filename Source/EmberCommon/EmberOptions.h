@@ -93,6 +93,8 @@ enum class eOptionIDs : et
 	OPT_START_COUNT,
 	OPT_PADDING,
 	OPT_PRIORITY,
+	OPT_W,
+	OPT_H,
 
 	OPT_SS,//Float value args.
 	OPT_WS,
@@ -402,11 +404,13 @@ public:
 		INITUINTOPTION(MaxXforms,       Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_MAX_XFORMS,       _T("--maxxforms"),            UINT_MAX,             SO_REQ_SEP, "   --maxxforms=<val>         The maximum number of xforms allowed in the final output.\n"));
 		INITUINTOPTION(StartCount,      Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_START_COUNT,      _T("--startcount"),           0,                    SO_REQ_SEP, "   --startcount=<val>        The number to add to each flame name when generating a sequence. Useful for programs like ffmpeg which require numerically increasing filenames [default: 0].\n"));
 		INITUINTOPTION(Padding,         Eou(eOptionUse::OPT_USE_GENOME,  eOptionIDs::OPT_PADDING,          _T("--padding"),              0,                    SO_REQ_SEP, "   --padding=<val>           Override the amount of zero padding added to each flame name when generating a sequence. Useful for programs like ffmpeg which require fixed width filenames [default: 0 (auto calculate padding)].\n"));
+		INITUINTOPTION(Width,           Eou(eOptionUse::OPT_RENDER_ANIM,  eOptionIDs::OPT_W,               _T("--width"),                0,                    SO_REQ_SEP, "   --width=<val>             Override the width the flame is rendered at. Ideally used in conjunction with --scaletype [default: 0 (no override)].\n"));
+		INITUINTOPTION(Height,          Eou(eOptionUse::OPT_RENDER_ANIM,  eOptionIDs::OPT_H,               _T("--height"),               0,                    SO_REQ_SEP, "   --height=<val>            Override the height the flame is rendered at. Ideally used in conjunction with --scaletype [default: 0 (no override)].\n"));
 		//Double.
-		INITDOUBLEOPTION(SizeScale,     Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1.0,                  SO_REQ_SEP, "   --ss=<val>                Size scale. All dimensions are scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(WidthScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_WS,               _T("--ws"),                   1.0,                  SO_REQ_SEP, "   --ws=<val>                Width scale. The width is scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(HeightScale,   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_HS,               _T("--hs"),                   1.0,                  SO_REQ_SEP, "   --hs=<val>                Height scale. The height is scaled by this amount [default: 1.0].\n"));
-		INITDOUBLEOPTION(QualityScale,  Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1.0,                  SO_REQ_SEP, "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0].\n"));
+		INITDOUBLEOPTION(SizeScale,     Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SS,               _T("--ss"),                   1.0,                  SO_REQ_SEP, "   --ss=<val>                Size scale. All dimensions are scaled by this amount. Ideally used in conjunction with --scaletype [default: 1.0 (no scaling)].\n"));
+		INITDOUBLEOPTION(WidthScale,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_WS,               _T("--ws"),                   1.0,                  SO_REQ_SEP, "   --ws=<val>                Width scale. The width is scaled by this amount. Ideally used in conjunction with --scaletype [default: 1.0 (no scaling)].\n"));
+		INITDOUBLEOPTION(HeightScale,   Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_HS,               _T("--hs"),                   1.0,                  SO_REQ_SEP, "   --hs=<val>                Height scale. The height is scaled by this amount. Ideally used in conjunction with --scaletype [default: 1.0 (no scaling)].\n"));
+		INITDOUBLEOPTION(QualityScale,  Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QS,               _T("--qs"),                   1.0,                  SO_REQ_SEP, "   --qs=<val>                Quality scale. All quality values are scaled by this amount [default: 1.0 (no scaling)].\n"));
 		INITDOUBLEOPTION(Quality,	    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_QUALITY,		   _T("--quality"),				 0.0,                  SO_REQ_SEP, "   --quality=<val>           Override the quality of the flame if not 0 [default: 0].\n"));
 		INITDOUBLEOPTION(SBPctPerTh,    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_SBPCTTH,          _T("--sbpctth"),              0.025,                SO_REQ_SEP, "   --sbpctth=<val>           The percentage of a sub batch from 0.01 to 1.0 to complete per thread per kernel launch done in OpenCL rendering. This is for performance tuning with OpenCL and does not apply to CPU rendering [default: 0.025 (256 iters with the default sub batch size of 10k)].\n"));
 		INITDOUBLEOPTION(DeMin,		    Eod(eOptionUse::OPT_RENDER_ANIM, eOptionIDs::OPT_DE_MIN,		   _T("--demin"),			    -1.0,                  SO_REQ_SEP, "   --demin=<val>             Override the minimum size of the density estimator filter radius if not -1 [default: -1].\n"));
@@ -556,6 +560,8 @@ public:
 					PARSEOPTION(eOptionIDs::OPT_MAX_XFORMS, MaxXforms);
 					PARSEOPTION(eOptionIDs::OPT_START_COUNT, StartCount);
 					PARSEOPTION(eOptionIDs::OPT_PADDING, Padding);
+					PARSEOPTION(eOptionIDs::OPT_W, Width);
+					PARSEOPTION(eOptionIDs::OPT_H, Height);
 					PARSEOPTION(eOptionIDs::OPT_SS, SizeScale);//Double args.
 					PARSEOPTION(eOptionIDs::OPT_WS, WidthScale);
 					PARSEOPTION(eOptionIDs::OPT_HS, HeightScale);
@@ -847,6 +853,8 @@ public:
 	Eou MaxXforms;
 	Eou StartCount;
 	Eou Padding;
+	Eou Width;
+	Eou Height;
 
 	Eod SizeScale;//Value double.
 	Eod WidthScale;

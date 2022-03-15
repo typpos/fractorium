@@ -1,15 +1,15 @@
-#Build Guide For Visual Studio 2019 or Qt Creator
-##Tools
+# Build Guide For Visual Studio 2019 or Qt Creator
+## Tools
 
-###git
+### git
 
 Install [git](https://git-scm.com/downloads).
 
-###Visual Studio
+### Visual Studio
 
 Install [Microsoft Visual Studio 2019 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
 
-###Qt
+### Qt
 
 Install Qt for Windows 64-bit (VS 2017) 5.12.8 or later (http://www.qt.io/download/). 
 
@@ -17,17 +17,17 @@ Add system environment variable named `QTPATH` and point it to the location of t
 
 `C:\Qt\5.12.8\msvc2017_64`
 
-###Wix
+### Wix
 
 To build the installer, you must have Wix installed. If you are unconcerned with it, you can skip this step and just dismiss the warning that shows when opening the solution later. It's recommended you ignore the installer since official builds are provided on this page.
 
-###CMake
+### CMake
 
 Install [CMake](https://cmake.org/download/) and be sure to check the option to add it to the system path.
 
-##Obtaining source
+## Obtaining source
 
-###This project
+### This project
 
 Open up the Visual Studio x64 Native Tools Command Prompt.
 
@@ -39,7 +39,7 @@ Create a new folder in your development area named fractorium:
 
 `git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git`
 
-###Prerequisites
+### Prerequisites
 
 There are six prerequisite dependencies. One of them must be downloaded manually:
 
@@ -74,12 +74,6 @@ This will download and build `glm libopenexr libpng libxml tbb zlib`. You will h
     │
     ├─Deps
         │
-        ├─Include
-            │
-            ├─OpenEXR
-                │
-                ├─*.h
-        │
         ├─libjpeg.lib
         ├─libpng.lib
         ├─libxml2.lib
@@ -103,9 +97,9 @@ This will download and build `glm libopenexr libpng libxml tbb zlib`. You will h
         ├─Imath-2_3.dll
 ```
 
-##Building with Qt Creator or Visual Studio
+## Building with Qt Creator or Visual Studio
 
-###Begin build with Qt Creator
+### Begin build with Qt Creator
 
 Open the Qt Project `fractorium/main.pro` using Qt Creator with the default config of *Desktop Qt [version] MSVC2019 64bit*.
 Make sure *Shadow build* in *Edit build configuration* for both *Debug* and *Release* is unchecked.
@@ -120,9 +114,9 @@ Ensure all projects are in the *Release* configuration and build main.pro.
 
 The outputs will be placed in `fractorium/Bin/release` several minutes later if no error occurs.
 
-###Begin build with Visual Studio
+### Begin build with Visual Studio
 
-####Visual Studio Qt Addon
+#### Visual Studio Qt Addon
 
 Install the [Visual Studio Qt Addon](http://www.qt.io/download/).
 
@@ -140,7 +134,7 @@ Open the file Fractorium.sln under Builds/MSVC/2019
 
 Set the configuration to release, and build all.
 
-###Outputs
+### Outputs
 
 The outputs will be the same whether Visual Studio or Qt Creator was used, however their locations will be different.
 
@@ -216,7 +210,7 @@ To run on a computer without Visual Studio 2017, these files also need to be in 
 
 or you can install [Visual C++ Redistributable Packages for Visual Studio 2019 (64 bit)](https://www.visualstudio.com/downloads/)
 
-##Final file structure for distribution
+## Final file structure for distribution
 
 ```
 [YOUR FOLDER]

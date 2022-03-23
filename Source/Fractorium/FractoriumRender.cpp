@@ -431,7 +431,7 @@ bool FractoriumEmberController<T>::Render()
 			{
 				const auto stats = m_Renderer->Stats();
 				auto iters = ToString<qulonglong>(stats.m_Iters);
-				auto scaledQuality = ToString(static_cast<intmax_t>(m_Renderer->ScaledQuality()));
+				auto scaledQuality = ToString(static_cast<qulonglong>(m_Renderer->ScaledQuality()));
 				auto renderTime = m_RenderElapsedTimer.Format(m_RenderElapsedTimer.Toc());
 				m_Fractorium->m_ProgressBar->setValue(100);
 

@@ -151,6 +151,8 @@ protected:
 	void SyncGuiToEmber(Ember<T>& ember, size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true);
 	bool SyncGuiToRenderer();
 	void SetProgressComplete(int val);
+	bool RenderSingleEmber(Ember<T>& ember, bool fullRender, size_t &stripForProgress);
+	bool RenderSingleEmberFromSeries(std::atomic<size_t>* atomfTime, size_t index);
 
 	Ember<T>* m_Ember;
 	EmberFile<T> m_EmberFile;

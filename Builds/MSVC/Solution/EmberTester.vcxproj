@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7930CAAC-9FC4-4202-B6A3-E760F73F88B7}</ProjectGuid>
+    <ProjectGuid>{320F611A-F9CE-4196-A8DC-FA24B2E8A320}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>EmberGenome</RootNamespace>
-    <ProjectName>EmberGenome</ProjectName>
+    <RootNamespace>EmberTester</RootNamespace>
+    <ProjectName>EmberTester</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -23,14 +23,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -57,7 +57,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OPENEXR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
@@ -89,7 +89,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENEXR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
@@ -116,9 +116,6 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\..\Source\Fractorium\Icons\Fractorium.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="Ember.vcxproj">
       <Project>{2bdb7a54-bb1a-476b-a6e5-f81e90ad4e67}</Project>
     </ProjectReference>
@@ -133,18 +130,14 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
     <ClInclude Include="..\..\..\Source\EmberCommon\JpegUtils.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\SimpleGlob.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\SimpleOpt.h" />
-    <ClInclude Include="..\..\..\Source\EmberGenome\EmberGenome.h" />
-    <ClInclude Include="..\..\..\Source\EmberGenome\resource.h" />
+    <ClInclude Include="..\..\..\Source\EmberTester\EmberTester.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\EmberCommon\EmberCommonPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\EmberGenome\EmberGenome.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="EmberGenome.rc" />
+    <ClCompile Include="..\..\..\Source\EmberTester\EmberTester.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

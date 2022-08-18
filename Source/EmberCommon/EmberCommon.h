@@ -864,7 +864,7 @@ static vector<const Variation<T>*> FindVarsWithWithout(const vector<const Variat
 /// This is useful for finding variations without certain characteristics since it's not possible
 /// to query the CPU C++ code at runtime.
 /// </summary>
-/// <param name="stringVec">The vector of variation pointers to search</param>
+/// <param name="vars">The vector of variation pointers to search</param>
 /// <param name="stringVec">The vector of strings to search for</param>
 /// <param name="findAll">True to find all variations which don't match any strings, false to break after the first non-match is found.</param>
 /// <returns>A vector of pointers to variations whose OpenCL string did not match any string in stringVec</returns>
@@ -886,6 +886,32 @@ static vector<const Variation<T>*> FindVarsWithout(const vector<const Variation<
 	}
 
 	return vec;
+}
+
+/// <summary>
+/// Check whether a file exists, and optionally if it's not empty.
+/// </summary>
+/// <param name="filename">The full path and file name to check for</param>
+/// <param name="notempty">Whether to only return true if the file is found and is not empty. Default: true.</param>
+/// <returns>True if the file was found and optionally not empty, else false.</returns>
+static bool FileExists(const string& filename, bool notempty = true)
+{
+	try
+	{
+		ifstream ifs;
+		ifs.exceptions(ifstream::failbit);
+		ifs.open(filename, ios::binary | ios::ate);
+
+		if (notempty)
+			return ifs.tellg() > 0;//Ensure it exists and wasn't empty.
+		else
+			return true;
+	}
+	catch (...)
+	{
+	}
+
+	return false;
 }
 }
 

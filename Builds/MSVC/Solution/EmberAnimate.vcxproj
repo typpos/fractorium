@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4A191F4C-03AC-4F1B-AFFD-F5483ECEBD29}</ProjectGuid>
+    <ProjectGuid>{35285FCF-6FA8-410E-841B-70AE744D38B8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>EmberRender</RootNamespace>
-    <ProjectName>EmberRender</ProjectName>
+    <RootNamespace>EmberAnimate</RootNamespace>
+    <ProjectName>EmberAnimate</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -23,14 +23,14 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -95,10 +95,9 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>
-      <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FloatingPointExceptions>false</FloatingPointExceptions>
       <StringPooling>true</StringPooling>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
@@ -118,6 +117,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\..\Source\Fractorium\Icons\Fractorium.ico" />
+    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Ember.vcxproj">
@@ -128,24 +128,24 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Source\EmberAnimate\EmberAnimate.h" />
+    <ClInclude Include="..\..\..\Source\EmberAnimate\resource.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\EmberCommon.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\EmberCommonPch.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\EmberOptions.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\JpegUtils.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\SimpleGlob.h" />
     <ClInclude Include="..\..\..\Source\EmberCommon\SimpleOpt.h" />
-    <ClInclude Include="..\..\..\Source\EmberRender\EmberRender.h" />
-    <ClInclude Include="..\..\..\Source\EmberRender\resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Source\EmberAnimate\EmberAnimate.cpp" />
     <ClCompile Include="..\..\..\Source\EmberCommon\EmberCommonPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\EmberRender\EmberRender.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="EmberRender.rc" />
+    <ResourceCompile Include="EmberAnimate.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

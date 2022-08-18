@@ -11,26 +11,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F6A9102C-69A9-48FB-BC4B-49E49AF43236}</ProjectGuid>
+    <ProjectGuid>{4A191F4C-03AC-4F1B-AFFD-F5483ECEBD29}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>EmberCLns</RootNamespace>
-    <ProjectName>EmberCL</ProjectName>
+    <RootNamespace>EmberRender</RootNamespace>
+    <ProjectName>EmberRender</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -57,13 +57,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BUILDING_EMBERCL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember\;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
-      <StructMemberAlignment>Default</StructMemberAlignment>
-      <PrecompiledHeaderFile>EmberCLPch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
@@ -72,11 +71,16 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>libxml2.lib;opencl.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;opencl.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -85,14 +89,12 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BUILDING_EMBERCL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember\;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include;$(AMDAPPSDKROOT)\include;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <PrecompiledHeaderFile>EmberCLPch.h</PrecompiledHeaderFile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FloatingPointExceptions>false</FloatingPointExceptions>
@@ -101,53 +103,49 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libxml2.lib;opencl.lib;Opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;opencl.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(AMDAPPSDKROOT)\lib\x86_64;$(CUDA_PATH)\lib\$(PlatformName)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
+xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Source\Fractorium\Icons\Fractorium.ico" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Ember.vcxproj">
       <Project>{2bdb7a54-bb1a-476b-a6e5-f81e90ad4e67}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>true</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <ProjectReference Include="EmberCL.vcxproj">
+      <Project>{f6a9102c-69a9-48fb-bc4b-49e49af43236}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Source\EmberCL\DllMain.cpp">
+    <ClInclude Include="..\..\..\Source\EmberCommon\EmberCommon.h" />
+    <ClInclude Include="..\..\..\Source\EmberCommon\EmberCommonPch.h" />
+    <ClInclude Include="..\..\..\Source\EmberCommon\EmberOptions.h" />
+    <ClInclude Include="..\..\..\Source\EmberCommon\JpegUtils.h" />
+    <ClInclude Include="..\..\..\Source\EmberCommon\SimpleGlob.h" />
+    <ClInclude Include="..\..\..\Source\EmberCommon\SimpleOpt.h" />
+    <ClInclude Include="..\..\..\Source\EmberRender\EmberRender.h" />
+    <ClInclude Include="..\..\..\Source\EmberRender\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Source\EmberCommon\EmberCommonPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\Source\EmberCL\FinalAccumOpenCLKernelCreator.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\DEOpenCLKernelCreator.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\FunctionMapper.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\IterOpenCLKernelCreator.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\OpenCLInfo.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\OpenCLWrapper.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\RendererCL.cpp" />
-    <ClCompile Include="..\..\..\Source\EmberCL\RendererClDevice.cpp" />
+    <ClCompile Include="..\..\..\Source\EmberRender\EmberRender.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Source\EmberCL\EmberCLFunctions.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\EmberCLStructs.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\DEOpenCLKernelCreator.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\FinalAccumOpenCLKernelCreator.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\FunctionMapper.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\IterOpenCLKernelCreator.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\OpenCLInfo.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\OpenCLWrapper.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\RendererCL.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\EmberCLPch.h" />
-    <ClInclude Include="..\..\..\Source\EmberCL\RendererClDevice.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="EmberCL.rc" />
+    <ResourceCompile Include="EmberRender.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

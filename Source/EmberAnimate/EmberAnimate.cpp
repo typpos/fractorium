@@ -336,6 +336,14 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		r->Priority(eThreadPriority(Clamp<intmax_t>(intmax_t(opt.Priority()), intmax_t(eThreadPriority::LOWEST), intmax_t(eThreadPriority::HIGHEST))));
 	}
 
+	const auto doBmp = Find(opt.Format(), "bmp");
+	const auto doJpg = Find(opt.Format(), "jpg");
+	const auto doExr16 = Find(opt.Format(), "exr");
+	const auto doExr32 = Find(opt.Format(), "exr32");
+	const auto doPng8 = Find(opt.Format(), "png");
+	const auto doPng16 = Find(opt.Format(), "png16");
+	const auto doOnlyPng8 = doPng8 && !doPng16;
+	const auto doOnlyExr16 = doExr16 && !doExr32;
 	std::function<void (vector<v4F>&, string, EmberImageComments, size_t, size_t, size_t)> saveFunc = [&](vector<v4F>& finalImage,
 			string baseFilename,//These are copies because this will be launched in a thread.
 			EmberImageComments comments,
@@ -345,14 +353,6 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 	{
 		const auto finalImagep = finalImage.data();
 		const auto size = w * h;
-		const auto doBmp = Find(opt.Format(), "bmp");
-		const auto doJpg = Find(opt.Format(), "jpg");
-		const auto doExr16 = Find(opt.Format(), "exr");
-		const auto doExr32 = Find(opt.Format(), "exr32");
-		const auto doPng8 = Find(opt.Format(), "png");
-		const auto doPng16 = Find(opt.Format(), "png16");
-		const auto doOnlyPng8 = doPng8 && !doPng16;
-		const auto doOnlyExr16 = doExr16 && !doExr32;
 		vector<byte> rgb8Image;
 		vector<std::thread> writeFileThreads;
 		writeFileThreads.reserve(6);
@@ -514,6 +514,84 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		while ((ftime = (atomfTime.fetch_add(opt.Dtime()) + opt.Dtime())) <= opt.LastFrame())
 		{
 			const auto localTime = static_cast<T>(ftime) - opt.Dtime();
+			const auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, size_t(localTime));
+
+			if (opt.IgnoreExisting())
+			{
+				auto doRender = false;
+
+				if (doBmp)
+				{
+					const auto fn = baseFilename + ".bmp";
+
+					if (!FileExists(fn))
+						doRender = true;
+				}
+
+				if (!doRender && doJpg)
+				{
+					const auto fn = baseFilename + ".jpg";
+
+					if (!FileExists(fn))
+						doRender = true;
+				}
+
+				if (!doRender && doPng8)
+				{
+					bool doBothPng = doPng16 && (opt.Format().find("png") != opt.Format().rfind("png"));
+
+					if (doBothPng || doOnlyPng8)//8-bit PNG.
+					{
+						const auto fn = baseFilename + ".png";
+
+						if (!FileExists(fn))
+							doRender = true;
+					}
+
+					if (!doRender && doPng16)//16-bit PNG.
+					{
+						auto fn = baseFilename;
+
+						if (doBothPng)//Add suffix if they specified both PNG.
+							fn += "_p16";
+
+						fn += ".png";
+
+						if (!FileExists(fn))
+							doRender = true;
+					}
+				}
+
+				if (!doRender && doExr16)
+				{
+					bool doBothExr = doExr32 && (opt.Format().find("exr") != opt.Format().rfind("exr"));
+
+					if (doBothExr || doOnlyExr16)//16-bit EXR
+					{
+						const auto fn = baseFilename + ".exr";
+
+						if (!FileExists(fn))
+							doRender = true;
+					}
+
+					if (!doRender && doExr32)//32-bit EXR.
+					{
+						auto fn = baseFilename;
+
+						if (doBothExr)//Add suffix if they specified both EXR.
+							fn += "_exr32";
+
+						fn += ".exr"; if (!FileExists(fn))
+							doRender = true;
+					}
+				}
+
+				if (!doRender)
+				{
+					VerbosePrint("Skipping " + baseFilename + " because --ignore-existing was specified and all of the files with the requested extensions already exist.");
+					continue;
+				}
+			}
 
 			if (opt.Verbose() && ((opt.LastFrame() - opt.FirstFrame()) / opt.Dtime() >= 1))
 			{
@@ -568,7 +646,6 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			//when running with OpenCL. Call join() to ensure the previous thread call has completed.
 			Join(writeThread);
 			const auto threadVecIndex = finalImageIndex;//Cache before launching thread.
-			const auto baseFilename = MakeAnimFilename(inputPath, opt.Prefix(), opt.Suffix(), "", padding, size_t(localTime));
 
 			if (opt.ThreadedWrite())//Copies of all but the first parameter are passed to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
 			{

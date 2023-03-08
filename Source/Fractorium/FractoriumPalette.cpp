@@ -144,7 +144,7 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 	const uint freq = m_Fractorium->m_PaletteFrequencySpin->value();
 	const auto sat = m_Fractorium->m_PaletteSaturationSpin->value() / 100.0;
 	const auto brightness = m_Fractorium->m_PaletteBrightnessSpin->value() / 255.0;
-	const auto contrast = m_Fractorium->m_PaletteContrastSpin->value() > 0 ? m_Fractorium->m_PaletteContrastSpin->value() * 2.0 : m_Fractorium->m_PaletteContrastSpin->value() / 100.0;
+	const auto contrast = double(m_Fractorium->m_PaletteContrastSpin->value() > 0 ? m_Fractorium->m_PaletteContrastSpin->value() * 2.0 : m_Fractorium->m_PaletteContrastSpin->value()) / 100.0;
 	const auto hue = m_Fractorium->m_PaletteHueSpin->value() / 360.0;
 	//Use the temp palette as the base and apply the adjustments gotten from the GUI and save the result in the ember palette.
 	m_TempPalette.MakeAdjustedPalette(m_Ember.m_Palette, m_Fractorium->m_PreviewPaletteRotation, hue, sat, brightness, contrast, blur, freq);

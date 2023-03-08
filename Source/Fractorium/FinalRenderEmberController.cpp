@@ -100,36 +100,33 @@ void FinalRenderEmberControllerBase::Output(const QString& s)
 /// <param name="stripForProgress">Used to report progress when strips.</param>
 /// <returns>True if rendering succeeded.</returns>
 template<typename T>
-bool FinalRenderEmberController<T>::RenderSingleEmber(Ember<T>& ember, bool fullRender, size_t &stripForProgress)
+bool FinalRenderEmberController<T>::RenderSingleEmber(Ember<T>& ember, bool fullRender, size_t& stripForProgress)
 {
-	if (!m_Renderer.get()) {
+	if (!m_Renderer.get())
+	{
 		return false;
 	}
 
 	ember.m_TemporalSamples = 1;//No temporal sampling.
-
 	m_Renderer->SetEmber(ember, fullRender ? eProcessAction::FULL_RENDER : eProcessAction::KEEP_ITERATING, /* updatePointer */ true);
-
 	m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 	m_Stats.Clear();
 	m_RenderTimer.Tic();//Toc() is called in RenderComplete().
-
 	StripsRender<T>(m_Renderer.get(), ember, m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
-		[&](size_t strip) { stripForProgress = strip; },//Pre strip.
-		[&](size_t strip) { m_Stats += m_Renderer->Stats(); },//Post strip.
-		[&](size_t strip)//Error.
-		{
-			Output("Rendering failed.\n");
-			m_Fractorium->ErrorReportToQTextEdit(m_Renderer->ErrorReport(), m_FinalRenderDialog->ui.FinalRenderTextOutput, false);//Internally calls invoke.
-		},
-		[&](Ember<T>& finalEmber)
-		{
-			m_FinishedImageCount.fetch_add(1);
-			SaveCurrentRender(finalEmber);
-			RenderComplete(finalEmber);
-			HandleFinishedProgress();
-		});//Final strip.
-
+	[&](size_t strip) { stripForProgress = strip; },//Pre strip.
+	[&](size_t strip) { m_Stats += m_Renderer->Stats(); },//Post strip.
+	[&](size_t strip)//Error.
+	{
+		Output("Rendering failed.\n");
+		m_Fractorium->ErrorReportToQTextEdit(m_Renderer->ErrorReport(), m_FinalRenderDialog->ui.FinalRenderTextOutput, false);//Internally calls invoke.
+	},
+	[&](Ember<T>& finalEmber)
+	{
+		m_FinishedImageCount.fetch_add(1);
+		SaveCurrentRender(finalEmber);
+		RenderComplete(finalEmber);
+		HandleFinishedProgress();
+	});//Final strip.
 	return true;
 }
 
@@ -143,7 +140,8 @@ bool FinalRenderEmberController<T>::RenderSingleEmber(Ember<T>& ember, bool full
 template<typename T>
 bool FinalRenderEmberController<T>::RenderSingleEmberFromSeries(std::atomic<size_t>* atomfTime, size_t index)
 {
-	if (m_Renderers.size() <= index) {
+	if (m_Renderers.size() <= index)
+	{
 		return false;
 	}
 
@@ -248,9 +246,9 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 
 			SyncGuiToRenderer();
 			m_GuiState.m_Strips = VerifyStrips(m_Ember->m_FinalRasH, m_GuiState.m_Strips,
-			[&](const string & s) { Output(QString::fromStdString(s)); }, //Greater than height.
-			[&](const string & s) { Output(QString::fromStdString(s)); }, //Mod height != 0.
-			[&](const string & s) { Output(QString::fromStdString(s) + "\n"); }); //Final strips value to be set.
+			[&](const string& s) { Output(QString::fromStdString(s)); },  //Greater than height.
+			[&](const string& s) { Output(QString::fromStdString(s)); },  //Mod height != 0.
+			[&](const string& s) { Output(QString::fromStdString(s) + "\n"); });  //Final strips value to be set.
 		}
 
 		//The rendering process is different between doing a single image, and doing multiple.
@@ -291,16 +289,15 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 				//even when using double precision, which most cards at the time of this writing already exceed.
 				m_GuiState.m_Strips = 1;
 				CopyCont(embers, m_EmberFile.m_Embers);
-
 				std::atomic<size_t> atomfTime(0);
 				vector<std::thread> threadVec;
 				threadVec.reserve(m_Renderers.size());
 
 				for (size_t r = 0; r < m_Renderers.size(); r++)
 				{
- 					//All will share a pointer to the original vector to conserve memory with large files. Ok because the vec doesn't get modified.
- 					m_Renderers[r]->SetExternalEmbersPointer(&embers);
-					threadVec.push_back(std::thread(&RenderSingleEmberFromSeries, this, &atomfTime, r));
+					//All will share a pointer to the original vector to conserve memory with large files. Ok because the vec doesn't get modified.
+					m_Renderers[r]->SetExternalEmbersPointer(&embers);
+					threadVec.push_back(std::thread(&FinalRenderEmberController<T>::RenderSingleEmberFromSeries, this, &atomfTime, r));
 				}
 
 				Join(threadVec);
@@ -326,11 +323,9 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		else if (m_Renderer.get())//Render a single image.
 		{
 			Output(ComposePath(QString::fromStdString(m_Ember->m_Name)));
-
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
 			m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true);//Update color and filter params from the main window controls, which only affect the filter and/or final accumulation stage.
-
 			RenderSingleEmber(*m_Ember, /* fullRender= */ !isBump, currentStripForProgress);
 		}
 		else
@@ -716,7 +711,7 @@ tuple<size_t, size_t, size_t> FinalRenderEmberController<T>::SyncAndComputeMemor
 	if (m_Renderer.get())
 	{
 		strips = VerifyStrips(m_Ember->m_FinalRasH, m_FinalRenderDialog->Strips(),
-		[&](const string & s) {}, [&](const string & s) {}, [&](const string & s) {});
+		[&](const string& s) {}, [&](const string& s) {}, [&](const string& s) {});
 		m_Renderer->SetEmber(*m_Ember, eProcessAction::FULL_RENDER, true);
 		m_FinalPreviewRenderer->Render(UINT_MAX, UINT_MAX);
 		p = m_Renderer->MemoryRequired(strips, true, m_FinalRenderDialog->DoSequence());
@@ -1164,7 +1159,7 @@ void FinalRenderPreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	m_PreviewRenderer.SetEmber(m_PreviewEmber, eProcessAction::FULL_RENDER, true);
 	m_PreviewRenderer.PrepFinalAccumVector(m_PreviewFinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 	auto strips = VerifyStrips(m_PreviewEmber.m_FinalRasH, d->Strips(),
-	[&](const string & s) {}, [&](const string & s) {}, [&](const string & s) {});
+	[&](const string& s) {}, [&](const string& s) {}, [&](const string& s) {});
 	StripsRender<T>(&m_PreviewRenderer, m_PreviewEmber, m_PreviewFinalImage, 0, strips, d->YAxisUp(),
 	[&](size_t strip) {},//Pre strip.
 	[&](size_t strip) {},//Post strip.

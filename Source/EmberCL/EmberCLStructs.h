@@ -322,18 +322,18 @@ static constexpr char DensityFilterCLStructString[] =
 template <typename T>
 struct ALIGN SpatialFilterCL
 {
-	uint m_SuperRasW;
-	uint m_SuperRasH;
-	uint m_FinalRasW;
-	uint m_FinalRasH;
-	uint m_Supersample;
-	uint m_FilterWidth;
-	uint m_DensityFilterOffset;
-	uint m_YAxisUp;
-	T m_Vibrancy;
-	T m_HighlightPower;
-	T m_Gamma;
-	T m_LinRange;
+	uint m_SuperRasW = 0;
+	uint m_SuperRasH = 0;
+	uint m_FinalRasW = 0;
+	uint m_FinalRasH = 0;
+	uint m_Supersample = 0;
+	uint m_FilterWidth = 0;
+	uint m_DensityFilterOffset = 0;
+	uint m_YAxisUp = 0;
+	T m_Vibrancy = 0;
+	T m_HighlightPower = 0;
+	T m_Gamma = 0;
+	T m_LinRange = 0;
 	Color<T> m_Background;
 };
 

@@ -350,7 +350,7 @@ void DoubleSpinBox::focusOutEvent(QFocusEvent* e)
 /// Must set the focus to make sure key down messages don't erroneously go to the GLWidget.
 /// </summary>
 /// <param name="e">The event</param>
-void DoubleSpinBox::enterEvent(QEvent* e)
+void DoubleSpinBox::enterEvent(QEnterEvent* e)
 {
 	StopTimer();
 	QDoubleSpinBox::enterEvent(e);
@@ -404,7 +404,7 @@ SpecialDoubleSpinBox::SpecialDoubleSpinBox(QWidget* p, int h, double step)
 /// So re-enable it here just to ensure whenever they focus this control, the menu works.
 /// </summary>
 /// <param name="e">The event</param>
-void SpecialDoubleSpinBox::enterEvent(QEvent* e)
+void SpecialDoubleSpinBox::enterEvent(QEnterEvent* e)
 {
 	this->setContextMenuPolicy(Qt::ActionsContextMenu);
 	DoubleSpinBox::enterEvent(e);

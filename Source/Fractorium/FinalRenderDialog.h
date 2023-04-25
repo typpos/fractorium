@@ -50,7 +50,7 @@ class FractoriumFinalRenderDialog : public QDialog
 #endif
 
 public:
-	FractoriumFinalRenderDialog(QWidget* p, Qt::WindowFlags f = 0);
+	FractoriumFinalRenderDialog(QWidget* p, Qt::WindowFlags f = Qt::WindowType::Widget);
 	~FractoriumFinalRenderDialog();
 	void Show(bool fromSequence);
 	bool EarlyClip();
@@ -137,6 +137,7 @@ private:
 	DoubleSpinBox* m_WidthScaleSpin;
 	SpinBox* m_WidthSpin;
 	DoubleSpinBox* m_HeightScaleSpin;
+	DoubleSpinBox* m_SubBatchPctSpin;
 	SpinBox* m_HeightSpin;
 	DoubleIntSpinnerWidget* m_WidthSpinnerWidget;
 	DoubleIntSpinnerWidget* m_HeightSpinnerWidget;

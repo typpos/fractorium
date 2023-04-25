@@ -33,7 +33,7 @@ RendererCL<T, bucketT>::RendererCL(const vector<pair<size_t, size_t>>& devices, 
 	m_FinalFormat.image_channel_order = CL_RGBA;
 	m_FinalFormat.image_channel_data_type = CL_FLOAT;
 	m_CompileBegun = [&]() { };
-	m_IterCountPerKernel = size_t(m_SubBatchPercentPerThread * m_Ember.m_SubBatchSize);
+	m_IterCountPerKernel = size_t(double(m_SubBatchPercentPerThread) * m_Ember.m_SubBatchSize);
 	Init(devices, shared, outputTexID);
 }
 
@@ -183,24 +183,29 @@ bool RendererCL<T, bucketT>::SetOutputTexture(GLuint outputTexID)
 /// </summary>
 
 //Iters per kernel/block/grid.
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterCountPerKernel() const { return m_IterCountPerKernel;						  }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterCountPerBlock()  const { return IterCountPerKernel() * IterBlockKernelCount(); }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterCountPerGrid()   const { return IterCountPerKernel() * IterGridKernelCount();  }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterCountPerKernel() const noexcept { return m_IterCountPerKernel;						   }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterCountPerBlock()  const noexcept { return IterCountPerKernel() * IterBlockKernelCount(); }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterCountPerGrid()   const noexcept { return IterCountPerKernel() * IterGridKernelCount();  }
 
 //Kernels per block.
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterBlockKernelWidth()  const { return m_IterBlockWidth;								    }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterBlockKernelHeight() const { return m_IterBlockHeight;								}
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterBlockKernelCount()  const { return IterBlockKernelWidth() * IterBlockKernelHeight(); }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterBlockKernelWidth()  const noexcept { return m_IterBlockWidth;								 }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterBlockKernelHeight() const noexcept { return m_IterBlockHeight;								 }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterBlockKernelCount()  const noexcept { return IterBlockKernelWidth() * IterBlockKernelHeight(); }
 
 //Kernels per grid.
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridKernelWidth()  const { return IterGridBlockWidth() * IterBlockKernelWidth();   }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridKernelHeight() const { return IterGridBlockHeight() * IterBlockKernelHeight(); }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridKernelCount()  const { return IterGridKernelWidth() * IterGridKernelHeight();  }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridKernelWidth()  const noexcept { return IterGridBlockWidth() * IterBlockKernelWidth();   }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridKernelHeight() const noexcept { return IterGridBlockHeight() * IterBlockKernelHeight(); }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridKernelCount()  const noexcept { return IterGridKernelWidth() * IterGridKernelHeight();  }
 
 //Blocks per grid.
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridBlockWidth()  const { return m_IterBlocksWide;							    }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridBlockHeight() const { return m_IterBlocksHigh;							    }
-template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridBlockCount()  const { return IterGridBlockWidth() * IterGridBlockHeight();   }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridBlockWidth()  const noexcept { return m_IterBlocksWide;							   }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridBlockHeight() const noexcept { return m_IterBlocksHigh;							   }
+template <typename T, typename bucketT> size_t RendererCL<T, bucketT>::IterGridBlockCount()  const noexcept { return IterGridBlockWidth() * IterGridBlockHeight(); }
+
+//Allow for setting the number of blocks in each grid dimension.
+//These should only be calle before a run starts.
+template <typename T, typename bucketT> void RendererCL<T, bucketT>::IterBlocksWide(size_t w) noexcept { m_IterBlocksWide = w; }
+template <typename T, typename bucketT> void RendererCL<T, bucketT>::IterBlocksHigh(size_t h) noexcept { m_IterBlocksHigh = h; }
 
 /// <summary>
 /// Read the histogram of the specified into the host side CPU buffer.
@@ -590,7 +595,7 @@ bool RendererCL<T, bucketT>::Shared() const { return m_Shared; }
 /// Clear the error report for this class as well as the OpenCLWrapper members of each device.
 /// </summary>
 template <typename T, typename bucketT>
-void RendererCL<T, bucketT>::ClearErrorReport()
+void RendererCL<T, bucketT>::ClearErrorReport() noexcept
 {
 	EmberReport::ClearErrorReport();
 
@@ -669,7 +674,7 @@ bool RendererCL<T, bucketT>::RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& ran
 /// </summary>
 /// <returns>True if an devices are from Nvidia, else false.</returns>
 template <typename T, typename bucketT>
-bool RendererCL<T, bucketT>::AnyNvidia() const
+bool RendererCL<T, bucketT>::AnyNvidia() const noexcept
 {
 	for (auto& dev : m_Devices)
 		if (dev->Nvidia())
@@ -701,7 +706,7 @@ bool RendererCL<T, bucketT>::Alloc(bool histOnly)
 	static std::string loc = __FUNCTION__;
 	auto& wrapper = m_Devices[0]->m_Wrapper;
 	InitStateVec();
-	m_IterCountPerKernel = size_t(m_SubBatchPercentPerThread * m_Ember.m_SubBatchSize);//This isn't the greatest place to put this, but it must be computed before the number of iters to do is computed in the base.
+	m_IterCountPerKernel = size_t(double(m_SubBatchPercentPerThread) * m_Ember.m_SubBatchSize);//This isn't the greatest place to put this, but it must be computed before the number of iters to do is computed in the base.
 
 	if (b && !(b = wrapper.AddBuffer(m_DEFilterParamsBufferName, sizeof(m_DensityFilterCL))))      { ErrorStr(loc, "Failed to set DE filter parameters buffer", m_Devices[0].get()); }
 
@@ -1305,11 +1310,11 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 		//that are far enough apart such that their filters do not overlap.
 		//Do the latter.
 		//Gap is in terms of blocks and specifies how many blocks must separate two blocks running at the same time.
-		const auto gapW = static_cast<uint>(ceil(fw2 / blockSizeW));
+		const auto gapW = static_cast<size_t>(ceil(fw2 / blockSizeW));
 		const auto chunkSizeW = gapW + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap to the right of it.
-		const auto gapH = static_cast<uint>(ceil(fw2 / blockSizeH));
+		const auto gapH = static_cast<size_t>(ceil(fw2 / blockSizeH));
 		const auto chunkSizeH = gapH + 1;//Chunk size is also in terms of blocks and is one block (the one running) plus the gap below it.
-		double totalChunks = chunkSizeW * chunkSizeH;
+		double totalChunks = double(chunkSizeW * chunkSizeH);
 
 		if (b && !(b = wrapper.AddAndWriteBuffer(m_DEFilterParamsBufferName, reinterpret_cast<void*>(&m_DensityFilterCL), sizeof(m_DensityFilterCL)))) { ErrorStr(loc, "Writing DE filter parameters buffer failed", m_Devices[0].get()); }
 
@@ -1350,12 +1355,12 @@ eRenderStatus RendererCL<T, bucketT>::RunDensityFilter()
 		gridH /= chunkSizeH;
 		OpenCLWrapper::MakeEvenGridDims(blockSizeW, blockSizeH, gridW, gridH);
 
-		for (uint rowChunkPass = 0; b && !m_Abort && rowChunkPass < chunkSizeH; rowChunkPass++)//Number of vertical passes.
+		for (size_t rowChunkPass = 0; b && !m_Abort && rowChunkPass < chunkSizeH; rowChunkPass++)//Number of vertical passes.
 		{
-			for (uint colChunkPass = 0; b && !m_Abort && colChunkPass < chunkSizeW; colChunkPass++)//Number of horizontal passes.
+			for (size_t colChunkPass = 0; b && !m_Abort && colChunkPass < chunkSizeW; colChunkPass++)//Number of horizontal passes.
 			{
 				//t2.Tic();
-				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, chunkSizeW, chunkSizeH, colChunkPass, rowChunkPass)))
+				if (b && !(b = RunDensityFilterPrivate(kernelIndex, gridW, gridH, blockSizeW, blockSizeH, uint(chunkSizeW), uint(chunkSizeH), uint(colChunkPass), uint(rowChunkPass))))
 				{
 					ErrorStr(loc, "Running DE filter program for row chunk "s + std::to_string(rowChunkPass) + ", col chunk "s + std::to_string(colChunkPass) + " failed", m_Devices[0].get());
 				}
@@ -1510,7 +1515,7 @@ bool RendererCL<T, bucketT>::ClearBuffer(size_t device, const string& bufferName
 		{
 			size_t blockW = m_Devices[device]->Nvidia() ? 32 : 16;//Max work group size is 256 on AMD, which means 16x16.
 			size_t blockH = m_Devices[device]->Nvidia() ? 32 : 16;
-			size_t gridW = width * elementSize;
+			size_t gridW = size_t(width) * elementSize;
 			size_t gridH = height;
 			b = true;
 			OpenCLWrapper::MakeEvenGridDims(blockW, blockH, gridW, gridH);

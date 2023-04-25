@@ -139,8 +139,8 @@ void FractoriumEmberController<T>::FillSummary()
 		colorIndexItem->setFlags(nondraggable | Qt::ItemNeverHasChildren);
 		color = ColorIndexToQColor(xform->m_ColorX);
 		color.setAlphaF(xform->m_Opacity);
-		colorIndexItem->setBackgroundColor(1, color);
-		colorIndexItem->setTextColor(1, VisibleColor(color));
+		colorIndexItem->setBackground(1, color);
+		colorIndexItem->setForeground(1, VisibleColor(color));
 		auto colorSpeedItem = new QTreeWidgetItem(item1);
 		colorSpeedItem->setText(0, "Color speed");
 		colorSpeedItem->setText(1, QLocale::system().toString(xform->m_ColorSpeed, pc, p));
@@ -255,24 +255,24 @@ void Fractorium::UpdateHistogramBounds()
 
 	if (auto r = m_Controller->Renderer())
 	{
-		ul.sprintf("UL: %3.3f, %3.3f", r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
-		ur.sprintf("UR: %3.3f, %3.3f", r->UpperRightX(), r->UpperRightY());
-		lr.sprintf("LR: %3.3f, %3.3f", r->UpperRightX(), r->LowerLeftY());
-		ll.sprintf("LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
-		wh.sprintf("W x H: %4u x %4u", r->SuperRasW(), r->SuperRasH());
-		g.sprintf("%u", static_cast<uint>(r->GutterWidth()));
-		ui.InfoBoundsLabelUL->setText(ul);
-		ui.InfoBoundsLabelUR->setText(ur);
-		ui.InfoBoundsLabelLR->setText(lr);
-		ui.InfoBoundsLabelLL->setText(ll);
-		ui.InfoBoundsLabelWH->setText(wh);
-		ui.InfoBoundsTable->item(0, 1)->setText(g);
+		auto ulstr = ul.asprintf("UL: %3.3f, %3.3f", r->LowerLeftX(), r->UpperRightY());//These bounds include gutter padding.
+		auto urstr = ur.asprintf("UR: %3.3f, %3.3f", r->UpperRightX(), r->UpperRightY());
+		auto lrstr = lr.asprintf("LR: %3.3f, %3.3f", r->UpperRightX(), r->LowerLeftY());
+		auto llstr = ll.asprintf("LL: %3.3f, %3.3f", r->LowerLeftX(), r->LowerLeftY());
+		auto whstr = wh.asprintf("W x H: %4u x %4u", r->SuperRasW(), r->SuperRasH());
+		auto gstr = g.asprintf("%u", static_cast<uint>(r->GutterWidth()));
+		ui.InfoBoundsLabelUL->setText(ulstr);
+		ui.InfoBoundsLabelUR->setText(urstr);
+		ui.InfoBoundsLabelLR->setText(lrstr);
+		ui.InfoBoundsLabelLL->setText(llstr);
+		ui.InfoBoundsLabelWH->setText(whstr);
+		ui.InfoBoundsTable->item(0, 1)->setText(gstr);
 
 		if (r->GetDensityFilter())
 		{
 			const auto deWidth = (r->GetDensityFilter()->FilterWidth() * 2) + 1;
-			de.sprintf("%d x %d", deWidth, deWidth);
-			ui.InfoBoundsTable->item(1, 1)->setText(de);
+			auto destr = de.asprintf("%d x %d", deWidth, deWidth);
+			ui.InfoBoundsTable->item(1, 1)->setText(destr);
 		}
 		else
 			ui.InfoBoundsTable->item(1, 1)->setText("N/A");

@@ -384,6 +384,7 @@ bool Renderer<T, bucketT>::CreateTemporalFilter(bool& newAlloc)
 template <typename T, typename bucketT>
 eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, size_t subBatchCountOverride, bool forceOutput, size_t finalOffset)
 {
+	m_RenderTimer.Tic();
 	m_InRender = true;
 	EnterRender();
 	m_Abort = false;
@@ -406,7 +407,6 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 
 	if (!resume)//Beginning, reset everything.
 	{
-		m_RenderTimer.Tic();
 		m_LastTemporalSample = 0;
 		m_LastIter = 0;
 		m_LastIterPercent = 0;
@@ -420,7 +420,6 @@ eRenderStatus Renderer<T, bucketT>::Run(vector<v4F>& finalImage, double time, si
 	//User requested an increase in quality after finishing.
 	else if (m_ProcessState == eProcessState::ITER_STARTED && m_ProcessAction == eProcessAction::KEEP_ITERATING && TemporalSamples() == 1)
 	{
-		m_RenderTimer.Tic();
 		m_LastTemporalSample = 0;
 		m_LastIter = m_Stats.m_Iters;
 		m_LastIterPercent = 0;//Might skip a progress update, but shouldn't matter.
@@ -709,7 +708,6 @@ AccumOnly:
 
 		if (AccumulatorToFinalImage(finalImage, finalOffset) == eRenderStatus::RENDER_OK)
 		{
-			m_Stats.m_RenderMs += m_RenderTimer.Toc();//Record total time from the very beginning to the very end, including all intermediate calls.
 			//Even though the ember changes throughought the inner loops because of interpolation, it's probably ok to assign here.
 			//This will hold the last interpolated value (even though spatial and temporal filters were created based off of one of the first interpolated values).
 			m_LastEmber = m_Ember;
@@ -741,6 +739,7 @@ Finish:
 
 	LeaveRender();
 	m_InRender = false;
+	m_Stats.m_RenderMs += m_RenderTimer.Toc();//Record total time from the very beginning to the very end, including all intermediate calls.
 	return success;
 }
 

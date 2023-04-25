@@ -20,15 +20,15 @@ class EMBERCL_API RendererClDevice : public EmberReport
 public:
 	RendererClDevice(size_t platform, size_t device, bool shared);
 	bool Init();
-	bool Ok() const;
-	bool Shared() const;
-	bool Nvidia() const;
-	size_t WarpSize() const;
-	size_t PlatformIndex() const;
-	size_t DeviceIndex() const;
+	bool Ok() const noexcept;
+	bool Shared() const noexcept;
+	bool Nvidia() const noexcept;
+	size_t WarpSize() const noexcept;
+	size_t PlatformIndex() const noexcept;
+	size_t DeviceIndex() const noexcept;
 
 	//Public virtual functions overridden from base classes.
-	void ClearErrorReport() override;
+	void ClearErrorReport() noexcept override;
 	string ErrorReportString() override;
 	vector<string> ErrorReport() override;
 

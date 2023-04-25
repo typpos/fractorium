@@ -145,7 +145,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 
 		if (suffix.endsWith("bmp", Qt::CaseInsensitive) || suffix.endsWith("jpg", Qt::CaseInsensitive))
 		{
-			vector<byte> rgb8Image(size * 3);
+			vector<unsigned char> rgb8Image(size * 3);
 			Rgba32ToRgb8(data, rgb8Image.data(), width, height);
 
 			if (suffix.endsWith("bmp", Qt::CaseInsensitive))
@@ -157,7 +157,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 		{
 			if (!png16Bit)
 			{
-				vector<byte> rgba8Image(size * 4);
+				vector<unsigned char> rgba8Image(size * 4);
 				Rgba32ToRgba8(data, rgba8Image.data(), width, height, transparency);
 				ret = WritePng(s.c_str(), rgba8Image.data(), width, height, 1, true, comments, id, url, nick);
 			}
@@ -165,7 +165,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 			{
 				vector<glm::uint16> rgba16Image(size * 4);
 				Rgba32ToRgba16(data, rgba16Image.data(), width, height, transparency);
-				ret = WritePng(s.c_str(), (byte*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);
+				ret = WritePng(s.c_str(), (unsigned char*)rgba16Image.data(), width, height, 2, true, comments, id, url, nick);
 			}
 		}
 		else if (suffix.endsWith("exr", Qt::CaseInsensitive))
@@ -432,7 +432,8 @@ bool FractoriumEmberController<T>::Render()
 				const auto stats = m_Renderer->Stats();
 				auto iters = ToString<qulonglong>(stats.m_Iters);
 				auto scaledQuality = ToString(static_cast<qulonglong>(m_Renderer->ScaledQuality()));
-				auto renderTime = m_RenderElapsedTimer.Format(m_RenderElapsedTimer.Toc());
+				//auto renderTime = m_RenderElapsedTimer.Format(m_RenderElapsedTimer.Toc());
+				auto renderTime = m_RenderElapsedTimer.Format(stats.m_RenderMs);
 				m_Fractorium->m_ProgressBar->setValue(100);
 
 				//Only certain stats can be reported with OpenCL.

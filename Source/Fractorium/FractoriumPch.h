@@ -39,7 +39,6 @@
 #include <QComboBox>
 #include <QConicalGradient>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDial>
 #include <QDoubleSpinBox>
 #include <QEvent>
@@ -71,7 +70,8 @@
 #include <QModelIndex>
 #include <QMouseEvent>
 #include <QOpenGLFunctions>
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QOpenGLShaderProgram>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPaintEvent>

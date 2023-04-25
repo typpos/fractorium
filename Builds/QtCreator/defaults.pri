@@ -1,6 +1,6 @@
 VERSION = 22.21.4.2
 win32:CONFIG += skip_target_version_ext
-CONFIG += c++14
+CONFIG += c++20
 
 #message(PWD: $$absolute_path($$PWD))
 
@@ -14,8 +14,6 @@ autobuild {
 }
 
 #2) Declare where dependency folders are.
-#   Point to local copy of OpenCL includes to ensure we have the right ones.
-LOCAL_INCLUDE_DIR = $$absolute_path($$EMBER_ROOT/Builds/include/vendor)
 #   Parent folders for third party dependencies and their compiled outputs.
 win32: {
 	EXTERNAL_DIR = $$absolute_path($$EMBER_ROOT/..)
@@ -27,7 +25,7 @@ SRC_DIR = $$EMBER_ROOT/Source
 SRC_COMMON_DIR = $$absolute_path($$EMBER_ROOT/Source/EmberCommon)
 ASSETS_DIR = $$absolute_path($$EMBER_ROOT/Data)
 QTCREATOR_DIR = $$absolute_path($$EMBER_ROOT/Builds/QtCreator)
-win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/VS2019)
+win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/Solution)
 
 #4) Add up all include paths.
 INCLUDEPATH += $$LOCAL_INCLUDE_DIR
@@ -64,12 +62,12 @@ exists( /usr/include/Imath ) {
 	INCLUDEPATH += /usr/include/Imath
 }
 
-        unix:!macx {
-            INCLUDEPATH += /usr/include/libxml2
-        }
-        else {
-            INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
-        }
+unix:!macx {
+	INCLUDEPATH += /usr/include/libxml2
+}
+else {
+	INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
+}
 
 #libjpeg and libpng aren't in separate folders, so nothing to add here for them.
 }
@@ -78,25 +76,18 @@ exists( /usr/include/Imath ) {
 # Ember doesn't need OpenCL. But just place them all here in the common file for ease of maintenance.
 # Unneeded libs will just be ignored.
 win32 {
-	LIBS = ""
-	LIBS += OpenGL32.lib
-	LIBS += WS2_32.lib
-_AMDAPPSDK = $$(AMDAPPSDKROOT)
-
-isEmpty(_AMDAPPSDK) {
-        LIBS += $$(CUDA_PATH)/lib/x64/OpenCL.lib
-}
-else {
-        LIBS += $$(AMDAPPSDKROOT)/lib/x86_64/OpenCL.lib
-}
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/Imath-3_1.lib
-        LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
+    LIBS = ""
+    LIBS += OpenGL32.lib
+    LIBS += WS2_32.lib
+    LIBS += $$(OCL_ROOT)/lib/x86_64/OpenCL.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/Imath-3_1.lib
+    LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
 }
 
 !win32 {
@@ -144,6 +135,10 @@ QMAKE_CXXFLAGS_RELEASE += -DNDEBUG
 QMAKE_CXXFLAGS += -D_M_X64
 QMAKE_CXXFLAGS += -D_CONSOLE
 QMAKE_CXXFLAGS += -D_USRDLL
+QMAKE_CXXFLAGS -= -D_UNICODE
+QMAKE_CXXFLAGS -= -DUNICODE
+DEFINES -= _UNICODE
+DEFINES -= UNICODE
 
 win32 {
 	QMAKE_CXXFLAGS += -bigobj #Allow for very large object files.
@@ -189,12 +184,11 @@ win32 {
 		QMAKE_CXXFLAGS += -march=k8
 	}
 
-	CMAKE_CXXFLAGS += -DCL_USE_DEPRECATED_OPENCL_1_1_APIS # Not sure if this is needed. We remove it if all systems we build on support 1.2.
 	QMAKE_CXXFLAGS_RELEASE += -fomit-frame-pointer
 	QMAKE_CXXFLAGS += -fPIC
 	QMAKE_CXXFLAGS += -fpermissive
 	QMAKE_CXXFLAGS += -pedantic
-	QMAKE_CXXFLAGS += -std=c++14
+        QMAKE_CXXFLAGS += -std=c++20
 	QMAKE_CXXFLAGS += -Wnon-virtual-dtor
 	QMAKE_CXXFLAGS += -Wshadow
 	QMAKE_CXXFLAGS += -Winit-self

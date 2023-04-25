@@ -39,7 +39,7 @@ public:
 	void Set(int curveIndex, int pointIndex, const QPointF& point);
 	void Set(Curves<float>& curves);
 	void SetTop(CurveIndex curveIndex);
-	size_t SelectedCurveIndex() const { return m_Index; }
+	size_t SelectedCurveIndex() const noexcept { return m_Index; }
 
 Q_SIGNALS:
 	void PointChangedSignal(int curveIndex, int pointIndex, const QPointF& point);
@@ -47,8 +47,8 @@ Q_SIGNALS:
 	void PointRemovedSignal(size_t curveIndex, int pointIndex);
 
 protected:
-	virtual void paintEvent(QPaintEvent* e) override;
-	virtual void mousePressEvent(QMouseEvent* e) override;
+	void paintEvent(QPaintEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
 
 	size_t m_Index = 0;
 	QPen m_APen;
@@ -110,8 +110,8 @@ public:
 	/// <summary>
 	/// Index properties, getters only.
 	/// </summary>
-	int CurveIndex() const { return m_CurveIndex; }
-	int PointIndex() const { return m_PointIndex; }
+	int CurveIndex() const noexcept { return m_CurveIndex; }
+	int PointIndex() const noexcept { return m_PointIndex; }
 
 protected:
 	/// <summary>
@@ -122,9 +122,12 @@ protected:
 	/// <param name="widget">Unused and just passed to QGraphicsEllipseItem::paint()</param>
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
 	{
-		QStyleOptionGraphicsItem myOption(*option);
-		myOption.state &= ~QStyle::State_Selected;
-		QGraphicsEllipseItem::paint(painter, &myOption, widget);
+		if (option != nullptr && widget != nullptr)
+		{
+			QStyleOptionGraphicsItem myOption(*option);
+			myOption.state &= ~QStyle::State_Selected;
+			QGraphicsEllipseItem::paint(painter, &myOption, widget);
+		}
 	}
 
 	/// <summary>

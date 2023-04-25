@@ -42,7 +42,7 @@ protected:
 	void keyPressEvent(QKeyEvent* event) override;
 	void focusInEvent(QFocusEvent* e) override;
 	void focusOutEvent(QFocusEvent* e) override;
-	void enterEvent(QEvent* e) override;
+	void enterEvent(QEnterEvent* e) override;
 	void leaveEvent(QEvent* e) override;
 
 private:

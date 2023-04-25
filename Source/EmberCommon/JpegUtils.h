@@ -19,7 +19,7 @@ static std::recursive_mutex fileCs;
 /// <param name="url">Url of the author</param>
 /// <param name="nick">Nickname of the author</param>
 /// <returns>True if success, else false</returns>
-static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t height, int quality, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
+static bool WriteJpeg(const char* filename, unsigned char* image, size_t width, size_t height, int quality, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
 {
 	bool b = false;
 	FILE* file = nullptr;
@@ -38,7 +38,7 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 
 	if (fileResult == 0)
 	{
-		size_t i;
+		size_t i = 0;
 		jpeg_error_mgr jerr;
 		jpeg_compress_struct info;
 		string nickString, urlString, idString;
@@ -73,14 +73,14 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 		if (enableComments)
 		{
 			string s;
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(verString.c_str()), static_cast<uint>(verString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(verString.c_str()), static_cast<uint>(verString.size()));
 
 			if (nick != "")
 			{
 				os.str("");
 				os << "nickname: " << nick;
 				s = os.str();
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), static_cast<uint>(s.size()));
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<uint>(s.size()));
 			}
 
 			if (url != "")
@@ -88,7 +88,7 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 				os.str("");
 				os << "url: " << url;
 				s = os.str();
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), static_cast<uint>(s.size()));
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<uint>(s.size()));
 			}
 
 			if (id != "")
@@ -96,13 +96,13 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 				os.str("");
 				os << "id: " << id;
 				s = os.str();
-				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(s.c_str()), static_cast<uint>(s.size()));
+				jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(s.c_str()), static_cast<uint>(s.size()));
 			}
 
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(bvString.c_str()), static_cast<uint>(bvString.size()));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(niString.c_str()), static_cast<uint>(niString.size()));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(rtString.c_str()), static_cast<uint>(rtString.size()));
-			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const byte*>(genomeString.c_str()), static_cast<uint>(genomeString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(bvString.c_str()), static_cast<uint>(bvString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(niString.c_str()), static_cast<uint>(niString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(rtString.c_str()), static_cast<uint>(rtString.size()));
+			jpeg_write_marker(&info, JPEG_COM, reinterpret_cast<const unsigned char*>(genomeString.c_str()), static_cast<uint>(genomeString.size()));
 		}
 
 		for (i = 0; i < height; i++)
@@ -138,7 +138,7 @@ static bool WriteJpeg(const char* filename, byte* image, size_t width, size_t he
 /// <param name="url">Url of the author</param>
 /// <param name="nick">Nickname of the author</param>
 /// <returns>True if success, else false</returns>
-static bool WritePng(const char* filename, byte* image, size_t width, size_t height, size_t bytesPerChannel, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
+static bool WritePng(const char* filename, unsigned char* image, size_t width, size_t height, size_t bytesPerChannel, bool enableComments, const EmberImageComments& comments, const string& id, const string& url, const string& nick)
 {
 	bool b = false;
 	FILE* file = nullptr;
@@ -160,9 +160,9 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 		png_structp  png_ptr;
 		png_infop    info_ptr;
 		png_text     text[PNG_COMMENT_MAX];
-		size_t i;
-		glm::uint16 testbe = 1;
-		vector<byte*> rows(height);
+		size_t i = 0;
+		constexpr glm::uint16 testbe = 1;
+		vector<unsigned char*> rows(height);
 		text[0].compression = PNG_TEXT_COMPRESSION_NONE;
 		text[0].key = const_cast<png_charp>("ember_version");
 		text[0].text = const_cast<png_charp>(EmberVersion());
@@ -241,10 +241,10 @@ static bool WritePng(const char* filename, byte* image, size_t width, size_t hei
 /// <param name="height">The height.</param>
 /// <param name="newSize">The size of the new buffer created</param>
 /// <returns>The converted buffer if successful, else NULL.</returns>
-static vector<byte> ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t height, size_t& newSize)
+static vector<unsigned char> ConvertRGBToBMPBuffer(unsigned char* buffer, size_t width, size_t height, size_t& newSize)
 {
 	if (buffer == nullptr || width == 0 || height == 0)
-		return vector<byte>();
+		return vector<unsigned char>();
 
 	size_t padding = 0;
 	const auto scanlinebytes = width * 3;
@@ -254,7 +254,7 @@ static vector<byte> ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t hei
 
 	const auto psw = scanlinebytes + padding;
 	newSize = height * psw;
-	vector<byte> newBuf(newSize);
+	vector<unsigned char> newBuf(newSize);
 	size_t bufpos = 0;
 	size_t newpos = 0;
 
@@ -286,7 +286,7 @@ static vector<byte> ConvertRGBToBMPBuffer(byte* buffer, size_t width, size_t hei
 /// <param name="height">Height of the image in pixels</param>
 /// <param name="paddedSize">Padded size, greater than or equal to total image size.</param>
 /// <returns>True if success, else false</returns>
-static bool SaveBmp(const char* filename, const byte* image, size_t width, size_t height, size_t paddedSize)
+static bool SaveBmp(const char* filename, const unsigned char* image, size_t width, size_t height, size_t paddedSize)
 {
 #ifdef _WIN32
 	BITMAPFILEHEADER bmfh;
@@ -362,7 +362,7 @@ static bool SaveBmp(const char* filename, const byte* image, size_t width, size_
 /// <param name="width">Width of the image in pixels</param>
 /// <param name="height">Height of the image in pixels</param>
 /// <returns>True if success, else false</returns>
-static bool WriteBmp(const char* filename, byte* image, size_t width, size_t height)
+static bool WriteBmp(const char* filename, unsigned char* image, size_t width, size_t height)
 {
 	bool b = false;
 	size_t newSize;

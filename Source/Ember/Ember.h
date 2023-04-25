@@ -1111,12 +1111,12 @@ public:
 			static intmax_t symDistrib[] =
 			{
 				-4, -3,
-					-2, -2, -2,
-					-1, -1, -1,
-					2,  2,  2,
-					3,  3,
-					4,  4,
-				};
+				-2, -2, -2,
+				-1, -1, -1,
+				2,  2,  2,
+				3,  3,
+				4,  4,
+			};
 
 			if (rand.RandBit())
 				sym = symDistrib[rand.Rand(Vlen(symDistrib))];
@@ -1605,16 +1605,16 @@ public:
 	/// <summary>
 	/// Accessors.
 	/// </summary>
-	inline const Xform<T>* Xforms() const { return m_Xforms.data(); }
-	inline Xform<T>* NonConstXforms() { return m_Xforms.data(); }
-	inline size_t XformCount() const { return m_Xforms.size(); }
-	inline const Xform<T>* FinalXform() const { return &m_FinalXform; }
-	inline Xform<T>* NonConstFinalXform() { return &m_FinalXform; }
-	inline bool UseFinalXform() const { return !m_FinalXform.Empty(); }
-	inline size_t TotalXformCount(bool forceFinal = false) const { return XformCount() + ((forceFinal || UseFinalXform()) ? 1 : 0); }
-	inline int PaletteIndex() const { return m_Palette.m_Index; }
-	inline T BlurCoef() { return m_BlurCoef; }
-	inline eScaleType ScaleType() const { return m_ScaleType; }
+	inline const Xform<T>* Xforms() const noexcept { return m_Xforms.data(); }
+	inline Xform<T>* NonConstXforms() noexcept { return m_Xforms.data(); }
+	inline size_t XformCount() const noexcept { return m_Xforms.size(); }
+	inline const Xform<T>* FinalXform() const noexcept { return &m_FinalXform; }
+	inline Xform<T>* NonConstFinalXform() noexcept { return &m_FinalXform; }
+	inline bool UseFinalXform() const noexcept { return !m_FinalXform.Empty(); }
+	inline size_t TotalXformCount(bool forceFinal = false) const noexcept { return XformCount() + ((forceFinal || UseFinalXform()) ? 1 : 0); }
+	inline int PaletteIndex() const noexcept { return m_Palette.m_Index; }
+	inline T BlurCoef() noexcept { return m_BlurCoef; }
+	inline eScaleType ScaleType() const noexcept { return m_ScaleType; }
 
 	//The width and height in pixels of the final output image. The size of the histogram and DE filtering buffers will differ from this.
 	//Xml fields: "size".

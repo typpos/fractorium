@@ -33,10 +33,10 @@
 
 #ifndef __ISAAC64
 typedef uint ISAAC_INT;
-const ISAAC_INT GOLDEN_RATIO = ISAAC_INT{ 0x9e3779b9 };
+constexpr ISAAC_INT GOLDEN_RATIO = ISAAC_INT{ 0x9e3779b9 };
 #else
 typedef size_t ISAAC_INT;
-const ISAAC_INT GOLDEN_RATIO = ISAAC_INT{ 0x9e3779b97f4a7c13 };
+constexpr ISAAC_INT GOLDEN_RATIO = ISAAC_INT{ 0x9e3779b97f4a7c13 };
 #endif
 
 namespace EmberNs

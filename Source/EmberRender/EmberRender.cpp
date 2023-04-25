@@ -65,7 +65,9 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 	if (opt.EmberCL() && renderer->RendererType() != eRendererType::OPENCL_RENDERER)//OpenCL init failed, so fall back to CPU.
 		opt.EmberCL(false);
 
-	if (auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get()))
+	auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get());
+
+	if (rendererCL)
 	{
 		rendererCL->OptAffine(true);//Optimize empty affines for final renderers, this is normally false for the interactive renderer.
 		rendererCL->SubBatchPercentPerThread(float(opt.SBPctPerTh()));
@@ -254,9 +256,9 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 		}
 
 		strips = VerifyStrips(ember.m_FinalRasH, strips,
-		[&](const string & s) { cout << s << "\n"; }, //Greater than height.
-		[&](const string & s) { cout << s << "\n"; }, //Mod height != 0.
-		[&](const string & s) { cout << s << "\n"; }); //Final strips value to be set.
+		[&](const string& s) { cout << s << "\n"; },  //Greater than height.
+		[&](const string& s) { cout << s << "\n"; },  //Mod height != 0.
+		[&](const string& s) { cout << s << "\n"; });  //Final strips value to be set.
 		//For testing incremental renderer.
 		//int sb = 1;
 		//bool resume = false, success = false;
@@ -267,193 +269,212 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 		//	resume = true;
 		//}
 		//while (success && renderer->ProcessState() != ACCUM_DONE);
-		StripsRender<T>(renderer.get(), ember, finalImage, 0, strips, opt.YAxisUp(),
-						[&](size_t strip)//Pre strip.
+		//for (auto gbw = 64; gbw <= 64; gbw <<= 1)
 		{
-			if (opt.Verbose() && (strips > 1) && strip > 0)
-				cout << "\n";
-
-			if (strips > 1)
-				VerbosePrint("Strip = " << (strip + 1) << "/" << strips);
-		},
-		[&](size_t strip)//Post strip.
-		{
-			progress->Clear();
-			stats += renderer->Stats();
-		},
-		[&](size_t strip)//Error.
-		{
-			cout << "Error: image rendering failed, skipping to next image.\n";
-			renderer->DumpErrorReport();//Something went wrong, print errors.
-		},
-		//Final strip.
-		//Original wrote every strip as a full image which could be very slow with many large images.
-		//Only write once all strips for this image are finished.
-		[&](Ember<T>& finalEmber)
-		{
-			//TotalIterCount() is actually using ScaledQuality() which does not get reset upon ember assignment,
-			//so it ends up using the correct value for quality * strips.
-			iterCount = renderer->TotalIterCount(1);
-			comments = renderer->ImageComments(stats, opt.PrintEditDepth(), true);
-			os.str("");
-			os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((static_cast<double>(stats.m_Iters) / static_cast<double>(iterCount)) * 100) << "%)";
-			VerbosePrint("\nIters ran/requested: " + os.str());
-
-			if (!opt.EmberCL())
-				VerbosePrint("Bad values: " << stats.m_Badvals);
-
-			VerbosePrint("Render time: " + t.Format(stats.m_RenderMs));
-			VerbosePrint("Pure iter time: " + t.Format(stats.m_IterMs));
-			VerbosePrint("Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << "\n");
-			const auto useName = opt.NameEnable() && !finalEmber.m_Name.empty();
-			const auto finalImagep = finalImage.data();
-			const auto size = finalEmber.m_FinalRasW * finalEmber.m_FinalRasH;
-			const auto doBmp = Find(opt.Format(), "bmp");
-			const auto doJpg = Find(opt.Format(), "jpg");
-			const auto doExr16 = Find(opt.Format(), "exr");
-			const auto doExr32 = Find(opt.Format(), "exr32");
-			const auto doPng8 = Find(opt.Format(), "png");
-			const auto doPng16 = Find(opt.Format(), "png16");
-			const auto doOnlyPng8 = doPng8 && !doPng16;
-			const auto doOnlyExr16 = doExr16 && !doExr32;
-			vector<byte> rgb8Image;
-			vector<std::thread> writeFileThreads;
-			writeFileThreads.reserve(6);
-
-			if (doBmp || doJpg)
+			//for (auto gbh = 2; gbh <= 64; gbh <<= 1)
 			{
-				rgb8Image.resize(size * 3);
-				Rgba32ToRgb8(finalImagep, rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
-
-				if (doBmp)
+				//if (rendererCL)
+				//{
+				//	VerbosePrint("Running OpenCL grid blocks of " << gbw << "x" << gbh);
+				//	rendererCL->IterBlocksWide(gbw);
+				//	rendererCL->IterBlocksHigh(gbh);
+				//}
+				stats.Clear();
+				StripsRender<T>(renderer.get(), ember, finalImage, 0, strips, opt.YAxisUp(),
+								[&](size_t strip)//Pre strip.
 				{
-					writeFileThreads.push_back(std::thread([&]()
-					{
-						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "bmp", padding, i, useName);
-						VerbosePrint("Writing " + filename);
-						const auto writeSuccess = WriteBmp(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
+					if (opt.Verbose() && (strips > 1) && strip > 0)
+						cout << "\n";
 
-						if (!writeSuccess)
-							cout << "Error writing " << filename << "\n";
-					}));
-				}
-
-				if (doJpg)
+					if (strips > 1)
+						VerbosePrint("Strip = " << (strip + 1) << "/" << strips);
+				},
+				[&](size_t strip)//Post strip.
 				{
-					writeFileThreads.push_back(std::thread([&]()
-					{
-						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "jpg", padding, i, useName);
-						VerbosePrint("Writing " + filename);
-						const auto writeSuccess = WriteJpeg(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-
-						if (!writeSuccess)
-							cout << "Error writing " << filename << "\n";
-					}));
-				}
-			}
-
-			if (doPng8)
-			{
-				bool doBothPng = doPng16 && (opt.Format().find("png") != opt.Format().rfind("png"));
-
-				if (doBothPng || doOnlyPng8)//8-bit PNG.
+					progress->Clear();
+					stats += renderer->Stats();
+				},
+				[&](size_t strip)//Error.
 				{
-					writeFileThreads.push_back(std::thread([&]()
-					{
-						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "png", padding, i, useName);
-						VerbosePrint("Writing " + filename);
-						vector<byte> rgba8Image(size * 4);
-						Rgba32ToRgba8(finalImagep, rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						const auto writeSuccess = WritePng(filename.c_str(), rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-
-						if (!writeSuccess)
-							cout << "Error writing " << filename << "\n";
-					}));
-				}
-
-				if (doPng16)//16-bit PNG.
+					cout << "Error: image rendering failed, skipping to next image.\n";
+					renderer->DumpErrorReport();//Something went wrong, print errors.
+				},
+				//Final strip.
+				//Original wrote every strip as a full image which could be very slow with many large images.
+				//Only write once all strips for this image are finished.
+				[&](Ember<T>& finalEmber)
 				{
-					writeFileThreads.push_back(std::thread([&]()
-					{
-						auto suffix = opt.Suffix();
+					//TotalIterCount() is actually using ScaledQuality() which does not get reset upon ember assignment,
+					//so it ends up using the correct value for quality * strips.
+					iterCount = renderer->TotalIterCount(1);
+					comments = renderer->ImageComments(stats, opt.PrintEditDepth(), true);
+					os.str("");
+					os << comments.m_NumIters << " / " << iterCount << " (" << std::fixed << std::setprecision(2) << ((static_cast<double>(stats.m_Iters) / static_cast<double>(iterCount)) * 100) << "%)";
+					VerbosePrint("\nIters ran/requested: " + os.str());
 
-						if (doBothPng)//Add suffix if they specified both PNG.
+					if (!opt.EmberCL())
+						VerbosePrint("Bad values: " << stats.m_Badvals);
+
+					VerbosePrint("Render time: " + t.Format(stats.m_RenderMs));
+					VerbosePrint("Pure iter time: " + t.Format(stats.m_IterMs));
+					VerbosePrint("Iters/sec: " << size_t(stats.m_Iters / (stats.m_IterMs / 1000.0)) << "\n");
+					const auto useName = opt.NameEnable() && !finalEmber.m_Name.empty();
+					const auto finalImagep = finalImage.data();
+					const auto size = finalEmber.m_FinalRasW * finalEmber.m_FinalRasH;
+					const auto doBmp = Find(opt.Format(), "bmp");
+					const auto doJpg = Find(opt.Format(), "jpg");
+					const auto doExr16 = Find(opt.Format(), "exr");
+					const auto doExr32 = Find(opt.Format(), "exr32");
+					const auto doPng8 = Find(opt.Format(), "png");
+					const auto doPng16 = Find(opt.Format(), "png16");
+					const auto doOnlyPng8 = doPng8 && !doPng16;
+					const auto doOnlyExr16 = doExr16 && !doExr32;
+					vector<unsigned char> rgb8Image;
+					vector<std::thread> writeFileThreads;
+					writeFileThreads.reserve(6);
+
+					if (doBmp || doJpg)
+					{
+						rgb8Image.resize(size * 3);
+						Rgba32ToRgb8(finalImagep, rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
+
+						if (doBmp)
 						{
-							VerbosePrint("Doing both PNG formats, so adding suffix _p16 to avoid overwriting the same file.");
-							suffix += "_p16";
+							writeFileThreads.push_back(std::thread([&]()
+							{
+								const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "bmp", padding, i, useName);
+								VerbosePrint("Writing " + filename);
+								const auto writeSuccess = WriteBmp(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH);
+
+								if (!writeSuccess)
+									cout << "Error writing " << filename << "\n";
+							}));
 						}
 
-						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "png", padding, i, useName);
-						VerbosePrint("Writing " + filename);
-						vector<glm::uint16> rgba16Image(size * 4);
-						Rgba32ToRgba16(finalImagep, rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						const auto writeSuccess = WritePng(filename.c_str(), (byte*)rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-
-						if (!writeSuccess)
-							cout << "Error writing " << filename << "\n";
-					}));
-				}
-			}
-
-			if (doExr16)
-			{
-				const auto doBothExr = doExr32 && (opt.Format().find("exr") != opt.Format().rfind("exr"));
-
-				if (doBothExr || doOnlyExr16)//16-bit EXR.
-				{
-					writeFileThreads.push_back(std::thread([&]()
-					{
-						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "exr", padding, i, useName);
-						VerbosePrint("Writing " + filename);
-						vector<Rgba> rgba32Image(size);
-						Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						const auto writeSuccess = WriteExr16(filename.c_str(),
-															 rgba32Image.data(),
-															 finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
-
-						if (!writeSuccess)
-							cout << "Error writing " << filename << "\n";
-					}));
-				}
-
-				if (doExr32)//32-bit EXR.
-				{
-					writeFileThreads.push_back(std::thread([&]()
-					{
-						auto suffix = opt.Suffix();
-
-						if (doBothExr)//Add suffix if they specified both EXR.
+						if (doJpg)
 						{
-							VerbosePrint("Doing both EXR formats, so adding suffix _exr32 to avoid overwriting the same file.");
-							suffix += "_exr32";
+							writeFileThreads.push_back(std::thread([&]()
+							{
+								const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "jpg", padding, i, useName);
+								VerbosePrint("Writing " + filename);
+								const auto writeSuccess = WriteJpeg(filename.c_str(), rgb8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, int(opt.JpegQuality()), opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+								if (!writeSuccess)
+									cout << "Error writing " << filename << "\n";
+							}));
+						}
+					}
+
+					if (doPng8)
+					{
+						bool doBothPng = doPng16 && (opt.Format().find("png") != opt.Format().rfind("png"));
+
+						if (doBothPng || doOnlyPng8)//8-bit PNG.
+						{
+							writeFileThreads.push_back(std::thread([&]()
+							{
+								const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "png", padding, i, useName);
+								VerbosePrint("Writing " + filename);
+								vector<unsigned char> rgba8Image(size * 4);
+								Rgba32ToRgba8(finalImagep, rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
+								const auto writeSuccess = WritePng(filename.c_str(), rgba8Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+								if (!writeSuccess)
+									cout << "Error writing " << filename << "\n";
+							}));
 						}
 
-						const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "exr", padding, i, useName);
-						VerbosePrint("Writing " + filename);
-						vector<float> r(size);
-						vector<float> g(size);
-						vector<float> b(size);
-						vector<float> a(size);
-						Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
-						const auto writeSuccess = WriteExr32(filename.c_str(),
-															 r.data(),
-															 g.data(),
-															 b.data(),
-															 a.data(),
-															 finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+						if (doPng16)//16-bit PNG.
+						{
+							writeFileThreads.push_back(std::thread([&]()
+							{
+								auto suffix = opt.Suffix();
 
-						if (!writeSuccess)
-							cout << "Error writing " << filename << "\n";
-					}));
-				}
+								if (doBothPng)//Add suffix if they specified both PNG.
+								{
+									VerbosePrint("Doing both PNG formats, so adding suffix _p16 to avoid overwriting the same file.");
+									suffix += "_p16";
+								}
+
+								const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "png", padding, i, useName);
+								VerbosePrint("Writing " + filename);
+								vector<glm::uint16> rgba16Image(size * 4);
+								Rgba32ToRgba16(finalImagep, rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
+								const auto writeSuccess = WritePng(filename.c_str(), (unsigned char*)rgba16Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+								if (!writeSuccess)
+									cout << "Error writing " << filename << "\n";
+							}));
+						}
+					}
+
+					if (doExr16)
+					{
+						const auto doBothExr = doExr32 && (opt.Format().find("exr") != opt.Format().rfind("exr"));
+
+						if (doBothExr || doOnlyExr16)//16-bit EXR.
+						{
+							writeFileThreads.push_back(std::thread([&]()
+							{
+								const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), opt.Suffix(), "exr", padding, i, useName);
+								VerbosePrint("Writing " + filename);
+								vector<Rgba> rgba32Image(size);
+								Rgba32ToRgbaExr(finalImagep, rgba32Image.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
+								const auto writeSuccess = WriteExr16(filename.c_str(),
+																	 rgba32Image.data(),
+																	 finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+								if (!writeSuccess)
+									cout << "Error writing " << filename << "\n";
+							}));
+						}
+
+						if (doExr32)//32-bit EXR.
+						{
+							writeFileThreads.push_back(std::thread([&]()
+							{
+								auto suffix = opt.Suffix();
+
+								if (doBothExr)//Add suffix if they specified both EXR.
+								{
+									VerbosePrint("Doing both EXR formats, so adding suffix _exr32 to avoid overwriting the same file.");
+									suffix += "_exr32";
+								}
+
+								const auto filename = MakeSingleFilename(inputPath, opt.Out(), finalEmber.m_Name, opt.Prefix(), suffix, "exr", padding, i, useName);
+								VerbosePrint("Writing " + filename);
+								vector<float> r(size);
+								vector<float> g(size);
+								vector<float> b(size);
+								vector<float> a(size);
+								Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
+								const auto writeSuccess = WriteExr32(filename.c_str(),
+																	 r.data(),
+																	 g.data(),
+																	 b.data(),
+																	 a.data(),
+																	 finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+
+								if (!writeSuccess)
+									cout << "Error writing " << filename << "\n";
+							}));
+						}
+					}
+
+					Join(writeFileThreads);
+				});
+
+				//if (!rendererCL)
+				//	break;
 			}
 
-			Join(writeFileThreads);
-		});
+		//	if (!rendererCL)
+				//break;
+		}
 
 		if (opt.EmberCL() && opt.DumpKernel())
 		{
-			if (const auto rendererCL = dynamic_cast<RendererCL<T, float>*>(renderer.get()))
+			if (rendererCL)
 			{
 				cout << "Iteration kernel:\n" <<
 					 rendererCL->IterKernel() << "\n\n" <<

@@ -70,7 +70,7 @@ private:
 	string m_GaussianDESsWithoutScfNoCacheKernel;
 	string m_GaussianDESsWithoutScfNoCacheEntryPoint = "GaussianDESsWithoutScfNoCacheKernel";
 
-	bool m_DoublePrecision;
-	bool m_NVidia;
+	bool m_DoublePrecision = false;
+	bool m_NVidia = false;
 };
 }

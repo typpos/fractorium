@@ -17,7 +17,7 @@ void LibraryTreeWidget::SetMainWindow(Fractorium* f)
 /// <param name="de">Pointer to the QDropEvent object</param>
 void LibraryTreeWidget::dropEvent(QDropEvent* de)
 {
-	const auto droppedIndex = indexAt(de->pos());
+	const auto droppedIndex = indexAt(de->position().toPoint());
 	const auto items = selectionModel()->selectedRows();
 
 	if (!droppedIndex.isValid())//Don't process drop because it's outside of the droppable area.
@@ -113,7 +113,7 @@ void InfoTreeWidget::SetMainWindow(Fractorium* f)
 /// <param name="dme">Pointer to the drag move event</param>
 void InfoTreeWidget::dragMoveEvent(QDragMoveEvent* dme)
 {
-	QModelIndex index = indexAt(dme->pos());
+	QModelIndex const index = indexAt(dme->position().toPoint());
 
 	if (!index.isValid())//Don't process drop because it's outside of the droppable area.
 	{
@@ -125,31 +125,32 @@ void InfoTreeWidget::dragMoveEvent(QDragMoveEvent* dme)
 
 	if (dragItems.size())
 	{
-		auto drag0 = dragItems[0];
-
-		if (auto itemat = itemFromIndex(index))
+		if (auto drag0 = dragItems[0])
 		{
-			auto dragpre = drag0->text(0).startsWith("pre_", Qt::CaseInsensitive);
-			auto droppre = itemat->text(0).startsWith("pre_", Qt::CaseInsensitive);
-			auto dragpost = drag0->text(0).startsWith("post_", Qt::CaseInsensitive);
-			auto droppost = itemat->text(0).startsWith("post_", Qt::CaseInsensitive);
-
-			if (auto par = itemat->parent())
+			if (auto itemat = itemFromIndex(index))
 			{
-				if (drag0->parent() == par &&
-						(par->text(0).startsWith("xform ", Qt::CaseInsensitive) ||
-						 par->text(0).startsWith("final", Qt::CaseInsensitive)))
-				{
-					if (auto vitemat = dynamic_cast<VariationTreeWidgetItem*>(itemat))
-					{
-						bool dopre = dragpre && droppre;
-						bool dopost = dragpost && droppost;
-						bool doreg = !dragpre && !droppre && !dragpost && !droppost;
+				const auto dragpre = drag0->text(0).startsWith("pre_", Qt::CaseInsensitive);
+				const auto droppre = itemat->text(0).startsWith("pre_", Qt::CaseInsensitive);
+				const auto dragpost = drag0->text(0).startsWith("post_", Qt::CaseInsensitive);
+				const auto droppost = itemat->text(0).startsWith("post_", Qt::CaseInsensitive);
 
-						if (dopre || doreg || dopost)
+				if (const auto par = itemat->parent())
+				{
+					if (drag0->parent() == par &&
+							(par->text(0).startsWith("xform ", Qt::CaseInsensitive) ||
+							 par->text(0).startsWith("final", Qt::CaseInsensitive)))
+					{
+						if (auto vitemat = dynamic_cast<const VariationTreeWidgetItem*>(itemat))
 						{
-							QTreeWidget::dragMoveEvent(dme);
-							return;
+							bool const dopre = dragpre && droppre;
+							bool const dopost = dragpost && droppost;
+							bool const doreg = !dragpre && !droppre && !dragpost && !droppost;
+
+							if (dopre || doreg || dopost)
+							{
+								QTreeWidget::dragMoveEvent(dme);
+								return;
+							}
 						}
 					}
 				}
@@ -168,7 +169,7 @@ void InfoTreeWidget::dragMoveEvent(QDragMoveEvent* dme)
 /// <param name="de">Pointer to the QDropEvent object</param>
 void InfoTreeWidget::dropEvent(QDropEvent* de)
 {
-	QModelIndex droppedIndex = indexAt(de->pos());
+	QModelIndex const droppedIndex = indexAt(de->position().toPoint());
 	auto items = selectionModel()->selectedRows();
 
 	if (!droppedIndex.isValid())//Don't process drop because it's outside of the droppable area.
@@ -183,17 +184,19 @@ void InfoTreeWidget::dropEvent(QDropEvent* de)
 		if (dragItems.size())
 		{
 			auto drag0 = dragItems[0];
-			auto itemat = itemFromIndex(droppedIndex);
 
-			if (auto par = itemat->parent())
+			if (auto itemat = itemFromIndex(droppedIndex))
 			{
-				if (auto vdropitem = dynamic_cast<VariationTreeWidgetItem*>(itemat))
+				if (auto par = itemat->parent())
 				{
-					if (auto vdragitem = dynamic_cast<VariationTreeWidgetItem*>(drag0))
+					if (auto vdropitem = dynamic_cast<const VariationTreeWidgetItem*>(itemat))
 					{
-						QTreeWidget::dropEvent(de);//This internally changes the order of the items.
-						m_Fractorium->ReorderVariations(par);
-						return;
+						if (auto vdragitem = dynamic_cast<const VariationTreeWidgetItem*>(drag0))
+						{
+							QTreeWidget::dropEvent(de);//This internally changes the order of the items.
+							m_Fractorium->ReorderVariations(par);
+							return;
+						}
 					}
 				}
 			}

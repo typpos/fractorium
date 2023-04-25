@@ -34,7 +34,7 @@ Fractorium::Fractorium(QWidget* p)
 	tabifyDockWidget(ui.XaosDockWidget, ui.PaletteDockWidget);
 	tabifyDockWidget(ui.PaletteDockWidget, ui.InfoDockWidget);
 	setTabPosition(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea, QTabWidget::TabPosition::North);
-	setTabShape(QTabWidget::TabShape::Triangular);
+	//setTabShape(QTabWidget::TabShape::Rounded);
 	m_Docks.reserve(8);
 	m_Docks.push_back(ui.LibraryDockWidget);
 	m_Docks.push_back(ui.FlameDockWidget);
@@ -69,8 +69,9 @@ Fractorium::Fractorium(QWidget* p)
 	m_VarDialog = new FractoriumVariationsDialog(this);
 	m_AboutDialog = new FractoriumAboutDialog(this);
 	//Put the about dialog in the screen center.
-	const QRect screen = QApplication::desktop()->screenGeometry();
-	m_AboutDialog->move(screen.center() - m_AboutDialog->rect().center());
+	auto screen = QGuiApplication::screenAt(pos());
+	auto geom = screen->availableGeometry();
+	m_AboutDialog->move(geom.center() - m_AboutDialog->rect().center());
 	connect(m_ColorDialog, SIGNAL(colorSelected(const QColor&)), this, SLOT(OnColorSelected(const QColor&)), Qt::QueuedConnection);
 	m_XformComboColors[i++] = QColor(0XFF, 0X00, 0X00);
 	m_XformComboColors[i++] = QColor(0XCC, 0XCC, 0X00);
@@ -261,8 +262,8 @@ QList<QUrl> Fractorium::Urls()
 void Fractorium::SetCoordinateStatus(int rasX, int rasY, float worldX, float worldY)
 {
 	static QString coords;
-	coords.sprintf("Window: %4d, %4d World: %2.2f, %2.2f", rasX, rasY, worldX, worldY);
-	m_CoordinateStatusLabel->setText(coords);
+	auto str = coords.asprintf("Window: %4d, %4d World: %2.2f, %2.2f", rasX, rasY, worldX, worldY);
+	m_CoordinateStatusLabel->setText(str);
 }
 
 /// <summary>
@@ -824,7 +825,7 @@ void Fractorium::dragMoveEvent(QDragMoveEvent* e)
 void Fractorium::dropEvent(QDropEvent* e)
 {
 	QStringList filenames;
-	const auto mod = e->keyboardModifiers();
+	const auto mod = e->modifiers();
 	const auto append = mod.testFlag(Qt::ControlModifier) ? false : true;
 
 	if (e->mimeData()->hasUrls())

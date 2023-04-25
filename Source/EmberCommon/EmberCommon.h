@@ -214,13 +214,16 @@ void FormatName(Ember<T>& result, ostringstream& os, streamsize padding)
 /// <param name="rgb">The RGB 8-bit buffer</param>
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
-static void Rgba32ToRgb8(v4F* rgba, byte* rgb, size_t width, size_t height)
+static void Rgba32ToRgb8(const v4F* rgba, unsigned char* rgb, size_t width, size_t height)
 {
-	for (size_t i = 0, j = 0; i < (width * height); i++)
+	if (rgba != nullptr && rgb != nullptr)
 	{
-		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
+		for (size_t i = 0, j = 0; i < (width * height); i++)
+		{
+			rgb[j++] = static_cast<unsigned char>(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
+			rgb[j++] = static_cast<unsigned char>(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
+			rgb[j++] = static_cast<unsigned char>(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
+		}
 	}
 }
 
@@ -233,14 +236,17 @@ static void Rgba32ToRgb8(v4F* rgba, byte* rgb, size_t width, size_t height)
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
 /// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
-static void Rgba32ToRgba8(v4F* rgba, byte* rgb, size_t width, size_t height, bool doAlpha)
+static void Rgba32ToRgba8(const v4F* rgba, unsigned char* rgb, size_t width, size_t height, bool doAlpha)
 {
-	for (size_t i = 0, j = 0; i < (width * height); i++)
+	if (rgba != nullptr && rgb != nullptr)
 	{
-		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = static_cast<byte>(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
-		rgb[j++] = doAlpha ? static_cast<byte>(Clamp<float>(rgba[i].a * 255.0f, 0.0f, 255.0f)) : 255;
+		for (size_t i = 0, j = 0; i < (width * height); i++)
+		{
+			rgb[j++] = static_cast<unsigned char>(Clamp<float>(rgba[i].r * 255.0f, 0.0f, 255.0f));
+			rgb[j++] = static_cast<unsigned char>(Clamp<float>(rgba[i].g * 255.0f, 0.0f, 255.0f));
+			rgb[j++] = static_cast<unsigned char>(Clamp<float>(rgba[i].b * 255.0f, 0.0f, 255.0f));
+			rgb[j++] = doAlpha ? static_cast<unsigned char>(Clamp<float>(rgba[i].a * 255.0f, 0.0f, 255.0f)) : 255;
+		}
 	}
 }
 
@@ -253,14 +259,17 @@ static void Rgba32ToRgba8(v4F* rgba, byte* rgb, size_t width, size_t height, boo
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
 /// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
-static void Rgba32ToRgba16(v4F* rgba, glm::uint16* rgb, size_t width, size_t height, bool doAlpha)
+static void Rgba32ToRgba16(const v4F* rgba, glm::uint16* rgb, size_t width, size_t height, bool doAlpha)
 {
-	for (size_t i = 0, j = 0; i < (width * height); i++)
+	if (rgba != nullptr && rgb != nullptr)
 	{
-		rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].r * 65535.0f, 0.0f, 65535.0f));
-		rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].g * 65535.0f, 0.0f, 65535.0f));
-		rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].b * 65535.0f, 0.0f, 65535.0f));
-		rgb[j++] = doAlpha ? static_cast<glm::uint16>(Clamp<float>(rgba[i].a * 65535.0f, 0.0f, 65535.0f)) : glm::uint16{ 65535 };
+		for (size_t i = 0, j = 0; i < (width * height); i++)
+		{
+			rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].r * 65535.0f, 0.0f, 65535.0f));
+			rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].g * 65535.0f, 0.0f, 65535.0f));
+			rgb[j++] = static_cast<glm::uint16>(Clamp<float>(rgba[i].b * 65535.0f, 0.0f, 65535.0f));
+			rgb[j++] = doAlpha ? static_cast<glm::uint16>(Clamp<float>(rgba[i].a * 65535.0f, 0.0f, 65535.0f)) : glm::uint16{ 65535 };
+		}
 	}
 }
 
@@ -274,14 +283,17 @@ static void Rgba32ToRgba16(v4F* rgba, glm::uint16* rgb, size_t width, size_t hei
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
 /// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
-static void Rgba32ToRgbaExr(v4F* rgba, Rgba* ilmfRgba, size_t width, size_t height, bool doAlpha)
+static void Rgba32ToRgbaExr(const v4F* rgba, Rgba* ilmfRgba, size_t width, size_t height, bool doAlpha)
 {
-	for (size_t i = 0; i < (width * height); i++)
+	if (rgba != nullptr && ilmfRgba != nullptr)
 	{
-		ilmfRgba[i].r = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
-		ilmfRgba[i].g = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
-		ilmfRgba[i].b = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
-		ilmfRgba[i].a = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
+		for (size_t i = 0; i < (width * height); i++)
+		{
+			ilmfRgba[i].r = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
+			ilmfRgba[i].g = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
+			ilmfRgba[i].b = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
+			ilmfRgba[i].a = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
+		}
 	}
 }
 
@@ -298,14 +310,17 @@ static void Rgba32ToRgbaExr(v4F* rgba, Rgba* ilmfRgba, size_t width, size_t heig
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
 /// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
-static void Rgba32ToRgba32Exr(v4F* rgba, float* r, float* g, float* b, float* a, size_t width, size_t height, bool doAlpha)
+static void Rgba32ToRgba32Exr(const v4F* rgba, float* r, float* g, float* b, float* a, size_t width, size_t height, bool doAlpha)
 {
-	for (size_t i = 0; i < (width * height); i++)
+	if (rgba != nullptr && r != nullptr && g != nullptr && b != nullptr && a != nullptr)
 	{
-		r[i] = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
-		g[i] = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
-		b[i] = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
-		a[i] = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
+		for (size_t i = 0; i < (width * height); i++)
+		{
+			r[i] = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
+			g[i] = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
+			b[i] = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
+			a[i] = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
+		}
 	}
 }
 
@@ -383,7 +398,7 @@ static string MakeAnimFilename(const string& path, const string& prefix, const s
 /// <param name="memAvailable">Amount of memory available on the system</param>
 /// <param name="useMem">The maximum amount of memory to use. Use max if 0.</param>
 /// <returns>The number of strips to use</returns>
-static uint CalcStrips(double memRequired, double memAvailable, double useMem)
+static uint CalcStrips(double memRequired, double memAvailable, double useMem) noexcept
 {
 	if (useMem > 0)
 		memAvailable = useMem;
@@ -404,7 +419,7 @@ static uint CalcStrips(double memRequired, double memAvailable, double useMem)
 /// <param name="denominator">The denominator</param>
 /// <returns>The next highest divisor if found, else 1.</returns>
 template <typename T>
-static T NextHighestEvenDiv(T numerator, T denominator)
+static T NextHighestEvenDiv(T numerator, T denominator) noexcept
 {
 	T result = 1;
 	T numDiv2 = numerator / 2;
@@ -432,7 +447,7 @@ static T NextHighestEvenDiv(T numerator, T denominator)
 /// <param name="denominator">The denominator</param>
 /// <returns>The next lowest divisor if found, else 1.</returns>
 template <typename T>
-static T NextLowestEvenDiv(T numerator, T denominator)
+static T NextLowestEvenDiv(T numerator, T denominator) noexcept
 {
 	T result = 1;
 	T numDiv2 = numerator / 2;

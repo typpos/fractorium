@@ -19,7 +19,7 @@ class FractoriumVariationsDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	FractoriumVariationsDialog(QWidget* p = nullptr, Qt::WindowFlags f = nullptr);
+	FractoriumVariationsDialog(QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowType::Widget);
 	void ForEachCell(std::function<void(QTableWidgetItem* cb)> func);
 	void ForEachSelectedCell(std::function<void(QTableWidgetItem* cb)> func);
 	void SyncSettings();

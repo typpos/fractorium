@@ -17,7 +17,7 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 	m_ColorPicker->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	m_ColorPicker->SetColorPanelColor(Qt::black);
 	QVBoxLayout* colorLayout = new QVBoxLayout();
-	colorLayout->setMargin(3);
+	colorLayout->setContentsMargins(3, 3, 3, 3);
 	colorLayout->addWidget(m_ColorPicker);
 	ui->ColorPickerGroupBox->setLayout(colorLayout);
 	ui->ColorPickerGroupBox->setContentsMargins(3, 8, 3, 3);
@@ -36,7 +36,7 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 	connect(ui->DistributeColorsButton,            SIGNAL(clicked()),                                this, SLOT(OnDistributeColorsButtonClicked()));
 	connect(ui->SyncCheckBox,                      SIGNAL(stateChanged(int)),                        this, SLOT(OnSyncCheckBoxStateChanged(int)), Qt::QueuedConnection);
 	connect(ui->BlendCheckBox,                     SIGNAL(stateChanged(int)),                        this, SLOT(OnBlendCheckBoxStateChanged(int)), Qt::QueuedConnection);
-	connect(ui->PaletteFilenameCombo,              SIGNAL(currentIndexChanged(const QString&)),      this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
+	connect(ui->PaletteFilenameCombo,              SIGNAL(currentTextChanged(const QString&)),       this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
 	connect(ui->PaletteListTable,                  SIGNAL(cellClicked(int, int)),                    this, SLOT(OnPaletteCellClicked(int, int)), Qt::QueuedConnection);
 	connect(ui->PaletteListTable,                  SIGNAL(cellChanged(int, int)),                    this, SLOT(OnPaletteCellChanged(int, int)), Qt::QueuedConnection);
 	connect(ui->NewPaletteFileButton,              SIGNAL(clicked()),                                this, SLOT(OnNewPaletteFileButtonClicked()));
@@ -46,7 +46,7 @@ PaletteEditor::PaletteEditor(QWidget* p) :
 	connect(ui->DeletePaletteButton,               SIGNAL(clicked()),                                this, SLOT(OnDeletePaletteButtonClicked()));
 	ui->PaletteListTable->horizontalHeader()->setSectionsClickable(true);
 	auto layout = new QVBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 	layout->addWidget(m_GradientColorView);
 	ui->ColorViewGroupBox->setLayout(layout);
@@ -594,8 +594,6 @@ void PaletteEditor::AddArrow(const QColor& color)
 map<float, GradientArrow> PaletteEditor::GetRandomColorsFromImage(QString filename, int numPoints)
 {
 	map<float, GradientArrow> colors;
-	const auto time = QTime::currentTime();
-	qsrand((uint)time.msec());
 	const QImage image(filename);
 	const qreal gSize = 512;
 	float off = 0.0f, inc = 1.0f / std::max(1, numPoints - 1);

@@ -467,7 +467,7 @@ bool OpenCLWrapper::WriteImage2D(size_t index, bool shared, ::size_t width, ::si
 	{
 		cl_int err;
 		cl::Event e;
-		cl::size_t<3> origin, region;
+		cl::array<cl::size_type, 3> origin, region;
 		origin[0] = 0;
 		origin[1] = 0;
 		origin[2] = 0;
@@ -539,7 +539,7 @@ bool OpenCLWrapper::ReadImage(size_t imageIndex, ::size_t width, ::size_t height
 	{
 		cl_int err;
 		cl::Event e;
-		cl::size_t<3> origin, region;
+		cl::array<cl::size_type, 3> origin, region;
 		origin[0] = 0;
 		origin[1] = 0;
 		origin[2] = 0;
@@ -799,7 +799,7 @@ bool OpenCLWrapper::EnqueueReleaseGLObjects(cl::ImageGL& image)
 /// </summary>
 /// <param name="memObjects">The memory objects to acquire</param>
 /// <returns>True if success, else false.</returns>
-bool OpenCLWrapper::EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects)
+bool OpenCLWrapper::EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObjects)
 {
 	if (m_Init && m_Shared)
 	{
@@ -816,7 +816,7 @@ bool OpenCLWrapper::EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memO
 /// </summary>
 /// <param name="memObjects">The memory objects to release</param>
 /// <returns>True if success, else false.</returns>
-bool OpenCLWrapper::EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects)
+bool OpenCLWrapper::EnqueueReleaseGLObjects(const cl::vector<cl::Memory>* memObjects)
 {
 	if (m_Init && m_Shared)
 	{
@@ -989,7 +989,7 @@ size_t OpenCLWrapper::MaxAllocSize() const { return m_MaxAllocSize; }
 /// <summary>
 /// Clear the error report for this class as well as the global OpenCLInfo instance.
 /// </summary>
-void OpenCLWrapper::ClearErrorReport()
+void OpenCLWrapper::ClearErrorReport() noexcept
 {
 	EmberReport::ClearErrorReport();
 	m_Info->ClearErrorReport();
@@ -1056,8 +1056,9 @@ bool OpenCLWrapper::CreateSPK(const string& name, const string& program, const s
 	if (m_Init)
 	{
 		cl_int err;
+		vector<std::string> programvec{ program };
 		spk.m_Name = name;
-		spk.m_Source = cl::Program::Sources(1, std::make_pair(program.c_str(), program.length() + 1));
+		spk.m_Source = cl::Program::Sources(programvec);
 		spk.m_Program = cl::Program(m_Context, spk.m_Source);
 
 		if (doublePrecision)

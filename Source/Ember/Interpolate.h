@@ -758,11 +758,11 @@ public:
 							refang = xform->m_Wind[col] - M_2PI;
 
 							//Make sure both angles are within [refang refang + 2 * pi].
-							while (cxAng[k - 1][col] < refang)
-								cxAng[k - 1][col] += M_2PI;
+							while (cxAng[k - 1L][col] < refang)
+								cxAng[k - 1L][col] += M_2PI;
 
-							while (cxAng[k - 1][col] > refang + M_2PI)
-								cxAng[k - 1][col] -= M_2PI;
+							while (cxAng[k - 1L][col] > refang + M_2PI)
+								cxAng[k - 1L][col] -= M_2PI;
 
 							while (cxAng[k][col] < refang)
 								cxAng[k][col] += M_2PI;

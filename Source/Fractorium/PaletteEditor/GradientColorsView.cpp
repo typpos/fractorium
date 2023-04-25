@@ -501,7 +501,7 @@ void GradientColorsView::SetColorIndices(const map<size_t, float>& indices)
 	{
 		auto text = QString::number(it.first + 1);//Get text width, which is used to adjust the size of the arrow.
 		QFontMetrics fm = painter.fontMetrics();
-		m_ColorIndicesArrows[it.first] = make_pair(it.second, TopArrow(fm.width(text) + 5, it.first));
+		m_ColorIndicesArrows[it.first] = make_pair(it.second, TopArrow(fm.horizontalAdvance(text) + 5, it.first));
 	}
 }
 

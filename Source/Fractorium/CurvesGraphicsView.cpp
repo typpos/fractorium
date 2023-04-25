@@ -38,8 +38,8 @@ void CurvesGraphicsView::PointChanged(int curveIndex, int pointIndex, const QPoi
 {
 	if (curveIndex == m_Index)
 	{
-		double x = point.x() / width();
-		double y = (height() - point.y()) / height();
+		const auto x = point.x() / width();
+		const auto y = (height() - point.y()) / height();
 		emit PointChangedSignal(curveIndex, pointIndex, QPointF(x, y));
 	}
 }
@@ -54,8 +54,8 @@ QPointF CurvesGraphicsView::Get(int curveIndex, int pointIndex)
 {
 	if (curveIndex < 4 && pointIndex < m_Points[curveIndex].size())
 	{
-		EllipseItem* item = m_Points[curveIndex][pointIndex];
-		return QPointF(item->pos().x() / width(), (height() - item->pos().y()) / height());
+		if (EllipseItem* item = m_Points[curveIndex][pointIndex])
+			return QPointF(item->pos().x() / width(), (height() - item->pos().y()) / height());
 	}
 
 	return QPointF();
@@ -99,7 +99,7 @@ void CurvesGraphicsView::Set(Curves<float>& curves)
 			m_Scene.addItem(item);
 			m_Points[index].push_back(item);
 			item->setZValue(zval);
-			QPointF point(curves.m_Points[index][i].x, curves.m_Points[index][i].y);
+			const QPointF point(curves.m_Points[index][i].x, curves.m_Points[index][i].y);
 			Set(index, i, point);
 		}
 	};
@@ -138,7 +138,7 @@ void CurvesGraphicsView::SetTop(CurveIndex curveIndex)
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		bool b = (i == m_Index);
+		const auto b = (i == m_Index);
 
 		for (auto& p : m_Points[i])
 			p->SetCurrent(b);
@@ -153,9 +153,9 @@ void CurvesGraphicsView::paintEvent(QPaintEvent* e)
 {
 	QGraphicsView::paintEvent(e);
 	int i;
-	QRectF rect = scene()->sceneRect();
-	double w2 = width() / 2;
-	double h2 = height() / 2;
+	const QRectF rect = scene()->sceneRect();
+	const double w2 = width() / 2;
+	const double h2 = height() / 2;
 	//Draw axis lines.
 	m_XLine->setLine(QLineF(0, h2, width(), h2));
 	m_YLine->setLine(QLineF(w2, 0, w2, height()));
@@ -196,8 +196,8 @@ void CurvesGraphicsView::paintEvent(QPaintEvent* e)
 
 		for (int j = 0; j < rect.width(); j++)
 		{
-			auto x = j;
-			auto y = spline.Interpolate(x);
+			const auto x = j;
+			const auto y = spline.Interpolate(x);
 			paths[i].lineTo(QPointF(x, y));
 		}
 
@@ -218,18 +218,24 @@ void CurvesGraphicsView::paintEvent(QPaintEvent* e)
 void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 {
 	QGraphicsView::mousePressEvent(e);
-	auto thresh = devicePixelRatioF() * 4;
+
+	if (e != nullptr)
+		return;
+
+	const auto thresh = devicePixelRatioF() * 4;
 	auto findpoint = [&](int x, int y, double thresh) -> int
 	{
 		for (int i = 0; i < m_Points[m_Index].size(); i++)
 		{
-			auto item = m_Points[m_Index][i];
-			auto xdist = std::abs(item->pos().x() - x);
-			auto ydist = std::abs(item->pos().y() - y);
-			auto threshAgain = thresh;
+			if (auto item = m_Points[m_Index][i])
+			{
+				const auto xdist = std::abs(item->pos().x() - x);
+				const auto ydist = std::abs(item->pos().y() - y);
+				const auto threshAgain = thresh;
 
-			if (xdist < threshAgain && ydist < threshAgain)
-				return i;
+				if (xdist < threshAgain && ydist < threshAgain)
+					return i;
+			}
 		}
 
 		return -1;
@@ -237,14 +243,14 @@ void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 
 	if (e->button() == Qt::RightButton)
 	{
-		int i = findpoint(e->pos().x(), e->pos().y(), thresh);
+		const auto i = findpoint(e->pos().x(), e->pos().y(), thresh);
 
 		if (i != -1)
 			emit PointRemovedSignal(m_Index, i);
 	}
 	else if (findpoint(e->pos().x(), e->pos().y(), thresh * 2) == -1)
 	{
-		QRectF rect = scene()->sceneRect();
+		const auto rect = scene()->sceneRect();
 		auto points = m_Points[m_Index];
 
 		if (points.size() < 2)
@@ -261,14 +267,14 @@ void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 		for (int j = 0; j < rect.width(); j++)
 		{
 			auto y = spline.Interpolate(j);
-			auto xdist = std::abs(j - e->pos().x());
-			auto ydist = std::abs(y - e->pos().y());
+			const auto xdist = std::abs(j - e->pos().x());
+			const auto ydist = std::abs(y - e->pos().y());
 
 			if (xdist < thresh && ydist < thresh)
 			{
-				double x = e->pos().x() / (double)width();
-				double y = (height() - e->pos().y()) / (double)height();
-				emit PointAddedSignal(m_Index, QPointF(x, y));
+				const auto x = e->pos().x() / (double)width();
+				const auto y2 = (height() - e->pos().y()) / (double)height();
+				emit PointAddedSignal(m_Index, QPointF(x, y2));
 				break;
 			}
 		}

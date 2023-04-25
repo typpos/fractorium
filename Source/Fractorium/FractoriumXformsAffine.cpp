@@ -161,7 +161,7 @@ void Fractorium::InitXformsAffineUI()
 /// Set the scale used for drawing the affines to a default value.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::InitLockedScale()
+void FractoriumEmberController<T>::InitLockedScale() noexcept
 {
 	m_LockedScale = (T)std::min<size_t>(m_Ember.m_FinalRasW, m_Ember.m_FinalRasH) / 4.0;
 	m_LockedX = m_Ember.m_CenterX;
@@ -187,7 +187,7 @@ void FractoriumEmberController<T>::ChangeLockedScale(T value)
 /// </summary>
 /// <returns>The scale value</returns>
 template <typename T>
-double FractoriumEmberController<T>::AffineScaleCurrentToLocked()
+double FractoriumEmberController<T>::AffineScaleCurrentToLocked() noexcept
 {
 	return LockedScale() / m_Ember.m_PixelsPerUnit;
 }
@@ -197,7 +197,7 @@ double FractoriumEmberController<T>::AffineScaleCurrentToLocked()
 /// </summary>
 /// <returns>The scale value</returns>
 template <typename T>
-double FractoriumEmberController<T>::AffineScaleLockedToCurrent()
+double FractoriumEmberController<T>::AffineScaleLockedToCurrent() noexcept
 {
 	return m_Ember.m_PixelsPerUnit / LockedScale();
 }

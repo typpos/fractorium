@@ -145,10 +145,10 @@ QssDialog::QssDialog(Fractorium* parent) :
 		m_StyleActionMapper->setMapping(styleAction, s);
 	}
 
-	connect(m_ColorActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotAddColor(QString)));
-	connect(m_GeomActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotAddGeom(QString)));
-	connect(m_BorderActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotAddBorder(QString)));
-	connect(m_StyleActionMapper, SIGNAL(mapped(QString)), this, SLOT(SlotSetTheme(QString)));
+	connect(m_ColorActionMapper, SIGNAL(mappedString(const QString&)), this, SLOT(SlotAddColor(const QString&)));
+	connect(m_GeomActionMapper, SIGNAL(mappedString(const QString&)), this, SLOT(SlotAddGeom(const QString&)));
+	connect(m_BorderActionMapper, SIGNAL(mappedString(const QString&)), this, SLOT(SlotAddBorder(const QString&)));
+	connect(m_StyleActionMapper, SIGNAL(mappedString(const QString&)), this, SLOT(SlotSetTheme(const QString&)));
 	m_AddColorAction->setMenu(colorActionMenu);
 	m_AddGeomAction->setMenu(geomActionMenu);
 	m_AddBorderAction->setMenu(borderActionMenu);
@@ -237,8 +237,8 @@ QList<QString> QssDialog::GetClassNames(bool includeObjectNames)
 					}
 				}
 
-				auto dlgList = dlgSet.toList();//Convert set to list and sort.
-				qSort(dlgList.begin(), dlgList.end(), CaseInsensitiveLessThanQ);
+				QList<QString> dlgList(dlgSet.begin(), dlgSet.end());//Convert set to list and sort.
+				std::sort(dlgList.begin(), dlgList.end(), CaseInsensitiveLessThanQ);
 				dialogClassNames.push_back(dlgList);//Add this to the full list after sorting at the end.
 			}
 			else if (GetAllParents<QDialog*>(widgetList[i]).empty())//Skip widgets on dialogs, they are added above.
@@ -254,8 +254,8 @@ QList<QString> QssDialog::GetClassNames(bool includeObjectNames)
 		}
 	}
 
-	auto l = classNames.toList();
-	qSort(l.begin(), l.end(), CaseInsensitiveLessThanQ);
+	QList<QString> l(classNames.begin(), classNames.end());//Convert set to list and sort.
+	std::sort(l.begin(), l.end(), CaseInsensitiveLessThanQ);
 
 	for (auto& d : dialogClassNames)
 		l.append(d);
@@ -637,7 +637,8 @@ void QssDialog::SetupFileDialog()
 	{
 		m_FileDialog = new QFileDialog(this);
 		m_FileDialog->setViewMode(QFileDialog::List);
-		m_FileDialog->setDirectory(m_Parent->m_SettingsPath);
+		//m_FileDialog->setDirectory(m_Parent->m_SettingsPath);
+		m_FileDialog->setDirectory("./");
 		m_FileDialog->setOption(QFileDialog::DontUseNativeDialog, true);
 		m_FileDialog->setSidebarUrls(dynamic_cast<Fractorium*>(parent())->Urls());
 	}
@@ -665,7 +666,7 @@ QString QssDialog::OpenFile()
 
 	return !filenames.empty() ? filenames[0] : "";
 #else
-	auto filename = QFileDialog::getOpenFileName(this, tr("Open Stylesheet"), m_Parent->m_SettingsPath, tr("Qss (*.qss)"));
+	auto filename = QFileDialog::getOpenFileName(this, tr("Open Stylesheet"), /*m_Parent->m_SettingsPath*/ "./", tr("Qss (*.qss)"));
 	return filename.size() > 0 ? filename : "";
 #endif
 }

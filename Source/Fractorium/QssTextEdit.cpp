@@ -2,9 +2,9 @@
 #include "QssTextEdit.h"
 
 QssTextEdit::QssTextEdit(QWidget* parent) :
-    QTextEdit(parent)
+	QTextEdit(parent)
 {
-    setTabStopWidth(fontMetrics().width(QLatin1Char(' '))*4);
-    setAcceptRichText(false);
-    new CssHighlighter(document());
+	setTabStopDistance(fontMetrics().horizontalAdvance(QLatin1Char(' ')) * 4);
+	setAcceptRichText(false);
+	new CssHighlighter(document());
 }

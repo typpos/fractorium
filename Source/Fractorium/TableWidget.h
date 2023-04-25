@@ -27,7 +27,7 @@ public:
 
 
 signals:
-	void MouseDragged(const QPointF& local, const QPoint& global);
+	void MouseDragged(const QPointF& local, const QPointF& global);
 	void MouseReleased();
 
 protected:
@@ -43,8 +43,8 @@ protected:
 	{
 		if (e->type() == QEvent::MouseMove)
 		{
-			if (const auto me = dynamic_cast<QMouseEvent*>(e))
-				emit MouseDragged(me->localPos(), me->globalPos());
+			if (const auto me = dynamic_cast<const QMouseEvent*>(e))
+				emit MouseDragged(me->position(), me->globalPosition());
 		}
 		else if (e->type() == QEvent::MouseButtonRelease)
 			emit MouseReleased();

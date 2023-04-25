@@ -22,7 +22,7 @@ public:
 	/// As a convenience, the Tic() function is called automatically.
 	/// </summary>
 	/// <param name="precision">The precision of the seconds field of the elapsed time. Default: 2.</param>
-	Timing(int precision = 2)
+	Timing(int precision = 2) noexcept
 	{
 		m_Precision = precision;
 		Init();
@@ -33,7 +33,7 @@ public:
 	/// Set the begin time.
 	/// </summary>
 	/// <returns>The begin time cast to a double</returns>
-	double Tic()
+	double Tic() noexcept
 	{
 		m_BeginTime = NowMsD();
 		return BeginTime();
@@ -62,19 +62,19 @@ public:
 	/// Return the begin time as a double.
 	/// </summary>
 	/// <returns></returns>
-	double BeginTime() const { return static_cast<double>(m_BeginTime.time_since_epoch().count()); }
+	double BeginTime() const noexcept { return static_cast<double>(m_BeginTime.time_since_epoch().count()); }
 
 	/// <summary>
 	/// Return the end time as a double.
 	/// </summary>
 	/// <returns></returns>
-	double EndTime() const { return static_cast<double>(m_EndTime.time_since_epoch().count()); }
+	double EndTime() const noexcept { return static_cast<double>(m_EndTime.time_since_epoch().count()); }
 
 	/// <summary>
 	/// Return the elapsed time in milliseconds.
 	/// </summary>
 	/// <returns>The elapsed time in milliseconds as a double</returns>
-	double ElapsedTime() const
+	double ElapsedTime() const noexcept
 	{
 		return (m_EndTime - m_BeginTime).count();
 	}
@@ -128,7 +128,7 @@ private:
 	/// Since it will never change it only needs to be queried once.
 	/// This is achieved by keeping static state and performance variables.
 	/// </summary>
-	static void Init()
+	static void Init() noexcept
 	{
 		if (!m_TimingInit)
 		{

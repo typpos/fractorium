@@ -51,22 +51,22 @@ public:
 	void InitGL();
 	void DrawQuad();
 	void SetMainWindow(Fractorium* f);
-	bool Init();
-	bool Drawing();
-	GLint MaxTexSize();
-	GLuint OutputTexID();
-	GLint TexWidth();
-	GLint TexHeight();
+	bool Init() const;
+	bool Drawing() const;
+	GLint MaxTexSize() const;
+	GLuint OutputTexID() const;
+	GLint TexWidth() const;
+	GLint TexHeight() const;
 
 protected:
-	virtual void initializeGL() override;
-	virtual void paintGL() override;
-	virtual void keyPressEvent(QKeyEvent* e) override;
-	virtual void keyReleaseEvent(QKeyEvent* e) override;
-	virtual void mousePressEvent(QMouseEvent* e) override;
-	virtual void mouseReleaseEvent(QMouseEvent* e) override;
-	virtual void mouseMoveEvent(QMouseEvent* e) override;
-	virtual void wheelEvent(QWheelEvent* e) override;
+	void initializeGL() override;
+	void paintGL() override;
+	void keyPressEvent(QKeyEvent* e) override;
+	void keyReleaseEvent(QKeyEvent* e) override;
+	void mousePressEvent(QMouseEvent* e) override;
+	void mouseReleaseEvent(QMouseEvent* e) override;
+	void mouseMoveEvent(QMouseEvent* e) override;
+	void wheelEvent(QWheelEvent* e) override;
 
 	void DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, bool dashed = false, GLfloat pointSize = 1.0f);
 	void DrawPointOrLine(const QVector4D& col, const std::vector<float>& vertices, int drawType, bool dashed = false, GLfloat pointSize = 1.0f);

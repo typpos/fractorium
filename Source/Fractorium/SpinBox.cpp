@@ -351,7 +351,7 @@ void SpinBox::focusOutEvent(QFocusEvent* e)
 /// Must set the focus to make sure key down messages don't erroneously go to the GLWidget.
 /// </summary>
 /// <param name="e">The event</param>
-void SpinBox::enterEvent(QEvent* e)
+void SpinBox::enterEvent(QEnterEvent* e)
 {
 	StopTimer();
 	QSpinBox::enterEvent(e);

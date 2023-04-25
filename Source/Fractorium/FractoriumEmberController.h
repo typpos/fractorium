@@ -78,16 +78,16 @@ public:
 	virtual void ClearXform() { }
 	virtual void DeleteXforms() { }
 	virtual void AddFinalXform() { }
-	virtual bool UseFinalXform() { return false; }
-	virtual size_t XformCount() const { return 0; }
-	virtual size_t TotalXformCount() const { return 0; }
+	virtual bool UseFinalXform() const noexcept { return false; }
+	virtual size_t XformCount() const noexcept { return 0; }
+	virtual size_t TotalXformCount() const noexcept { return 0; }
 	virtual QString Name() const { return ""; }
 	virtual void Name(const string& s) { }
-	virtual size_t FinalRasW() const { return 0; }
-	virtual void FinalRasW(size_t w) { }
-	virtual size_t FinalRasH() const { return 0; }
-	virtual void FinalRasH(size_t h) { }
-	virtual size_t Index() const { return 0; }
+	virtual size_t FinalRasW() const noexcept { return 0; }
+	virtual void FinalRasW(size_t w) noexcept { }
+	virtual size_t FinalRasH() const noexcept { return 0; }
+	virtual void FinalRasH(size_t h) noexcept { }
+	virtual size_t Index() const noexcept { return 0; }
 	virtual void AddSymmetry(int sym, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) { }
 	virtual void CalcNormalizedWeights() { }
 
@@ -213,13 +213,13 @@ public:
 	virtual void RandomXformsAffine(bool pre) { }
 	virtual void FillBothAffines() { }
 	virtual void SwapAffines() { }
-	double LockedScale() { return m_LockedScale; }
-	double LockedX() { return m_LockedX; }
-	double LockedY() { return m_LockedY; }
-	void LockedScale(double scale) { m_LockedScale = scale; }
-	virtual void InitLockedScale() { }
-	virtual double AffineScaleCurrentToLocked() { return 0; };
-	virtual double AffineScaleLockedToCurrent() { return 0; };
+	double LockedScale() const noexcept { return m_LockedScale; }
+	double LockedX() const noexcept { return m_LockedX; }
+	double LockedY() const noexcept { return m_LockedY; }
+	void LockedScale(double scale) noexcept { m_LockedScale = scale; }
+	virtual void InitLockedScale() noexcept { }
+	virtual double AffineScaleCurrentToLocked() noexcept { return 0; };
+	virtual double AffineScaleLockedToCurrent() noexcept { return 0; };
 
 	//Xforms Color.
 	virtual void XformColorIndexChanged(double d, bool updateRender, bool updateSpinner, bool updateScroll, eXformUpdate update = eXformUpdate::UPDATE_SELECTED, size_t index = 0) { }
@@ -272,7 +272,7 @@ public:
 	//Rendering/progress.
 	virtual bool Render() { return false; }
 	virtual bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) { return false; }
-	virtual uint SizeOfT() const { return 0; }
+	virtual uint SizeOfT() const noexcept { return 0; }
 	virtual void ClearUndo() { }
 	virtual void DeleteRenderer() { }
 	virtual GLEmberControllerBase* GLController() { return nullptr; }
@@ -373,16 +373,16 @@ public:
 	void ClearXform() override;
 	void DeleteXforms() override;
 	void AddFinalXform() override;
-	bool UseFinalXform() override { return m_Ember.UseFinalXform(); }
-	size_t XformCount() const override { return m_Ember.XformCount(); }
-	size_t TotalXformCount() const override { return m_Ember.TotalXformCount(); }
+	bool UseFinalXform() const noexcept override { return m_Ember.UseFinalXform(); }
+	size_t XformCount() const noexcept override { return m_Ember.XformCount(); }
+	size_t TotalXformCount() const noexcept override { return m_Ember.TotalXformCount(); }
 	QString Name() const override { return QString::fromStdString(m_Ember.m_Name); }
 	void Name(const string& s) override { m_Ember.m_Name = s; }
-	size_t FinalRasW() const override { return m_Ember.m_FinalRasW; }
-	void FinalRasW(size_t w) override { m_Ember.m_FinalRasW = w; }
-	size_t FinalRasH() const override { return m_Ember.m_FinalRasH; }
-	void FinalRasH(size_t h) override { m_Ember.m_FinalRasH = h; }
-	size_t Index() const override { return m_Ember.m_Index; }
+	size_t FinalRasW() const noexcept override { return m_Ember.m_FinalRasW; }
+	void FinalRasW(size_t w) noexcept override { m_Ember.m_FinalRasW = w; }
+	size_t FinalRasH() const noexcept override { return m_Ember.m_FinalRasH; }
+	void FinalRasH(size_t h) noexcept override { m_Ember.m_FinalRasH = h; }
+	size_t Index() const noexcept override { return m_Ember.m_Index; }
 	void AddSymmetry(int sym, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override { m_Ember.AddSymmetry(sym, rand); }
 	void CalcNormalizedWeights() override { m_Ember.CalcNormalizedWeights(m_NormalizedWeights); }
 	void ConstrainDimensions(Ember<T>& ember);
@@ -515,9 +515,9 @@ public:
 	void RandomXformsAffine(bool pre) override;
 	void FillBothAffines() override;
 	void SwapAffines() override;
-	void InitLockedScale() override;
-	double AffineScaleCurrentToLocked() override;
-	double AffineScaleLockedToCurrent() override;
+	void InitLockedScale() noexcept override;
+	double AffineScaleCurrentToLocked() noexcept override;
+	double AffineScaleLockedToCurrent() noexcept override;
 	void FillAffineWithXform(Xform<T>* xform, bool pre);
 	void ChangeLockedScale(T value);
 
@@ -575,7 +575,7 @@ public:
 	//Rendering/progress.
 	bool Render() override;
 	bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
-	uint SizeOfT() const override { return sizeof(T); }
+	uint SizeOfT() const noexcept override { return sizeof(T); }
 	int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
 	void ClearUndo() override;
 	GLEmberControllerBase* GLController() override { return m_GLController.get(); }
@@ -681,7 +681,7 @@ public:
 protected:
 	volatile bool m_PreviewRun = false;
 	Ember<T> m_PreviewEmber;
-	vector<byte> m_PreviewVec;
+	vector<unsigned char> m_PreviewVec;
 	vv4F m_PreviewFinalImage;
 	EmberNs::Renderer<T, float> m_PreviewRenderer;
 

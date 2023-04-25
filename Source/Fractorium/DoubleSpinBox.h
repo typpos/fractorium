@@ -41,7 +41,7 @@ protected:
 	virtual void keyPressEvent(QKeyEvent* event) override;
 	virtual void focusInEvent(QFocusEvent* e) override;
 	virtual void focusOutEvent(QFocusEvent* e) override;
-	virtual void enterEvent(QEvent* e) override;
+	virtual void enterEvent(QEnterEvent* e) override;
 	virtual void leaveEvent(QEvent* e) override;
 
 	bool m_DoubleClick;
@@ -76,7 +76,7 @@ public:
 	virtual ~SpecialDoubleSpinBox() { }
 
 protected:
-	virtual void enterEvent(QEvent* e) override;
+	virtual void enterEvent(QEnterEvent* e) override;
 	virtual void leaveEvent(QEvent* e) override;
 	virtual bool eventFilter(QObject* o, QEvent* e) override;
 };

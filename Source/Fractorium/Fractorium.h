@@ -240,6 +240,8 @@ public slots:
 	void OnPaletteModeComboCurrentIndexChanged(int index);
 	void OnWidthChanged(int d);//Geometry.
 	void OnHeightChanged(int d);
+	void PresetWidthActionTriggered(bool b);
+	void PresetHeightActionTriggered(bool b);
 	void OnCenterXChanged(double d);
 	void OnCenterYChanged(double d);
 	void OnScaleChanged(double d);
@@ -367,7 +369,7 @@ public slots:
 	void OnPaletteAdjust(int d);
 	void OnPaletteCellClicked(int row, int col);
 	void OnPaletteCellDoubleClicked(int row, int col);
-	void OnPreviewPaletteMouseDragged(const QPointF& local, const QPoint& global);
+	void OnPreviewPaletteMouseDragged(const QPointF& local, const QPointF& global);
 	void OnPreviewPaletteMouseReleased();
 	void OnPreviewPaletteCellDoubleClicked(int row, int col);
 	void OnPreviewPaletteCellPressed(int row, int col);
@@ -443,6 +445,9 @@ private:
 	void SyncSequenceSettings();
 
 	//Params.
+	void AddSizePreset(QString name, int w, int h);
+	void SetWidthWithAspect(int w, int h);
+	void SetHeightWithAspect(int w, int h);
 
 	//Xforms.
 
@@ -615,6 +620,7 @@ private:
 	QColor m_VariationTreeColorNonZero, m_VariationTreeColorZero;
 	QColor m_VariationTreeBgColorNonZero, m_VariationTreeBgColorZero;
 	vector<QDockWidget*> m_Docks;
+	std::unordered_map<QString, std::pair<int, int>> m_HeightPresets;
 
 	bool m_PreviousAffineState[4];
 	int m_FontSize;
@@ -622,7 +628,7 @@ private:
 	int m_PaletteSortMode;
 	int m_PreviousPaletteRow;
 	int m_BgRow;
-	vector<byte> m_PreviewVec;
+	vector<unsigned char> m_PreviewVec;
 	shared_ptr<OpenCLInfo> m_Info;
 	unique_ptr<FractoriumEmberControllerBase> m_Controller;
 	Ui::FractoriumClass ui;

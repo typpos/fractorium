@@ -268,8 +268,8 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 					if (xformVar)
 						xform->DeleteVariationById(var->VariationId());
 
-					widgetItem->setTextColor(0, m_Fractorium->m_VariationTreeColorZero);
-					widgetItem->setBackgroundColor(0, m_Fractorium->m_VariationTreeBgColorZero);
+					widgetItem->setForeground(0, m_Fractorium->m_VariationTreeColorZero);
+					widgetItem->setBackground(0, m_Fractorium->m_VariationTreeBgColorZero);
 				}
 				else
 				{
@@ -284,8 +284,8 @@ void FractoriumEmberController<T>::VariationSpinBoxValueChanged(double d)//Would
 						const auto newVar = var->Copy();//Create a new one with default values.
 						newVar->m_Weight = d;
 						xform->AddVariation(newVar);
-						widgetItem->setTextColor(0, m_Fractorium->m_VariationTreeColorNonZero);
-						widgetItem->setBackgroundColor(0, m_Fractorium->m_VariationTreeBgColorNonZero);
+						widgetItem->setForeground(0, m_Fractorium->m_VariationTreeColorNonZero);
+						widgetItem->setBackground(0, m_Fractorium->m_VariationTreeBgColorNonZero);
 
 						//If they've added a new parametric variation, then grab the values currently in the spinners
 						//for the child parameters and assign them to the newly added variation.
@@ -353,8 +353,8 @@ void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 				item->setHidden(false);
 
 			spinBox->SetValueStealth(var ? var->m_Weight : 0);//If the variation was present, set the spin box to its weight, else zero.
-			item->setTextColor(0, var ? m_Fractorium->m_VariationTreeColorNonZero :  m_Fractorium->m_VariationTreeColorZero);
-			item->setBackgroundColor(0, var ? m_Fractorium->m_VariationTreeBgColorNonZero :  m_Fractorium->m_VariationTreeBgColorZero);
+			item->setForeground(0, var ? m_Fractorium->m_VariationTreeColorNonZero :  m_Fractorium->m_VariationTreeColorZero);
+			item->setBackground(0, var ? m_Fractorium->m_VariationTreeBgColorNonZero :  m_Fractorium->m_VariationTreeBgColorZero);
 
 			for (int j = 0; j < item->childCount(); j++)//Iterate through all of the children, which will be the params if it was a parametric variation.
 			{

@@ -291,7 +291,7 @@ Palette<T>* PaletteList<T>::GetRandomPalette()
 		attempts++;
 	}
 
-	return Size() ? &s_Palettes[0][0] : nullptr;
+	return Size() ? (&s_Palettes.begin()->second[0]) : nullptr;
 }
 
 /// <summary>

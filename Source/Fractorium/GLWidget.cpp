@@ -375,12 +375,12 @@ void GLWidget::SetMainWindow(Fractorium* f) { m_Fractorium = f; }
 /// Getters for OpenGL state.
 /// </summary>
 
-bool GLWidget::Init() { return m_Init; }
-bool GLWidget::Drawing() { return m_Drawing; }
-GLint GLWidget::MaxTexSize() { return m_MaxTexSize; }
-GLuint GLWidget::OutputTexID() { return m_OutputTexID; }
-GLint GLWidget::TexWidth() { return m_TexWidth; }
-GLint GLWidget::TexHeight() { return m_TexHeight; }
+bool GLWidget::Init() const { return m_Init; }
+bool GLWidget::Drawing() const { return m_Drawing; }
+GLint GLWidget::MaxTexSize() const { return m_MaxTexSize; }
+GLuint GLWidget::OutputTexID() const { return m_OutputTexID; }
+GLint GLWidget::TexWidth() const { return m_TexWidth; }
+GLint GLWidget::TexHeight() const { return m_TexHeight; }
 
 /// <summary>
 /// Initialize OpenGL, called once at startup after the main window constructor finishes.
@@ -803,7 +803,7 @@ void GLWidget::keyPressEvent(QKeyEvent* e)
 /// <param name="e">The event</param>
 bool GLEmberControllerBase::KeyRelease_(QKeyEvent* e)
 {
-	if (e->key() == Qt::Key_Control)
+	if (e != nullptr && e->key() == Qt::Key_Control)
 	{
 		ClearControl();
 		return true;
@@ -818,10 +818,13 @@ bool GLEmberControllerBase::KeyRelease_(QKeyEvent* e)
 /// <param name="e">The event</param>
 void GLWidget::keyReleaseEvent(QKeyEvent* e)
 {
-	if (!GLController() || !GLController()->KeyRelease_(e))
-		QOpenGLWidget::keyReleaseEvent(e);
+	if (e)
+	{
+		if (!GLController() || !GLController()->KeyRelease_(e))
+			QOpenGLWidget::keyReleaseEvent(e);
 
-	update();
+		update();
+	}
 }
 
 /// <summary>
@@ -834,7 +837,12 @@ void GLWidget::keyReleaseEvent(QKeyEvent* e)
 template <typename T>
 void GLEmberController<T>::MousePress(QMouseEvent* e)
 {
-	v3T mouseFlipped(e->x() * m_GL->devicePixelRatioF(), m_Viewport[3] - e->y() * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+	if (!e)
+		return;
+
+	const auto x = e->position().x();
+	const auto y = e->position().y();
+	v3T const mouseFlipped(x * m_GL->devicePixelRatioF(), m_Viewport[3] - y * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	const auto ember = m_FractoriumEmberController->CurrentEmber();
 	const auto renderer = m_FractoriumEmberController->Renderer();
 
@@ -842,7 +850,7 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 	if (!renderer)
 		return;
 
-	m_MouseDownPos = glm::ivec2(e->x() * m_GL->devicePixelRatioF(), e->y() * m_GL->devicePixelRatioF());//Capture the raster coordinates of where the mouse was clicked.
+	m_MouseDownPos = glm::ivec2(x * m_GL->devicePixelRatioF(), y * m_GL->devicePixelRatioF());//Capture the raster coordinates of where the mouse was clicked.
 	m_MouseWorldPos = WindowToWorld(mouseFlipped, false);//Capture the world cartesian coordinates of where the mouse is.
 	m_BoundsDown.w = renderer->LowerLeftX(false);//Need to capture these because they'll be changing if scaling.
 	m_BoundsDown.x = renderer->LowerLeftY(false);
@@ -927,12 +935,15 @@ void GLEmberController<T>::MousePress(QMouseEvent* e)
 /// <param name="e">The event</param>
 void GLWidget::mousePressEvent(QMouseEvent* e)
 {
-	setFocus();//Must do this so that this window gets keyboard events.
+	if (e)
+	{
+		setFocus();//Must do this so that this window gets keyboard events.
 
-	if (const auto controller = GLController())
-		controller->MousePress(e);
+		if (const auto controller = GLController())
+			controller->MousePress(e);
 
-	QOpenGLWidget::mousePressEvent(e);
+		QOpenGLWidget::mousePressEvent(e);
+	}
 }
 
 /// <summary>
@@ -943,18 +954,23 @@ void GLWidget::mousePressEvent(QMouseEvent* e)
 template <typename T>
 void GLEmberController<T>::MouseRelease(QMouseEvent* e)
 {
-	v3T mouseFlipped(e->x() * m_GL->devicePixelRatioF(), m_Viewport[3] - e->y() * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
-	m_MouseWorldPos = WindowToWorld(mouseFlipped, false);
+	if (e)
+	{
+		const auto x = e->position().x();
+		const auto y = e->position().y();
+		v3T const mouseFlipped(x * m_GL->devicePixelRatioF(), m_Viewport[3] - y * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+		m_MouseWorldPos = WindowToWorld(mouseFlipped, false);
 
-	if (m_DragState == eDragState::DragDragging && (e->button() & Qt::LeftButton))
-		UpdateHover(mouseFlipped);
+		if (m_DragState == eDragState::DragDragging && (e->button() & Qt::LeftButton))
+			UpdateHover(mouseFlipped);
 
-	if (m_DragState == eDragState::DragNone)
-		m_Fractorium->OnXformsSelectNoneButtonClicked(false);
+		if (m_DragState == eDragState::DragNone)
+			m_Fractorium->OnXformsSelectNoneButtonClicked(false);
 
-	m_DragState = eDragState::DragNone;
-	m_DragModifier = 0;
-	m_GL->update();
+		m_DragState = eDragState::DragNone;
+		m_DragModifier = 0;
+		m_GL->update();
+	}
 }
 
 /// <summary>
@@ -979,9 +995,11 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* e)
 template <typename T>
 void GLEmberController<T>::MouseMove(QMouseEvent* e)
 {
-	bool draw = true;
-	const glm::ivec2 mouse(e->x() * m_GL->devicePixelRatioF(), e->y() * m_GL->devicePixelRatioF());
-	const v3T mouseFlipped(e->x() * m_GL->devicePixelRatioF(), m_Viewport[3] - e->y() * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
+	const auto draw = true;
+	const auto x = e->position().x();
+	const auto y = e->position().y();
+	const glm::ivec2 mouse(x * m_GL->devicePixelRatioF(), y * m_GL->devicePixelRatioF());
+	const v3T mouseFlipped(x * m_GL->devicePixelRatioF(), m_Viewport[3] - y * m_GL->devicePixelRatioF(), 0);//Must flip y because in OpenGL, 0,0 is bottom left, but in windows, it's top left.
 	const auto ember = m_FractoriumEmberController->CurrentEmber();
 
 	//First check to see if the mouse actually moved.
@@ -993,7 +1011,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 
 	//Update status bar on main window, regardless of whether anything is being dragged.
 	if (m_Fractorium->m_Controller->RenderTimerRunning())
-		m_Fractorium->SetCoordinateStatus(e->x() * m_GL->devicePixelRatioF(), e->y() * m_GL->devicePixelRatioF(), m_MouseWorldPos.x, m_MouseWorldPos.y);
+		m_Fractorium->SetCoordinateStatus(x * m_GL->devicePixelRatioF(), y * m_GL->devicePixelRatioF(), m_MouseWorldPos.x, m_MouseWorldPos.y);
 
 	if (m_SelectedXform && m_DragState == eDragState::DragDragging)//Dragging and affine.
 	{
@@ -1017,7 +1035,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 		const QPointF br(m_MouseWorldPos.x, m_MouseWorldPos.y);
 		const QRectF qrf(tl, br);
 		const T scale = m_FractoriumEmberController->AffineScaleCurrentToLocked();
-		int i = 0;
+		const auto i = 0;
 		m_FractoriumEmberController->UpdateXform([&](Xform<T>* xform, size_t xfindex, size_t selIndex)
 		{
 			if (m_Fractorium->DrawAllPre() || xform == m_SelectedXform)//Draw all pre affine if specified.
@@ -1155,10 +1173,13 @@ void GLEmberController<T>::Wheel(QWheelEvent* e)
 /// <param name="e">The event</param>
 void GLWidget::wheelEvent(QWheelEvent* e)
 {
-	if (auto controller = GLController())
+	if (e)
 	{
-		controller->Wheel(e);
-		e->accept();//Prevents it from being sent to the main scroll bars. Scrolling should only affect the scale parameter and affine display zooming.
+		if (auto controller = GLController())
+		{
+			controller->Wheel(e);
+			e->accept();//Prevents it from being sent to the main scroll bars. Scrolling should only affect the scale parameter and affine display zooming.
+		}
 	}
 
 	//Do not call QOpenGLWidget::wheelEvent(e) because this should only affect the scale and not the position of the scroll bars.
@@ -1235,10 +1256,10 @@ bool GLWidget::Allocate(bool force)
 {
 	bool alloc = false;
 	//auto scaledW = std::ceil(width() * devicePixelRatioF());
-	auto w = m_Fractorium->m_Controller->FinalRasW();
-	auto h = m_Fractorium->m_Controller->FinalRasH();
-	bool doResize = force || m_TexWidth != w || m_TexHeight != h;
-	bool doIt = doResize || m_OutputTexID == 0;
+	const auto w = m_Fractorium->m_Controller->FinalRasW();
+	const auto h = m_Fractorium->m_Controller->FinalRasH();
+	bool const doResize = force || m_TexWidth != w || m_TexHeight != h;
+	bool const doIt = doResize || m_OutputTexID == 0;
 #ifndef USE_GLSL
 
 	if (doIt)
@@ -1335,7 +1356,7 @@ void GLWidget::SetViewport()
 {
 	if (m_Init && (m_ViewWidth != m_TexWidth || m_ViewHeight != m_TexHeight))
 	{
-		this->glViewport(0, 0, static_cast<GLint>(m_TexWidth), static_cast<GLint>(m_TexHeight));
+		this->glViewport(0, 0, GLint{ m_TexWidth }, GLint{ m_TexHeight });
 #ifdef USE_GLSL
 		m_Viewport = glm::ivec4(0, 0, m_TexWidth, m_TexHeight);
 #endif
@@ -1392,21 +1413,21 @@ void GLWidget::DrawUnitSquare()
 	GLfloat vertices[] =//Should these be of type T?//TODO
 	{
 		-1, -1,
-			1, -1,
-			-1, 1,
-			1, 1,
-			-1, -1,
-			-1, 1,
-			1, -1,
-			1, 1
-		};
+		1, -1,
+		-1, 1,
+		1, 1,
+		-1, -1,
+		-1, 1,
+		1, -1,
+		1, 1
+	};
 	QVector4D col(1.0f, 1.0f, 1.0f, 0.25f);
 	DrawPointOrLine(col, vertices, 8, GL_LINES);
 	const GLfloat vertices2[] =//Should these be of type T?//TODO
 	{
 		-1, 0,
-			1, 0
-		};
+		1, 0
+	};
 	QVector4D col2(1.0f, 0.0f, 0.0f, 0.5f);
 	DrawPointOrLine(col2, vertices2, 2, GL_LINES);
 	const GLfloat vertices3[] =//Should these be of type T?//TODO

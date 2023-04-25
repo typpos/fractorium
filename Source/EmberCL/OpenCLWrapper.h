@@ -28,7 +28,7 @@ public:
 class EMBERCL_API NamedBuffer
 {
 public:
-	NamedBuffer()
+	NamedBuffer() noexcept
 	{
 	}
 
@@ -48,7 +48,7 @@ public:
 class EMBERCL_API NamedImage2D
 {
 public:
-	NamedImage2D()
+	NamedImage2D() noexcept
 	{
 	}
 
@@ -69,7 +69,7 @@ public:
 class EMBERCL_API NamedImage2DGL
 {
 public:
-	NamedImage2DGL()
+	NamedImage2DGL() noexcept
 	{
 	}
 
@@ -133,8 +133,8 @@ public:
 	bool EnqueueAcquireGLObjects(cl::ImageGL& image);
 	bool EnqueueReleaseGLObjects(const string& name);
 	bool EnqueueReleaseGLObjects(cl::ImageGL& image);
-	bool EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = nullptr);
-	bool EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = nullptr);
+	bool EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObjects = nullptr);
+	bool EnqueueReleaseGLObjects(const cl::vector<cl::Memory>* memObjects = nullptr);
 	bool CreateSampler(cl::Sampler& sampler, cl_bool normalizedCoords, cl_addressing_mode addressingMode, cl_filter_mode filterMode);
 
 	//Arguments.
@@ -180,9 +180,9 @@ public:
 	size_t MaxAllocSize() const;
 
 	//Public virtual functions overridden from base classes.
-	virtual void ClearErrorReport() override;
-	virtual string ErrorReportString() override;
-	virtual vector<string> ErrorReport() override;
+	void ClearErrorReport() noexcept override;
+	string ErrorReportString() override;
+	vector<string> ErrorReport() override;
 
 	static void MakeEvenGridDims(size_t blockW, size_t blockH, size_t& gridW, size_t& gridH);
 
@@ -194,8 +194,8 @@ private:
 	size_t m_PlatformIndex = 0;
 	size_t m_DeviceIndex = 0;
 	size_t m_LocalMemSize = 0;
-	size_t m_GlobalMemSize;
-	size_t m_MaxAllocSize;
+	size_t m_GlobalMemSize = 0;
+	size_t m_MaxAllocSize = 0;
 	cl::Platform m_Platform;
 	cl::Context m_Context;
 	cl::Device m_Device;

@@ -21,9 +21,9 @@ public:
 	virtual ~RendererCLBase() { }
 	virtual bool ReadFinal(v4F* pixels) { return false; }
 	virtual bool ClearFinal() { return false; }
-	virtual bool AnyNvidia() const { return false; }
-	bool OptAffine() const { return m_OptAffine; }
-	void OptAffine(bool optAffine) { m_OptAffine = optAffine; }
+	virtual bool AnyNvidia() const noexcept { return false; }
+	bool OptAffine() const noexcept { return m_OptAffine; }
+	void OptAffine(bool optAffine) noexcept { m_OptAffine = optAffine; }
 
 	std::function<void(void)> m_CompileBegun;
 
@@ -112,24 +112,28 @@ public:
 	bool SetOutputTexture(GLuint outputTexID);
 
 	//Iters per kernel/block/grid.
-	inline size_t IterCountPerKernel() const;
-	inline size_t IterCountPerBlock() const;
-	inline size_t IterCountPerGrid() const;
+	inline size_t IterCountPerKernel() const noexcept;
+	inline size_t IterCountPerBlock() const noexcept;
+	inline size_t IterCountPerGrid() const noexcept;
 
 	//Kernels per block.
-	inline size_t IterBlockKernelWidth() const;
-	inline size_t IterBlockKernelHeight() const;
-	inline size_t IterBlockKernelCount() const;
+	inline size_t IterBlockKernelWidth() const noexcept;
+	inline size_t IterBlockKernelHeight() const noexcept;
+	inline size_t IterBlockKernelCount() const noexcept;
 
 	//Kernels per grid.
-	inline size_t IterGridKernelWidth() const;
-	inline size_t IterGridKernelHeight() const;
-	inline size_t IterGridKernelCount() const;
+	inline size_t IterGridKernelWidth() const noexcept;
+	inline size_t IterGridKernelHeight() const noexcept;
+	inline size_t IterGridKernelCount() const noexcept;
 
 	//Blocks per grid.
-	inline size_t IterGridBlockWidth() const;
-	inline size_t IterGridBlockHeight() const;
-	inline size_t IterGridBlockCount() const;
+	inline size_t IterGridBlockWidth() const noexcept;
+	inline size_t IterGridBlockHeight() const noexcept;
+	inline size_t IterGridBlockCount() const noexcept;
+
+	//Allow for changing the number of blocks in each dimension of the grid.
+	void IterBlocksWide(size_t w) noexcept;
+	void IterBlocksHigh(size_t h) noexcept;
 
 	bool ReadHist(size_t device);
 	bool ReadAccum();
@@ -164,11 +168,11 @@ public:
 	bool CreateSpatialFilter(bool& newAlloc) override;
 	eRendererType RendererType() const override;
 	bool Shared() const override;
-	void ClearErrorReport() override;
+	void ClearErrorReport() noexcept override;
 	string ErrorReportString() override;
 	vector<string> ErrorReport() override;
 	bool RandVec(vector<QTIsaac<ISAAC_SIZE, ISAAC_INT>>& randVec) override;
-	bool AnyNvidia() const override;
+	bool AnyNvidia() const noexcept override;
 
 #ifndef TEST_CL
 protected:

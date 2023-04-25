@@ -41,8 +41,8 @@ public:
 		m_Id = id;
 	}
 
-	virtual ~VariationTreeWidgetItem() { }
-	eVariationId Id() { return m_Id; }
+	//virtual ~VariationTreeWidgetItem() { }
+	eVariationId Id() const { return m_Id; }
 
 private:
 	/// <summary>
@@ -50,7 +50,7 @@ private:
 	/// </summary>
 	/// <param name="other">The QTreeWidgetItem to compare against for sorting</param>
 	/// <returns>True if this is less than other, else false.</returns>
-	bool operator < (const QTreeWidgetItem& other) const
+	bool operator < (const QTreeWidgetItem& other) const override
 	{
 		const auto column = treeWidget()->sortColumn();
 		auto itemWidget1 = treeWidget()->itemWidget(const_cast<VariationTreeWidgetItem*>(this), 1);//Get the widget for the second column.

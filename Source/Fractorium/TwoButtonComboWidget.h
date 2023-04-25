@@ -59,7 +59,7 @@ public:
 		l->addWidget(m_Button1);
 		l->addWidget(m_Button2);
 		l->setAlignment(Qt::AlignLeft);
-		l->setMargin(0);
+		l->setContentsMargins(0, 0, 0, 0);
 		l->setSpacing(2);
 		setLayout(l);
 	}
@@ -106,7 +106,7 @@ public:
 		l->addWidget(spinBox);
 		l->addWidget(m_Button);
 		l->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		l->setMargin(0);
+		l->setContentsMargins(0, 0, 0, 0);
 		l->setSpacing(0);
 		setLayout(l);
 	}
@@ -144,7 +144,7 @@ public:
 		m_L->addWidget(spinBox);
 		m_L->addWidget(m_Label);
 		m_L->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		m_L->setMargin(0);
+		m_L->setContentsMargins(0, 0, 0, 0);
 		m_L->setSpacing(0);
 		setLayout(m_L);
 	}
@@ -218,7 +218,7 @@ public:
 		m_L->addWidget(doubleSpinBox);
 		m_L->addWidget(spinBox);
 		m_L->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		m_L->setMargin(0);
+		m_L->setContentsMargins(0, 0, 0, 0);
 		m_L->setSpacing(0);
 		setLayout(m_L);
 	}

@@ -10,10 +10,10 @@ void Fractorium::InitPaletteUI()
 	int spinHeight = 20, row = 0;
 	auto paletteTable = ui.PaletteListTable;
 	auto palettePreviewTable = ui.PalettePreviewTable;
-	connect(ui.PaletteFilenameCombo, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
+	connect(ui.PaletteFilenameCombo, SIGNAL(currentTextChanged(const QString&)), this, SLOT(OnPaletteFilenameComboChanged(const QString&)), Qt::QueuedConnection);
 	connect(paletteTable, SIGNAL(cellClicked(int, int)),	   this, SLOT(OnPaletteCellClicked(int, int)),		 Qt::QueuedConnection);
 	connect(paletteTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnPaletteCellDoubleClicked(int, int)), Qt::QueuedConnection);
-	connect(palettePreviewTable, SIGNAL(MouseDragged(const QPointF&, const QPoint&)), this, SLOT(OnPreviewPaletteMouseDragged(const QPointF&, const QPoint&)), Qt::QueuedConnection);
+	connect(palettePreviewTable, SIGNAL(MouseDragged(const QPointF&, const QPointF&)), this, SLOT(OnPreviewPaletteMouseDragged(const QPointF&, const QPointF&)), Qt::QueuedConnection);
 	connect(palettePreviewTable, SIGNAL(MouseReleased()), this, SLOT(OnPreviewPaletteMouseReleased()), Qt::QueuedConnection);
 	connect(palettePreviewTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnPreviewPaletteCellDoubleClicked(int, int)), Qt::QueuedConnection);
 	connect(palettePreviewTable, SIGNAL(cellPressed(int, int)), this, SLOT(OnPreviewPaletteCellPressed(int, int)), Qt::QueuedConnection);
@@ -144,7 +144,7 @@ void FractoriumEmberController<T>::ApplyPaletteToEmber()
 	const uint freq = m_Fractorium->m_PaletteFrequencySpin->value();
 	const auto sat = m_Fractorium->m_PaletteSaturationSpin->value() / 100.0;
 	const auto brightness = m_Fractorium->m_PaletteBrightnessSpin->value() / 255.0;
-	const auto contrast = m_Fractorium->m_PaletteContrastSpin->value() > 0 ? m_Fractorium->m_PaletteContrastSpin->value() * 2.0 : m_Fractorium->m_PaletteContrastSpin->value() / 100.0;
+	const auto contrast = double(m_Fractorium->m_PaletteContrastSpin->value() > 0 ? m_Fractorium->m_PaletteContrastSpin->value() * 2.0 : m_Fractorium->m_PaletteContrastSpin->value()) / 100.0;
 	const auto hue = m_Fractorium->m_PaletteHueSpin->value() / 360.0;
 	//Use the temp palette as the base and apply the adjustments gotten from the GUI and save the result in the ember palette.
 	m_TempPalette.MakeAdjustedPalette(m_Ember.m_Palette, m_Fractorium->m_PreviewPaletteRotation, hue, sat, brightness, contrast, blur, freq);
@@ -167,7 +167,7 @@ void FractoriumEmberController<T>::UpdateAdjustedPaletteGUI(Palette<float>& pale
 	if (previewPaletteItem)//This can be null if the palette file was moved or corrupted.
 	{
 		//Use the adjusted palette to fill the preview palette control so the user can see the effects of applying the adjustements.
-		vector<byte> v = palette.MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);//Make the palette repeat for PALETTE_CELL_HEIGHT rows.
+		vector<unsigned char> v = palette.MakeRgbPaletteBlock(PALETTE_CELL_HEIGHT);//Make the palette repeat for PALETTE_CELL_HEIGHT rows.
 		m_FinalPaletteImage = QImage(int(palette.Size()), PALETTE_CELL_HEIGHT, QImage::Format_RGB888);//Create a QImage out of it.
 		memcpy(m_FinalPaletteImage.scanLine(0), v.data(), v.size() * sizeof(v[0]));//Memcpy the data in.
 		QPixmap pixmap(QPixmap::fromImage(m_FinalPaletteImage));//Create a QPixmap out of the QImage.
@@ -269,7 +269,7 @@ void Fractorium::OnPaletteCellClicked(int row, int col)
 /// </summary>
 /// <param name="local">The local mouse coordinates relative to the palette preview table</param>
 /// <param name="global">The global mouse coordinates</param>
-void Fractorium::OnPreviewPaletteMouseDragged(const QPointF& local, const QPoint& global)
+void Fractorium::OnPreviewPaletteMouseDragged(const QPointF& local, const QPointF& global)
 {
 	if (m_PreviewPaletteMouseDown)
 	{

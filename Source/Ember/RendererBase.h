@@ -54,12 +54,12 @@ public:
 	/// <summary>
 	/// Constructor which sets all values to 0.
 	/// </summary>
-	EmberStats()
+	EmberStats() noexcept
 	{
 		Clear();
 	}
 
-	void Clear()
+	void Clear() noexcept
 	{
 		m_Success = true;
 		m_Iters = 0;
@@ -68,7 +68,7 @@ public:
 		m_RenderMs = 0;
 	}
 
-	EmberStats& operator += (const EmberStats& stats)
+	EmberStats& operator += (const EmberStats& stats) noexcept
 	{
 		m_Success &= stats.m_Success;
 		m_Iters += stats.m_Iters;

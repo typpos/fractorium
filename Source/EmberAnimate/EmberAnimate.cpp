@@ -353,7 +353,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 	{
 		const auto finalImagep = finalImage.data();
 		const auto size = w * h;
-		vector<byte> rgb8Image;
+		vector<unsigned char> rgb8Image;
 		vector<std::thread> writeFileThreads;
 		writeFileThreads.reserve(6);
 
@@ -399,7 +399,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 				{
 					const auto fn = baseFilename + ".png";
 					VerbosePrint("Writing " + fn);
-					vector<byte> rgba8Image(size * 4);
+					vector<unsigned char> rgba8Image(size * 4);
 					Rgba32ToRgba8(finalImagep, rgba8Image.data(), w, h, opt.Transparency());
 					const auto writeSuccess = WritePng(fn.c_str(), rgba8Image.data(), w, h, 1, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
@@ -425,7 +425,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 					VerbosePrint("Writing " + fn);
 					vector<glm::uint16> rgba16Image(size * 4);
 					Rgba32ToRgba16(finalImagep, rgba16Image.data(), w, h, opt.Transparency());
-					const auto writeSuccess = WritePng(fn.c_str(), (byte*)rgba16Image.data(), w, h, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
+					const auto writeSuccess = WritePng(fn.c_str(), (unsigned char*)rgba16Image.data(), w, h, 2, opt.EnableComments(), comments, opt.Id(), opt.Url(), opt.Nick());
 
 					if (!writeSuccess)
 						cout << "Error writing " << fn << "\n";

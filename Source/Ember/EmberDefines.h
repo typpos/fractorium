@@ -88,12 +88,12 @@ typedef std::lock_guard <std::recursive_mutex> rlg;
 typedef std::chrono::high_resolution_clock Clock;
 typedef std::chrono::duration<double, std::ratio<1, 1000>> DoubleMs;
 typedef std::chrono::time_point<Clock, DoubleMs> DoubleMsTimePoint;
-static inline DoubleMsTimePoint NowMsD() { return time_point_cast<DoubleMs>(Clock::now()); }
-static inline size_t NowMs() { return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count(); }
+static inline DoubleMsTimePoint NowMsD() noexcept { return time_point_cast<DoubleMs>(Clock::now()); }
+static inline size_t NowMs() noexcept { return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count(); }
 
-#ifndef byte
-	typedef unsigned char byte;
-#endif
+//#ifndef byte
+//	typedef unsigned char byte;
+//#endif
 
 #define DO_DOUBLE 1//Comment this out for shorter build times during development. Always uncomment for release.
 //#define ISAAC_FLAM3_DEBUG 1//This is almost never needed, but is very useful when troubleshooting difficult bugs. Enable it to do a side by side comparison with flam3.

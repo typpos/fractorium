@@ -142,7 +142,7 @@ public:
 #ifdef _DEBUG
 
 					//Ensure distribution contains no out of bounds indices.
-					if (byte(i) >= ember.XformCount())
+					if ((unsigned char)i >= ember.XformCount())
 						throw "Out of bounds xform index in selection distribution.";
 
 #endif
@@ -156,7 +156,7 @@ public:
 			//If probability was zero, then nothing was filled in, so make all zero.
 			//If it was non zero but for some reason didn't fill all elements, then just make the remaining
 			//elements have the index of the last xform.
-			byte val = j ? byte(i - 1) : 0;
+			byte val = j ? byte(i - 1) : byte(0);
 
 			for (; j < CHOOSE_XFORM_GRAIN; j++)//Make absolutely sure they are set to a valid value.
 				m_XformDistributions[(distrib * CHOOSE_XFORM_GRAIN) + j] = val;

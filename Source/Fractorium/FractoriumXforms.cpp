@@ -706,11 +706,11 @@ void FractoriumEmberController<T>::UpdateXformName(int index)
 		m_Fractorium->ui.CurrentXformCombo->setItemText(index, name);
 		const auto view = m_Fractorium->ui.CurrentXformCombo->view();
 		const auto fontMetrics1 = view->fontMetrics();
-		const auto ww = fontMetrics1.width("WW") * 3;
+		const auto ww = fontMetrics1.horizontalAdvance("WW") * 3;
 		auto textWidth = m_Fractorium->ui.CurrentXformCombo->width();
 
 		for (int i = 0; i < m_Fractorium->ui.CurrentXformCombo->count(); ++i)
-			textWidth = std::max(fontMetrics1.width(m_Fractorium->ui.CurrentXformCombo->itemText(i)) + ww, textWidth);
+			textWidth = std::max(fontMetrics1.horizontalAdvance(m_Fractorium->ui.CurrentXformCombo->itemText(i)) + ww, textWidth);
 
 		view->setMinimumWidth(textWidth);
 		view->setMaximumWidth(textWidth);

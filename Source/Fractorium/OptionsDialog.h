@@ -24,7 +24,7 @@ class FractoriumOptionsDialog : public QDialog
 	friend Fractorium;
 
 public:
-	FractoriumOptionsDialog(QWidget* p = nullptr, Qt::WindowFlags f = 0);
+	FractoriumOptionsDialog(QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowType::Widget);
 	bool EarlyClip();
 	bool YAxisUp();
 	bool Transparency();

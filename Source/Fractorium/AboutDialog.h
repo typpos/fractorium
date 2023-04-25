@@ -15,7 +15,7 @@ class FractoriumAboutDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	FractoriumAboutDialog(QWidget* p = nullptr, Qt::WindowFlags f = 0);
+	FractoriumAboutDialog(QWidget* p = nullptr, Qt::WindowFlags f = Qt::WindowType::Widget);
 
 private:
 	Ui::AboutDialog ui;

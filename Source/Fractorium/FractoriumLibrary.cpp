@@ -183,7 +183,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 {
 	StopAllPreviewRenderers();
 	const uint size = PREVIEW_SIZE;
-	vector<byte> empy_preview(size * size * 4);
+	vector<unsigned char> empy_preview(size * size * 4);
 	const auto tree = m_Fractorium->ui.LibraryTree;
 	tree->clear();
 	auto fileItem = new QTreeWidgetItem(tree);
@@ -222,7 +222,7 @@ template <typename T>
 void FractoriumEmberController<T>::UpdateLibraryTree()
 {
 	const uint size = PREVIEW_SIZE;
-	vector<byte> empy_preview(size * size * 4);
+	vector<unsigned char> empy_preview(size * size * 4);
 	const auto tree = m_Fractorium->ui.LibraryTree;
 
 	if (auto top = tree->topLevelItem(0))
@@ -440,7 +440,7 @@ void FractoriumEmberController<T>::RenderPreviews(QTreeWidget* tree, TreePreview
 		if (const auto top = tree->topLevelItem(tree->topLevelItemCount() - 1))
 		{
 			const auto childCount = top->childCount();
-			vector<byte> emptyPreview(PREVIEW_SIZE * PREVIEW_SIZE * 4);
+			vector<unsigned char> emptyPreview(PREVIEW_SIZE * PREVIEW_SIZE * 4);
 
 			for (int i = 0; i < childCount; i++)
 				if (auto treeItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(i)))
@@ -488,7 +488,7 @@ void FractoriumEmberController<T>::AddAnimationItem()
 	emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	emberItem->setToolTip(0, "Animated Frame");
 	const uint size = PREVIEW_SIZE;
-	vector<byte> empy_preview(size * size * 4);
+	vector<unsigned char> empy_preview(size * size * 4);
 	emberItem->SetImage(empy_preview, size, size);
 }
 
@@ -502,7 +502,7 @@ void FractoriumEmberController<T>::FillSequenceTree()
 {
 	StopAllPreviewRenderers();
 	const uint size = PREVIEW_SIZE;
-	vector<byte> empy_preview(size * size * 4);
+	vector<unsigned char> empy_preview(size * size * 4);
 	const auto tree = m_Fractorium->ui.SequenceTree;
 	tree->clear();
 	// Add extra TreeWidget for animation at index 0

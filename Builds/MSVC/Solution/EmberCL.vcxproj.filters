@@ -16,6 +16,9 @@
     <Filter Include="Kernel Creators">
       <UniqueIdentifier>{d66f35ca-a4cd-470a-9c56-653b0665b598}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CL">
+      <UniqueIdentifier>{e37b04de-79bc-483b-9725-618dbe484452}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Source\EmberCL\DllMain.cpp">
@@ -79,6 +82,60 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Source\EmberCL\FunctionMapper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_d3d10.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_d3d11.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_dx9_media_sharing.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_dx9_media_sharing_intel.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_egl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_ext.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_ext_intel.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_gl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_gl_ext.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_half.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_icd.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_layer.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_platform.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_va_api_media_sharing_intel.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\cl_version.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\opencl.h">
+      <Filter>CL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Source\EmberCL\CL\opencl.hpp">
+      <Filter>CL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -44,6 +44,10 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	SetupSpinner<SpinBox, int>(ui.FinalRenderSizeTable, this, row, -1, m_WidthSpin,  spinHeight, 10, std::numeric_limits<int>::max(), 10, SIGNAL(valueChanged(int)), SLOT(OnWidthChanged(int)), true, 1920, 1920, 1920);
 	SetupSpinner<DoubleSpinBox, double>(ui.FinalRenderSizeTable, this, row, -1, m_HeightScaleSpin, spinHeight, 0.001, 99.99, 0.1, SIGNAL(valueChanged(double)), SLOT(OnHeightScaleChanged(double)), true, 1.0, 1.0, 1.0);
 	SetupSpinner<SpinBox, int>(ui.FinalRenderSizeTable, this, row, -1, m_HeightSpin, spinHeight, 10, std::numeric_limits<int>::max(), 10, SIGNAL(valueChanged(int)), SLOT(OnHeightChanged(int)), true, 1080, 1080, 1080);
+	m_SubBatchPctSpin = (DoubleSpinBox*)ui.FinalRenderOpenCLSubBatchPctSpin;
+	m_SubBatchPctSpin->DoubleClick(true);
+	m_SubBatchPctSpin->DoubleClickZero(0.025);
+	m_SubBatchPctSpin->DoubleClickNonZero(0.025);
 	int spinsize = 120;
 	m_WidthScaleSpin->setDecimals(4);
 	m_HeightScaleSpin->setDecimals(4);
@@ -237,10 +241,12 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	OnOpenCLCheckBoxStateChanged(ui.FinalRenderOpenCLCheckBox->isChecked());
 	OnDoAllCheckBoxStateChanged(ui.FinalRenderDoAllCheckBox->isChecked());
 	OnDoSequenceCheckBoxStateChanged(ui.FinalRenderDoSequenceCheckBox->isChecked());
-	QSize s = size();
-	const auto desktopHeight = qApp->desktop()->availableGeometry().height();
+	auto s = size();
+	auto screen = QGuiApplication::screenAt(pos());
+	auto geom = screen->availableGeometry();
+	const auto desktopHeight = geom.height();
 	s.setHeight(std::min(s.height(), int(double(desktopHeight * 0.90))));
-	setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, s, qApp->desktop()->availableGeometry()));
+	setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, s, geom));
 	//Update these with new controls.
 	auto w = SetTabOrder(this, ui.FinalRenderEarlyClipCheckBox, ui.FinalRenderYAxisUpCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderTransparencyCheckBox);

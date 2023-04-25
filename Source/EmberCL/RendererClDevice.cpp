@@ -51,17 +51,17 @@ bool RendererClDevice::Init()
 /// <summary>
 /// OpenCL property accessors, getters only.
 /// </summary>
-bool RendererClDevice::Ok() const { return m_Init; }
-bool RendererClDevice::Shared() const { return m_Shared; }
-bool RendererClDevice::Nvidia() const { return m_NVidia; }
-size_t RendererClDevice::WarpSize() const { return m_WarpSize; }
-size_t RendererClDevice::PlatformIndex() const { return m_PlatformIndex; }
-size_t RendererClDevice::DeviceIndex() const { return m_DeviceIndex; }
+bool RendererClDevice::Ok() const noexcept { return m_Init; }
+bool RendererClDevice::Shared() const noexcept { return m_Shared; }
+bool RendererClDevice::Nvidia() const noexcept { return m_NVidia; }
+size_t RendererClDevice::WarpSize() const noexcept { return m_WarpSize; }
+size_t RendererClDevice::PlatformIndex() const noexcept { return m_PlatformIndex; }
+size_t RendererClDevice::DeviceIndex() const noexcept { return m_DeviceIndex; }
 
 /// <summary>
 /// Clear the error report for this class as well as the wrapper.
 /// </summary>
-void RendererClDevice::ClearErrorReport()
+void RendererClDevice::ClearErrorReport() noexcept
 {
 	EmberReport::ClearErrorReport();
 	m_Wrapper.ClearErrorReport();

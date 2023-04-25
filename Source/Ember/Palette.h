@@ -54,7 +54,7 @@ public:
 		else//They passed in null, so just fill with hard coded values so they at least have something.
 		{
 			//Palette 15 used in the test ember file.
-			byte palette15[COLORMAP_LENGTH * 4] =
+			unsigned char palette15[COLORMAP_LENGTH * 4] =
 			{
 				0x00, 0xda, 0xde, 0xbc, 0x00, 0xee, 0xe6, 0xc5, 0x00, 0xee, 0xf2, 0xce, 0x00, 0xee, 0xf2, 0xcf, 0x00, 0xe6, 0xee, 0xe1, 0x00, 0xea, 0xee, 0xd8, 0x00, 0xf2, 0xf1, 0xeb, 0x00, 0xf2, 0xf5, 0xd8,
 				0x00, 0xe6, 0xf2, 0xce, 0x00, 0xde, 0xea, 0xc5, 0x00, 0xd6, 0xda, 0xc6, 0x00, 0xce, 0xd2, 0xbc, 0x00, 0xc2, 0xca, 0xa9, 0x00, 0xbe, 0xca, 0xa0, 0x00, 0xce, 0xd6, 0xaa, 0x00, 0xde, 0xe2, 0xc5,
@@ -395,10 +395,10 @@ public:
 	/// </summary>
 	/// <param name="height">The height of the output block</param>
 	/// <returns>A vector holding the color values</returns>
-	vector<byte> MakeRgbPaletteBlock(size_t height)
+	vector<unsigned char> MakeRgbPaletteBlock(size_t height)
 	{
 		const auto width = Size();
-		vector<byte> v(height * width * 3);
+		vector<unsigned char> v(height * width * 3);
 
 		if (v.size() == (height * Size() * 3))
 		{
@@ -406,9 +406,9 @@ public:
 			{
 				for (size_t j = 0; j < width; j++)
 				{
-					v[(width * 3 * i) + (j * 3)]     = static_cast<byte>(m_Entries[j][0] * static_cast<T>(255));//Palettes are as [0..1], so convert to [0..255] here since it's for GUI display.
-					v[(width * 3 * i) + (j * 3) + 1] = static_cast<byte>(m_Entries[j][1] * static_cast<T>(255));
-					v[(width * 3 * i) + (j * 3) + 2] = static_cast<byte>(m_Entries[j][2] * static_cast<T>(255));
+					v[(width * 3 * i) + (j * 3)]     = static_cast<unsigned char>(m_Entries[j][0] * static_cast<T>(255));//Palettes are as [0..1], so convert to [0..255] here since it's for GUI display.
+					v[(width * 3 * i) + (j * 3) + 1] = static_cast<unsigned char>(m_Entries[j][1] * static_cast<T>(255));
+					v[(width * 3 * i) + (j * 3) + 2] = static_cast<unsigned char>(m_Entries[j][2] * static_cast<T>(255));
 				}
 			}
 		}

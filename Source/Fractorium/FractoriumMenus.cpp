@@ -256,8 +256,8 @@ void FractoriumEmberController<T>::CreateReferenceFile()
 		ember.m_Palette = temppal;
 		m_EmberFile.m_Embers.push_back(ember);
 	};
-
 	size_t i;
+
 	for (i = 0; i < count; i++)
 	{
 		addsquaresfunc(i, regVars[i]);
@@ -685,8 +685,9 @@ void FractoriumEmberController<T>::PasteXmlAppend()
 	string s, errors;
 	XmlToEmber<T> parser;
 	vector<Ember<T>> embers;
-	auto codec = QTextCodec::codecForName("UTF-8");
-	auto b = codec->fromUnicode(QApplication::clipboard()->text());
+	auto b = QApplication::clipboard()->text().toUtf8();
+	//auto codec = QTextCodec::codecForName("UTF-8");
+	//auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
 
 	for (auto i = 0; i < b.size(); i++)
@@ -742,8 +743,9 @@ void FractoriumEmberController<T>::PasteXmlOver()
 	XmlToEmber<T> parser;
 	list<Ember<T>> embers;
 	auto backupEmber = *m_EmberFile.m_Embers.begin();
-	auto codec = QTextCodec::codecForName("UTF-8");
-	auto b = codec->fromUnicode(QApplication::clipboard()->text());
+	auto b = QApplication::clipboard()->text().toUtf8();
+	//auto codec = QTextCodec::codecForName("UTF-8");
+	//auto b = codec->fromUnicode(QApplication::clipboard()->text());
 	s.reserve(b.size());
 
 	for (auto i = 0; i < b.size(); i++)

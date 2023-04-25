@@ -490,14 +490,20 @@ static QString FindFirstDefaultPalette()
 static QString BaseStyle()
 {
 	return "/*---Base Style---\n"
-		   "This is needed to deal with the large tabs in the fusion theme which is the default on Linux, and optional on Windows.\n"
-		   "It's not needed for other themes."
+		   "This may be needed to deal with the large tabs.\n"
 		   "You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/\n"
+		   "/*\n"
 #ifndef _WIN32
-		   "QTabBar::tab { height: 4ex; }\n\n"
+		   "QTabBar::tab { height: 4ex; }\n"
 #else
-		   "QTabBar::tab { height: 4ex; }\n\n"
+		   "QTabBar::tab { height: 4ex; }\n"
 #endif
+		   "*/\n"
+		   "*\n"
+		   "{\n"
+		   "\tfont: 8.5pt \"MS Shell Dlg 2\";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/\n"
+		   "}\n"
+		   "\n"
 		   "/*This is needed to give the labels on the status bar some padding.*/\n"
 		   "QStatusBar QLabel { padding-left: 2px; padding-right: 2px; }\n"
 		   "\n"
@@ -520,7 +526,6 @@ static QString BaseStyle()
 		   "\tpadding-right: 0px;\n"
 		   "\tpadding-top: 0px;\n"
 		   "\tpadding-bottom: 0px;\n"
-		   "\tfont: 8pt \"MS Shell Dlg 2\";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/\n"
 		   "}\n"
 		   "\n"
 		   "QHeaderView::section::horizontal:enabled\n"
@@ -532,7 +537,6 @@ static QString BaseStyle()
 		   "\tpadding-top: 0px;\n"
 		   "\tpadding-bottom: 0px;\n"
 		   "\tpadding-left: 3px;\n"
-		   "\tfont: 8pt \"MS Shell Dlg 2\";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/\n"
 		   "}\n"
 		   "\n"
 		   "QHeaderView::section::vertical:disabled\n"
@@ -545,7 +549,6 @@ static QString BaseStyle()
 		   "\tpadding-right: 0px;\n"
 		   "\tpadding-top: 0px;\n"
 		   "\tpadding-bottom: 0px;\n"
-		   "\tfont: 8pt \"MS Shell Dlg 2\";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/\n"
 		   "}\n"
 		   "\n"
 		   "QHeaderView::section::horizontal:disabled\n"
@@ -557,7 +560,6 @@ static QString BaseStyle()
 		   "\tpadding-top: 0px;\n"
 		   "\tpadding-bottom: 0px;\n"
 		   "\tpadding-left: 3px;\n"
-		   "\tfont: 8pt \"MS Shell Dlg 2\";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/\n"
 		   "}\n"
 		   ;
 }
@@ -572,12 +574,15 @@ static QList<T> GetAllParents(QWidget* widget)
 {
 	QList<T> parents;
 
-	while (const auto parent = qobject_cast<QWidget*>(widget->parent()))
+	if (widget != nullptr)
 	{
-		if (const auto parentT = qobject_cast<T>(parent))
-			parents.push_back(parentT);
+		while (const auto parent = qobject_cast<QWidget*>(widget->parent()))
+		{
+			if (const auto parentT = qobject_cast<T>(parent))
+				parents.push_back(parentT);
 
-		widget = parent;
+			widget = parent;
+		}
 	}
 
 	return parents;

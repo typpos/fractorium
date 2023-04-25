@@ -1,6 +1,12 @@
-* 
+/*---Base Style---
+This may be needed to deal with the large tabs.
+You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/
+/*
+QTabBar::tab { height: 4ex; }
+*/
+*
 {
-	font: 8.5pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QObject

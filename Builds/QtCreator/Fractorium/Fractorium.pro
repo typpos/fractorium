@@ -1,5 +1,5 @@
 TEMPLATE = app
-QT += core gui widgets opengl concurrent
+QT += core gui widgets opengl openglwidgets concurrent
 
 TARGET = fractorium
 
@@ -22,7 +22,8 @@ PRJ_SRC_DIR = $$absolute_path($$EMBER_ROOT/../Source/Fractorium)
 win32 {
 CONFIG(release, debug|release) {
 	qtfiles.path = $$BIN_INSTALL_DIR
-	qtfiles.files = $$(QTDIR)\bin\Qt5Core.dll $$(QTDIR)\bin\Qt5Gui.dll $$(QTDIR)\bin\Qt5Widgets.dll
+	
+	qtfiles.files = $$(QTDIR)\bin\Qt6Core.dll $$(QTDIR)\bin\Qt6Gui.dll $$(QTDIR)\bin\Qt6OpenGL.dll $$(QTDIR)\bin\Qt6OpenGLWidgets.dll $$(QTDIR)\bin\Qt6Widgets.dll
 	INSTALLS += qtfiles
 
 	qtplatforms.path = $$BIN_INSTALL_DIR\platforms
@@ -36,7 +37,7 @@ CONFIG(release, debug|release) {
 
 CONFIG(debug, debug|release) {
 	qtfiles.path = $$BIN_INSTALL_DIR
-	qtfiles.files = $$(QTDIR)\bin\Qt5Cored.dll $$(QTDIR)\bin\Qt5Guid.dll $$(QTDIR)\bin\Qt5Widgetsd.dll
+	qtfiles.files = $$(QTDIR)\bin\Qt6Cored.dll $$(QTDIR)\bin\Qt6Guid.dll $$(QTDIR)\bin\Qt6OpenGLd.dll $$(QTDIR)\bin\Qt6OpenGLWidgetsd.dll $$(QTDIR)\bin\Qt6Widgetsd.dll
 	INSTALLS += qtfiles
 
 	qtplatforms.path = $$BIN_INSTALL_DIR\platforms
@@ -52,6 +53,7 @@ CONFIG(debug, debug|release) {
 #For some reason, a Qt project needs to be told to look at itself.
 INCLUDEPATH += $$PRJ_SRC_DIR
 INCLUDEPATH += $$PRJ_SRC_DIR/PaletteEditor
+INCLUDEPATH += $$(QTDIR)\include\QtWidget
 
 # Uncomment this if you only want to build a binary instead of an app bundle.
 #macx:CONFIG -= app_bundle

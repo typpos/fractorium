@@ -161,7 +161,7 @@ private:
 	/// <summary>
 	/// Default constructor. This should never be used, instead use the one that takes arguments.
 	/// </summary>
-	EmberOptionEntry()
+	EmberOptionEntry() noexcept
 	{
 		m_Option.nId = 0;
 		m_Option.pszArg = _T("--fillmein");
@@ -220,8 +220,8 @@ public:
 	/// <summary>
 	/// Functor accessors.
 	/// </summary>
-	inline const T& operator() (void) const { return m_Val; }
-	inline void operator() (T t) { m_Val = t; }
+	inline const T& operator() (void) const noexcept { return m_Val; }
+	inline void operator() (T t) noexcept { m_Val = t; }
 
 private:
 	eOptionUse m_OptionUse = eOptionUse::OPT_USE_ALL;
@@ -241,7 +241,7 @@ struct NoDelimiters : std::ctype<char>
 	/// <summary>
 	/// Constructor that passes the table created in GetTable() to the base.
 	/// </summary>
-	NoDelimiters()
+	NoDelimiters() noexcept
 		: std::ctype<char>(GetTable())
 	{
 	}
@@ -250,7 +250,7 @@ struct NoDelimiters : std::ctype<char>
 	/// Create and return a pointer to an empty table with no delimiters.
 	/// </summary>
 	/// <returns>A pointer to the empty delimiter table</returns>
-	static std::ctype_base::mask const* GetTable()
+	static std::ctype_base::mask const* GetTable() noexcept
 	{
 		typedef std::ctype<char> cctype;
 		static cctype::mask rc[cctype::table_size];
@@ -330,7 +330,7 @@ public:
 	/// </summary>
 	EmberOptions()
 	{
-		const size_t size = (size_t)eOptionIDs::OPT_EXTRAS;
+		constexpr size_t size = (size_t)eOptionIDs::OPT_EXTRAS;
 		m_BoolArgs.reserve(size);
 		m_IntArgs.reserve(size);
 		m_UintArgs.reserve(size);
@@ -649,7 +649,7 @@ public:
 	/// Return a const ref to m_Devices.
 	/// </summary>
 	/// <returns>A const ref to the vector of absolute device indices to be used</returns>
-	const vector<size_t>& Devices()
+	const vector<size_t>& Devices() noexcept
 	{
 		return m_Devices;
 	}
@@ -662,7 +662,7 @@ public:
 	vector<CSimpleOpt::SOption> GetSimpleOptions(eOptionUse optUsage = eOptionUse::OPT_USE_ALL)
 	{
 		vector<CSimpleOpt::SOption> entries;
-		CSimpleOpt::SOption endOption = SO_END_OF_OPTIONS;
+		CSimpleOpt::SOption const endOption = SO_END_OF_OPTIONS;
 		entries.reserve(75);
 
 		for (auto entry : m_BoolArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) entries.push_back(entry->m_Option);
@@ -711,15 +711,15 @@ public:
 		ostringstream os;
 		os << std::boolalpha;
 
-		for (auto entry : m_BoolArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_BoolArgs)   if (entry != nullptr) { if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n"; }
 
-		for (auto entry : m_IntArgs)    if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_IntArgs)    if (entry != nullptr) { if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n"; }
 
-		for (auto entry : m_UintArgs)   if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_UintArgs)   if (entry != nullptr) { if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n"; }
 
-		for (auto entry : m_DoubleArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_DoubleArgs) if (entry != nullptr) { if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n"; }
 
-		for (auto entry : m_StringArgs) if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n";
+		for (auto entry : m_StringArgs) if (entry != nullptr) { if (static_cast<et>(entry->m_OptionUse) & static_cast<et>(optUsage)) os << entry->m_NameWithoutDashes << ": " << (*entry)() << "\n"; }
 
 		return os.str();
 	}
@@ -768,7 +768,7 @@ public:
 	/// </summary>
 	/// <param name="errorCode">The code of the last parsing error</param>
 	/// <returns>The last option parsing error text as a string</returns>
-	string GetLastErrorText(int errorCode)
+	string GetLastErrorText(int errorCode) noexcept
 	{
 		switch (errorCode)
 		{

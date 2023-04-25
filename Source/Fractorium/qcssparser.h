@@ -64,7 +64,8 @@ class QIcon;
 namespace QCss
 {
 
-enum Property {
+enum Property
+{
 	UnknownProperty,
 	BackgroundColor,
 	Color,
@@ -171,7 +172,8 @@ enum Property {
 	NumProperties
 };
 
-enum KnownValue {
+enum KnownValue
+{
 	UnknownValue,
 	Value_Normal,
 	Value_Pre,
@@ -254,7 +256,8 @@ enum KnownValue {
 	NumKnownValues
 };
 
-enum BorderStyle {
+enum BorderStyle
+{
 	BorderStyle_Unknown,
 	BorderStyle_None,
 	BorderStyle_Dotted,
@@ -271,7 +274,8 @@ enum BorderStyle {
 	NumKnownBorderStyles
 };
 
-enum Edge {
+enum Edge
+{
 	TopEdge,
 	RightEdge,
 	BottomEdge,
@@ -279,14 +283,16 @@ enum Edge {
 	NumEdges
 };
 
-enum Corner {
+enum Corner
+{
 	TopLeftCorner,
 	TopRightCorner,
 	BottomLeftCorner,
 	BottomRightCorner
 };
 
-enum TileMode {
+enum TileMode
+{
 	TileMode_Unknown,
 	TileMode_Round,
 	TileMode_Stretch,
@@ -294,7 +300,8 @@ enum TileMode {
 	NumKnownTileModes
 };
 
-enum Repeat {
+enum Repeat
+{
 	Repeat_Unknown,
 	Repeat_None,
 	Repeat_X,
@@ -303,7 +310,8 @@ enum Repeat {
 	NumKnownRepeats
 };
 
-enum Origin {
+enum Origin
+{
 	Origin_Unknown,
 	Origin_Padding,
 	Origin_Border,
@@ -312,7 +320,8 @@ enum Origin {
 	NumKnownOrigins
 };
 
-enum PositionMode {
+enum PositionMode
+{
 	PositionMode_Unknown,
 	PositionMode_Static,
 	PositionMode_Relative,
@@ -321,31 +330,34 @@ enum PositionMode {
 	NumKnownPositionModes
 };
 
-enum Attachment {
+enum Attachment
+{
 	Attachment_Unknown,
 	Attachment_Fixed,
 	Attachment_Scroll,
 	NumKnownAttachments
 };
 
-enum StyleFeature {
+enum StyleFeature
+{
 	StyleFeature_None = 0,
 	StyleFeature_BackgroundColor = 1,
 	StyleFeature_BackgroundGradient = 2,
 	NumKnownStyleFeatures = 4
 };
 
-static inline bool isHexDigit(const char c)
+static inline bool isHexDigit(const char c) noexcept
 {
 	return (c >= '0' && c <= '9')
-		|| (c >= 'a' && c <= 'f')
-		|| (c >= 'A' && c <= 'F')
-		;
+		   || (c >= 'a' && c <= 'f')
+		   || (c >= 'A' && c <= 'F')
+		   ;
 }
 
 struct Value
 {
-	enum Type {
+	enum Type
+	{
 		Unknown,
 		Number,
 		Percentage,
@@ -359,43 +371,48 @@ struct Value
 		TermOperatorSlash,
 		TermOperatorComma
 	};
-	inline Value() : type(Unknown) { }
+	inline Value() noexcept : type(Unknown) { }
 	Type type;
 	QVariant variant;
 	QString toString() const;
 };
 
-struct ColorData {
-	ColorData() : role(QPalette::NoRole), type(Invalid) {}
-	ColorData(const QColor &col) : color(col), role(QPalette::NoRole), type(Color) {}
-	ColorData(QPalette::ColorRole r) : role(r), type(Role) {}
+struct ColorData
+{
+	ColorData() noexcept : role(QPalette::NoRole), type(Invalid) {}
+	ColorData(const QColor& col) noexcept : color(col), role(QPalette::NoRole), type(Color) {}
+	ColorData(QPalette::ColorRole r) noexcept : role(r), type(Role) {}
 	QColor color;
 	QPalette::ColorRole role;
 	enum { Invalid, Color, Role} type;
 };
 
-struct BrushData {
-	BrushData() : role(QPalette::NoRole), type(Invalid) {}
-	BrushData(const QBrush &br) : brush(br), role(QPalette::NoRole), type(Brush) {}
+struct BrushData
+{
+	BrushData() noexcept : role(QPalette::NoRole), type(Invalid) {}
+	BrushData(const QBrush& br) : brush(br), role(QPalette::NoRole), type(Brush) {}
 	BrushData(QPalette::ColorRole r) : role(r), type(Role) {}
 	QBrush brush;
 	QPalette::ColorRole role;
 	enum { Invalid, Brush, Role, DependsOnThePalette } type;
 };
 
-struct BackgroundData {
+struct BackgroundData
+{
 	BrushData brush;
 	QString image;
 	Repeat repeat;
 	Qt::Alignment alignment;
 };
 
-struct LengthData {
+struct LengthData
+{
 	qreal number;
 	enum { NONE, Px, Ex, Em } unit;
 };
 
-struct BorderData {
+struct BorderData
+{
 	LengthData width;
 	BorderStyle style;
 	BrushData color;
@@ -424,13 +441,13 @@ struct Declaration
 	inline bool isEmpty() const { return d->property.isEmpty() && d->propertyId == UnknownProperty; }
 
 	// helper functions
-	QColor colorValue(const QPalette & = QPalette()) const;
-	void colorValues(QColor *c, const QPalette & = QPalette()) const;
-	QBrush brushValue(const QPalette & = QPalette()) const;
-	void brushValues(QBrush *c, const QPalette & = QPalette()) const;
+	QColor colorValue(const QPalette& = QPalette()) const;
+	void colorValues(QColor* c, const QPalette& = QPalette()) const;
+	QBrush brushValue(const QPalette& = QPalette()) const;
+	void brushValues(QBrush* c, const QPalette& = QPalette()) const;
 
 	BorderStyle styleValue() const;
-	void styleValues(BorderStyle *s) const;
+	void styleValues(BorderStyle* s) const;
 
 	Origin originValue() const;
 	Repeat repeatValue() const;
@@ -439,15 +456,15 @@ struct Declaration
 	Attachment attachmentValue() const;
 	int  styleFeaturesValue() const;
 
-	bool intValue(int *i, const char *unit = 0) const;
-	bool realValue(qreal *r, const char *unit = 0) const;
+	bool intValue(int* i, const char* unit = 0) const;
+	bool realValue(qreal* r, const char* unit = 0) const;
 
 	QSize sizeValue() const;
 	QRect rectValue() const;
 	QString uriValue() const;
 	QIcon iconValue() const;
 
-	void borderImageValue(QString *image, int *cuts, TileMode *h, TileMode *v) const;
+	void borderImageValue(QString* image, int* cuts, TileMode* h, TileMode* v) const;
 };
 
 const quint64 PseudoClass_Unknown          = Q_UINT64_C(0x0000000000000000);
@@ -511,7 +528,8 @@ struct Pseudo
 
 struct AttributeSelector
 {
-	enum ValueMatchType {
+	enum ValueMatchType
+	{
 		NoMatch,
 		MatchEqual,
 		MatchContains,
@@ -528,7 +546,8 @@ struct BasicSelector
 {
 	inline BasicSelector() : relationToNext(NoRelation) {}
 
-	enum Relation {
+	enum Relation
+	{
 		NoRelation,
 		MatchNextSelectorIfAncestor,
 		MatchNextSelectorIfParent,
@@ -548,7 +567,7 @@ struct Selector
 {
 	QVector<BasicSelector> basicSelectors;
 	int specificity() const;
-	quint64 pseudoClass(quint64 *negated = 0) const;
+	quint64 pseudoClass(quint64* negated = 0) const;
 	QString pseudoElement() const;
 };
 
@@ -559,30 +578,30 @@ struct ImportRule;
 
 struct ValueExtractor
 {
-	ValueExtractor(const QVector<Declaration> &declarations, const QPalette & = QPalette());
+	ValueExtractor(const QVector<Declaration>& declarations, const QPalette& = QPalette());
 
-	bool extractFont(QFont *font, int *fontSizeAdjustment);
-	bool extractBackground(QBrush *, QString *, Repeat *, Qt::Alignment *, QCss::Origin *, QCss::Attachment *,
-						   QCss::Origin *);
-	bool extractGeometry(int *w, int *h, int *minw, int *minh, int *maxw, int *maxh);
-	bool extractPosition(int *l, int *t, int *r, int *b, QCss::Origin *, Qt::Alignment *,
-						 QCss::PositionMode *, Qt::Alignment *);
-	bool extractBox(int *margins, int *paddings, int *spacing = 0);
-	bool extractBorder(int *borders, QBrush *colors, BorderStyle *Styles, QSize *radii);
-	bool extractOutline(int *borders, QBrush *colors, BorderStyle *Styles, QSize *radii, int *offsets);
-	bool extractPalette(QBrush *fg, QBrush *sfg, QBrush *sbg, QBrush *abg);
+	bool extractFont(QFont* font, int* fontSizeAdjustment);
+	bool extractBackground(QBrush*, QString*, Repeat*, Qt::Alignment*, QCss::Origin*, QCss::Attachment*,
+						   QCss::Origin*);
+	bool extractGeometry(int* w, int* h, int* minw, int* minh, int* maxw, int* maxh);
+	bool extractPosition(int* l, int* t, int* r, int* b, QCss::Origin*, Qt::Alignment*,
+						 QCss::PositionMode*, Qt::Alignment*);
+	bool extractBox(int* margins, int* paddings, int* spacing = 0);
+	bool extractBorder(int* borders, QBrush* colors, BorderStyle* Styles, QSize* radii);
+	bool extractOutline(int* borders, QBrush* colors, BorderStyle* Styles, QSize* radii, int* offsets);
+	bool extractPalette(QBrush* fg, QBrush* sfg, QBrush* sbg, QBrush* abg);
 	int  extractStyleFeatures();
-	bool extractImage(QIcon *icon, Qt::Alignment *a, QSize *size);
+	bool extractImage(QIcon* icon, Qt::Alignment* a, QSize* size);
 
-	int lengthValue(const Declaration &decl);
+	int lengthValue(const Declaration& decl);
 
-private:
+	private:
 	void extractFont();
-	void borderValue(const Declaration &decl, int *width, QCss::BorderStyle *style, QBrush *color);
+	void borderValue(const Declaration& decl, int* width, QCss::BorderStyle* style, QBrush* color);
 	LengthData lengthValue(const Value& v);
-	void lengthValues(const Declaration &decl, int *m);
-	QSize sizeValue(const Declaration &decl);
-	void sizeValues(const Declaration &decl, QSize *radii);
+	void lengthValues(const Declaration& decl, int* m);
+	QSize sizeValue(const Declaration& decl);
+	void sizeValues(const Declaration& decl, QSize* radii);
 
 	QVector<Declaration> declarations;
 	QFont f;
@@ -617,7 +636,8 @@ struct ImportRule
 	QStringList media;
 };
 
-enum StyleSheetOrigin {
+enum StyleSheetOrigin
+{
 	StyleSheetOrigin_Unspecified,
 	StyleSheetOrigin_UserAgent,
 	StyleSheetOrigin_User,
@@ -645,16 +665,17 @@ public:
 	StyleSelector() : nameCaseSensitivity(Qt::CaseSensitive)  {}
 	virtual ~StyleSelector();
 
-	union NodePtr {
-		void *ptr;
+	union NodePtr
+	{
+		void* ptr;
 		int id;
 	};
 
 	QVector<StyleRule> styleRulesForNode(NodePtr node);
-	QVector<Declaration> declarationsForNode(NodePtr node, const char *extraPseudo = 0);
+	QVector<Declaration> declarationsForNode(NodePtr node, const char* extraPseudo = 0);
 
 	virtual bool nodeNameEquals(NodePtr node, const QString& nodeName) const;
-	virtual QString attribute(NodePtr node, const QString &name) const = 0;
+	virtual QString attribute(NodePtr node, const QString& name) const = 0;
 	virtual bool hasAttributes(NodePtr node) const = 0;
 	virtual QStringList nodeIds(NodePtr node) const;
 	virtual QStringList nodeNames(NodePtr node) const = 0;
@@ -668,13 +689,14 @@ public:
 	QString medium;
 	Qt::CaseSensitivity nameCaseSensitivity;
 private:
-	void matchRule(NodePtr node, const StyleRule &rules, StyleSheetOrigin origin,
-					int depth, QMap<uint, StyleRule> *weightedRules);
-	bool selectorMatches(const Selector &rule, NodePtr node);
-	bool basicSelectorMatches(const BasicSelector &rule, NodePtr node);
+	void matchRule(NodePtr node, const StyleRule& rules, StyleSheetOrigin origin,
+				   int depth, QMap<uint, StyleRule>* weightedRules);
+	bool selectorMatches(const Selector& rule, NodePtr node);
+	bool basicSelectorMatches(const BasicSelector& rule, NodePtr node);
 };
 
-enum TokenType {
+enum TokenType
+{
 	NONE,
 
 	S,
@@ -734,54 +756,54 @@ struct Symbol
 class Scanner
 {
 public:
-	static QString preprocess(const QString &input, bool *hasEscapeSequences = 0);
-	static void scan(const QString &preprocessedInput, QVector<Symbol> *symbols);
+	static QString preprocess(const QString& input, bool* hasEscapeSequences = 0);
+	static void scan(const QString& preprocessedInput, QVector<Symbol>* symbols);
 };
 
 class Parser
 {
 public:
-	Parser();
-	explicit Parser(const QString &css, bool file = false);
+	Parser() noexcept;
+	explicit Parser(const QString& css, bool file = false);
 
-	void init(const QString &css, bool file = false);
-	bool parse(StyleSheet *styleSheet, Qt::CaseSensitivity nameCaseSensitivity = Qt::CaseSensitive);
+	void init(const QString& css, bool file = false);
+	bool parse(StyleSheet* styleSheet, Qt::CaseSensitivity nameCaseSensitivity = Qt::CaseSensitive);
 	Symbol errorSymbol();
 
-	bool parseImport(ImportRule *importRule);
-	bool parseMedia(MediaRule *mediaRule);
-	bool parseMedium(QStringList *media);
-	bool parsePage(PageRule *pageRule);
-	bool parsePseudoPage(QString *selector);
-	bool parseNextOperator(Value *value);
-	bool parseCombinator(BasicSelector::Relation *relation);
-	bool parseProperty(Declaration *decl);
-	bool parseRuleset(StyleRule *styleRule);
-	bool parseSelector(Selector *sel);
-	bool parseSimpleSelector(BasicSelector *basicSel);
-	bool parseClass(QString *name);
-	bool parseElementName(QString *name);
-	bool parseAttrib(AttributeSelector *attr);
-	bool parsePseudo(Pseudo *pseudo);
-	bool parseNextDeclaration(Declaration *declaration);
-	bool parsePrio(Declaration *declaration);
-	bool parseExpr(QVector<Value> *values);
-	bool parseTerm(Value *value);
-	bool parseFunction(QString *name, QString *args);
-	bool parseHexColor(QColor *col);
-	bool testAndParseUri(QString *uri);
+	bool parseImport(ImportRule* importRule);
+	bool parseMedia(MediaRule* mediaRule);
+	bool parseMedium(QStringList* media);
+	bool parsePage(PageRule* pageRule);
+	bool parsePseudoPage(QString* selector);
+	bool parseNextOperator(Value* value);
+	bool parseCombinator(BasicSelector::Relation* relation);
+	bool parseProperty(Declaration* decl);
+	bool parseRuleset(StyleRule* styleRule);
+	bool parseSelector(Selector* sel);
+	bool parseSimpleSelector(BasicSelector* basicSel);
+	bool parseClass(QString* name);
+	bool parseElementName(QString* name);
+	bool parseAttrib(AttributeSelector* attr);
+	bool parsePseudo(Pseudo* pseudo);
+	bool parseNextDeclaration(Declaration* declaration);
+	bool parsePrio(Declaration* declaration);
+	bool parseExpr(QVector<Value>* values);
+	bool parseTerm(Value* value);
+	bool parseFunction(QString* name, QString* args);
+	bool parseHexColor(QColor* col);
+	bool testAndParseUri(QString* uri);
 
 	inline bool testRuleset() { return testSelector(); }
 	inline bool testSelector() { return testSimpleSelector(); }
-	inline bool parseNextSelector(Selector *sel) { if (!testSelector()) return recordError(); return parseSelector(sel); }
+	inline bool parseNextSelector(Selector* sel) { if (!testSelector()) return recordError(); return parseSelector(sel); }
 	bool testSimpleSelector();
-	inline bool parseNextSimpleSelector(BasicSelector *basicSel) { if (!testSimpleSelector()) return recordError(); return parseSimpleSelector(basicSel); }
+	inline bool parseNextSimpleSelector(BasicSelector* basicSel) { if (!testSimpleSelector()) return recordError(); return parseSimpleSelector(basicSel); }
 	inline bool testElementName() { return test(IDENT) || test(STAR); }
 	inline bool testClass() { return test(DOT); }
 	inline bool testAttrib() { return test(LBRACKET); }
 	inline bool testPseudo() { return test(COLON); }
 	inline bool testMedium() { return test(IDENT); }
-	inline bool parseNextMedium(QStringList *media) { if (!testMedium()) return recordError(); return parseMedium(media); }
+	inline bool parseNextMedium(QStringList* media) { if (!testMedium()) return recordError(); return parseMedium(media); }
 	inline bool testPseudoPage() { return test(COLON); }
 	inline bool testImport() { return testTokenAndEndsWith(ATKEYWORD_SYM, QLatin1String("import")); }
 	inline bool testMedia() { return testTokenAndEndsWith(ATKEYWORD_SYM, QLatin1String("media")); }
@@ -790,11 +812,11 @@ public:
 	inline bool testProperty() { return test(IDENT); }
 	bool testTerm();
 	inline bool testExpr() { return testTerm(); }
-	inline bool parseNextExpr(QVector<Value> *values) { if (!testExpr()) return recordError(); return parseExpr(values); }
+	inline bool parseNextExpr(QVector<Value>* values) { if (!testExpr()) return recordError(); return parseExpr(values); }
 	bool testPrio();
 	inline bool testHexColor() { return test(HASH); }
 	inline bool testFunction() { return test(FUNCTION); }
-	inline bool parseNextFunction(QString *name, QString *args) { if (!testFunction()) return recordError(); return parseFunction(name, args); }
+	inline bool parseNextFunction(QString* name, QString* args) { if (!testFunction()) return recordError(); return parseFunction(name, args); }
 
 	inline bool lookupElementName() const { return lookup() == IDENT || lookup() == STAR; }
 
@@ -803,14 +825,15 @@ public:
 	inline bool hasNext() const { return index < symbols.count(); }
 	inline TokenType next() { return symbols.at(index++).token; }
 	bool next(TokenType t);
-	bool test(TokenType t);
+	bool test(TokenType t) noexcept;
 	inline void prev() { index--; }
-	inline const Symbol &symbol() const { return symbols.at(index - 1); }
+	inline const Symbol& symbol() const { return symbols.at(index - 1); }
 	inline QString lexem() const { return symbol().lexem(); }
 	QString unquotedLexem() const;
 	QString lexemUntil(TokenType t);
-	bool until(TokenType target, TokenType target2 = NONE);
-	inline TokenType lookup() const {
+	bool until(TokenType target, TokenType target2 = NONE) noexcept;
+	inline TokenType lookup() const
+	{
 		return (index - 1) < symbols.count() ? symbols.at(index - 1).token : NONE;
 	}
 

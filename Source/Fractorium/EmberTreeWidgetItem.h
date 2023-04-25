@@ -53,7 +53,7 @@ public:
 	/// <param name="v">The vector containing the RGB pixels [0..255] which will make up the preview image</param>
 	/// <param name="width">The width of the image in pixels</param>
 	/// <param name="height">The height of the image in pixels</param>
-	void SetImage(vector<byte>& v, uint width, uint height)
+	void SetImage(vector<unsigned char>& v, uint width, uint height)
 	{
 		constexpr auto size = PREVIEW_SIZE;
 		m_Image = QImage(width, height, QImage::Format_RGBA8888);
@@ -70,7 +70,7 @@ public:
 protected:
 	QImage m_Image;
 	QPixmap m_Pixmap;
-	bool m_Rendered;
+	bool m_Rendered = false;
 };
 
 /// <summary>

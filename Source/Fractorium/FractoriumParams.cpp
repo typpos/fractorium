@@ -87,7 +87,7 @@ void Fractorium::InitParamsUI()
 	table = ui.FilterTable;
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SpatialFilterWidthSpin, spinHeight,   0, 2, 0.1, SIGNAL(valueChanged(double)), SLOT(OnSpatialFilterWidthChanged(double)), true, 1.0, 1.0, 0);
 	comboVals = SpatialFilterCreator<float>::FilterTypes();
-	SetupCombo(table, this, row, 1, m_SpatialFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnSpatialFilterTypeComboCurrentIndexChanged(const QString&)));
+	SetupCombo(table, this, row, 1, m_SpatialFilterTypeCombo, comboVals, SIGNAL(currentTextChanged(const QString&)), SLOT(OnSpatialFilterTypeComboCurrentIndexChanged(const QString&)));
 	m_SpatialFilterTypeCombo->SetCurrentIndexStealth(0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMinRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMinRadiusWidthChanged(double)), true,   0,   0,   0);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_DEFilterMaxRadiusSpin, spinHeight,    0, 25,   1, SIGNAL(valueChanged(double)), SLOT(OnDEFilterMaxRadiusWidthChanged(double)), true, 0.0, 9.0,   0);
@@ -122,10 +122,63 @@ void Fractorium::InitParamsUI()
 	m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(eAffineInterp::AFFINE_INTERP_LOG));
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1, 1, 1);
 	comboVals = TemporalFilterCreator<float>::FilterTypes();
-	SetupCombo(                         table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
+	SetupCombo(                         table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentTextChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
 	m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(eTemporalFilterType::BOX_TEMPORAL_FILTER));
 	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterExpSpin, spinHeight, 0,  5, 0.1, SIGNAL(valueChanged(double)), SLOT(OnExpChanged(double)),     true, 1, 1, 0);
+	//
+	AddSizePreset("HD", 1920, 1080);
+	AddSizePreset("QHD", 2560, 1440);
+	AddSizePreset("4K UHD", 3840, 2160);
+	AddSizePreset("4K DCP", 4096, 2160);
+	AddSizePreset("5K", 5120, 2880);
+	AddSizePreset("6K", 6144, 3456);
+	AddSizePreset("8K UHD", 7680, 4320);
+	AddSizePreset("8K", 8192, 4608);
+	AddSizePreset("12K", 12288, 6912);
+	m_WidthSpin->setContextMenuPolicy(Qt::ActionsContextMenu);
+	m_HeightSpin->setContextMenuPolicy(Qt::ActionsContextMenu);
+}
+
+/// <summary>
+/// Add a new size preset.
+/// </summary>
+/// <param name="name">The name of the preset</param>
+/// <param name="w">The width of the preset</param>
+/// <param name="h">The height of the preset</param>
+void Fractorium::AddSizePreset(QString name, int w, int h)
+{
+	auto widthAction = new QAction(name, m_WidthSpin);
+	connect(widthAction, SIGNAL(triggered(bool)), this, SLOT(PresetWidthActionTriggered(bool)), Qt::QueuedConnection);
+	m_WidthSpin->addAction(widthAction);
+	auto heightAction = new QAction(name, m_HeightSpin);
+	connect(heightAction, SIGNAL(triggered(bool)), this, SLOT(PresetHeightActionTriggered(bool)), Qt::QueuedConnection);
+	m_HeightSpin->addAction(heightAction);
+	m_HeightPresets[name] = std::pair<int, int>(w, h);
+}
+
+/// <summary>
+/// Assign a new width and height, and scale by the width.
+/// </summary>
+/// <param name="w">The width to assign</param>
+/// <param name="h">The height to assign</param>
+void Fractorium::SetWidthWithAspect(int w, int h)
+{
+	m_Controller->ResizeAndScale(w, h, eScaleType::SCALE_WIDTH);
+	m_WidthSpin->SetValueStealth(w);
+	m_HeightSpin->SetValueStealth(h);
+}
+
+/// <summary>
+/// Assign a new width and height, and scale by the height.
+/// </summary>
+/// <param name="w">The width to assign</param>
+/// <param name="h">The height to assign</param>
+void Fractorium::SetHeightWithAspect(int w, int h)
+{
+	m_Controller->ResizeAndScale(w, h, eScaleType::SCALE_HEIGHT);
+	m_WidthSpin->SetValueStealth(w);
+	m_HeightSpin->SetValueStealth(h);
 }
 
 /// <summary>
@@ -260,8 +313,8 @@ void FractoriumEmberController<T>::BackgroundChanged(const QColor& color)
 	const auto r = ToString(color.red());
 	const auto g = ToString(color.green());
 	const auto b = ToString(color.blue());
-	colorTable->item(itemRow, 1)->setBackgroundColor(color);
-	colorTable->item(itemRow, 1)->setTextColor(VisibleColor(color));
+	colorTable->item(itemRow, 1)->setBackground(color);
+	colorTable->item(itemRow, 1)->setForeground(VisibleColor(color));
 	colorTable->item(itemRow, 1)->setText("rgb(" + r + ", " + g + ", " + b + ")");
 	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
@@ -324,6 +377,48 @@ template <typename T> void FractoriumEmberController<T>::HeightChanged(uint i)
 }
 
 void Fractorium::OnHeightChanged(int i) { m_Controller->HeightChanged(i); }
+
+/// <summary>
+/// Change the width and height to the value specified in the preset, and scale relative to the original width.
+/// Called when the popup menu is clicked in the width spinner.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="b">Ignored</param>
+void Fractorium::PresetWidthActionTriggered(bool b)
+{
+	const auto act = qobject_cast<QAction*>(sender());
+
+	if (act)
+	{
+		auto it = m_HeightPresets.find(act->text());
+
+		if (it != m_HeightPresets.end())
+		{
+			SetWidthWithAspect(it->second.first, it->second.second);
+		}
+	}
+}
+
+/// <summary>
+/// Change the width and height to the value specified in the preset, and scale relative to the original height.
+/// Called when the popup menu is clicked in the height spinner.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="b">Ignored</param>
+void Fractorium::PresetHeightActionTriggered(bool b)
+{
+	const auto act = qobject_cast<QAction*>(sender());
+
+	if (act)
+	{
+		auto it = m_HeightPresets.find(act->text());
+
+		if (it != m_HeightPresets.end())
+		{
+			SetHeightWithAspect(it->second.first, it->second.second);
+		}
+	}
+}
 
 /// <summary>
 /// Set the width and height of the ember in pixels to the passed in values.
@@ -822,7 +917,7 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_HighlightSpin->SetValueStealth(m_Ember.m_HighlightPower);
 	m_Fractorium->m_K2Spin->SetValueStealth(m_Ember.m_K2);
 	m_Fractorium->m_ColorDialog->setCurrentColor(QColor(m_Ember.m_Background.r * 255, m_Ember.m_Background.g * 255, m_Ember.m_Background.b * 255));
-	m_Fractorium->ui.ColorTable->item(m_Fractorium->m_BgRow, 1)->setBackgroundColor(m_Fractorium->m_ColorDialog->currentColor());
+	m_Fractorium->ui.ColorTable->item(m_Fractorium->m_BgRow, 1)->setBackground(m_Fractorium->m_ColorDialog->currentColor());
 	BackgroundChanged(m_Fractorium->m_ColorDialog->currentColor());
 	m_Fractorium->m_PaletteModeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_PaletteMode));
 	m_Fractorium->m_WidthSpin->SetValueStealth(m_Ember.m_FinalRasW);//Geometry.
@@ -897,10 +992,10 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 	ember.m_TemporalFilterWidth = m_Fractorium->m_TemporalFilterWidthSpin->value();
 	ember.m_TemporalFilterType = static_cast<eTemporalFilterType>(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
 	ember.m_TemporalFilterExp = m_Fractorium->m_TemporalFilterExpSpin->value();
-	auto const color = m_Fractorium->ui.ColorTable->item(5, 1)->backgroundColor();
-	ember.m_Background.r = color.red() / 255.0;
-	ember.m_Background.g = color.green() / 255.0;
-	ember.m_Background.b = color.blue() / 255.0;
+	const auto color = m_Fractorium->ui.ColorTable->item(5, 1)->background();
+	ember.m_Background.r = color.color().red() / 255.0;
+	ember.m_Background.g = color.color().green() / 255.0;
+	ember.m_Background.b = color.color().blue() / 255.0;
 	ember.m_PaletteMode = static_cast<ePaletteMode>(m_Fractorium->m_PaletteModeCombo->currentIndex());
 	ember.m_FinalRasW = m_Fractorium->m_WidthSpin->value();//Geometry.
 	ember.m_FinalRasH = m_Fractorium->m_HeightSpin->value();

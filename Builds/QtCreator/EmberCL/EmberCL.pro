@@ -61,4 +61,3 @@ HEADERS += \
     $$PRJ_SRC_DIR/OpenCLWrapper.h \
     $$PRJ_SRC_DIR/RendererClDevice.h \
     $$PRJ_SRC_DIR/RendererCL.h
-

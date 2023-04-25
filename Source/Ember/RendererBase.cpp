@@ -432,7 +432,7 @@ void RendererBase::ThreadCount(size_t threads, const char* seedString)
 				m_Rand.push_back(isaac);
 
 				for (i = 0; i < (isaacSize * sizeof(ISAAC_INT)); i++)
-					reinterpret_cast<byte*>(seeds)[i]++;
+					reinterpret_cast<unsigned char*>(seeds)[i]++;
 			}
 			else
 			{

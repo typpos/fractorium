@@ -1,8 +1,15 @@
 /*---Base Style---
-		This is needed to deal with the large tabs in the fusion theme which is the default on Linux, and optional on Windows.
-		It's not needed for other themes.
-		You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/
+This may be needed to deal with the large tabs.
+You should keep this at the top of whatever custom style you make to ensure the tabs aren't unusually large.*/
+/*
 QTabBar::tab { height: 4ex; }
+*/
+/*
+*
+{
+	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+}
+*/
 
 /*This is needed to give the labels on the status bar some padding.*/
 QStatusBar QLabel { padding-left: 2px; padding-right: 2px; }
@@ -101,7 +108,6 @@ QDoubleSpinBox
 	padding-right: 0px;
 	color: darkgray;
 	selection-background-color: darkgray;
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QCheckBox
@@ -322,7 +328,6 @@ QTreeView
 {
 	border: 1px solid gray;
 	background-color: rgb(53, 53, 53);
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 /*Setting this gives a more consistent look. Also, by omitting color and background color, it allows us to set it above with VariationTreeColorNonZero etc...*/
@@ -378,7 +383,6 @@ QTableView
 	color: darkgray;
 	selection-color: darkgray;
 	selection-background-color: rgb(53, 53, 53);
-    font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QTableView QTableCornerButton::section:enabled
@@ -411,7 +415,6 @@ QHeaderView::section::vertical:enabled
 	border-bottom: 1px solid gray;
 	padding-left: 5px;
 	padding-right: 0px;
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QHeaderView::section::horizontal:enabled
@@ -423,7 +426,6 @@ QHeaderView::section::horizontal:enabled
 	padding-top: 0px;
 	padding-bottom: 0px;
 	padding-left: 3px;
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QHeaderView::section::vertical:disabled
@@ -434,7 +436,6 @@ QHeaderView::section::vertical:disabled
 	border-bottom: 1px solid rgb(53, 53, 53);
 	padding-left: 5px;
 	padding-right: 0px;
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QHeaderView::section::horizontal:disabled
@@ -446,7 +447,6 @@ QHeaderView::section::horizontal:disabled
 	padding-top: 0px;
 	padding-bottom: 0px;
 	padding-left: 3px;
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 }
 
 QScrollBar::vertical

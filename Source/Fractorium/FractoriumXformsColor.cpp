@@ -74,7 +74,7 @@ void FractoriumEmberController<T>::XformColorIndexChanged(double d, bool updateR
 	}
 
 	if (updateGUI)
-		m_Fractorium->ui.XformColorIndexTable->item(0, 0)->setBackgroundColor(ColorIndexToQColor(d));//Grab the current color from the index and assign it to the first cell of the first table.
+		m_Fractorium->ui.XformColorIndexTable->item(0, 0)->setBackground(ColorIndexToQColor(d));//Grab the current color from the index and assign it to the first cell of the first table.
 }
 
 void Fractorium::OnXformColorIndexChanged(double d) { OnXformColorIndexChanged(d, true, false, true, eXformUpdate::UPDATE_SELECTED, std::numeric_limits<size_t>::max()); }

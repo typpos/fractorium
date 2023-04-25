@@ -116,13 +116,11 @@ static int SortPointByY(const Point<T>& a, const Point<T>& b)
 template <typename T>
 struct EMBER_API Color : public v4T
 {
-#ifndef _WIN32
 	using v4T::r;
 	using v4T::g;
 	using v4T::b;
 	using v4T::a;
-#endif
-public:
+	public:
 	/// <summary>
 	/// Constructor to set color values to zero, with full visibility.
 	/// </summary>

@@ -81,21 +81,20 @@ void writeRgba1(const char filename[],
 		cout << e.what() << endl;
 	}
 }
-
-template <typename T>
-void SaveFinalImage(Renderer<T, T>& renderer, vector<byte>& pixels, char* suffix)
-{
+/*
+	template <typename T>
+	void SaveFinalImage(Renderer<T, T>& renderer, vector<byte>& pixels, char* suffix)
+	{
 	long newSize;
 	ostringstream os;
-	os << ".\\BasicFlame_" << sizeof(T) << "_"  << suffix ".bmp";
+	os << ".\\BasicFlame_" << sizeof(T) << "_"  << suffix << ".bmp";
 	BYTE* bgrBuf = ConvertRGBToBMPBuffer(pixels.data(), renderer.FinalRasW(), renderer.FinalRasH(), newSize);
 	SaveBMP(ch, bgrBuf, renderer.FinalRasW(), renderer.FinalRasH(), newSize);
 	delete [] bgrBuf;
-}
-
-template <typename T>
-Ember<T> CreateBasicEmber(uint width, uint height, uint ss, T quality, T centerX, T centerY, T rotate)
-{
+	}
+	template <typename T>
+	Ember<T> CreateBasicEmber(uint width, uint height, uint ss, T quality, T centerX, T centerY, T rotate)
+	{
 	Timing t;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	//t.Tic();
@@ -124,7 +123,8 @@ Ember<T> CreateBasicEmber(uint width, uint height, uint ss, T quality, T centerX
 	ember1.AddXform(xform4);
 	//ember1.SetFinalXform(xform4);
 	return ember1;
-}
+	}
+*/
 
 string GetEmberCLKernelString(Ember<float>& ember, bool iter, bool log, bool de, uint ss, bool accum)
 {
@@ -186,10 +186,10 @@ void MakeTestAllVarsRegPrePost(vector<Ember<T>>& embers)
 	while (index < varList->RegSize())
 	{
 		/*  if (index != eVariationId::VAR_SYNTH)
-		    {
+			{
 			index++;
 			continue;
-		    }
+			}
 		*/
 		Ember<T> ember1;
 		unique_ptr<Variation<T>> regVar(varList->GetVariationCopy(index, eVariationType::VARTYPE_REG));
@@ -762,16 +762,22 @@ bool TestVarRegPrePost()
 					success = false;
 				}
 
-				if (!TestVarPrecalcEqual<float, float>(regVar, preVar))
+				if (preVar)
 				{
-					cout << "Regular and pre variation precalc test failed for " << regVar->Name() << " and " << preVar->Name() << "." << endl;
-					success = false;
+					if (!TestVarPrecalcEqual<float, float>(regVar, preVar))
+					{
+						cout << "Regular and pre variation precalc test failed for " << regVar->Name() << " and " << preVar->Name() << "." << endl;
+						success = false;
+					}
 				}
 
-				if (!TestVarPrecalcEqual<float, float>(regVar, postVar))
+				if (postVar)
 				{
-					cout << "Regular and post variation precalc test failed for " << regVar->Name() << " and " << postVar->Name() << "." << endl;
-					success = false;
+					if (!TestVarPrecalcEqual<float, float>(regVar, postVar))
+					{
+						cout << "Regular and post variation precalc test failed for " << regVar->Name() << " and " << postVar->Name() << "." << endl;
+						success = false;
+					}
 				}
 			}
 		}
@@ -2167,7 +2173,7 @@ void DistribTester()
 #ifdef _DEBUG
 
 				//Ensure distribution contains no out of bounds indices.
-				if (byte(i) >= xformCount)
+				if ((unsigned char)i >= xformCount)
 					throw "Out of bounds xform index in selection distribution.";
 
 #endif
@@ -2281,48 +2287,48 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		return 1;
 		  vector<Ember<float>> fv;
-		    vector<Ember<double>> dv;
-		    list<Ember<float>> fl;
-		    list<Ember<double>> dl;
-		    int w = 1000, h = 1000;
-		    string filename = ".\\testexr.exr";
-		    vector<Rgba> pixels;
-		    pixels.resize(w * h);
+			vector<Ember<double>> dv;
+			list<Ember<float>> fl;
+			list<Ember<double>> dl;
+			int w = 1000, h = 1000;
+			string filename = ".\\testexr.exr";
+			vector<Rgba> pixels;
+			pixels.resize(w * h);
 
-		    for (auto& pix : pixels)
-		    {
-		    pix.r = 1.0;
-		    pix.b = 0.0;
-		    pix.a = 1.0;
-		    //pix.r = std::numeric_limits<float>::max();
-		    }
+			for (auto& pix : pixels)
+			{
+			pix.r = 1.0;
+			pix.b = 0.0;
+			pix.a = 1.0;
+			//pix.r = std::numeric_limits<float>::max();
+			}
 
-		    writeRgba1(filename.c_str(), pixels.data(), w, h);
-		    TestFuncs();
-		    string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
-		    auto vec = Split(line, delim, true);
+			writeRgba1(filename.c_str(), pixels.data(), w, h);
+			TestFuncs();
+			string line = "title=\"cj_aerie\" smooth=no", delim = " =\"";
+			auto vec = Split(line, delim, true);
 
-		    for (auto& s : vec) cout << s << endl;
+			for (auto& s : vec) cout << s << endl;
 
-		    line = "index=0 color=2177354", delim = " =";
-		    vec = Split(line, delim, true);
+			line = "index=0 color=2177354", delim = " =";
+			vec = Split(line, delim, true);
 
-		    for (auto& s : vec) cout << s << endl;
+			for (auto& s : vec) cout << s << endl;
 
 
-		    EmberContainerTester<float>::TestEmberContainer(fv);
-		    EmberContainerTester<double>::TestEmberContainer(dv);
-		    EmberContainerTester<float>::TestEmberContainer(fl);
-		    EmberContainerTester<double>::TestEmberContainer(dl);
-		    CopyCont(fv, fl);
+			EmberContainerTester<float>::TestEmberContainer(fv);
+			EmberContainerTester<double>::TestEmberContainer(dv);
+			EmberContainerTester<float>::TestEmberContainer(fl);
+			EmberContainerTester<double>::TestEmberContainer(dl);
+			CopyCont(fv, fl);
 	*/
 	//QTIsaac<ISAAC_SIZE, ISAAC_INT> rand(1, 2, 3);
 	//mt19937 meow(1729);
 	/*  TestAffine<float>();
-	    TestAffine<double>();*/
+		TestAffine<double>();*/
 	/*  TestRotate<float>();
-	    TestRotate<double>();
-	    return 1;
+		TestRotate<double>();
+		return 1;
 	*/
 	//MakeTestAllVarsRegPrePostComboFile("testallvarsout.flame");
 	//cout << (10.0 / 2.0 * 5.0) << endl;
@@ -2332,46 +2338,46 @@ int _tmain(int argc, _TCHAR* argv[])
 	//cout << 2 + 5 * 3 << endl;
 	/*  return 0;
 
-			    TestThreadedKernel();
+				TestThreadedKernel();
 
-			    auto palf = PaletteList<float>::Instance();
-			    Palette<float>* pal = palf->GetRandomPalette();
+				auto palf = PaletteList<float>::Instance();
+				Palette<float>* pal = palf->GetRandomPalette();
 
-			    cout << pal->Size() << endl;
+				cout << pal->Size() << endl;
 
-			    double d = 1;
+				double d = 1;
 
-			    for (int i = 0; i < 10; i++)
-			    {
-			    cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
-			    d *= 10;
-			    }
+				for (int i = 0; i < 10; i++)
+				{
+				cout << "log10(" << d << ") = " << std::max<uint>(1u, uint(std::log10(d)) + 1u) << endl;
+				d *= 10;
+				}
 
-			    return 0;*/
+				return 0;*/
 	/*
-	    uint i, iters = (uint)10e7;
-	    size_t total = 0;
+		uint i, iters = (uint)10e7;
+		size_t total = 0;
 
-	    t.Tic();
-	    for (i = 0; i < iters; i++)
-	    {
+		t.Tic();
+		for (i = 0; i < iters; i++)
+		{
 		total += rand.RandByte();
 		total += rand.Rand();
-	    }
-	    t.Toc("Isaac sum");
+		}
+		t.Toc("Isaac sum");
 
-	    cout << "Isaac total = " << total << " for " << i << " iters." << endl;
+		cout << "Isaac total = " << total << " for " << i << " iters." << endl;
 
-	    total = 0;
+		total = 0;
 
-	    t.Tic();
-	    for (i = 0; i < iters; i++)
-	    {
+		t.Tic();
+		for (i = 0; i < iters; i++)
+		{
 		total += meow();
-	    }
-	    t.Toc("Mt sum");
+		}
+		t.Toc("Mt sum");
 
-	    cout << "Mt total = " << total << " for " << i << " iters." << endl;
+		cout << "Mt total = " << total << " for " << i << " iters." << endl;
 	*/
 	//glm::vec2 solution, src[4];
 	//double bezT = 1, w[4];
@@ -2381,14 +2387,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	//BezierSolve(bezT, src, w, solution);
 	//cout << pow(-1, 5.1) << endl;
 	/*  for (i = 0; i < 2500000000; i++)
-	    {
+		{
 		double d = std::abs(RandD(rand));
 
 		if (d >= 0.5)
 			cout << d << endl;
-	    }
+		}
 
-	    return 0;*/
+		return 0;*/
 	//cout << "sizeof(Ember<float>): " << sizeof(Ember<float>) << endl;
 	//cout << "sizeof(Ember<double>): " << sizeof(Ember<double>) << endl;
 	//
@@ -2398,12 +2404,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	//cout << "sizeof(RendererCL<float>): " << sizeof(RendererCL<float>) << endl;
 	//cout << "sizeof(RendererCL<double>): " << sizeof(RendererCL<double>) << endl;
 	/*  unique_ptr<LinearVariation<float>> linV(new LinearVariation<float>());
-	    unique_ptr<PreLinearVariation<float>> preLinV(new PreLinearVariation<float>());
-	    unique_ptr<PostLinearVariation<float>> postLinV(new PostLinearVariation<float>());
+		unique_ptr<PreLinearVariation<float>> preLinV(new PreLinearVariation<float>());
+		unique_ptr<PostLinearVariation<float>> postLinV(new PostLinearVariation<float>());
 
-	    cout << linV->BaseName() << endl;
-	    cout << preLinV->BaseName() << endl;
-	    cout << postLinV->BaseName() << endl;*/
+		cout << linV->BaseName() << endl;
+		cout << preLinV->BaseName() << endl;
+		cout << postLinV->BaseName() << endl;*/
 	//float num = 1;
 	//float denom = 4294967296.0f;
 	//float frac = num / denom;
@@ -2502,12 +2508,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	TestGlobalFuncs();
 	t.Toc("TestGlobalFuncs()");
 	/*  t.Tic();
-	    TestXformsInOutPoints();
-	    t.Toc("TestXformsInOutPoints()");
+		TestXformsInOutPoints();
+		t.Toc("TestXformsInOutPoints()");
 
-	    t.Tic();
-	    TestVarTime<float>();
-	    t.Toc("TestVarTime()");
+		t.Tic();
+		TestVarTime<float>();
+		t.Toc("TestVarTime()");
 	*/
 	t.Tic();
 	TestOperations<float>();

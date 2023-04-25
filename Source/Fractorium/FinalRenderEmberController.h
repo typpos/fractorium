@@ -121,8 +121,8 @@ public:
 	bool BumpQualityRender(double d)  override;
 	bool CreateRenderer(eRendererType renderType, const vector<pair<size_t, size_t>>& devices, bool updatePreviews, bool shared = true) override;
 	int ProgressFunc(Ember<T>& ember, void* foo, double fraction, int stage, double etaMs) override;
-	size_t Index() const override { return m_Ember->m_Index; }
-	uint SizeOfT() const override { return sizeof(T); }
+	size_t Index() const noexcept override { return m_Ember->m_Index; }
+	uint SizeOfT() const noexcept override { return sizeof(T); }
 
 	//Virtual functions overridden from FinalRenderEmberControllerBase.
 	void SyncCurrentToGui() override;
@@ -151,7 +151,7 @@ protected:
 	void SyncGuiToEmber(Ember<T>& ember, size_t widthOverride = 0, size_t heightOverride = 0, bool dowidth = true, bool doheight = true);
 	bool SyncGuiToRenderer();
 	void SetProgressComplete(int val);
-	bool RenderSingleEmber(Ember<T>& ember, bool fullRender, size_t &stripForProgress);
+	bool RenderSingleEmber(Ember<T>& ember, bool fullRender, size_t& stripForProgress);
 	bool RenderSingleEmberFromSeries(std::atomic<size_t>* atomfTime, size_t index);
 
 	Ember<T>* m_Ember;

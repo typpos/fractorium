@@ -48,7 +48,7 @@ static inline bool FindIf(c& container, pr pred)
 /// <param name="val">The value to search for</param>
 /// <returns>True if the value was contained at least once, else false.</returns>
 template<class c, class T>
-static inline bool Contains(c& container, const T& val)
+static inline bool Contains(c& container, const T& val) noexcept
 {
 	return std::find_if(container.begin(), container.end(), [&](const T & t) -> bool { return t == val; }) != container.end();
 }
@@ -60,7 +60,7 @@ static inline bool Contains(c& container, const T& val)
 /// <param name="str1">The string to call find() on</param>
 /// <param name="str2">The string to search for</param>
 /// <returns>True if str2 was present at least once, else false.</returns>
-static bool Find(const string& str1, const string& str2)
+static bool Find(const string& str1, const string& str2) noexcept
 {
 	return str1.find(str2) != string::npos;
 }
@@ -71,7 +71,7 @@ static bool Find(const string& str1, const string& str2)
 /// <param name="vec">The vector to compute the size of</param>
 /// <returns>The size of one element times the length.</returns>
 template<typename T>
-static inline size_t SizeOf(const vector<T>& vec)
+static inline size_t SizeOf(const vector<T>& vec) noexcept
 {
 	return sizeof(vec[0]) * vec.size();
 }
@@ -140,7 +140,7 @@ public:
 	/// Derived classes with members that also derive from EmberReport should override this to clear
 	/// their error information as well as that of their members.
 	/// </summary>
-	virtual void ClearErrorReport() { m_ErrorReport.clear(); }
+	virtual void ClearErrorReport() noexcept { m_ErrorReport.clear(); }
 
 	/// <summary>
 	/// Return the entire error report as a single string.
@@ -310,7 +310,7 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 		ifs.exceptions(ifstream::failbit);
 		ifs.open(filename, ios::binary | ios::ate);
 
-		if (auto pos = ifs.tellg())//Ensure it exists and wasn't empty.
+		if (const auto pos = ifs.tellg())//Ensure it exists and wasn't empty.
 		{
 			buf.resize(pos + streampos(nullTerminate ? 1 : 0));
 			ifs.seekg(0, ios::beg);
@@ -465,7 +465,7 @@ static inline void Memset(vector<T>& vec, int val = 0)
 /// <param name="x">The value to return the floor of</param>
 /// <returns>The floored value</returns>
 template <typename T>
-static inline intmax_t Floor(T val)
+static inline intmax_t Floor(T val) noexcept
 {
 	if (val >= 0)
 	{
@@ -487,7 +487,7 @@ static inline intmax_t Floor(T val)
 /// <param name="max">A value which the clamped value must be less than or equal to</param>
 /// <returns>The clamped value</returns>
 template <typename T>
-static inline T Clamp(T val, T min, T max)
+static inline T Clamp(T val, T min, T max) noexcept
 {
 	if (val < min)
 		return min;
@@ -498,7 +498,7 @@ static inline T Clamp(T val, T min, T max)
 }
 
 template <>
-STATIC float Clamp<float>(float val, float min, float max)
+STATIC float Clamp<float>(float val, float min, float max) noexcept
 {
 	if (val < min)
 		return min;
@@ -511,7 +511,7 @@ STATIC float Clamp<float>(float val, float min, float max)
 }
 
 template <>
-STATIC double Clamp<double>(double val, double min, double max)
+STATIC double Clamp<double>(double val, double min, double max) noexcept
 {
 	if (val < min)
 		return min;
@@ -533,7 +533,7 @@ STATIC double Clamp<double>(double val, double min, double max)
 /// <param name="max">A value which the clamped value must be less than or equal to</param>
 /// <returns>The clamped and modded value</returns>
 template <typename T>
-static inline T ClampMod(T val, T min, T max)
+static inline T ClampMod(T val, T min, T max) noexcept
 {
 	if (val < min)
 		return min + fmod(val - min, max - min);
@@ -552,7 +552,7 @@ static inline T ClampMod(T val, T min, T max)
 /// <param name="min">A value which the clamped value must be greater than or equal to</param>
 /// <param name="max">A value which the clamped value must be less than or equal to</param>
 template <typename T>
-static inline void ClampRef(T& val, T min, T max)
+static inline void ClampRef(T& val, T min, T max) noexcept
 {
 	if (val < min)
 		val = min;
@@ -561,7 +561,7 @@ static inline void ClampRef(T& val, T min, T max)
 }
 
 template <>
-STATIC void ClampRef<float>(float& val, float min, float max)
+STATIC void ClampRef<float>(float& val, float min, float max) noexcept
 {
 	if (val < min)
 		val = min;
@@ -572,7 +572,7 @@ STATIC void ClampRef<float>(float& val, float min, float max)
 }
 
 template <>
-STATIC void ClampRef<double>(double& val, double min, double max)
+STATIC void ClampRef<double>(double& val, double min, double max) noexcept
 {
 	if (val < min)
 		val = min;
@@ -588,21 +588,21 @@ STATIC void ClampRef<double>(double& val, double min, double max)
 /// <param name="val">The reference value to be clamped in place</param>
 /// <param name="gte">A value which the clamped value must be less than or equal to</param>
 template <typename T>
-static inline void ClampLteRef(T& val, T lte)
+static inline void ClampLteRef(T& val, T lte) noexcept
 {
 	if (val > lte)
 		val = lte;
 }
 
 template <>
-STATIC void ClampLteRef<float>(float& val, float lte)
+STATIC void ClampLteRef<float>(float& val, float lte) noexcept
 {
 	if (val > lte || !std::isfinite(val))
 		val = lte;
 }
 
 template <>
-STATIC void ClampLteRef<double>(double& val, double lte)
+STATIC void ClampLteRef<double>(double& val, double lte) noexcept
 {
 	if (val > lte || !std::isfinite(val))
 		val = lte;
@@ -616,13 +616,13 @@ STATIC void ClampLteRef<double>(double& val, double lte)
 /// <param name="gte">A value which the clamped value must be greater than or equal to</param>
 /// <returns>The clamped value</returns>
 template <typename T>
-static inline T ClampGte(T val, T gte)
+static inline T ClampGte(T val, T gte) noexcept
 {
 	return (val < gte) ? gte : val;
 }
 
 template <>
-STATIC float ClampGte<float>(float val, float gte)
+STATIC float ClampGte<float>(float val, float gte) noexcept
 {
 	if (val < gte || !std::isfinite(val))
 		return gte;
@@ -631,7 +631,7 @@ STATIC float ClampGte<float>(float val, float gte)
 }
 
 template <>
-STATIC double ClampGte<double>(double val, double gte)
+STATIC double ClampGte<double>(double val, double gte) noexcept
 {
 	if (val < gte || !std::isfinite(val))
 		return gte;
@@ -645,21 +645,21 @@ STATIC double ClampGte<double>(double val, double gte)
 /// <param name="val">The reference value to be clamped in place</param>
 /// <param name="gte">A value which the clamped value must be greater than or equal to</param>
 template <typename T>
-static inline void ClampGteRef(T& val, T gte)
+static inline void ClampGteRef(T& val, T gte) noexcept
 {
 	if (val < gte)
 		val = gte;
 }
 
 template <>
-STATIC void ClampGteRef<float>(float& val, float gte)
+STATIC void ClampGteRef<float>(float& val, float gte) noexcept
 {
 	if (val < gte || !std::isfinite(val))
 		val = gte;
 }
 
 template <>
-STATIC void ClampGteRef<double>(double& val, double gte)
+STATIC void ClampGteRef<double>(double& val, double gte) noexcept
 {
 	if (val < gte || !std::isfinite(val))
 		val = gte;
@@ -671,7 +671,7 @@ STATIC void ClampGteRef<double>(double& val, double gte)
 /// <param name="val">The value to be clamped</param>
 /// <returns>The clamped value</returns>
 template <typename T>
-static inline T ClampGte0(T val)
+static inline T ClampGte0(T val) noexcept
 {
 	return ClampGte<T>(val, 0);
 }
@@ -681,7 +681,7 @@ static inline T ClampGte0(T val)
 /// </summary>
 /// <param name="val">The reference value to be clamped in place</param>
 template <typename T>
-static inline void ClampGte0Ref(T& val)
+static inline void ClampGte0Ref(T& val) noexcept
 {
 	ClampGteRef<T>(val, 0);
 }
@@ -692,7 +692,7 @@ static inline void ClampGte0Ref(T& val)
 /// <param name="r">The value to round</param>
 /// <returns>The rounded value</returns>
 template <typename T>
-static inline T Round(T r)
+static inline T Round(T r) noexcept
 {
 	return (r > 0) ? static_cast<T>(Floor<T>(r + T(0.5))) : std::ceil(r - T(0.5));
 }
@@ -703,7 +703,7 @@ static inline T Round(T r)
 /// <param name="r">The value to round</param>
 /// <returns>The rounded value</returns>
 template <typename T>
-static inline T Round6(T r)
+static inline T Round6(T r) noexcept
 {
 	r *= 1e6;
 
@@ -721,7 +721,7 @@ static inline T Round6(T r)
 /// <param name="v">The value to square</param>
 /// <returns>The squared value</returns>
 template <typename T>
-static inline T Sqr(T t)
+static inline T Sqr(T t) noexcept
 {
 	return t * t;
 }
@@ -734,25 +734,25 @@ static inline T Sqr(T t)
 /// <param name="v">The value to cube</param>
 /// <returns>The cubed value</returns>
 template <typename T>
-static inline T Cube(T t)
+static inline T Cube(T t) noexcept
 {
 	return t * t * t;
 }
 
 template <typename T>
-static inline T SafeTan(T x)
+static inline T SafeTan(T x) noexcept
 {
 	return x;
 }
 
 template <>
-STATIC float SafeTan<float>(float x)
+STATIC float SafeTan<float>(float x) noexcept
 {
 	return std::tan(Clamp<float>(x, FLOAT_MIN_TAN, FLOAT_MAX_TAN));
 }
 
 template <>
-STATIC double SafeTan<double>(double x)
+STATIC double SafeTan<double>(double x) noexcept
 {
 	return std::tan(x);
 }
@@ -764,7 +764,7 @@ STATIC double SafeTan<double>(double x)
 /// <param name="y">The y distance</param>
 /// <returns>EPS or the value if it was non-zero</returns>
 template <typename T>
-static inline T Zeps(T x)
+static inline T Zeps(T x) noexcept
 {
 	return x == 0 ? EPS : x;
 }
@@ -777,7 +777,7 @@ static inline T Zeps(T x)
 /// <param name="p">The percentage between the two values to calculate.</param>
 /// <returns>The interpolated value.</returns>
 template <typename T>
-static inline T Lerp(T a, T b, T p)
+static inline T Lerp(T a, T b, T p) noexcept
 {
 	return a + (b - a) * p;
 }
@@ -802,7 +802,7 @@ static inline bool Compare(const xmlChar* name, const char* val)
 /// <param name="tolerance">The tolerance. Default: 1e-6.</param>
 /// <returns>True if the value was very close to zero, else false</returns>
 template <typename T>
-static inline bool IsNearZero(T val, T tolerance = 1e-6)
+static inline bool IsNearZero(T val, T tolerance = 1e-6) noexcept
 {
 	return (val > -tolerance && val < tolerance);
 }
@@ -816,7 +816,7 @@ static inline bool IsNearZero(T val, T tolerance = 1e-6)
 /// <param name="tolerance">The tolerance. Default: 1e-6.</param>
 /// <returns>True if the values were very close to each other, else false</returns>
 template <typename T>
-static inline bool IsClose(T val1, T val2, T tolerance = 1e-6)
+static inline bool IsClose(T val1, T val2, T tolerance = 1e-6) noexcept
 {
 	return IsNearZero(val1 - val2, tolerance);
 }
@@ -827,7 +827,7 @@ static inline bool IsClose(T val1, T val2, T tolerance = 1e-6)
 /// <param name="angle">The angle to normalize</param>
 /// <returns>The normalized angle in a range of -180 - 180</returns>
 template <typename T>
-static inline T NormalizeDeg180(T angle)
+static inline T NormalizeDeg180(T angle) noexcept
 {
 	auto a = fmod(angle, T(360));
 
@@ -845,7 +845,7 @@ static inline T NormalizeDeg180(T angle)
 /// <param name="angle">The angle to normalize</param>
 /// <returns>The normalized angle in a range of 0 - 360</returns>
 template <typename T>
-static inline T NormalizeDeg360(T angle)
+static inline T NormalizeDeg360(T angle) noexcept
 {
 	if (angle > 360 || angle < -360)
 		angle = fmod(angle, T(360));
@@ -862,7 +862,7 @@ static inline T NormalizeDeg360(T angle)
 /// <param name="Angle">The angle to convert</param>
 /// <returns>The trig equivalent of the angle passed in</returns>
 template <typename T>
-static inline T ToTrigAngle(T angle)
+static inline T ToTrigAngle(T angle) noexcept
 {
 	return NormalizeDeg360(90 - angle);
 }
@@ -1164,7 +1164,7 @@ static void Join(std::vector<std::thread>& vec)
 /// <summary>
 /// Return a character pointer to a version string composed of the EMBER_OS and EMBER_VERSION values.
 /// </summary>
-static inline const char* EmberVersion()
+static inline const char* EmberVersion() noexcept
 {
 	return EMBER_OS "-" EMBER_VERSION;
 }

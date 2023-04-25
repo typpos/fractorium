@@ -555,7 +555,7 @@ public:
 	/// <summary>
 	/// Compute color cache values: color speed and one minus color speed.
 	/// </summary>
-	void CacheColorVals()
+	void CacheColorVals() noexcept
 	{
 		//Figure out which is right. //TODO.
 		//m_ColorSpeedCache = m_ColorX * (1 - m_ColorSpeed) / 2;//Apo style.
@@ -572,7 +572,7 @@ public:
 	/// </summary>
 	/// <param name="i">The xaos index to retrieve</param>
 	/// <returns>The value at the index if in range, else 1.</returns>
-	T Xaos(size_t i) const
+	T Xaos(size_t i) const noexcept
 	{
 		return i < m_Xaos.size() ? m_Xaos[i] : 1;
 	}
@@ -605,7 +605,7 @@ public:
 	/// of the parent ember is anything other than 1.
 	/// </summary>
 	/// <returns>True if found, else false.</returns>
-	bool XaosPresent() const
+	bool XaosPresent() const noexcept
 	{
 		if (m_ParentEmber)
 			for (size_t i = 0; i < m_Xaos.size(); i++)
@@ -859,25 +859,25 @@ public:
 	/// The precalc flags are duplicated in each variation. Each value here
 	/// is true if any of the variations need it precalculated.
 	/// </summary>
-	inline bool NeedPrecalcSumSquares()     const { return m_NeedPrecalcSumSquares; }
-	inline bool NeedPrecalcSqrtSumSquares() const { return m_NeedPrecalcSqrtSumSquares; }
-	inline bool NeedPrecalcAngles()         const { return m_NeedPrecalcAngles; }
-	inline bool NeedPrecalcAtanXY()         const { return m_NeedPrecalcAtanXY; }
-	inline bool NeedPrecalcAtanYX()         const { return m_NeedPrecalcAtanYX; }
-	inline bool NeedAnyPrecalc()            const { return NeedPrecalcSumSquares() || NeedPrecalcSqrtSumSquares() || NeedPrecalcAngles() || NeedPrecalcAtanXY() || NeedPrecalcAtanYX(); }
-	bool HasPre() const { return m_HasPre; }
-	bool HasPost() const { return m_HasPost; }
-	size_t PreVariationCount()   const { return m_PreVariations.size(); }
-	size_t VariationCount()      const { return m_Variations.size(); }
-	size_t PostVariationCount()  const { return m_PostVariations.size(); }
-	size_t TotalVariationCount() const { return PreVariationCount() + VariationCount() + PostVariationCount(); }
-	bool Empty() const { return TotalVariationCount() == 0 && m_Affine.IsID(); }//Use this instead of padding like the original did.
-	T ColorSpeedCache() const { return m_ColorSpeedCache; }
-	T OneMinusColorCache() const { return m_OneMinusColorCache; }
-	const vector<T>& XaosVec() const { return m_Xaos; }
-	Ember<T>* ParentEmber() const { return m_ParentEmber; }
+	inline bool NeedPrecalcSumSquares()     const noexcept { return m_NeedPrecalcSumSquares; }
+	inline bool NeedPrecalcSqrtSumSquares() const noexcept { return m_NeedPrecalcSqrtSumSquares; }
+	inline bool NeedPrecalcAngles()         const noexcept { return m_NeedPrecalcAngles; }
+	inline bool NeedPrecalcAtanXY()         const noexcept { return m_NeedPrecalcAtanXY; }
+	inline bool NeedPrecalcAtanYX()         const noexcept { return m_NeedPrecalcAtanYX; }
+	inline bool NeedAnyPrecalc()            const noexcept { return NeedPrecalcSumSquares() || NeedPrecalcSqrtSumSquares() || NeedPrecalcAngles() || NeedPrecalcAtanXY() || NeedPrecalcAtanYX(); }
+	bool HasPre() const noexcept { return m_HasPre; }
+	bool HasPost() const noexcept { return m_HasPost; }
+	size_t PreVariationCount()   const noexcept { return m_PreVariations.size(); }
+	size_t VariationCount()      const noexcept { return m_Variations.size(); }
+	size_t PostVariationCount()  const noexcept { return m_PostVariations.size(); }
+	size_t TotalVariationCount() const noexcept { return PreVariationCount() + VariationCount() + PostVariationCount(); }
+	bool Empty() const noexcept { return TotalVariationCount() == 0 && m_Affine.IsID(); }//Use this instead of padding like the original did.
+	T ColorSpeedCache() const noexcept { return m_ColorSpeedCache; }
+	T OneMinusColorCache() const noexcept { return m_OneMinusColorCache; }
+	const vector<T>& XaosVec() const noexcept { return m_Xaos; }
+	Ember<T>* ParentEmber() const noexcept { return m_ParentEmber; }
 	void ParentEmber(Ember<T>* ember) { m_ParentEmber = ember; }
-	intmax_t IndexInParentEmber() const { return m_ParentEmber ? m_ParentEmber->GetTotalXformIndex(const_cast<Xform<T>*>(this)) : -1; }
+	intmax_t IndexInParentEmber() const noexcept { return m_ParentEmber ? m_ParentEmber->GetTotalXformIndex(const_cast<Xform<T>*>(this)) : -1; }
 
 	/// <summary>
 	/// Set the precalc flags based on whether any variation in the vector needs them.
@@ -973,7 +973,7 @@ public:
 				{
 					if (var->m_Weight != 0)//This should never happen, but just to be safe.
 					{
-						if (FindIf(names, [&] (const string & s) -> bool { return !_stricmp(s.c_str(), var->Name().c_str()); })) //If any variation is present, don't flatten.
+						if (FindIf(names, [&] (const string& s) -> bool { return !_stricmp(s.c_str(), var->Name().c_str()); }))  //If any variation is present, don't flatten.
 						{
 							shouldFlatten = false;
 							keepGoing = false;
@@ -1079,7 +1079,7 @@ public:
 	/// </summary>
 	/// <param name="helper">The helper to store the output values in</param>
 	/// <param name="assignType">The type of assignment this variation uses, assign or sum.</param>
-	inline void WritePost(IteratorHelper<T>& helper, Point<T>& outPoint, eVariationAssignType assignType)
+	inline void WritePost(IteratorHelper<T>& helper, Point<T>& outPoint, eVariationAssignType assignType) noexcept
 	{
 		switch (assignType)
 		{

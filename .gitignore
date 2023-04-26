@@ -259,3 +259,5 @@ Builds/include/GL
 /main.pro.user.294b646
 /Deps/Include/Imath
 /Builds/MSVC/Solution/.vs/Fractorium
+/Builds/QtCreator/Ember/.qtc_clangd/compile_commands.json
+/Builds/QtCreator/Fractorium/.qtc_clangd/compile_commands.json

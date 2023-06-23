@@ -1,6 +1,6 @@
 VERSION = 22.21.4.2
 win32:CONFIG += skip_target_version_ext
-CONFIG += c++20
+CONFIG += c++2a
 
 #message(PWD: $$absolute_path($$PWD))
 
@@ -191,7 +191,7 @@ win32 {
 	QMAKE_CXXFLAGS += -fPIC
 	QMAKE_CXXFLAGS += -fpermissive
 	QMAKE_CXXFLAGS += -pedantic
-        QMAKE_CXXFLAGS += -std=c++20
+        QMAKE_CXXFLAGS += -std=c++2a
 	QMAKE_CXXFLAGS += -Wnon-virtual-dtor
 	QMAKE_CXXFLAGS += -Wshadow
 	QMAKE_CXXFLAGS += -Winit-self

@@ -93,6 +93,7 @@ cp $EXTRA_LIBS/libImath.so $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libjpeg.so.8 $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libpng16.so.16 $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libOpenCL.so.1 $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libxcb-cursor.so.0 $FRACTORIUM_LIB
 
 cp $DATA_PATH/dark_linux.qss $FRACTORIUM_BIN
 cp $DATA_PATH/lightdark.qss $FRACTORIUM_BIN

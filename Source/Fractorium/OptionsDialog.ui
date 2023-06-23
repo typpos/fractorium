@@ -947,12 +947,12 @@
   <customwidget>
    <class>SpinBox</class>
    <extends>QWidget</extends>
-   <header>spinbox.h</header>
+   <header>SpinBox.h</header>
   </customwidget>
   <customwidget>
    <class>DoubleSpinBox</class>
    <extends>QWidget</extends>
-   <header>doublespinbox.h</header>
+   <header>DoubleSpinBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

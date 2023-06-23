@@ -25,6 +25,10 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	m_Info = OpenCLInfo::Instance();
 	m_Fractorium = qobject_cast<Fractorium*>(p);
 	m_Settings = FractoriumSettings::DefInstance();
+	ui.FinalRenderIterationProgress->setAlignment(Qt::AlignCenter);
+	ui.FinalRenderFilteringProgress->setAlignment(Qt::AlignCenter);
+	ui.FinalRenderAccumProgress->setAlignment(Qt::AlignCenter);
+	ui.FinalRenderTotalProgress->setAlignment(Qt::AlignCenter);
 	ui.FinalRenderThreadCountSpin->setRange(1, Timing::ProcessorCount());
 	connect(ui.FinalRenderEarlyClipCheckBox,	   SIGNAL(stateChanged(int)),		 this, SLOT(OnEarlyClipCheckBoxStateChanged(int)),		 Qt::QueuedConnection);
 	connect(ui.FinalRenderYAxisUpCheckBox,	       SIGNAL(stateChanged(int)),		 this, SLOT(OnYAxisUpCheckBoxStateChanged(int)),		 Qt::QueuedConnection);
@@ -44,7 +48,7 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	SetupSpinner<SpinBox, int>(ui.FinalRenderSizeTable, this, row, -1, m_WidthSpin,  spinHeight, 10, std::numeric_limits<int>::max(), 10, SIGNAL(valueChanged(int)), SLOT(OnWidthChanged(int)), true, 1920, 1920, 1920);
 	SetupSpinner<DoubleSpinBox, double>(ui.FinalRenderSizeTable, this, row, -1, m_HeightScaleSpin, spinHeight, 0.001, 99.99, 0.1, SIGNAL(valueChanged(double)), SLOT(OnHeightScaleChanged(double)), true, 1.0, 1.0, 1.0);
 	SetupSpinner<SpinBox, int>(ui.FinalRenderSizeTable, this, row, -1, m_HeightSpin, spinHeight, 10, std::numeric_limits<int>::max(), 10, SIGNAL(valueChanged(int)), SLOT(OnHeightChanged(int)), true, 1080, 1080, 1080);
-	m_SubBatchPctSpin = (DoubleSpinBox*)ui.FinalRenderOpenCLSubBatchPctSpin;
+	m_SubBatchPctSpin = ui.FinalRenderOpenCLSubBatchPctSpin;
 	m_SubBatchPctSpin->DoubleClick(true);
 	m_SubBatchPctSpin->DoubleClickZero(0.025);
 	m_SubBatchPctSpin->DoubleClickNonZero(0.025);

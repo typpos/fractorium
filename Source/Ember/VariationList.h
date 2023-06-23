@@ -49,7 +49,7 @@ public:
 	const vector<const Variation<T>*>& NonParametricVariations() const;
 	const vector<const ParametricVariation<T>*>& ParametricVariations() const;
 
-	SINGLETON_DERIVED_DECL(VariationList<T>);
+	SINGLETON_DERIVED_DECL_T(VariationList, T);
 
 private:
 	VariationList();

@@ -148,6 +148,7 @@ Fractorium::Fractorium(QWidget* p)
 	m_ProgressBar->setMaximumHeight(progressBarHeight);
 	m_ProgressBar->setMinimumWidth(progressBarWidth);
 	m_ProgressBar->setMaximumWidth(progressBarWidth);
+	m_ProgressBar->setAlignment(Qt::AlignCenter);
 	ui.StatusBar->addPermanentWidget(m_ProgressBar);
 	//Setup pointer in the GL window to point back to here.
 	ui.GLDisplay->SetMainWindow(this);
@@ -197,8 +198,24 @@ Fractorium::Fractorium(QWidget* p)
 	{
 		if (!QStyleFactory::keys().empty())
 		{
-			m_Theme = QStyleFactory::create(qApp->style()->objectName());
-			setStyle(m_Theme);
+			auto foundFusion = false;
+
+			for (auto& s : QStyleFactory::keys())
+			{
+				if (s.compare("fusion", Qt::CaseInsensitive) == 0)//Default to fusion if it exists and the style has not been set yet.
+				{
+					m_Theme = QStyleFactory::create(s);
+					setStyle(m_Theme);
+					foundFusion = true;
+					break;
+				}
+			}
+
+			if (!foundFusion)
+			{
+				m_Theme = QStyleFactory::create(qApp->style()->objectName());
+				setStyle(m_Theme);
+			}
 		}
 	}
 

@@ -709,7 +709,7 @@ public:
 		}
 	}
 
-	SINGLETON_DERIVED_IMPL(VarFuncs<T>);
+	SINGLETON_DERIVED_IMPL_T(VarFuncs, T);
 
 private:
 	/// <summary>

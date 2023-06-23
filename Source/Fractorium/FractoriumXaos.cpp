@@ -176,16 +176,16 @@ void Fractorium::FillXaosTable()
 	m_AppliedXaosTableModel->setVerticalHeaderLabels(vl);
 	ui.XaosDistVizTableWidget->setRowCount(1);
 	ui.XaosDistVizTableWidget->setColumnCount(count);
-	ui.XaosDistVizTableWidget->setHorizontalHeaderLabels(hl);
-	ui.XaosDistVizTableWidget->setVerticalHeaderLabels(blanks);
 	ui.XaosDistVizTableWidget->verticalHeader()->setSectionsClickable(false);
 	ui.XaosDistVizTableWidget->horizontalHeader()->setSectionsClickable(false);
 	ui.XaosTableView->setModel(m_XaosTableModel);
 	ui.XaosAppliedTableView->setModel(m_AppliedXaosTableModel);
 	ui.XaosTableView->setItemDelegate(m_XaosTableItemDelegate);//No need for a delegate on the applied table because it's read-only.
-	ui.XaosDistVizTableWidget->verticalHeader()->setFixedWidth(ui.XaosTableView->verticalHeader()->width());
-	SetTabOrder(this, ui.ClearXaosButton, ui.RandomXaosButton);
 	ui.XaosDistVizTableWidget->setRowHeight(0, ui.XaosTableView->rowHeight(0) * count);
+	ui.XaosDistVizTableWidget->setHorizontalHeaderLabels(hl);
+	ui.XaosDistVizTableWidget->setVerticalHeaderLabels(vl);
+	SetTabOrder(this, ui.ClearXaosButton, ui.RandomXaosButton);
+	ui.XaosDistVizTableWidget->verticalHeader()->setStyleSheet("QHeaderView::section::vertical { color: rgba(0, 0, 0, 0); }");
 	m_Controller->FillXaos();
 	m_Controller->FillAppliedXaos();
 	//Needed to get the dark stylesheet to correctly color the top left corner button.

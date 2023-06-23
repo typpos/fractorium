@@ -4,12 +4,11 @@ You should keep this at the top of whatever custom style you make to ensure the 
 /*
 QTabBar::tab { height: 4ex; }
 */
-/*
+/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 *
 {
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";
 }
-*/
 
 /*Specific styles below this line*/
 Fractorium
@@ -132,7 +131,7 @@ QCheckBox::indicator:enabled:checked,
 QTableView::indicator:enabled:checked
 {
 	background-color: lightgray;
-    image: url(:/Fractorium/Icons/checkbox_checked.png);
+	image: url(:/Fractorium/Icons/checkbox_checked.png);
 }
 
 QCheckBox::indicator:disabled:unchecked,
@@ -146,7 +145,7 @@ QCheckBox::indicator:disabled:checked,
 QTableView::indicator:disabled:checked
 {
 	background-color: gray;
-    image: none;
+	image: none;
 }
 
 QRadioButton::indicator:checked
@@ -212,9 +211,9 @@ QComboBox::item:selected
 
 QComboBox QAbstractItemView
 {
-    border: 1px solid gray;
+	border: 1px solid gray;
 	outline: none;
-    selection-background-color: darkgray;
+	selection-background-color: darkgray;
 }
 
 QTableView QComboBox
@@ -241,9 +240,9 @@ QProgressBar
 {
 	color: black;
 	background-color: gray;
-    border: 0px none gray;
+	border: 0px none gray;
 	border-radius: 3px;
-	text-align: center;
+	text-align: center center;
 }
 
 QProgressBar::chunk
@@ -294,8 +293,8 @@ QGroupBox
 {
 	padding-top: 3px;
 	border: 2px solid gray;
-    border-radius: 4px;
-    margin-top: 3ex;
+	border-radius: 4px;
+	margin-top: 3ex;
 }
 
 QGroupBox::title
@@ -483,15 +482,15 @@ QScrollBar::sub-line::vertical
 
 QScrollBar::up-arrow::vertical, QScrollBar::down-arrow::vertical
 {
-     border: 2px solid darkgray;
-     width: 5px;
-     height: 12px;
-     background-color: gray;
+	border: 2px solid darkgray;
+	width: 5px;
+	height: 12px;
+	background-color: gray;
 }
 
 QScrollBar::add-page::vertical, QScrollBar::sub-page::vertical, QScrollBar::add-page::horizontal, QScrollBar::sub-page::horizontal
 {
-     background-color: darkgray;
+	background-color: darkgray;
 }
 
 QScrollBar::horizontal
@@ -530,10 +529,10 @@ QScrollBar::sub-line::horizontal
 
 QScrollBar::left-arrow::horizontal, QScrollBar::right-arrow::horizontal
 {
-    border: 2px solid darkgray;
-    width: 12px;
-    height: 5px;
-    background-color: gray;
+	border: 2px solid darkgray;
+	width: 12px;
+	height: 5px;
+	background-color: gray;
 }
 
 QMenu::separator

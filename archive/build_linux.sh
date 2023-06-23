@@ -12,9 +12,9 @@ FRACTORIUM_RPM_PACKAGE=$BUILD_PATH/../Bin/rpmbuild
 EXTRA_LIBS=/usr/lib/x86_64-linux-gnu
 
 # replace 5.12.8 by your QT version, and ensure the installation path is the same
-QT_PATH=/home/$USER/Dev/Qt/5.12.8/gcc_64/bin
+QT_PATH=/home/$USER/Dev/Qt/6.5.1/gcc_64/bin
 
-LINUX_DEPLOY_QT=/home/$USER/Dev/linuxdeployqt-6-x86_64.AppImage
+LINUX_DEPLOY_QT=/home/$USER/Dev/linuxdeployqt-continuous-x86_64.AppImage
 APP_IMAGE_TOOL=/home/$USER/Dev/appimagetool-x86_64.AppImage
 
 #######################
@@ -84,12 +84,12 @@ cp $FRACTORIUM_RELEASE_ROOT/ember* $FRACTORIUM_BIN
 cp $FRACTORIUM_RELEASE_ROOT/fractorium $FRACTORIUM_BIN
 cp $FRACTORIUM_RELEASE_ROOT/lib* $FRACTORIUM_LIB
 
-cp $EXTRA_LIBS/libHalf.so.12 $FRACTORIUM_LIB
-cp $EXTRA_LIBS/libIex-2_2.so.12 $FRACTORIUM_LIB
-cp $EXTRA_LIBS/libIexMath-2_2.so.12 $FRACTORIUM_LIB
-cp $EXTRA_LIBS/libIlmImf-2_2.so.22 $FRACTORIUM_LIB
-cp $EXTRA_LIBS/libIlmThread-2_2.so.12 $FRACTORIUM_LIB
-cp $EXTRA_LIBS/libImath-2_2.so.12 $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libHalf.so $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libIex.so $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libIexMath.so $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libIlmImf.so $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libIlmThread.so $FRACTORIUM_LIB
+cp $EXTRA_LIBS/libImath.so $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libjpeg.so.8 $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libpng16.so.16 $FRACTORIUM_LIB
 cp $EXTRA_LIBS/libOpenCL.so.1 $FRACTORIUM_LIB

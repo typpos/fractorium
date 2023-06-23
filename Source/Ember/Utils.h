@@ -277,9 +277,25 @@ protected:
 	x(const x& other) = delete; \
 	const x& operator=(const x& other) = delete//Semicolon deliberately omitted to force it on the caller.
 
+//Use this if the body of the destructor will be implemented in a cpp file and the type is templated.
+#define SINGLETON_DERIVED_DECL_T(x, T) \
+	friend class Singleton<x<T>>; \
+	public: \
+	~x(); \
+	x(const x& other) = delete; \
+	const x& operator=(const x& other) = delete//Semicolon deliberately omitted to force it on the caller.
+
 //Use this if the body of the destructor is empty and is will be implemented inline in the header file.
 #define SINGLETON_DERIVED_IMPL(x) \
 	friend class Singleton<x>; \
+	public: \
+	~x(){} \
+	x(const x& other) = delete; \
+	const x& operator=(const x& other) = delete
+
+//Use this if the body of the destructor is empty and is will be implemented inline in the header file and the type is templated.
+#define SINGLETON_DERIVED_IMPL_T(x, T) \
+	friend class Singleton<x<T>>; \
 	public: \
 	~x(){} \
 	x(const x& other) = delete; \

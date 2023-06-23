@@ -77,8 +77,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1279</width>
-      <height>980</height>
+      <width>1280</width>
+      <height>985</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -170,7 +170,7 @@
             <x>0</x>
             <y>0</y>
             <width>230</width>
-            <height>931</height>
+            <height>926</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -480,9 +480,6 @@
               <property name="text">
                <string>Geometry</string>
               </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
-              </property>
              </column>
             </widget>
            </item>
@@ -560,9 +557,6 @@
              <column>
               <property name="text">
                <string>Iteration</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
               </property>
              </column>
             </widget>
@@ -660,9 +654,6 @@
              <column>
               <property name="text">
                <string>Filter</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
               </property>
              </column>
             </widget>
@@ -1324,9 +1315,6 @@
               <property name="text">
                <string>Animation</string>
               </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
-              </property>
              </column>
             </widget>
            </item>
@@ -1864,9 +1852,6 @@
               <property name="text">
                <string>Color</string>
               </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
-              </property>
              </column>
             </widget>
            </item>
@@ -1895,7 +1880,7 @@
      <property name="minimumSize">
       <size>
        <width>310</width>
-       <height>439</height>
+       <height>444</height>
       </size>
      </property>
      <property name="floating">
@@ -2465,8 +2450,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>285</width>
-            <height>675</height>
+            <width>307</width>
+            <height>674</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -3155,7 +3140,7 @@
             <x>0</x>
             <y>0</y>
             <width>291</width>
-            <height>874</height>
+            <height>869</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -3533,32 +3518,20 @@
               <property name="text">
                <string>Weight</string>
               </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
-              </property>
              </column>
              <column>
               <property name="text">
                <string>Name</string>
-              </property>
-              <property name="textAlignment">
-               <set>AlignCenter</set>
               </property>
              </column>
              <item row="0" column="0">
               <property name="text">
                <string/>
               </property>
-              <property name="textAlignment">
-               <set>AlignLeading|AlignVCenter</set>
-              </property>
              </item>
              <item row="0" column="1">
               <property name="text">
                <string/>
-              </property>
-              <property name="textAlignment">
-               <set>AlignLeading|AlignVCenter</set>
               </property>
              </item>
             </widget>
@@ -3761,9 +3734,6 @@
                   <property name="toolTip">
                    <string/>
                   </property>
-                  <property name="textAlignment">
-                   <set>AlignLeading|AlignVCenter</set>
-                  </property>
                  </item>
                 </widget>
                </item>
@@ -3845,7 +3815,7 @@
                   <bool>false</bool>
                  </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
-                  <number>21</number>
+                  <number>24</number>
                  </attribute>
                  <attribute name="verticalHeaderHighlightSections">
                   <bool>false</bool>
@@ -4124,9 +4094,6 @@
                     <kerning>true</kerning>
                    </font>
                   </property>
-                  <property name="textAlignment">
-                   <set>AlignLeading|AlignVCenter</set>
-                  </property>
                  </item>
                  <item row="1" column="0">
                   <property name="text">
@@ -4155,6 +4122,19 @@
                   </property>
                  </item>
                 </widget>
+               </item>
+               <item row="6" column="0">
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
                <item row="5" column="0">
                 <widget class="QCheckBox" name="SoloXformCheckBox">
@@ -6279,8 +6259,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>267</width>
-                       <height>656</height>
+                       <width>269</width>
+                       <height>650</height>
                       </rect>
                      </property>
                      <property name="sizePolicy">
@@ -6410,7 +6390,7 @@
             <x>0</x>
             <y>0</y>
             <width>291</width>
-            <height>854</height>
+            <height>849</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -7153,9 +7133,6 @@
                        <kerning>true</kerning>
                       </font>
                      </property>
-                     <property name="textAlignment">
-                      <set>AlignLeading|AlignVCenter</set>
-                     </property>
                     </item>
                    </widget>
                   </item>
@@ -7291,7 +7268,7 @@
      <x>0</x>
      <y>0</y>
      <width>1712</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">
@@ -7524,8 +7501,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>422</width>
-           <height>587</height>
+           <width>418</width>
+           <height>631</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -7534,7 +7511,7 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_10" stretch="3,0,8">
+         <layout class="QVBoxLayout" name="verticalLayout_10" stretch="3,0,8,0">
           <property name="spacing">
            <number>4</number>
           </property>
@@ -8081,11 +8058,11 @@
               <property name="prefix">
                <string>Animation FPS: </string>
               </property>
-              <property name="maximum">
-               <number>200</number>
-              </property>
               <property name="minimum">
                <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>200</number>
               </property>
               <property name="value">
                <number>30</number>
@@ -8140,9 +8117,9 @@
              </widget>
             </item>
            </layout>
-           </item>
-           <item>
-           <layout class="QHBoxLayout" name="SequenceAnimateButtonsHLayout" stretch="0,0,0,0">
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="SequenceAnimateButtonsHLayout" stretch="0,0">
             <property name="spacing">
              <number>2</number>
             </property>

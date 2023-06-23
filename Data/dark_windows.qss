@@ -133,7 +133,7 @@ QCheckBox::indicator:enabled:checked,
 QTableView::indicator:enabled:checked
 {
 	background-color: lightgray;
-    image: url(:/Fractorium/Icons/checkbox_checked.png);
+	image: url(:/Fractorium/Icons/checkbox_checked.png);
 }
 
 QCheckBox::indicator:disabled:unchecked,
@@ -147,7 +147,7 @@ QCheckBox::indicator:disabled:checked,
 QTableView::indicator:disabled:checked
 {
 	background-color: gray;
-    image: none;
+	image: none;
 }
 
 QRadioButton::indicator:checked
@@ -242,15 +242,15 @@ QProgressBar
 {
 	color: black;
 	background-color: gray;
-    border: 0px none gray;
+	border: 0px none gray;
 	border-radius: 3px;
-	text-align: center;
+	text-align: center center;
 }
 
 QProgressBar::chunk
 {
 	border-radius: 3px;
-    background-color: lightgray;
+	background-color: lightgray;
 }
 
 QStatusBar QProgressBar
@@ -295,8 +295,8 @@ QGroupBox
 {
 	padding-top: 3px;
 	border: 2px solid gray;
-    border-radius: 4px;
-    margin-top: 3ex;
+	border-radius: 4px;
+	margin-top: 3ex;
 }
 
 QGroupBox::title
@@ -351,7 +351,7 @@ QTreeView::item:selected
 
 QTreeView::branch:!has-children
 {
-       background:  rgb(53, 53, 53);
+	background:  rgb(53, 53, 53);
 }
 
 QTreeView::branch:has-children:closed
@@ -457,7 +457,7 @@ QScrollBar::vertical
 
 QScrollBar::handle::vertical
 {
-    background-color: gray;
+	background-color: gray;
 	border-top: 1px solid darkgray;
 	border-bottom: 1px solid darkgray;
 	min-height: 20px;
@@ -483,15 +483,15 @@ QScrollBar::sub-line::vertical
 
 QScrollBar::up-arrow::vertical, QScrollBar::down-arrow::vertical
 {
-     border: 2px solid darkgray;
-     width: 5px;
-     height: 12px;
-     background-color: gray;
+	border: 2px solid darkgray;
+	width: 5px;
+	height: 12px;
+	background-color: gray;
 }
 
 QScrollBar::add-page::vertical, QScrollBar::sub-page::vertical, QScrollBar::add-page::horizontal, QScrollBar::sub-page::horizontal
 {
-     background-color: darkgray;
+	background-color: darkgray;
 }
 
 QScrollBar::horizontal
@@ -530,10 +530,10 @@ QScrollBar::sub-line::horizontal
 
 QScrollBar::left-arrow::horizontal, QScrollBar::right-arrow::horizontal
 {
-    border: 2px solid darkgray;
-    width: 12px;
-    height: 5px;
-    background-color: gray;
+	border: 2px solid darkgray;
+	width: 12px;
+	height: 5px;
+	background-color: gray;
 }
 
 QMenu::separator

@@ -94,7 +94,10 @@ win32 {
 	LIBS += -ljpeg
 	LIBS += -lpng
 	LIBS += -lpthread
-	LIBS += -lOpenEXR
+	LIBS += -lIlmImf
+	LIBS += -lHalf
+	LIBS += -lImath
+	LIBS += -lIex
 
         unix:!macx {
             LIBS += -lxml2

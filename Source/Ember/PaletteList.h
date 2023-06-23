@@ -49,7 +49,7 @@ public:
 	bool IsModifiable(const string& filename);
 	const map<string, vector<Palette<T>>>& Palettes() const;
 
-	SINGLETON_DERIVED_DECL(PaletteList<T>);
+	SINGLETON_DERIVED_DECL_T(PaletteList, T);
 private:
 	PaletteList();
 	bool Save(const string& filename);

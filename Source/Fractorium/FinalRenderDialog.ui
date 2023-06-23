@@ -296,14 +296,14 @@
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>22</number>
+         </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
          </attribute>
          <row>
           <property name="text">
@@ -419,7 +419,7 @@
           </widget>
          </item>
          <item>
-          <widget class="DoubleSpinBox" name="FinalRenderOpenCLSubBatchPctSpin">
+          <widget class="DoubleSpinBox" name="FinalRenderOpenCLSubBatchPctSpin" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -441,22 +441,22 @@
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The percentage of a sub batch to execute on each thread per kernel call when using OpenCL. Default: 0.025 (256 iters with a 10k sub batch size).&lt;/p&gt;&lt;p&gt;Increase this number for slightly faster render times.&lt;/p&gt;&lt;p&gt;Note that this can cause a crash and subsequent restart of the graphics driver if each kernel call takes too long. So reduce the value if you encounter such a problem.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="prefix">
+           <property name="prefix" stdset="0">
             <string>OpenCL sub batch % per thread </string>
            </property>
-           <property name="decimals">
+           <property name="decimals" stdset="0">
             <number>3</number>
            </property>
-           <property name="minimum">
+           <property name="minimum" stdset="0">
             <double>0.010000000000000</double>
            </property>
-           <property name="maximum">
+           <property name="maximum" stdset="0">
             <double>1.000000000000000</double>
            </property>
-           <property name="singleStep">
+           <property name="singleStep" stdset="0">
             <double>0.010000000000000</double>
            </property>
-           <property name="value">
+           <property name="value" stdset="0">
             <double>0.250000000000000</double>
            </property>
           </widget>
@@ -593,14 +593,14 @@
             <attribute name="horizontalHeaderVisible">
              <bool>false</bool>
             </attribute>
+            <attribute name="horizontalHeaderMinimumSectionSize">
+             <number>35</number>
+            </attribute>
             <attribute name="horizontalHeaderDefaultSectionSize">
              <number>85</number>
             </attribute>
             <attribute name="horizontalHeaderHighlightSections">
              <bool>false</bool>
-            </attribute>
-            <attribute name="horizontalHeaderMinimumSectionSize">
-             <number>35</number>
             </attribute>
             <attribute name="horizontalHeaderStretchLastSection">
              <bool>true</bool>
@@ -608,14 +608,14 @@
             <attribute name="verticalHeaderVisible">
              <bool>false</bool>
             </attribute>
+            <attribute name="verticalHeaderMinimumSectionSize">
+             <number>22</number>
+            </attribute>
             <attribute name="verticalHeaderDefaultSectionSize">
              <number>22</number>
             </attribute>
             <attribute name="verticalHeaderHighlightSections">
              <bool>false</bool>
-            </attribute>
-            <attribute name="verticalHeaderMinimumSectionSize">
-             <number>22</number>
             </attribute>
             <row>
              <property name="text">
@@ -811,14 +811,14 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>35</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>110</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>35</number>
          </attribute>
          <attribute name="horizontalHeaderStretchLastSection">
           <bool>true</bool>
@@ -826,14 +826,14 @@
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>22</number>
+         </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>22</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>22</number>
          </attribute>
          <attribute name="verticalHeaderStretchLastSection">
           <bool>false</bool>
@@ -1055,6 +1055,9 @@
              <property name="value">
               <number>0</number>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
@@ -1094,6 +1097,9 @@
              <property name="value">
               <number>0</number>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="3" column="1">
@@ -1106,6 +1112,9 @@
              </property>
              <property name="value">
               <number>0</number>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -1145,6 +1154,9 @@
              </property>
              <property name="value">
               <number>0</number>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -1293,6 +1305,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DoubleSpinBox</class>
+   <extends>QWidget</extends>
+   <header>doublespinbox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>FinalRenderEarlyClipCheckBox</tabstop>
   <tabstop>FinalRenderDoublePrecisionCheckBox</tabstop>

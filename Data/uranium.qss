@@ -4,9 +4,10 @@ You should keep this at the top of whatever custom style you make to ensure the 
 /*
 QTabBar::tab { height: 4ex; }
 */
+/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 *
 {
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";
 }
 
 QObject
@@ -45,7 +46,6 @@ QTableView
 /*For some reason, Qt does not draw table headers correctly, so the style must always be manually specified.*/
 QHeaderView::section::vertical:enabled
 {
-	width: 12px;
 	color: black;
 	background-color: rgb(176, 204, 177);
 	border: none;
@@ -65,7 +65,6 @@ QHeaderView::section::horizontal:enabled
 
 QHeaderView::section::vertical:disabled
 {
-	width: 12px;
 	color: rgb(35, 35, 35);
 	background-color: rgb(53, 53, 53);
 	border: none;
@@ -174,12 +173,20 @@ QScrollBar::sub-line::vertical
 	subcontrol-origin: margin;
 }
 
-QScrollBar::up-arrow::vertical, QScrollBar::down-arrow::vertical
+QScrollBar::up-arrow::vertical
 {
-	 border: 2px solid rgb(124, 232, 0);
-	 width: 5px;
-	 height: 12px;
-	 background-color: gray;
+	border: 2px solid rgb(124, 232, 0);
+	width: 5px;
+	height: 12px;
+	background-color: gray;
+}
+
+QScrollBar::down-arrow::vertical
+{
+	border: 2px solid rgb(124, 232, 0);
+	width: 5px;
+	height: 12px;
+	background-color: gray;
 }
 
 QScrollBar::add-page::vertical,
@@ -187,12 +194,12 @@ QScrollBar::sub-page::vertical,
 QScrollBar::add-page::horizontal,
 QScrollBar::sub-page::horizontal
 {
-	 background-color: rgb(115, 133, 116);
+	background-color: rgb(115, 133, 116);
 }
 
 QScrollBar::horizontal
 {
-	background-color: rgb(176, 204, 177);
+	background-color: rgb(115, 133, 116);
 	border: 0px solid darkgray;
 	height: 15px;
 	margin: 0px 20px 0 20px;
@@ -224,7 +231,14 @@ QScrollBar::sub-line::horizontal
 	subcontrol-origin: margin;
 }
 
-QScrollBar::left-arrow::horizontal,
+QScrollBar::left-arrow::horizontal
+{
+	border: 2px solid rgb(124, 232, 0);
+	width: 12px;
+	height: 5px;
+	background-color: gray;
+}
+
 QScrollBar::right-arrow::horizontal
 {
 	border: 2px solid rgb(124, 232, 0);
@@ -718,7 +732,7 @@ QProgressBar
 	background-color: gray;
 	border: 0px none gray;
 	border-radius: 3px;
-	text-align: center;
+	text-align: center center;
 }
 
 QProgressBar::chunk
@@ -830,13 +844,6 @@ QTableView#FinalRenderParamsTable QPushButton
 {
 	margin-top: 1px;
 	margin-bottom: 2px;
-}
-
-QTableView#XaosTableView QHeaderView::section::vertical,
-QTableView#XaosDistVizTableWidget QHeaderView::section::vertical,
-QTableView#XaosAppliedTableView QHeaderView::section::vertical
-{    
-	width: 19px;
 }
 
 QTableView#SummaryTable QHeaderView::section::vertical

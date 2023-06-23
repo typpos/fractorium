@@ -4,9 +4,10 @@ You should keep this at the top of whatever custom style you make to ensure the 
 /*
 QTabBar::tab { height: 4ex; }
 */
+/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
 *
 {
-	font: 8pt "MS Shell Dlg 2";/*For some reason the font changes if you set any style. Set this to whatever font is the default on your system*/
+	font: 8pt "MS Shell Dlg 2";
 }
 
 QObject
@@ -41,42 +42,40 @@ QTableView
 /*For some reason, Qt does not draw table headers correctly, so the style must always be manually specified.*/
 QHeaderView::section::vertical:enabled
 {
-    width: 12px;
 	color: black;
 	background-color: lightgray;
 	border: none;
 	padding: 0px;
-    padding-left: 4px;
+	padding-left: 4px;
 }
 
 QHeaderView::section::horizontal:enabled
 {
-    height: 18px;
-    color: black;
-    background-color: lightgray;
-    border: none;
-    padding: 0px;
-    padding-left: 4px;
+	height: 18px;
+	color: black;
+	background-color: lightgray;
+	border: none;
+	padding: 0px;
+	padding-left: 4px;
 }
 
 QHeaderView::section::vertical:disabled
 {
-    width: 12px;
 	color: rgb(35, 35, 35);
 	background-color: rgb(53, 53, 53);
 	border: none;
 	padding: 0px;
-    padding-left: 4px;
+	padding-left: 4px;
 }
 
 QHeaderView::section::horizontal:disabled
 {
-    height: 18px;
+	height: 18px;
 	color:rgb(35, 35, 35);
 	background-color: rgb(53, 53, 53);
 	border: none;
 	padding: 0px;
-    padding-left: 4px;
+	padding-left: 4px;
 }
 
 QTableView
@@ -89,13 +88,13 @@ QTableView
 
 QTableView QTableCornerButton::section:enabled
 {
-    border: none;
+	border: none;
 	background-color: lightgray;
 }
 
 QTableView QTableCornerButton::section:disabled
 {
-    border: none;
+	border: none;
 	background-color: rgb(53, 53, 53);
 }
 
@@ -154,12 +153,20 @@ QScrollBar::sub-line::vertical
 	subcontrol-origin: margin;
 }
 
-QScrollBar::up-arrow::vertical, QScrollBar::down-arrow::vertical
+QScrollBar::up-arrow::vertical
 {
-     border: 2px solid darkgray;
-     width: 5px;
-     height: 12px;
-     background-color: gray;
+	border: 2px solid darkgray;
+	width: 5px;
+	height: 12px;
+	background-color: gray;
+}
+
+QScrollBar::down-arrow::vertical
+{
+	border: 2px solid darkgray;
+	width: 5px;
+	height: 12px;
+	background-color: gray;
 }
 
 QScrollBar::add-page::vertical,
@@ -167,7 +174,7 @@ QScrollBar::sub-page::vertical,
 QScrollBar::add-page::horizontal,
 QScrollBar::sub-page::horizontal
 {
-     background-color: darkgray;
+	background-color: darkgray;
 }
 
 QScrollBar::horizontal
@@ -204,13 +211,20 @@ QScrollBar::sub-line::horizontal
 	subcontrol-origin: margin;
 }
 
-QScrollBar::left-arrow::horizontal,
+QScrollBar::left-arrow::horizontal
+{
+	border: 2px solid darkgray;
+	width: 12px;
+	height: 5px;
+	background-color: gray;
+}
+
 QScrollBar::right-arrow::horizontal
 {
-    border: 2px solid darkgray;
-    width: 12px;
-    height: 5px;
-    background-color: gray;
+	border: 2px solid darkgray;
+	width: 12px;
+	height: 5px;
+	background-color: gray;
 }
 
 /*==================================================================================================
@@ -368,7 +382,7 @@ QDockWidget QTabBar
 
 QDialog QTabBar 
 {
-    border-color: transparent; /* set color for QTabBars inside Preferences dialog */
+	border-color: transparent; /* set color for QTabBars inside Preferences dialog */
 }
 /* end fix */
 
@@ -377,15 +391,15 @@ QTabBar::tab
 	background-color: transparent;
 	border: 1px solid transparent;
 	padding: 4px 4px 4px 4px;
-    margin: 0px;
+	margin: 0px;
 }
 
 QDialog QTabBar::tab:top
 {
-    background-color: transparent;
+	background-color: transparent;
 	border: 1px solid transparent;
 	padding: 4px 4px 4px 4px;
-    min-width: 20ex;
+	min-width: 20ex;
 }
 
 QTabBar::tab:left,
@@ -462,28 +476,28 @@ QToolBar
 
 QToolBar > QToolButton
 {
-    margin: 1px;
-    padding: 1px;
-    border-radius: 3px;
+	margin: 1px;
+	padding: 1px;
+	border-radius: 3px;
 	border: 1px solid #5e5e5e;
-    position: relative;
+	position: relative;
 	subcontrol-position: right;
 	subcontrol-origin: margin;
 }
 
 QDialog > QToolBar > QToolButton
 {
-    width: 95px;
-    margin: 0px;
-    padding: 0px;
-    border-radius: 3px;
+	width: 95px;
+	margin: 0px;
+	padding: 0px;
+	border-radius: 3px;
 	border: 1px solid #5e5e5e;
 }
 
 QDialog > QToolBar > QToolButton::menu-button
 {
-    left: -2px;
-    border-radius: 3px;
+	left: -2px;
+	border-radius: 3px;
 	border: 1px solid #5e5e5e;
 }
 
@@ -523,11 +537,13 @@ QPushButton
 {
 	margin: 1px;
 	padding: 4px;
+	color: white;
+	background-color: gray;
 }
 
 QPushButton:pressed
 {
-	background-color: gray;
+	background-color: darkgray;
 }
 
 QPushButton:focus
@@ -574,7 +590,7 @@ QTableView::indicator:enabled:checked,
 QGroupBox::indicator:enabled:checked
 {
 	background-color: lightgray;
-    image: url(:/Fractorium/Icons/checkbox_checked.png);
+	image: url(:/Fractorium/Icons/checkbox_checked.png);
 }
 
 QCheckBox::indicator:disabled:unchecked,
@@ -590,7 +606,7 @@ QTableView::indicator:disabled:checked,
 QGroupBox::indicator:disabled:checked
 {
 	background-color: gray;
-    image: none;
+	image: none;
 }
 
 QRadioButton::indicator:checked
@@ -657,15 +673,15 @@ QProgressBar
 {
 	color: black;
 	background-color: gray;
-    border: 0px none gray;
+	border: 0px none gray;
 	border-radius: 3px;
-	text-align: center;
+	text-align: center center;
 }
 
 QProgressBar::chunk
 {
 	border-radius: 3px;
-    background-color: lightgray;
+	background-color: lightgray;
 }
 
 QStatusBar QProgressBar
@@ -679,8 +695,8 @@ QGroupBox
 {
 	padding-top: 8px;
 	border: 2px solid gray;
-    border-radius: 4px;
-    margin-top: 3ex;
+	border-radius: 4px;
+	margin-top: 3ex;
 }
 
 QGroupBox::title
@@ -751,16 +767,9 @@ QTableView#FinalRenderParamsTable QPushButton
 	margin-bottom: 2px;
 }
 
-QTableView#XaosTableView QHeaderView::section::vertical,
-QTableView#XaosDistVizTableWidget QHeaderView::section::vertical,
-QTableView#XaosAppliedTableView QHeaderView::section::vertical
-{    
-    width: 19px;
-}
-
 QTableView#SummaryTable QHeaderView::section::vertical
 {    
-    width: 69px;
+	width: 69px;
 }
 
 QssDialog QssTextEdit#QssEdit

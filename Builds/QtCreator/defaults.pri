@@ -1,4 +1,4 @@
-VERSION = 22.21.4.2
+VERSION = 23.23.8.1
 win32:CONFIG += skip_target_version_ext
 CONFIG += c++2a
 

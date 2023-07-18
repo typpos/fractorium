@@ -463,13 +463,11 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 					Join(writeFileThreads);
 				});
-
 				//if (!rendererCL)
 				//	break;
 			}
-
-		//	if (!rendererCL)
-				//break;
+			//	if (!rendererCL)
+			//break;
 		}
 
 		if (opt.EmberCL() && opt.DumpKernel())

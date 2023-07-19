@@ -466,11 +466,11 @@ bool OpenCLWrapper::WriteImage2D(size_t index, bool shared, ::size_t width, ::si
 	if (m_Init)
 	{
 		cl_int err;
-        cl::Event e;
+		cl::Event e;
 #ifdef  OCL_USE_1_2_V
-        cl::size_t<3> origin, region;
+		cl::size_t<3> origin, region;
 #else
-        cl::array<cl::size_type, 3> origin, region;
+		cl::array<cl::size_type, 3> origin, region;
 #endif
 		origin[0] = 0;
 		origin[1] = 0;
@@ -544,9 +544,9 @@ bool OpenCLWrapper::ReadImage(size_t imageIndex, ::size_t width, ::size_t height
 		cl_int err;
 		cl::Event e;
 #ifdef  OCL_USE_1_2_V
-        cl::size_t<3> origin, region;
+		cl::size_t<3> origin, region;
 #else
-        cl::array<cl::size_type, 3> origin, region;
+		cl::array<cl::size_type, 3> origin, region;
 #endif
 		origin[0] = 0;
 		origin[1] = 0;
@@ -808,9 +808,9 @@ bool OpenCLWrapper::EnqueueReleaseGLObjects(cl::ImageGL& image)
 /// <param name="memObjects">The memory objects to acquire</param>
 /// <returns>True if success, else false.</returns>
 #ifdef  OCL_USE_1_2_V
-bool OpenCLWrapper::EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects)
+	bool OpenCLWrapper::EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects)
 #else
-bool OpenCLWrapper::EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObjects)
+	bool OpenCLWrapper::EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObjects)
 #endif
 {
 	if (m_Init && m_Shared)
@@ -829,9 +829,9 @@ bool OpenCLWrapper::EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObj
 /// <param name="memObjects">The memory objects to release</param>
 /// <returns>True if success, else false.</returns>
 #ifdef  OCL_USE_1_2_V
-bool OpenCLWrapper::EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects)
+	bool OpenCLWrapper::EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects)
 #else
-bool OpenCLWrapper::EnqueueReleaseGLObjects(const cl::vector<cl::Memory>* memObjects)
+	bool OpenCLWrapper::EnqueueReleaseGLObjects(const cl::vector<cl::Memory>* memObjects)
 #endif
 {
 	if (m_Init && m_Shared)
@@ -1073,13 +1073,13 @@ bool OpenCLWrapper::CreateSPK(const string& name, const string& program, const s
 	{
 		cl_int err;
 #ifndef OCL_USE_1_2_V
-        vector<std::string> programvec{ program };
+		vector<std::string> programvec { program };
 #endif
-        spk.m_Name = name;
+		spk.m_Name = name;
 #ifdef OCL_USE_1_2_V
-        spk.m_Source = cl::Program::Sources(1, std::make_pair(program.c_str(), program.length() + 1));
+		spk.m_Source = cl::Program::Sources(1, std::make_pair(program.c_str(), program.length() + 1));
 #else
-        spk.m_Source = cl::Program::Sources(programvec);
+		spk.m_Source = cl::Program::Sources(programvec);
 #endif
 		spk.m_Program = cl::Program(m_Context, spk.m_Source);
 

@@ -72,9 +72,9 @@ unix:!macx {
 	INCLUDEPATH += /usr/include/libxml2
 }
 else {
-        INCLUDEPATH += /usr/local/opt/ilmbase/include/OpenEXR
-        INCLUDEPATH += /usr/local/opt/openexr@2/include
-        INCLUDEPATH += /usr/local/opt/jpeg/include
+	INCLUDEPATH += /usr/local/opt/ilmbase/include/OpenEXR
+	INCLUDEPATH += /usr/local/opt/openexr@2/include
+	INCLUDEPATH += /usr/local/opt/jpeg/include
 }
 
 #libjpeg and libpng aren't in separate folders, so nothing to add here for them.
@@ -84,18 +84,18 @@ else {
 # Ember doesn't need OpenCL. But just place them all here in the common file for ease of maintenance.
 # Unneeded libs will just be ignored.
 win32 {
-    LIBS = ""
-    LIBS += OpenGL32.lib
-    LIBS += WS2_32.lib
-    LIBS += $$(OCL_ROOT)/lib/x86_64/OpenCL.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/Imath-3_1.lib
-    LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
+	LIBS = ""
+	LIBS += OpenGL32.lib
+	LIBS += WS2_32.lib
+	LIBS += $$(OCL_ROOT)/lib/x86_64/OpenCL.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/libjpeg.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/libpng.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/libxml2.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/zlib.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/Iex-3_1.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/IlmThread-3_1.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/Imath-3_1.lib
+	LIBS += $$absolute_path($$EXTERNAL_LIB)/OpenEXR-3_1.lib
 }
 
 !win32 {
@@ -106,16 +106,16 @@ win32 {
 	LIBS += -lHalf
 	LIBS += -lImath
 	LIBS += -lIex
-        LIBS += -lxml2
+	LIBS += -lxml2
 }
 
 macx {
-        LIBS += -framework OpenGL
-        LIBS += -framework OpenCL
-        LIBS += -L/usr/local/lib# homebrew installs into /usr/local
-        LIBS += -L/usr/local/opt/jpeg/lib
-        LIBS += -L/usr/local/opt/openexr@2/lib
-        LIBS += -L/usr/local/opt/ilmbase/lib
+	LIBS += -framework OpenGL
+	LIBS += -framework OpenCL
+	LIBS += -L/usr/local/lib# homebrew installs into /usr/local
+	LIBS += -L/usr/local/opt/jpeg/lib
+	LIBS += -L/usr/local/opt/openexr@2/lib
+	LIBS += -L/usr/local/opt/ilmbase/lib
 }
 
 unix:!macx {
@@ -227,10 +227,10 @@ win32 {
 }
 
 macx {
-        QMAKE_MAC_SDK = macosx12.1
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
-        QMAKE_CXXFLAGS += -mmacosx-version-min=11.0 -arch x86_64
-        QMAKE_CXXFLAGS += -stdlib=libc++
+	QMAKE_MAC_SDK = macosx12.1
+	QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
+	QMAKE_CXXFLAGS += -mmacosx-version-min=11.0 -arch x86_64
+	QMAKE_CXXFLAGS += -stdlib=libc++
 }
 
 unix {

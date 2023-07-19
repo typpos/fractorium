@@ -31,6 +31,12 @@ win32:RCPATH=$$absolute_path($$QTCREATOR_DIR/../MSVC/Solution)
 INCLUDEPATH += $$LOCAL_INCLUDE_DIR
 INCLUDEPATH += $$absolute_path($$SRC_DIR/Ember)
 INCLUDEPATH += $$absolute_path($$SRC_DIR/EmberCL)
+macx {
+INCLUDEPATH += $$absolute_path($$EMBER_ROOT/Builds/include/CLs/CL1.2)
+}
+else {
+INCLUDEPATH += $$absolute_path($$EMBER_ROOT/Builds/include/CLs/CL3.0)
+}
 INCLUDEPATH += $$absolute_path($$SRC_DIR/EmberCommon)
 
 win32 {
@@ -66,7 +72,9 @@ unix:!macx {
 	INCLUDEPATH += /usr/include/libxml2
 }
 else {
-	INCLUDEPATH += /usr/local/opt/libxml2/include/libxml2
+        INCLUDEPATH += /usr/local/opt/ilmbase/include/OpenEXR
+        INCLUDEPATH += /usr/local/opt/openexr@2/include
+        INCLUDEPATH += /usr/local/opt/jpeg/include
 }
 
 #libjpeg and libpng aren't in separate folders, so nothing to add here for them.
@@ -98,19 +106,16 @@ win32 {
 	LIBS += -lHalf
 	LIBS += -lImath
 	LIBS += -lIex
-
-        unix:!macx {
-            LIBS += -lxml2
-        }
-        else {
-            LIBS += -L/usr/local/opt/libxml2/lib -lxml2
-        }
+        LIBS += -lxml2
 }
 
 macx {
-	LIBS += -framework OpenGL
-	LIBS += -framework OpenCL
-	LIBS += -L/usr/local/lib# homebrew installs into /usr/local
+        LIBS += -framework OpenGL
+        LIBS += -framework OpenCL
+        LIBS += -L/usr/local/lib# homebrew installs into /usr/local
+        LIBS += -L/usr/local/opt/jpeg/lib
+        LIBS += -L/usr/local/opt/openexr@2/lib
+        LIBS += -L/usr/local/opt/ilmbase/lib
 }
 
 unix:!macx {
@@ -222,10 +227,10 @@ win32 {
 }
 
 macx {
-        QMAKE_MAC_SDK = macosx10.14
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
-        QMAKE_CXXFLAGS += -mmacosx-version-min=10.10 -arch x86_64
-	QMAKE_CXXFLAGS += -stdlib=libc++
+        QMAKE_MAC_SDK = macosx12.1
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 11.0
+        QMAKE_CXXFLAGS += -mmacosx-version-min=11.0 -arch x86_64
+        QMAKE_CXXFLAGS += -stdlib=libc++
 }
 
 unix {

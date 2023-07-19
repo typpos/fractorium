@@ -261,3 +261,4 @@ Builds/include/GL
 /Builds/MSVC/Solution/.vs/Fractorium
 /Builds/QtCreator/Ember/.qtc_clangd/compile_commands.json
 /Builds/QtCreator/Fractorium/.qtc_clangd/compile_commands.json
+.DS_Store

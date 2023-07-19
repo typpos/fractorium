@@ -66,7 +66,7 @@
 #ifdef __APPLE__
 #include <OpenEXR/ImfRgbaFile.h>
 #include <OpenEXR/ImfStringAttribute.h>
-#include <OpenEXR/half.h>
+#include <half.h>
 //May need these instead for openexr3
 //#include <Imath/half.h>
 //#include <Imath/ImathInt64.h>

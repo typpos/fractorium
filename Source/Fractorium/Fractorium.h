@@ -397,6 +397,9 @@ public slots:
 	//Can't have a template function be a slot.
 	void SetTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h);
 
+private slots:
+    void WindowShown();
+
 public:
 	//template<typename spinType, typename valType>//See below.
 	//static void SetupSpinner(QTableWidget* table, const QObject* receiver, int& row, int col, spinType*& spinBox, int height, valType min, valType max, valType step, const char* signal, const char* slot, bool incRow = true, valType val = 0, valType doubleClickZero = -999, valType doubleClickNonZero = -999);
@@ -623,6 +626,7 @@ private:
 	std::unordered_map<QString, std::pair<int, int>> m_HeightPresets;
 
 	bool m_PreviousAffineState[4];
+    bool m_AboutDialogCentered;
 	int m_FontSize;
 	int m_VarSortMode;
 	int m_PaletteSortMode;

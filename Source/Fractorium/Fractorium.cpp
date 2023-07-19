@@ -69,9 +69,7 @@ Fractorium::Fractorium(QWidget* p)
 	m_VarDialog = new FractoriumVariationsDialog(this);
 	m_AboutDialog = new FractoriumAboutDialog(this);
 	//Put the about dialog in the screen center.
-	auto screen = QGuiApplication::screenAt(pos());
-	auto geom = screen->availableGeometry();
-	m_AboutDialog->move(geom.center() - m_AboutDialog->rect().center());
+    m_AboutDialogCentered = false;
 	connect(m_ColorDialog, SIGNAL(colorSelected(const QColor&)), this, SLOT(OnColorSelected(const QColor&)), Qt::QueuedConnection);
 	m_XformComboColors[i++] = QColor(0XFF, 0X00, 0X00);
 	m_XformComboColors[i++] = QColor(0XCC, 0XCC, 0X00);
@@ -756,6 +754,25 @@ void Fractorium::showEvent(QShowEvent* e)
 	//Tell Qt to refresh the native menubar from this widget.
 	emit qGuiApp->focusWindowChanged(windowHandle());
 	QMainWindow::showEvent(e);
+
+    if(!m_AboutDialogCentered)
+    {
+        m_AboutDialogCentered = true;
+        QTimer::singleShot(100, this, SLOT(WindowShown()));
+    }
+}
+
+/// <summary>
+/// Center About Dialog window.
+/// Called on program starts after show is completed.
+/// See https://doc.qt.io/qt-6/application-windows.html#window-geometry for more information
+/// </summary>
+void Fractorium::WindowShown()
+{
+    //Put the about dialog in the screen center.
+    auto screen = QGuiApplication::screenAt(pos());
+    auto geom = screen->availableGeometry();
+    m_AboutDialog->move(geom.center() - m_AboutDialog->rect().center());
 }
 
 /// <summary>

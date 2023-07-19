@@ -6,6 +6,18 @@
 /// Precompiled header file. Place all system includes here with appropriate #defines for different operating systems and compilers.
 /// </summary>
 
+//This special define is made to fix buggy OpenCL compilers on Mac.
+//Rendering is much slower there for unknown reasons. Michel traced it down
+//to the consec variable which keeps track of how many tries are needed to compute
+//a point which is not a bad value. Strangely, keeping this as a local variable
+//is slower than keeping it as an element in a global array.
+//This is counterintuitive, and lends further weight to the idea that OpenCL on Mac
+//is horribly broken.
+#ifdef __APPLE__
+    #define KNL_USE_GLOBAL_CONSEC
+    #define OCL_USE_1_2_V
+#endif
+
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN//Exclude rarely-used stuff from Windows headers.
 #define _USE_MATH_DEFINES
@@ -14,9 +26,11 @@
 //For reasons unknown, QtCreator cannot use any value higher than 120 with these, because
 //it causes errors when compiling opencl.hpp. This happens even though it's using MSVC under the hood
 //and it compiles in MSVC when using Visual Studio.
-#define CL_TARGET_OPENCL_VERSION 300
-#define CL_HPP_TARGET_OPENCL_VERSION 300
-#define CL_HPP_MINIMUM_OPENCL_VERSION 300
+#ifndef OCL_USE_1_2_V
+    #define CL_TARGET_OPENCL_VERSION 300
+    #define CL_HPP_TARGET_OPENCL_VERSION 300
+    #define CL_HPP_MINIMUM_OPENCL_VERSION 300
+#endif
 
 #include "Timing.h"
 #include "Renderer.h"
@@ -33,7 +47,11 @@
 #endif
 
 #include <utility>
-#include <CL/opencl.hpp>
+#ifdef  OCL_USE_1_2_V
+    #include <CL/cl.hpp>
+#else
+    #include <CL/opencl.hpp>
+#endif
 #include <algorithm>
 #include <atomic>
 #include <cstdio>
@@ -60,14 +78,3 @@ using namespace std;
 using namespace EmberNs;
 //#define TEST_CL 1
 //#define TEST_CL_BUFFERS 1
-
-//This special define is made to fix buggy OpenCL compilers on Mac.
-//Rendering is much slower there for unknown reasons. Michel traced it down
-//to the consec variable which keeps track of how many tries are needed to compute
-//a point which is not a bad value. Strangely, keeping this as a local variable
-//is slower than keeping it as an element in a global array.
-//This is counterintuitive, and lends further weight to the idea that OpenCL on Mac
-//is horribly broken.
-#ifdef __APPLE__
-	#define KNL_USE_GLOBAL_CONSEC
-#endif

@@ -133,9 +133,14 @@ public:
 	bool EnqueueAcquireGLObjects(cl::ImageGL& image);
 	bool EnqueueReleaseGLObjects(const string& name);
 	bool EnqueueReleaseGLObjects(cl::ImageGL& image);
-	bool EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObjects = nullptr);
-	bool EnqueueReleaseGLObjects(const cl::vector<cl::Memory>* memObjects = nullptr);
-	bool CreateSampler(cl::Sampler& sampler, cl_bool normalizedCoords, cl_addressing_mode addressingMode, cl_filter_mode filterMode);
+#ifdef  OCL_USE_1_2_V
+    bool EnqueueAcquireGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = nullptr);
+    bool EnqueueReleaseGLObjects(const VECTOR_CLASS<cl::Memory>* memObjects = nullptr);
+#else
+    bool EnqueueAcquireGLObjects(const cl::vector<cl::Memory>* memObjects = nullptr);
+    bool EnqueueReleaseGLObjects(const cl::vector<cl::Memory>* memObjects = nullptr);
+#endif
+    bool CreateSampler(cl::Sampler& sampler, cl_bool normalizedCoords, cl_addressing_mode addressingMode, cl_filter_mode filterMode);
 
 	//Arguments.
 	bool SetBufferArg(size_t kernelIndex, cl_uint argIndex, const string& name);

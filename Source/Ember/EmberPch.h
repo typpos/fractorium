@@ -41,6 +41,7 @@
 #include <list>
 #ifdef __APPLE__
 	#include <malloc/malloc.h>
+    #include <sys/sysctl.h>
 #else
 	#include <malloc.h>
 #endif

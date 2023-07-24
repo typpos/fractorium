@@ -63,7 +63,7 @@
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember\;$(ProjectDir)..\..\..\Source\EmberCL\;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0</AdditionalIncludeDirectories>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <PrecompiledHeaderFile>EmberCLPch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -92,7 +92,7 @@
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember\;$(ProjectDir)..\..\..\Source\EmberCL\;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PrecompiledHeaderFile>EmberCLPch.h</PrecompiledHeaderFile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>

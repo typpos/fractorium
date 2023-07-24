@@ -14,8 +14,8 @@
 //This is counterintuitive, and lends further weight to the idea that OpenCL on Mac
 //is horribly broken.
 #ifdef __APPLE__
-    #define KNL_USE_GLOBAL_CONSEC
-    #define OCL_USE_1_2_V
+	#define KNL_USE_GLOBAL_CONSEC
+	#define OCL_USE_1_2_V
 #endif
 
 #define NOMINMAX
@@ -27,9 +27,9 @@
 //it causes errors when compiling opencl.hpp. This happens even though it's using MSVC under the hood
 //and it compiles in MSVC when using Visual Studio.
 #ifndef OCL_USE_1_2_V
-    #define CL_TARGET_OPENCL_VERSION 300
-    #define CL_HPP_TARGET_OPENCL_VERSION 300
-    #define CL_HPP_MINIMUM_OPENCL_VERSION 300
+	#define CL_TARGET_OPENCL_VERSION 300
+	#define CL_HPP_TARGET_OPENCL_VERSION 300
+	#define CL_HPP_MINIMUM_OPENCL_VERSION 300
 #endif
 
 #include "Timing.h"
@@ -48,9 +48,9 @@
 
 #include <utility>
 #ifdef  OCL_USE_1_2_V
-    #include <CL/cl.hpp>
+	#include <CL/cl.hpp>
 #else
-    #include <CL/opencl.hpp>
+	#include <CL/opencl.hpp>
 #endif
 #include <algorithm>
 #include <atomic>

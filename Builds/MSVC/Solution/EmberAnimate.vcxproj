@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>
@@ -94,7 +94,7 @@ xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Data\flam3-palettes.xml" "$(OutDir)"
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <PrecompiledHeaderFile>EmberCommonPch.h</PrecompiledHeaderFile>

@@ -666,7 +666,7 @@ QString QssDialog::OpenFile()
 
 	return !filenames.empty() ? filenames[0] : "";
 #else
-	auto filename = QFileDialog::getOpenFileName(this, tr("Open Stylesheet"), /*m_Parent->m_SettingsPath*/ "./", tr("Qss (*.qss)"));
+    auto filename = QFileDialog::getOpenFileName(this, tr("Open Stylesheet"), m_Parent->m_SettingsPath, tr("Qss (*.qss)"));
 	return filename.size() > 0 ? filename : "";
 #endif
 }

@@ -86,7 +86,11 @@ void FractoriumSettings::EnsureDefaults()
 		OpenImageExt("*.png");
 
 	if (SaveImageExt() == "")
-		SaveImageExt(".png");
+#ifndef __APPLE__
+        SaveImageExt(".png");
+#else
+        SaveImageExt("Png (*.png)");
+#endif
 
 	if (FinalExt() != "jpg" && FinalExt() != "png" && FinalExt() != "exr"
 #ifdef _WIN32

@@ -148,13 +148,15 @@ void Fractorium::InitParamsUI()
 /// <param name="h">The height of the preset</param>
 void Fractorium::AddSizePreset(QString name, int w, int h)
 {
-	auto widthAction = new QAction(name, m_WidthSpin);
+	QString caption;
+	QTextStream(&caption) << name << " (" << ToString<int>(w) << " x " << ToString<int>(h) << ")";
+	auto widthAction = new QAction(caption, m_WidthSpin);
 	connect(widthAction, SIGNAL(triggered(bool)), this, SLOT(PresetWidthActionTriggered(bool)), Qt::QueuedConnection);
 	m_WidthSpin->addAction(widthAction);
-	auto heightAction = new QAction(name, m_HeightSpin);
+	auto heightAction = new QAction(caption, m_HeightSpin);
 	connect(heightAction, SIGNAL(triggered(bool)), this, SLOT(PresetHeightActionTriggered(bool)), Qt::QueuedConnection);
 	m_HeightSpin->addAction(heightAction);
-	m_HeightPresets[name] = std::pair<int, int>(w, h);
+	m_HeightPresets[caption] = std::pair<int, int>(w, h);
 }
 
 /// <summary>

@@ -1,3 +1,51 @@
+23.23.8.1 8/6/2023
+
+--User changes
+ -Add Clear Sequence button to the Sequence Panel.
+ -Add animation preview in the sequence generator output pane.
+ -Add two new options --width and --height to EmberRender and EmberAnimate to allow the user to specify absolute dimensions to render the image at.
+ -Add a new option to EmberAnimate --ignore-existing which makes it skip rendering a frame if the files from all of the requested extensions for that frame already exist.
+ -Add new preset dimensions to the right click menu of the width and height fields in the editor.
+ -Make various fields in the Options window be resettable via double click.
+ -Fix various bugs in stylesheets to get them working properly on Windows and Linux with Qt6.
+ --Change QSS stylesheets to properly handle tabs.
+ --Make tabs rectangular by default. For some reason, they had always been triangular.
+ --Set default style to Fusion.
+ -Change installer to install to program files for all users.
+ 
+--Bug fixes
+ -Handle forward slashes better in file output paths.
+ -Start and end tags were not properly included in the final render backup file output.
+ -Numbering of rendered files was wrong.
+ -Truchet_hex_fill was not compiling with some newer Nvidia drivers.
+ -Contrast was too sensitive.
+ -Incremental rendering times in the editor were wrong.
+ -Proper sizing of vertical header on the xaos visualization table on Linux.
+ -Options window layout was completely broken.
+ -Error when saving screen on macOS at first time.
+ -Center progress bars on Linux.
+
+--Code changes
+ -Upgrade openexr to version 3.1.3.
+ -Remove all dependencies on Intel Threading Building Blocks and write our own version of parallel_for().
+ -Test if directories exist before adding to INCLUDEPATH.
+ -Fix compiler warnings in XmlToEmber.
+ -Remove unused varIndex = IndexInXform.
+ -Change Sequence Preview to PREVIEW_SIZE (128).
+ -Add include for /usr/include/Imath for OpenEXR to defaults.pri because it wasn't building on some linux systems with out it.
+ -Fix warning about unused CLStrings.
+ -Migrate to VS2022 and no longer use a version specific folder for the VS solution and project files. It is now under a version agnostic folder called Solution.
+ -Migrate to Qt6. There is probably more work to be done here.
+ -Migrate to Wix 4 installer.
+ -Fix many VS2022 code analysis warnings.
+ -No longer use byte typedef, because std::byte is now a type. Revert all back to unsigned char.
+ -Upgrade OpenCL headers to version 3.0 and keep locally now rather than trying to look for system files.
+ -No longer link to Nvidia or AMD specific OpenCL libraries. Use the generic installer located at OCL_ROOT.
+ -Add the ability to change OpenCL grid dimensions. This was attempted for investigating possible performance improvments, but made no difference.
+ -Get build and deployment scripts working with latest versions of Qt6, AppImage, and various library dependencies.
+ -Add two new macros so it would build with the latest gcc: SINGLETON_DERIVED_DECL_T and SINGLETON_DERIVED_IMPL_T.
+ -Small changes to opencl.hpp to get it to build.
+
 22.21.4.2 4/19/2021
 
 --User changes

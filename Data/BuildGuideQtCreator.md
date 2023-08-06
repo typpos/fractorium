@@ -1,4 +1,4 @@
-# Build Guide For Visual Studio 2019 or Qt Creator
+# Build Guide For Visual Studio 2022 or Qt Creator
 ## Tools
 
 ### git
@@ -7,15 +7,15 @@ Install [git](https://git-scm.com/downloads).
 
 ### Visual Studio
 
-Install [Microsoft Visual Studio 2019 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
+Install [Microsoft Visual Studio 2022 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
 
 ### Qt
 
-Install Qt for Windows 64-bit (VS 2017) 5.12.8 or later (http://www.qt.io/download/). 
+Install Qt for Windows 64-bit (VS 2019) 6.5.1 or later (http://www.qt.io/download/). 
 
 Add system environment variable named `QTPATH` and point it to the location of the Qt folder. On a default install, this will be something like:
 
-`C:\Qt\5.12.8\msvc2017_64`
+`C:\Qt\6.5.1\msvc2019_64`
 
 ### Wix
 
@@ -59,7 +59,7 @@ Go into the fractorium folder and run this script which will get the rest of the
 
 `makedeps.bat`
 
-This will download and build `glm libopenexr libpng libxml tbb zlib`. You will have a folder structure like this:
+This will download and build `glm libopenexr libpng libxml zlib`. You will have a folder structure like this:
 
 ```
 [fractorium]
@@ -69,32 +69,25 @@ This will download and build `glm libopenexr libpng libxml tbb zlib`. You will h
 ├─libpng
 ├─libxml2
 ├─openexr
-├─tbb
 └─fractorium
     │
     ├─Deps
         │
+	├─Iex-3_1.dll
+        ├─IlmThread-3_1.dll
+        ├─IMath-3_1.dll
+        ├─libxml2.dll
+	├─OpenEXR-3_1.dll
+        ├─Iex-3_1.lib
+        ├─IlmThread-3_1.lib
+        ├─Imath-3_1.lib
         ├─libjpeg.lib
         ├─libpng.lib
         ├─libxml2.lib
-        ├─libxml2.dll
-        ├─tbb.dll
-        ├─tbb.lib
+        ├─OpenEXR-3_1.lib
+        ├─OpenEXRCore-3_1.lib
+        ├─OpenEXRUtil-3_1.lib
         ├─zlib.lib
-        ├─Half-2_3.lib
-        ├─Iex-2_3.lib
-        ├─IexMath-2_3.lib
-        ├─IlmImf-2_3.lib
-        ├─IlmImfUtil-2_3.lib
-        ├─IlmThread-2_3.lib
-        ├─Imath-2_3.lib
-        ├─Half-2_3.dll
-        ├─Iex-2_3.dll
-        ├─IexMath-2_3.dll
-        ├─IlmImf-2_3.dll
-        ├─IlmImfUtil-2_3.dll
-        ├─IlmThread-2_3.dll
-        ├─Imath-2_3.dll
 ```
 
 ## Building with Qt Creator or Visual Studio
@@ -120,17 +113,17 @@ The outputs will be placed in `fractorium/Bin/release` several minutes later if 
 
 Install the [Visual Studio Qt Addon](http://www.qt.io/download/).
 
-Run Visual Studio and verify there is a menu item named *Qt5*. Click on it and click *Qt Options*.
+Run Visual Studio and verify there is a menu item named *Qt6*. Click on it and click *Qt Options*.
 
-Add a new Qt version to the list with the exact name of "Qt5", and set its path to the same as `$QTPATH`, which will be something like:
+Add a new Qt version to the list with the exact name of "Qt6", and set its path to the same as `$QTPATH`, which will be something like:
 
-`C:\Qt\5.12.8\msvc2017_64`
+`C:\Qt\6.5.1\msvc2019_64`
 
-The name "Qt5" must match exactly and this step must be completed before the Fractorium solution is opened. If not, the Qt add-in will completely ruin all solution and project files that use Qt.
+The name "Qt6" must match exactly and this step must be completed before the Fractorium solution is opened. If not, the Qt add-in will completely ruin all solution and project files that use Qt.
 
 Set the default version to the newly created Qt version and click *Ok*.
 
-Open the file Fractorium.sln under Builds/MSVC/2019
+Open the file Fractorium.sln under Builds/MSVC
 
 Set the configuration to release, and build all.
 
@@ -154,17 +147,13 @@ Apatite_Supergroup.ugr
 boxtail_pack_02.gradient
 boxtail_pack_03_triangle.gradient
 boxtail_pack_04_mineshack.gradient
+concrt140.dll
 dark_windows.qss
-lightdark.qss
-ember.dll
-ember.exp
-ember.lib
-emberanimate.exe
-embercl.dll
-embercl.exp
-embercl.lib
-embergenome.exe
-emberrender.exe
+Ember.dll
+EmberAnimate.exe
+EmberCL.dll
+EmberGenome.exe
+EmberRender.exe
 fardareismai_pack_01_variety_number_128.gradient
 fardareismai_pack_02_b_sides.gradient
 fardareismai_pack_03_old_and_new.gradient
@@ -172,18 +161,20 @@ fardareismai_pack_04_hoard.gradient
 Feldspar_Group.ugr
 flam3-palettes.xml
 fractaldesire_pack_01.gradient
-fractorium.exe
-half-2_3.dll
-iex-2_3.dll
-iexmath-2_3.dll
-ilmimf-2_3.dll
-ilmthread-2_3.dll
-imath-2_3.dll
+Fractorium.exe
+Iex-3_1.dll
+IlmThread-3_1.dll
+Imath-3_1.dll
 libxml2.dll
+lightdark.qss
 Mica_Group.ugr
-Qt5Core.dll
-Qt5Gui.dll
-Qt5Widgets.dll
+msvcp140.dll
+OpenEXR-3_1.dll
+Qt6Core.dll
+Qt6Gui.dll
+Qt6OpenGL.dll
+Qt6OpenGLWidgets.dll
+Qt6Widgets.dll
 Quartz_Varieties.ugr
 rce_ordinary_pack_01_colornation.gradient
 tatasz_pack_01.gradient
@@ -191,75 +182,87 @@ tatasz_pack_02_colder.gradient
 tatasz_pack_02_dark.gradient
 tatasz_pack_02_warmer.gradient
 tatasz_pack_03.gradient
-tbb.dll
+tatasz_pack_04.gradient
+tatasz_pack_05.gradient
+tatasz_pack_06.gradient
+tatasz_pack_07.gradient
+uranium.qss
+user-palettes.xml
+vccorlib140.dll
+vcruntime140.dll
+vcruntime140_1.dll
 imageformats\qjpeg.dll
 platforms\qwindows.dll
 ```
 
 Double click fractorium.exe to run it, and use the command line to run the others.
 
-To run on a computer without Visual Studio 2017, these files also need to be in the folder:
+To run on a computer without Visual Studio 2022, these files also need to be in the folder:
 
 ```
-2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\msvcp140.dll
-2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vcruntime140.dll
-2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vcruntime140_1.dll
-2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\vccorlib140.dll
-2019\Community\VC\Redist\MSVC\14.25.28508\x64\Microsoft.VC142.CRT\concrt140.dll
+C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\msvcp140.dll
+C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\vcruntime140.dll
+C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\vcruntime140_1.dll
+C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\vccorlib140.dll
+C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\concrt140.dll
 ```
 
-or you can install [Visual C++ Redistributable Packages for Visual Studio 2019 (64 bit)](https://www.visualstudio.com/downloads/)
+or you can install [Visual C++ Redistributable Packages for Visual Studio 2022 (64 bit)](https://www.visualstudio.com/downloads/)
 
 ## Final file structure for distribution
 
 ```
 [YOUR FOLDER]
  │
- ├─ Amphibole_Supergroup.ugr
- ├─ Apatite_Supergroup.ugr
- ├─ boxtail_pack_02.gradient
- ├─ boxtail_pack_03_triangle.gradient
- ├─ boxtail_pack_04_mineshack.gradient
- ├─ dark_windows.qss
- ├─ lightdark.qss
- ├─ ember.dll
- ├─ emberanimate.exe
- ├─ embercl.dll
- ├─ embergenome.exe
- ├─ emberrender.exe
- ├─ fardareismai_pack_01_variety_number_128.gradient
- ├─ fardareismai_pack_02_b_sides.gradient
- ├─ fardareismai_pack_03_old_and_new.gradient
- ├─ fardareismai_pack_04_hoard.gradient
- ├─ Feldspar_Group.ugr
- ├─ flam3-palettes.xml
- ├─ fractaldesire_pack_01.gradient
- ├─ fractorium.exe
- ├─ half-2_3.dll
- ├─ iex-2_3.dll
- ├─ iexmath-2_3.dll
- ├─ ilmimf-2_3.dll
- ├─ ilmthread-2_3.dll
- ├─ imath-2_3.dll
- ├─ libxml2.dll
- ├─ Mica_Group.ugr
- ├─ Qt5Core.dll
- ├─ Qt5Gui.dll
- ├─ Qt5Widgets.dll
- ├─ Quartz_Varieties.ugr
- ├─ rce_ordinary_pack_01_colornation.gradient
- ├─ tatasz_pack_01.gradient
- ├─ tatasz_pack_02_colder.gradient
- ├─ tatasz_pack_02_dark.gradient
- ├─ tatasz_pack_02_warmer.gradient
- ├─ tatasz_pack_03.gradient
- ├─ tbb.dll
- │
- ├─ msvcp140.dll (optional)
- ├─ vcruntime140.dll (optional)
- ├─ vcruntime140_1.dll (optional)
- ├─ vccorlib140.dll (optional)
- ├─ concrt140.dll (optional)
+ ├─Amphibole_Supergroup.ugr
+ ├─Apatite_Supergroup.ugr
+ ├─boxtail_pack_02.gradient
+ ├─boxtail_pack_03_triangle.gradient
+ ├─boxtail_pack_04_mineshack.gradient
+ ├─dark_windows.qss
+ ├─Ember.dll
+ ├─EmberAnimate.exe
+ ├─EmberCL.dll
+ ├─EmberGenome.exe
+ ├─EmberRender.exe
+ ├─fardareismai_pack_01_variety_number_128.gradient
+ ├─fardareismai_pack_02_b_sides.gradient
+ ├─fardareismai_pack_03_old_and_new.gradient
+ ├─fardareismai_pack_04_hoard.gradient
+ ├─Feldspar_Group.ugr
+ ├─flam3-palettes.xml
+ ├─fractaldesire_pack_01.gradient
+ ├─Fractorium.exe
+ ├─Iex-3_1.dll
+ ├─IlmThread-3_1.dll
+ ├─Imath-3_1.dll
+ ├─libxml2.dll
+ ├─lightdark.qss
+ ├─Mica_Group.ugr
+ ├─OpenEXR-3_1.dll
+ ├─Qt6Core.dll
+ ├─Qt6Gui.dll
+ ├─Qt6OpenGL.dll
+ ├─Qt6OpenGLWidgets.dll
+ ├─Qt6Widgets.dll
+ ├─Quartz_Varieties.ugr
+ ├─rce_ordinary_pack_01_colornation.gradient
+ ├─tatasz_pack_01.gradient
+ ├─tatasz_pack_02_colder.gradient
+ ├─tatasz_pack_02_dark.gradient
+ ├─tatasz_pack_02_warmer.gradient
+ ├─tatasz_pack_03.gradient
+ ├─tatasz_pack_04.gradient
+ ├─tatasz_pack_05.gradient
+ ├─tatasz_pack_06.gradient
+ ├─tatasz_pack_07.gradient
+ ├─uranium.qss
+ ├─user-palettes.xml
+ ├─msvcp140.dll (optional)
+ ├─vcruntime140.dll (optional)
+ ├─vcruntime140_1.dll (optional)
+ ├─vccorlib140.dll (optional)
+ ├─concrt140.dll (optional)
  │  
  └─imageformats
     │

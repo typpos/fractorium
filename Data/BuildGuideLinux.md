@@ -1,6 +1,6 @@
 # Build Guide for Linux
 
-The following has been tested on Ubuntu 17.10 (artful).
+The following has been tested on Ubuntu 20.
 
 Make sure the package lists are up-to-date:
 
@@ -13,13 +13,13 @@ Install `git` and clone the repository:
 
 ```
 sudo apt-get install git
-git clone --depth=1 https://mfeemster@bitbucket.org/mfeemster/fractorium.git
+git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 ```
 
 Install the dependencies.
 
 ```
-sudo apt-get install g++ libc6-dev libgl1-mesa-dev libgl-dev libglm-dev libjpeg-dev libpng-dev libqt5opengl5-dev libtbb-dev libxml2-dev ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers qt5-default qt5-qmake qtbase5-dev libopenexr22 libopenexr-dev
+sudo apt-get install g++ libxcb-cursor0 libc6-dev libgl1-mesa-dev libgl-dev libglm-dev libjpeg-dev libpng-dev libqt6opengl6-dev libxml2-dev ocl-icd-libopencl1 ocl-icd-opencl-dev opencl-headers qt6-default qt6-qmake qtbase6-dev libopenexr25 libopenexr-dev
 ```
 
 Install the OpenCL drivers and opencl support for your hardware.
@@ -36,10 +36,10 @@ Optionally you can install the Nvidia-specific `nvidia-libopencl1-384` package,
 but keep in mind that this will remove the generic ones (`ocl-icd-opencl-dev`
 and `ocl-icd-libopencl1`).
 
-If you have both Qt 4 and 5 installed, select Qt 5 before compilation:
+If you have both Qt 5 and 6 installed, select Qt 6 before compilation:
 
 ```
-export QT_SELECT=qt5
+export QT_SELECT=qt6
 ```
 
 Compile the binaries, they will be created in the `Bin/release` folder.

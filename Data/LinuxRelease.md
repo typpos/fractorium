@@ -10,7 +10,7 @@ Starting with a fresh clone from bitbucket.org. It will not work unless it's tot
 ```
 $ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 $ cd fractorium
-$ qmake main.pro -r -spec linux-g++-64 CONFIG+="release native"
+$ qmake main.pro -r -spec linux-g++-64 CONFIG+=release
 ```
 
 ### Building a `.deb` locally
@@ -69,7 +69,7 @@ To build the AppImage after successfully building using the make after qmake has
 
 Ensure you these have two files in the folder up one level from the fractorium folder:
 
-`linuxdeployqt-6-x86_64.AppImage`
+`linuxdeployqt-continuous-x86_64.AppImage`
 
 `appimagetool-x86_64.AppImage`
 

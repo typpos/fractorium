@@ -2,21 +2,22 @@
 
 Install Xcode from the App Store
 
-Install Qt 5.4.2 (Note, newer versions of Qt up to and including 5.8 have a bug with drawing OpenGL lines)
+Install Qt 6.5.1
 
 Install [homebrew](http://brew.sh/).
 
-Install `git` and clone the repository:
+Install Command Line Tools for Xcode
+
+Clone the repository:
 
 ```
-brew install git
 git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
 ```
 
 Install the dependencies:
 
 ```
-brew install qt5 tbb glm jpeg libpng glib libxml2 openexr
+brew install glm jpeg libpng glib openexr@2
 ```
 
 Add the Qt `bin` folder to `PATH` to make `qmake` available. In

@@ -113,7 +113,7 @@ cd ../
 
 # -unsupported-allow-new-glibc: Allows linuxdeployqt to run on distributions newer than the oldest still-supported Ubuntu LTS release. This will result in AppImages that will not run on all still-supported distributions, and is neither recommended nor tested or supported
 
-$LINUX_DEPLOY_QT $APP_DIR/usr/share/applications/fractorium.desktop -executable=Fractorium.AppDir/usr/bin/emberrender -executable=Fractorium.AppDir/usr/bin/embergenome -executable=Fractorium.AppDir/usr/bin/emberanimate -always-overwrite #-unsupported-allow-new-glibc
+$LINUX_DEPLOY_QT $APP_DIR/usr/share/applications/fractorium.desktop -executable=Fractorium.AppDir/usr/bin/emberrender -executable=Fractorium.AppDir/usr/bin/embergenome -executable=Fractorium.AppDir/usr/bin/emberanimate -always-overwrite -bundle-non-qt-libs #-unsupported-allow-new-glibc
 
 rm $APP_DIR/AppRun
 

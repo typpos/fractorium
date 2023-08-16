@@ -9,44 +9,28 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_22.21.4.2.msi](https://drive.google.com/file/d/1eeUNoAvkrfSG6fCObAYE1e2vmvUQY6MR/view?usp=sharing)
+Download: [Fractorium_23.23.8.1.msi](https://drive.google.com/file/d/1AskP9JLRfKBcVOV0a4m6m4reQh_ogyqJ/view?usp=drive_link)
 
 ## Mac
 
-Download: [Fractorium_22.21.4.2.dmg](https://drive.google.com/file/d/19cT7EyqmC-bMFl5PdBMaQE-qNbLz0wrR/view?usp=sharing)
+Download: [Fractorium_23.23.8.1.dmg](https://drive.google.com/file/d/1M_HSzNMGfzS6NWCVPK-VmkWpMOaLdSuk/view?usp=drive_link)
 
 ## Linux
 
-### Install from PPA
-
-Enable `universe` in the Ubuntu Software Center:
-
-- open the Edit menu
-- select Software Sources...
-- enable "Community maintained ... `universe`"
-
-Add the [Fractorium Ubuntu PPA](https://launchpad.net/~fractorium/+archive/ubuntu/ppa) and install:
-
-```
-sudo apt-add-repository ppa:fractorium/ppa
-sudo apt-get update
-sudo apt-get install fractorium
-```
-
 ### Install from App Image .deb
 
-Install ubuntu.
+Install ubuntu 20 or greater.
 
-Download: [Fractorium-22.21.4.2.x86_64.deb](https://drive.google.com/file/d/1KJTQEh7Ll4fMTloTDPIZIJGkTL2eEbIj/view?usp=sharing)
+Download: [Fractorium-23.23.8.1.x86_64.deb](https://drive.google.com/file/d/1kMvTDgQpSsGmee-nUT99sb97m90F5ALd/view?usp=drive_link)
 
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-22.21.4.2.x86_64.deb
+sudo dpkg -i Fractorium-23.23.8.1.x86_64.deb
 ```
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-22.21.4.2.x86_64.rpm](https://drive.google.com/file/d/1VNT77_V51O4o01_Q_3SToZjr-L4SX_cy/view?usp=sharing)
+Download: [Fractorium-23.23.8.1.x86_64.rpm](https://drive.google.com/file/d/1woZBP8f6qoB53vRfXfrj0XfxEznQD_CD/view?usp=drive_link)
 
 # Building from git
 

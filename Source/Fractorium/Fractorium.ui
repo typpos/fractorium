@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1712</width>
+    <width>1709</width>
     <height>1054</height>
    </rect>
   </property>
@@ -77,7 +77,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1280</width>
+      <width>1277</width>
       <height>985</height>
      </rect>
     </property>
@@ -6057,7 +6057,7 @@
                    <string>Type</string>
                   </property>
                   <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red: Uses non-standard assignment which means direct assignment for regular variations, sum for pre/post.&lt;/p&gt;&lt;p&gt;Green: Uses direct color.&lt;/p&gt;&lt;p&gt;Blue: Uses an internal variation state.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red: Uses non-standard assignment which means direct assignment for regular variations, sum for pre/post. Order matters for these variations, which can be adjusted by dragging them within the tree on the Summary Tab.&lt;/p&gt;&lt;p&gt;Green: Uses direct color.&lt;/p&gt;&lt;p&gt;Blue: Uses an internal variation state.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </column>
                  <item>
@@ -7267,7 +7267,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1712</width>
+     <width>1709</width>
      <height>22</height>
     </rect>
    </property>

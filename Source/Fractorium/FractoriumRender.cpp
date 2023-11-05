@@ -120,11 +120,12 @@ void FractoriumEmberController<T>::DeleteRenderer()
 /// <param name="height">The height in pixels of the image</param>
 /// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png/32-bits per channel when saving as Exr.</param>
 /// <param name="transparency">Whether to use alpha when saving as Png or Exr.</param>
-void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
+bool FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
 {
+	bool ret = false;
+
 	if (filename != "")
 	{
-		bool ret = false;
 		const auto size = width * height;
 		auto settings = m_Fractorium->m_Settings;
 		QFileInfo fileInfo(filename);
@@ -138,7 +139,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 		if (pixels.size() < size)
 		{
 			m_Fractorium->ShowCritical("Save Failed", "Dimensions didn't match, not saving.", true);
-			return;
+			return ret;
 		}
 
 		auto data = pixels.data();
@@ -189,7 +190,7 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 		else
 		{
 			m_Fractorium->ShowCritical("Save Failed", "Unrecognized format " + suffix + ", not saving.", true);
-			return;
+			return ret;
 		}
 
 		if (ret)
@@ -197,6 +198,8 @@ void FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 		else
 			m_Fractorium->ShowCritical("Save Failed", "Could not save file, try saving to a different folder.", true);
 	}
+
+	return ret;
 }
 
 /// <summary>

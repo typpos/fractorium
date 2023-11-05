@@ -116,7 +116,8 @@ static bool WriteJpeg(const char* filename, unsigned char* image, size_t width, 
 		jpeg_destroy_compress(&info);
 
 		if (file != nullptr)
-			fclose(file);
+			if (fclose(file))//Non-zero indicates failure.
+				return false;
 
 		b = true;
 	}
@@ -225,7 +226,8 @@ static bool WritePng(const char* filename, unsigned char* image, size_t width, s
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 
 		if (file != nullptr)
-			fclose(file);
+			if (fclose(file))
+				return false;
 
 		b = true;
 	}

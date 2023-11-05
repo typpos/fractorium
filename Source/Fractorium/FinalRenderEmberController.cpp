@@ -107,6 +107,7 @@ bool FinalRenderEmberController<T>::RenderSingleEmber(Ember<T>& ember, bool full
 		return false;
 	}
 
+	auto ret = true;
 	ember.m_TemporalSamples = 1;//No temporal sampling.
 	m_Renderer->SetEmber(ember, fullRender ? eProcessAction::FULL_RENDER : eProcessAction::KEEP_ITERATING, /* updatePointer */ true);
 	m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
@@ -119,15 +120,19 @@ bool FinalRenderEmberController<T>::RenderSingleEmber(Ember<T>& ember, bool full
 	{
 		Output("Rendering failed.\n");
 		m_Fractorium->ErrorReportToQTextEdit(m_Renderer->ErrorReport(), m_FinalRenderDialog->ui.FinalRenderTextOutput, false);//Internally calls invoke.
+		ret = false;
 	},
 	[&](Ember<T>& finalEmber)
 	{
 		m_FinishedImageCount.fetch_add(1);
-		SaveCurrentRender(finalEmber);
+
+		if (SaveCurrentRender(finalEmber) == "")
+			m_Run = ret = false;
+
 		RenderComplete(finalEmber);
 		HandleFinishedProgress();
 	});//Final strip.
-	return true;
+	return ret;
 }
 
 /// <summary>
@@ -188,13 +193,14 @@ bool FinalRenderEmberController<T>::RenderSingleEmberFromSeries(std::atomic<size
 			comments = renderer->ImageComments(stats, 0, true);
 			writeThread = std::thread([&](size_t tempTime, size_t threadFinalImageIndex)
 			{
-				SaveCurrentRender(*m_EmberFile.Get(tempTime),
-								  comments,//These all don't change during the renders, so it's ok to access them in the thread.
-								  finalImages[threadFinalImageIndex],
-								  renderer->FinalRasW(),
-								  renderer->FinalRasH(),
-								  m_FinalRenderDialog->Png16Bit(),
-								  m_FinalRenderDialog->Transparency());
+				if (SaveCurrentRender(*m_EmberFile.Get(tempTime),
+									  comments,//These all don't change during the renders, so it's ok to access them in the thread.
+									  finalImages[threadFinalImageIndex],
+									  renderer->FinalRasW(),
+									  renderer->FinalRasH(),
+									  m_FinalRenderDialog->Png16Bit(),
+									  m_FinalRenderDialog->Transparency()) == "")
+					m_Run = false;
 			}, ftime, finalImageIndex);
 			m_FinishedImageCount.fetch_add(1);
 			RenderComplete(*m_EmberFile.Get(ftime), stats, renderTimer);
@@ -336,7 +342,8 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			Output("No renderer present, aborting.");
 		}
 
-		const QString totalTimeString = "All renders completed in: " + QString::fromStdString(m_TotalTimer.Format(m_TotalTimer.Toc())) + ".";
+		const QString totalTimeString = m_Run ? "All renders completed in: " + QString::fromStdString(m_TotalTimer.Format(m_TotalTimer.Toc())) + "."
+										: "Render aborted.";
 		Output(totalTimeString);
 		QFile::remove(backup);
 		QMetaObject::invokeMethod(m_FinalRenderDialog, "Pause", Qt::QueuedConnection, Q_ARG(bool, false));
@@ -856,13 +863,12 @@ QString FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember)
 /// <param name="height">The height in pixels of the image</param>
 /// <param name="png16Bit">Whether to use 16 bits per channel per pixel when saving as Png/32-bits per channel when saving as Exr.</param>
 /// <param name="transparency">Whether to use alpha when saving as Png or Exr.</param>
-/// <returns>The full path and filename the image was saved to.</returns>
+/// <returns>The full path and filename the image was saved to. Empty string is saving failed.</returns>
 template<typename T>
 QString FinalRenderEmberController<T>::SaveCurrentRender(Ember<T>& ember, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency)
 {
 	const auto filename = ComposePath(QString::fromStdString(ember.m_Name));
-	FractoriumEmberControllerBase::SaveCurrentRender(filename, comments, pixels, width, height, png16Bit, transparency);
-	return filename;
+	return FractoriumEmberControllerBase::SaveCurrentRender(filename, comments, pixels, width, height, png16Bit, transparency) ? filename : "";
 }
 
 /// <summary>

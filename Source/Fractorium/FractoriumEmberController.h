@@ -285,7 +285,7 @@ public:
 	void ClearFinalImages();
 	void Shutdown();
 	void UpdateRender(eProcessAction action = eProcessAction::FULL_RENDER);
-	void SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
+	bool SaveCurrentRender(const QString& filename, const EmberImageComments& comments, vector<v4F>& pixels, size_t width, size_t height, bool png16Bit, bool transparency);
 	RendererBase* Renderer() { return m_Renderer.get(); }
 	vector<v4F>* FinalImage() { return &(m_FinalImage); }
 	vector<v4F>* PreviewFinalImage() { return &m_PreviewFinalImage; }

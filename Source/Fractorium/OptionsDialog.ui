@@ -841,6 +841,9 @@
        </item>
        <item row="1" column="0">
         <widget class="QCheckBox" name="AutoUniqueCheckBox">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When resaving a file, use an auto generated unique name based on the first name supplied.&lt;/p&gt;&lt;p&gt;This allows you to keep snapshots of your changes instead of overwriting them with each save.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Auto Unique Filenames</string>
          </property>

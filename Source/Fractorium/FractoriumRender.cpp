@@ -758,9 +758,11 @@ bool Fractorium::CreateControllerFromOptions()
 #ifdef DO_DOUBLE
 		EmberFile<double> efd;
 		Palette<double> tempPalette;
+		Ember<double> xaosToggle;
 #else
 		EmberFile<float> efd;
 		Palette<float> tempPalette;
+		Ember<float> xaosToggle;
 #endif
 		const QModelIndex index = ui.LibraryTree->currentIndex();
 		ui.LibraryTree->clear();//This must be here before FillLibraryTree() is called below, else a spurious EmberTreeItemChanged event will be called on a deleted object.
@@ -774,6 +776,7 @@ bool Fractorium::CreateControllerFromOptions()
 			current = m_Controller->SaveCurrentToOpenedFile(false);
 			//Replace below with this once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
 			//m_Controller->CopyEmberFile(efd);
+			m_Controller->CopyXaosToggleEmber(xaosToggle);
 #ifdef DO_DOUBLE
 			m_Controller->CopyEmberFile(efd, false, [&](Ember<double>& ember) { });
 #else
@@ -804,6 +807,7 @@ bool Fractorium::CreateControllerFromOptions()
 			//will apply the palette adjustments.
 			m_Controller->FillLibraryTree(index.row());
 			m_Controller->SetEmber(current, true);
+			m_Controller->SetXaosToggleEmber(xaosToggle);
 			m_Controller->LockedScale(scale);
 			//Setting these and updating the GUI overwrites the work of clearing them done in SetEmber() above.
 			//It's a corner case, but doesn't seem to matter.

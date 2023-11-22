@@ -2000,6 +2000,16 @@
            </property>
           </widget>
          </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="ToggleXaosButton">
+           <property name="toolTip">
+            <string>Toggle whether to use xaos</string>
+           </property>
+           <property name="text">
+            <string>Toggle Xaos</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -6025,7 +6035,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="columnCount">
-                  <number>3</number>
+                  <number>2</number>
                  </property>
                  <attribute name="headerMinimumSectionSize">
                   <number>10</number>
@@ -6046,18 +6056,13 @@
                   <property name="text">
                    <string>Variation</string>
                   </property>
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red: Uses non-standard assignment which means direct assignment for regular variations, sum for pre/post. Order matters for these variations, which can be adjusted by dragging them within the tree on the Summary Tab.&lt;/p&gt;&lt;p&gt;Green: Uses direct color.&lt;/p&gt;&lt;p&gt;Blue: Uses an internal variation state.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
                  </column>
                  <column>
                   <property name="text">
                    <string>Weight</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>Type</string>
-                  </property>
-                  <property name="toolTip">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red: Uses non-standard assignment which means direct assignment for regular variations, sum for pre/post. Order matters for these variations, which can be adjusted by dragging them within the tree on the Summary Tab.&lt;/p&gt;&lt;p&gt;Green: Uses direct color.&lt;/p&gt;&lt;p&gt;Blue: Uses an internal variation state.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </column>
                  <item>

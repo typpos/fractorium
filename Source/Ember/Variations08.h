@@ -311,7 +311,124 @@ private:
 	T m_WeightPrecalc;
 };
 
+/// <summary>
+/// Circle_Rand.
+/// A new version of CircleRand from Chaotica by tatasz.
+/// </summary>
+template <typename T>
+class Circle_RandVariation : public ParametricVariation<T>
+{
+public:
+	Circle_RandVariation(T weight = 1.0) : ParametricVariation<T>("Circle_Rand", eVariationId::VAR_CIRCLE_RAND, weight)
+	{
+		Init();
+	}
+
+	PARVARCOPY(Circle_RandVariation)
+
+	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
+	{
+		T a = rand.Frand01<T>() * M_2PI;
+		T r = std::sqrt(rand.Frand01<T>());
+		T x = 2 * (Floor(rand.Frand01<T>() * m_SideX * 2 + T(0.5)) - m_SideX);
+		T y = 2 * (Floor(rand.Frand01<T>() * m_SideY * 2 + T(0.5)) - m_SideY);
+		T ret;
+
+		if (VarFuncs<T>::HashShadertoy(y, x, m_Seed) < m_Dens)
+			ret = m_Size * r * std::exp(std::log(VarFuncs<T>::HashShadertoy(x, y, m_Seed)) * m_Power);
+		else
+			ret = 0;
+
+		if (ret > 0)
+		{
+			helper.Out.x = m_Weight * (std::cos(a) * ret + x);
+			helper.Out.y = m_Weight * (std::sin(a) * ret + y);
+		}
+
+		helper.Out.z = DefaultZ(helper);
+	}
+
+	virtual string OpenCLString() const override
+	{
+		ostringstream ss, ss2;
+		intmax_t i = 0;
+		ss2 << "_" << XformIndexInEmber() << "]";
+		string index = ss2.str();
+		string weight = WeightDefineString();
+		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string y = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string size = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string density = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string seed = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sidex = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string sidey = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		ss << "\t{\n"
+		   << "\t\treal_t seed = " << seed << ";\n"
+		   << "\t\treal_t sidex = " << sidex << ";\n"
+		   << "\t\treal_t sidey = " << sidey << ";\n"
+		   << "\t\treal_t a = MwcNext01(mwc) * M_2PI;\n"
+		   << "\t\treal_t r = sqrt(MwcNext01(mwc));\n"
+		   << "\t\treal_t x = 2 * (floor(MwcNext01(mwc) * sidex * 2 + (real_t)(0.5)) - sidex);\n"
+		   << "\t\treal_t y = 2 * (floor(MwcNext01(mwc) * sidey * 2 + (real_t)(0.5)) - sidey);\n"
+		   << "\n"
+		   << "\t\treal_t ret;\n"
+		   << "\n"
+		   << "\t\tif (HashShadertoy(y, x, seed) < " << density << ")\n"
+		   << "\t\t	ret = " << size << " * r * exp(log(HashShadertoy(x, y, seed)) * " << power << ");\n"
+		   << "\t\telse"
+		   << "\t\t	ret = (real_t)(0.0);"
+		   << "\n"
+		   << "\t\tif (ret > (real_t)(0.0))\n"
+		   << "\t\t{"
+		   << "\t\t	vOut.x = " << weight << " * fma((real_t)(cos(a)), ret, x);\n"
+		   << "\t\t	vOut.y = " << weight << " * fma((real_t)(sin(a)), ret, y);\n"
+		   << "\t\t}"
+		   << "\n"
+		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\t}\n";
+		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		return vector<string> { "Fract", "HashShadertoy" };
+	}
+
+	virtual void Precalc() override
+	{
+		m_SideX = m_X * T(0.5);
+		m_SideY = m_Y * T(0.5);
+	}
+
+protected:
+	void Init()
+	{
+		string prefix = Prefix();
+		m_Params.clear();
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "Circle_Rand_X", 10));
+		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "Circle_Rand_Y", 10));
+		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "Circle_Rand_size", 1, eParamType::REAL, 0));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "Circle_Rand_power", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Dens, prefix + "Circle_Rand_density", 1, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Seed, prefix + "Circle_Rand_seed", 1, eParamType::REAL));
+		m_Params.push_back(ParamWithName<T>(true, &m_SideX, prefix + "Circle_Rand_side_x"));//Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_SideY, prefix + "Circle_Rand_side_y"));
+	}
+
+private:
+	T m_X;
+	T m_Y;
+	T m_Size;
+	T m_Power;
+	T m_Dens;
+	T m_Seed;
+	T m_SideX;//Precalc.
+	T m_SideY;
+};
+
 MAKEPREPOSTPARVAR(Gnarly, gnarly, GNARLY)
 MAKEPREPOSTPARVAR(Inkdrop, inkdrop, INKDROP)
 MAKEPREPOSTPARVAR(HexModulus, hex_modulus, HEX_MODULUS)
+MAKEPREPOSTPARVAR(Circle_Rand, circle_rand, CIRCLE_RAND)
 }

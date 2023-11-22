@@ -884,7 +884,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 	xmlAttrPtr att;
 	currentEmber.m_Palette.Clear();//Wipe out the current palette.
 	att = emberNode->properties;//The top level element is a ember element, read the attributes of it and store them.
-	auto variationsfunc = [&](const string & prefix, const char* nodename, xmlNode * node, Xform<T>& xf, std::vector<std::string>& alliterweights)
+	auto variationsfunc = [&](const string& prefix, const char* nodename, xmlNode * node, Xform<T>& xf, std::vector<std::string>& alliterweights)
 	{
 		if (const auto transformsChildNode = GetChildNode(node, nodename))
 		{
@@ -1352,7 +1352,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 				{
 					if (camChildNode->type == XML_ELEMENT_NODE)
 					{
-						if (ParseAndAssignContent(camChildNode, "name", "rotate", currentEmber.m_Rotate)) { currentEmber.m_Rotate = NormalizeDeg180<T>(currentEmber.m_Rotate); }
+						if (ParseAndAssignContent(camChildNode, "name", "rotate", currentEmber.m_Rotate)) { currentEmber.m_Rotate = NormalizeDeg360<T>(currentEmber.m_Rotate); }
 						else if (ParseAndAssignContent(camChildNode, "name", "sensor_width", sensorWidth)) {  }
 						else if (ParseAndAssignContent(camChildNode, "name", "pos", pos))
 						{
@@ -1441,7 +1441,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 									valv = CCX(valvalsnode->children->content);
 					}
 
-					auto parsehsvfunc = [&](const std::string & knots, const std::string & vals, vector<v2F>& vec)
+					auto parsehsvfunc = [&](const std::string& knots, const std::string& vals, vector<v2F>& vec)
 					{
 						istringstream kstr(knots);
 						istringstream vstr(vals);
@@ -1563,7 +1563,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		//First parse out simple float reads.
 		if (ParseAndAssign(curAtt->name, attStr, "time", currentEmber.m_Time, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "scale", currentEmber.m_PixelsPerUnit, ret)) { currentEmber.m_OrigPixPerUnit = currentEmber.m_PixelsPerUnit; }
-		else if (ParseAndAssign(curAtt->name, attStr, "rotate", currentEmber.m_Rotate, ret)) { currentEmber.m_Rotate = NormalizeDeg180<T>(currentEmber.m_Rotate); }
+		else if (ParseAndAssign(curAtt->name, attStr, "rotate", currentEmber.m_Rotate, ret)) { currentEmber.m_Rotate = NormalizeDeg360<T>(currentEmber.m_Rotate); }
 		else if (ParseAndAssign(curAtt->name, attStr, "zoom", currentEmber.m_Zoom, ret)) { ClampGteRef<T>(currentEmber.m_Zoom, 0); }
 		else if (ParseAndAssign(curAtt->name, attStr, "cam_zoom", currentEmber.m_Zoom, ret)) { ClampGteRef<T>(currentEmber.m_Zoom, 0); }//JWildfire uses cam_zoom.
 		else if (ParseAndAssign(curAtt->name, attStr, "filter", currentEmber.m_SpatialFilterRadius, ret)) {}

@@ -69,7 +69,7 @@ Fractorium::Fractorium(QWidget* p)
 	m_VarDialog = new FractoriumVariationsDialog(this);
 	m_AboutDialog = new FractoriumAboutDialog(this);
 	//Put the about dialog in the screen center.
-    m_AboutDialogCentered = false;
+	m_AboutDialogCentered = false;
 	connect(m_ColorDialog, SIGNAL(colorSelected(const QColor&)), this, SLOT(OnColorSelected(const QColor&)), Qt::QueuedConnection);
 	m_XformComboColors[i++] = QColor(0XFF, 0X00, 0X00);
 	m_XformComboColors[i++] = QColor(0XCC, 0XCC, 0X00);
@@ -755,11 +755,11 @@ void Fractorium::showEvent(QShowEvent* e)
 	emit qGuiApp->focusWindowChanged(windowHandle());
 	QMainWindow::showEvent(e);
 
-    if(!m_AboutDialogCentered)
-    {
-        m_AboutDialogCentered = true;
-        QTimer::singleShot(100, this, SLOT(WindowShown()));
-    }
+	if (!m_AboutDialogCentered)
+	{
+		m_AboutDialogCentered = true;
+		QTimer::singleShot(100, this, SLOT(WindowShown()));
+	}
 }
 
 /// <summary>
@@ -769,10 +769,10 @@ void Fractorium::showEvent(QShowEvent* e)
 /// </summary>
 void Fractorium::WindowShown()
 {
-    //Put the about dialog in the screen center.
-    auto screen = QGuiApplication::screenAt(pos());
-    auto geom = screen->availableGeometry();
-    m_AboutDialog->move(geom.center() - m_AboutDialog->rect().center());
+	//Put the about dialog in the screen center.
+	auto screen = QGuiApplication::screenAt(pos());
+	auto geom = screen->availableGeometry();
+	m_AboutDialog->move(geom.center() - m_AboutDialog->rect().center());
 }
 
 /// <summary>

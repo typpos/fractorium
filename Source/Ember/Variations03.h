@@ -584,7 +584,7 @@ private:
 		*y = r * sinPhi + m_Y1;
 	}
 
-	T m_Radius;//Params.
+	T m_Radius;
 	T m_Radius1;
 	T m_Phi1;
 	T m_Thickness;
@@ -742,7 +742,7 @@ private:
 		*y = r * sinPhi;
 	}
 
-	T m_Radius;//Params.
+	T m_Radius;
 	T m_Thickness;
 	T m_Contrast;
 	T m_Pow;
@@ -907,7 +907,7 @@ private:
 		*y = r * sinPhi;
 	}
 
-	T m_Radius;//Params.
+	T m_Radius;
 	T m_Thickness;
 	T m_Thickness2;
 	T m_Contrast;
@@ -1014,7 +1014,7 @@ protected:
 	}
 
 private:
-	T m_Radius;//Params.
+	T m_Radius;
 	T m_Contrast;
 	T m_Pow;
 	T m_X;
@@ -1123,7 +1123,7 @@ protected:
 	}
 
 private:
-	T m_Radius;//Params.
+	T m_Radius;
 	T m_Thickness;
 	T m_Contrast;
 	T m_Pow;

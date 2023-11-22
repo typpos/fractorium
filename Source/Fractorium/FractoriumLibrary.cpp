@@ -672,13 +672,13 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 			return;
 		}
 
-		if (framesPerRot > 1 && !rots)//Because framesPerRot control has a min value of 1, check greater than 1. Also don't need to check the inverse like in EmberGenome.
-		{
-			QMessageBox::critical(m_Fractorium, "Animation sequence parameters error",
-								  "Frames per rot cannot be greater than one while Rotations is zero. Setting it to 1.");
-			ui.SequenceFramesPerRotSpinBox->setValue(1);
-			return;
-		}
+		//if (framesPerRot > 1 && !rots)//Because framesPerRot control has a min value of 1, check greater than 1. Also don't need to check the inverse like in EmberGenome.
+		//{
+		//QMessageBox::critical(m_Fractorium, "Animation sequence parameters error",
+		//					  "Frames per rot cannot be greater than one while Rotations is zero. Setting it to 1.");
+		//ui.SequenceFramesPerRotSpinBox->setValue(1);
+		//return;
+		//}
 	}
 
 	SheepTools<T, float> tools(palettePath, EmberCommon::CreateRenderer<T>(eRendererType::CPU_RENDERER, devices, false, 0, emberReport));
@@ -695,8 +695,10 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 
 	if (randFramesRot)
 		frames = ui.SequenceRandomFramesPerRotMaxSpinBox->value();
-	else
+	else if (rots)
 		frames = ui.SequenceFramesPerRotSpinBox->value();
+	else
+		frames = 1;
 
 	if (randRot)
 		frames *= ui.SequenceRandomRotationsMaxSpinBox->value();

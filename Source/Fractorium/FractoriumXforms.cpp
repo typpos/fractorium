@@ -670,10 +670,8 @@ void FractoriumEmberController<T>::FillXforms(int index)
 
 	m_Fractorium->m_XformsSelectionLayout->blockSignals(false);
 	combo->blockSignals(false);
-
-	if (index < combo->count())
-		combo->setCurrentIndex(index);
-
+	index = index >= 0 && index < combo->count() ? index : 0;
+	combo->setCurrentIndex(index);
 	m_Fractorium->ui.SoloXformCheckBox->blockSignals(true);
 
 	if (m_Ember.m_Solo == combo->currentIndex())

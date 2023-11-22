@@ -11,6 +11,9 @@ void Fractorium::InitXaosUI()
 	int spinHeight = 20;
 	ui.XaosTableView->verticalHeader()->setSectionsClickable(true);
 	ui.XaosTableView->horizontalHeader()->setSectionsClickable(true);
+	auto ttstr = "<html><head/><body><p>Double click to toggle all table spinner values in one row/col.</p><p>If any cell in the row is non zero, set all cells to zero, else 1.</p><p>If shift is held down, reverse the logic.</p><p>If ctrl is held down, set each cell to a random 0 or 1.</p></body></html>";
+	ui.XaosTableView->horizontalHeader()->setToolTip(ttstr);
+	ui.XaosTableView->verticalHeader()->setToolTip(ttstr);
 	m_XaosSpinBox = new DoubleSpinBox(nullptr, spinHeight, 0.1, false);
 	m_XaosSpinBox->DoubleClick(true);
 	m_XaosSpinBox->DoubleClickZero(1);
@@ -24,6 +27,7 @@ void Fractorium::InitXaosUI()
 	connect(ui.ClearXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnClearXaosButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.RandomXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnRandomXaosButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.TransposeXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnTransposeXaosButtonClicked(bool)), Qt::QueuedConnection);
+	connect(ui.ToggleXaosButton, SIGNAL(clicked(bool)), this, SLOT(OnToggleXaosButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.AddLayerButton, SIGNAL(clicked(bool)), this, SLOT(OnAddLayerButtonClicked(bool)), Qt::QueuedConnection);
 	connect(ui.XaosTableView->verticalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnXaosRowDoubleClicked(int)), Qt::QueuedConnection);
 	connect(ui.XaosTableView->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(OnXaosColDoubleClicked(int)), Qt::QueuedConnection);
@@ -59,22 +63,22 @@ void FractoriumEmberController<T>::FillXaos()
 template <typename T>
 void FractoriumEmberController<T>::FillAppliedXaos()
 {
-	m_Ember.CalcNormalizedWeights(m_NormalizedWeights);
+	std::vector<T> weights;
+	auto ct = int(XformCount());
 
-	for (int i = 0, count = int(XformCount()); i < count; i++)//Column.
+	for (int i = 0, count = ct; i < count; i++)
+		weights.push_back(m_Ember.GetXform(i)->m_Weight);
+
+	for (int i = 0, count = ct; i < count; i++)//Column.
 	{
 		if (const auto xform = m_Ember.GetXform(i))
 		{
 			T norm = 0;
 			double start = 0, offset = 0;
-			auto tempweights = m_NormalizedWeights;
+			auto tempweights = weights;
 
 			for (int j = 0; j < count; j++)//Row.
-			{
 				tempweights[j] *= xform->Xaos(j);
-				QModelIndex index = m_Fractorium->m_AppliedXaosTableModel->index(j, i, QModelIndex());//j and i are intentionally swapped here.
-				m_Fractorium->m_AppliedXaosTableModel->setData(index, TruncPrecision(xform->Xaos(j) * xform->m_Weight, 4));//Applied xaos is just a read only table for display purposes.
-			}
 
 			QPixmap pixmap(m_Fractorium->ui.XaosAppliedTableView->columnWidth(i) - 8, m_Fractorium->ui.XaosTableView->rowHeight(0) * count);
 			QPainter painter(&pixmap);
@@ -83,6 +87,13 @@ void FractoriumEmberController<T>::FillAppliedXaos()
 			for (auto& w : tempweights) norm += w;
 
 			for (auto& w : tempweights) w = norm == static_cast<T>(0) ? static_cast<T>(0) : w / norm;
+
+			for (int j = 0; j < count; j++)//Row.
+			{
+				auto normXaosAppliedWeight = tempweights[j];
+				QModelIndex index = m_Fractorium->m_AppliedXaosTableModel->index(j, i, QModelIndex());//j and i are intentionally swapped here.
+				m_Fractorium->m_AppliedXaosTableModel->setData(index, TruncPrecision(normXaosAppliedWeight, 4));//Applied xaos is just a read only table for display purposes.
+			}
 
 			if (norm)
 			{
@@ -308,6 +319,48 @@ void FractoriumEmberController<T>::TransposeXaos()
 }
 
 void Fractorium::OnTransposeXaosButtonClicked(bool checked) { m_Controller->TransposeXaos(); }
+
+/// <summary>
+/// Toggle whether to use xaos or not by saving/restoring a backup flame.
+/// Resets the rendering process.
+/// </summary>
+template <typename T>
+void FractoriumEmberController<T>::ToggleXaos()
+{
+	Update([&]
+	{
+		if (m_Ember.XaosPresent())
+		{
+			m_XaosToggleEmber = m_Ember;
+			m_Ember.ClearXaos();
+		}
+		else if (m_XaosToggleEmber.XaosPresent())
+		{
+			size_t i = 0;
+
+			while (auto xform = m_Ember.GetXform(i))
+			{
+				auto backupXform = m_XaosToggleEmber.GetXform(i);
+
+				if (backupXform)
+				{
+					for (size_t j = 0; j < m_Ember.XformCount(); j++)
+						xform->SetXaos(j, TruncPrecision(backupXform->Xaos(j), XAOS_PREC));
+				}
+				else
+					break;
+
+				i++;
+			}
+
+			m_XaosToggleEmber.Clear();
+		}
+	});
+	FillXaos();
+	FillAppliedXaos();
+}
+
+void Fractorium::OnToggleXaosButtonClicked(bool checked) { m_Controller->ToggleXaos(); }
 
 /// <summary>
 /// Toggle all xaos values in one row on left mouse button double click and resize all cells to fit their data.

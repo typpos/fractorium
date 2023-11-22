@@ -57,17 +57,21 @@ public:
 	virtual ~FractoriumEmberControllerBase();
 
 	//Embers.
-	virtual void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) { }
+	virtual void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer, int xformIndex) { }
 	virtual void CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }//Uncomment default lambdas once LLVM fixes a crash in their compiler with default lambda parameters.//TODO
 	virtual void SetEmberFile(const EmberFile<float>& emberFile, bool move) { }
 	virtual void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) { }
+	virtual void CopyXaosToggleEmber(Ember<float>& ember) { }
+	virtual void SetXaosToggleEmber(const Ember<float>& ember) { }
 	virtual void SetTempPalette(const Palette<float>& palette) { }
 	virtual void CopyTempPalette(Palette<float>& palette) { }
 #ifdef DO_DOUBLE
-	virtual void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) { }
+	virtual void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer, int xformIndex) { }
 	virtual void CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
 	virtual void SetEmberFile(const EmberFile<double>& emberFile, bool move) { }
 	virtual void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) { }
+	virtual void CopyXaosToggleEmber(Ember<double>& ember) { }
+	virtual void SetXaosToggleEmber(const Ember<double>& ember) { }
 	virtual void SetTempPalette(const Palette<double>& palette) { }
 	virtual void CopyTempPalette(Palette<double>& palette) { }
 #endif
@@ -252,6 +256,7 @@ public:
 	virtual void RandomXaos() { }
 	virtual void AddLayer(int xforms) { }
 	virtual void TransposeXaos() { }
+	virtual void ToggleXaos() { }
 
 	//Palette.
 	virtual size_t InitPaletteList(const QString& s) { return 0; }
@@ -352,17 +357,21 @@ public:
 	virtual ~FractoriumEmberController();
 
 	//Embers.
-	void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) override;
+	void SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer, int xformIndex) override;
 	void CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
 	void SetEmberFile(const EmberFile<float>& emberFile, bool move) override;
 	void CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation/* = [&](Ember<float>& ember) { }*/) override;
+	void CopyXaosToggleEmber(Ember<float>& ember) override;
+	void SetXaosToggleEmber(const Ember<float>& ember) override;
 	void SetTempPalette(const Palette<float>& palette) override;
 	void CopyTempPalette(Palette<float>& palette) override;
 #ifdef DO_DOUBLE
-	void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) override;
+	void SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer, int xformIndex) override;
 	void CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
 	void SetEmberFile(const EmberFile<double>& emberFile, bool move) override;
 	void CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation/* = [&](Ember<double>& ember) { }*/) override;
+	void CopyXaosToggleEmber(Ember<double>& ember) override;
+	void SetXaosToggleEmber(const Ember<double>& ember) override;
 	void SetTempPalette(const Palette<double>& palette) override;
 	void CopyTempPalette(Palette<double>& palette) override;
 #endif
@@ -542,6 +551,7 @@ public:
 	void FilteredVariations() override;
 	void FillVariationTreeWithCurrentXform() override;
 	void FillVariationTreeWithXform(Xform<T>* xform);
+	QIcon MakeVariationIcon(const Variation<T>* var);
 
 	//Xforms Xaos.
 	void FillXaos() override;
@@ -551,6 +561,7 @@ public:
 	void RandomXaos() override;
 	void AddLayer(int xforms) override;
 	void TransposeXaos() override;
+	void ToggleXaos() override;
 
 	//Xforms Selection.
 	virtual QString MakeXformCaption(size_t i) override;
@@ -584,7 +595,7 @@ public:
 private:
 	//Embers.
 	void ApplyXmlSavingTemplate(Ember<T>& ember);
-	template <typename U> void SetEmberPrivate(const Ember<U>& ember, bool verbatim, bool updatePointer);
+	template <typename U> void SetEmberPrivate(const Ember<U>& ember, bool verbatim, bool updatePointer, int xformIndex);
 
 	//Params.
 	template <typename U> void ParamsToEmberPrivate(Ember<U>& ember, bool imageParamsOnly);
@@ -609,6 +620,7 @@ private:
 	vector<T> m_TempOpacities;
 	vector<T> m_NormalizedWeights;
 	Ember<T> m_Ember;
+	Ember<T> m_XaosToggleEmber;
 	Ember<T>* m_EmberFilePointer = nullptr;
 	EmberFile<T> m_EmberFile;
 	EmberFile<T> m_SequenceFile;

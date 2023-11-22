@@ -496,8 +496,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		EmberStats stats;
 		EmberImageComments comments;
 		Ember<T> centerEmber;
-		vector<v4F> finalImages[2];
-		std::thread writeThread;
+		ThreadedWriter threadedWriter(16);
 		os.imbue(std::locale(""));
 
 		//The conditions of this loop use atomics to synchronize when running on multiple GPUs.
@@ -600,8 +599,10 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 			}
 
 			renderer->Reset();
+			auto threadIndex = threadedWriter.Increment();
+			auto threadImage = threadedWriter.GetImage(opt.ThreadedWrite() ? threadIndex : 0);
 
-			if ((renderer->Run(finalImages[finalImageIndex], localTime) != eRenderStatus::RENDER_OK) || renderer->Aborted() || finalImages[finalImageIndex].empty())
+			if ((renderer->Run(*threadImage, localTime) != eRenderStatus::RENDER_OK) || renderer->Aborted() || threadImage->empty())
 			{
 				cout << "Error: image rendering failed, aborting.\n";
 				renderer->DumpErrorReport();//Something went wrong, print errors.
@@ -644,19 +645,19 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 
 			//Run image writing in a thread. Although doing it this way duplicates the final output memory, it saves a lot of time
 			//when running with OpenCL. Call join() to ensure the previous thread call has completed.
-			Join(writeThread);
+			//Join(writeThread);
 			const auto threadVecIndex = finalImageIndex;//Cache before launching thread.
 
 			if (opt.ThreadedWrite())//Copies of all but the first parameter are passed to saveFunc(), to avoid conflicting with those values changing when starting the render for the next image.
 			{
-				writeThread = std::thread(saveFunc, std::ref(finalImages[threadVecIndex]), baseFilename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());
-				finalImageIndex ^= 1;//Toggle the index.
+				auto writeThread = std::thread(saveFunc, std::ref(*threadImage), baseFilename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());
+				threadedWriter.SetThread(threadIndex, writeThread);
 			}
 			else
-				saveFunc(finalImages[threadVecIndex], baseFilename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());//Will always use the first index, thereby not requiring more memory.
+				saveFunc(*threadImage, baseFilename, comments, renderer->FinalRasW(), renderer->FinalRasH(), renderer->NumChannels());//Will always use the first index, thereby not requiring more memory.
 		}
 
-		Join(writeThread);//One final check to make sure all writing is done before exiting this thread.
+		threadedWriter.JoinAll();//One final check to make sure all writing is done before exiting this thread.
 	};
 	threadVec.reserve(renderers.size());
 

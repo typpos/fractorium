@@ -96,6 +96,7 @@ enum class eVariationId : glm::uint
 	VAR_CIRCLERAND,
 	VAR_CIRCLESPLIT,
 	VAR_CIRCLETRANS1,
+	VAR_CIRCLE_RAND,
 	VAR_CIRCLIZE	,
 	VAR_CIRCLIZE2	,
 	VAR_CIRCUS,
@@ -514,6 +515,7 @@ enum class eVariationId : glm::uint
 	VAR_PRE_CIRCLERAND,
 	VAR_PRE_CIRCLESPLIT,
 	VAR_PRE_CIRCLETRANS1,
+	VAR_PRE_CIRCLE_RAND,
 	VAR_PRE_CIRCLIZE,
 	VAR_PRE_CIRCLIZE2,
 	VAR_PRE_CIRCUS,
@@ -931,6 +933,7 @@ enum class eVariationId : glm::uint
 	VAR_POST_CIRCLERAND,
 	VAR_POST_CIRCLESPLIT,
 	VAR_POST_CIRCLETRANS1,
+	VAR_POST_CIRCLE_RAND,
 	VAR_POST_CIRCLIZE,
 	VAR_POST_CIRCLIZE2,
 	VAR_POST_CIRCUS,
@@ -2213,13 +2216,11 @@ public:
 			if (!_stricmp(param.Name().c_str(), name))
 			{
 				param.Set(val);
+				this->Precalc();
 				b = true;
 				break;
 			}
 		}
-
-		if (b)
-			this->Precalc();
 
 		return b;
 	}
@@ -2235,10 +2236,11 @@ public:
 		bool b = false;
 
 		if (index < m_Params.size())
+		{
 			m_Params[index].Set(val);
-
-		if (b)
 			this->Precalc();
+			b = true;
+		}
 
 		return b;
 	}
@@ -2268,8 +2270,6 @@ public:
 	void Clear()
 	{
 		for (auto& param : m_Params) *(param.Param()) = 0;
-
-		this->Precalc();
 	}
 
 	/// <summary>

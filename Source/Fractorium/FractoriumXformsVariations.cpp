@@ -110,13 +110,9 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 	const QSize hint0(170, 16);
 	const QSize hint1(80, 16);
 	const QSize hint2(20, 16);
-	static vector<string> dc{ "m_ColorX" };
-	static vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
-								  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };
 	auto tree = m_Fractorium->ui.VariationsTree;
 	tree->clear();
 	tree->blockSignals(true);
-	int iconSize_ = 20;
 
 	for (size_t i = 0; i < m_VariationList->Size(); i++)
 	{
@@ -129,33 +125,8 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 		item->setSizeHint(0, hint0);
 		item->setSizeHint(1, hint1);
 		item->setSizeHint(2, hint2);
-		QPixmap pixmap(iconSize_ * 3, iconSize_);
-		auto mask = pixmap.createMaskFromColor(QColor("transparent"), Qt::MaskOutColor);
-		pixmap.setMask(mask);
-		QPainter paint(&pixmap);
-		paint.fillRect(QRect(0, 0, iconSize_ * 3, iconSize_), QColor(0, 0, 0, 0));
-
-		if (var->VarType() == eVariationType::VARTYPE_REG)
-		{
-			if (SearchVar(var, assign, false))
-				paint.fillRect(QRect(0, 0, iconSize_, iconSize_), QColor(255, 0, 0));
-		}
-		else if (var->VarType() == eVariationType::VARTYPE_PRE || var->VarType() == eVariationType::VARTYPE_POST)
-		{
-			if (var->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
-				paint.fillRect(QRect(0, 0, iconSize_, iconSize_), QColor(255, 0, 0));
-		}
-
-		bool isDc = SearchVar(var, dc, false);
-
-		if (isDc)
-			paint.fillRect(QRect(iconSize_, 0, iconSize_, iconSize_), QColor(0, 255, 0));
-
-		if (!var->StateOpenCLString().empty())
-			paint.fillRect(QRect(iconSize_ * 2, 0, iconSize_, iconSize_), QColor(0, 0, 255));
-
-		QIcon qi(pixmap);
-		item->setIcon(2, qi);
+		auto qi = MakeVariationIcon(var);
+		item->setIcon(0, qi);
 		spinBox->setRange(fMin, fMax);
 		spinBox->DoubleClick(true);
 		spinBox->DoubleClickZero(1);
@@ -173,6 +144,7 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 			{
 				if (!params[j].IsPrecalc())
 				{
+					auto def = params[j].Def();
 					auto paramWidget = new VariationTreeWidgetItem(var->VariationId(), item);
 					auto varSpinBox = new VariationTreeDoubleSpinBox(tree, paramWidget, parVar->VariationId(), params[j].Name());
 					paramWidget->setText(0, params[j].Name().c_str());
@@ -181,8 +153,9 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 					varSpinBox->setRange(params[j].Min(), params[j].Max());
 					varSpinBox->setValue(params[j].ParamVal());
 					varSpinBox->DoubleClick(true);
-					varSpinBox->DoubleClickZero(1);
-					varSpinBox->DoubleClickNonZero(0);
+					varSpinBox->DoubleClickZero(def != 0 ? 0 : 1);
+					varSpinBox->DoubleClickLowVal(def);
+					varSpinBox->DoubleClickNonZero(def);
 
 					if (params[j].Type() == eParamType::INTEGER || params[j].Type() == eParamType::INTEGER_NONZERO)
 					{
@@ -385,6 +358,50 @@ void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 
 	tree->blockSignals(false);
 	m_Fractorium->OnTreeHeaderSectionClicked(m_Fractorium->m_VarSortMode);
+}
+
+/// <summary>
+/// Create an icon for the passed in variation which indicates the following:
+///		Red: position matters because it uses non-standard assigning vs. summing.
+///		Green: uses direct color.
+///		Blue: maintains internal state, mostly of engineering interest.
+/// </summary>
+/// <param name="text">The variation to create the icon for</param>
+/// <returns>The newly created icon</returns>
+template <typename T>
+QIcon FractoriumEmberController<T>::MakeVariationIcon(const Variation<T>* var)
+{
+	const int iconSize = 20;
+	static vector<string> dc{ "m_ColorX" };
+	static vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
+								  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };
+	QPixmap pixmap(iconSize * 3, iconSize);
+	auto mask = pixmap.createMaskFromColor(QColor("transparent"), Qt::MaskOutColor);
+	pixmap.setMask(mask);
+	QPainter paint(&pixmap);
+	paint.fillRect(QRect(0, 0, iconSize * 3, iconSize), QColor(0, 0, 0, 0));
+
+	if (var->VarType() == eVariationType::VARTYPE_REG)
+	{
+		if (SearchVar(var, assign, false))
+			paint.fillRect(QRect(0, 0, iconSize, iconSize), QColor(255, 0, 0));
+	}
+	else if (var->VarType() == eVariationType::VARTYPE_PRE || var->VarType() == eVariationType::VARTYPE_POST)
+	{
+		if (var->AssignType() == eVariationAssignType::ASSIGNTYPE_SUM)
+			paint.fillRect(QRect(0, 0, iconSize, iconSize), QColor(255, 0, 0));
+	}
+
+	bool isDc = SearchVar(var, dc, false);
+
+	if (isDc)
+		paint.fillRect(QRect(iconSize, 0, iconSize, iconSize), QColor(0, 255, 0));
+
+	if (!var->StateOpenCLString().empty())
+		paint.fillRect(QRect(iconSize * 2, 0, iconSize, iconSize), QColor(0, 0, 255));
+
+	QIcon qi(pixmap);
+	return qi;
 }
 
 /// <summary>

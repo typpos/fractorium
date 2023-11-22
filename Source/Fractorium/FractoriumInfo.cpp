@@ -163,6 +163,8 @@ void FractoriumEmberController<T>::FillSummary()
 			vitem->setText(0, QString::fromStdString(var->Name()));
 			vitem->setText(1, QLocale::system().toString(var->m_Weight, pc, vp).rightJustified(vlen, ' '));
 			vitem->setFlags(draggable);
+			auto qi = MakeVariationIcon(var);
+			vitem->setIcon(0, qi);
 
 			if (const auto parVar = dynamic_cast<ParametricVariation<T>*>(var))
 			{

@@ -1682,7 +1682,7 @@ private:
 		return ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) * am;
 	}
 
-	T m_K;//Params.
+	T m_K;
 	T m_Step;
 	T m_Num;
 	T m_XSeed;
@@ -1804,7 +1804,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_XThickness, prefix + "waffle_xthickness", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_YThickness, prefix + "waffle_ythickness", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix + "waffle_rotation"));
-		m_Params.push_back(ParamWithName<T>(true, &m_SinR, prefix + "waffle_sinr"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinR, prefix + "waffle_sinr"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CosR, prefix + "waffle_cosr"));
 	}
 
@@ -2284,7 +2284,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "circlecrop_y"));
 		m_Params.push_back(ParamWithName<T>(&m_ScatterArea, prefix + "circlecrop_scatter_area"));
 		m_Params.push_back(ParamWithName<T>(&m_Zero, prefix + "circlecrop_zero", 1, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_Ca, prefix + "circlecrop_ca"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Ca, prefix + "circlecrop_ca"));//Precalc.
 	}
 
 private:
@@ -2392,7 +2392,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Inner,           prefix + "circlecrop2_inner", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Outer,           prefix + "circlecrop2_outer", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Zero,            prefix + "circlecrop2_zero", 1, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_In,        prefix + "circlecrop2_in"));
+		m_Params.push_back(ParamWithName<T>(true, &m_In,        prefix + "circlecrop2_in"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Out,       prefix + "circlecrop2_out"));
 		m_Params.push_back(ParamWithName<T>(true, &m_OutWeight, prefix + "circlecrop2_out_weight"));
 	}
@@ -2491,7 +2491,7 @@ protected:
 	}
 
 private:
-	T m_Dist;//Params.
+	T m_Dist;
 	T m_Power;
 	T m_A;
 	T m_B;
@@ -3062,7 +3062,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Sx, prefix + "curl_sp_sx"));
 		m_Params.push_back(ParamWithName<T>(&m_Sy, prefix + "curl_sp_sy"));
 		m_Params.push_back(ParamWithName<T>(&m_Dc, prefix + "curl_sp_dc"));
-		m_Params.push_back(ParamWithName<T>(true, &m_C2x2, prefix + "curl_sp_c2_x2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_C2x2, prefix + "curl_sp_c2_x2"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_DcAdjust, prefix + "curl_sp_dc_adjust"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PowerInv, prefix + "curl_sp_power_inv"));
 	}
@@ -3191,7 +3191,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Rperiod, prefix + "heat_r_period", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Rphase, prefix + "heat_r_phase"));
 		m_Params.push_back(ParamWithName<T>(&m_Ramp, prefix + "heat_r_amp"));
-		m_Params.push_back(ParamWithName<T>(true, &m_At, prefix + "heat_at"));
+		m_Params.push_back(ParamWithName<T>(true, &m_At, prefix + "heat_at"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Bt, prefix + "heat_bt"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ct, prefix + "heat_ct"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ap, prefix + "heat_ap"));
@@ -4932,7 +4932,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_CenterY, prefix + "gdoffs_center_y"));
 		m_Params.push_back(ParamWithName<T>(&m_Gamma, prefix + "gdoffs_gamma", 1, eParamType::INTEGER, 1, 6));
 		m_Params.push_back(ParamWithName<T>(&m_Square, prefix + "gdoffs_square", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_Dx, prefix + "gdoffs_dx"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Dx, prefix + "gdoffs_dx"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Ax, prefix + "gdoffs_ax"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Cx, prefix + "gdoffs_cx"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Dy, prefix + "gdoffs_dyd"));
@@ -4948,7 +4948,7 @@ private:
 	static inline T GdoffsFosc(T p, T a) { return GdoffsFscl(-1 * std::cos(p * a * M_2PI)); }
 	static inline T GdoffsFlip(T a, T b, T c) { return (c * (b - a) + a); }
 
-	T m_DeltaX;//Params.
+	T m_DeltaX;
 	T m_DeltaY;
 	T m_AreaX;
 	T m_AreaY;
@@ -5245,7 +5245,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_D1, prefix + "trade_d1", 1, eParamType::REAL, 0, TMAX));
 		m_Params.push_back(ParamWithName<T>(&m_R2, prefix + "trade_r2", 1, eParamType::REAL, EPS, TMAX));
 		m_Params.push_back(ParamWithName<T>(&m_D2, prefix + "trade_d2", 1, eParamType::REAL, 0, TMAX));
-		m_Params.push_back(ParamWithName<T>(true, &m_C1, prefix + "trade_c1"));
+		m_Params.push_back(ParamWithName<T>(true, &m_C1, prefix + "trade_c1"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_C2, prefix + "trade_c2"));
 	}
 
@@ -5326,7 +5326,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Re, prefix + "Juliac_re", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Im, prefix + "Juliac_im", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "Juliac_dist", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_HalfDist, prefix     + "Juliac_half_dist"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfDist, prefix     + "Juliac_half_dist"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_ReInv, prefix        + "Juliac_re_inv"));
 		m_Params.push_back(ParamWithName<T>(true, &m_OneOverReInv, prefix + "Juliac_one_over_re_inv"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Im100, prefix        + "Juliac_im100"));

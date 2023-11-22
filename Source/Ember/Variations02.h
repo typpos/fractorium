@@ -116,7 +116,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "epispiral_n", 6));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "epispiral_thickness"));
 		m_Params.push_back(ParamWithName<T>(&m_Holes, prefix + "epispiral_holes", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_ThicknessWeight, prefix + "epispiral_thickness_weight"));        //Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_ThicknessWeight, prefix + "epispiral_thickness_weight"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_HolesWeight, prefix + "epispiral_holes_weight"));
 	}
 
@@ -5862,7 +5862,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(true, &m_Weight01, prefix + "bisplit_weight01"));//Precalc only.
+		m_Params.push_back(ParamWithName<T>(true, &m_Weight01, prefix + "bisplit_weight01"));//Precalcs only, no params.
 	}
 
 private:

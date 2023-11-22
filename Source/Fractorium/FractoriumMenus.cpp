@@ -162,14 +162,15 @@ void Fractorium::OnActionNewRandomFlameInCurrentFile(bool checked) { m_Controlle
 template <typename T>
 void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 {
-	auto ember = m_Ember;
 	StopAllPreviewRenderers();
+	auto ember = m_Ember;
+	auto insertEmberIndex = m_Fractorium->ui.LibraryTree->currentIndex().row() + 1;
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
-	ember.m_Index = m_EmberFile.Size();
-	m_EmberFile.m_Embers.push_back(ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
+	ember.m_Index = insertEmberIndex;//Will be overwritten below in UpdateLibraryTree().
+	m_EmberFile.m_Embers.insert(Advance(m_EmberFile.m_Embers.begin(), insertEmberIndex), ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
 	m_EmberFile.MakeNamesUnique();
-	UpdateLibraryTree();
-	SetEmber(m_EmberFile.Size() - 1, false);
+	FillLibraryTree(insertEmberIndex);
+	SetEmber(insertEmberIndex, false);
 }
 
 void Fractorium::OnActionCopyFlameInCurrentFile(bool checked) { m_Controller->CopyFlameInCurrentFile(); }
@@ -590,7 +591,7 @@ void FractoriumEmberController<T>::Undo()
 		int index = m_Ember.GetTotalXformIndex(current, forceFinal);
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::max<size_t>(0u, m_UndoIndex - 1u);
-		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list.
+		SetEmber(m_UndoList[m_UndoIndex], true, false, index);//Don't update pointer because it's coming from the undo list.
 		m_EditState = eEditUndoState::UNDO_REDO;
 
 		if (index >= 0 &&  index < m_Fractorium->ui.CurrentXformCombo->count())
@@ -616,7 +617,7 @@ void FractoriumEmberController<T>::Redo()
 		int index = m_Ember.GetTotalXformIndex(current, forceFinal);
 		m_LastEditWasUndoRedo = true;
 		m_UndoIndex = std::min<size_t>(m_UndoIndex + 1, m_UndoList.size() - 1);
-		SetEmber(m_UndoList[m_UndoIndex], true, false);//Don't update pointer because it's coming from the undo list.
+		SetEmber(m_UndoList[m_UndoIndex], true, false, index);//Don't update pointer because it's coming from the undo list.
 		m_EditState = eEditUndoState::UNDO_REDO;
 
 		if (index >= 0 && index < m_Fractorium->ui.CurrentXformCombo->count())

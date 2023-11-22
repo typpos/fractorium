@@ -438,7 +438,7 @@ void FractoriumEmberController<T>::ResizeAndScale(int width, int height, eScaleT
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
-		m_Ember.SetSizeAndAdjustScale(width, height, false, scaleType);
+		ember.SetSizeAndAdjustScale(width, height, false, scaleType);
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 	m_Fractorium->m_ScaleSpin->SetValueStealth(m_Ember.m_PixelsPerUnit);
 	m_Fractorium->OnActionResetScale(true);
@@ -521,11 +521,6 @@ template <typename T> void FractoriumEmberController<T>::RotateChanged(double d)
 }
 void Fractorium::OnRotateChanged(double d)
 {
-	if (d < -180)
-		d = 180 - ((-d + m_RotateSpin->value()) - (180 + m_RotateSpin->value()));
-	else if (d > 180)
-		d = -180 + ((d - m_RotateSpin->value()) - (180 - m_RotateSpin->value()));
-
 	m_Controller->RotateChanged(d); // d is ever between -180 and +180
 }
 

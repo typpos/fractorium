@@ -219,7 +219,7 @@ void CurvesGraphicsView::mousePressEvent(QMouseEvent* e)
 {
 	QGraphicsView::mousePressEvent(e);
 
-	if (e != nullptr)
+	if (e == nullptr)
 		return;
 
 	const auto thresh = devicePixelRatioF() * 4;

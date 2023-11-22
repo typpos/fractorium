@@ -52,7 +52,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string centerX = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string centerY = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string bdcs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
@@ -104,14 +104,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_CenterX, prefix + "dc_bubble_centerx"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_CenterX, prefix + "dc_bubble_centerx"));
 		m_Params.push_back(ParamWithName<T>(&m_CenterY, prefix + "dc_bubble_centery"));
 		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "dc_bubble_scale", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Bdcs, prefix + "dc_bubble_bdcs"));//Precalc.
 	}
 
 private:
-	T m_CenterX;//Params.
+	T m_CenterX;
 	T m_CenterY;
 	T m_Scale;
 	T m_Bdcs;//Precalc.
@@ -152,7 +152,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string origin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string origin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string h = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		ss << "\t{\n"
 		   << "\t\tint x0 = (MwcNext(mwc) & 1) ? -1 : 1;\n"
@@ -180,12 +180,12 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Origin, prefix + "dc_carpet_origin"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Origin, prefix + "dc_carpet_origin"));
 		m_Params.push_back(ParamWithName<T>(true, &m_H, prefix + "dc_carpet_h"));//Precalc.
 	}
 
 private:
-	T m_Origin;//Params.
+	T m_Origin;
 	T m_H;//Precalc.
 };
 
@@ -263,7 +263,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string cubeC1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string cubeC1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cubeC2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cubeC3 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string cubeC4 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -345,7 +345,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_DcCubeC1, prefix + "dc_cube_c1"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_DcCubeC1, prefix + "dc_cube_c1"));
 		m_Params.push_back(ParamWithName<T>(&m_DcCubeC2, prefix + "dc_cube_c2"));
 		m_Params.push_back(ParamWithName<T>(&m_DcCubeC3, prefix + "dc_cube_c3"));
 		m_Params.push_back(ParamWithName<T>(&m_DcCubeC4, prefix + "dc_cube_c4"));
@@ -363,7 +363,7 @@ protected:
 	}
 
 private:
-	T m_DcCubeC1;//Params.
+	T m_DcCubeC1;
 	T m_DcCubeC2;
 	T m_DcCubeC3;
 	T m_DcCubeC4;
@@ -429,7 +429,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string offset = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string offset = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string x = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -484,7 +484,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "dc_cylinder_offset"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "dc_cylinder_offset"));
 		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "dc_cylinder_angle"));//Original used a prefix of dc_cyl_, which is incompatible with Ember's design.
 		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "dc_cylinder_scale", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "dc_cylinder_x", T(0.125)));//Original used a prefix of cyl_, which is incompatible with Ember's design.
@@ -497,7 +497,7 @@ protected:
 	}
 
 private:
-	T m_Offset;//Params.
+	T m_Offset;
 	T m_Angle;
 	T m_Scale;
 	T m_X;
@@ -730,7 +730,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string offset = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string offset = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string scale = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ldcs = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
@@ -778,7 +778,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "dc_linear_offset"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "dc_linear_offset"));
 		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "dc_linear_angle"));
 		m_Params.push_back(ParamWithName<T>(&m_Scale, prefix + "dc_linear_scale", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ldcs, prefix + "dc_linear_ldcs"));//Precalc.
@@ -788,7 +788,7 @@ protected:
 	}
 
 private:
-	T m_Offset;//Params.
+	T m_Offset;
 	T m_Angle;
 	T m_Scale;
 	T m_Ldcs;//Precalc.
@@ -901,7 +901,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string scatterArea = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string scatterArea = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string zeroEdges = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string a = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		ss << "\t{\n"
@@ -994,13 +994,13 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_ScatterArea, prefix + "dc_triangle_scatter_area", 0, eParamType::REAL, -1, 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_ScatterArea, prefix + "dc_triangle_scatter_area", 0, eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(&m_ZeroEdges, prefix + "dc_triangle_zero_edges", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_A, prefix + "dc_triangle_a"));//Precalc.
 	}
 
 private:
-	T m_ScatterArea;//Params.
+	T m_ScatterArea;
 	T m_ZeroEdges;
 	T m_A;//Precalc.
 };
@@ -1044,7 +1044,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string x0 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string x0 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string x1 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string factor = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string overwrite = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
@@ -1081,7 +1081,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_X0, prefix + "dc_ztransl_x0", 0, eParamType::REAL, 0, 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_X0, prefix + "dc_ztransl_x0", 0, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_X1, prefix + "dc_ztransl_x1", 1, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Factor, prefix + "dc_ztransl_factor", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Overwrite, prefix + "dc_ztransl_overwrite", 1, eParamType::INTEGER, 0, 1));
@@ -1092,7 +1092,7 @@ protected:
 	}
 
 private:
-	T m_X0;//Params.
+	T m_X0;
 	T m_X1;
 	T m_Factor;
 	T m_Overwrite;
@@ -1426,7 +1426,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.reserve(15);
-		m_Params.push_back(ParamWithName<T>(&m_Shape, prefix + "dc_perlin_shape", 0, eParamType::INTEGER, 0, 2));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Shape, prefix + "dc_perlin_shape", 0, eParamType::INTEGER, 0, 2));
 		m_Params.push_back(ParamWithName<T>(&m_Map, prefix + "dc_perlin_map", 0, eParamType::INTEGER, 0, 5));
 		m_Params.push_back(ParamWithName<T>(&m_SelectCentre, prefix + "dc_perlin_select_centre", 0, eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(&m_SelectRange, prefix + "dc_perlin_select_range", 1, eParamType::REAL, T(0.1), 2));
@@ -1439,11 +1439,11 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Freqs, prefix + "dc_perlin_freqs", 2));
 		m_Params.push_back(ParamWithName<T>(&m_Z, prefix + "dc_perlin_z"));
 		m_Params.push_back(ParamWithName<T>(&m_SelectBailout, prefix + "dc_perlin_select_bailout", 10, eParamType::INTEGER, 2, 1000));
-		m_Params.push_back(ParamWithName<T>(true, &m_NotchBottom, prefix + "dc_perlin_notch_bottom"));
+		m_Params.push_back(ParamWithName<T>(true, &m_NotchBottom, prefix + "dc_perlin_notch_bottom"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_NotchTop, prefix + "dc_perlin_notch_top"));
 	}
 private:
-	T m_Shape;//Params.
+	T m_Shape;
 	T m_Map;
 	T m_SelectCentre;
 	T m_SelectRange;
@@ -1636,7 +1636,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Width, prefix + "pixel_flow_width", 200));
 		m_Params.push_back(ParamWithName<T>(&m_Seed, prefix + "pixel_flow_seed", 42, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_EnableDC, prefix + "pixel_flow_enable_dc", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_Rad, prefix + "pixel_flow_rad"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Rad, prefix + "pixel_flow_rad"));//Precalc.
 	}
 
 private:

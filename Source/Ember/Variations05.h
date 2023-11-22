@@ -819,7 +819,7 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Xpand, prefix              + "cubic3D_xpand", T(0.25)));
 		m_Params.push_back(ParamWithName<T>(&m_Style, prefix              + "cubic3D_style"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Fill, prefix         + "cubic3D_fill"));    //Precalc.
+		m_Params.push_back(ParamWithName<T>(true, &m_Fill, prefix         + "cubic3D_fill"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Smooth, prefix       + "cubic3D_smooth"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SmoothStyle, prefix  + "cubic3D_smooth_style"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SmoothFill, prefix   + "cubic3D_smooth_fill"));
@@ -2043,7 +2043,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "popcorn2_3D_y", T(0.1)));
 		m_Params.push_back(ParamWithName<T>(&m_Z, prefix + "popcorn2_3D_z", T(0.1)));
 		m_Params.push_back(ParamWithName<T>(&m_C, prefix + "popcorn2_3D_c", 3));
-		m_Params.push_back(ParamWithName<T>(true, &m_SinTanC, prefix + "popcorn2_3D_sintanc"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinTanC, prefix + "popcorn2_3D_sintanc"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_HalfWeight, prefix + "popcorn2_3D_half_weight"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vv, prefix + "popcorn2_3D_vv"));
 	}
@@ -2225,7 +2225,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_XWidth, prefix + "shredlin_xwidth", T(0.5), eParamType::REAL, -1, 1));
 		m_Params.push_back(ParamWithName<T>(&m_YDistance, prefix + "shredlin_ydistance", 1, eParamType::REAL_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_YWidth, prefix + "shredlin_ywidth", T(0.5), eParamType::REAL, -1, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_Xw, prefix + "shredlin_xw"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Xw, prefix + "shredlin_xw"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Yw, prefix + "shredlin_yw"));
 		m_Params.push_back(ParamWithName<T>(true, &m_1mX, prefix + "shredlin_1mx"));
 		m_Params.push_back(ParamWithName<T>(true, &m_1mY, prefix + "shredlin_1my"));
@@ -2585,7 +2585,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Invert,                prefix + "falloff_invert", 0, eParamType::INTEGER, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Type,                  prefix + "falloff_type", 0, eParamType::INTEGER, 0, 2));
 		m_Params.push_back(ParamWithName<T>(&m_BoxPow,                prefix + "falloff_boxpow", 2, eParamType::INTEGER, 2, 32));//Original defaulted this to 0 which directly contradicts the specified range of 2-32.
-		m_Params.push_back(ParamWithName<T>(true, &m_InternalScatter, prefix + "falloff_internal_scatter"));
+		m_Params.push_back(ParamWithName<T>(true, &m_InternalScatter, prefix + "falloff_internal_scatter"));//Precalc.
 	}
 
 private:
@@ -3625,7 +3625,7 @@ public:
 		//Creating Z factors relative to the planes. These will be added, whereas x and y will be assigned.
 		//Original does += z *, so using z on the right side of = is intentional.
 		if (m_MajPlane == 2)
-		    //Boost is the separation distance between the two planes.
+			//Boost is the separation distance between the two planes.
 			helper.Out.z = helper.In.z * T(0.5) * m_ZLift + (posNeg * m_Boost);
 		else
 			helper.Out.z = helper.In.z * T(0.5) * m_ZLift;

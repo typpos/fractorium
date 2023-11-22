@@ -160,34 +160,9 @@ static bool WritePng(const char* filename, unsigned char* image, size_t width, s
 	{
 		png_structp  png_ptr;
 		png_infop    info_ptr;
-		png_text     text[PNG_COMMENT_MAX];
 		size_t i = 0;
 		constexpr glm::uint16 testbe = 1;
 		vector<unsigned char*> rows(height);
-		text[0].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[0].key = const_cast<png_charp>("ember_version");
-		text[0].text = const_cast<png_charp>(EmberVersion());
-		text[1].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[1].key = const_cast<png_charp>("ember_nickname");
-		text[1].text = const_cast<png_charp>(nick.c_str());
-		text[2].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[2].key = const_cast<png_charp>("ember_url");
-		text[2].text = const_cast<png_charp>(url.c_str());
-		text[3].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[3].key = const_cast<png_charp>("ember_id");
-		text[3].text = const_cast<png_charp>(id.c_str());
-		text[4].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[4].key = const_cast<png_charp>("ember_error_rate");
-		text[4].text = const_cast<png_charp>(comments.m_Badvals.c_str());
-		text[5].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[5].key = const_cast<png_charp>("ember_samples");
-		text[5].text = const_cast<png_charp>(comments.m_NumIters.c_str());
-		text[6].compression = PNG_TEXT_COMPRESSION_NONE;
-		text[6].key = const_cast<png_charp>("ember_time");
-		text[6].text = const_cast<png_charp>(comments.m_Runtime.c_str());
-		text[7].compression = PNG_TEXT_COMPRESSION_zTXt;
-		text[7].key = const_cast<png_charp>("ember_genome");
-		text[7].text = const_cast<png_charp>(comments.m_Genome.c_str());
 
 		for (i = 0; i < height; i++)
 			rows[i] = image + i * width * 4 * bytesPerChannel;
@@ -209,9 +184,37 @@ static bool WritePng(const char* filename, unsigned char* image, size_t width, s
 					 PNG_INTERLACE_NONE,
 					 PNG_COMPRESSION_TYPE_BASE,
 					 PNG_FILTER_TYPE_BASE);
+		//png_set_filter(png_ptr, 0, PNG_NO_FILTERS);
 
 		if (enableComments == 1)
+		{
+			png_text text[PNG_COMMENT_MAX];
+			text[0].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[0].key = const_cast<png_charp>("ember_version");
+			text[0].text = const_cast<png_charp>(EmberVersion());
+			text[1].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[1].key = const_cast<png_charp>("ember_nickname");
+			text[1].text = const_cast<png_charp>(nick.c_str());
+			text[2].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[2].key = const_cast<png_charp>("ember_url");
+			text[2].text = const_cast<png_charp>(url.c_str());
+			text[3].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[3].key = const_cast<png_charp>("ember_id");
+			text[3].text = const_cast<png_charp>(id.c_str());
+			text[4].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[4].key = const_cast<png_charp>("ember_error_rate");
+			text[4].text = const_cast<png_charp>(comments.m_Badvals.c_str());
+			text[5].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[5].key = const_cast<png_charp>("ember_samples");
+			text[5].text = const_cast<png_charp>(comments.m_NumIters.c_str());
+			text[6].compression = PNG_TEXT_COMPRESSION_NONE;
+			text[6].key = const_cast<png_charp>("ember_time");
+			text[6].text = const_cast<png_charp>(comments.m_Runtime.c_str());
+			text[7].compression = PNG_TEXT_COMPRESSION_zTXt;
+			text[7].key = const_cast<png_charp>("ember_genome");
+			text[7].text = const_cast<png_charp>(comments.m_Genome.c_str());
 			png_set_text(png_ptr, info_ptr, text, PNG_COMMENT_MAX);
+		}
 
 		png_write_info(png_ptr, info_ptr);
 

@@ -17,6 +17,12 @@ FinalRenderEmberControllerBase::FinalRenderEmberControllerBase(FractoriumFinalRe
 	m_Settings = FractoriumSettings::DefInstance();
 }
 
+template <typename T>
+FinalRenderEmberController<T>::~FinalRenderEmberController()
+{
+	m_ThreadedWriter.JoinAll();
+}
+
 /// <summary>
 /// Cancel the render by calling Abort().
 /// This will block until the cancelling is actually finished.
@@ -91,7 +97,6 @@ void FinalRenderEmberControllerBase::Output(const QString& s)
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderTextOutput, "append", Qt::QueuedConnection, Q_ARG(const QString&, s));
 }
 
-
 /// <summary>
 /// Render a single ember.
 /// </summary>
@@ -103,36 +108,43 @@ template<typename T>
 bool FinalRenderEmberController<T>::RenderSingleEmber(Ember<T>& ember, bool fullRender, size_t& stripForProgress)
 {
 	if (!m_Renderer.get())
-	{
 		return false;
-	}
 
-	auto ret = true;
+	auto threadIndex = fullRender ? m_ThreadedWriter.Increment() : m_ThreadedWriter.Current();
+	auto threadImage = m_ThreadedWriter.GetImage(threadIndex);
 	ember.m_TemporalSamples = 1;//No temporal sampling.
 	m_Renderer->SetEmber(ember, fullRender ? eProcessAction::FULL_RENDER : eProcessAction::KEEP_ITERATING, /* updatePointer */ true);
-	m_Renderer->PrepFinalAccumVector(m_FinalImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
+	m_Renderer->PrepFinalAccumVector(*threadImage);//Must manually call this first because it could be erroneously made smaller due to strips if called inside Renderer::Run().
 	m_Stats.Clear();
 	m_RenderTimer.Tic();//Toc() is called in RenderComplete().
-	StripsRender<T>(m_Renderer.get(), ember, m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
+	StripsRender<T>(m_Renderer.get(), ember, *threadImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp,
 	[&](size_t strip) { stripForProgress = strip; },//Pre strip.
 	[&](size_t strip) { m_Stats += m_Renderer->Stats(); },//Post strip.
 	[&](size_t strip)//Error.
 	{
 		Output("Rendering failed.\n");
 		m_Fractorium->ErrorReportToQTextEdit(m_Renderer->ErrorReport(), m_FinalRenderDialog->ui.FinalRenderTextOutput, false);//Internally calls invoke.
-		ret = false;
+		m_Run = false;
 	},
 	[&](Ember<T>& finalEmber)
 	{
 		m_FinishedImageCount.fetch_add(1);
-
-		if (SaveCurrentRender(finalEmber) == "")
-			m_Run = ret = false;
-
+		auto stats = m_Renderer->Stats();
+		auto comments = m_Renderer->ImageComments(stats, 0, true);
+		auto rasw = m_Renderer->FinalRasW();
+		auto rash = m_Renderer->FinalRasH();
+		auto png16 = m_FinalRenderDialog->Png16Bit();
+		auto transparency = m_FinalRenderDialog->Transparency();
 		RenderComplete(finalEmber);
 		HandleFinishedProgress();
+		auto writeThread = std::thread([ = ](Ember<T> threadEmber)//Pass ember by value.
+		{
+			if (SaveCurrentRender(threadEmber, comments, *threadImage, rasw, rash, png16, transparency) == "")
+				m_Run = false;
+		}, finalEmber);
+		m_ThreadedWriter.SetThread(threadIndex, writeThread);
 	});//Final strip.
-	return ret;
+	return m_Run;
 }
 
 /// <summary>
@@ -146,21 +158,16 @@ template<typename T>
 bool FinalRenderEmberController<T>::RenderSingleEmberFromSeries(std::atomic<size_t>* atomfTime, size_t index)
 {
 	if (m_Renderers.size() <= index)
-	{
 		return false;
-	}
 
-	size_t ftime;
-	size_t finalImageIndex = 0;
-	std::thread writeThread;
-	vector<v4F> finalImages[2];
-	EmberStats stats;
-	EmberImageComments comments;
-	Timing renderTimer;
 	const auto renderer = m_Renderers[index].get();
 
 	if (renderer == nullptr)
 		return false;
+
+	size_t ftime;
+	Timing renderTimer;
+	ThreadedWriter localThreadedWriter(16);//Use a local one for each renderer in a sequence instead of the class member.
 
 	//Render each image, cancelling if m_Run ever gets set to false.
 	//The conditions of this loop use atomics to synchronize when running on multiple GPUs.
@@ -176,9 +183,12 @@ bool FinalRenderEmberController<T>::RenderSingleEmberFromSeries(std::atomic<size
 		Output("Image " + ToString(ftime + 1ULL) + ":\n" + ComposePath(QString::fromStdString(m_EmberFile.Get(ftime)->m_Name)));
 		renderer->Reset();//Have to manually set this since the ember is not set each time through.
 		renderTimer.Tic();//Toc() is called in RenderComplete().
+		auto threadIndex = localThreadedWriter.Increment();
+		auto threadImage = localThreadedWriter.GetImage(threadIndex);
+		//renderer->PrepFinalAccumVector(threadImage);
 
 		//Can't use strips render here. Run() must be called directly for animation.
-		if (renderer->Run(finalImages[finalImageIndex], T(ftime)) != eRenderStatus::RENDER_OK)
+		if (renderer->Run(*threadImage, T(ftime)) != eRenderStatus::RENDER_OK)
 		{
 			Output("Rendering failed.\n");
 			m_Fractorium->ErrorReportToQTextEdit(renderer->ErrorReport(), m_FinalRenderDialog->ui.FinalRenderTextOutput, false);//Internally calls invoke.
@@ -188,31 +198,33 @@ bool FinalRenderEmberController<T>::RenderSingleEmberFromSeries(std::atomic<size
 		}
 		else
 		{
-			Join(writeThread);
-			stats = renderer->Stats();
-			comments = renderer->ImageComments(stats, 0, true);
-			writeThread = std::thread([&](size_t tempTime, size_t threadFinalImageIndex)
-			{
-				if (SaveCurrentRender(*m_EmberFile.Get(tempTime),
-									  comments,//These all don't change during the renders, so it's ok to access them in the thread.
-									  finalImages[threadFinalImageIndex],
-									  renderer->FinalRasW(),
-									  renderer->FinalRasH(),
-									  m_FinalRenderDialog->Png16Bit(),
-									  m_FinalRenderDialog->Transparency()) == "")
-					m_Run = false;
-			}, ftime, finalImageIndex);
+			auto stats = renderer->Stats();
+			auto comments = renderer->ImageComments(stats, 0, true);
+			auto w = renderer->FinalRasW();
+			auto h = renderer->FinalRasH();
+			auto ember = m_EmberFile.Get(ftime);
 			m_FinishedImageCount.fetch_add(1);
-			RenderComplete(*m_EmberFile.Get(ftime), stats, renderTimer);
+			RenderComplete(*ember, stats, renderTimer);
 
 			if (!index)//Only first device has a progress callback, so it also makes sense to only manually set the progress on the first device as well.
 				HandleFinishedProgress();
-		}
 
-		finalImageIndex ^= 1;//Toggle the index.
+			auto writeThread = std::thread([ = ]()
+			{
+				if (SaveCurrentRender(*ember,
+									  comments,//These all don't change during the renders, so it's ok to access them in the thread.
+									  *threadImage,
+									  w,
+									  h,
+									  m_FinalRenderDialog->Png16Bit(),
+									  m_FinalRenderDialog->Transparency()) == "")
+					m_Run = false;
+			});
+			localThreadedWriter.SetThread(threadIndex, writeThread);
+		}
 	}
 
-	Join(writeThread);//One final check to make sure all writing is done before exiting this thread.
+	localThreadedWriter.JoinAll();//One final check to make sure all writing is done before exiting this thread.
 	return m_Run;
 }
 
@@ -223,7 +235,8 @@ bool FinalRenderEmberController<T>::RenderSingleEmberFromSeries(std::atomic<size
 /// <param name="finalRender">Pointer to the final render dialog</param>
 template<typename T>
 FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderDialog* finalRender)
-	: FinalRenderEmberControllerBase(finalRender)
+	: FinalRenderEmberControllerBase(finalRender),
+	  m_ThreadedWriter(16)
 {
 	m_FinalPreviewRenderer = make_unique<FinalRenderPreviewRenderer<T>>(this);
 	//The main rendering function which will be called in a Qt thread.
@@ -321,7 +334,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 						break;
 
 					Output("Image " + ToString<qulonglong>(m_FinishedImageCount.load() + 1) + ":\n" + ComposePath(QString::fromStdString(it.m_Name)));
-					RenderSingleEmber(it, /* fullRender */ true, currentStripForProgress);
+					RenderSingleEmber(it, true, currentStripForProgress);
 				}
 			}
 			else
@@ -335,18 +348,21 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			m_ImageCount = 1;
 			m_Ember->m_TemporalSamples = 1;
 			m_Fractorium->m_Controller->ParamsToEmber(*m_Ember, true);//Update color and filter params from the main window controls, which only affect the filter and/or final accumulation stage.
-			RenderSingleEmber(*m_Ember, /* fullRender= */ !isBump, currentStripForProgress);
+			RenderSingleEmber(*m_Ember, !isBump, currentStripForProgress);
 		}
 		else
 		{
 			Output("No renderer present, aborting.");
 		}
 
+		m_ThreadedWriter.JoinAll();
 		const QString totalTimeString = m_Run ? "All renders completed in: " + QString::fromStdString(m_TotalTimer.Format(m_TotalTimer.Toc())) + "."
 										: "Render aborted.";
 		Output(totalTimeString);
 		QFile::remove(backup);
 		QMetaObject::invokeMethod(m_FinalRenderDialog, "Pause", Qt::QueuedConnection, Q_ARG(bool, false));
+		QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderSaveAgainAsButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get()));//Can do save again with variable number of strips.
+		QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderBumpQualityStartButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
 		m_Run = false;
 	};
 }
@@ -815,6 +831,8 @@ QString FinalRenderEmberController<T>::SaveCurrentAgain()
 									  minde != m_Ember->m_MinRadDE ||
 									  maxde != m_Ember->m_MaxRadDE ||
 									  curvede != m_Ember->m_CurveDE;
+		auto threadIndex = m_ThreadedWriter.Current();
+		auto threadImage = m_ThreadedWriter.GetImage(threadIndex);
 
 		//This is sort of a hack outside of the normal rendering process above.
 		if (dofilterandaccum ||
@@ -831,14 +849,18 @@ QString FinalRenderEmberController<T>::SaveCurrentAgain()
 			m_Ember->m_TemporalSamples = 1;
 			m_Renderer->m_ProgressParameter = reinterpret_cast<void*>(&currentStripForProgress);//Need to reset this because it was set to a local variable within the render thread.
 			m_Renderer->SetEmber(*m_Ember, dofilterandaccum ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY);
-			m_Renderer->Run(m_FinalImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp);
+			m_Renderer->Run(*threadImage, 0, m_GuiState.m_Strips, m_GuiState.m_YAxisUp);
 			m_FinishedImageCount.fetch_add(1);
 			HandleFinishedProgress();
 			m_Run = false;
 		}
+
+		auto stats = m_Renderer->Stats();
+		auto comments = m_Renderer->ImageComments(stats, 0, true);
+		return SaveCurrentRender(*m_Ember, comments, *threadImage, m_Renderer->FinalRasW(), m_Renderer->FinalRasH(), m_FinalRenderDialog->Png16Bit(), m_FinalRenderDialog->Transparency());
 	}
 
-	return SaveCurrentRender(*m_Ember);
+	return "";
 }
 
 /// <summary>
@@ -941,8 +963,6 @@ void FinalRenderEmberController<T>::HandleFinishedProgress()
 
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderTotalProgress, "setValue", Qt::QueuedConnection, Q_ARG(int, static_cast<int>((float(finishedCountCached) / static_cast<float>(m_ImageCount)) * 100)));
 	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderImageCountLabel, "setText", Qt::QueuedConnection, Q_ARG(const QString&, ToString<qulonglong>(finishedCountCached) + " / " + ToString<qulonglong>(m_ImageCount)));
-	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderSaveAgainAsButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get()));//Can do save again with variable number of strips.
-	QMetaObject::invokeMethod(m_FinalRenderDialog->ui.FinalRenderBumpQualityStartButton, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, !doAll && m_Renderer.get() && m_GuiState.m_Strips == 1));
 }
 
 /// <summary>

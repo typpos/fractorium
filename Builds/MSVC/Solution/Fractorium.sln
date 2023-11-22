@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2036
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ember", "Ember.vcxproj", "{2BDB7A54-BB1A-476B-A6E5-F81E90AD4E67}"
 EndProject
@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmberGenome", "EmberGenome.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmberCL", "EmberCL.vcxproj", "{F6A9102C-69A9-48FB-BC4B-49E49AF43236}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "FractoriumInstaller", "..\Installer\FractoriumInstaller.wixproj", "{C8096C47-E358-438C-A520-146D46B0637D}"
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "FractoriumInstaller", "..\Installer\FractoriumInstaller.wixproj", "{C8096C47-E358-438C-A520-146D46B0637D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F6A9102C-69A9-48FB-BC4B-49E49AF43236} = {F6A9102C-69A9-48FB-BC4B-49E49AF43236}
 		{4A191F4C-03AC-4F1B-AFFD-F5483ECEBD29} = {4A191F4C-03AC-4F1B-AFFD-F5483ECEBD29}

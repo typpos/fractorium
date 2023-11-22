@@ -1078,7 +1078,7 @@ void GLEmberController<T>::MouseMove(QMouseEvent* e)
 	{
 		const T rot = CalcRotation();
 		const T scale = CalcScale();
-		ember->m_Rotate = NormalizeDeg180<T>(m_RotationDown + rot);
+		ember->m_Rotate = NormalizeDeg360<T>(m_RotationDown + rot);
 		m_Fractorium->SetRotation(ember->m_Rotate, true);
 		m_Fractorium->SetScale(std::max(static_cast<T>(10), m_ScaleDown + scale));//Will restart the rendering process.
 	}

@@ -497,6 +497,7 @@ uint Timing::m_ProcessorCount;
 	EXPORTPREPOSTREGVAR(Inkdrop, T) \
 	EXPORTPREPOSTREGVAR(HexModulus, T) \
 	EXPORTPREPOSTREGVAR(Vignette, T) \
+	EXPORTPREPOSTREGVAR(Circle_Rand, T) \
 	template EMBER_API class VariationList<T>; \
 	template EMBER_API class SpatialFilter<T>; \
 	template EMBER_API class GaussianFilter<T>; \

@@ -821,7 +821,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_F, prefix + "pRose3D_f", 3));
 		m_Params.push_back(ParamWithName<T>(&m_Wigsc, prefix + "pRose3D_wigsc"));
 		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix + "pRose3D_offset"));
-		m_Params.push_back(ParamWithName<T>(true, &m_Cycle, prefix + "pRose3D_cycle"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Cycle, prefix + "pRose3D_cycle"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_OptDir, prefix + "pRose3D_opt_dir"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PetalsSign, prefix + "pRose3D_petals_sign"));
 		m_Params.push_back(ParamWithName<T>(true, &m_NumPetals, prefix + "pRose3D_num_petals"));
@@ -954,7 +954,7 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Base, prefix + "log_db_base", 1));
 		m_Params.push_back(ParamWithName<T>(&m_FixPeriod, prefix + "log_db_fix_period", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_Denom, prefix + "log_db_denom"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Denom, prefix + "log_db_denom"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_FixPe, prefix + "log_db_fix_pe"));
 	}
 private:
@@ -4486,7 +4486,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Freq2,             prefix + "vibration_freq2", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Amp2,              prefix + "vibration_amp2", T(0.25)));
 		m_Params.push_back(ParamWithName<T>(&m_Phase2,            prefix + "vibration_phase2", 0, eParamType::REAL_CYCLIC, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_CosDir,      prefix + "vibration_cos_dir"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosDir,      prefix + "vibration_cos_dir"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_SinDir,      prefix + "vibration_sin_dir"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CosTot,      prefix + "vibration_cos_tot"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SinTot,      prefix + "vibration_sin_tot"));
@@ -4701,7 +4701,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_F2mfreq,           prefix + "vibration2_fmfreq2"));
 		m_Params.push_back(ParamWithName<T>(&m_A2m	,             prefix + "vibration2_am2"));
 		m_Params.push_back(ParamWithName<T>(&m_A2mfreq,           prefix + "vibration2_amfreq2"));
-		m_Params.push_back(ParamWithName<T>(true, &m_CosDir,      prefix + "vibration2_cos_dir"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CosDir,      prefix + "vibration2_cos_dir"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_SinDir,      prefix + "vibration2_sin_dir"));
 		m_Params.push_back(ParamWithName<T>(true, &m_ScaledFreq,  prefix + "vibration2_scaled_freq"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PhaseShift,  prefix + "vibration2_phase_shift"));
@@ -5202,8 +5202,8 @@ public:
 			T z_scaled = z * std::sqrt(rand.Frand01<T>()) * T(1.1547005383792515290182975610039);//2 / sqrt(3)
 			T n = VarFuncs<T>::HashShadertoy(xfinal, yfinal, m_Seed);
 			T R = m_SizeOver2 * z_scaled * std::pow(n, m_Power);
-			helper.Out.x = std::cos(final_angle) * R + xfinal * m_Weight;
-			helper.Out.y = std::sin(final_angle) * R + yfinal * m_Weight;
+			helper.Out.x = (std::cos(final_angle) * R + xfinal) * m_Weight;
+			helper.Out.y = (std::sin(final_angle) * R + yfinal) * m_Weight;
 		}
 
 		helper.Out.z = DefaultZ(helper);
@@ -5270,7 +5270,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Power,           prefix + "hex_rand_power", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Density,         prefix + "hex_rand_density", 1, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Seed,            prefix + "hex_rand_seed", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_SizeOver2, prefix + "hex_rand_size_over_2"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SizeOver2, prefix + "hex_rand_size_over_2"));//Precalc.
 	}
 
 private:
@@ -5884,7 +5884,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_SinYAmp,          prefix + "unicorngaloshen_sin_y_amplitude", 2));
 		m_Params.push_back(ParamWithName<T>(&m_SinYFreq,         prefix + "unicorngaloshen_sin_y_freq", T(0.2)));
 		m_Params.push_back(ParamWithName<T>(&m_Mode,             prefix + "unicorngaloshen_mode", 0, eParamType::INTEGER, 0, 4));
-		m_Params.push_back(ParamWithName<T>(true, &m_SinXFreqPi, prefix + "unicorngaloshen_sin_x_freq_pi"));
+		m_Params.push_back(ParamWithName<T>(true, &m_SinXFreqPi, prefix + "unicorngaloshen_sin_x_freq_pi"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_SinYFreqPi, prefix + "unicorngaloshen_sin_y_freq_pi"));
 	}
 
@@ -7461,7 +7461,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Scaley, prefix + "waves23_scaley", T(0.05)));
 		m_Params.push_back(ParamWithName<T>(&m_Freqx,  prefix + "waves23_freqx", T(7.0)));
 		m_Params.push_back(ParamWithName<T>(&m_Freqy,  prefix + "waves23_freqy", T(13.0)));
-		m_Params.push_back(ParamWithName<T>(true, &m_Freqx12Pi, prefix + "waves23_freqx_12pi"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Freqx12Pi, prefix + "waves23_freqx_12pi"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Freqy12Pi, prefix + "waves23_freqy_12pi"));
 	}
 

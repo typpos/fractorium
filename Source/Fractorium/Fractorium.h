@@ -358,6 +358,7 @@ public slots:
 	void OnRandomXaosButtonClicked(bool checked);
 	void OnAddLayerButtonClicked(bool checked);
 	void OnTransposeXaosButtonClicked(bool checked);
+	void OnToggleXaosButtonClicked(bool checked);
 	void OnXaosRowDoubleClicked(int logicalIndex);
 	void OnXaosColDoubleClicked(int logicalIndex);
 	void OnXaosHScrollValueChanged(int value);
@@ -398,7 +399,7 @@ public slots:
 	void SetTreeItemData(EmberTreeWidgetItemBase* item, vv4F& v, uint w, uint h);
 
 private slots:
-    void WindowShown();
+	void WindowShown();
 
 public:
 	//template<typename spinType, typename valType>//See below.
@@ -626,7 +627,7 @@ private:
 	std::unordered_map<QString, std::pair<int, int>> m_HeightPresets;
 
 	bool m_PreviousAffineState[4];
-    bool m_AboutDialogCentered;
+	bool m_AboutDialogCentered;
 	int m_FontSize;
 	int m_VarSortMode;
 	int m_PaletteSortMode;

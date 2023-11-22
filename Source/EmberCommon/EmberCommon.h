@@ -928,6 +928,51 @@ static bool FileExists(const string& filename, bool notempty = true)
 
 	return false;
 }
+
+class ThreadedWriter
+{
+public:
+	ThreadedWriter(int _size)
+	{
+		m_Size = _size;
+		m_WriteThreads.resize(m_Size);
+		m_FinalImages.resize(m_Size);
+	}
+
+	size_t Current()
+	{
+		return m_CurrentIndex % m_Size;
+	}
+
+	size_t Increment()
+	{
+		auto ret = ++m_CurrentIndex % m_Size;
+		Join(m_WriteThreads[ret]);
+		return ret;
+	}
+
+	vector<v4F>* GetImage(size_t i)
+	{
+		return &m_FinalImages[i];
+	}
+
+	void SetThread(size_t i, std::thread& th)
+	{
+		Join(m_WriteThreads[i]);
+		m_WriteThreads[i] = std::move(th);
+	}
+
+	void JoinAll()
+	{
+		Join(m_WriteThreads);
+	}
+
+private:
+	size_t m_Size = 0;
+	size_t m_CurrentIndex = 0;
+	std::vector<std::thread> m_WriteThreads;
+	std::vector<vector<v4F>> m_FinalImages;
+};
 }
 
 /// <summary>

@@ -1752,7 +1752,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Blur, prefix + "crob_blur", 1, eParamType::INTEGER));
 		m_Params.push_back(ParamWithName<T>(&m_RatioBlur, prefix + "crob_ratioBlur", T(0.5), eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(&m_DirectBlur, prefix + "crob_directBlur", 2));
-		m_Params.push_back(ParamWithName<T>(true, &m_XInterval, prefix + "crob_xinterval"));
+		m_Params.push_back(ParamWithName<T>(true, &m_XInterval, prefix + "crob_xinterval"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_YInterval, prefix + "crob_yinterval"));
 		m_Params.push_back(ParamWithName<T>(true, &m_XInt2, prefix + "crob_xint2"));
 		m_Params.push_back(ParamWithName<T>(true, &m_YInt2, prefix + "crob_yint2"));
@@ -3889,7 +3889,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Distort,            prefix + "crackle_distort"));
 		m_Params.push_back(ParamWithName<T>(&m_Scale,              prefix + "crackle_scale", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Z,                  prefix + "crackle_z"));
-		m_Params.push_back(ParamWithName<T>(true, &m_HalfCellSize, prefix + "crackle_half_cellsize"));
+		m_Params.push_back(ParamWithName<T>(true, &m_HalfCellSize, prefix + "crackle_half_cellsize"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &(m_C[0][0].x),  prefix + "crackle_cache", sizeof(m_C)));
 	}
 
@@ -4028,7 +4028,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Cellsize,              prefix + "crackle2_cellsize", 1, eParamType::REAL, T(0.0001)));
-		m_Params.push_back(ParamWithName<T>(true, &m_OneOverCellsize, prefix + "crackle2_one_over_cellsize"));
+		m_Params.push_back(ParamWithName<T>(true, &m_OneOverCellsize, prefix + "crackle2_one_over_cellsize"));//Precalc.
 	}
 
 private:
@@ -4876,7 +4876,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_SuperN1, prefix + "w_super_n1", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN2, prefix + "w_super_n2", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN3, prefix + "w_super_n3", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "w_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "w_inv_lituus_a"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope, prefix + "w_tan_star_slope"));
 		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD, prefix + "w_hypergon_d"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th, prefix + "w_super_m_4th"));
@@ -5076,7 +5076,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_SuperN1, prefix + "x_super_n1", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN2, prefix + "x_super_n2", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN3, prefix + "x_super_n3", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "x_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "x_inv_lituus_a"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope, prefix + "x_tan_star_slope"));
 		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD, prefix + "x_hypergon_d"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th, prefix + "x_super_m_4th"));
@@ -5276,7 +5276,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_SuperN1, prefix + "y_super_n1", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN2, prefix + "y_super_n2", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN3, prefix + "y_super_n3", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "y_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "y_inv_lituus_a"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope, prefix + "y_tan_star_slope"));
 		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD, prefix + "y_hypergon_d"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th, prefix + "y_super_m_4th"));
@@ -5477,7 +5477,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_SuperN1, prefix + "z_super_n1", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN2, prefix + "z_super_n2", 1));
 		m_Params.push_back(ParamWithName<T>(&m_SuperN3, prefix + "z_super_n3", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "z_inv_lituus_a"));//Precalc
+		m_Params.push_back(ParamWithName<T>(true, &m_InvLituusA, prefix + "z_inv_lituus_a"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_TanStarSlope, prefix + "z_tan_star_slope"));
 		m_Params.push_back(ParamWithName<T>(true, &m_HypergonD, prefix + "z_hypergon_d"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SuperM4th, prefix + "z_super_m_4th"));

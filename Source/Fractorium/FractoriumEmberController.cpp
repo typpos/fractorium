@@ -20,7 +20,6 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_RenderRestartTimer = make_unique<QTimer>(m_Fractorium);
 	m_AnimateTimer = make_unique<QTimer>(m_Fractorium);
 	m_AnimateTimer->stop();
-
 	m_Fractorium->connect(m_RenderRestartTimer.get(), &QTimer::timeout, [&]() { m_Fractorium->StartRenderTimer(false); });//It's ok to pass false for the first shot because creating the controller will start the preview renders.
 	// XXX: why not SLOT(SequenceAnimateNextFrame())?
 	m_Fractorium->connect(m_AnimateTimer.get(), &QTimer::timeout, [&]() { SequenceAnimateNextFrame(); });
@@ -115,7 +114,7 @@ FractoriumEmberController<T>::~FractoriumEmberController() { }
 /// These are used to preserve the current ember/file when switching between renderers.
 /// Note that some precision will be lost when going from double to float.
 /// </summary>
-template <typename T> void FractoriumEmberController<T>::SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer) { SetEmberPrivate<float>(ember, verbatim, updatePointer); }
+template <typename T> void FractoriumEmberController<T>::SetEmber(const Ember<float>& ember, bool verbatim, bool updatePointer, int xformIndex) { SetEmberPrivate<float>(ember, verbatim, updatePointer, xformIndex); }
 template <typename T> void FractoriumEmberController<T>::CopyEmber(Ember<float>& ember, std::function<void(Ember<float>& ember)> perEmberOperation) { ember = m_Ember; perEmberOperation(ember); }
 template <typename T> void FractoriumEmberController<T>::SetEmberFile(const EmberFile<float>& emberFile, bool move) { move ? m_EmberFile = std::move(emberFile) : m_EmberFile = emberFile; }
 template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<float>& emberFile, bool sequence, std::function<void(Ember<float>& ember)> perEmberOperation)
@@ -132,10 +131,12 @@ template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile
 	}
 }
 
+template <typename T> void FractoriumEmberController<T>::CopyXaosToggleEmber(Ember<float>& ember) { ember = m_XaosToggleEmber; }
+template <typename T> void FractoriumEmberController<T>::SetXaosToggleEmber(const Ember<float>& ember) { m_XaosToggleEmber = ember; }
 template <typename T> void FractoriumEmberController<T>::SetTempPalette(const Palette<float>& palette) { m_TempPalette = palette; }
 template <typename T> void FractoriumEmberController<T>::CopyTempPalette(Palette<float>& palette) { palette = m_TempPalette; }
 #ifdef DO_DOUBLE
-template <typename T> void FractoriumEmberController<T>::SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer) { SetEmberPrivate<double>(ember, verbatim, updatePointer); }
+template <typename T> void FractoriumEmberController<T>::SetEmber(const Ember<double>& ember, bool verbatim, bool updatePointer, int xformIndex) { SetEmberPrivate<double>(ember, verbatim, updatePointer, xformIndex); }
 template <typename T> void FractoriumEmberController<T>::CopyEmber(Ember<double>& ember, std::function<void(Ember<double>& ember)> perEmberOperation) { ember = m_Ember; perEmberOperation(ember); }
 template <typename T> void FractoriumEmberController<T>::SetEmberFile(const EmberFile<double>& emberFile, bool move) { move ? m_EmberFile = std::move(emberFile) : m_EmberFile = emberFile; }
 template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile<double>& emberFile, bool sequence, std::function<void(Ember<double>& ember)> perEmberOperation)
@@ -152,6 +153,8 @@ template <typename T> void FractoriumEmberController<T>::CopyEmberFile(EmberFile
 	}
 }
 
+template <typename T> void FractoriumEmberController<T>::CopyXaosToggleEmber(Ember<double>& ember) { ember = m_XaosToggleEmber; }
+template <typename T> void FractoriumEmberController<T>::SetXaosToggleEmber(const Ember<double>& ember) { m_XaosToggleEmber = ember; }
 template <typename T> void FractoriumEmberController<T>::SetTempPalette(const Palette<double>& palette) { m_TempPalette = palette; }
 template <typename T> void FractoriumEmberController<T>::CopyTempPalette(Palette<double>& palette) { palette = m_TempPalette; }
 #endif
@@ -166,6 +169,8 @@ void FractoriumEmberController<T>::ConstrainDimensions(Ember<T>& ember)
 
 /// <summary>
 /// Set the ember at the specified index from the currently opened file as the current Ember.
+/// Also attempt to keep the same xform inxed selected, which is useful when switching between many
+/// similar embers when setting up animation keyframes.
 /// Clears the undo state.
 /// Resets the rendering process.
 /// </summary>
@@ -176,9 +181,10 @@ void FractoriumEmberController<T>::SetEmber(size_t index, bool verbatim)
 {
 	if (index < m_EmberFile.Size())
 	{
+		auto currentXformIndex = m_Fractorium->ui.CurrentXformCombo->currentIndex();
 		m_Fractorium->SelectLibraryItem(index);
 		ClearUndo();
-		SetEmber(*m_EmberFile.Get(index), verbatim, true);
+		SetEmber(*m_EmberFile.Get(index), verbatim, true, currentXformIndex);
 	}
 }
 
@@ -329,9 +335,10 @@ void FractoriumEmberController<T>::UpdateXform(std::function<void(Xform<T>*, siz
 /// <param name="ember">The ember to set as the current</param>
 /// <param name="verbatim">If true, do not overwrite temporal samples, quality or supersample value, else overwrite.</param>
 /// <param name="updatePointer">If true, update the current ember pointer to the address of the one passed in.</param>
+/// <param name="xformIndex">The xform index to select as the current one</param>
 template <typename T>
 template <typename U>
-void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool verbatim, bool updatePointer)
+void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool verbatim, bool updatePointer, int xformIndex)
 {
 	if (ember.m_Name != m_Ember.m_Name)
 		m_LastSaveCurrent = "";
@@ -339,6 +346,7 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	const auto w = m_Ember.m_FinalRasW;//Cache values for use below.
 	const auto h = m_Ember.m_FinalRasH;
 	m_Ember = ember;
+	m_XaosToggleEmber.Clear();
 
 	if (updatePointer && (typeid(T) == typeid(U)))
 		m_EmberFilePointer = (Ember<T>*)&ember;
@@ -360,7 +368,7 @@ void FractoriumEmberController<T>::SetEmberPrivate(const Ember<U>& ember, bool v
 	const auto filename = path.toStdString() + "/last.flame";
 	writer.Save(filename, m_Ember, 0, true, true, false, true, true);
 	m_GLController->ResetMouseState();
-	FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
+	FillXforms(xformIndex);//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 	FillParamTablesAndPalette();
 	FillCurvesControl();
 	FillSummary();

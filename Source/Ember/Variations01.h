@@ -1691,7 +1691,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string vSin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string vfCos = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -1729,14 +1729,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "perspective_angle"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "perspective_angle"));
 		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "perspective_dist"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vsin, prefix + "perspective_vsin"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_VfCos, prefix + "perspective_vfcos"));
 	}
 
 private:
-	T m_Angle;//Params.
+	T m_Angle;
 	T m_Dist;
 	T m_Vsin;//Precalc.
 	T m_VfCos;
@@ -1808,7 +1808,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string cn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -1842,14 +1842,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "julian_dist", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "julian_dist", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "julian_power", 1, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_Rn, prefix + "julian_rn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn, prefix + "julian_cn"));
 	}
 
 private:
-	T m_Dist;//Params.
+	T m_Dist;
 	T m_Power;
 	T m_Rn;//Precalc.
 	T m_Cn;
@@ -1900,7 +1900,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string rn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string cn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -1954,14 +1954,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "juliascope_dist", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "juliascope_dist", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "juliascope_power", 1, eParamType::REAL_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_Rn, prefix + "juliascope_rn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn, prefix + "juliascope_cn"));
 	}
 
 private:
-	T m_Dist;//Params.
+	T m_Dist;
 	T m_Power;
 	T m_Rn;//Precalc.
 	T m_Cn;
@@ -2113,7 +2113,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string spin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string zoom = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
@@ -2144,13 +2144,13 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "radial_blur_angle"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "radial_blur_angle"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Spin, prefix + "radial_blur_spin"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Zoom, prefix + "radial_blur_zoom"));
 	}
 
 private:
-	T m_Angle;//Params.
+	T m_Angle;
 	T m_Spin;//Precalc.
 	T m_Zoom;
 };
@@ -2222,7 +2222,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Slices, prefix + "pie_slices", 6, eParamType::INTEGER_NONZERO, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix + "pie_rotation", T(0.5), eParamType::REAL_CYCLIC, 0, M_2PI));
 		m_Params.push_back(ParamWithName<T>(&m_Thickness, prefix + "pie_thickness", T(0.5), eParamType::REAL, 0, 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_Pi2Slices, prefix + "pie_pi2_slices"));
+		m_Params.push_back(ParamWithName<T>(true, &m_Pi2Slices, prefix + "pie_pi2_slices"));//Precalc.
 	}
 
 private:
@@ -2326,7 +2326,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "ngon_power", 3));
 		m_Params.push_back(ParamWithName<T>(&m_Circle, prefix + "ngon_circle", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Corners, prefix + "ngon_corners", 2));
-		m_Params.push_back(ParamWithName<T>(true, &m_CSides, prefix + "ngon_csides"));
+		m_Params.push_back(ParamWithName<T>(true, &m_CSides, prefix + "ngon_csides"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CSidesInv, prefix + "ngon_csides_inv"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CPower, prefix + "ngon_cpower"));
 	}
@@ -2986,7 +2986,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string rot = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string rot = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string twist = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string sinAdd = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string cosAdd = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -3037,7 +3037,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Rot, prefix + "disc2_rot"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Rot, prefix + "disc2_rot"));
 		m_Params.push_back(ParamWithName<T>(&m_Twist, prefix + "disc2_twist"));
 		m_Params.push_back(ParamWithName<T>(true, &m_SinAdd, prefix + "disc2_sin_add"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CosAdd, prefix + "disc2_cos_add"));
@@ -3045,7 +3045,7 @@ protected:
 	}
 
 private:
-	T m_Rot;//Params.
+	T m_Rot;
 	T m_Twist;
 	T m_SinAdd;//Precalc.
 	T m_CosAdd;
@@ -3087,7 +3087,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string m       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string m       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string n1      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string n2      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string n3      = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -3131,7 +3131,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_M, prefix + "super_shape_m"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_M, prefix + "super_shape_m"));
 		m_Params.push_back(ParamWithName<T>(&m_N1, prefix + "super_shape_n1", 1));
 		m_Params.push_back(ParamWithName<T>(&m_N2, prefix + "super_shape_n2", 1));
 		m_Params.push_back(ParamWithName<T>(&m_N3, prefix + "super_shape_n3", 1));
@@ -3142,7 +3142,7 @@ protected:
 	}
 
 private:
-	T m_M;//Params.
+	T m_M;
 	T m_N1;
 	T m_N2;
 	T m_N3;
@@ -3493,14 +3493,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "bent2_x", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "bent2_x", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "bent2_y", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vx, prefix + "bent2_vx"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Vy, prefix + "bent2_vy"));
 	}
 
 private:
-	T m_X;//Params.
+	T m_X;
 	T m_Y;
 	T m_Vx;//Precalc.
 	T m_Vy;
@@ -3649,14 +3649,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "bipolar_shift"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Shift, prefix + "bipolar_shift"));
 		m_Params.push_back(ParamWithName<T>(true, &m_S, prefix + "bipolar_s"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_V, prefix + "bipolar_v"));
 		m_Params.push_back(ParamWithName<T>(true, &m_V4, prefix + "bipolar_v4"));
 	}
 
 private:
-	T m_Shift;//Params.
+	T m_Shift;
 	T m_S;//Precalc.
 	T m_V;
 	T m_V4;
@@ -4014,7 +4014,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_PowerR, prefix + "cpow_r", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_PowerR, prefix + "cpow_r", 1));
 		m_Params.push_back(ParamWithName<T>(&m_PowerI, prefix + "cpow_i"));
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "cpow_power", 1, eParamType::INTEGER_NONZERO));
 		m_Params.push_back(ParamWithName<T>(true, &m_C, prefix + "cpow_c"));//Precalc.
@@ -4023,7 +4023,7 @@ protected:
 	}
 
 private:
-	T m_PowerR;//Params.
+	T m_PowerR;
 	T m_PowerI;
 	T m_Power;
 	T m_C;//Precalc.
@@ -4096,7 +4096,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_XAmp, prefix + "curve_xamp"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_XAmp, prefix + "curve_xamp"));
 		m_Params.push_back(ParamWithName<T>(&m_YAmp, prefix + "curve_yamp"));
 		m_Params.push_back(ParamWithName<T>(&m_XLength, prefix + "curve_xlength", 1));
 		m_Params.push_back(ParamWithName<T>(&m_YLength, prefix + "curve_ylength", 1));
@@ -4107,7 +4107,7 @@ protected:
 	}
 
 private:
-	T m_XAmp;//Params.
+	T m_XAmp;
 	T m_YAmp;
 	T m_XLength;
 	T m_YLength;
@@ -4472,13 +4472,13 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Beta, prefix + "escher_beta"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Beta, prefix + "escher_beta"));
 		m_Params.push_back(ParamWithName<T>(true, &m_C, prefix + "escher_beta_c"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_D, prefix + "escher_beta_d"));
 	}
 
 private:
-	T m_Beta;//Params.
+	T m_Beta;
 	T m_C;//Precalc.
 	T m_D;
 };
@@ -4806,14 +4806,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "modulus_x", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "modulus_x", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "modulus_y", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_XRange, prefix + "modulus_xrange"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_YRange, prefix + "modulus_yrange"));
 	}
 
 private:
-	T m_X;//Params.
+	T m_X;
 	T m_Y;
 	T m_XRange;//Precalc.
 	T m_YRange;
@@ -4910,7 +4910,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Separation,    prefix + "oscilloscope_separation", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Separation,    prefix + "oscilloscope_separation", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Frequency,     prefix + "oscilloscope_frequency", T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_Amplitude,     prefix + "oscilloscope_amplitude", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Damping,       prefix + "oscilloscope_damping"));
@@ -4918,7 +4918,7 @@ protected:
 	}
 
 private:
-	T m_Separation;//Params.
+	T m_Separation;
 	T m_Frequency;
 	T m_Amplitude;
 	T m_Damping;
@@ -5015,7 +5015,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Separation,   prefix + "oscilloscope2_separation", 1, eParamType::REAL, 0));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Separation,   prefix + "oscilloscope2_separation", 1, eParamType::REAL, 0));
 		m_Params.push_back(ParamWithName<T>(&m_FrequencyX,   prefix + "oscilloscope2_frequencyx", T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_FrequencyY,   prefix + "oscilloscope2_frequencyy", T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_Amplitude,    prefix + "oscilloscope2_amplitude", 1));
@@ -5026,7 +5026,7 @@ protected:
 	}
 
 private:
-	T m_Separation;//Params.
+	T m_Separation;
 	T m_FrequencyX;
 	T m_FrequencyY;
 	T m_Amplitude;
@@ -5391,7 +5391,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "separation_x", 1));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "separation_x", 1));
 		m_Params.push_back(ParamWithName<T>(&m_XInside, prefix + "separation_xinside"));
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "separation_y", 1));
 		m_Params.push_back(ParamWithName<T>(&m_YInside, prefix + "separation_yinside"));
@@ -5400,7 +5400,7 @@ protected:
 	}
 
 private:
-	T m_X;//Params.
+	T m_X;
 	T m_XInside;
 	T m_Y;
 	T m_YInside;
@@ -5481,14 +5481,14 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_XSize, prefix + "split_xsize", T(0.5)));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_XSize, prefix + "split_xsize", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_YSize, prefix + "split_ysize", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(true, &m_XAng, prefix + "split_xang"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_YAng, prefix + "split_yang"));
 	}
 
 private:
-	T m_XSize;//Params.
+	T m_XSize;
 	T m_YSize;
 	T m_XAng;//Precalc.
 	T m_YAng;
@@ -5701,7 +5701,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "wedge_angle", T(M_PI_2)));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "wedge_angle", T(M_PI_2)));
 		m_Params.push_back(ParamWithName<T>(&m_Hole, prefix + "wedge_hole"));
 		m_Params.push_back(ParamWithName<T>(&m_Count, prefix + "wedge_count", 2, eParamType::INTEGER, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Swirl, prefix + "wedge_swirl"));
@@ -5709,7 +5709,7 @@ protected:
 	}
 
 private:
-	T m_Angle;//Params.
+	T m_Angle;
 	T m_Hole;
 	T m_Count;
 	T m_Swirl;
@@ -5749,7 +5749,7 @@ public:
 		ss2 << "_" << XformIndexInEmber() << "]";
 		string index = ss2.str();
 		string weight = WeightDefineString();
-		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Params.
+		string angle = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string count = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
@@ -5790,7 +5790,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "wedge_julia_angle"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Angle, prefix + "wedge_julia_angle"));
 		m_Params.push_back(ParamWithName<T>(&m_Count, prefix + "wedge_julia_count", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "wedge_julia_power", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "wedge_julia_dist"));
@@ -5800,7 +5800,7 @@ protected:
 	}
 
 private:
-	T m_Angle;//Params.
+	T m_Angle;
 	T m_Count;
 	T m_Power;
 	T m_Dist;
@@ -5890,7 +5890,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Count, prefix + "wedge_sph_count", 2, eParamType::INTEGER, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Hole, prefix + "wedge_sph_hole"));
 		m_Params.push_back(ParamWithName<T>(&m_Swirl, prefix + "wedge_sph_swirl"));
-		m_Params.push_back(ParamWithName<T>(true, &m_C12Pi, prefix + "wedge_sph_c1_2pi"));
+		m_Params.push_back(ParamWithName<T>(true, &m_C12Pi, prefix + "wedge_sph_c1_2pi"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CompFac, prefix + "wedge_sph_comp_fac"));
 	}
 
@@ -7342,12 +7342,12 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Spread, prefix + "flux_spread"));//Params.
+		m_Params.push_back(ParamWithName<T>(&m_Spread, prefix + "flux_spread"));
 		m_Params.push_back(ParamWithName<T>(true, &m_Spr, prefix + "flux_spr"));//Precalc.
 	}
 
 private:
-	T m_Spread;//Params.
+	T m_Spread;
 	T m_Spr;//Precalc.
 };
 

@@ -99,8 +99,8 @@ template <typename T>
 T GLEmberController<T>::CalcRotation()
 {
 	const auto scrolledWorldCenter = ScrolledCenter(true);
-	const T rotStart = NormalizeDeg180<T>((std::atan2(m_MouseDownWorldPos.y - scrolledWorldCenter.y, m_MouseDownWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
-	const T rot = NormalizeDeg180<T>((std::atan2(m_MouseWorldPos.y - scrolledWorldCenter.y, m_MouseWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
+	const T rotStart = NormalizeDeg360<T>((std::atan2(m_MouseDownWorldPos.y - scrolledWorldCenter.y, m_MouseDownWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
+	const T rot = NormalizeDeg360<T>((std::atan2(m_MouseWorldPos.y - scrolledWorldCenter.y, m_MouseWorldPos.x - scrolledWorldCenter.x) * RAD_2_DEG_T));
 	return rotStart - rot;
 }
 

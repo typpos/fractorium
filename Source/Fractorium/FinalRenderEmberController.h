@@ -106,7 +106,7 @@ class FinalRenderEmberController : public FinalRenderEmberControllerBase
 
 public:
 	FinalRenderEmberController(FractoriumFinalRenderDialog* finalRender);
-	virtual ~FinalRenderEmberController() { }
+	virtual ~FinalRenderEmberController();
 
 	//Virtual functions overridden from FractoriumEmberControllerBase.
 	void SetEmberFile(const EmberFile<float>& emberFile, bool move) override;
@@ -159,6 +159,7 @@ protected:
 	EmberToXml<T> m_XmlWriter;
 	unique_ptr<FinalRenderPreviewRenderer<T>> m_FinalPreviewRenderer;
 	vector<unique_ptr<EmberNs::Renderer<T, float>>> m_Renderers;
+	ThreadedWriter m_ThreadedWriter;
 };
 
 /// <summary>

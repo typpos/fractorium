@@ -531,6 +531,10 @@ bool RendererBase::Shared() const { return false; }
 void RendererBase::Reset()
 {
 	Abort();
+
+	while (InRender())
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 	EnterRender();
 	EnterFinalAccum();
 	LeaveFinalAccum();

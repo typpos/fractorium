@@ -641,7 +641,7 @@ bool FractoriumEmberController<T>::CreateRenderer(eRendererType renderType, cons
 
 		if (updatePreviews)
 		{
-			m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile);//Will take the same settings as the main renderer.
+			m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile, nullptr);//Will take the same settings as the main renderer.
 			RenderLibraryPreviews();
 		}
 

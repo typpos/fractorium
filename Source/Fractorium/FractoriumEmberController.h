@@ -646,8 +646,9 @@ template <typename T>
 class PreviewRenderer
 {
 public:
-	PreviewRenderer()
+	PreviewRenderer(QProgressBar* p)
 	{
+		m_Pb = p;
 	}
 
 	virtual ~PreviewRenderer()
@@ -669,8 +670,10 @@ public:
 	void Stop()
 	{
 		m_PreviewRun = false;
-		m_PreviewRenderer.Abort();
-		m_PreviewResult.waitForFinished();
+		m_PreviewRenderer.Reset();
+
+		while (m_PreviewResult.isRunning())
+			QApplication::processEvents();
 	}
 
 	bool EarlyClip()
@@ -696,6 +699,7 @@ protected:
 	vector<unsigned char> m_PreviewVec;
 	vv4F m_PreviewFinalImage;
 	EmberNs::Renderer<T, float> m_PreviewRenderer;
+	QProgressBar* m_Pb = nullptr;
 
 private:
 	QFuture<void> m_PreviewResult;
@@ -714,6 +718,7 @@ public:
 	using PreviewRenderer<T>::m_PreviewVec;
 	using PreviewRenderer<T>::m_PreviewRenderer;
 	using PreviewRenderer<T>::m_PreviewFinalImage;
+	using PreviewRenderer<T>::m_Pb;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TreePreviewRenderer{T}"/> class.
@@ -721,10 +726,11 @@ public:
 	/// <param name="controller">A pointer to the controller this instance is a member of</param>
 	/// <param name="tree">A pointer to the tree to render to</param>
 	/// <param name="emberFile">A reference to the ember file to render</param>
-	TreePreviewRenderer(FractoriumEmberController<T>* controller, QTreeWidget* tree, EmberFile<T>& emberFile) :
+	TreePreviewRenderer(FractoriumEmberController<T>* controller, QTreeWidget* tree, EmberFile<T>& emberFile, QProgressBar* p) :
 		m_Controller(controller),
 		m_Tree(tree),
-		m_EmberFile(emberFile)
+		m_EmberFile(emberFile),
+		PreviewRenderer<T>(p)
 	{
 		const auto f = m_Controller->m_Fractorium;
 		m_PreviewRenderer.Callback(nullptr);

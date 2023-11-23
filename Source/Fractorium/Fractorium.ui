@@ -6264,8 +6264,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>269</width>
-                       <height>650</height>
+                       <width>144</width>
+                       <height>58</height>
                       </rect>
                      </property>
                      <property name="sizePolicy">
@@ -8071,6 +8071,13 @@
               </property>
               <property name="value">
                <number>30</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="2">
+             <widget class="QProgressBar" name="SequenceProgressBar">
+              <property name="value">
+               <number>0</number>
               </property>
              </widget>
             </item>

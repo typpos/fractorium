@@ -68,8 +68,8 @@ FractoriumEmberController<T>::FractoriumEmberController(Fractorium* fractorium)
 {
 	size_t b = 0;
 	m_GLController = make_unique<GLEmberController<T>>(fractorium, fractorium->ui.GLDisplay, this);
-	m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile);
-	m_SequencePreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.SequenceTree, m_SequenceFile);
+	m_LibraryPreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.LibraryTree, m_EmberFile, nullptr);
+	m_SequencePreviewRenderer = make_unique<TreePreviewRenderer<T>>(this, m_Fractorium->ui.SequenceTree, m_SequenceFile, m_Fractorium->ui.SequenceProgressBar);
 	m_PaletteList->Clear();
 	m_Fractorium->ui.PaletteFilenameCombo->clear();
 	//Initial combo change event to fill the palette table will be called automatically later.
@@ -397,6 +397,12 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 	if (const auto top = m_Tree->topLevelItem(m_Tree->topLevelItemCount() - 1))
 	{
 		size_t i = start;
+		double prc = 0;
+		double ct = 0;
+		double total = end - start;
+
+		if (m_Pb)
+			QMetaObject::invokeMethod(m_Pb, "setValue", Qt::QueuedConnection, Q_ARG(const int, 0));
 
 		for (auto b = Advance(m_EmberFile.m_Embers.begin(), start); m_PreviewRun && i < end && b != m_EmberFile.m_Embers.end(); ++b, ++i)
 		{
@@ -422,11 +428,19 @@ void TreePreviewRenderer<T>::PreviewRenderFunc(uint start, uint end)
 												  Q_ARG(vv4F&, m_PreviewFinalImage),
 												  Q_ARG(uint, PREVIEW_SIZE),
 												  Q_ARG(uint, PREVIEW_SIZE));
+						prc = 100.0 * (++ct / total);
+
+						if (m_Pb)
+							QMetaObject::invokeMethod(m_Pb, "setValue", Qt::QueuedConnection, Q_ARG(const int, int(prc)));
+
 						treeItem->SetRendered();
 					}
 				}
 			}
 		}
+
+		if (m_Pb)
+			QMetaObject::invokeMethod(m_Pb, "setValue", Qt::QueuedConnection, Q_ARG(const int, 100));
 	}
 }
 

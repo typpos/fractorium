@@ -40,15 +40,7 @@ void FinalRenderEmberController<T>::CancelRender()
 
 			if (m_Renderer.get())
 			{
-				m_Renderer->Abort();
-
-				while (m_Renderer->InRender())
-					std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-				m_Renderer->EnterRender();
-				m_Renderer->EnterFinalAccum();
-				m_Renderer->LeaveFinalAccum();
-				m_Renderer->LeaveRender();
+				m_Renderer->Reset();
 			}
 			else
 			{

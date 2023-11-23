@@ -290,13 +290,13 @@ void FractoriumEmberController<T>::OpenAndPrepFiles(const QStringList& filenames
 {
 	if (!filenames.empty())
 	{
+		StopAllPreviewRenderers();
 		size_t i;
 		EmberFile<T> emberFile;
 		XmlToEmber<T> parser;
 		vector<Ember<T>> embers;
 		vector<string> errors;
 		uint previousSize = append ? uint(m_EmberFile.Size()) : 0u;
-		StopAllPreviewRenderers();
 		emberFile.m_Filename = filenames[0];
 
 		for (auto& filename : filenames)

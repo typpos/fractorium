@@ -465,7 +465,11 @@ void FractoriumEmberController<T>::RenderLibraryPreviews(uint start, uint end)
 }
 
 template <typename T>
-void FractoriumEmberController<T>::StopLibraryPreviewRender() { m_LibraryPreviewRenderer->Stop(); }
+void FractoriumEmberController<T>::StopLibraryPreviewRender()
+{
+	m_LibraryPreviewRenderer->Stop();
+	QApplication::processEvents();
+}
 
 /// <summary>
 /// Thing wrapper around StopLibraryPreviewRender() and StopSequencePreviewRender() to stop both preview renderers.
@@ -571,17 +575,18 @@ void FractoriumEmberController<T>::RenderSequencePreviews(uint start, uint end)
 	RenderPreviews(m_Fractorium->ui.SequenceTree, m_SequencePreviewRenderer.get(), m_SequenceFile, start, end);
 }
 
-void Fractorium::OnSequenceStartPreviewsButtonClicked(bool checked)
-{
-	m_Controller->RenderSequencePreviews();
-}
+void Fractorium::OnSequenceStartPreviewsButtonClicked(bool checked) { m_Controller->RenderSequencePreviews(); }
 
 /// <summary>
 /// Stop rendering the sequence previews.
 /// Called when Stop Previews is clicked.
 /// </summary>
 template <typename T>
-void FractoriumEmberController<T>::StopSequencePreviewRender() { m_SequencePreviewRenderer->Stop(); }
+void FractoriumEmberController<T>::StopSequencePreviewRender()
+{
+	m_SequencePreviewRenderer->Stop();
+	QApplication::processEvents();
+}
 void Fractorium::OnSequenceStopPreviewsButtonClicked(bool checked) { m_Controller->StopSequencePreviewRender(); }
 
 /// <summary>

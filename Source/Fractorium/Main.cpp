@@ -28,11 +28,11 @@ int main(int argc, char* argv[])
 	int rv = -1;
 	QApplication a(argc, argv);
 #ifdef TEST_CL
-	QMessageBox::critical(QApplication::desktop(), "Error", "Fractorium cannot be run in test mode, undefine TEST_CL first.");
+	QMessageBox::critical(nullptr, "Error", "Fractorium cannot be run in test mode, undefine TEST_CL first.");
 	return 1;
 #endif
 #ifdef ISAAC_FLAM3_DEBUG
-	QMessageBox::critical(QApplication::desktop(), "Error", "Fractorium cannot be run in test mode, undefine ISAAC_FLAM3_DEBUG first.");
+	QMessageBox::critical(nullptr, "Error", "Fractorium cannot be run in test mode, undefine ISAAC_FLAM3_DEBUG first.");
 	return 1;
 #endif
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);

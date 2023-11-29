@@ -502,6 +502,7 @@ string EmberToXml<T>::ToString(Xform<T>& xform, size_t xformCount, bool isFinal,
 {
 	size_t i, j;
 	ostringstream os;
+	os << std::fixed << std::setprecision(8);
 
 	if (doMotion)
 	{

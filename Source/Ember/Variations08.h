@@ -104,8 +104,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_GnarlyCellSize, prefix + "gnarly_cellsize", T(1)));
-		m_Params.push_back(ParamWithName<T>(&m_GnarlyTwist, prefix + "gnarly_twist", T(1)));
+		m_Params.push_back(ParamWithName<T>(&m_GnarlyCellSize, prefix + "gnarly_cellsize", 1));
+		m_Params.push_back(ParamWithName<T>(&m_GnarlyTwist, prefix + "gnarly_twist", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_R2, prefix + "gnarly_r2"));//Precalc.
 	}
 
@@ -300,7 +300,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Size,                prefix + "hex_modulus_size", T(1.0)));
+		m_Params.push_back(ParamWithName<T>(&m_Size,                prefix + "hex_modulus_size", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_HsizePrecalc,  prefix + "hex_modulus_hsize_precalc"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_WeightPrecalc, prefix + "hex_modulus_weight_precalc"));
 	}

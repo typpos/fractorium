@@ -1,7 +1,7 @@
 #include "FractoriumPch.h"
 #include "Fractorium.h"
 
-#define XAOS_PREC 6
+#define XAOS_PREC 8
 
 /// <summary>
 /// Initialize the xforms xaos UI.

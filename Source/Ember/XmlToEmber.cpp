@@ -55,8 +55,8 @@ XmlToEmber<T>::XmlToEmber()
 			{ "pow_correctn", "pow_block_correctn" },
 			{ "pow_correctd", "pow_block_correctd" },
 			{ "pow_power", "pow_block_power" },
-			{ "lt", "linearT_powX" },                      //linearT.
-			{ "lt", "linearT_powY" },
+			{ "lt_powx", "linearT_powX" },                      //linearT.
+			{ "lt_powy", "linearT_powY" },
 			{ "re_a", "Mobius_Re_A" },                    //Mobius.
 			{ "im_a", "Mobius_Im_A" },
 			{ "re_b", "Mobius_Re_B" },
@@ -136,12 +136,12 @@ XmlToEmber<T>::XmlToEmber()
 			{ "nb_exactcalc", "nBlur_exactCalc" },
 			{ "nb_highlightedges", "nBlur_highlightEdges" },
 			{ "octapol_r", "octapol_radius" },               //octapol.
-			{ "number_of_stripes", "bubbleT3D_number_of_stripes" },       //bubbleT3D.
-			{ "ratio_of_stripes", "bubbleT3D_ratio_of_stripes" },
-			{ "angle_of_hole", "bubbleT3D_angle_of_hole" },
-			{ "exponentZ", "bubbleT3D_exponentZ" },
-			{ "_symmetryZ", "bubbleT3D_symmetryZ" },
-			{ "_modusBlur", "bubbleT3D_modusBlur" },
+			//{ "number_of_stripes", "bubbleT3D_number_of_stripes" },       //bubbleT3D.
+			//{ "ratio_of_stripes", "bubbleT3D_ratio_of_stripes" },
+			//{ "angle_of_hole", "bubbleT3D_angle_of_hole" },
+			//{ "exponentZ", "bubbleT3D_exponentZ" },
+			//{ "_symmetryZ", "bubbleT3D_symmetryZ" },
+			//{ "_modusBlur", "bubbleT3D_modusBlur" },
 			{ "post_scrop_power", "post_smartcrop_power" },        //post_smartcrop.
 			{ "post_scrop_radius", "post_smartcrop_radius" },
 			{ "post_scrop_roundstr", "post_smartcrop_roundstr" },
@@ -164,20 +164,20 @@ XmlToEmber<T>::XmlToEmber()
 			{ "tf_exponent", "Truchet_fill_exponent" },
 			{ "tf_arc_width", "Truchet_fill_arc_width" },
 			{ "tf_seed", "Truchet_fill_seed" },
-			{ "blockSize", "randCubes_blockSize" },
-			{ "blockHeight", "randCubes_blockHeight" },
-			{ "spread", "randCubes_spread" },
-			{ "seed", "randCubes_seed" },
-			{ "density", "randCubes_density" },
-			{ "radius", "concentric_radius" },
+			//{ "blockSize", "randCubes_blockSize" },
+			//{ "blockHeight", "randCubes_blockHeight" },
+			//{ "spread", "randCubes_spread" },
+			//{ "seed", "randCubes_seed" },
+			//{ "density", "randCubes_density" },
+			//{ "radius", "concentric_radius" },
 			//{ "density", "concentric_density" },//Can't have two, which means you can never properly paste from Apophysis with both of these in one xform.
-			{ "r_blur", "concentric_R_blur" },
-			{ "z_blur", "concentric_Z_blur" },
-			{ "angle", "pixel_flow_angle" },
-			{ "len", "pixel_flow_len" },
-			{ "width", "pixel_flow_width" },
+			//{ "r_blur", "concentric_R_blur" },
+			//{ "z_blur", "concentric_Z_blur" },
+			//{ "angle", "pixel_flow_angle" },
+			///{ "len", "pixel_flow_len" },
+			//{ "width", "pixel_flow_width" },
 			//{ "seed", "pixel_flow_seed" },//randCubes above already uses "seed", but it's just for randomness, so it shouldn't matter.
-			{ "enable_dc", "pixel_flow_enable_dc" },
+			//{ "enable_dc", "pixel_flow_enable_dc" },
 			{ "radial_gaussian_angle", "radial_blur_angle" },
 			{ "pr_a",	"projective_A"  },
 			{ "pr_b",	"projective_B"  },
@@ -202,7 +202,7 @@ XmlToEmber<T>::XmlToEmber()
 			{ "oscope_frequency", "oscilloscope_frequency" },
 			{ "oscope_amplitude", "oscilloscope_amplitude" },
 			{ "oscope_damping", "oscilloscope_damping" },
-			{ "power", "scry2_power" },
+			//{ "power", "scry2_power" },
 			{ "faber_w_angle", "w_angle" },
 			{ "faber_w_hypergon", "w_hypergon" },
 			{ "faber_w_hypergon_n", "w_hypergon_n" },
@@ -240,21 +240,26 @@ XmlToEmber<T>::XmlToEmber()
 			{ "post_sshape_roundwidth", "post_smartshape_roundwidth" },
 			{ "post_sshape_distortion", "post_smartshape_distortion" },
 			{ "post_sshape_compensation", "post_smartshape_compensation" },
-			{ "mult_x", "unicorngaloshen_mult_x" },
-			{ "mult_y", "unicorngaloshen_mult_y" },
-			{ "sine", "unicorngaloshen_sine" },
-			{ "sin_x_amplitude", "unicorngaloshen_sin_x_amplitude" },
-			{ "sin_x_freq", "unicorngaloshen_sin_x_freq" },
-			{ "sin_y_amplitude", "unicorngaloshen_sin_y_amplitude" },
-			{ "sin_y_freq", "unicorngaloshen_sin_y_freq" },
-			{ "mode", "unicorngaloshen_mode" },
+			//{ "mult_x", "unicorngaloshen_mult_x" },
+			//{ "mult_y", "unicorngaloshen_mult_y" },
+			//{ "sine", "unicorngaloshen_sine" },
+			//{ "sin_x_amplitude", "unicorngaloshen_sin_x_amplitude" },
+			//{ "sin_x_freq", "unicorngaloshen_sin_x_freq" },
+			//{ "sin_y_amplitude", "unicorngaloshen_sin_y_amplitude" },
+			//{ "sin_y_freq", "unicorngaloshen_sin_y_freq" },
+			//{ "mode", "unicorngaloshen_mode" },
 			{ "d_spher_weight", "d_spherical_weight" },
 			{ "poincare_p", "poincare2_p" },
 			{ "poincare_q", "poincare2_q" },
 			{ "phoenix_power", "phoenix_julia_power"},
 			{ "phoenix_dist", "phoenix_julia_dist" },
-			{ "x_distort", "phoenix_julia_x_distort"},
-			{ "y_distort", "phoenix_julia_y_distort" }
+			//{ "x_distort", "phoenix_julia_x_distort"},
+			//{ "y_distort", "phoenix_julia_y_distort" },
+			{ "phoenixjulia_power", "phoenix_julia_power" },
+			{ "phoenixjulia_dist", "phoenix_julia_dist" },
+			{ "phoenixjulia_x_distort", "phoenix_julia_x_distort" },
+			{ "phoenixjulia_y_distort", "phoenix_julia_y_distort" },
+			{ "log_", "log" }//Chaotica uses log_ as the weight for log to avoid a name conflict with the function log().
 		};
 		m_FlattenNames =
 		{
@@ -908,6 +913,8 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 						{
 							const auto corrvarname = GetCorrectedVariationName(m_BadVariationNames, varname);
 							const auto corrwprefix = !StartsWith(corrvarname, prefix) ? prefix + corrvarname : corrvarname;
+							const auto varnamewithunderscore = corrvarname + "_";
+							const auto fullprefix = prefix + varnamewithunderscore;
 
 							if (auto var = m_VariationList->GetVariation(corrwprefix))
 							{
@@ -949,16 +956,28 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 													}
 													else if (ParseAndAssignContent(paramsChildNode, "name", paramname, val))
 													{
-														auto paramstr = GetCorrectedParamName(m_BadParamNames, ToLower(paramname).c_str());
+														auto paramstr = GetCorrectedParamName(m_BadParamNames, paramname);
 
-														if (paramname == varname)//Compare non corrected names.
+														//Compare non corrected or corrected names.
+														//This is needed for the case of "log_" which gets corrected to "log".
+														if (paramname == varname || paramstr == varname)
 														{
 															varCopy->m_Weight = val;
 														}
 														else if (parvar)
 														{
-															if (!StartsWith(paramstr, prefix))
+															if (StartsWith(paramstr, fullprefix, true))
+															{
+																//Do nothing.
+															}
+															else if (!StartsWith(paramstr, varnamewithunderscore, true) && (prefix.size() == 0 || !StartsWith(paramstr, prefix, true)))
+															{
+																paramstr = fullprefix + paramstr;
+															}
+															else if (StartsWith(paramstr, varnamewithunderscore, true))
+															{
 																paramstr = prefix + paramstr;
+															}
 
 															//Need some special corrections here because Chaotica allows values that don't make sense.
 															if (varname == "falloff2")
@@ -2412,10 +2431,40 @@ bool XmlToEmber<T>::ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion,
 	{
 		if (const auto parVar = dynamic_cast<ParametricVariation<T>*>(xform.GetVariation(i)))
 		{
+			string prefix;
+
+			if (!fromEmber)
+			{
+				if (parVar->VarType() == eVariationType::VARTYPE_PRE)
+					prefix = "pre_";
+				else if (parVar->VarType() == eVariationType::VARTYPE_POST)
+					prefix = "post_";
+			}
+
 			for (curAtt = attPtr; curAtt; curAtt = curAtt->next)
 			{
 				//Only correct names if it came from an outside source. Names originating from this library are always considered correct.
 				string s = fromEmber ? string(CCX(curAtt->name)) : GetCorrectedParamName(m_BadParamNames, ToLower(CCX(curAtt->name)).c_str());
+
+				if (!fromEmber)
+				{
+					auto varnamewithunderscore = parVar->m_Name + "_";
+					auto fullprefix = prefix + varnamewithunderscore;
+
+					if (StartsWith(s, fullprefix, true))
+					{
+						//Do nothing.
+					}
+					else if (!StartsWith(s, varnamewithunderscore, true) && (prefix.size() == 0 || !StartsWith(s, prefix, true)))
+					{
+						s = fullprefix + s;
+					}
+					else if (StartsWith(s, varnamewithunderscore, true))
+					{
+						s = prefix + s;
+					}
+				}
+
 				const char* name = s.c_str();
 
 				if (parVar->ContainsParam(name))
@@ -2504,8 +2553,12 @@ string XmlToEmber<T>::GetCorrectedVariationName(vector<pair<pair<string, string>
 template <typename T>
 string XmlToEmber<T>::GetCorrectedVariationName(vector<pair<pair<string, string>, vector<string>>>& vec, const string& varname)
 {
-	if (varname == "poincare")//for Apo flames, poincare must be the same, but chaotica poincare is implemented as poincare2
+	if (varname == "poincare")//for Apo flames, poincare must be the same, but Chaotica poincare is implemented as poincare2
 		return "poincare2";
+	else if (varname == "fisheye")
+		return "eyefish";//Chaotica automatically uses eyefish instead of fisheye.
+	else if (varname == "phoenixjulia")
+		return "phoenix_julia";
 	else if (varname != "mobius")//Chaotica actually gets this right, but Apophysis doesn't.
 		for (auto& v : vec)
 			if (!_stricmp(v.first.first.c_str(), varname.c_str()))//Do case insensitive here.

@@ -900,11 +900,17 @@ static bool EndsWith(const std::string& str, const std::string& suffix)
 /// </summary>
 /// <param name="str">The string to test</param>
 /// <param name="suffix">The string to test for</param>
+/// <param name="ignoreCase">True to do a case insensitive comparisoin, else case sensitive. Default: false.</param>
 /// <returns>True if str starts with suffix, else false.</returns>
-static bool StartsWith(const std::string& str, const std::string& prefix)
+static bool StartsWith(const std::string& str, const std::string& prefix, bool ignoreCase = false)
 {
-	return str.size() >= prefix.size() &&
-		   str.compare(0, prefix.size(), prefix) == 0;
+	if (ignoreCase)
+	{
+		return str.size() >= prefix.size() &&
+			   (_strnicmp(str.c_str(), prefix.c_str(), std::min(str.length(), prefix.length())) == 0);
+	}
+	else
+		return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 
 /// <summary>

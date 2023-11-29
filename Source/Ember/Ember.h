@@ -22,14 +22,14 @@ static void parallel_for(size_t start, size_t end, size_t parlevel, std::functio
 
 	for (size_t i = 0; i < ct; i++)
 	{
-		threads.push_back(std::thread([&, i]
+		threads.push_back(std::thread([&](size_t _i, size_t _ct)
 		{
-			const auto chunkStart = chunkSize* i;
-			const auto chunkEnd = std::min(chunkStart + chunkSize, end);
+			const auto chunkStart = chunkSize * _i;
+			const auto chunkEnd = _i == _ct - 1 ? end : std::min(chunkStart + chunkSize, end);
 
 			for (size_t j = chunkStart; j < chunkEnd; j++)
 				func(j);
-		}));
+		}, i, ct));
 	}
 
 	EmberNs::Join(threads);

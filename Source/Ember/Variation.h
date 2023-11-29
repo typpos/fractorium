@@ -1757,7 +1757,7 @@ protected:
 	eVariationType m_VarType;//The type of variation: regular, pre or post.
 	eVariationAssignType m_PrePostAssignType;//Whether to assign the results for pre/post, or sum them.
 
-private:
+protected:
 	bool m_NeedPrecalcSumSquares;//Whether this variation uses the precalc sum squares value in its calculations.
 	bool m_NeedPrecalcSqrtSumSquares;//Whether it uses the sqrt precalc sum squares value in its calculations.
 	bool m_NeedPrecalcAngles;//Whether it uses the precalc sin and cos values in its calculations.

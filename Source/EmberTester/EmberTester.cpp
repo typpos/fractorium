@@ -43,7 +43,7 @@ using namespace Imath;
 using namespace EmberNs;
 using namespace EmberCommon;
 
-#define DO_NVIDIA 1
+//#define DO_NVIDIA 1
 
 void writeRgba1(const char filename[],
 				const Rgba* pixels,
@@ -2251,15 +2251,53 @@ int _tmain(int argc, _TCHAR* argv[])
 	size_t times = 1'000'000'001;
 	QTIsaac<ISAAC_SIZE, ISAAC_INT> rand;
 	std::vector<unsigned int> vec(16, 0);
+	double accum = 0;
 	Timing t(4);
 	/*
-		for (size_t i = 1; i < times; i++)
-		{
-			auto res = rand.Rand() % i;
-			vec[res & 15]++;
-		}
+	    for (size_t i = 0; i < times; i++)
+	    {
+		auto res = rand.Frand11<double>();
+		auto flr = (double)(Floor(res));
+		accum += flr;
+	    }
 
-		t.Toc("rand mod");
+	    t.Toc("Floor");
+	    cout << accum << endl;
+	    accum = 0;
+	    t.Tic();
+
+	    for (size_t i = 0; i < times; i++)
+	    {
+		auto res = rand.Frand11<double>();
+		auto flr = std::floor(res);
+		accum += flr;
+	    }
+
+	    t.Toc("std::floor");
+	    cout << accum << endl;
+
+	    t.Tic();
+
+	    for (size_t i = 0; i < times; i++)
+	    {
+		accum += rand.Frand01<double>();
+	    }
+
+	    t.Toc("Frand01");
+	    cout << accum << endl;
+	    accum = 0;
+	    t.Tic();
+
+	    for (size_t i = 0; i < times; i++)
+	    {
+		accum += rand.Frand<double>(static_cast<double>(0), static_cast<double>(1));
+	    }
+
+	    t.Toc("Frand(0, 1)");
+	    cout << accum << endl;
+	    return 1;
+	*/
+	/*
 
 		for (auto& it : vec)
 		{
@@ -2443,126 +2481,136 @@ int _tmain(int argc, _TCHAR* argv[])
 	//TestCross<double>(rand.Frand<double>(-5, 5), rand.Frand<double>(-5, 5), rand.Frand<double>(-5, 5));
 	//std::complex<double> cd, cd2;
 	//cd2 = sin(cd);
-	t.Tic();
-	TestCasting();
-	t.Toc("TestCasting()");
-	t.Tic();
-	auto vlf(VariationList<float>::Instance());
-	t.Toc("Creating VariationList<float>");
-	cout << "There are " << vlf->Size() << " variations present." << endl;
-#ifdef DO_DOUBLE
-	t.Tic();
-	auto vld(VariationList<double>::Instance());
-	t.Toc("Creating VariationList<double>");
-#endif
-	t.Tic();
-	TestVarCounts();
-	t.Toc("TestVarCounts()");
-	t.Tic();
-	TestVarUnique<float>();
-	t.Toc("TestVarUnique<float>()");
-#ifdef DO_DOUBLE
-	t.Tic();
-	TestVarUnique<double>();
-	t.Toc("TestVarUnique<double>()");
-#endif
-	t.Tic();
-	TestVarCopy<float, float>();
-	t.Toc("TestVarCopy<float, float>()");
-#ifdef DO_DOUBLE
-	t.Tic();
-	TestVarCopy<double, double>();
-	t.Toc("TestVarCopy<double, double>()");
-	t.Tic();
-	TestVarCopy<float, double>();
-	t.Toc("TestVarCopy<float, double>()");
-	t.Tic();
-	TestVarCopy<double, float>();
-	t.Toc("TestVarCopy<double, float>()");
-#endif
-	t.Tic();
-	TestVarRegPrePost();
-	t.Toc("TestVarRegPrePost()");
-	t.Tic();
-	TestParVars();
-	t.Toc("TestParVars()");
-	t.Tic();
-	TestVarPrePostNames();
-	t.Toc("TestVarPrePostNames()");
-	t.Tic();
-	TestVarPrecalcUsedCL();
-	t.Toc("TestVarPrecalcUsedCL()");
-	t.Tic();
-	TestVarAssignTypes();
-	t.Toc("TestVarAssignTypes()");
-	t.Tic();
-	TestVarAssignVals();
-	t.Toc("TestVarAssignVals()");
-	t.Tic();
-	TestZepsFloor();
-	t.Toc("TestZepsFloor()");
-	t.Tic();
-	TestConstants();
-	t.Toc("TestConstants()");
-	t.Tic();
-	TestGlobalFuncs();
-	t.Toc("TestGlobalFuncs()");
-	/*  t.Tic();
-		TestXformsInOutPoints();
-		t.Toc("TestXformsInOutPoints()");
-
-		t.Tic();
-		TestVarTime<float>();
-		t.Toc("TestVarTime()");
-	*/
-	t.Tic();
-	TestOperations<float>();
-	t.Toc("TestOperations()");
-	t.Tic();
-	TestArbitrary();
-	t.Toc("TestArbitrary()");
-	//t.Tic();
-	//TestVarsSimilar<float>();
-	//t.Toc("TestVarsSimilar()");
-#ifdef TEST_CL
-	//t.Tic();
-	//TestCpuGpuResults<float>();
-	//t.Toc("TestCpuGpuResults<float>()");
-	//t.Tic();
-	//b = TestAllVarsCLBuild<float>(0, 0, true);
-	//t.Toc("TestAllVarsCLBuild<float>()");
-
-	if (b)
+	auto testfunc = [&]()
 	{
-#ifdef DO_NVIDIA
 		t.Tic();
-		b = TestAllVarsCLBuild<float>(1, 0, true);
-		t.Toc("TestAllVarsCLBuild<float>()");
-#endif
-	}
-
+		TestCasting();
+		t.Toc("TestCasting()");
+		t.Tic();
+		auto vlf(VariationList<float>::Instance());
+		t.Toc("Creating VariationList<float>");
+		cout << "There are " << vlf->Size() << " variations present." << endl;
 #ifdef DO_DOUBLE
+		t.Tic();
+		auto vld(VariationList<double>::Instance());
+		t.Toc("Creating VariationList<double>");
+#endif
+		t.Tic();
+		TestVarCounts();
+		t.Toc("TestVarCounts()");
+		t.Tic();
+		TestVarUnique<float>();
+		t.Toc("TestVarUnique<float>()");
+#ifdef DO_DOUBLE
+		t.Tic();
+		TestVarUnique<double>();
+		t.Toc("TestVarUnique<double>()");
+#endif
+		t.Tic();
+		TestVarCopy<float, float>();
+		t.Toc("TestVarCopy<float, float>()");
+#ifdef DO_DOUBLE
+		t.Tic();
+		TestVarCopy<double, double>();
+		t.Toc("TestVarCopy<double, double>()");
+		t.Tic();
+		TestVarCopy<float, double>();
+		t.Toc("TestVarCopy<float, double>()");
+		t.Tic();
+		TestVarCopy<double, float>();
+		t.Toc("TestVarCopy<double, float>()");
+#endif
+		t.Tic();
+		TestVarRegPrePost();
+		t.Toc("TestVarRegPrePost()");
+		t.Tic();
+		TestParVars();
+		t.Toc("TestParVars()");
+		t.Tic();
+		TestVarPrePostNames();
+		t.Toc("TestVarPrePostNames()");
+		t.Tic();
+		TestVarPrecalcUsedCL();
+		t.Toc("TestVarPrecalcUsedCL()");
+		t.Tic();
+		TestVarAssignTypes();
+		t.Toc("TestVarAssignTypes()");
+		t.Tic();
+		TestVarAssignVals();
+		t.Toc("TestVarAssignVals()");
+		t.Tic();
+		TestZepsFloor();
+		t.Toc("TestZepsFloor()");
+		t.Tic();
+		TestConstants();
+		t.Toc("TestConstants()");
+		t.Tic();
+		TestGlobalFuncs();
+		t.Toc("TestGlobalFuncs()");
+		/*  t.Tic();
+			TestXformsInOutPoints();
+			t.Toc("TestXformsInOutPoints()");
 
-	//t.Tic();
-	//TestCpuGpuResults<double>();
-	//t.Toc("TestCpuGpuResults<double>()");
-	if (b)
-	{
+			t.Tic();
+			TestVarTime<float>();
+			t.Toc("TestVarTime()");
+		*/
+		t.Tic();
+		TestOperations<float>();
+		t.Toc("TestOperations()");
+		t.Tic();
+		TestArbitrary();
+		t.Toc("TestArbitrary()");
 		//t.Tic();
-		//b = TestAllVarsCLBuild<double>(0, 0, true);
-		//t.Toc("TestAllVarsCLBuild<double>()");
+		//TestVarsSimilar<float>();
+		//t.Toc("TestVarsSimilar()");
+#ifdef TEST_CL
+		//t.Tic();
+		//TestCpuGpuResults<float>();
+		//t.Toc("TestCpuGpuResults<float>()");
+		t.Tic();
+		b = TestAllVarsCLBuild<float>(0, 0, true);
+		t.Toc("TestAllVarsCLBuild<float>()");
+
 		if (b)
 		{
 #ifdef DO_NVIDIA
 			t.Tic();
-			TestAllVarsCLBuild<double>(1, 0, true);
-			t.Toc("TestAllVarsCLBuild<double>()");
+			b = TestAllVarsCLBuild<float>(1, 0, true);
+			t.Toc("TestAllVarsCLBuild<float>()");
 #endif
 		}
-	}
+
+#ifdef DO_DOUBLE
+
+		//t.Tic();
+		//TestCpuGpuResults<double>();
+		//t.Toc("TestCpuGpuResults<double>()");
+		if (b)
+		{
+			t.Tic();
+			b = TestAllVarsCLBuild<double>(0, 0, true);
+			t.Toc("TestAllVarsCLBuild<double>()");
+
+			if (b)
+			{
+#ifdef DO_NVIDIA
+				t.Tic();
+				TestAllVarsCLBuild<double>(1, 0, true);
+				t.Toc("TestAllVarsCLBuild<double>()");
+#endif
+			}
+		}
 
 #endif
 #endif
+	};
+	cout << "\n\nTesting in compatibility mode:\n\n";
+	Compat::m_Compat = true;
+	testfunc();
+	cout << "\n\nTesting in non-compatibility mode:\n\n";
+	Compat::m_Compat = false;
+	testfunc();
 	//PrintAllVars();
 	//_CrtDumpMemoryLeaks();
 	return 0;

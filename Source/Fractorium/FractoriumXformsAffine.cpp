@@ -6,7 +6,7 @@
 /// </summary>
 void Fractorium::InitXformsAffineUI()
 {
-	const auto affinePrec = 6;
+	const auto affinePrec = 8;
 	const auto spinHeight = 20;
 	const auto affineStep = 0.01;
 	const auto affineMin = std::numeric_limits<double>::lowest();

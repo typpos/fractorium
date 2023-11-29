@@ -285,8 +285,18 @@ public:
 		T alpha = helper.m_PrecalcAtanyx + n * M_2PI / Zeps<T>(T(Floor<T>(m_Power)));
 		T sina = std::sin(alpha);
 		T cosa = std::cos(alpha);
-		helper.Out.x = m_Weight * cosa / r;
-		helper.Out.y = m_Weight * sina / r;
+
+		if (Compat::m_Compat)
+		{
+			helper.Out.x = m_Weight * cosa / r;
+			helper.Out.y = m_Weight * sina / r;
+		}
+		else
+		{
+			helper.Out.x = m_Weight * sina / r;
+			helper.Out.y = m_Weight * cosa / r;
+		}
+
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -300,15 +310,27 @@ public:
 		string power = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string dist  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
+		   << "\t\treal_t weight = " << weight << ";\n"
+		   << "\t\treal_t power  = " << power << ";\n"
 		   << "\t\treal_t r = Zeps(pow(precalcSqrtSumSquares, " << dist << "));\n"
-		   << "\t\tint n = floor(" << power << " * MwcNext01(mwc));\n"
-		   << "\t\treal_t alpha = fma(n, M_2PI / Zeps(floor(" << power << ")), precalcAtanyx);\n"
+		   << "\t\tint n = floor(power * MwcNext01(mwc));\n"
+		   << "\t\treal_t alpha = fma(n, M_2PI / Zeps(floor(power)), precalcAtanyx);\n"
 		   << "\t\treal_t sina = sin(alpha);\n"
 		   << "\t\treal_t cosa = cos(alpha);\n"
-		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * cosa / r;\n"
-		   << "\t\tvOut.y = " << weight << " * sina / r;\n"
-		   << "\t\tvOut.z = " << DefaultZCl()
+		   << "\n";
+
+		if (Compat::m_Compat)
+		{
+			ss << "\t\tvOut.x = weight * cosa / r;\n"
+			   << "\t\tvOut.y = weight * sina / r;\n";
+		}
+		else
+		{
+			ss << "\t\tvOut.x = weight * sina / r;\n"
+			   << "\t\tvOut.y = weight * cosa / r;\n";
+		}
+
+		ss << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
 	}
@@ -1214,7 +1236,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power,        prefix + "starblur_power", 5, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power,        prefix + "starblur_power", 5));
 		m_Params.push_back(ParamWithName<T>(&m_Range,        prefix + "starblur_range", T(0.4016228317)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Length, prefix + "starblur_length"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha,  prefix + "starblur_alpha"));
@@ -1382,42 +1404,77 @@ private:
 
 /// <summary>
 /// CropN.
+/// By zy0rg.
 /// </summary>
 template <typename T>
 class CropNVariation : public ParametricVariation<T>
 {
 public:
+	using Variation<T>::m_NeedPrecalcSumSquares;
+	using Variation<T>::m_NeedPrecalcAngles;
 	CropNVariation(T weight = 1.0) : ParametricVariation<T>("cropn", eVariationId::VAR_CROPN, weight, true, true, true, false, true)
 	{
 		Init();
+		m_NeedPrecalcSumSquares = !Compat::m_Compat;
+		m_NeedPrecalcAngles = Compat::m_Compat;
 	}
 
 	PARVARCOPY(CropNVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T xang = (helper.m_PrecalcAtanyx + T(M_PI)) / m_Alpha;
-		xang = (xang - int(xang)) * m_Alpha;
-		xang = std::cos((xang < m_Alpha / 2) ? xang : m_Alpha - xang);
-		T xr = xang > 0 ? m_Radius / xang : 1;
-
-		if ((helper.m_PrecalcSqrtSumSquares > xr) == (m_Power > 0))
+		if (Compat::m_Compat)
 		{
-			if (m_Zero == 1)
+			T xang = (helper.m_PrecalcAtanyx + T(M_PI)) / m_Alpha;
+			xang = (xang - int(xang)) * m_Alpha;
+			xang = std::cos((xang < m_AlphaDiv2) ? xang : m_Alpha - xang);
+			T xr = xang > 0 ? m_Radius / xang : 1;
+
+			if ((helper.m_PrecalcSqrtSumSquares > xr) == (m_Power > 0))
 			{
-				helper.Out.x = helper.Out.y = 0;
+				if (m_Zero == 1)
+				{
+					helper.Out.x = helper.Out.y = 0;
+				}
+				else
+				{
+					T rdc = xr + (rand.Frand01<T>() * T(0.5) * m_ScatterDist);
+					helper.Out.x = m_Weight * rdc * helper.m_PrecalcCosa;
+					helper.Out.y = m_Weight * rdc * helper.m_PrecalcSina;
+				}
 			}
 			else
 			{
-				T rdc = xr + (rand.Frand01<T>() * T(0.5) * m_ScatterDist);
-				helper.Out.x = m_Weight * rdc * helper.m_PrecalcCosa;
-				helper.Out.y = m_Weight * rdc * helper.m_PrecalcSina;
+				helper.Out.x = m_Weight * helper.In.x;
+				helper.Out.y = m_Weight * helper.In.y;
 			}
 		}
 		else
 		{
-			helper.Out.x = m_Weight * helper.In.x;
-			helper.Out.y = m_Weight * helper.In.y;
+			T r2 = helper.m_PrecalcSumSquares;
+			T aModAlpha = std::fmod(helper.m_PrecalcAtanyx + T(M_PI), m_Alpha);
+			T xang = std::cos(aModAlpha < m_AlphaDiv2 ? aModAlpha : m_Alpha - aModAlpha);
+			T xr = xang > 0 ? m_Radius / Zeps(xang) : T(1);
+			T xr2 = xr * xr;
+
+			if ((r2 > xr2) == (m_Power > 0))
+			{
+				if (m_Zero == 0)
+				{
+					helper.Out.x = helper.Out.y = 0;
+				}
+				else
+				{
+					T temp = (xr + rand.Frand01<T>() * m_ScatterDist) * m_Weight / Zeps(std::sqrt(r2));
+					helper.Out.x = temp * helper.In.x;
+					helper.Out.y = temp * helper.In.y;
+				}
+			}
+			else
+			{
+				helper.Out.x = m_Weight * helper.In.x;
+				helper.Out.y = m_Weight * helper.In.y;
+			}
 		}
 
 		helper.Out.z = DefaultZ(helper);
@@ -1436,45 +1493,103 @@ public:
 		string zero        = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string workPower   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string alpha       = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		string alphaDiv2   = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t xang = (precalcAtanyx + MPI) / " << alpha << ";\n"
-		   << "\n"
-		   << "\t\txang = (xang - (int) xang) * " << alpha << ";\n"
-		   << "\t\txang = cos((xang < " << alpha << " / 2) ? xang : " << alpha << " - xang);\n"
-		   << "\n"
-		   << "\t\treal_t xr = xang > 0 ? " << radius << " / xang : 1;\n"
-		   << "\n"
-		   << "\t\tif ((precalcSqrtSumSquares > xr) == (" << power << " > 0))\n"
-		   << "\t\t{\n"
-		   << "\t\t	if (" << zero << " == 1)\n"
-		   << "\t\t	{\n"
-		   << "\t\t		vOut.x = vOut.y = 0;\n"
-		   << "\t\t	}\n"
-		   << "\t\t	else\n"
-		   << "\t\t	{\n"
-		   << "\t\t		real_t rdc = fma(MwcNext01(mwc), (real_t)(0.5) * " << scatterDist << ", xr);\n"
-		   << "\n"
-		   << "\t\t		vOut.x = " << weight << " * rdc * precalcCosa;\n"
-		   << "\t\t		vOut.y = " << weight << " * rdc * precalcSina;\n"
-		   << "\t\t	}\n"
-		   << "\t\t}\n"
-		   << "\t\telse\n"
-		   << "\t\t{\n"
-		   << "\t\t	vOut.x = " << weight << " * vIn.x;\n"
-		   << "\t\t	vOut.y = " << weight << " * vIn.y;\n"
-		   << "\t\t}\n"
-		   << "\n"
-		   << "\t\tvOut.z = " << DefaultZCl()
-		   << "\t}\n";
+		   << "\t\treal_t weight = " << weight << ";\n"
+		   << "\t\treal_t alpha = " << alpha << ";\n";
+
+		if (Compat::m_Compat)
+		{
+			ss << "\t\treal_t xang = (precalcAtanyx + MPI) / alpha;\n"
+			   << "\n"
+			   << "\t\txang = (xang - (int) xang) * alpha;\n"
+			   << "\t\txang = cos((xang < " << alphaDiv2 << ") ? xang : alpha - xang);\n"
+			   << "\n"
+			   << "\t\treal_t xr = xang > 0 ? " << radius << " / xang : 1;\n"
+			   << "\n"
+			   << "\t\tif ((precalcSqrtSumSquares > xr) == (" << power << " > 0))\n"
+			   << "\t\t{\n"
+			   << "\t\t	if (" << zero << " == 1)\n"
+			   << "\t\t	{\n"
+			   << "\t\t		vOut.x = vOut.y = 0;\n"
+			   << "\t\t	}\n"
+			   << "\t\t	else\n"
+			   << "\t\t	{\n"
+			   << "\t\t		real_t rdc = fma(MwcNext01(mwc), (real_t)(0.5) * " << scatterDist << ", xr);\n"
+			   << "\n"
+			   << "\t\t		vOut.x = weight * rdc * precalcCosa;\n"
+			   << "\t\t		vOut.y = weight * rdc * precalcSina;\n"
+			   << "\t\t	}\n"
+			   << "\t\t}\n"
+			   << "\t\telse\n"
+			   << "\t\t{\n"
+			   << "\t\t	vOut.x = weight * vIn.x;\n"
+			   << "\t\t	vOut.y = weight * vIn.y;\n"
+			   << "\t\t}\n"
+			   << "\n"
+			   << "\t\tvOut.z = " << DefaultZCl()
+			   << "\t}\n";
+		}
+		else
+		{
+			ss << "\t\treal_t r2 = precalcSumSquares;\n"
+			   << "\t\treal_t aModAlpha = fmod(precalcAtanyx + MPI, alpha);\n"
+			   << "\t\treal_t xang = cos(aModAlpha < " << alphaDiv2 << " ? aModAlpha : alpha - aModAlpha);\n"
+			   << "\t\treal_t xr = xang > 0 ? " << radius << " / Zeps(xang) : (real_t)1.0;\n"
+			   << "\t\treal_t xr2 = xr * xr;\n"
+			   << "\n"
+			   << "\t\tif ((r2 > xr2) == (" << power << " > 0))\n"
+			   << "\t\t{\n"
+			   << "\t\t	if (" << zero << " == 0)\n"
+			   << "\t\t	{\n"
+			   << "\t\t		vOut.x = vOut.y = 0;\n"
+			   << "\t\t	}\n"
+			   << "\t\t	else\n"
+			   << "\t\t	{\n"
+			   << "\t\t		real_t temp = fma(MwcNext01(mwc), " << scatterDist << ", xr) * weight / Zeps(sqrt(r2));\n"
+			   << "\n"
+			   << "\t\t		vOut.x = temp * vIn.x;\n"
+			   << "\t\t		vOut.y = temp * vIn.y;\n"
+			   << "\t\t	}\n"
+			   << "\t\t}\n"
+			   << "\t\telse\n"
+			   << "\t\t{\n"
+			   << "\t\t	vOut.x = weight * vIn.x;\n"
+			   << "\t\t	vOut.y = weight * vIn.y;\n"
+			   << "\t\t}\n"
+			   << "\n"
+			   << "\t\tvOut.z = " << DefaultZCl()
+			   << "\t}\n";
+		}
+
 		return ss.str();
+	}
+
+	virtual vector<string> OpenCLGlobalFuncNames() const override
+	{
+		if (Compat::m_Compat)
+			return vector<string> { };
+		else
+			return vector<string> { "Zeps" };
 	}
 
 	virtual void Precalc() override
 	{
-		bool mode = m_Power > 0;
-		m_WorkPower = mode ? m_Power : -m_Power;
-		ClampGteRef<T>(m_WorkPower, 2);
-		m_Alpha = M_2PI / m_WorkPower;
+		if (Compat::m_Compat)
+		{
+			bool mode = m_Power > 0;
+			m_WorkPower = mode ? m_Power : -m_Power;
+			ClampGteRef<T>(m_WorkPower, 2);
+			m_Alpha = M_2PI / m_WorkPower;
+		}
+		else
+		{
+			m_Alpha = M_2PI / std::max(T(2), std::abs(m_Power));
+		}
+
+		m_AlphaDiv2 = m_Alpha / 2;
+		m_NeedPrecalcSumSquares = !Compat::m_Compat;
+		m_NeedPrecalcAngles = Compat::m_Compat;
 	}
 
 protected:
@@ -1482,12 +1597,13 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "cropn_power", -5));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "cropn_power", 5));
 		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "cropn_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_ScatterDist, prefix + "cropn_scatterdist"));
-		m_Params.push_back(ParamWithName<T>(&m_Zero, prefix + "cropn_zero", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero, prefix + "cropn_zero"));
 		m_Params.push_back(ParamWithName<T>(true, &m_WorkPower, prefix + "cropn_workpower"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Alpha, prefix + "cropn_alpha"));
+		m_Params.push_back(ParamWithName<T>(true, &m_AlphaDiv2, prefix + "cropn_alpha_div_2"));
 	}
 
 private:
@@ -1497,6 +1613,7 @@ private:
 	T m_Zero;
 	T m_WorkPower;//Precalc.
 	T m_Alpha;
+	T m_AlphaDiv2;
 };
 
 /// <summary>
@@ -1655,13 +1772,13 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Mode, prefix + "blob2_mode", 0, eParamType::INTEGER, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "blob2_n", 5, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_Mode, prefix + "blob2_mode", T(0.5)));
+		m_Params.push_back(ParamWithName<T>(&m_N, prefix + "blob2_n", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix + "blob2_radius"));
 		m_Params.push_back(ParamWithName<T>(&m_Prescale, prefix + "blob2_prescale", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Postscale, prefix + "blob2_postscale", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Symmetry, prefix + "blob2_symmetry", 0, eParamType::REAL, -1, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Compensation, prefix + "blob2_compensation", 0, eParamType::REAL, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Compensation, prefix + "blob2_compensation", 0));
 		m_Params.push_back(ParamWithName<T>(true, &m_DeltaHelp, prefix + "blob2_deltahelp"));//Precalc.
 	}
 
@@ -2688,11 +2805,24 @@ public:
 	{
 		T preX = helper.In.x * (m_XDistort + 1);
 		T preY = helper.In.y * (m_YDistort + 1);
-		T temp = std::atan2(preY, preX) * m_InvN + rand.Crand() * m_Inv2PiN;
-		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
-		helper.Out.x = r * std::cos(temp);
-		helper.Out.y = r * std::sin(temp);
-		helper.Out.z = DefaultZ(helper);
+
+		if (Compat::m_Compat)
+		{
+			T temp = std::atan2(preY, preX) * m_InvN + rand.Crand() * m_Inv2PiN;
+			T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
+			helper.Out.x = r * std::cos(temp);
+			helper.Out.y = r * std::sin(temp);
+			helper.Out.z = m_Weight * helper.In.z;
+		}
+		else
+		{
+			int root = (int)(rand.Frand01<T>() * m_Power);
+			T a = std::atan2(preY, preX) * m_InvN + root * m_Inv2PiN;
+			T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
+			helper.Out.x = r * std::cos(a);
+			helper.Out.y = r * std::sin(a);
+			helper.Out.z = DefaultZ(helper);
+		}
 	}
 
 	virtual string OpenCLString() const override
@@ -2710,15 +2840,32 @@ public:
 		string invN     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string inv2PiN  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
+		   << "\t\treal_t weight = " << weight << ";\n"
 		   << "\t\treal_t preX = vIn.x * (" << xDistort << " + 1);\n"
-		   << "\t\treal_t preY = vIn.y * (" << yDistort << " + 1);\n"
-		   << "\t\treal_t temp = fma(atan2(preY, preX), " << invN << ", MwcNextCrand(mwc) * " << inv2PiN << ");\n"
-		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cN << ");\n"
-		   << "\n"
-		   << "\t\tvOut.x = r * cos(temp);\n"
-		   << "\t\tvOut.y = r * sin(temp);\n"
-		   << "\t\tvOut.z = " << DefaultZCl()
-		   << "\t}\n";
+		   << "\t\treal_t preY = vIn.y * (" << yDistort << " + 1);\n";
+
+		if (Compat::m_Compat)
+		{
+			ss << "\t\treal_t temp = fma(atan2(preY, preX), " << invN << ", MwcNextCrand(mwc) * " << inv2PiN << ");\n"
+			   << "\t\treal_t r = weight * pow(precalcSumSquares, " << cN << ");\n"
+			   << "\n"
+			   << "\t\tvOut.x = r * cos(temp);\n"
+			   << "\t\tvOut.y = r * sin(temp);\n"
+			   << "\t\tvOut.z = weight * vIn.z;\n"
+			   << "\t}\n";
+		}
+		else
+		{
+			ss << "\t\tint root = (int)(MwcNext01(mwc) * " << power << ");\n"
+			   << "\t\treal_t temp = fma(atan2(preY, preX), " << invN << ", root * " << inv2PiN << ");\n"
+			   << "\t\treal_t r = weight * pow(precalcSumSquares, " << cN << ");\n"
+			   << "\n"
+			   << "\t\tvOut.x = r * cos(temp);\n"
+			   << "\t\tvOut.y = r * sin(temp);\n"
+			   << "\t\tvOut.z = weight * vIn.z;\n"
+			   << "\t}\n";
+		}
+
 		return ss.str();
 	}
 
@@ -2727,7 +2874,7 @@ public:
 		auto zp = Zeps(m_Power);
 		m_InvN = m_Dist / zp;
 		m_Inv2PiN = M_2PI / zp;
-		m_Cn = m_Dist / zp / 2;
+		m_Cn = m_InvN / 2;
 	}
 
 protected:
@@ -3727,8 +3874,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "collideoscope_a", 0, eParamType::REAL_CYCLIC, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "collideoscope_num", 1, eParamType::INTEGER));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "collideoscope_a"));
+		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "collideoscope_num", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ka, prefix + "collideoscope_ka"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_KnPi, prefix + "collideoscope_kn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_KaKn, prefix + "collideoscope_ka_kn"));
@@ -3972,7 +4119,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Rotate, prefix + "bTransform_rotate"));
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "bTransform_power", 1, eParamType::INTEGER, 1, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "bTransform_power", 0, eParamType::REAL_NONZERO, 1, T(INT_MAX)));
 		m_Params.push_back(ParamWithName<T>(&m_Move, prefix + "bTransform_move"));
 		m_Params.push_back(ParamWithName<T>(&m_Split, prefix + "bTransform_split"));
 	}
@@ -4060,9 +4207,9 @@ public:
 	virtual void Precalc() override
 	{
 		m_CnPi = m_Num * T(M_1_PI);
-		m_PiCn = T(M_PI) / m_Num;
+		m_PiCn = T(M_PI) / Zeps(m_Num);
 		m_Ca = T(M_PI) * m_A;
-		m_CaCn = m_Ca / m_Num;
+		m_CaCn = m_Ca / Zeps(m_Num);
 	}
 
 protected:
@@ -4070,8 +4217,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "bCollide_a", 0, eParamType::REAL_CYCLIC, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "bCollide_num", 1, eParamType::INTEGER, 1, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "bCollide_a", 0, eParamType::REAL_CYCLIC, -1, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Num, prefix + "bCollide_num", 1, eParamType::REAL, EPS, T(INT_MAX)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ca, prefix + "bCollide_ca"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_CnPi, prefix + "bCollide_cn_pi"));
 		m_Params.push_back(ParamWithName<T>(true, &m_CaCn, prefix + "bCollide_ca_cn"));
@@ -4498,7 +4645,7 @@ public:
 		}
 		else
 		{
-			r2 = 1 / r2;
+			r2 = 1 / Zeps(r2);
 			x = helper.In.x * r2;
 		}
 
@@ -4537,7 +4684,7 @@ public:
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	r2 = 1 / r2;\n"
+		   << "\t\t	r2 = 1 / Zeps(r2);\n"
 		   << "\t\t	x = vIn.x * r2;\n"
 		   << "\t\t}\n"
 		   << "\n"
@@ -4566,7 +4713,7 @@ public:
 
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
-		return vector<string> { "SafeSqrt" };
+		return vector<string> { "SafeSqrt", "Zeps" };
 	}
 
 	virtual void Precalc() override
@@ -4912,7 +5059,7 @@ public:
 
 		nu = fmod(nu + m_Rotate + T(M_PI), M_2PI) - T(M_PI);
 		helper.Out.x = m_Weight * xmax * std::cos(nu);
-		helper.Out.y = m_Weight * std::sqrt(xmax - 1) * std::sqrt(xmax + 1) * std::sin(nu);
+		helper.Out.y = m_Weight * std::sqrt(xmax * xmax - 1) * std::sin(nu);
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -4925,6 +5072,7 @@ public:
 		string weight = WeightDefineString();
 		string rotate = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
+		   << "\t\treal_t weight = " << weight << ";\n"
 		   << "\t\treal_t tmp = precalcSumSquares + 1;\n"
 		   << "\t\treal_t tmp2 = 2 * vIn.x;\n"
 		   << "\t\treal_t xmax = (SafeSqrt(tmp + tmp2) + SafeSqrt(tmp - tmp2)) * (real_t)(0.5);\n"
@@ -4939,8 +5087,8 @@ public:
 		   << "\n"
 		   << "\t\tnu = fmod(nu + " << rotate << " + MPI, M_2PI) - MPI;\n"
 		   << "\n"
-		   << "\t\tvOut.x = " << weight << " * xmax * cos(nu);\n"
-		   << "\t\tvOut.y = " << weight << " * sqrt(xmax - 1) * sqrt(xmax + 1) * sin(nu);\n"
+		   << "\t\tvOut.x = weight * xmax * cos(nu);\n"
+		   << "\t\tvOut.y = weight * sqrt(xmax * xmax - 1) * sin(nu);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();

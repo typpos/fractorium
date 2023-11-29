@@ -224,7 +224,7 @@ public:
 #ifdef ISAAC_FLAM3_DEBUG
 		return (Rand() & 0xfffffff) / (floatType)0xfffffff;
 #else
-		return Frand<floatType>(static_cast<floatType>(0), static_cast<floatType>(1));
+		return static_cast<floatType>(Rand()) / static_cast<floatType>(std::numeric_limits<T>::max());
 #endif
 	}
 

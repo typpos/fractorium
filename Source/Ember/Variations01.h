@@ -726,13 +726,23 @@ template <typename T>
 class JuliaVariation : public Variation<T>
 {
 public:
-	JuliaVariation(T weight = 1.0) : Variation<T>("julia", eVariationId::VAR_JULIA, weight, true, true, false, true) { }
+	using Variation<T>::m_NeedPrecalcSqrtSumSquares;
+	JuliaVariation(T weight = 1.0) : Variation<T>("julia", eVariationId::VAR_JULIA, weight, true, false, false, true)
+	{
+		m_NeedPrecalcSqrtSumSquares = Compat::m_Compat;
+	}
 
 	VARCOPY(JuliaVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T r = m_Weight * std::sqrt(helper.m_PrecalcSqrtSumSquares);
+		T r;
+
+		if (Compat::m_Compat)
+			r = m_Weight * std::sqrt(helper.m_PrecalcSqrtSumSquares);
+		else
+			r = m_Weight * std::exp(T(0.25) * std::log(helper.m_PrecalcSumSquares));
+
 		T a = T(0.5) * helper.m_PrecalcAtanxy;
 
 		if (rand.RandBit())
@@ -747,9 +757,14 @@ public:
 	{
 		ostringstream ss;
 		string weight = WeightDefineString();
-		ss << "\t{\n"
-		   << "\t\treal_t r = " << weight << " * sqrt(precalcSqrtSumSquares);\n"
-		   << "\t\treal_t a = (real_t)(0.5) * precalcAtanxy;\n"
+		ss << "\t{\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\treal_t r = " << weight << " * sqrt(precalcSqrtSumSquares);\n";
+		else
+			ss << "\t\treal_t r = " << weight << " * exp((real_t)(0.25) * log(precalcSumSquares));\n";
+
+		ss << "\t\treal_t a = (real_t)(0.5) * precalcAtanxy;\n"
 		   << "\n"
 		   << "\t\tif (MwcNext(mwc) & 1)\n"
 		   << "\t\t	a += MPI;\n"
@@ -759,6 +774,11 @@ public:
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
+	}
+
+	virtual void Precalc() override
+	{
+		m_NeedPrecalcSqrtSumSquares = Compat::m_Compat;
 	}
 };
 
@@ -1407,15 +1427,23 @@ public:
 	{
 		T a = helper.m_PrecalcAtanxy;
 		T r = m_Weight * helper.m_PrecalcSqrtSumSquares;
-		T t = a + m_Fan2Y - m_Fan2Dx * int((a + m_Fan2Y) / m_Fan2Dx);
 
-		if (t > m_Fan2Dx2)
+		if (std::fmod(a + m_Fan2Y, m_Fan2Dx) > m_Fan2Dx2)
 			a = a - m_Fan2Dx2;
 		else
 			a = a + m_Fan2Dx2;
 
-		helper.Out.x = r * std::sin(a);
-		helper.Out.y = r * std::cos(a);
+		if (Compat::m_Compat)
+		{
+			helper.Out.x = r * std::sin(a);
+			helper.Out.y = r * std::cos(a);
+		}
+		else
+		{
+			helper.Out.x = r * std::cos(a);
+			helper.Out.y = r * std::sin(a);
+		}
+
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -1432,18 +1460,27 @@ public:
 		string dx2 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t a = precalcAtanxy;\n"
-		   << "\t\treal_t r = " << weight << " * precalcSqrtSumSquares;\n"
-		   << "\t\treal_t t = a + " << fan2Y << " - " << dx << " * (int)((a + " << fan2Y << ") / " << dx << ");\n"
+		   << "\t\treal_t weight = " << weight << ";\n"
+		   << "\t\treal_t r = weight * precalcSqrtSumSquares;\n"
+		   << "\t\treal_t dx2 = " << dx2 << ";\n"
 		   << "\n"
-		   << "\t\tif (t > " << dx2 << ")\n"
-		   << "\t\t	a = a - " << dx2 << ";\n"
+		   << "\t\tif (fmod(a + " << fan2Y << ", " << dx << ") > dx2)\n"
+		   << "\t\t	a = a - dx2;\n"
 		   << "\t\telse\n"
-		   << "\t\t	a = a + " << dx2 << ";\n"
-		   << "\n"
-		   << "\t\tvOut.x = r * sin(a);\n"
-		   << "\t\tvOut.y = r * cos(a);\n"
-		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
-		   << "\t}\n";
+		   << "\t\t	a = a + dx2;\n"
+		   << "\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\tvOut.x = r * sin(a);\n"
+			   << "\t\tvOut.y = r * cos(a);\n"
+			   << "\t\tvOut.z = weight * vIn.z;\n"
+			   << "\t}\n";
+		else
+			ss << "\t\tvOut.x = r * cos(a);\n"
+			   << "\t\tvOut.y = r * sin(a);\n"
+			   << "\t\tvOut.z = weight * vIn.z;\n"
+			   << "\t}\n";
+
 		return ss.str();
 	}
 
@@ -1464,8 +1501,8 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Fan2X, prefix + "fan2_x"));
-		m_Params.push_back(ParamWithName<T>(&m_Fan2Y, prefix + "fan2_y"));
+		m_Params.push_back(ParamWithName<T>(&m_Fan2X, prefix + "fan2_x", T(0.70710678118654752440084436210485)));
+		m_Params.push_back(ParamWithName<T>(&m_Fan2Y, prefix + "fan2_y", T(-0.70710678118654752440084436210485)));
 		m_Params.push_back(ParamWithName<T>(true, &m_Fan2Dx, prefix + "fan2_dx"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Fan2Dx2, prefix + "fan2_dx2"));
 	}
@@ -1677,10 +1714,9 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T d = Zeps(m_Dist - helper.In.y * m_Vsin);
-		T t = 1 / d;
-		helper.Out.x = m_Weight * m_Dist * helper.In.x * t;
-		helper.Out.y = m_Weight * m_VfCos * helper.In.y * t;
+		T d = m_Weight / Zeps(m_Dist - helper.In.y * m_Vsin);
+		helper.Out.x = d * m_Dist * helper.In.x;
+		helper.Out.y = d * m_VfCos * helper.In.y;
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -1696,11 +1732,10 @@ public:
 		string vSin = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string vfCos = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t d = Zeps(" << dist << " - vIn.y * " << vSin << ");\n"
-		   << "\t\treal_t t = (real_t)(1.0) / d;\n"
+		   << "\t\treal_t d = " << weight << " / Zeps(" << dist << " - vIn.y * " << vSin << "); \n"
 		   << "\n"
-		   << "\t\tvOut.x = (" << weight << " * " << dist << " * vIn.x * t);\n"
-		   << "\t\tvOut.y = (" << weight << " * " << vfCos << " * vIn.y * t);\n"
+		   << "\t\tvOut.x = d * " << dist << " * vIn.x;\n"
+		   << "\t\tvOut.y = d * " << vfCos << " * vIn.y;\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -1756,7 +1791,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T tempr = rand.Frand01<T>() * M_2PI;
-		T r = m_Weight * rand.Frand01<T>();
+		T r = rand.Frand01<T>() * m_Weight;
 		helper.Out.x = helper.In.x * r * std::cos(tempr);
 		helper.Out.y = helper.In.y * r * std::sin(tempr);
 		helper.Out.z = m_Weight * helper.In.z;
@@ -1768,7 +1803,7 @@ public:
 		string weight = WeightDefineString();
 		ss << "\t{\n"
 		   << "\t\treal_t tempr = MwcNext01(mwc) * M_2PI;\n"
-		   << "\t\treal_t r = " << weight << " * MwcNext01(mwc);\n"
+		   << "\t\treal_t r = MwcNext01(mwc) * " << weight << ";\n"
 		   << "\n"
 		   << "\t\tvOut.x = vIn.x * r * cos(tempr);\n"
 		   << "\t\tvOut.y = vIn.y * r * sin(tempr);\n"
@@ -1794,10 +1829,21 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T tempr = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(size_t(m_Rn))) / m_Power;
+		T a;
 		T r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
-		helper.Out.x = r * std::cos(tempr);
-		helper.Out.y = r * std::sin(tempr);
+
+		if (Compat::m_Compat)
+		{
+			a = (helper.m_PrecalcAtanyx + M_2PI * rand.Rand(size_t(m_Rn))) / m_Power;
+		}
+		else
+		{
+			int root = (int)(m_Power * rand.Frand01<T>());
+			a = (helper.m_PrecalcAtanyx + root * M_2PI) / m_Power;
+		}
+
+		helper.Out.x = r * std::cos(a);
+		helper.Out.y = r * std::sin(a);
 		helper.Out.z = m_Weight * helper.In.z;
 	}
 
@@ -1813,12 +1859,21 @@ public:
 		string rn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string cn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tint tRnd = (int)(" << rn << " * MwcNext01(mwc));\n"
-		   << "\t\treal_t tempr = fma(M_2PI, (real_t)tRnd, precalcAtanyx) / " << power << ";\n"
-		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
-		   << "\n"
-		   << "\t\tvOut.x = r * cos(tempr);\n"
-		   << "\t\tvOut.y = r * sin(tempr);\n"
+		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cn << ");\n";
+
+		if (Compat::m_Compat)
+		{
+			ss << "\t\treal_t a = (precalcAtanyx + M_2PI * (int)(" << rn << " * MwcNext01(mwc))) / " << power << ";\n";
+		}
+		else
+		{
+			ss << "\t\tint root = (int)(" << power << " * MwcNext01(mwc));\n"
+			   << "\t\treal_t a = (precalcAtanyx + root * M_2PI) / " << power << ";\n";
+		}
+
+		ss << "\n"
+		   << "\t\tvOut.x = r * cos(a);\n"
+		   << "\t\tvOut.y = r * sin(a);\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
 		return ss.str();
@@ -1828,7 +1883,7 @@ public:
 	{
 		m_Power = Zeps(m_Power);
 		m_Rn = std::abs(m_Power);
-		m_Cn = m_Dist / m_Power / 2;
+		m_Cn = m_Dist / m_Power * T(0.5);
 	}
 
 	virtual void Random(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
@@ -1843,7 +1898,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Dist, prefix + "julian_dist", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "julian_power", 1, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "julian_power", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Rn, prefix + "julian_rn"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Cn, prefix + "julian_cn"));
 	}
@@ -1871,26 +1926,29 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		int rnd = int(m_Rn * rand.Frand01<T>());
-		T tempr, r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
+		T a, r = m_Weight * std::pow(helper.m_PrecalcSumSquares, m_Cn);
 
-		if ((rnd & 1) == 0)
-			tempr = (M_2PI * rnd + helper.m_PrecalcAtanyx) / m_Power;
+		if (Compat::m_Compat)
+		{
+			int rnd = int(m_Rn * rand.Frand01<T>());
+
+			if ((rnd & 1) == 0)
+				a = (M_2PI * rnd + helper.m_PrecalcAtanyx) / m_Power;
+			else
+				a = (M_2PI * rnd - helper.m_PrecalcAtanyx) / m_Power;
+		}
 		else
-			tempr = (M_2PI * rnd - helper.m_PrecalcAtanyx) / m_Power;
+		{
+			auto root = Floor(m_Power * rand.Frand01<T>());
+			auto root_div2 = Floor(root * T(0.5));
+			auto root_mod2 = root - root_div2 * 2;
+			T root_scale = T(root_mod2 == 1 ? -1 : 1);
+			a = (helper.m_PrecalcAtanyx * root_scale + root * M_2PI) / Zeps(m_Power);
+		}
 
-		helper.Out.x = r * std::cos(tempr);
-		helper.Out.y = r * std::sin(tempr);
+		helper.Out.x = r * std::cos(a);
+		helper.Out.y = r * std::sin(a);
 		helper.Out.z = m_Weight * helper.In.z;
-		//int rnd = (int)(m_Rn * rand.Frand01<T>());
-		//T tempr, r;
-		//if ((rnd & 1) == 0)
-		//	tempr = (2 * T(M_PI) * (int)(m_Rn * rand.Frand01<T>()) + helper.m_PrecalcAtanyx) / m_Power;//Fixed to get new random rather than use rnd from above.//SMOULDER
-		//else
-		//	tempr = (2 * T(M_PI) * (int)(m_Rn * rand.Frand01<T>()) - helper.m_PrecalcAtanyx) / m_Power;
-		//r = m_Weight * pow(helper.m_PrecalcSumSquares, m_Cn);
-		//helper.Out.x = r * cos(tempr);
-		//helper.Out.y = r * sin(tempr);
 	}
 
 	virtual string OpenCLString() const override
@@ -1905,40 +1963,40 @@ public:
 		string rn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;//Precalc.
 		string cn    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tint rnd = (int)(" << rn << " * MwcNext01(mwc));\n"
-		   << "\t\treal_t tempr, r;\n"
-		   << "\n"
-		   << "\t\tif ((rnd & 1) == 0)\n"
-		   << "\t\t	tempr = fma(M_2PI, (real_t)rnd, precalcAtanyx) / " << power << ";\n"
-		   << "\t\telse\n"
-		   << "\t\t	tempr = fma(M_2PI, (real_t)rnd, -precalcAtanyx) / " << power << ";\n"
-		   << "\n"
-		   << "\t\tr = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
-		   << "\n"
-		   << "\t\tvOut.x = r * cos(tempr);\n"
-		   << "\t\tvOut.y = r * sin(tempr);\n"
+		   << "\t\treal_t a;\n"
+		   << "\t\treal_t r = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
+		   << "\t\treal_t power = " << power << ";\n"
+		   << "\n";
+
+		if (Compat::m_Compat)
+		{
+			ss << "\t\tint rnd = (int)(" << rn << " * MwcNext01(mwc));\n"
+			   << "\n"
+			   << "\t\tif ((rnd & 1) == 0)\n"
+			   << "\t\t	a = fma(M_2PI, (real_t)rnd, precalcAtanyx) / power;\n"
+			   << "\t\telse\n"
+			   << "\t\t	a = fma(M_2PI, (real_t)rnd, -precalcAtanyx) / power;\n"
+			   << "\n";
+		}
+		else
+		{
+			ss << "\t\tint root = (int)floor(power * MwcNext01(mwc));\n"
+			   << "\t\tint root_div2 = (int)floor(root * (real_t)(0.5));\n"
+			   << "\t\tint root_mod2 = root - root_div2 * 2;\n"
+			   << "\t\tint root_scale = (real_t)(root_mod2 == 1 ? -1.0 : 1.0);\n"
+			   << "\t\ta = (precalcAtanyx * root_scale + root * M_2PI) / power;\n";
+		}
+
+		ss << "\t\tvOut.x = r * cos(a);\n"
+		   << "\t\tvOut.y = r * sin(a);\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
-		//ss << "\t{\n"
-		//   << "\t\tint rnd = (int)(" << rn << " * MwcNext01(mwc));\n"
-		//   << "\t\treal_t tempr, r;\n"
-		//   << "\n"
-		//   << "\t\tif ((rnd & 1) == 0)\n"
-		//   << "\t\t	tempr = (2 * M_PI * (int)(" << rn << " * MwcNext01(mwc)) + precalcAtanyx) / " << power << ";\n"//Fixed to get new random rather than use rnd from above.//SMOULDER
-		//   << "\t\telse\n"
-		//   << "\t\t	tempr = (2 * M_PI * (int)(" << rn << " * MwcNext01(mwc)) - precalcAtanyx) / " << power << ";\n"
-		//   << "\n"
-		//   << "\t\tr = " << weight << " * pow(precalcSumSquares, " << cn << ");\n"
-		//   << "\n"
-		//   << "\t\tvOut.x = r * cos(tempr);\n"
-		//   << "\t\tvOut.y = r * sin(tempr);\n"
-		//	 << "\t\tvOut.z = " << weight << " * vIn.z;\n"
-		//   << "\t}\n";
 		return ss.str();
 	}
 
 	virtual void Precalc() override
 	{
+		m_Power = Zeps(m_Power);
 		m_Rn = std::abs(m_Power);
 		m_Cn = m_Dist / m_Power / 2;
 	}
@@ -2361,7 +2419,7 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T re = 1 + m_C1 * helper.In.x + m_C2 * (SQR(helper.In.x) - SQR(helper.In.y));
-		T im = m_C1 * helper.In.y + m_C22 * helper.In.x * helper.In.y;
+		T im = (m_C1 + m_C22 * helper.In.x) * helper.In.y;
 		T r = m_Weight / Zeps(SQR(re) + SQR(im));
 		helper.Out.x = (helper.In.x * re + helper.In.y * im) * r;
 		helper.Out.y = (helper.In.y * re - helper.In.x * im) * r;
@@ -2380,7 +2438,7 @@ public:
 		string c22 = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
 		   << "\t\treal_t re = (real_t)(1.0) + " << c1 << " * vIn.x + " << c2 << " * fma(vIn.x, vIn.x, -SQR(vIn.y));\n"
-		   << "\t\treal_t im = fma(" << c1 << ", vIn.y, " << c22 << " * vIn.x * vIn.y);\n"
+		   << "\t\treal_t im = fma(" << c22 << ", vIn.x, " << c1 << ") * vIn.y;\n"
 		   << "\t\treal_t r = " << weight << " / Zeps(fma(re, re, SQR(im)));\n"
 		   << "\n"
 		   << "\t\tvOut.x = fma(vIn.x, re, vIn.y * im) * r;\n"
@@ -2928,7 +2986,18 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T r = m_Weight / Zeps(std::abs((helper.In.x - helper.In.y) * (helper.In.x + helper.In.y)));
+		T r;
+
+		if (Compat::m_Compat)
+		{
+			r = m_Weight / Zeps(std::abs((helper.In.x - helper.In.y) * (helper.In.x + helper.In.y)));
+		}
+		else
+		{
+			T s = Zeps(Sqr(helper.In.x) - Sqr(helper.In.y));
+			r = m_Weight / s;
+		}
+
 		helper.Out.x = helper.In.x * r;
 		helper.Out.y = helper.In.y * r;
 		helper.Out.z = m_Weight * helper.In.z;
@@ -2939,12 +3008,23 @@ public:
 		ostringstream ss;
 		string weight = WeightDefineString();
 		ss << "\t{\n"
-		   << "\t\treal_t r = " << weight << " /Zeps(fabs((vIn.x - vIn.y) * (vIn.x + vIn.y)));\n"
-		   << "\n"
-		   << "\t\tvOut.x = vIn.x * r;\n"
-		   << "\t\tvOut.y = vIn.y * r;\n"
-		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
-		   << "\t}\n";
+		   << "\t\treal_t r;\n";
+
+		if (Compat::m_Compat)
+		{
+			ss << "\t\tr = " << weight << " / Zeps(fabs((vIn.x - vIn.y) * (vIn.x + vIn.y)));\n";
+		}
+		else
+		{
+			ss << "\t\treal_t s = Zeps(SQR(vIn.x) - SQR(vIn.y));\n"
+			   << "\t\tr = " << weight << " / s;\n";
+		}
+
+		ss   << "\n"
+			 << "\t\tvOut.x = vIn.x * r;\n"
+			 << "\t\tvOut.y = vIn.y * r;\n"
+			 << "\t\tvOut.z = " << weight << " * vIn.z;\n"
+			 << "\t}\n";
 		return ss.str();
 	}
 
@@ -3534,10 +3614,11 @@ public:
 
 		const T f = t + x2;
 		const T g = t - x2;
+		const T foverg = f / Zeps(g);
 
-		if ((g == 0) || (f / g <= 0))
+		if ((g == 0) || (foverg <= 0))
 		{
-			if (m_VarType == eVariationType::VARTYPE_REG)
+			if (Compat::m_Compat && m_VarType == eVariationType::VARTYPE_REG)
 			{
 				helper.Out.x = 0;
 				helper.Out.y = 0;
@@ -3552,7 +3633,7 @@ public:
 		}
 		else
 		{
-			helper.Out.x = m_V4 * std::log((t + x2) / Zeps(t - x2));
+			helper.Out.x = m_V4 * std::log(foverg);
 			helper.Out.y = m_V * y;
 			helper.Out.z = m_Weight * helper.In.z;
 		}
@@ -3583,11 +3664,12 @@ public:
 		   << "\n"
 		   << "\t\treal_t f = t + x2;\n"
 		   << "\t\treal_t g = t - x2;\n"
+		   << "\t\treal_t foverg = f / Zeps(g);\n"
 		   << "\n";
 
-		if (m_VarType == eVariationType::VARTYPE_REG)
+		if (Compat::m_Compat && m_VarType == eVariationType::VARTYPE_REG)
 		{
-			ss << "\t\tif ((g == 0) || (f / g <= 0))\n"
+			ss << "\t\tif ((g == 0) || (foverg <= 0))\n"
 			   << "\t\t{\n"
 			   << "\t\t	vOut.x = 0;\n"
 			   << "\t\t	vOut.y = 0;\n"
@@ -3596,7 +3678,7 @@ public:
 		}
 		else
 		{
-			ss << "\t\tif ((g == 0) || (f / g <= 0))\n"
+			ss << "\t\tif ((g == 0) || (foverg <= 0))\n"
 			   << "\t\t{\n"
 			   << "\t\t	vOut.x = vIn.x;\n"
 			   << "\t\t	vOut.y = vIn.y;\n"
@@ -3606,8 +3688,8 @@ public:
 
 		ss << "\t\telse\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = (" << v4 << " * log((t + x2) / Zeps(t - x2)));\n"
-		   << "\t\t	vOut.y = (" << v << " * y);\n"
+		   << "\t\t	vOut.x = " << v4 << " * log(foverg);\n"
+		   << "\t\t	vOut.y = " << v << " * y;\n"
 		   << "\t\t	vOut.z = " << weight << " * vIn.z;\n"
 		   << "\t\t}\n"
 		   << "\t}\n";
@@ -3616,7 +3698,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_S = -T(M_PI_2) * m_Shift;;
+		m_S = -T(M_PI_2) * m_Shift;
 		m_V = m_Weight * T(M_2_PI);
 		m_V4 = m_Weight * T(0.25) * T(M_2_PI);
 	}
@@ -3629,19 +3711,6 @@ public:
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
 		return vector<string> { "Zeps" };
-	}
-
-	virtual bool SetParamVal(const char* name, T val) override
-	{
-		if (!_stricmp(name, "bipolar_shift"))
-		{
-			T temp = VarFuncs<T>::Fabsmod(T(0.5) * (val + 1));
-			m_Shift = 2 * temp - 1;
-			Precalc();
-			return true;
-		}
-
-		return ParametricVariation<T>::SetParamVal(name, val);
 	}
 
 protected:
@@ -3829,8 +3898,8 @@ public:
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
 		T invCellSize = 1 / m_Size;
-		T x = std::floor(helper.In.x * invCellSize);//Calculate input cell. Note that int cast is omitted here. See below.
-		T y = std::floor(helper.In.y * invCellSize);
+		T x = T(Floor(helper.In.x * invCellSize));//Calculate input cell. Note that int cast is omitted here. See below.
+		T y = T(Floor(helper.In.y * invCellSize));
 		T dx = helper.In.x - x * m_Size;//Offset from cell origin.
 		T dy = helper.In.y - y * m_Size;
 
@@ -4135,11 +4204,17 @@ public:
 		T r1 = std::sqrt(tmp + tmp2);
 		T r2 = std::sqrt(tmp - tmp2);
 		T xmax = Zeps((r1 + r2) * T(0.5));
-		T a1 = std::log(xmax + std::sqrt(xmax - 1));
-		T a2 = -std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));
-		T w = m_Weight / T(11.57034632);//This is an interesting magic number.
+		T logs = std::log(xmax + std::sqrt(xmax - 1));
+		T a2;
+
+		if (Compat::m_Compat)
+			a2 = -std::acos(Clamp<T>(helper.In.x / xmax, -1, 1));
+		else
+			a2 = std::acos(helper.In.x / xmax);
+
+		T w = m_Weight / T(11.57034632);//2 / e^pi.
 		T snv, csv, snhu, cshu;
-		sincos(a1, &snv, &csv);
+		sincos(logs, &snv, &csv);
 		snhu = std::sinh(a2);
 		cshu = std::cosh(a2);
 
@@ -4161,11 +4236,17 @@ public:
 		   << "\t\treal_t r1 = sqrt(tmp + tmp2);\n"
 		   << "\t\treal_t r2 = sqrt(tmp - tmp2);\n"
 		   << "\t\treal_t xmax = Zeps((r1 + r2) * (real_t)(0.5));\n"
-		   << "\t\treal_t a1 = log(xmax + sqrt(xmax - (real_t)(1.0)));\n"
-		   << "\t\treal_t a2 = -acos(clamp(vIn.x / xmax, -(real_t)(1.0), (real_t)(1.0)));\n"
-		   << "\t\treal_t w = " << weight << " / (real_t)(11.57034632);\n"
-		   << "\t\treal_t snv = sin(a1);\n"
-		   << "\t\treal_t csv = cos(a1);\n"
+		   << "\t\treal_t logs = log(xmax + sqrt(xmax - (real_t)(1.0)));\n"
+		   << "\t\treal_t a2;\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\ta2 = -acos(clamp(vIn.x / xmax, -(real_t)(1.0), (real_t)(1.0)));\n";
+		else
+			ss << "\t\ta2 = acos(vIn.x / xmax);\n";
+
+		ss << "\t\treal_t w = " << weight << " / (real_t)(11.57034632);\n"
+		   << "\t\treal_t snv = sin(logs);\n"
+		   << "\t\treal_t csv = cos(logs);\n"
 		   << "\t\treal_t snhu = sinh(a2);\n"
 		   << "\t\treal_t cshu = cosh(a2);\n"
 		   << "\t\tif (vIn.y > 0)\n"
@@ -4197,7 +4278,7 @@ public:
 
 	PARVARCOPY(EllipticVariation)
 
-	//An improved version which was posted in the Discord chat by user Claude which was helps with rounding errors.
+	//An improved version which was posted in the Discord chat by user Claude which helps with rounding errors.
 	//Note that for this to work, a "bad value" had to be changed from 1e10 and -1e10 to 1e50 and -1e50.
 	//For this to be correct, it must always use double. So there is no point in switching precisions when using this variation.
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
@@ -4402,16 +4483,29 @@ template <typename T>
 class EscherVariation : public ParametricVariation<T>
 {
 public:
-	EscherVariation(T weight = 1.0) : ParametricVariation<T>("escher", eVariationId::VAR_ESCHER, weight, true, false, false, false, true)
+	using Variation<T>::m_NeedPrecalcAtanXY;
+	using Variation<T>::m_NeedPrecalcAtanYX;
+	EscherVariation(T weight = 1.0) : ParametricVariation<T>("escher", eVariationId::VAR_ESCHER, weight, true, false, false, true, true)
 	{
 		Init();
+
+		if (Compat::m_Compat)
+		{
+			m_NeedPrecalcAtanXY = false;
+			m_NeedPrecalcAtanYX = true;
+		}
+		else
+		{
+			m_NeedPrecalcAtanXY = true;
+			m_NeedPrecalcAtanYX = false;
+		}
 	}
 
 	PARVARCOPY(EscherVariation)
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		T a = helper.m_PrecalcAtanyx;
+		T a = Compat::m_Compat ? helper.m_PrecalcAtanyx : helper.m_PrecalcAtanxy;
 		T lnr = T(0.5) * std::log(helper.m_PrecalcSumSquares);
 		T m = m_Weight * std::exp(m_C * lnr - m_D * a);
 		T n = m_C * a + m_D * lnr;
@@ -4431,7 +4525,7 @@ public:
 		string c    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string d    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\treal_t a = precalcAtanyx;\n"
+		   << "\t\treal_t a = " << (Compat::m_Compat ? "precalcAtanyx" : "precalcAtanxy") << ";\n"
 		   << "\t\treal_t lnr = (real_t)(0.5) * log(precalcSumSquares);\n"
 		   << "\t\treal_t m = " << weight << " * exp(fma(" << c << ", lnr, -(" << d << " * a)));\n"
 		   << "\t\treal_t n = fma(" << c << ", a, " << d << " * lnr);\n"
@@ -4448,23 +4542,22 @@ public:
 		sincos(m_Beta, &m_D, &m_C);
 		m_C = T(0.5) * (1 + m_C);
 		m_D = T(0.5) * m_D;
+
+		if (Compat::m_Compat)
+		{
+			m_NeedPrecalcAtanXY = false;
+			m_NeedPrecalcAtanYX = true;
+		}
+		else
+		{
+			m_NeedPrecalcAtanXY = true;
+			m_NeedPrecalcAtanYX = false;
+		}
 	}
 
 	virtual void Random(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		SetParamVal("escher_beta", T(M_PI) * rand.Frand01<T>());
-	}
-
-	virtual bool SetParamVal(const char* name, T val) override
-	{
-		if (!_stricmp(name, "escher_beta"))
-		{
-			m_Beta = VarFuncs<T>::Fabsmod((val + T(M_PI)) / (2 * T(M_PI))) * 2 * T(M_PI) - T(M_PI);
-			Precalc();
-			return true;
-		}
-
-		return ParametricVariation<T>::SetParamVal(name, val);
+		m_Beta = T(M_PI) * rand.Frand01<T>();
 	}
 
 protected:
@@ -4472,7 +4565,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Beta, prefix + "escher_beta"));
+		m_Params.push_back(ParamWithName<T>(&m_Beta, prefix + "escher_beta", 3));
 		m_Params.push_back(ParamWithName<T>(true, &m_C, prefix + "escher_beta_c"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_D, prefix + "escher_beta_d"));
 	}
@@ -4608,18 +4701,6 @@ public:
 	virtual vector<string> OpenCLGlobalFuncNames() const override
 	{
 		return vector<string> { "Zeps" };
-	}
-
-	virtual bool SetParamVal(const char* name, T val) override
-	{
-		if (!_stricmp(name, "lazysusan_spin"))
-		{
-			m_Spin = VarFuncs<T>::Fabsmod(val / T(M_2PI)) * T(M_2PI);
-			this->Precalc();
-			return true;
-		}
-
-		return ParametricVariation<T>::SetParamVal(name, val);
 	}
 
 	virtual void Random(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
@@ -5020,7 +5101,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_FrequencyY,   prefix + "oscilloscope2_frequencyy", T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_Amplitude,    prefix + "oscilloscope2_amplitude", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Perturbation, prefix + "oscilloscope2_perturbation", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Damping,      prefix + "oscilloscope2_damping", 0, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Damping,      prefix + "oscilloscope2_damping", 0));
 		m_Params.push_back(ParamWithName<T>(true, &m_Tpf,    prefix + "oscilloscope2_tpf"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Tpf2,   prefix + "oscilloscope2_tpf2"));
 	}
@@ -6142,7 +6223,7 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		helper.Out.x = m_Weight * std::log(helper.m_PrecalcSumSquares) * m_Denom;
+		helper.Out.x = std::log(helper.m_PrecalcSumSquares) * m_Denom;
 		helper.Out.y = m_Weight * helper.m_PrecalcAtanyx;
 		helper.Out.z = m_Weight * helper.In.z;
 	}
@@ -6157,7 +6238,7 @@ public:
 		string base = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string denom = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tvOut.x = " << weight << " * log(precalcSumSquares) * " << denom << ";\n"
+		   << "\t\tvOut.x = log(precalcSumSquares) * " << denom << ";\n"
 		   << "\t\tvOut.y = " << weight << " * precalcAtanyx;\n"
 		   << "\t\tvOut.z = " << weight << " * vIn.z;\n"
 		   << "\t}\n";
@@ -6166,7 +6247,7 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_Denom = T(0.5) / std::log(m_Base);
+		m_Denom = m_Weight * T(0.5) / std::log(m_Base);
 	}
 
 protected:

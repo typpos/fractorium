@@ -76,7 +76,9 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define CUBE(x) ((x) * (x) * (x))\n"
 	   "#define MPI ((real_t)M_PI)\n"
 	   "#define MPI2 ((real_t)M_PI_2)\n"
+	   "#define MPI3 ((real_t)(1.0471975511965977461542144610932))\n"
 	   "#define MPI4 ((real_t)M_PI_4)\n"
+	   "#define MPI6 ((real_t)(0.52359877559829887307710723054658))\n"
 	   "#define M1PI ((real_t)M_1_PI)\n"
 	   "#define M2PI ((real_t)M_2_PI)\n"
 	   "#define M_2PI (MPI * 2)\n"
@@ -87,8 +89,6 @@ static string ConstantDefinesString(bool doublePrecision)
 	   "#define M_SQRT5 ((real_t)(2.2360679774997896964091736687313))\n"
 	   "#define M_PHI ((real_t)(1.61803398874989484820458683436563))\n"
 	   "#define M_1_2PI ((real_t)(0.15915494309189533576888376337251))\n"
-	   "#define M_PI3 ((real_t)(1.0471975511965977461542144610932))\n"
-	   "#define M_PI6 ((real_t)(0.52359877559829887307710723054658))\n"
 	   "#define DEG_2_RAD (MPI / 180)\n"
 	   "#define CURVES_LENGTH_M1 ((real_bucket_t)" << CURVES_LENGTH_M1 << ")\n" <<
 	   "#define ONE_OVER_CURVES_LENGTH_M1 ((real_bucket_t)" << ONE_OVER_CURVES_LENGTH_M1 << ")\n" <<

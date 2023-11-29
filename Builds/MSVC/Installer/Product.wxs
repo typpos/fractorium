@@ -12,7 +12,7 @@
 	<!--
 	Change this for every release.
 	-->
-	<?define ProductCode="{C4B772EF-F8FE-4327-9CE7-22308F363E69}"?>
+	<?define ProductCode="{BAB35746-A149-483E-B3F8-A5FE73E8D407}"?>
 	
 	<Package Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="400" Scope="perMachine" ProductCode="$(var.ProductCode)">
 		<SummaryInformation Keywords="Installer" Description="$(var.Manufacturer)" Manufacturer="$(var.Manufacturer)" />

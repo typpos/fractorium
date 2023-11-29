@@ -787,7 +787,7 @@ public:
 			if (int(m_NumEdges) % 4 == 0)
 				m_AdjustedWeight = m_Weight / Zeps(std::sqrt(2 - 2 * std::cos(m_MidAngle * (m_NumEdges / 2 - 1))) / 2);
 			else
-				m_AdjustedWeight = m_Weight / Zeps(std::sqrt(2 - 2 * std::cos(m_MidAngle * std::floor((m_NumEdges / 2)))) / 2);
+				m_AdjustedWeight = m_Weight / Zeps(std::sqrt(2 - 2 * std::cos(m_MidAngle * Floor((m_NumEdges / 2)))) / 2);
 		}
 		else
 			m_AdjustedWeight = m_Weight;
@@ -3721,8 +3721,8 @@ public:
 		T theta = M_2PI * rand.Frand01<T>();
 		u.x = blurr * std::sin(theta);
 		u.y = blurr * std::cos(theta);
-		cv.x = int(std::floor(u.x / m_HalfCellSize));
-		cv.y = int(std::floor(u.y / m_HalfCellSize));
+		cv.x = int(Floor(u.x / m_HalfCellSize));
+		cv.y = int(Floor(u.y / m_HalfCellSize));
 
 		for (int di = -1; di < 2; di++)
 		{
@@ -4483,7 +4483,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix              + "smartcrop_power", 4));      //Original used a prefix of scrop_, which is incompatible with Ember's design.
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix              + "smartcrop_power", 4));//Original used a prefix of scrop_, which is incompatible with Ember's design.
 		m_Params.push_back(ParamWithName<T>(&m_Radius, prefix             + "smartcrop_radius", 1));
 		m_Params.push_back(ParamWithName<T>(&m_Roundstr, prefix           + "smartcrop_roundstr"));
 		m_Params.push_back(ParamWithName<T>(&m_Roundwidth, prefix         + "smartcrop_roundwidth", 1));
@@ -4492,8 +4492,8 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_Scatter, prefix            + "smartcrop_scatter"));
 		m_Params.push_back(ParamWithName<T>(&m_Offset, prefix             + "smartcrop_offset"));
 		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix           + "smartcrop_rotation"));
-		m_Params.push_back(ParamWithName<T>(&m_Cropmode, prefix           + "smartcrop_cropmode", 1, eParamType::INTEGER, -1, 2));
-		m_Params.push_back(ParamWithName<T>(&m_Static, prefix             + "smartcrop_static", 1, eParamType::INTEGER, -1, 3));
+		m_Params.push_back(ParamWithName<T>(&m_Cropmode, prefix           + "smartcrop_cropmode", 1, eParamType::REAL, -1, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Static, prefix             + "smartcrop_static", 1, eParamType::REAL, -1, 3));
 		m_Params.push_back(ParamWithName<T>(true, &m_Mode, prefix         + "smartcrop_mode"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Radial, prefix       + "smartcrop_radial"));
 		m_Params.push_back(ParamWithName<T>(true, &m_WorkRadius, prefix   + "smartcrop_work_radius"));

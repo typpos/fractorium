@@ -304,10 +304,10 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_N,                    prefix + "lazyjess_n", 4, eParamType::INTEGER_NONZERO, 2));
-		m_Params.push_back(ParamWithName<T>(&m_Spin,                 prefix + "lazyjess_spin", T(M_PI), eParamType::REAL_CYCLIC, 0, M_2PI));
+		m_Params.push_back(ParamWithName<T>(&m_N,                    prefix + "lazyjess_n", 4, eParamType::REAL_NONZERO, 2));
+		m_Params.push_back(ParamWithName<T>(&m_Spin,                 prefix + "lazyjess_spin", T(M_PI)));
 		m_Params.push_back(ParamWithName<T>(&m_Space,                prefix + "lazyjess_space"));
-		m_Params.push_back(ParamWithName<T>(&m_Corner,               prefix + "lazyjess_corner", 1, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Corner,               prefix + "lazyjess_corner", 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Vertex,         prefix + "lazyjess_vertex"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_SinVertex,      prefix + "lazyjess_sin_vertex"));
 		m_Params.push_back(ParamWithName<T>(true, &m_PieSlice,       prefix + "lazyjess_pie_slice"));
@@ -742,7 +742,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "squish_power", 2, eParamType::INTEGER, 2, T(INT_MAX)));
+		m_Params.push_back(ParamWithName<T>(&m_Power, prefix + "squish_power", 2, eParamType::REAL_NONZERO, 2));
 		m_Params.push_back(ParamWithName<T>(true, &m_InvPower, prefix + "squish_inv_power"));//Precalc.
 	}
 
@@ -1800,7 +1800,7 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Slices, prefix + "waffle_slices", 6, eParamType::INTEGER_NONZERO));
+		m_Params.push_back(ParamWithName<T>(&m_Slices, prefix + "waffle_slices", 6, eParamType::REAL_NONZERO));
 		m_Params.push_back(ParamWithName<T>(&m_XThickness, prefix + "waffle_xthickness", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_YThickness, prefix + "waffle_ythickness", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix + "waffle_rotation"));
@@ -2156,8 +2156,9 @@ public:
 	{
 		T xi = helper.In.x - m_X;
 		T yi = helper.In.y - m_Y;
+		auto b = Compat::m_Compat && m_VarType == eVariationType::VARTYPE_REG;
 
-		if (m_VarType == eVariationType::VARTYPE_REG)//Original altered the input pointed to for reg.
+		if (b)//Original altered the input pointed to for reg.
 		{
 			helper.m_TransX -= m_X;
 			helper.m_TransY -= m_Y;
@@ -2169,31 +2170,29 @@ public:
 		}
 
 		const T rad = std::sqrt(SQR(xi) + SQR(yi));
-		const T ang = std::atan2(yi, xi);
 		const T rdc = m_Radius + (rand.Frand01<T>() * T(0.5) * m_Ca);
-		const T s = std::sin(ang);
-		const T c = std::cos(ang);
 		const int esc = rad > m_Radius;
 		const int cr0 = int(m_Zero);
 
-		if (cr0 && esc)
+		if (esc)
 		{
-			helper.Out.x = helper.Out.y = 0;
+			if (cr0)
+			{
+				helper.Out.x = helper.Out.y = 0;
 
-			if (m_VarType == eVariationType::VARTYPE_REG)
-				outPoint.m_X = outPoint.m_Y = 0;
+				if (b)
+					outPoint.m_X = outPoint.m_Y = 0;
+			}
+			else
+			{
+				const T ang = std::atan2(yi, xi);
+				const T s = std::sin(ang);
+				const T c = std::cos(ang);
+				helper.Out.x = m_Weight * rdc * c + m_X;
+				helper.Out.y = m_Weight * rdc * s + m_Y;
+			}
 		}
-		else if (cr0 && !esc)
-		{
-			helper.Out.x = m_Weight * xi + m_X;
-			helper.Out.y = m_Weight * yi + m_Y;
-		}
-		else if (!cr0 && esc)
-		{
-			helper.Out.x = m_Weight * rdc * c + m_X;
-			helper.Out.y = m_Weight * rdc * s + m_Y;
-		}
-		else if (!cr0 && !esc)
+		else
 		{
 			helper.Out.x = m_Weight * xi + m_X;
 			helper.Out.y = m_Weight * yi + m_Y;
@@ -2213,59 +2212,57 @@ public:
 		string scatterArea = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string zero = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string ca = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
+		auto b = Compat::m_Compat && m_VarType == eVariationType::VARTYPE_REG;
 		ss << "\t{\n"
-		   << "\t\treal_t xi = vIn.x - " << x << ";\n"
-		   << "\t\treal_t yi = vIn.y - " << y << ";\n"
+		   << "\t\treal_t x = " << x << ";\n"
+		   << "\t\treal_t y = " << y << ";\n"
+		   << "\t\treal_t radius = " << radius << ";\n"
+		   << "\t\treal_t xi = vIn.x - x;\n"
+		   << "\t\treal_t yi = vIn.y - y;\n"
+		   << "\t\treal_t weight = " << weight << ";\n"
 		   << "\n";
 
-		if (m_VarType == eVariationType::VARTYPE_REG)//Original altered the input pointed to for reg.
+		if (b)//Original altered the input pointed to for reg.
 		{
-			ss
-					<< "\t\ttransX -= " << x << ";\n"
-					<< "\t\ttransY -= " << y << ";\n"
-					<< "\t\tvOut.z = " << weight << " * vIn.z;\n";
+			ss << "\t\ttransX -= x;\n"
+			   << "\t\ttransY -= y;\n"
+			   << "\t\tvOut.z = weight * vIn.z;\n";
 		}
 		else
 		{
-			ss
-					<< "\t\tvOut.z = vIn.z;\n";
+			ss << "\t\tvOut.z = vIn.z;\n";
 		}
 
-		ss
-				<< "\t\tconst real_t rad = sqrt(SQR(xi) + SQR(yi));\n"
-				<< "\t\tconst real_t ang = atan2(yi, xi);\n"
-				<< "\t\tconst real_t rdc = fma(MwcNext01(mwc) * (real_t)(0.5), " << ca << ", " << radius << ");\n"
-				<< "\t\tconst real_t s = sin(ang);\n"
-				<< "\t\tconst real_t c = cos(ang);\n"
-				<< "\n"
-				<< "\t\tconst int esc = rad > " << radius << ";\n"
-				<< "\t\tconst int cr0 = (int)" << zero << ";\n"
-				<< "\n"
-				<< "\t\tif (cr0 && esc)\n"
-				<< "\t\t{\n"
-				<< "\t\t	vOut.x = vOut.y = 0;\n";
+		ss << "\t\tconst real_t rad = sqrt(SQR(xi) + SQR(yi));\n"
+		   << "\t\tconst real_t rdc = fma(MwcNext01(mwc) * (real_t)(0.5), " << ca << ", radius);\n"
+		   << "\t\tconst int esc = rad > radius;\n"
+		   << "\t\tconst int cr0 = (int)" << zero << ";\n"
+		   << "\n"
+		   << "\t\tif (esc)\n"
+		   << "\t\t{\n"
+		   << "\t\t	if (cr0)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		vOut.x = vOut.y = 0;\n";
 
-		if (m_VarType == eVariationType::VARTYPE_REG)
-			ss << "\t\t	outPoint->m_X = outPoint->m_Y = 0;\n";
+		if (b)
+			ss << "\t\t		outPoint->m_X = outPoint->m_Y = 0;\n";
 
-		ss
-				<< "\t\t}\n"
-				<< "\t\telse if (cr0 && !esc)\n"
-				<< "\t\t{\n"
-				<< "\t\t	vOut.x = fma(" << weight << ", xi, " << x << ");\n"
-				<< "\t\t	vOut.y = fma(" << weight << ", yi, " << y << ");\n"
-				<< "\t\t}\n"
-				<< "\t\telse if (!cr0 &&  esc)\n"
-				<< "\t\t{\n"
-				<< "\t\t	vOut.x = fma(" << weight << ", rdc * c, " << x << ");\n"
-				<< "\t\t	vOut.y = fma(" << weight << ", rdc * s, " << y << ");\n"
-				<< "\t\t}\n"
-				<< "\t\telse if (!cr0 && !esc)\n"
-				<< "\t\t{\n"
-				<< "\t\t	vOut.x = fma(" << weight << ", xi, " << x << ");\n"
-				<< "\t\t	vOut.y = fma(" << weight << ", yi, " << y << ");\n"
-				<< "\t\t}\n"
-				<< "\t}\n";
+		ss << "\t\t	}\n"
+		   << "\t\t	else\n"
+		   << "\t\t	{\n"
+		   << "\t\t		const real_t ang = atan2(yi, xi);\n"
+		   << "\t\t		const real_t s = sin(ang);\n"
+		   << "\t\t		const real_t c = cos(ang);\n"
+		   << "\t\t		vOut.x = fma(weight, rdc * c, x);\n"
+		   << "\t\t		vOut.y = fma(weight, rdc * s, y);\n"
+		   << "\t\t	}\n"
+		   << "\t\t}\n"
+		   << "\t\telse\n"
+		   << "\t\t{\n"
+		   << "\t\t	vOut.x = fma(weight, xi, x);\n"
+		   << "\t\t	vOut.y = fma(weight, yi, y);\n"
+		   << "\t\t}\n"
+		   << "\t}\n";
 		return ss.str();
 	}
 
@@ -2283,7 +2280,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_X, prefix + "circlecrop_x"));
 		m_Params.push_back(ParamWithName<T>(&m_Y, prefix + "circlecrop_y"));
 		m_Params.push_back(ParamWithName<T>(&m_ScatterArea, prefix + "circlecrop_scatter_area"));
-		m_Params.push_back(ParamWithName<T>(&m_Zero, prefix + "circlecrop_zero", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero, prefix + "circlecrop_zero", 1, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_Ca, prefix + "circlecrop_ca"));//Precalc.
 	}
 
@@ -2391,7 +2388,7 @@ protected:
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_Inner,           prefix + "circlecrop2_inner", T(0.5)));
 		m_Params.push_back(ParamWithName<T>(&m_Outer,           prefix + "circlecrop2_outer", 1));
-		m_Params.push_back(ParamWithName<T>(&m_Zero,            prefix + "circlecrop2_zero", 1, eParamType::INTEGER, 0, 1));
+		m_Params.push_back(ParamWithName<T>(&m_Zero,            prefix + "circlecrop2_zero", 1, eParamType::REAL, 0, 1));
 		m_Params.push_back(ParamWithName<T>(true, &m_In,        prefix + "circlecrop2_in"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_Out,       prefix + "circlecrop2_out"));
 		m_Params.push_back(ParamWithName<T>(true, &m_OutWeight, prefix + "circlecrop2_out_weight"));
@@ -3000,7 +2997,9 @@ public:
 		helper.Out.x = (x * re + y * im) * r;
 		helper.Out.y = (y * re - x * im) * r;
 		helper.Out.z = (z * m_Weight) / c;
-		outPoint.m_ColorX = Clamp<T>(outPoint.m_ColorX + m_DcAdjust * c, 0, 1);
+
+		if (Compat::m_Compat)
+			outPoint.m_ColorX = Clamp<T>(outPoint.m_ColorX + m_DcAdjust * c, 0, 1);
 	}
 
 	virtual string OpenCLString() const override
@@ -3020,21 +3019,27 @@ public:
 		string dcAdjust = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string powerInv = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tconst real_t x = Powq4c(vIn.x, " << power << ");\n"
-		   << "\t\tconst real_t y = Powq4c(vIn.y, " << power << ");\n"
-		   << "\t\tconst real_t z = Powq4c(vIn.z, " << power << ");\n"
+		   << "\t\treal_t weight = " << weight << ";\n"
+		   << "\t\treal_t power = " << power << ";\n"
+		   << "\t\treal_t c1 = " << c1 << ";\n"
+		   << "\t\tconst real_t x = Powq4c(vIn.x, power);\n"
+		   << "\t\tconst real_t y = Powq4c(vIn.y, power);\n"
+		   << "\t\tconst real_t z = Powq4c(vIn.z, power);\n"
 		   << "\t\tconst real_t d = fma(x, x, -SQR(y));\n"
-		   << "\t\tconst real_t re = Spread(fma(" << c1 << ", x, " << c2 << " * d), " << sx << ") + (real_t)(1.0);\n"
-		   << "\t\tconst real_t im = Spread(fma(" << c1 << ", y, " << c2x2 << " * x * y), " << sy << ");\n"
+		   << "\t\tconst real_t re = Spread(fma(c1, x, " << c2 << " * d), " << sx << ") + (real_t)(1.0);\n"
+		   << "\t\tconst real_t im = Spread(fma(c1, y, " << c2x2 << " * x * y), " << sy << ");\n"
 		   << "\t\treal_t c = Zeps(Powq4c(fma(re, re, SQR(im)), " << powerInv << "));\n"
 		   << "\n"
-		   << "\t\tconst real_t r = " << weight << " / c;\n"
+		   << "\t\tconst real_t r = weight / c;\n"
 		   << "\n"
 		   << "\t\tvOut.x = fma(x, re, y * im) * r;\n"
 		   << "\t\tvOut.y = fma(y, re, -(x * im)) * r;\n"
-		   << "\t\tvOut.z = (z * " << weight << ") / c;\n"
-		   << "\t\toutPoint->m_ColorX = clamp(fma(" << dcAdjust << ", c, outPoint->m_ColorX), (real_t)(0.0), (real_t)(1.0));\n"
-		   << "\t}\n";
+		   << "\t\tvOut.z = (z * weight) / c;\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\toutPoint->m_ColorX = clamp(fma(" << dcAdjust << ", c, outPoint->m_ColorX), (real_t)(0.0), (real_t)(1.0));\n";
+
+		ss << "\t}\n";
 		return ss.str();
 	}
 
@@ -4404,7 +4409,7 @@ protected:
 		string prefix = Prefix();
 		m_Params.clear();
 		m_Params.push_back(ParamWithName<T>(&m_P, prefix + "blur_heart_p", T(0.5)));
-		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "blur_heart_a", T(-T(0.6))));
+		m_Params.push_back(ParamWithName<T>(&m_A, prefix + "blur_heart_a", T(-0.6)));
 		m_Params.push_back(ParamWithName<T>(&m_B, prefix + "blur_heart_b", T(0.7)));
 	}
 
@@ -4430,9 +4435,9 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		int extended = int(m_Extended);
+		bool extended = int(m_Extended) == 0 || !Compat::m_Compat;
 		T seed = m_AbsSeed;
-		T r = -m_Rotation;
+		T r;
 		T r0 = 0;
 		T r1 = 0;
 		T tileType = 0;
@@ -4445,7 +4450,6 @@ public:
 		T y = helper.In.y * m_Scale;
 		int intx = int(Round(x));
 		int inty = int(Round(y));
-		int randiter;
 		r = x - intx;
 
 		if (r < 0)
@@ -4467,24 +4471,22 @@ public:
 			tileType = 1;
 		else
 		{
-			if (extended == 0)
+			if (extended)
 			{
-				T xrand = Round(helper.In.x);
-				T yrand = Round(helper.In.y);
-				xrand = xrand * m_Seed2;
-				yrand = yrand * m_Seed2;
+				T xrand = Round(helper.In.x) * m_Seed2;
+				T yrand = Round(helper.In.y) * m_Seed2;
 				niter = xrand + yrand + xrand * yrand;
-				randInt = (niter + seed) * m_Seed2 / 2;
+				randInt = (niter + seed) * m_Seed2 * T(0.5);
 				randInt = fmod((randInt * multiplier + offset), modBase);
 			}
 			else
 			{
+				int randiter = 0;
 				int xrand = int(Round(helper.In.x));
 				int yrand = int(Round(helper.In.y));
 				seed = T(Floor<T>(seed));
-				niter = T(abs(xrand + yrand + xrand * yrand));
+				niter = T(std::abs(xrand + yrand + xrand * yrand));
 				randInt = seed + niter;
-				randiter = 0;
 
 				while (randiter < niter && randiter < 20)//Allow it to escape.
 				{
@@ -4496,34 +4498,38 @@ public:
 			tileType = fmod(randInt, T(2));
 		}
 
+		T xval1, xval2;
+
 		//Drawing the points.
-		if (extended == 0)//Fast drawmode
+		if (extended)//Fast drawmode.
 		{
 			if (tileType < 1)
 			{
-				r0 = std::pow((pow(std::abs(x), m_Exponent) + std::pow(std::abs(y), m_Exponent)), m_OneOverEx);
-				r1 = std::pow((pow(std::abs(x - 1), m_Exponent) + std::pow(std::abs(y - 1), m_Exponent)), m_OneOverEx);
+				xval1 = x;
+				xval2 = x - 1;
 			}
 			else
 			{
-				r0 = std::pow((pow(std::abs(x - 1), m_Exponent) + std::pow(std::abs(y), m_Exponent)), m_OneOverEx);
-				r1 = std::pow((pow(std::abs(x), m_Exponent) + std::pow(std::abs(y - 1), m_Exponent)), m_OneOverEx);
+				xval1 = x - 1;
+				xval2 = x;
 			}
 		}
-		else//Slow drawmode
+		else//Slow drawmode.
 		{
 			if (tileType == 1)
 			{
-				r0 = std::pow((std::pow(std::abs(x), m_Exponent) + std::pow(std::abs(y), m_Exponent)), m_OneOverEx);
-				r1 = std::pow((std::pow(std::abs(x - 1), m_Exponent) + std::pow(std::abs(y - 1), m_Exponent)), m_OneOverEx);
+				xval1 = x;
+				xval2 = x - 1;
 			}
 			else
 			{
-				r0 = std::pow((std::pow(std::abs(x - 1), m_Exponent) + std::pow(std::abs(y), m_Exponent)), m_OneOverEx);
-				r1 = std::pow((std::pow(std::abs(x), m_Exponent) + std::pow(std::abs(y - 1), m_Exponent)), m_OneOverEx);
+				xval1 = x - 1;
+				xval2 = x;
 			}
 		}
 
+		r0 = std::pow((std::pow(std::abs(xval1), m_Exponent) + std::pow(std::abs(y), m_Exponent)), m_OneOverEx);
+		r1 = std::pow((std::pow(std::abs(xval2), m_Exponent) + std::pow(std::abs(y - 1), m_Exponent)), m_OneOverEx);
 		r = std::abs(r0 - T(0.5)) * m_OneOverRmax;
 
 		if (r < 1)
@@ -4569,7 +4575,11 @@ public:
 		ss << "\t{\n"
 		   << "\t\tint extended = (int)" << extended << ";\n"
 		   << "\t\treal_t seed = " << absSeed << ";\n"
-		   << "\t\treal_t r = -" << rotation << ";\n"
+		   << "\t\treal_t seed2 = " << seed2 << ";\n"
+		   << "\t\treal_t exponent = " << exponent << ";\n"
+		   << "\t\treal_t oneOverEx = " << oneOverEx << ";\n"
+		   << "\t\treal_t size = " << size << ";\n"
+		   << "\t\treal_t oneOverRmax = " << oneOverRmax << ";\n"
 		   << "\t\treal_t r0 = 0;\n"
 		   << "\t\treal_t r1 = 0;\n"
 		   << "\t\treal_t tileType = 0;\n"
@@ -4582,9 +4592,7 @@ public:
 		   << "\t\treal_t y = vIn.y * " << scale << ";\n"
 		   << "\t\tint intx = (int)Round(x);\n"
 		   << "\t\tint inty = (int)Round(y);\n"
-		   << "\t\tint randiter;\n"
-		   << "\n"
-		   << "\t\tr = x - intx;\n"
+		   << "\t\treal_t r = x - intx;\n"
 		   << "\n"
 		   << "\t\tif (r < 0)\n"
 		   << "\t\t	x = 1 + r;\n"
@@ -4603,71 +4611,84 @@ public:
 		   << "\t\telse if (seed == 1)\n"
 		   << "\t\t	tileType = 1;\n"
 		   << "\t\telse\n"
-		   << "\t\t{\n"
-		   << "\t\t	if (extended == 0)\n"
-		   << "\t\t	{\n"
-		   << "\t\t		real_t xrand = Round(vIn.x);\n"
-		   << "\t\t		real_t yrand = Round(vIn.y);\n"
-		   << "\n"
-		   << "\t\t		xrand = xrand * " << seed2 << ";\n"
-		   << "\t\t		yrand = yrand * " << seed2 << ";\n"
+		   << "\t\t{\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\t	if (extended == 0)\n"
+			   << "\t\t	{\n";
+
+		ss << "\t\t		real_t xrand = Round(vIn.x) * seed2;\n"
+		   << "\t\t		real_t yrand = Round(vIn.y) * seed2;\n"
 		   << "\t\t		niter = fma(xrand, yrand, xrand + yrand);\n"
-		   << "\t\t		randInt = (niter + seed) * " << seed2 << " / 2;\n"
-		   << "\t\t		randInt = fmod(fma(randInt, multiplier, offset), modBase);\n"
+		   << "\t\t		randInt = (niter + seed) * seed2 * (real_t)(0.5);\n"
+		   << "\t\t		randInt = fmod(fma(randInt, multiplier, offset), modBase);\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\t	}\n"
+			   << "\t\t	else\n"
+			   << "\t\t	{\n"
+			   << "\t\t		int xrand = (int)Round(vIn.x);\n"
+			   << "\t\t		int yrand = (int)Round(vIn.y);\n"
+			   << "\n"
+			   << "\t\t		seed = floor(seed);\n"
+			   << "\t\t		niter = (real_t)abs(xrand + yrand + xrand * yrand);\n"
+			   << "\t\t		randInt = seed + niter;\n"
+			   << "\t\t		int randiter = 0;\n"
+			   << "\n"
+			   << "\t\t		while (randiter < niter && randiter < 20)\n"
+			   << "\t\t		{\n"
+			   << "\t\t			randiter++;\n"
+			   << "\t\t			randInt = fmod(fma(randInt, multiplier, offset), modBase);\n"
+			   << "\t\t		}\n"
+			   << "\t\t	}\n"
+			   << "\n";
+
+		ss << "\t\t	tileType = fmod(randInt, 2);\n"
+		   << "\t\t}\n"
+		   << "\n"
+		   << "\t\treal_t xval1, xval2;\n"
+		   << "\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\tif(extended == 0)\n"
+			   << "\t\t{\n";
+
+		ss << "\t\t	if (tileType < 1)\n"
+		   << "\t\t	{\n"
+		   << "\t\t		xval1 = x;\n"
+		   << "\t\t		xval2 = x - 1;\n"
 		   << "\t\t	}\n"
 		   << "\t\t	else\n"
 		   << "\t\t	{\n"
-		   << "\t\t		int xrand = (int)Round(vIn.x);\n"
-		   << "\t\t		int yrand = (int)Round(vIn.y);\n"
-		   << "\n"
-		   << "\t\t		seed = floor(seed);\n"
-		   << "\t\t		niter = (real_t)abs(xrand + yrand + xrand * yrand);\n"
-		   << "\t\t		randInt = seed + niter;\n"
-		   << "\t\t		randiter = 0;\n"
-		   << "\n"
-		   << "\t\t		while (randiter < niter && randiter < 20)\n"
-		   << "\t\t		{\n"
-		   << "\t\t			randiter++;\n"
-		   << "\t\t			randInt = fmod((randInt * multiplier + offset), modBase);\n"
-		   << "\t\t		}\n"
-		   << "\t\t	}\n"
-		   << "\n"
-		   << "\t\t	tileType = fmod(randInt, 2);\n"
-		   << "\t\t}\n"
-		   << "\n"
-		   << "\t\tif (extended == 0)\n"
-		   << "\t\t{\n"
-		   << "\t\t	if (tileType < 1)\n"
-		   << "\t\t	{\n"
-		   << "\t\t		r0 = pow((pow(fabs(x    ), " << exponent << ") + pow(fabs(y    ), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t		r1 = pow((pow(fabs(x - 1), " << exponent << ") + pow(fabs(y - 1), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t	}\n"
-		   << "\t\t	else\n"
-		   << "\t\t	{\n"
-		   << "\t\t		r0 = pow((pow(fabs(x - 1), " << exponent << ") + pow(fabs(y    ), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t		r1 = pow((pow(fabs(x    ), " << exponent << ") + pow(fabs(y - 1), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t	}\n"
-		   << "\t\t}\n"
-		   << "\t\telse\n"
-		   << "\t\t{\n"
-		   << "\t\t	if (tileType == 1)\n"
-		   << "\t\t	{\n"
-		   << "\t\t		r0 = pow((pow(fabs(x    ), " << exponent << ") + pow(fabs(y    ), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t		r1 = pow((pow(fabs(x - 1), " << exponent << ") + pow(fabs(y - 1), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t	}\n"
-		   << "\t\t	else\n"
-		   << "\t\t	{\n"
-		   << "\t\t		r0 = pow((pow(fabs(x - 1), " << exponent << ") + pow(fabs(y    ), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t		r1 = pow((pow(fabs(x    ), " << exponent << ") + pow(fabs(y - 1), " << exponent << ")), " << oneOverEx << ");\n"
-		   << "\t\t	}\n"
-		   << "\t\t}\n"
-		   << "\n"
-		   << "\t\tr = fabs(r0 - (real_t)(0.5)) * " << oneOverRmax << ";\n"
+		   << "\t\t		xval1 = x - 1;\n"
+		   << "\t\t		xval2 = x;\n"
+		   << "\t\t	}\n";
+
+		if (Compat::m_Compat)
+			ss << "\t\t}\n"
+			   << "\t\telse\n"
+			   << "\t\t{\n"
+			   << "\t\t	if (tileType == 1)\n"
+			   << "\t\t	{\n"
+			   << "\t\t		xval1 = x;\n"
+			   << "\t\t		xval2 = x - 1;\n"
+			   << "\t\t	}\n"
+			   << "\t\t	else\n"
+			   << "\t\t	{\n"
+			   << "\t\t		xval1 = x - 1;\n"
+			   << "\t\t		xval2 = x;\n"
+			   << "\t\t	}\n"
+			   << "\t\t}\n";
+
+		ss << "\n"
+		   << "\t\tr0 = pow((pow(fabs(xval1), exponent) + pow(fabs(y    ), exponent)), oneOverEx);\n"
+		   << "\t\tr1 = pow((pow(fabs(xval2), exponent) + pow(fabs(y - 1), exponent)), oneOverEx);\n"
+		   << "\t\tr = fabs(r0 - (real_t)(0.5)) * oneOverRmax;\n"
 		   << "\n"
 		   << "\t\tif (r < 1)\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x = " << size << " * (x + floor(vIn.x));\n"
-		   << "\t\t	vOut.y = " << size << " * (y + floor(vIn.y));\n"
+		   << "\t\t	vOut.x = size * (x + floor(vIn.x));\n"
+		   << "\t\t	vOut.y = size * (y + floor(vIn.y));\n"
 		   << "\t\t}\n"
 		   << "\t\telse\n"
 		   << "\t\t{\n"
@@ -4675,12 +4696,12 @@ public:
 		   << "\t\t	vOut.y = (real_t)(0.0);\n"
 		   << "\t\t}\n"
 		   << "\n"
-		   << "\t\tr = fabs(r1 - (real_t)(0.5)) * " << oneOverRmax << ";\n"
+		   << "\t\tr = fabs(r1 - (real_t)(0.5)) * oneOverRmax;\n"
 		   << "\n"
 		   << "\t\tif (r < 1)\n"
 		   << "\t\t{\n"
-		   << "\t\t	vOut.x += " << size << " * (x + floor(vIn.x));\n"
-		   << "\t\t	vOut.y += " << size << " * (y + floor(vIn.y));\n"
+		   << "\t\t	vOut.x += size * (x + floor(vIn.x));\n"
+		   << "\t\t	vOut.y += size * (y + floor(vIn.y));\n"
 		   << "\t\t}\n"
 		   << "\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
@@ -4695,11 +4716,13 @@ public:
 
 	virtual void Precalc() override
 	{
+		m_Exponent = Clamp<T>(m_Exponent, EPS, 2);
+		m_ArcWidth = Clamp<T>(m_Exponent, EPS, 1);
 		m_OneOverEx = 1 / m_Exponent;
 		m_AbsSeed = std::abs(m_Seed);
-		m_Seed2 = std::sqrt(Zeps(m_AbsSeed + (m_AbsSeed / 2))) / Zeps((m_AbsSeed * T(0.5))) * T(0.25);
-		m_OneOverRmax = 1 / (T(0.5) * (std::pow(T(2), 1 / m_Exponent) - 1) * m_ArcWidth);
-		m_Scale = (std::cos(-m_Rotation) - std::sin(-m_Rotation)) / m_Weight;
+		m_Seed2 = std::sqrt(Zeps(m_AbsSeed * T(1.5))) / Zeps((m_AbsSeed * T(0.5))) * T(0.25);
+		m_OneOverRmax = 1 / (T(0.5) * (std::pow(T(2), m_OneOverEx) - 1) * m_ArcWidth);
+		m_Scale = (std::cos(m_Rotation) + std::sin(m_Rotation)) / m_Weight;
 	}
 
 protected:
@@ -4707,11 +4730,11 @@ protected:
 	{
 		string prefix = Prefix();
 		m_Params.clear();
-		m_Params.push_back(ParamWithName<T>(&m_Extended, prefix + "Truchet_extended", 0, eParamType::INTEGER, 0, 1));
-		m_Params.push_back(ParamWithName<T>(&m_Exponent, prefix + "Truchet_exponent", 2, eParamType::REAL_CYCLIC, T(0.001), 2));
-		m_Params.push_back(ParamWithName<T>(&m_ArcWidth, prefix + "Truchet_arc_width", T(0.5), eParamType::REAL_CYCLIC, T(0.001), 1));
+		m_Params.push_back(ParamWithName<T>(&m_Extended, prefix + "Truchet_extended", 1));
+		m_Params.push_back(ParamWithName<T>(&m_Exponent, prefix + "Truchet_exponent", 2, eParamType::REAL_NONZERO, EPS, 2));
+		m_Params.push_back(ParamWithName<T>(&m_ArcWidth, prefix + "Truchet_arc_width", T(0.5), eParamType::REAL_NONZERO, EPS, 1));
 		m_Params.push_back(ParamWithName<T>(&m_Rotation, prefix + "Truchet_rotation"));
-		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "Truchet_size", 1, eParamType::REAL_CYCLIC, T(0.001), 10));
+		m_Params.push_back(ParamWithName<T>(&m_Size, prefix + "Truchet_size", 1, eParamType::REAL, EPS));
 		m_Params.push_back(ParamWithName<T>(&m_Seed, prefix + "Truchet_seed", 50));
 		m_Params.push_back(ParamWithName<T>(true, &m_OneOverEx, prefix + "Truchet_one_over_ex"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_AbsSeed, prefix + "Truchet_abs_seed"));

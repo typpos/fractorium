@@ -1,3 +1,14 @@
+fractorium (23.23.8.101-0ubuntu1~pre0) UNRELEASED; urgency=medium
+
+  * Non-maintainer upload.
+  * Differences from upstream:
+    * remove executable bit from non-executable files
+    * bump debian compat version (allows parallel builds)
+    * export raw histogram data
+    * line endings in package-linux.sh
+
+ -- Claude Heiland-Allen <claude@mathr.co.uk>  Tue, 05 Dec 2023 11:22:23 +0000
+
 fractorium (22.21.4.2-0ubuntu1) bionic; urgency=low
 
   * release 22.21.4.2

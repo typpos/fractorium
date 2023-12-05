@@ -332,6 +332,8 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 		r->EarlyClip(opt.EarlyClip());
 		r->YAxisUp(opt.YAxisUp());
 		r->LockAccum(opt.LockAccum());
+		r->RawHistogram(opt.RawHistogram());
+		r->RawHistogramPreDensity(opt.RawHistogramPreDensity());
 		r->PixelAspectRatio(T(opt.AspectRatio()));
 		r->Priority(eThreadPriority(Clamp<intmax_t>(intmax_t(opt.Priority()), intmax_t(eThreadPriority::LOWEST), intmax_t(eThreadPriority::HIGHEST))));
 	}
@@ -471,7 +473,7 @@ bool EmberAnimate(int argc, _TCHAR* argv[], EmberOptions& opt)
 					vector<float> g(size);
 					vector<float> b(size);
 					vector<float> a(size);
-					Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), w, h, opt.Transparency());
+					Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), w, h, opt.Transparency(), ! opt.RawHistogram());
 					const auto writeSuccess = WriteExr32(fn.c_str(),
 														 r.data(),
 														 g.data(),

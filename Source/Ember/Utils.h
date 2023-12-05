@@ -2,6 +2,10 @@
 
 #include "Isaac.h"
 
+#ifndef _WIN32
+#define _strnicmp strncasecmp
+#endif
+
 /// <summary>
 /// Global utility classes and functions that don't really fit anywhere else, but are
 /// too small to justify being in their own file.

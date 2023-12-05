@@ -11,7 +11,7 @@ Vcs-Browser: https://bitbucket.org/mfeemster/fractorium
 Package: fractorium
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: A fractal flame editor with GPU support
+Description: fractal flame editor with GPU support
  Fractorium
  .
  A fractal flame editor with GPU support.

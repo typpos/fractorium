@@ -101,12 +101,13 @@ win32 {
 !win32 {
 	LIBS += -ljpeg
 	LIBS += -lpng
-	LIBS += -lpthread
-	LIBS += -lIlmImf
-	LIBS += -lHalf
-	LIBS += -lImath
-	LIBS += -lIex
 	LIBS += -lxml2
+	LIBS += -lz
+	LIBS += -lpthread
+	LIBS += -lIex-3_1
+	LIBS += -lIlmThread-3_1
+	LIBS += -lImath-3_1
+	LIBS += -lOpenEXR-3_1
 }
 
 macx {

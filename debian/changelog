@@ -2,12 +2,18 @@ fractorium (23.23.8.101-0ubuntu1~pre0) UNRELEASED; urgency=medium
 
   * Non-maintainer upload.
   * Differences from upstream:
+    * update debian build-depends for Qt 6
+    * dos2unix debian/rules
+    * fix lintian warning about description starting with article
+    * remove unused mime type from desktop file (fixes lintian warning)
+    * add alternative for _strnicmp on non-Windows
+    * update dependencies to OpenEXR 3.1
     * remove executable bit from non-executable files
     * bump debian compat version (allows parallel builds)
     * export raw histogram data
     * line endings in package-linux.sh
 
- -- Claude Heiland-Allen <claude@mathr.co.uk>  Tue, 05 Dec 2023 11:22:23 +0000
+ -- Claude Heiland-Allen <claude@mathr.co.uk>  Tue, 05 Dec 2023 14:00:00 +0000
 
 fractorium (22.21.4.2-0ubuntu1) bionic; urgency=low
 

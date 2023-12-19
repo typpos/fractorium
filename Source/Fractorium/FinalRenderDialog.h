@@ -60,8 +60,9 @@ public:
 	bool Double();
 	bool SaveXml();
 	bool DoAll();
-	bool DoSequence();
 	bool Png16Bit();
+	bool DoSequence();
+	bool UseNumbers();
 	bool KeepAspect();
 	bool ApplyToAll();
 	eScaleType Scale();
@@ -72,6 +73,7 @@ public:
 	QString Prefix();
 	QString Suffix();
 	uint Current();
+	uint StartAt();
 	uint ThreadCount();
 	int ThreadPriority();
 	double OpenCLSubBatchPct();

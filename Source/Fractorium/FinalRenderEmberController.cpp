@@ -269,6 +269,9 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		if (doAll)
 		{
 			m_ImageCount = m_EmberFile.Size();
+			ostringstream os;
+			const auto padding = streamsize(std::log10(m_EmberFile.Size())) + 1;
+			os << setfill('0') << setprecision(0) << fixed;
 
 			//Different action required for rendering as animation or not.
 			if (m_GuiState.m_DoSequence && !m_Renderers.empty())
@@ -291,7 +294,7 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 					}
 					else if (it.m_Time <= prev->m_Time)
 					{
-						it.m_Time  = prev->m_Time + 1;
+						it.m_Time = prev->m_Time + 1;
 					}
 
 					it.m_TemporalSamples = m_GuiState.m_TemporalSamples;
@@ -303,7 +306,19 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 				//even when using double precision, which most cards at the time of this writing already exceed.
 				m_GuiState.m_Strips = 1;
 				CopyCont(embers, m_EmberFile.m_Embers);
-				std::atomic<size_t> atomfTime(0);
+
+				if (m_GuiState.m_UseNumbers)
+				{
+					auto i = 0;
+
+					for (auto& it : embers)
+					{
+						it.m_Time = i++;
+						FormatName(it, os, padding);
+					}
+				}
+
+				std::atomic<size_t> atomfTime(m_GuiState.m_StartAt);
 				vector<std::thread> threadVec;
 				threadVec.reserve(m_Renderers.size());
 
@@ -320,13 +335,28 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			else if (m_Renderer.get())//Make sure a renderer was created and render all images, but not as an animation sequence (without temporal samples motion blur).
 			{
 				//Render each image, cancelling if m_Run ever gets set to false.
-				for (auto& it : m_EmberFile.m_Embers)
+				auto i = m_GuiState.m_StartAt;
+
+				while (auto ember = m_EmberFile.Get(i))
 				{
 					if (!m_Run)
 						break;
 
-					Output("Image " + ToString<qulonglong>(m_FinishedImageCount.load() + 1) + ":\n" + ComposePath(QString::fromStdString(it.m_Name)));
-					RenderSingleEmber(it, true, currentStripForProgress);
+					std::string oldname;
+
+					if (m_GuiState.m_UseNumbers)
+					{
+						oldname = ember->m_Name;
+						ember->m_Time = i;
+						FormatName(*ember, os, padding);
+					}
+
+					Output("Image " + ToString<qulonglong>(m_FinishedImageCount.load() + 1) + ":\n" + ComposePath(QString::fromStdString(ember->m_Name)));
+					RenderSingleEmber(*ember, true, currentStripForProgress);
+					i++;
+
+					if (m_GuiState.m_UseNumbers)
+						ember->m_Name = oldname;
 				}
 			}
 			else
@@ -1003,6 +1033,7 @@ void FinalRenderEmberController<T>::RenderComplete(Ember<T>& ember, const EmberS
 		m_Settings->FinalSaveXml(m_GuiState.m_SaveXml);
 		m_Settings->FinalDoAll(m_GuiState.m_DoAll);
 		m_Settings->FinalDoSequence(m_GuiState.m_DoSequence);
+		m_Settings->FinalUseNumbers(m_GuiState.m_UseNumbers);
 		m_Settings->FinalPng16Bit(m_GuiState.m_Png16Bit);
 		m_Settings->FinalKeepAspect(m_GuiState.m_KeepAspect);
 		m_Settings->FinalScale(uint(m_GuiState.m_Scale));

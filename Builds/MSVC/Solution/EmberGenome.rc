@@ -49,8 +49,8 @@
 	//
 
 	VS_VERSION_INFO VERSIONINFO
-	FILEVERSION 23, 23, 8, 101
-	PRODUCTVERSION 23, 23, 8, 101
+	FILEVERSION 23, 23, 8, 102
+	PRODUCTVERSION 23, 23, 8, 102
 	FILEFLAGSMASK 0x3fL
 	#ifdef _DEBUG
 		FILEFLAGS 0x1L
@@ -67,12 +67,12 @@
 	BEGIN
 	VALUE "CompanyName", "Open Source"
 	VALUE "FileDescription", "Manipulates fractal flame parameter files"
-	VALUE "FileVersion", "23, 23, 8, 101"
+	VALUE "FileVersion", "23, 23, 8, 102"
 	VALUE "InternalName", "EmberGenome.exe"
 	VALUE "LegalCopyright", "Copyright (C) Matt Feemster 2021, GPL v3"
 	VALUE "OriginalFilename", "EmberGenome.exe"
 	VALUE "ProductName", "Ember Genome"
-	VALUE "ProductVersion", "23, 23, 8, 101"
+	VALUE "ProductVersion", "23, 23, 8, 102"
 	END
 	END
 	BLOCK "VarFileInfo"

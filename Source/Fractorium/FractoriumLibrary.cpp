@@ -83,7 +83,7 @@ void Fractorium::SelectLibraryItem(size_t index)
 			if (auto emberItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(i)))
 			{
 				emberItem->setSelected(i == index);
-				emberItem->setCheckState(0, i == index ? Qt::Checked : Qt::Unchecked);
+				emberItem->setCheckState(NAME_COL, i == index ? Qt::Checked : Qt::Unchecked);
 			}
 		}
 	}
@@ -111,7 +111,7 @@ vector<pair<size_t, QTreeWidgetItem*>> Fractorium::GetCurrentEmberIndex(bool isC
 			{
 				if (isChecked)
 				{
-					if (item->checkState(0) == Qt::Checked)
+					if (item->checkState(NAME_COL) == Qt::Checked)
 						v.push_back(make_pair(index, item));
 				}
 				else
@@ -154,19 +154,21 @@ void FractoriumEmberController<T>::SyncLibrary(eLibraryUpdate update)
 	{
 		for (int i = 0; i < top->childCount() && it != m_EmberFile.m_Embers.end(); ++i, ++it)//Iterate through all of the children, which will represent the open embers.
 		{
-			if (auto item = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))//Cast the child widget to the EmberTreeWidgetItem type.
+			if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(top->child(i)))//Cast the child widget to the EmberTreeWidgetItem type.
 			{
 				if (static_cast<uint>(update) & static_cast<uint>(eLibraryUpdate::INDEX))
 					it->m_Index = i;
 
 				if (static_cast<uint>(update) & static_cast<uint>(eLibraryUpdate::NAME))
-					item->setText(0, QString::fromStdString(it->m_Name));
+					emberItem->setText(NAME_COL, QString::fromStdString(it->m_Name));
 
 				if (static_cast<uint>(update) & static_cast<uint>(eLibraryUpdate::POINTER))
-					item->SetEmberPointer(&(*it));
+					emberItem->SetEmberPointer(&(*it));
 
-				if (item->checkState(0) == Qt::Checked)
-					m_EmberFilePointer = item->GetEmber();
+				if (emberItem->checkState(NAME_COL) == Qt::Checked)
+					m_EmberFilePointer = emberItem->GetEmber();
+
+				emberItem->setText(INDEX_COL, ToString(i));
 			}
 		}
 	}
@@ -188,21 +190,23 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 	tree->clear();
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_EmberFile.m_Filename);
-	fileItem->setText(0, info.fileName());
-	fileItem->setToolTip(0, m_EmberFile.m_Filename);
+	fileItem->setText(NAME_COL, info.fileName());
+	fileItem->setToolTip(NAME_COL, m_EmberFile.m_Filename);
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled);
 	uint i = 0;
 
 	for (auto& it : m_EmberFile.m_Embers)
 	{
 		auto emberItem = new EmberTreeWidgetItem<T>(&it, fileItem);
+		auto istr = ToString(i++);
+		emberItem->setText(INDEX_COL, istr);
 
 		if (it.m_Name.empty())
-			emberItem->setText(0, ToString(i++));
+			emberItem->setText(NAME_COL, istr);
 		else
-			emberItem->setText(0, it.m_Name.c_str());
+			emberItem->setText(NAME_COL, it.m_Name.c_str());
 
-		emberItem->setToolTip(0, emberItem->text(0));
+		emberItem->setToolTip(NAME_COL, emberItem->text(NAME_COL));
 		emberItem->SetImage(empy_preview, size, size);
 	}
 
@@ -233,13 +237,15 @@ void FractoriumEmberController<T>::UpdateLibraryTree()
 		for (auto it = Advance(m_EmberFile.m_Embers.begin(), i); it != m_EmberFile.m_Embers.end(); ++it)
 		{
 			auto emberItem = new EmberTreeWidgetItem<T>(&(*it), top);
+			auto istr = ToString(i++);
+			emberItem->setText(INDEX_COL, istr);
 
 			if (it->m_Name.empty())
-				emberItem->setText(0, ToString(i++));
+				emberItem->setText(NAME_COL, istr);
 			else
-				emberItem->setText(0, it->m_Name.c_str());
+				emberItem->setText(NAME_COL, it->m_Name.c_str());
 
-			emberItem->setToolTip(0, emberItem->text(0));
+			emberItem->setToolTip(NAME_COL, emberItem->text(NAME_COL));
 			emberItem->SetImage(empy_preview, size, size);
 		}
 
@@ -270,7 +276,7 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 		if (auto emberItem = dynamic_cast<EmberTreeWidgetItem<T>*>(item))
 		{
 			auto oldName = emberItem->GetEmber()->m_Name;//First preserve the previous name.
-			auto newName = emberItem->text(0).toStdString();
+			auto newName = emberItem->text(NAME_COL).toStdString();
 
 			//Checking/unchecking other items shouldn't perform the processing below.
 			//If nothing changed, nothing to do.
@@ -296,7 +302,7 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 		}
 		else if (const auto parentItem = dynamic_cast<QTreeWidgetItem*>(item))
 		{
-			const auto text = parentItem->text(0);
+			const auto text = parentItem->text(NAME_COL);
 
 			if (text != "")
 			{
@@ -485,12 +491,11 @@ template <typename T>
 void FractoriumEmberController<T>::AddAnimationItem()
 {
 	auto fileItem = new QTreeWidgetItem(m_Fractorium->ui.SequenceTree);
-	fileItem->setText(0, "Rendered Animation");
-	fileItem->setToolTip(0, "Rendered frames can be animated here");
+	fileItem->setText(NAME_COL, "Rendered Animation");
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	auto emberItem = new EmberTreeWidgetItemBase(fileItem);
 	emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	emberItem->setToolTip(0, "Animated Frame");
+	emberItem->setToolTip(INDEX_COL, "Animated Frame");
 	const uint size = PREVIEW_SIZE;
 	vector<unsigned char> empy_preview(size * size * 4);
 	emberItem->SetImage(empy_preview, size, size);
@@ -509,34 +514,43 @@ void FractoriumEmberController<T>::FillSequenceTree()
 	vector<unsigned char> empy_preview(size * size * 4);
 	const auto tree = m_Fractorium->ui.SequenceTree;
 	tree->clear();
-	// Add extra TreeWidget for animation at index 0
+	//Add extra TreeWidget for animation at index 0.
 	AddAnimationItem();
+	m_AnimateTimer->stop();
 	auto fileItem = new QTreeWidgetItem(tree);
 	QFileInfo info(m_SequenceFile.m_Filename);
-	fileItem->setText(0, info.fileName());
-	fileItem->setToolTip(0, m_SequenceFile.m_Filename);
+	fileItem->setText(NAME_COL, info.fileName());
+	fileItem->setToolTip(NAME_COL, m_SequenceFile.m_Filename);
 	fileItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 	uint i = 0;
 
 	for (auto& it : m_SequenceFile.m_Embers)
 	{
 		auto emberItem = new EmberTreeWidgetItemBase(fileItem);
+		auto istr = ToString(i++);
 
 		if (it.m_Name.empty())
-			emberItem->setText(0, ToString(i));
+			emberItem->setText(NAME_COL, istr);
 		else
-			emberItem->setText(0, it.m_Name.c_str());
+			emberItem->setText(NAME_COL, it.m_Name.c_str());
 
-		i++;
+		emberItem->setText(INDEX_COL, istr);
 		emberItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		emberItem->setToolTip(0, emberItem->text(0));
+		emberItem->setToolTip(NAME_COL, emberItem->text(NAME_COL));
 		emberItem->SetImage(empy_preview, size, size);
 	}
 
 	tree->expandAll();
-	// Hide the animation item
+	//Hide, then show the animation item.
 	tree->collapseItem(tree->topLevelItem(0));
 	RenderSequencePreviews(0, uint(m_SequenceFile.Size()));
+
+	if (const auto animation = tree->topLevelItem(0))
+	{
+		animation->setExpanded(true);
+		m_AnimateFrame = 0;
+		m_AnimateTimer->start(1000 / m_Fractorium->ui.SequenceAnimationFpsSpinBox->value());
+	}
 }
 
 /// <summary>
@@ -550,7 +564,7 @@ void FractoriumEmberController<T>::SequenceTreeItemChanged(QTreeWidgetItem* item
 {
 	if (item == m_Fractorium->ui.SequenceTree->topLevelItem(1))
 	{
-		auto text = item->text(0);
+		auto text = item->text(NAME_COL);
 
 		if (text != "")
 			m_SequenceFile.m_Filename = text;
@@ -598,7 +612,7 @@ void Fractorium::SyncFileCountToSequenceCount()
 	if (const auto top = ui.LibraryTree->topLevelItem(0))
 	{
 		const int count = top->childCount() - 1;
-		ui.LibraryTree->headerItem()->setText(0, "Current Flame File (" + QString::number(top->childCount()) + ")");
+		ui.LibraryTree->headerItem()->setText(NAME_COL, "Current Flame File (" + QString::number(top->childCount()) + ")");
 		ui.SequenceStartFlameSpinBox->setMinimum(0);
 		ui.SequenceStartFlameSpinBox->setMaximum(count);
 		ui.SequenceStartFlameSpinBox->setValue(0);
@@ -835,7 +849,7 @@ void FractoriumEmberController<T>::SequenceAnimateNextFrame()
 				else
 				{
 					animate->m_Pixmap = QPixmap(nth->m_Pixmap);
-					animate->setData(0, Qt::DecorationRole, animate->m_Pixmap);
+					animate->setData(NAME_COL, Qt::DecorationRole, animate->m_Pixmap);
 				}
 			}
 		}
@@ -859,7 +873,6 @@ void FractoriumEmberController<T>::SequenceAnimateButtonClicked()
 		{
 			animation->setExpanded(true);
 			m_AnimateFrame = 0;
-			// TODO look at duration based instead of time
 			m_AnimateTimer->start(1000 / m_Fractorium->ui.SequenceAnimationFpsSpinBox->value());
 		}
 	}

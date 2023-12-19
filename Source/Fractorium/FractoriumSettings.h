@@ -74,6 +74,7 @@
 #define FINALTEMPORALSAMPLES   "finalrender/temporalsamples"
 #define FINALSUPERSAMPLE       "finalrender/supersample"
 #define FINALSTRIPS		       "finalrender/strips"
+#define FINALUSENUMBERS	       "finalrender/usenumbers"
 
 #define XMLWIDTH			 "xml/width"
 #define XMLHEIGHT			 "xml/height"
@@ -269,6 +270,9 @@ public:
 
 	bool FinalDoSequence();
 	void FinalDoSequence(bool b);
+
+	bool FinalUseNumbers();
+	void FinalUseNumbers(bool b);
 
 	bool FinalPng16Bit();
 	void FinalPng16Bit(bool b);

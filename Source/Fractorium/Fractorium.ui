@@ -6264,8 +6264,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>144</width>
-                       <height>58</height>
+                       <width>269</width>
+                       <height>650</height>
                       </rect>
                      </property>
                      <property name="sizePolicy">
@@ -7487,6 +7487,11 @@
         </attribute>
         <column>
          <property name="text">
+          <string>Index</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>Current Flame File</string>
          </property>
         </column>
@@ -8215,7 +8220,12 @@
             </attribute>
             <column>
              <property name="text">
-              <string>Sequence</string>
+              <string>Index</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Image</string>
              </property>
             </column>
            </widget>

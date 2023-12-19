@@ -2,6 +2,9 @@
 
 #include "FractoriumPch.h"
 
+#define INDEX_COL 0
+#define NAME_COL 1
+
 template <typename T> class FractoriumEmberController;
 
 /// <summary>
@@ -59,7 +62,7 @@ public:
 		m_Image = QImage(width, height, QImage::Format_RGBA8888);
 		memcpy(m_Image.scanLine(0), v.data(), SizeOf(v));//Memcpy the data in.
 		m_Pixmap = QPixmap::fromImage(m_Image).scaled(QSize(size, size), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);//Create a QPixmap out of the QImage, scaled to size.
-		setData(0, Qt::DecorationRole, m_Pixmap);
+		setData(NAME_COL, Qt::DecorationRole, m_Pixmap);
 	}
 
 	void SetRendered()
@@ -92,7 +95,7 @@ public:
 		  m_Ember(ember)
 	{
 		setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
-		setCheckState(0, Qt::Unchecked);
+		setCheckState(NAME_COL, Qt::Unchecked);
 	}
 
 	/// <summary>
@@ -106,18 +109,18 @@ public:
 		  m_Ember(ember)
 	{
 		setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);
-		setCheckState(0, Qt::Unchecked);
+		setCheckState(NAME_COL, Qt::Unchecked);
 	}
 
 	/// <summary>
 	/// Copy the text of the tree item to the name of the ember.
 	/// </summary>
-	void UpdateEmberName() { m_Ember->m_Name = text(0).toStdString(); }
+	void UpdateEmberName() { m_Ember->m_Name = text(NAME_COL).toStdString(); }
 
 	/// <summary>
 	/// Set the text of the tree item.
 	/// </summary>
-	void UpdateEditText() { setText(0, QString::fromStdString(m_Ember->m_Name)); }
+	void UpdateEditText() { setText(NAME_COL, QString::fromStdString(m_Ember->m_Name)); }
 
 	/// <summary>
 	/// Get a pointer to the ember held by the tree item.

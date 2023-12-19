@@ -260,14 +260,18 @@ FractoriumFinalRenderDialog::FractoriumFinalRenderDialog(QWidget* p, Qt::WindowF
 	w = SetTabOrder(this, w, ui.FinalRenderSaveXmlCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderDoAllCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderDoSequenceCheckBox);
+	w = SetTabOrder(this, w, ui.FinalRenderUseNumbersForNames);
+	w = SetTabOrder(this, w, ui.FinalRenderStartAtCheckBox);
 	w = SetTabOrder(this, w, ui.FinalRenderCurrentSpin);
-	w = SetTabOrder(this, w, ui.FinalRenderDeviceTable);
 	w = SetTabOrder(this, w, ui.FinalRenderApplyToAllCheckBox);
+	w = SetTabOrder(this, w, ui.FinalRenderDeviceTable);
 	w = SetTabOrder(this, w, ui.FinalRenderThreadCountSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderThreadPriorityComboBox);
 	w = SetTabOrder(this, w, ui.FinalRenderOpenCLSubBatchPctSpin);
 	w = SetTabOrder(this, w, m_WidthScaleSpin);
+	w = SetTabOrder(this, w, m_WidthSpin);
 	w = SetTabOrder(this, w, m_HeightScaleSpin);
+	w = SetTabOrder(this, w, m_HeightSpin);
 	w = SetTabOrder(this, w, ui.FinalRenderScaleNoneRadioButton);
 	w = SetTabOrder(this, w, ui.FinalRenderScaleWidthRadioButton);
 	w = SetTabOrder(this, w, ui.FinalRenderScaleHeightRadioButton);
@@ -314,16 +318,16 @@ void FractoriumFinalRenderDialog::Show(bool fromSequence)
 /// <summary>
 /// GUI settings wrapper functions, getters only.
 /// </summary>
-
 bool FractoriumFinalRenderDialog::EarlyClip() { return ui.FinalRenderEarlyClipCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::YAxisUp() { return ui.FinalRenderYAxisUpCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::Transparency() { return ui.FinalRenderTransparencyCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::OpenCL() { return ui.FinalRenderOpenCLCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::Double() { return ui.FinalRenderDoublePrecisionCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::SaveXml() { return ui.FinalRenderSaveXmlCheckBox->isChecked(); }
-bool FractoriumFinalRenderDialog::DoAll() { return ui.FinalRenderDoAllCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::DoSequence() { return ui.FinalRenderDoSequenceCheckBox->isChecked(); }
+bool FractoriumFinalRenderDialog::DoAll() { return ui.FinalRenderDoAllCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::Png16Bit() { return ui.FinalRenderPng16BitCheckBox->isChecked(); }
+bool FractoriumFinalRenderDialog::UseNumbers() { return ui.FinalRenderUseNumbersForNames->isChecked(); }
 bool FractoriumFinalRenderDialog::KeepAspect() { return ui.FinalRenderKeepAspectCheckBox->isChecked(); }
 bool FractoriumFinalRenderDialog::ApplyToAll() { return ui.FinalRenderApplyToAllCheckBox->isChecked(); }
 QString FractoriumFinalRenderDialog::Ext() { return m_Tbcw->m_Combo->currentText(); }
@@ -332,6 +336,7 @@ void FractoriumFinalRenderDialog::Path(const QString& s) { ui.FinalRenderParamsT
 QString FractoriumFinalRenderDialog::Prefix() { return m_PrefixEdit->text(); }
 QString FractoriumFinalRenderDialog::Suffix() { return m_SuffixEdit->text(); }
 uint FractoriumFinalRenderDialog::Current() { return ui.FinalRenderCurrentSpin->value(); }
+uint FractoriumFinalRenderDialog::StartAt() { return ui.FinalRenderStartAtCheckBox->isChecked() ? Current() - 1 : 0; }
 uint FractoriumFinalRenderDialog::ThreadCount() { return ui.FinalRenderThreadCountSpin->value(); }
 #ifdef _WIN32
 int FractoriumFinalRenderDialog::ThreadPriority() { return ui.FinalRenderThreadPriorityComboBox->currentIndex() - 2; }
@@ -373,6 +378,8 @@ FinalRenderGuiState FractoriumFinalRenderDialog::State()
 	state.m_DoSequence = DoSequence();
 	state.m_Png16Bit = Png16Bit();
 	state.m_KeepAspect = KeepAspect();
+	state.m_UseNumbers = UseNumbers();
+	state.m_StartAt = StartAt();
 	state.m_Scale = Scale();
 	state.m_Path = Path();
 	state.m_Ext = Ext();

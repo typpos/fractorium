@@ -87,9 +87,10 @@ void FractoriumSettings::EnsureDefaults()
 
 	if (SaveImageExt() == "")
 #ifndef __APPLE__
-        SaveImageExt(".png");
+		SaveImageExt(".png");
+
 #else
-        SaveImageExt("Png (*.png)");
+		SaveImageExt("Png (*.png)");
 #endif
 
 	if (FinalExt() != "jpg" && FinalExt() != "png" && FinalExt() != "exr"
@@ -307,6 +308,9 @@ void FractoriumSettings::FinalDoAll(bool b)							  { setValue(FINALDOALL, b);		
 
 bool FractoriumSettings::FinalDoSequence()							  { return value(FINALDOSEQUENCE).toBool();	         }
 void FractoriumSettings::FinalDoSequence(bool b)					  { setValue(FINALDOSEQUENCE, b);				     }
+
+bool FractoriumSettings::FinalUseNumbers()							  { return value(FINALUSENUMBERS).toBool();			 }
+void FractoriumSettings::FinalUseNumbers(bool b)					  { setValue(FINALUSENUMBERS, b);					 }
 
 bool FractoriumSettings::FinalPng16Bit()							  { return value(FINALPNG16BIT).toBool();	         }
 void FractoriumSettings::FinalPng16Bit(bool b)			    		  { setValue(FINALPNG16BIT, b);			    	     }

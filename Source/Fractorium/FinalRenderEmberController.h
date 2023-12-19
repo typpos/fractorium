@@ -22,7 +22,6 @@ struct FinalRenderGuiState
 {
 	bool m_EarlyClip;
 	bool m_YAxisUp;
-	bool m_AlphaChannel;
 	bool m_Transparency;
 	bool m_OpenCL;
 	bool m_Double;
@@ -31,12 +30,14 @@ struct FinalRenderGuiState
 	bool m_Png16Bit;
 	bool m_DoSequence;
 	bool m_KeepAspect;
+	bool m_UseNumbers;
 	eScaleType m_Scale;
 	QString m_Path;
 	QString m_Ext;
 	QString m_Prefix;
 	QString m_Suffix;
 	QList<QVariant> m_Devices;
+	uint m_StartAt;
 	uint m_ThreadCount;
 	int m_ThreadPriority;
 	double m_SubBatchPct;

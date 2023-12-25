@@ -508,6 +508,7 @@ void FractoriumFinalRenderDialog::OnDoAllCheckBoxStateChanged(int state)
 		ui.FinalRenderDoSequenceCheckBox->setChecked(false);
 
 	ui.FinalRenderDoSequenceCheckBox->setEnabled(ui.FinalRenderDoAllCheckBox->isChecked());
+	ui.FinalRenderStartAtCheckBox->setEnabled(ui.FinalRenderDoAllCheckBox->isChecked());
 	ui.FinalRenderSaveAgainAsButton->setEnabled(false);
 	ui.FinalRenderBumpQualityStartButton->setEnabled(false);
 }

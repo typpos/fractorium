@@ -8489,7 +8489,7 @@
     <string>Add co&amp;py of flame</string>
    </property>
    <property name="toolTip">
-    <string>Add a copy of the current flame to the end of the current file</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a copy of the current flame to the position after it&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+J</string>

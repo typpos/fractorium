@@ -69,23 +69,32 @@ void Fractorium::InitLibraryUI()
 	ui.SequenceAnimationFpsSpinBox->setValue(m_Settings->AnimationFps());
 }
 
-
 /// <summary>
 /// Select the item in the library tree specified by the passed in index.
 /// </summary>
 /// <param name="index">The 0-based index of the item in the library tree to select</param>
 void Fractorium::SelectLibraryItem(size_t index)
 {
+	EmberTreeWidgetItemBase* item = nullptr;
+
 	if (const auto top = ui.LibraryTree->topLevelItem(0))
 	{
 		for (int i = 0; i < top->childCount(); i++)
 		{
 			if (auto emberItem = dynamic_cast<EmberTreeWidgetItemBase*>(top->child(i)))
 			{
-				emberItem->setSelected(i == index);
+				auto b = i == index;
+
+				if (b)
+					item = emberItem;
+
+				emberItem->setSelected(b);
 				emberItem->setCheckState(NAME_COL, i == index ? Qt::Checked : Qt::Unchecked);
 			}
 		}
+
+		if (item)
+			ui.LibraryTree->scrollToItem(item, QAbstractItemView::EnsureVisible);
 	}
 }
 
@@ -307,7 +316,7 @@ void FractoriumEmberController<T>::EmberTreeItemChanged(QTreeWidgetItem* item, i
 			if (text != "")
 			{
 				m_EmberFile.m_Filename = text;
-				m_LastSaveAll = "";//Reset will force the dialog to show on the next save all since the user probably wants a different name.
+				//m_LastSaveAll = "";//Reset will force the dialog to show on the next save all since the user probably wants a different name.
 			}
 		}
 	}

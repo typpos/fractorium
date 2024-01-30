@@ -268,7 +268,8 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 		//The rendering process is different between doing a single image, and doing multiple.
 		if (doAll)
 		{
-			m_ImageCount = m_EmberFile.Size();
+			auto i = m_GuiState.m_StartAt;
+			m_ImageCount = m_EmberFile.Size() - i;
 			ostringstream os;
 			const auto padding = streamsize(std::log10(m_EmberFile.Size())) + 1;
 			os << setfill('0') << setprecision(0) << fixed;
@@ -335,8 +336,6 @@ FinalRenderEmberController<T>::FinalRenderEmberController(FractoriumFinalRenderD
 			else if (m_Renderer.get())//Make sure a renderer was created and render all images, but not as an animation sequence (without temporal samples motion blur).
 			{
 				//Render each image, cancelling if m_Run ever gets set to false.
-				auto i = m_GuiState.m_StartAt;
-
 				while (auto ember = m_EmberFile.Get(i))
 				{
 					if (!m_Run)

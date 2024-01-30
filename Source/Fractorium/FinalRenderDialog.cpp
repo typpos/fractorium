@@ -974,7 +974,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 	if (m_FromSequence)
 	{
 		ui.FinalRenderDoAllCheckBox->setChecked(true);
-		ui.FinalRenderDoSequenceCheckBox->setChecked(true);
+		//ui.FinalRenderDoSequenceCheckBox->setChecked(true);
 		ui.FinalRenderApplyToAllCheckBox->setChecked(true);
 		m_PrefixEdit->setText(firstfile + "_");
 	}

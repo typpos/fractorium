@@ -603,8 +603,6 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 	renderer->EarlyClip(opt.EarlyClip());
 	renderer->YAxisUp(opt.YAxisUp());
 	renderer->LockAccum(opt.LockAccum());
-	renderer->RawHistogram(opt.RawHistogram());
-	renderer->RawHistogramPreDensity(opt.RawHistogramPreDensity());
 	renderer->PixelAspectRatio(T(opt.AspectRatio()));
 
 	if (opt.Repeat() == 0)

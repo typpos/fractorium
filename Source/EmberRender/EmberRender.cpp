@@ -153,8 +153,6 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 	renderer->EarlyClip(opt.EarlyClip());
 	renderer->YAxisUp(opt.YAxisUp());
 	renderer->LockAccum(opt.LockAccum());
-	renderer->RawHistogram(opt.RawHistogram());
-	renderer->RawHistogramPreDensity(opt.RawHistogramPreDensity());
 	renderer->InsertPalette(opt.InsertPalette());
 	renderer->PixelAspectRatio(T(opt.AspectRatio()));
 	renderer->Priority(eThreadPriority(Clamp<intmax_t>(intmax_t(opt.Priority()), intmax_t(eThreadPriority::LOWEST), intmax_t(eThreadPriority::HIGHEST))));
@@ -449,7 +447,7 @@ bool EmberRender(int argc, _TCHAR* argv[], EmberOptions& opt)
 								vector<float> g(size);
 								vector<float> b(size);
 								vector<float> a(size);
-								Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency(), ! opt.RawHistogram());
+								Rgba32ToRgba32Exr(finalImagep, r.data(), g.data(), b.data(), a.data(), finalEmber.m_FinalRasW, finalEmber.m_FinalRasH, opt.Transparency());
 								const auto writeSuccess = WriteExr32(filename.c_str(),
 																	 r.data(),
 																	 g.data(),

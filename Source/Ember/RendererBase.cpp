@@ -375,40 +375,6 @@ void RendererBase::ReclaimOnResize(bool reclaimOnResize)
 }
 
 /// <summary>
-/// Get whether to output raw histogram values instead of gamma corrected
-/// colours.
-/// Default: false.
-/// </summary>
-/// <returns>True if raw, else false.</returns>
-bool RendererBase::RawHistogram() const { return m_RawHistogram; }
-
-/// <summary>
-/// Set whether to output raw histogram values instead of gamma corrected
-/// colours.
-/// </summary>
-/// <param name="rawHistogram">True if raw, else false.</param>
-void RendererBase::RawHistogram(bool rawHistogram)
-{
-	ChangeVal([&] { m_RawHistogram = rawHistogram; }, eProcessAction::ACCUM_ONLY);
-}
-
-/// <summary>
-/// Get whether to output raw histogram values before density filtering.
-/// Default: false.
-/// </summary>
-/// <returns>True if raw, else false.</returns>
-bool RendererBase::RawHistogramPreDensity() const { return m_RawHistogramPreDensity; }
-
-/// <summary>
-/// Set whether to output raw histogram values before density filtering.
-/// </summary>
-/// <param name="rawHistogram">True if pre density, else false.</param>
-void RendererBase::RawHistogramPreDensity(bool rawHistogramPreDensity)
-{
-	ChangeVal([&] { m_RawHistogramPreDensity = rawHistogramPreDensity; }, eProcessAction::ACCUM_ONLY);
-}
-
-/// <summary>
 /// Set the callback object.
 /// </summary>
 /// <param name="callback">The callback object to set</param>

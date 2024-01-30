@@ -310,30 +310,16 @@ static void Rgba32ToRgbaExr(const v4F* rgba, Rgba* ilmfRgba, size_t width, size_
 /// <param name="width">The width of the image in pixels</param>
 /// <param name="height">The height of the image in pixels</param>
 /// <param name="doAlpha">True to use alpha transparency, false to assign the max alpha value to make each pixel fully visible</param>
-/// <param name="doClamp">True to clamp output to 0..1, false to use full high dynamic range</param>
-static void Rgba32ToRgba32Exr(const v4F* rgba, float* r, float* g, float* b, float* a, size_t width, size_t height, bool doAlpha, bool doClamp)
+static void Rgba32ToRgba32Exr(const v4F* rgba, float* r, float* g, float* b, float* a, size_t width, size_t height, bool doAlpha)
 {
 	if (rgba != nullptr && r != nullptr && g != nullptr && b != nullptr && a != nullptr)
 	{
-		if (doClamp)
-		{
 		for (size_t i = 0; i < (width * height); i++)
 		{
 			r[i] = Clamp<float>(Sqr(rgba[i].r), 0.0f, 1.0f);
 			g[i] = Clamp<float>(Sqr(rgba[i].g), 0.0f, 1.0f);
 			b[i] = Clamp<float>(Sqr(rgba[i].b), 0.0f, 1.0f);
 			a[i] = doAlpha ? Clamp<float>(rgba[i].a * 1.0f, 0.0f, 1.0f) : 1.0f;
-		}
-		}
-		else
-		{
-		for (size_t i = 0; i < (width * height); i++)
-		{
-			r[i] = rgba[i].r;
-			g[i] = rgba[i].g;
-			b[i] = rgba[i].b;
-			a[i] = rgba[i].a;
-		}
 		}
 	}
 }

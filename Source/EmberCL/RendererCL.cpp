@@ -433,36 +433,8 @@ template <typename T, typename bucketT>
 bool RendererCL<T, bucketT>::ReadFinal(v4F* pixels)
 {
 	if (pixels && !m_Devices.empty())
-	{
-		if (RawHistogram())
-		{
-			if (RawHistogramPreDensity() ? ReadHist(0) : ReadAccum())
-			{
-				auto p = pixels;
-				auto q = RawHistogramPreDensity() ? HistBuckets() : AccumulatorBuckets();
-				auto bytes = sizeof(*p) * FinalRasW();
-				parallel_for(size_t(0), FinalRasH(), size_t(1), [&](size_t j)
-				{
-					auto pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRasW();//Pull out of inner loop for optimization.
-					auto rowStart = j * SuperRasW();
-					memcpy(p + pixelsRowStart, q + rowStart, bytes);
-				}
-		#if defined(_WIN32) || defined(__APPLE__)
-				, tbb::static_partitioner()
-		#endif
-				);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return m_Devices[0]->m_Wrapper.ReadImage(m_FinalImageName, FinalRasW(), FinalRasH(), 0, m_Devices[0]->m_Wrapper.Shared(), pixels);
-		}
-	}
+		return m_Devices[0]->m_Wrapper.ReadImage(m_FinalImageName, FinalRasW(), FinalRasH(), 0, m_Devices[0]->m_Wrapper.Shared(), pixels);
+
 	return false;
 }
 

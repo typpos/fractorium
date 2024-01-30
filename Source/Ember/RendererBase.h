@@ -156,6 +156,10 @@ public:
 	void InsertPalette(bool insertPalette);
 	bool ReclaimOnResize() const;
 	void ReclaimOnResize(bool reclaimOnResize);
+	bool RawHistogram() const;
+	void RawHistogram(bool rawHistogram);
+	bool RawHistogramPreDensity() const;
+	void RawHistogramPreDensity(bool rawHistogramPreDensity);
 	void Callback(RenderCallback* callback);
 	void ThreadCount(size_t threads, const char* seedString = nullptr);
 	size_t BytesPerChannel() const;
@@ -207,6 +211,8 @@ protected:
 	bool m_InFinalAccum = false;
 	bool m_InsertPalette = false;
 	bool m_ReclaimOnResize = false;
+	bool m_RawHistogram = false;
+	bool m_RawHistogramPreDensity = false;
 	bool m_CurvesSet = false;
 	volatile bool m_Abort = false;
 	volatile bool m_Pause = false;

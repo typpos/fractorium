@@ -183,7 +183,8 @@ bool FractoriumEmberControllerBase::SaveCurrentRender(const QString& filename, c
 				vector<float> g(size);
 				vector<float> b(size);
 				vector<float> a(size);
-				Rgba32ToRgba32Exr(data, r.data(), g.data(), b.data(), a.data(), width, height, transparency);
+				bool raw_histogram = false;
+				Rgba32ToRgba32Exr(data, r.data(), g.data(), b.data(), a.data(), width, height, transparency, ! raw_histogram);
 				ret = WriteExr32(s.c_str(), r.data(), g.data(), b.data(), a.data(), width, height, true, comments, id, url, nick);
 			}
 		}

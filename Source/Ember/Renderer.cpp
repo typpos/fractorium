@@ -1137,6 +1137,25 @@ eRenderStatus Renderer<T, bucketT>::AccumulatorToFinalImage(vector<v4F>& pixels,
 		return eRenderStatus::RENDER_ERROR;
 	}
 
+	if (RawHistogram())
+	{
+		auto p = pixels.data() + finalOffset;
+		auto q = m_AccumulatorBuckets.data();
+		auto bytes = sizeof(*p) * FinalRasW();
+		parallel_for(size_t(0), FinalRasH(), size_t(1), [&](size_t j)
+		{
+			auto pixelsRowStart = (m_YAxisUp ? ((FinalRasH() - j) - 1) : j) * FinalRasW();//Pull out of inner loop for optimization.
+			auto rowStart = j * m_SuperRasW;
+			memcpy(p + pixelsRowStart, q + rowStart, bytes);
+		}
+#if defined(_WIN32) || defined(__APPLE__)
+		, tbb::static_partitioner()
+#endif
+		);
+		LeaveFinalAccum();
+		return m_Abort ? eRenderStatus::RENDER_ABORT : eRenderStatus::RENDER_OK;
+	}
+
 	//Timing t(4);
 	const size_t filterWidth = m_SpatialFilter->FinalFilterWidth();
 	bucketT g, linRange, vibrancy;

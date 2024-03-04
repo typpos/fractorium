@@ -38,7 +38,7 @@ All builds are 64-bit.
 
 ## Windows
 
-[Build Guide for Visual Studio 2019 or Qt Creator](Data/BuildGuideQtCreator.md)
+[Build Guide for Visual Studio 2022 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 

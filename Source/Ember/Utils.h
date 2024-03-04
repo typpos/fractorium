@@ -3,7 +3,7 @@
 #include "Isaac.h"
 
 #ifndef _WIN32
-#define _strnicmp strncasecmp
+	#define _strnicmp strncasecmp
 #endif
 
 /// <summary>
@@ -336,7 +336,7 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 			ifs.seekg(0, ios::beg);
 			ifs.read(&buf[0], pos);
 
-			if (nullTerminate)//Optionally NULL terminate if they want to treat it as a string.
+			if (nullTerminate && (buf[buf.size() - 1] != 0))//Optionally NULL terminate if they want to treat it as a string, and it's not terminated arleady.
 				buf[buf.size() - 1] = 0;
 
 			return true;

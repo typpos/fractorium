@@ -332,12 +332,12 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 
 		if (const auto pos = ifs.tellg())//Ensure it exists and wasn't empty.
 		{
-			buf.resize(pos + streampos(nullTerminate ? 1 : 0));
+			buf.resize(pos);// +streampos(nullTerminate ? 1 : 0));
 			ifs.seekg(0, ios::beg);
 			ifs.read(&buf[0], pos);
 
 			if (nullTerminate && (buf[buf.size() - 1] != 0))//Optionally NULL terminate if they want to treat it as a string, and it's not terminated arleady.
-				buf[buf.size() - 1] = 0;
+				buf.push_back(0);
 
 			return true;
 		}

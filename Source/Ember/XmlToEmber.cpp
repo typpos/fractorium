@@ -1389,6 +1389,7 @@ bool XmlToEmber<T>::ParseEmberElementFromChaos(xmlNode* emberNode, Ember<T>& cur
 							{
 								finalXform.m_Weight = 0;
 								finalXform.m_Animate = 0;//Do not animate final by default.
+								finalXform.m_AnimateOrigin = 0;
 								finalXform.m_ColorX = finalXform.m_ColorY = 0;//Chaotica does not support any kind of coloring for final xforms, opacity remains 1 though.
 								finalXform.m_ColorSpeed = 0;
 								currentEmber.SetFinalXform(finalXform);
@@ -1615,6 +1616,14 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 		else if (ParseAndAssign(curAtt->name, attStr, "rand_range", currentEmber.m_RandPointRange, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "soloxform", soloXform, ret)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "new_linear", newLinear, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "stagger", currentEmber.m_Stagger, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "rotations", currentEmber.m_Rotations, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "seconds_per_rotation", currentEmber.m_SecondsPerRotation, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "rotate_xforms_cw", currentEmber.m_RotateXformsCw, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "blend_seconds", currentEmber.m_BlendSeconds, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "rotations_per_blend", currentEmber.m_RotationsPerBlend, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "blend_rotate_xforms_cw", currentEmber.m_BlendRotateXformsCw, ret)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "linear_blend", currentEmber.m_Linear, ret)) {}
 		//Parse more complicated reads that have multiple possible values.
 		else if (!Compare(curAtt->name, "interpolation"))
 		{
@@ -1817,6 +1826,9 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 				vals[3] = v2F(0.75);
 
 			currentEmber.m_Curves.m_Points[3] = vals;
+		}
+		else if (!Compare(curAtt->name, "animations"))
+		{
 		}
 
 		xmlFree(attStr);
@@ -2023,6 +2035,7 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 			{
 				Xform<T> finalXform;
 				finalXform.m_Animate = 0;//Do not animate final by default.
+				finalXform.m_AnimateOrigin = 0;
 
 				if (!ParseXform(childNode, finalXform, false, fromEmber))
 				{
@@ -2148,6 +2161,8 @@ bool XmlToEmber<T>::ParseEmberElement(xmlNode* emberNode, Ember<T>& currentEmber
 					ret = ret && AttToEmberMotionFloat(att, attStr, eEmberMotionParam::FLAME_MOTION_RAND_RANGE, motion);
 				else if (!Compare(curAtt->name, "vibrancy"))
 					ret = ret && AttToEmberMotionFloat(att, attStr, eEmberMotionParam::FLAME_MOTION_VIBRANCY, motion);
+				else if (!Compare(curAtt->name, "scale"))
+					ret = ret && AttToEmberMotionFloat(att, attStr, eEmberMotionParam::FLAME_MOTION_SCALE, motion);
 				else if (!Compare(curAtt->name, "background"))
 				{
 					double r = 0, g = 0, b = 0;
@@ -2258,6 +2273,7 @@ bool XmlToEmber<T>::ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion,
 		if (ParseAndAssign(curAtt->name, attStr, "weight", xform.m_Weight, success)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "color_speed", xform.m_ColorSpeed, success)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "animate", xform.m_Animate, success)) {}
+		else if (ParseAndAssign(curAtt->name, attStr, "animate_origin", xform.m_AnimateOrigin, success)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "opacity", xform.m_Opacity, success)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "var_color", xform.m_DirectColor, success)) {}
 		else if (ParseAndAssign(curAtt->name, attStr, "motion_frequency", xform.m_MotionFreq, success)) {}
@@ -2275,6 +2291,7 @@ bool XmlToEmber<T>::ParseXform(xmlNode* childNode, Xform<T>& xform, bool motion,
 			Aton(attStr, temp);
 			xform.m_ColorSpeed = (1 - temp) / 2;
 			xform.m_Animate = T(temp > 0 ? 0 : 1);
+			//Ignore m_AnimateOrigin because it's new and symmetry is a legacy setting.
 		}
 		else if (!Compare(curAtt->name, "motion_function"))
 		{

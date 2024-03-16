@@ -932,7 +932,8 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 
 	if (CreateControllerFromGUI(true))//Create controller if it does not exist, or if it does and the renderer is not running.
 	{
-		const auto index = static_cast<int>(m_Fractorium->m_Controller->Index()) + 1;
+		//If animating, then always start at 0 because the entire sequence usually needs to be rendered and if they need to start at a specific frame, they can use the Start At checkbox.
+		const auto index = m_FromSequence ? 0 : static_cast<int>(m_Fractorium->m_Controller->Index()) + 1;
 #ifdef DO_DOUBLE
 		Ember<double> ed;
 		EmberFile<double> efi;
@@ -976,7 +977,7 @@ void FractoriumFinalRenderDialog::showEvent(QShowEvent* e)
 		ui.FinalRenderDoAllCheckBox->setChecked(true);
 		//ui.FinalRenderDoSequenceCheckBox->setChecked(true);
 		ui.FinalRenderApplyToAllCheckBox->setChecked(true);
-		m_PrefixEdit->setText(firstfile + "_");
+		//m_PrefixEdit->setText(firstfile + "_");
 	}
 
 	ui.FinalRenderTextOutput->clear();

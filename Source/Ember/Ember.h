@@ -163,6 +163,14 @@ public:
 		m_CurveDE			  = static_cast<T>(ember.m_CurveDE);
 		m_SpatialFilterType	  = ember.m_SpatialFilterType;
 		m_SpatialFilterRadius = static_cast<T>(ember.m_SpatialFilterRadius);
+		m_Stagger             = ember.m_Stagger;
+		m_Rotations           = ember.m_Rotations;
+		m_SecondsPerRotation  = ember.m_SecondsPerRotation;
+		m_RotateXformsCw      = ember.m_RotateXformsCw;
+		m_BlendSeconds        = ember.m_BlendSeconds;
+		m_RotationsPerBlend   = ember.m_RotationsPerBlend;
+		m_BlendRotateXformsCw = ember.m_BlendRotateXformsCw;
+		m_Linear              = ember.m_Linear;
 		m_TemporalFilterType  = ember.m_TemporalFilterType;
 		m_TemporalFilterExp	  = static_cast<T>(ember.m_TemporalFilterExp);
 		m_TemporalFilterWidth = static_cast<T>(ember.m_TemporalFilterWidth);
@@ -171,6 +179,7 @@ public:
 		m_Name				  = ember.m_Name;
 		m_ParentFilename	  = ember.m_ParentFilename;
 		m_Index		  = ember.m_Index;
+		//m_Animations  = ember.m_Animations;
 		m_ScaleType	  = ember.ScaleType();
 		m_Palette	  = ember.m_Palette;
 		m_Curves	  = ember.m_Curves;
@@ -193,6 +202,7 @@ public:
 		{
 			m_FinalXform.m_Motion.clear();
 			m_FinalXform.m_Animate = 0;
+			m_FinalXform.m_AnimateOrigin = 0;
 			m_FinalXform.m_ColorSpeed = 0;
 		}
 
@@ -303,6 +313,7 @@ public:
 				ember.m_FinalXform.m_Affine.MakeID();
 				ember.m_FinalXform.m_Post.MakeID();
 				ember.m_FinalXform.m_Animate = 0;
+				ember.m_FinalXform.m_AnimateOrigin = 0;
 				ember.m_FinalXform.m_ColorSpeed = 0;
 				ember.m_FinalXform.m_Motion.clear();
 				ember.m_FinalXform.ClearAndDeleteVariations();
@@ -925,11 +936,12 @@ public:
 				}
 			}
 
-			InterpXform<&Xform<T>::m_Weight>	(thisXform, i, embers, coefs, size);
-			InterpXform<&Xform<T>::m_ColorX>	(thisXform, i, embers, coefs, size);
-			InterpXform<&Xform<T>::m_ColorSpeed>(thisXform, i, embers, coefs, size);
-			InterpXform<&Xform<T>::m_Opacity>	(thisXform, i, embers, coefs, size);
-			InterpXform<&Xform<T>::m_Animate>	(thisXform, i, embers, coefs, size);
+			InterpXform<&Xform<T>::m_Weight>	    (thisXform, i, embers, coefs, size);
+			InterpXform<&Xform<T>::m_ColorX>	    (thisXform, i, embers, coefs, size);
+			InterpXform<&Xform<T>::m_ColorSpeed>    (thisXform, i, embers, coefs, size);
+			InterpXform<&Xform<T>::m_Opacity>	    (thisXform, i, embers, coefs, size);
+			InterpXform<&Xform<T>::m_Animate>	    (thisXform, i, embers, coefs, size);
+			InterpXform<&Xform<T>::m_AnimateOrigin>	(thisXform, i, embers, coefs, size);
 			ClampGte0Ref(thisXform->m_Weight);
 			ClampRef<T>(thisXform->m_ColorX, 0, 1);
 			ClampRef<T>(thisXform->m_ColorSpeed, -1, 1);
@@ -1077,15 +1089,17 @@ public:
 
 		while (auto xform = GetTotalXform(i++))//Flam3 only allowed animation with normal xforms. This has been changed to allow animations of final xforms.
 		{
-			//Don't rotate xforms with animate set to 0.
-			if (xform->m_Animate == 0)
-				continue;
-
 			//Assume that if there are no variations, then it's a padding xform.
 			if (xform->Empty() && m_AffineInterp != eAffineInterp::AFFINE_INTERP_LOG)
 				continue;
 
-			xform->m_Affine.Rotate(angle * DEG_2_RAD_T);
+			//Don't rotate xforms with animate set to 0.
+			if (xform->m_Animate != 0)
+				xform->m_Affine.Rotate(angle * DEG_2_RAD_T);
+
+			if (xform->m_AnimateOrigin != 0)
+				xform->m_Affine.RotateTrans(angle * DEG_2_RAD_T);
+
 			//Don't rotate post.
 		}
 	}
@@ -1139,6 +1153,7 @@ public:
 			m_Xforms[i].m_Weight = 1;
 			m_Xforms[i].m_ColorSpeed = 0;
 			m_Xforms[i].m_Animate = 0;
+			m_Xforms[i].m_AnimateOrigin = 0;
 			m_Xforms[i].m_ColorX = 1;
 			m_Xforms[i].m_ColorY = 1;//Added in case 2D palette support is ever added.
 			m_Xforms[i].m_Affine.A(-1);
@@ -1162,6 +1177,7 @@ public:
 			m_Xforms[i].m_Weight = 1;
 			m_Xforms[i].m_ColorSpeed = 0;
 			m_Xforms[i].m_Animate = 0;
+			m_Xforms[i].m_AnimateOrigin = 0;
 			m_Xforms[i].m_ColorX = m_Xforms[i].m_ColorY = (sym < 3) ? 0 : (static_cast<T>(k - 1) / static_cast<T>(sym - 2));//Added Y.
 			m_Xforms[i].m_Affine.A(Round6(std::cos(k * a)));
 			m_Xforms[i].m_Affine.D(Round6(std::sin(k * a)));
@@ -1409,6 +1425,10 @@ public:
 						APP_FMP(m_BlurCurve);
 						break;
 
+					case eEmberMotionParam::FLAME_MOTION_SCALE:
+						APP_FMP(m_Zoom);
+						break;
+
 					case eEmberMotionParam::FLAME_MOTION_NONE:
 					default:
 						break;
@@ -1445,8 +1465,8 @@ public:
 			m_HighlightPower = 1;
 			m_K2 = 0;
 			m_Background.Reset();
-			m_FinalRasW = 100;
-			m_FinalRasH = 100;
+			m_FinalRasW = 1920;
+			m_FinalRasH = 1080;
 			m_Supersample = 1;
 			m_SpatialFilterRadius = static_cast<T>(0.5);
 			m_Zoom = 0;
@@ -1470,11 +1490,19 @@ public:
 			m_TemporalSamples = 100;
 			m_SpatialFilterType = eSpatialFilterType::GAUSSIAN_SPATIAL_FILTER;
 			m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
+			m_PaletteMode = ePaletteMode::PALETTE_LINEAR;
+			m_Interp = eInterp::EMBER_INTERP_SMOOTH;
+			m_Stagger = 0;
+			m_Rotations = 1;
+			m_SecondsPerRotation = 3;
+			m_RotateXformsCw = false;
+			m_BlendSeconds = 3;
+			m_RotationsPerBlend = 0;
+			m_BlendRotateXformsCw = false;
+			m_Linear = false;
 			m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
 			m_TemporalFilterWidth = 1;
 			m_TemporalFilterExp = 1;
-			m_PaletteMode = ePaletteMode::PALETTE_LINEAR;
-			m_Interp = eInterp::EMBER_INTERP_SMOOTH;
 		}
 		else
 		{
@@ -1507,11 +1535,19 @@ public:
 			m_TemporalSamples = 0;
 			m_SpatialFilterType = eSpatialFilterType::GAUSSIAN_SPATIAL_FILTER;
 			m_AffineInterp = eAffineInterp::AFFINE_INTERP_LOG;
+			m_PaletteMode = ePaletteMode::PALETTE_STEP;
+			m_Interp = eInterp::EMBER_INTERP_LINEAR;
+			m_Stagger = 999999;
+			m_Rotations = 999999;
+			m_SecondsPerRotation = 999999;
+			m_RotateXformsCw = false;
+			m_BlendSeconds = 999999;
+			m_RotationsPerBlend = 999999;
+			m_BlendRotateXformsCw = false;
+			m_Linear = false;
 			m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
 			m_TemporalFilterWidth = -1;
 			m_TemporalFilterExp = -999;
-			m_PaletteMode = ePaletteMode::PALETTE_STEP;
-			m_Interp = eInterp::EMBER_INTERP_LINEAR;
 		}
 
 		m_Xforms.clear();
@@ -1578,6 +1614,13 @@ public:
 		   << "DE Curve: " << m_CurveDE << "\n"
 		   << "Spatial Filter Type: " << m_SpatialFilterType << "\n"
 		   << "Spatial Filter Radius: " << m_SpatialFilterRadius << "\n"
+		   << "Stagger: " << m_Stagger << "\n"
+		   << "Rotations: " << m_Rotations << "\n"
+		   << "Seconds Per Rotation: " << m_SecondsPerRotation << "\n"
+		   << "Rotate Xforms Clockwise: " << m_RotateXformsCw << "\n"
+		   << "Blend Seconds: " << m_BlendSeconds << "\n"
+		   << "Rotations Per Blend: " << m_RotationsPerBlend << "\n"
+		   << "Blend Rotate Xforms Clockwise: " << m_BlendRotateXformsCw << "\n"
 		   << "Temporal Filter Type: " << m_TemporalFilterType << "\n"
 		   << "Temporal Filter Width: " << m_TemporalFilterWidth << "\n"
 		   << "Temporal Filter Exp: " << m_TemporalFilterExp << "\n"
@@ -1754,20 +1797,6 @@ public:
 	//Xml field: "palette_interpolation".
 	ePaletteInterp m_PaletteInterp = ePaletteInterp::INTERP_HSV;
 
-	//Temporal Filter.
-
-	//Only used if temporal filter type is exp, else unused.
-	//Xml field: "temporal_filter_exp".
-	T m_TemporalFilterExp = 1;
-
-	//The width of the temporal filter.
-	//Xml field: "temporal_filter_width".
-	T m_TemporalFilterWidth = 1;
-
-	//The type of the temporal filter: Gaussian, Box or Exp.
-	//Xml field: "temporal_filter_type".
-	eTemporalFilterType m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
-
 	//Density Estimation Filter.
 
 	//The minimum radius of the DE filter.
@@ -1824,6 +1853,30 @@ public:
 
 	//The 0-based position of this ember in the file it was contained in.
 	size_t m_Index = 0;
+
+	//The parameters for animating.
+	double m_Stagger = 0;
+	double m_Rotations = 1;
+	double m_SecondsPerRotation = 3;
+	bool m_RotateXformsCw = false;
+	double m_BlendSeconds = 3;
+	size_t m_RotationsPerBlend = 0;//Could this ever be double?
+	bool m_BlendRotateXformsCw = false;
+	bool m_Linear = false;
+
+	//Temporal Filter.
+
+	//Only used if temporal filter type is exp, else unused.
+	//Xml field: "temporal_filter_exp".
+	T m_TemporalFilterExp = 1;
+
+	//The width of the temporal filter.
+	//Xml field: "temporal_filter_width".
+	T m_TemporalFilterWidth = 1;
+
+	//The type of the temporal filter: Gaussian, Box or Exp.
+	//Xml field: "temporal_filter_type".
+	eTemporalFilterType m_TemporalFilterType = eTemporalFilterType::BOX_TEMPORAL_FILTER;
 
 	//The list of motion elements for the top-level flame params
 	vector<EmberMotion<T>> m_EmberMotionElements;

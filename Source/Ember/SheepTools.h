@@ -656,6 +656,7 @@ public:
 			xform->m_ColorY = m_Rand.Frand01<T>();//Will need to update this if 2D coordinates are ever supported.
 			xform->m_ColorSpeed = T(0.5);
 			xform->m_Animate = 1;
+			xform->m_AnimateOrigin = T(m_Rand.RandBit());
 			xform->m_Affine.A(m_Rand.Frand11<T>());
 			xform->m_Affine.B(m_Rand.Frand11<T>());
 			xform->m_Affine.C(m_Rand.Frand11<T>());
@@ -865,8 +866,8 @@ public:
 		{
 			auto& p = m_FinalImage[i];
 			m_Hist[static_cast<size_t>((p.r * res) +
-																(p.g * res) * res +
-																(p.b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
+									   (p.g * res) * res +
+									   (p.b * res) * res * res)]++;//A specific histogram index representing the sum of R,G,B values.
 		}
 
 		for (i = 0; i < res3; i++)

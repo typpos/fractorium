@@ -160,6 +160,7 @@ public:
 	virtual void VibrancyChanged(double d) { }
 	virtual void HighlightPowerChanged(double d) { }
 	virtual void K2Changed(double d) { }
+	virtual void BackgroundChanged(const QColor& color) { }
 	virtual void PaletteModeChanged(uint i) { }
 	virtual void WidthChanged(uint i) { }
 	virtual void HeightChanged(uint i) { }
@@ -177,8 +178,6 @@ public:
 	virtual void BlurCurveChanged(double d) { }
 	virtual void SpatialFilterWidthChanged(double d) { }
 	virtual void SpatialFilterTypeChanged(const QString& text) { }
-	virtual void TemporalFilterWidthChanged(double d) { }
-	virtual void TemporalFilterTypeChanged(const QString& text) { }
 	virtual void DEFilterMinRadiusWidthChanged(double d) { }
 	virtual void DEFilterMaxRadiusWidthChanged(double d) { }
 	virtual void DEFilterCurveWidthChanged(double d) { }
@@ -187,21 +186,30 @@ public:
 	virtual void RandRangeChanged(double d) { }
 	virtual void QualityChanged(double d) { }
 	virtual void SupersampleChanged(int d) { }
-	virtual void AffineInterpTypeChanged(int i) { }
 	virtual void InterpTypeChanged(int i) { }
-	virtual void BackgroundChanged(const QColor& color) { }
+	virtual void AffineInterpTypeChanged(int i) { }
+	virtual void RotationsChanged(double d) { }
+	virtual void SecondsPerRotationChanged(double d) { }
+	virtual void RotateXformsDirChanged(uint i) { }
+	virtual void BlendSecondsChanged(double d) { };
+	virtual void RotationsPerBlendChanged(uint i) { };
+	virtual void BlendXformsRotateDirChanged(uint i) { }
+	virtual void BlendInterpTypeChanged(uint i) { };
+	virtual void StaggerChanged(double d) { };
+	virtual void TemporalFilterWidthChanged(double d) { }
+	virtual void TemporalFilterTypeChanged(const QString& text) { }
+	virtual void ExpChanged(double d) { }
 	virtual void ClearColorCurves(int i) { }
 	virtual void ColorCurveChanged(int curveIndex, int pointInxed, const QPointF& point) { }
 	virtual void ColorCurvesPointAdded(size_t curveIndex, const QPointF& point) { }
 	virtual void ColorCurvesPointRemoved(size_t curveIndex, int pointIndex) { }
-	virtual void ExpChanged(double d) { }
 
 	//Xforms.
 	virtual void CurrentXformComboChanged(int index) { }
 	virtual void XformWeightChanged(double d) { }
 	virtual void EqualizeWeights() { }
 	virtual void XformNameChanged(const QString& s) { }
-	virtual void XformAnimateChanged(int state) { }
+	virtual void XformAnimateChangedHelper(int state, bool local) { }
 	virtual void FillXforms(int index = 0) { }
 	virtual void UpdateXformName(int index) { }
 
@@ -463,6 +471,7 @@ public:
 	void VibrancyChanged(double d) override;
 	void HighlightPowerChanged(double d) override;
 	void K2Changed(double d) override;
+	void BackgroundChanged(const QColor& col) override;
 	void PaletteModeChanged(uint i) override;
 	void WidthChanged(uint i) override;
 	void HeightChanged(uint i) override;
@@ -480,8 +489,6 @@ public:
 	void BlurCurveChanged(double d) override;
 	void SpatialFilterWidthChanged(double d) override;
 	void SpatialFilterTypeChanged(const QString& text) override;
-	void TemporalFilterWidthChanged(double d) override;
-	void TemporalFilterTypeChanged(const QString& text) override;
 	void DEFilterMinRadiusWidthChanged(double d) override;
 	void DEFilterMaxRadiusWidthChanged(double d) override;
 	void DEFilterCurveWidthChanged(double d) override;
@@ -490,21 +497,30 @@ public:
 	void RandRangeChanged(double d) override;
 	void QualityChanged(double d) override;
 	void SupersampleChanged(int d) override;
-	void AffineInterpTypeChanged(int index) override;
 	void InterpTypeChanged(int index) override;
-	void BackgroundChanged(const QColor& col) override;
+	void AffineInterpTypeChanged(int index) override;
+	void RotationsChanged(double d) override;
+	void SecondsPerRotationChanged(double d) override;
+	void RotateXformsDirChanged(uint i) override;
+	void BlendSecondsChanged(double d) override;
+	void RotationsPerBlendChanged(uint i) override;
+	void BlendXformsRotateDirChanged(uint i) override;
+	void BlendInterpTypeChanged(uint i) override;
+	void StaggerChanged(double d) override;
+	void TemporalFilterWidthChanged(double d) override;
+	void TemporalFilterTypeChanged(const QString& text) override;
+	void ExpChanged(double d) override;
 	void ClearColorCurves(int i) override;
 	void ColorCurveChanged(int curveIndex, int pointInxed, const QPointF& point) override;
 	void ColorCurvesPointAdded(size_t curveIndex, const QPointF& point) override;
 	void ColorCurvesPointRemoved(size_t curveIndex, int pointIndex) override;
-	void ExpChanged(double d) override;
 
 	//Xforms.
 	void CurrentXformComboChanged(int index) override;
 	void XformWeightChanged(double d) override;
 	void EqualizeWeights() override;
 	void XformNameChanged(const QString& s) override;
-	void XformAnimateChanged(int state) override;
+	void XformAnimateChangedHelper(int state, bool local) override;
 	void FillXforms(int index = 0) override;
 	void UpdateXformName(int index) override;
 	void FillWithXform(Xform<T>* xform);

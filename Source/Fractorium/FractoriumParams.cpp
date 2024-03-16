@@ -9,7 +9,8 @@ void Fractorium::InitParamsUI()
 	int row = 0;
 	int spinHeight = 20;
 	double dmax = numeric_limits<double>::max();
-	vector<string> comboVals;
+	int imax = numeric_limits<int>::max();
+	vector<string> comboVals, llComboVals;
 	QTableWidget* table = ui.ColorTable;
 	//Because QTableWidget does not allow for a single title bar/header
 	//at the top of a multi-column table, the workaround hack is to just
@@ -118,15 +119,29 @@ void Fractorium::InitParamsUI()
 	comboVals.clear();
 	comboVals.push_back("Linear");
 	comboVals.push_back("Log");
-	SetupCombo(                         table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
+	llComboVals = comboVals;
+	SetupCombo(table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
 	m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(eAffineInterp::AFFINE_INTERP_LOG));
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1, 1, 1);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotationsSpin,			spinHeight, 0,      dmax,  1, SIGNAL(valueChanged(double)), SLOT(OnRotationsChanged(double)),   true,     1.0, 1.0, 0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SecondsPerRotationSpin,	spinHeight, 0,      dmax,  1, SIGNAL(valueChanged(double)), SLOT(OnSecondsPerRotationChanged(double)),   true,     1.0, 1.0, 0);
+	comboVals.clear();
+	comboVals.push_back("Cw");
+	comboVals.push_back("Ccw");
+	SetupCombo(table, this, row, 1, m_RotateXformsDirCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnRotateXformsDirComboCurrentIndexChanged(int)));
+	m_RotateXformsDirCombo->SetCurrentIndexStealth(0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_BlendSecondsSpin,	  spinHeight, 0, dmax,  1, SIGNAL(valueChanged(double)), SLOT(OnBlendSecondsChanged(double)),   true, 1.0, 1.0, 0);
+	SetupSpinner<SpinBox, int>(         table, this, row, 1, m_RotationsPerBlendSpin, spinHeight, 0, imax,  1, SIGNAL(valueChanged(int)),    SLOT(OnRotationsPerBlendChanged(int)), true,   0,   1, 0);
+	SetupCombo(table, this, row, 1, m_BlendXformsRotateDirCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnBlendXformsRotateDirComboCurrentIndexChanged(int)));
+	m_BlendXformsRotateDirCombo->SetCurrentIndexStealth(0);
+	SetupCombo(table, this, row, 1, m_BlendInterpTypeCombo, llComboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnBlendInterpTypeComboCurrentIndexChanged(int)));
+	m_BlendInterpTypeCombo->SetCurrentIndexStealth(1);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_StaggerSpin,	spinHeight, 0,          1,   0.1, SIGNAL(valueChanged(double)), SLOT(OnStaggerChanged(double)),             true, 0, 1.0, 0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1,   1, 1);
 	comboVals = TemporalFilterCreator<float>::FilterTypes();
-	SetupCombo(                         table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentTextChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
+	SetupCombo(table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentTextChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
 	m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(eTemporalFilterType::BOX_TEMPORAL_FILTER));
 	table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterExpSpin, spinHeight, 0,  5, 0.1, SIGNAL(valueChanged(double)), SLOT(OnExpChanged(double)),     true, 1, 1, 0);
-	//
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterExpSpin, spinHeight, 0,  5, 0.1, SIGNAL(valueChanged(double)), SLOT(OnExpChanged(double)), true, 1, 1, 0);
 	AddSizePreset("HD", 1920, 1080);
 	AddSizePreset("QHD", 2560, 1440);
 	AddSizePreset("4K UHD", 3840, 2160);
@@ -198,7 +213,7 @@ bool Fractorium::ApplyAll()
 
 /// <summary>
 /// Set the brightness to be used for calculating K1 and K2 for filtering and final accum.
-/// Called when brightness spinner is changed.
+/// Called when the brightness spinner is changed.
 /// Resets the rendering process to the filtering stage.
 /// </summary>
 /// <param name="d">The brightness</param>
@@ -210,12 +225,11 @@ void FractoriumEmberController<T>::BrightnessChanged(double d)
 		ember.m_Brightness = d;
 	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnBrightnessChanged(double d) { m_Controller->BrightnessChanged(d); }
 
 /// <summary>
 /// Set the gamma to be used for final accum.
-/// Called when gamma spinner is changed.
+/// Called when the gamma spinner is changed.
 /// Resets the rendering process if temporal samples is greater than 1,
 /// else if early clip is true, filter and accum, else final accum only.
 /// </summary>
@@ -231,7 +245,7 @@ void Fractorium::OnGammaChanged(double d) { m_Controller->GammaChanged(d); }
 
 /// <summary>
 /// Set the gamma threshold to be used for final accum.
-/// Called when gamma threshold spinner is changed.
+/// Called when the gamma threshold spinner is changed.
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The gamma threshold</param>
@@ -246,7 +260,7 @@ void Fractorium::OnGammaThresholdChanged(double d) { m_Controller->GammaThreshol
 
 /// <summary>
 /// Set the vibrancy to be used for final accum.
-/// Called when vibrancy spinner is changed.
+/// Called when the vibrancy spinner is changed.
 /// Resets the rendering process to the final accumulation stage if temporal samples is 1, else full reset.
 /// </summary>
 /// <param name="d">The vibrancy</param>
@@ -261,7 +275,7 @@ void Fractorium::OnVibrancyChanged(double d) { m_Controller->VibrancyChanged(d);
 
 /// <summary>
 /// Set the highlight power to be used for final accum.
-/// Called when highlight power spinner is changed.
+/// Called when the highlight power spinner is changed.
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The highlight power</param>
@@ -276,7 +290,7 @@ void Fractorium::OnHighlightPowerChanged(double d) { m_Controller->HighlightPowe
 
 /// <summary>
 /// Set the k2 brightness value to be used for final accum.
-/// Called when k2 is changed.
+/// Called when the k2 spinner is changed.
 /// Resets the rendering process to the final accumulation stage.
 /// </summary>
 /// <param name="d">The k2 value</param>
@@ -287,12 +301,11 @@ template <typename T> void FractoriumEmberController<T>::K2Changed(double d)
 		ember.m_K2 = d;
 	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnK2Changed(double d) { m_Controller->K2Changed(d); }
 
 /// <summary>
 /// Show the color selection dialog.
-/// Called when background color button is clicked.
+/// Called when the background color button is clicked.
 /// </summary>
 /// <param name="checked">Ignored</param>
 void Fractorium::OnBackgroundColorButtonClicked(bool checked)
@@ -326,12 +339,11 @@ void FractoriumEmberController<T>::BackgroundChanged(const QColor& color)
 		ember.m_Background.b = color.blue()  / 255.0;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnColorSelected(const QColor& color) { m_Controller->BackgroundChanged(color); }
 
 /// <summary>
 /// Set the palette index interpolation mode.
-/// Called when palette mode combo box index is changed.
+/// Called when the palette mode combo box index is changed.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="index">The index of the palette mode combo box</param>
@@ -361,7 +373,6 @@ template <typename T> void FractoriumEmberController<T>::WidthChanged(uint i)
 		ember.m_FinalRasW = i;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnWidthChanged(int i) { m_Controller->WidthChanged(i); }
 
 /// <summary>
@@ -377,7 +388,6 @@ template <typename T> void FractoriumEmberController<T>::HeightChanged(uint i)
 		ember.m_FinalRasH = i;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnHeightChanged(int i) { m_Controller->HeightChanged(i); }
 
 /// <summary>
@@ -476,7 +486,7 @@ void Fractorium::OnCenterYChanged(double d) { m_Controller->CenterYChanged(d); }
 /// Set the scale (pixels per unit) value of the image.
 /// Note this will not increase the number of iters ran, but will degrade quality.
 /// To preserve quality, but exponentially increase iters, use zoom.
-/// Called when scale spinner is changed.
+/// Called when the scale spinner is changed.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The scale value</param>
@@ -493,7 +503,7 @@ void Fractorium::OnScaleChanged(double d) { m_Controller->ScaleChanged(d); }
 /// Set the zoom value of the image.
 /// Note this will increase the number of iters ran exponentially.
 /// To zoom in without increasing iters, but sacrifice quality, use scale.
-/// Called when zoom spinner is changed.
+/// Called when the zoom spinner is changed.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The zoom value</param>
@@ -508,10 +518,10 @@ void Fractorium::OnZoomChanged(double d) { m_Controller->ZoomChanged(d); }
 
 /// <summary>
 /// Set the angular rotation of the image.
-/// Called when rotate spinner is changed.
+/// Called when the rotate spinner is changed.
 /// Resets the rendering process.
 /// </summary>
-/// <param name="d">The rotation in angles</param>
+/// <param name="d">The rotation in degrees</param>
 template <typename T> void FractoriumEmberController<T>::RotateChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -519,11 +529,14 @@ template <typename T> void FractoriumEmberController<T>::RotateChanged(double d)
 		ember.m_Rotate = d;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
-void Fractorium::OnRotateChanged(double d)
-{
-	m_Controller->RotateChanged(d); // d is ever between -180 and +180
-}
+void Fractorium::OnRotateChanged(double d) { m_Controller->RotateChanged(d); }
 
+/// <summary>
+/// Set the 3D z position of the image.
+/// Called when the 3D zpos spinner is changed.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="d">The 3D zpos in world space units</param>
 template <typename T> void FractoriumEmberController<T>::ZPosChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -533,6 +546,12 @@ template <typename T> void FractoriumEmberController<T>::ZPosChanged(double d)
 }
 void Fractorium::OnZPosChanged(double d) {  m_Controller->ZPosChanged(d); }
 
+/// <summary>
+/// Set the 3D persepctive of the image.
+/// Called when the 3D persepctive spinner is changed.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="d">The 3D perspective in world space units</param>
 template <typename T> void FractoriumEmberController<T>::PerspectiveChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -542,6 +561,12 @@ template <typename T> void FractoriumEmberController<T>::PerspectiveChanged(doub
 }
 void Fractorium::OnPerspectiveChanged(double d) { m_Controller->PerspectiveChanged(d); }
 
+/// <summary>
+/// Set the 3D pitch of the image.
+/// Called when the 3D pitch spinner is changed.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="d">The 3D pitch in degrees</param>
 template <typename T> void FractoriumEmberController<T>::PitchChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -551,6 +576,12 @@ template <typename T> void FractoriumEmberController<T>::PitchChanged(double d)
 }
 void Fractorium::OnPitchChanged(double d) { m_Controller->PitchChanged(d); }
 
+/// <summary>
+/// Set the 3D yaw of the image.
+/// Called when the 3D yaw spinner is changed.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="d">The 3D yaw in degrees</param>
 template <typename T> void FractoriumEmberController<T>::YawChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -560,6 +591,12 @@ template <typename T> void FractoriumEmberController<T>::YawChanged(double d)
 }
 void Fractorium::OnYawChanged(double d) { m_Controller->YawChanged(d); }
 
+/// <summary>
+/// Set the 3D depth blur of the image.
+/// Called when the 3D depth blur spinner is changed.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="d">The 3D depth blur</param>
 template <typename T> void FractoriumEmberController<T>::DepthBlurChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -569,6 +606,12 @@ template <typename T> void FractoriumEmberController<T>::DepthBlurChanged(double
 }
 void Fractorium::OnDepthBlurChanged(double d) { m_Controller->DepthBlurChanged(d); }
 
+/// <summary>
+/// Set the 3D blur curve used to calculate the 3D depth blur of the image.
+/// Called when the blur curve spinner is changed.
+/// Resets the rendering process.
+/// </summary>
+/// <param name="d">The 3D blur curve</param>
 template <typename T> void FractoriumEmberController<T>::BlurCurveChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
@@ -595,7 +638,6 @@ template <typename T> void FractoriumEmberController<T>::SpatialFilterWidthChang
 		ember.m_SpatialFilterRadius = d;
 	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnSpatialFilterWidthChanged(double d) { m_Controller->SpatialFilterWidthChanged(d); }
 
 /// <summary>
@@ -611,7 +653,6 @@ template <typename T> void FractoriumEmberController<T>::SpatialFilterTypeChange
 		ember.m_SpatialFilterType = SpatialFilterCreator<T>::FromString(text.toStdString());
 	}, true, m_Renderer->EarlyClip() ? eProcessAction::FILTER_AND_ACCUM : eProcessAction::ACCUM_ONLY, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnSpatialFilterTypeComboCurrentIndexChanged(const QString& text) { m_Controller->SpatialFilterTypeChanged(text); }
 
 /// <summary>
@@ -672,7 +713,6 @@ template <typename T> void FractoriumEmberController<T>::DEFilterCurveWidthChang
 		ember.m_CurveDE = d;
 	}, true, eProcessAction::FILTER_AND_ACCUM, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnDEFilterCurveWidthChanged(double d) { m_Controller->DEFilterCurveWidthChanged(d); }
 
 /// <summary>
@@ -707,7 +747,6 @@ template <typename T> void FractoriumEmberController<T>::RandRangeChanged(double
 		ember.m_RandPointRange = d;
 	}, true, eProcessAction::FULL_RENDER, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnRandRangeChanged(double d) { m_Controller->RandRangeChanged(d); }
 
 /// <summary>
@@ -759,6 +798,35 @@ template <typename T> void FractoriumEmberController<T>::SupersampleChanged(int 
 void Fractorium::OnSupersampleChanged(int d) { m_Controller->SupersampleChanged(d); }
 
 /// <summary>
+/// Set the interpolation type.
+/// Does not reset anything because this is only used for animation.
+/// Called when the interp type combo box index is changed.
+/// </summary>
+/// <param name="i">The index</param>
+template <typename T>
+void FractoriumEmberController<T>::InterpTypeChanged(int i)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		eInterp interp;
+
+		if (i == 0)
+			interp = eInterp::EMBER_INTERP_LINEAR;
+		else if (i == 1)
+			interp = eInterp::EMBER_INTERP_SMOOTH;
+		else
+			interp = eInterp::EMBER_INTERP_LINEAR;
+
+		ember.m_Interp = interp;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_Interp = interp;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnInterpTypeComboCurrentIndexChanged(int index) { m_Controller->InterpTypeChanged(index); }
+
+/// <summary>
 /// Set the affine interpolation type.
 /// Does not reset anything because this is only used for animation.
 /// In the future, when animation is implemented, this will have an effect.
@@ -786,38 +854,159 @@ void FractoriumEmberController<T>::AffineInterpTypeChanged(int i)
 				m_EmberFilePointer->m_AffineInterp = interp;
 	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnAffineInterpTypeComboCurrentIndexChanged(int index) { m_Controller->AffineInterpTypeChanged(index); }
 
 /// <summary>
-/// Set the interpolation type.
+/// Set the rotations to be used in animation.
+/// Called when the rotations spinner is changed.
 /// Does not reset anything because this is only used for animation.
-/// Called when the interp type combo box index is changed.
 /// </summary>
-/// <param name="i">The index</param>
-template <typename T>
-void FractoriumEmberController<T>::InterpTypeChanged(int i)
+/// <param name="d">The number of rotations to perform in a loop</param>
+template <typename T> void FractoriumEmberController<T>::RotationsChanged(double d)
 {
 	UpdateAll([&](Ember<T>& ember, bool isMain)
 	{
-		eInterp interp;
-
-		if (i == 0)
-			interp = eInterp::EMBER_INTERP_LINEAR;
-		else if (i == 1)
-			interp = eInterp::EMBER_INTERP_SMOOTH;
-		else
-			interp = eInterp::EMBER_INTERP_LINEAR;
-
-		ember.m_Interp = interp;
+		ember.m_Rotations = d;
 
 		if (!m_Fractorium->ApplyAll())
 			if (m_EmberFilePointer)
-				m_EmberFilePointer->m_Interp = interp;
+				m_EmberFilePointer->m_Rotations = d;
 	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
+void Fractorium::OnRotationsChanged(double d) { m_Controller->RotationsChanged(d); }
 
-void Fractorium::OnInterpTypeComboCurrentIndexChanged(int index) { m_Controller->InterpTypeChanged(index); }
+/// <summary>
+/// Set the seconds each loop rotation takes in animation.
+/// Called when the seconds per rotation spinner is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The number of seconds each loop rotation should take</param>
+template <typename T> void FractoriumEmberController<T>::SecondsPerRotationChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_SecondsPerRotation = d;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_SecondsPerRotation = d;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnSecondsPerRotationChanged(double d) { m_Controller->SecondsPerRotationChanged(d); }
+
+/// <summary>
+/// Set the direction loop rotations rotate in animation.
+/// Called when the xforms rotation direction combobox index is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The index</param>
+template <typename T> void FractoriumEmberController<T>::RotateXformsDirChanged(uint d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_RotateXformsCw = d == 0;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_RotateXformsCw = ember.m_RotateXformsCw;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnRotateXformsDirComboCurrentIndexChanged(int i) { m_Controller->RotateXformsDirChanged(i); }
+
+/// <summary>
+/// Set the seconds each blend takes in animation.
+/// Called when the blend seconds spinner is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The number of seconds each blend should take</param>
+template <typename T> void FractoriumEmberController<T>::BlendSecondsChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_BlendSeconds = d;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_BlendSeconds = ember.m_BlendSeconds;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnBlendSecondsChanged(double d) { m_Controller->BlendSecondsChanged(d); }
+
+/// <summary>
+/// Set the rotations each blend performs in animation.
+/// Called when the rotations per blend spinner is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The number of rotations each blend should perform</param>
+template <typename T> void FractoriumEmberController<T>::RotationsPerBlendChanged(uint d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_RotationsPerBlend = d;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_RotationsPerBlend = d;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnRotationsPerBlendChanged(int d) { m_Controller->RotationsPerBlendChanged(d); }
+
+/// <summary>
+/// Set the direction blend rotations rotate in animation.
+/// Called when the blend xforms rotation direction combobox index is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The index</param>
+template <typename T> void FractoriumEmberController<T>::BlendXformsRotateDirChanged(uint d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_BlendRotateXformsCw = d == 0;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_BlendRotateXformsCw = ember.m_BlendRotateXformsCw;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnBlendXformsRotateDirComboCurrentIndexChanged(int i) { m_Controller->BlendXformsRotateDirChanged(i); }
+
+/// <summary>
+/// Set the blend interpolation type in animation.
+/// Called when the blend interpolation type combobox index is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The index</param>
+template <typename T> void FractoriumEmberController<T>::BlendInterpTypeChanged(uint d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_Linear = d == 0;
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_Linear = ember.m_Linear;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnBlendInterpTypeComboCurrentIndexChanged(int i) { m_Controller->BlendInterpTypeChanged(i); }
+
+/// <summary>
+/// Set the stagger amount in animation.
+/// Called when the stagger spinner is changed.
+/// Does not reset anything because this is only used for animation.
+/// </summary>
+/// <param name="d">The amount to stagger the blending of xforms</param>
+template <typename T> void FractoriumEmberController<T>::StaggerChanged(double d)
+{
+	UpdateAll([&](Ember<T>& ember, bool isMain)
+	{
+		ember.m_Stagger = Clamp(d, 0.0, 1.0);
+
+		if (!m_Fractorium->ApplyAll())
+			if (m_EmberFilePointer)
+				m_EmberFilePointer->m_Stagger = ember.m_Stagger;
+	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
+}
+void Fractorium::OnStaggerChanged(double d) { m_Controller->StaggerChanged(d); }
 
 /// <summary>
 /// Set the temporal filter width to be used with animation.
@@ -878,7 +1067,6 @@ void FractoriumEmberController<T>::ExpChanged(double d)
 				m_EmberFilePointer->m_TemporalFilterExp = d;
 	}, false, eProcessAction::NOTHING, m_Fractorium->ApplyAll());
 }
-
 void Fractorium::OnExpChanged(double d) { m_Controller->ExpChanged(d); }
 
 /// <summary>
@@ -932,9 +1120,6 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_BlurCurveSpin->SetValueStealth(m_Ember.m_BlurCurve);
 	m_Fractorium->m_SpatialFilterWidthSpin->SetValueStealth(m_Ember.m_SpatialFilterRadius);//Filter.
 	m_Fractorium->m_SpatialFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_SpatialFilterType));
-	m_Fractorium->m_TemporalFilterWidthSpin->SetValueStealth(m_Ember.m_TemporalFilterWidth);
-	m_Fractorium->m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_TemporalFilterType));
-	m_Fractorium->m_TemporalFilterExpSpin->SetValueStealth(m_Ember.m_TemporalFilterExp);
 	m_Fractorium->m_DEFilterMinRadiusSpin->SetValueStealth(m_Ember.m_MinRadDE);
 	m_Fractorium->m_DEFilterMaxRadiusSpin->SetValueStealth(m_Ember.m_MaxRadDE);
 	m_Fractorium->m_DECurveSpin->SetValueStealth(m_Ember.m_CurveDE);
@@ -943,8 +1128,19 @@ void FractoriumEmberController<T>::FillParamTablesAndPalette()
 	m_Fractorium->m_RandRangeSpin->SetValueStealth(m_Ember.m_RandPointRange);
 	m_Fractorium->m_QualitySpin->SetValueStealth(m_Ember.m_Quality);
 	m_Fractorium->m_SupersampleSpin->SetValueStealth(m_Ember.m_Supersample);
-	m_Fractorium->m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_AffineInterp));
 	m_Fractorium->m_InterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_Interp));
+	m_Fractorium->m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_AffineInterp));
+	m_Fractorium->m_RotationsSpin->SetValueStealth(m_Ember.m_Rotations);
+	m_Fractorium->m_SecondsPerRotationSpin->SetValueStealth(m_Ember.m_SecondsPerRotation);
+	m_Fractorium->m_RotateXformsDirCombo->SetCurrentIndexStealth(m_Ember.m_RotateXformsCw ? 0 : 1);
+	m_Fractorium->m_BlendSecondsSpin->SetValueStealth(m_Ember.m_BlendSeconds);
+	m_Fractorium->m_RotationsPerBlendSpin->SetValueStealth(m_Ember.m_RotationsPerBlend);
+	m_Fractorium->m_BlendXformsRotateDirCombo->SetCurrentIndexStealth(m_Ember.m_BlendRotateXformsCw ? 0 : 1);
+	m_Fractorium->m_BlendInterpTypeCombo->SetCurrentIndexStealth(m_Ember.m_Linear ? 0 : 1);
+	m_Fractorium->m_StaggerSpin->SetValueStealth(m_Ember.m_Stagger);
+	m_Fractorium->m_TemporalFilterWidthSpin->SetValueStealth(m_Ember.m_TemporalFilterWidth);
+	m_Fractorium->m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(m_Ember.m_TemporalFilterType));
+	m_Fractorium->m_TemporalFilterExpSpin->SetValueStealth(m_Ember.m_TemporalFilterExp);
 	auto temp = m_Ember.m_Palette.m_Filename;
 
 	if (temp.get())
@@ -986,9 +1182,6 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 	if (imageParamsOnly)
 		return;
 
-	ember.m_TemporalFilterWidth = m_Fractorium->m_TemporalFilterWidthSpin->value();
-	ember.m_TemporalFilterType = static_cast<eTemporalFilterType>(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
-	ember.m_TemporalFilterExp = m_Fractorium->m_TemporalFilterExpSpin->value();
 	const auto color = m_Fractorium->ui.ColorTable->item(5, 1)->background();
 	ember.m_Background.r = color.color().red() / 255.0;
 	ember.m_Background.g = color.color().green() / 255.0;
@@ -1012,8 +1205,19 @@ void FractoriumEmberController<T>::ParamsToEmberPrivate(Ember<U>& ember, bool im
 	ember.m_RandPointRange = m_Fractorium->m_RandRangeSpin->value();
 	ember.m_Quality = m_Fractorium->m_QualitySpin->value();
 	ember.m_Supersample = m_Fractorium->m_SupersampleSpin->value();
-	ember.m_AffineInterp = static_cast<eAffineInterp>(m_Fractorium->m_AffineInterpTypeCombo->currentIndex());
 	ember.m_Interp = static_cast<eInterp>(m_Fractorium->m_InterpTypeCombo->currentIndex());
+	ember.m_AffineInterp = static_cast<eAffineInterp>(m_Fractorium->m_AffineInterpTypeCombo->currentIndex());
+	ember.m_Rotations = m_Fractorium->m_RotationsSpin->value();
+	ember.m_SecondsPerRotation = m_Fractorium->m_SecondsPerRotationSpin->value();
+	ember.m_RotateXformsCw = m_Fractorium->m_RotateXformsDirCombo->currentIndex() == 0;
+	ember.m_BlendSeconds = m_Fractorium->m_BlendSecondsSpin->value();
+	ember.m_RotationsPerBlend = m_Fractorium->m_RotationsPerBlendSpin->value();
+	ember.m_BlendRotateXformsCw = m_Fractorium->m_BlendXformsRotateDirCombo->currentIndex() == 0;
+	ember.m_Linear = m_Fractorium->m_BlendInterpTypeCombo->currentIndex() == 0;
+	ember.m_Stagger = m_Fractorium->m_StaggerSpin->value();
+	ember.m_TemporalFilterWidth = m_Fractorium->m_TemporalFilterWidthSpin->value();
+	ember.m_TemporalFilterType = static_cast<eTemporalFilterType>(m_Fractorium->m_TemporalFilterTypeCombo->currentIndex());
+	ember.m_TemporalFilterExp = m_Fractorium->m_TemporalFilterExpSpin->value();
 	ember.SyncSize();
 }
 

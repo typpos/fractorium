@@ -21,7 +21,6 @@ FractoriumEmberControllerBase::FractoriumEmberControllerBase(Fractorium* fractor
 	m_AnimateTimer = make_unique<QTimer>(m_Fractorium);
 	m_AnimateTimer->stop();
 	m_Fractorium->connect(m_RenderRestartTimer.get(), &QTimer::timeout, [&]() { m_Fractorium->StartRenderTimer(false); });//It's ok to pass false for the first shot because creating the controller will start the preview renders.
-	// XXX: why not SLOT(SequenceAnimateNextFrame())?
 	m_Fractorium->connect(m_AnimateTimer.get(), &QTimer::timeout, [&]() { SequenceAnimateNextFrame(); });
 }
 

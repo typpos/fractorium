@@ -407,7 +407,7 @@ QIcon FractoriumEmberController<T>::MakeVariationIcon(const Variation<T>* var)
 /// <summary>
 /// Change the sorting to be either by variation ID, or by weight.
 /// If sorting by variation ID, repeated clicks will alternate ascending or descending.
-/// Called when user clicks the tree headers.
+/// Called when the user clicks the tree headers.
 /// </summary>
 /// <param name="logicalIndex">Column index of the header clicked. Sort by name if 0, sort by weight if 1.</param>
 void Fractorium::OnTreeHeaderSectionClicked(int logicalIndex)
@@ -435,7 +435,7 @@ void Fractorium::OnVariationsFilterLineEditTextChanged(const QString& text)
 
 /// <summary>
 /// Clear the variation name filter, which will display all variations.
-/// Called when clear variations filter button is clicked.
+/// Called when the clear variations filter button is clicked.
 /// </summary>
 /// <param name="checked">Ignored</param>
 void Fractorium::OnVariationsFilterClearButtonClicked(bool checked)

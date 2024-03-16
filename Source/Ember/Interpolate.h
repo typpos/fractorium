@@ -832,8 +832,10 @@ public:
 					//If this is an asymmetric case, store the NON-symmetric angle
 					//Check them pairwise and store the reference angle in the second
 					//to avoid overwriting if asymmetric on both sides.
-					sym0 = (embers[k - 1].GetXform(xfi)->m_Animate == 0 || (embers[k - 1].GetXform(xfi)->Empty() && padSymFlag));
-					sym1 = (embers[k    ].GetXform(xfi)->m_Animate == 0 || (embers[k    ].GetXform(xfi)->Empty() && padSymFlag));
+					auto xfk = embers[k].GetXform(xfi);
+					auto xfkm1 = embers[k - 1].GetXform(xfi);
+					sym0 = ((xfkm1->m_Animate == 0 && xfkm1->m_AnimateOrigin == 0) || (xfkm1->Empty() && padSymFlag));
+					sym1 = ((xfk->m_Animate == 0 && xfk->m_AnimateOrigin == 0) || (xfk->Empty() && padSymFlag));
 
 					if (sym1 && !sym0)
 						embers[k].GetXform(xfi)->m_Wind[col] = cxang[k - 1][col] + 2 * T(M_PI);

@@ -262,3 +262,4 @@ Builds/include/GL
 /Builds/QtCreator/Ember/.qtc_clangd/compile_commands.json
 /Builds/QtCreator/Fractorium/.qtc_clangd/compile_commands.json
 .DS_Store
+/.vs/VSWorkspaceState.json

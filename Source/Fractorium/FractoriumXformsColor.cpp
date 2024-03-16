@@ -36,7 +36,7 @@ void Fractorium::InitXformsColorUI()
 /// <summary>
 /// Set the color index of the selected xforms.
 /// Update the color index scrollbar to match.
-/// Called when spinner in the color index cell in the palette ref table is changed.
+/// Called when the spinner in the color index cell in the palette ref table is changed.
 /// Optionally resets the rendering process.
 /// </summary>
 /// <param name="d">The color index, 0-1/</param>
@@ -83,7 +83,7 @@ void Fractorium::OnXformColorIndexChanged(double d, bool updateRender, bool upda
 /// <summary>
 /// Set the color index of the current xform.
 /// Will trigger an update which will cause the color index cell in the palette ref table to match.
-/// Called when color index scrollbar is changed.
+/// Called when the color index scrollbar is changed.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The color index, 0-1.</param>
@@ -148,7 +148,7 @@ void Fractorium::OnToggleColorSpeedsButtonClicked(bool b) { m_Controller->Toggle
 
 /// <summary>
 /// Set the color speed of the selected xforms.
-/// Called when xform color speed spinner is changed.
+/// Called when the xform color speed spinner is changed.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="d">The color speed, -1-1.</param>
@@ -168,7 +168,7 @@ void Fractorium::OnXformOpacityChanged(double d) { m_Controller->XformOpacityCha
 
 /// <summary>
 /// Set the direct color percentage of the selected xforms.
-/// Called when xform direct color spinner is changed.
+/// Called when the xform direct color spinner is changed.
 /// Note this only affects xforms that include a dc_ variation.
 /// Resets the rendering process.
 /// </summary>
@@ -184,7 +184,7 @@ void Fractorium::OnXformDirectColorChanged(double d) { m_Controller->XformDirect
 /// set to zero while rendering so that only the effect of current xform is visible.
 /// This will not permanently alter the opacities of ember, as the temporary opacity values will be applied
 /// right before rendering and reset right after.
-/// Called when solo xform check box is checked.
+/// Called when the solo xform check box is checked.
 /// Resets the rendering process.
 /// </summary>
 /// <param name="state">The state of the checkbox</param>

@@ -455,6 +455,8 @@ bool EmberGenome(int argc, _TCHAR* argv[], EmberOptions& opt)
 		return true;
 	}
 
+	//Note that in Fractorium, the sequence is created from the params stored in the flame file.
+	//Here, it's done using the values passed on the command line, which will override the values in the file.
 	if (opt.Sequence() != "")
 	{
 		Ember<T> result;

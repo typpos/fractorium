@@ -1008,22 +1008,16 @@ void FractoriumEmberController<T>::ClearFlame()
 {
 	Update([&]()
 	{
-		while (m_Ember.TotalXformCount() > 1)
-			m_Ember.DeleteTotalXform(m_Ember.TotalXformCount() - 1);
-
-		if (m_Ember.XformCount() == 1)
-		{
-			if (auto xform = m_Ember.GetXform(0))
-			{
-				xform->Clear();
-				xform->AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
-				xform->ParentEmber(&m_Ember);
-			}
-		}
-
-		m_Ember.m_Curves.Init();
-		FillXforms();
+		Xform<T> newXform;
+		newXform.m_Weight = 0.25;
+		newXform.m_ColorX = m_Rand.Frand01<T>();
+		newXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
+		m_Ember.Clear();
+		m_Ember.AddXform(newXform);
+		FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
+		FillParamTablesAndPalette();
 		FillCurvesControl();
+		FillSummary();
 	});
 }
 

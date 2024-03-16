@@ -154,6 +154,7 @@ public:
 		m_DirectColor = static_cast<T>(xform.m_DirectColor);
 		m_ColorSpeed = static_cast<T>(xform.m_ColorSpeed);
 		m_Animate = static_cast<T>(xform.m_Animate);
+		m_AnimateOrigin = static_cast<T>(xform.m_AnimateOrigin);
 		m_Opacity = static_cast<T>(xform.m_Opacity);
 		CacheColorVals();
 		m_HasPre = xform.HasPre();
@@ -209,6 +210,7 @@ public:
 			m_Weight = 0;
 			m_ColorSpeed = static_cast<T>(0.5);
 			m_Animate = 1;
+			m_AnimateOrigin = 0;
 			m_ColorX = static_cast<T>(count & 1);
 			m_ColorY = 0;
 			m_DirectColor = 1;
@@ -235,6 +237,7 @@ public:
 			m_Weight = EMPTYFIELD;
 			m_ColorSpeed = EMPTYFIELD;
 			m_Animate = EMPTYFIELD;
+			m_AnimateOrigin = EMPTYFIELD;
 			m_ColorX = EMPTYFIELD;
 			m_ColorY = EMPTYFIELD;
 			m_DirectColor = EMPTYFIELD;
@@ -547,6 +550,7 @@ public:
 		m_OneMinusColorCache = 0;
 		m_Opacity = 1;
 		m_Animate = 0;
+		m_AnimateOrigin = 0;
 		m_Wind[0] = 0;
 		m_Wind[1] = 0;
 		m_Name = "";
@@ -800,6 +804,7 @@ public:
 			APPMOT(m_Opacity);
 			APPMOT(m_ColorSpeed);
 			APPMOT(m_Animate);
+			APPMOT(m_AnimateOrigin);
 
 			for (size_t j = 0; j < currentMot.TotalVariationCount(); j++)//For each variation in the motion xform.
 			{
@@ -811,8 +816,11 @@ public:
 				{
 					Variation<T>* newVar = motVar->Copy();
 					newVar->m_Weight = motVar->m_Weight * Interpolater<T>::MotionFuncs(func, freq * (blend + cleanOffset));
-					AddVariation(newVar);
-					var = newVar;//Use this below for params.
+
+					if (AddVariation(newVar))
+						var = newVar;//Use this below for params.
+					else
+						delete newVar;
 				}
 				else//It was present, so apply the motion func to the weight.
 				{
@@ -821,7 +829,7 @@ public:
 
 				//At this point, we've added if needed, or just applied the motion func to the weight.
 				//Now apply the motion func to the params if needed.
-				if (motParVar)
+				if (var && motParVar)
 				{
 					auto parVar = dynamic_cast<ParametricVariation<T>*>(var);
 					auto params = parVar->Params();
@@ -1213,7 +1221,8 @@ public:
 		ss << "\nColorY: " << m_ColorY;
 		ss << "\nDirect Color: " << m_DirectColor;
 		ss << "\nColor Speed: " << m_ColorSpeed;
-		ss << "\nAnimate: " << m_Animate;
+		ss << "\nAnimate Local Rotation: " << m_Animate;
+		ss << "\nAnimate Origin Rotation: " << m_AnimateOrigin;
 		ss << "\nOpacity: " << m_Opacity;
 		ss << "\nWind: " << m_Wind[0] << ", " << m_Wind[1];
 		ss << "\nMotion Frequency: " << m_MotionFreq;
@@ -1290,7 +1299,8 @@ public:
 	//C = (C + Ci) * m_ColorSpeed.
 	T m_ColorSpeed;
 	T m_Opacity;//How much of this xform is seen. Range: 0.0 (invisible) - 1.0 (totally visible).
-	T m_Animate;//Whether or not this xform rotates during animation. 0 means stationary, > 0 means rotate. Use T instead of bool so it can be interpolated.
+	T m_Animate;//Whether or not this xform rotates around its center during animation. 0 means stationary, > 0 means rotate. Use T instead of bool so it can be interpolated.
+	T m_AnimateOrigin;//Same, but rotate around the global origin.
 	T m_Wind[2];
 	eMotion m_MotionFunc;
 	T m_MotionFreq;

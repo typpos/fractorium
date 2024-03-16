@@ -158,6 +158,14 @@ string EmberToXml<T>::ToString(Ember<T>& ember, const string& extraAttributes, s
 	os << " cam_pitch=\"" << ember.m_CamPitch << "\"";
 	os << " cam_dof=\"" << ember.m_CamDepthBlur << "\"";
 	os << " blur_curve=\"" << ember.m_BlurCurve << "\"";
+	os << " stagger=\"" << ember.m_Stagger << "\"";
+	os << " rotations=\"" << ember.m_Rotations << "\"";
+	os << " seconds_per_rotation=\"" << ember.m_SecondsPerRotation << "\"";
+	os << " rotate_xforms_cw=\"" << ember.m_RotateXformsCw << "\"";
+	os << " blend_seconds=\"" << ember.m_BlendSeconds << "\"";
+	os << " rotations_per_blend=\"" << ember.m_RotationsPerBlend << "\"";
+	os << " blend_rotate_xforms_cw=\"" << ember.m_BlendRotateXformsCw << "\"";
+	os << " linear_blend=\"" << ember.m_Linear << "\"";
 
 	if (ember.m_PaletteMode == ePaletteMode::PALETTE_STEP)
 		os << " palette_mode=\"step\"";
@@ -544,6 +552,7 @@ string EmberToXml<T>::ToString(Xform<T>& xform, size_t xformCount, bool isFinal,
 		std::replace(s.begin(), s.end(), ' ', '_');
 		os << "name=\"" << s << "\" ";//Flam3 didn't do this, but Apo does.
 		os << "animate=\"" << xform.m_Animate << "\" ";//Flam3 only did this for non-final. Ember supports animating final.
+		os << "animate_origin=\"" << xform.m_AnimateOrigin << "\" ";
 	}
 
 	//Variation writing order differs slightly from the original to make it a bit more readable.
@@ -870,6 +879,10 @@ string EmberToXml<T>::ToString(const EmberMotion<T>& motion)
 
 			case eEmberMotionParam::FLAME_MOTION_VIBRANCY:
 				os << " vibrancy=\"" << motion.m_MotionParams[i].second << "\"";
+				break;
+
+			case eEmberMotionParam::FLAME_MOTION_SCALE:
+				os << " scale=\"" << motion.m_MotionParams[i].second << "\"";
 				break;
 
 			case eEmberMotionParam::FLAME_MOTION_NONE:

@@ -210,23 +210,8 @@ public slots:
 	void OnSequenceOpenButtonClicked(bool checked);
 	void OnSequenceAnimateButtonClicked(bool checked);
 	void OnSequenceClearButtonClicked(bool checked);
-	void OnSequenceRandomizeStaggerCheckBoxStateChanged(int state);
-	void OnSequenceRandomizeFramesPerRotCheckBoxStateChanged(int state);
-	void OnSequenceRandomizeRotationsCheckBoxStateChanged(int state);
-	void OnSequenceRandomizeBlendFramesCheckBoxStateChanged(int state);
-	void OnSequenceRandomizeRotationsPerBlendCheckBoxStateChanged(int state);
-	void OnSequenceStaggerSpinBoxChanged(double d);
-	void OnSequenceRandomStaggerMaxSpinBoxChanged(double d);
 	void OnSequenceStartFlameSpinBoxChanged(int d);
 	void OnSequenceStopFlameSpinBoxChanged(int d);
-	void OnSequenceFramesPerRotSpinBoxChanged(int d);
-	void OnSequenceRandomFramesPerRotMaxSpinBoxChanged(int d);
-	void OnSequenceRotationsSpinBoxChanged(double d);
-	void OnSequenceRandomRotationsMaxSpinBoxChanged(double d);
-	void OnSequenceBlendFramesSpinBoxChanged(int d);
-	void OnSequenceRandomBlendMaxFramesSpinBoxChanged(int d);
-	void OnSequenceRandomRotationsPerBlendSpinBoxChanged(int d);
-	void OnSequenceRandomRotationsPerBlendMaxSpinBoxChanged(int d);
 
 	//Params.
 	void OnBrightnessChanged(double d);//Color.
@@ -265,6 +250,14 @@ public slots:
 	void OnRandRangeChanged(double d);
 	void OnQualityChanged(double d);
 	void OnSupersampleChanged(int d);
+	void OnRotationsChanged(double d);
+	void OnSecondsPerRotationChanged(double d);
+	void OnRotateXformsDirComboCurrentIndexChanged(int index);
+	void OnBlendSecondsChanged(double d);
+	void OnRotationsPerBlendChanged(int d);
+	void OnBlendXformsRotateDirComboCurrentIndexChanged(int index);
+	void OnBlendInterpTypeComboCurrentIndexChanged(int index);
+	void OnStaggerChanged(double d);
 	void OnAffineInterpTypeComboCurrentIndexChanged(int index);
 	void OnInterpTypeComboCurrentIndexChanged(int index);
 	void OnExpChanged(double d);
@@ -280,7 +273,8 @@ public slots:
 	void OnXformWeightChanged(double d);
 	void OnEqualWeightButtonClicked(bool checked);
 	void OnXformNameChanged(const QString& s);
-	void OnXformAnimateCheckBoxStateChanged(int state);
+	void OnXformAnimateLocalRotationCheckBoxStateChanged(int state);
+	void OnXformAnimateOriginRotationCheckBoxStateChanged(int state);
 
 	//Xforms Affine.
 	void OnPreAffineRowDoubleClicked(int logicalIndex);
@@ -523,8 +517,6 @@ private:
 	DoubleSpinBox* m_BlurCurveSpin;
 	DoubleSpinBox* m_SpatialFilterWidthSpin;//Filter.
 	StealthComboBox* m_SpatialFilterTypeCombo;
-	DoubleSpinBox* m_TemporalFilterWidthSpin;
-	StealthComboBox* m_TemporalFilterTypeCombo;
 	DoubleSpinBox* m_DEFilterMinRadiusSpin;
 	DoubleSpinBox* m_DEFilterMaxRadiusSpin;
 	DoubleSpinBox* m_DECurveSpin;
@@ -533,8 +525,18 @@ private:
 	DoubleSpinBox* m_RandRangeSpin;
 	DoubleSpinBox* m_QualitySpin;
 	SpinBox* m_SupersampleSpin;
+	StealthComboBox* m_InterpTypeCombo;//Animation.
 	StealthComboBox* m_AffineInterpTypeCombo;
-	StealthComboBox* m_InterpTypeCombo;
+	DoubleSpinBox* m_RotationsSpin;
+	DoubleSpinBox* m_SecondsPerRotationSpin;
+	StealthComboBox* m_RotateXformsDirCombo;
+	DoubleSpinBox* m_BlendSecondsSpin;
+	SpinBox* m_RotationsPerBlendSpin;
+	StealthComboBox* m_BlendXformsRotateDirCombo;
+	StealthComboBox* m_BlendInterpTypeCombo;
+	DoubleSpinBox* m_StaggerSpin;
+	DoubleSpinBox* m_TemporalFilterWidthSpin;
+	StealthComboBox* m_TemporalFilterTypeCombo;
 	DoubleSpinBox* m_TemporalFilterExpSpin;
 
 	//Xforms.

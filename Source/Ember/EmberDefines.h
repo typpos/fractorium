@@ -169,7 +169,8 @@ enum class eEmberMotionParam : et//These must remain in this order forever.
 	FLAME_MOTION_BACKGROUND_G,
 	FLAME_MOTION_BACKGROUND_B,
 	FLAME_MOTION_VIBRANCY,
-	FLAME_MOTION_BLUR_CURVE
+	FLAME_MOTION_BLUR_CURVE,
+	FLAME_MOTION_SCALE
 };
 
 /// <summary>

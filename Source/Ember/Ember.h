@@ -1479,7 +1479,7 @@ public:
 			m_BlurCurve = 0;
 			m_BlurCoef = 0;
 			m_CamMat = m3T(0);
-			m_Quality = 1;
+			m_Quality = 30;
 			m_SubBatchSize = 10240;
 			m_RandPointRange = 1;
 			m_FuseCount = 15;

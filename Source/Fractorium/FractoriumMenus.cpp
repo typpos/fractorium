@@ -164,10 +164,12 @@ void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 {
 	StopAllPreviewRenderers();
 	auto ember = m_Ember;
-	auto insertEmberIndex = m_Fractorium->ui.LibraryTree->currentIndex().row() + 1;
+	auto model = m_Fractorium->ui.LibraryTree->selectionModel();
+	auto sel = model->selectedIndexes();
+	auto insertEmberIndex = sel.size() > 0 ? sel[0].row() + 1 : 0;
 	ember.m_Name = EmberFile<T>::DefaultEmberName(m_EmberFile.Size() + 1).toStdString();
-	ember.m_Index = insertEmberIndex;//Will be overwritten below in UpdateLibraryTree().
-	m_EmberFile.m_Embers.insert(Advance(m_EmberFile.m_Embers.begin(), insertEmberIndex), ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, UpdateLibraryTree() will resync.
+	ember.m_Index = insertEmberIndex;//Will be overwritten below in FillLibraryTree().
+	m_EmberFile.m_Embers.insert(Advance(m_EmberFile.m_Embers.begin(), insertEmberIndex), ember);//Will invalidate the pointers contained in the EmberTreeWidgetItems, FillLibraryTree() has the effect of resyncing because index, name and pointer are assigned.
 	m_EmberFile.MakeNamesUnique();
 	FillLibraryTree(insertEmberIndex);
 	SetEmber(insertEmberIndex, false);
@@ -1013,6 +1015,9 @@ void FractoriumEmberController<T>::ClearFlame()
 		newXform.m_ColorX = m_Rand.Frand01<T>();
 		newXform.AddVariation(m_VariationList->GetVariationCopy(eVariationId::VAR_LINEAR));
 		m_Ember.Clear();
+		m_Ember.m_FinalRasW = m_Fractorium->m_WidthSpin->value();
+		m_Ember.m_FinalRasH = m_Fractorium->m_HeightSpin->value();
+		m_Ember.m_Quality = m_Fractorium->m_QualitySpin->value();
 		m_Ember.AddXform(newXform);
 		FillXforms();//Must do this first because the palette setup in FillParamTablesAndPalette() uses the xforms combo.
 		FillParamTablesAndPalette();

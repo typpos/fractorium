@@ -16,7 +16,7 @@ void Fractorium::InitXformsVariationsUI()
 	//Setting dimensions in the designer with a layout is futile, so must hard code here.
 	tree->setColumnWidth(0, 170);
 	tree->setColumnWidth(1, 80);
-	tree->setColumnWidth(2, 20);
+	//tree->setColumnWidth(2, 20);
 	//Set Default variation tree text and background colors for zero and non zero cases.
 	m_VariationTreeColorNonZero = Qt::black;
 	m_VariationTreeColorZero = Qt::black;
@@ -107,12 +107,19 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 {
 	T fMin = TLOW;
 	T fMax = TMAX;
+	const int iconSize = 20;
 	const QSize hint0(170, 16);
 	const QSize hint1(80, 16);
-	const QSize hint2(20, 16);
+	//const QSize hint2(20, 16);
+	QPixmap pixmap(iconSize * 3, iconSize);
+	auto mask = pixmap.createMaskFromColor(QColor("transparent"), Qt::MaskOutColor);
 	auto tree = m_Fractorium->ui.VariationsTree;
 	tree->clear();
 	tree->blockSignals(true);
+	pixmap.setMask(mask);
+	QPainter paint(&pixmap);
+	paint.fillRect(QRect(0, 0, iconSize * 3, iconSize), QColor(0, 0, 0, 0));
+	QIcon defIcon(pixmap);
 
 	for (size_t i = 0; i < m_VariationList->Size(); i++)
 	{
@@ -124,8 +131,8 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 		item->setText(0, QString::fromStdString(var->Name()));
 		item->setSizeHint(0, hint0);
 		item->setSizeHint(1, hint1);
-		item->setSizeHint(2, hint2);
-		auto qi = MakeVariationIcon(var);
+		//item->setSizeHint(2, hint2);
+		auto qi = MakeVariationIcon(var, iconSize);
 		item->setIcon(0, qi);
 		spinBox->setRange(fMin, fMax);
 		spinBox->DoubleClick(true);
@@ -150,6 +157,7 @@ void FractoriumEmberController<T>::SetupVariationsTree()
 					paramWidget->setText(0, params[j].Name().c_str());
 					paramWidget->setSizeHint(0, hint0);
 					paramWidget->setSizeHint(1, hint1);
+					paramWidget->setIcon(0, defIcon);
 					varSpinBox->setRange(params[j].Min(), params[j].Max());
 					varSpinBox->setValue(params[j].ParamVal());
 					varSpinBox->DoubleClick(true);
@@ -367,11 +375,11 @@ void FractoriumEmberController<T>::FillVariationTreeWithXform(Xform<T>* xform)
 ///		Blue: maintains internal state, mostly of engineering interest.
 /// </summary>
 /// <param name="text">The variation to create the icon for</param>
+/// <param name="size">The size of the icon in pixels</param>
 /// <returns>The newly created icon</returns>
 template <typename T>
-QIcon FractoriumEmberController<T>::MakeVariationIcon(const Variation<T>* var)
+QIcon FractoriumEmberController<T>::MakeVariationIcon(const Variation<T>* var, int iconSize)
 {
-	const int iconSize = 20;
 	static vector<string> dc{ "m_ColorX" };
 	static vector<string> assign{ "outPoint->m_X =", "outPoint->m_Y =", "outPoint->m_Z =",
 								  "outPoint->m_X=", "outPoint->m_Y=", "outPoint->m_Z=" };

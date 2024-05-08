@@ -71,6 +71,7 @@ void FractoriumEmberController<T>::FillSummary()
 	const auto vp = 4;
 	const auto vlen = 7;
 	const auto pc = 'f';
+	const auto iconSize = 20;
 	const auto forceFinal = m_Fractorium->HaveFinal();
 	const auto total = m_Ember.TotalXformCount(forceFinal);
 	const auto table = m_Fractorium->ui.SummaryTable;
@@ -163,7 +164,7 @@ void FractoriumEmberController<T>::FillSummary()
 			vitem->setText(0, QString::fromStdString(var->Name()));
 			vitem->setText(1, QLocale::system().toString(var->m_Weight, pc, vp).rightJustified(vlen, ' '));
 			vitem->setFlags(draggable);
-			auto qi = MakeVariationIcon(var);
+			auto qi = MakeVariationIcon(var, iconSize);
 			vitem->setIcon(0, qi);
 
 			if (const auto parVar = dynamic_cast<ParametricVariation<T>*>(var))

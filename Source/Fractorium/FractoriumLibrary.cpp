@@ -47,7 +47,7 @@ void Fractorium::SelectLibraryItem(size_t index)
 					item = emberItem;
 
 				emberItem->setSelected(b);
-				emberItem->setCheckState(NAME_COL, i == index ? Qt::Checked : Qt::Unchecked);
+				emberItem->setCheckState(NAME_COL, b ? Qt::Checked : Qt::Unchecked);
 			}
 		}
 
@@ -164,6 +164,7 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 
 	for (auto& it : m_EmberFile.m_Embers)
 	{
+		it.m_Index = i;
 		auto emberItem = new EmberTreeWidgetItem<T>(&it, fileItem);
 		auto istr = ToString(i++);
 		emberItem->setText(INDEX_COL, istr);
@@ -175,7 +176,10 @@ void FractoriumEmberController<T>::FillLibraryTree(int selectIndex)
 
 		emberItem->setToolTip(NAME_COL, emberItem->text(NAME_COL));
 		emberItem->SetImage(empy_preview, size, size);
+		emberItem->SetEmberPointer(&it);
 	}
+
+	//tree->update();
 
 	if (selectIndex != -1)
 		m_Fractorium->SelectLibraryItem(selectIndex);
@@ -345,8 +349,7 @@ void FractoriumEmberController<T>::MoveLibraryItems(const QModelIndexList& items
 		return false;
 	});
 	tree->update();
-	SyncLibrary(eLibraryUpdate(static_cast<uint>(eLibraryUpdate::INDEX) | static_cast<uint>(eLibraryUpdate::POINTER)));
-	//SyncLibrary(eLibraryUpdate(eLibraryUpdate::INDEX | eLibraryUpdate::POINTER | eLibraryUpdate::NAME));
+	SyncLibrary(eLibraryUpdate(static_cast<uint>(eLibraryUpdate::INDEX) | static_cast<uint>(eLibraryUpdate::NAME) | static_cast<uint>(eLibraryUpdate::POINTER)));
 }
 
 /// <summary>
@@ -367,7 +370,7 @@ void FractoriumEmberController<T>::Delete(const vector<pair<size_t, QTreeWidgetI
 		{
 			last = uint(p.first - offset);
 			delete p.second;
-			SyncLibrary(eLibraryUpdate::INDEX);
+			SyncLibrary(eLibraryUpdate(static_cast<uint>(eLibraryUpdate::INDEX) | static_cast<uint>(eLibraryUpdate::NAME) | static_cast<uint>(eLibraryUpdate::POINTER)));
 			m_Fractorium->SyncFileCountToSequenceCount();
 		}
 
@@ -669,7 +672,7 @@ void FractoriumEmberController<T>::SequenceGenerateButtonClicked()
 		const auto rotsPerBlend = it->m_RotationsPerBlend;
 		const auto linear = it->m_Linear;
 		tools.SetSpinParams(!linear,
-							stagger,//Will be set again below if random is used.
+							stagger,
 							0,
 							0,
 							s->Nick().toStdString(),

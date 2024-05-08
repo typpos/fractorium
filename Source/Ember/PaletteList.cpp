@@ -208,6 +208,7 @@ bool PaletteList<T>::Add(const string& filename, bool force)
 
 			if (EndsWith(lower, ".xml"))
 			{
+				//Subtract 1 to make reading with nullterminate set to true work on linux.
 				const auto doc = xmlReadMemory(static_cast<const char*>(buf.data()), static_cast<int>(buf.size()), filename.c_str(), nullptr, XML_PARSE_NONET);
 
 				if (doc)

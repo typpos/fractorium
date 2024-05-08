@@ -320,9 +320,8 @@ public:
 /// </summary>
 /// <param name="filename">The full path to the file to read</param>
 /// <param name="buf">The string which will be populated with the file's contents</param>
-/// <param name="nullTerminate">Whether to append a NULL character as the last element of the vector. Needed when reading text files. Default: true.</param>
 /// <returns>True if successfully read and populated, else false</returns>
-static bool ReadFile(const char* filename, string& buf, bool nullTerminate = true)
+static bool ReadFile(const char* filename, string& buf)
 {
 	try
 	{
@@ -332,13 +331,9 @@ static bool ReadFile(const char* filename, string& buf, bool nullTerminate = tru
 
 		if (const auto pos = ifs.tellg())//Ensure it exists and wasn't empty.
 		{
-			buf.resize(pos);// +streampos(nullTerminate ? 1 : 0));
+			buf.resize(pos);
 			ifs.seekg(0, ios::beg);
 			ifs.read(&buf[0], pos);
-
-			if (nullTerminate && (buf[buf.size() - 1] != 0))//Optionally NULL terminate if they want to treat it as a string, and it's not terminated arleady.
-				buf.push_back(0);
-
 			return true;
 		}
 	}

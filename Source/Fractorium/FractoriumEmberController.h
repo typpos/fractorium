@@ -567,7 +567,7 @@ public:
 	void FilteredVariations() override;
 	void FillVariationTreeWithCurrentXform() override;
 	void FillVariationTreeWithXform(Xform<T>* xform);
-	QIcon MakeVariationIcon(const Variation<T>* var);
+	QIcon MakeVariationIcon(const Variation<T>* var, int iconSize);
 
 	//Xforms Xaos.
 	void FillXaos() override;

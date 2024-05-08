@@ -122,8 +122,8 @@ void Fractorium::InitParamsUI()
 	llComboVals = comboVals;
 	SetupCombo(table, this, row, 1, m_AffineInterpTypeCombo, comboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnAffineInterpTypeComboCurrentIndexChanged(int)));
 	m_AffineInterpTypeCombo->SetCurrentIndexStealth(static_cast<int>(eAffineInterp::AFFINE_INTERP_LOG));
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotationsSpin,			spinHeight, 0,      dmax,  1, SIGNAL(valueChanged(double)), SLOT(OnRotationsChanged(double)),   true,     1.0, 1.0, 0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SecondsPerRotationSpin,	spinHeight, 0,      dmax,  1, SIGNAL(valueChanged(double)), SLOT(OnSecondsPerRotationChanged(double)),   true,     1.0, 1.0, 0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_RotationsSpin,			spinHeight, 0, dmax, 1, SIGNAL(valueChanged(double)), SLOT(OnRotationsChanged(double)),          true, 1.0, 1.0, 0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_SecondsPerRotationSpin,	spinHeight, 0, dmax, 1, SIGNAL(valueChanged(double)), SLOT(OnSecondsPerRotationChanged(double)), true, 1.0, 1.0, 0);
 	comboVals.clear();
 	comboVals.push_back("Cw");
 	comboVals.push_back("Ccw");
@@ -135,8 +135,8 @@ void Fractorium::InitParamsUI()
 	m_BlendXformsRotateDirCombo->SetCurrentIndexStealth(0);
 	SetupCombo(table, this, row, 1, m_BlendInterpTypeCombo, llComboVals, SIGNAL(currentIndexChanged(int)), SLOT(OnBlendInterpTypeComboCurrentIndexChanged(int)));
 	m_BlendInterpTypeCombo->SetCurrentIndexStealth(1);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_StaggerSpin,	spinHeight, 0,          1,   0.1, SIGNAL(valueChanged(double)), SLOT(OnStaggerChanged(double)),             true, 0, 1.0, 0);
-	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10, 1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1,   1, 1);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_StaggerSpin,	            spinHeight, 0,  1, 0.1, SIGNAL(valueChanged(double)), SLOT(OnStaggerChanged(double)),             true, 0, 1.0, 0);
+	SetupSpinner<DoubleSpinBox, double>(table, this, row, 1, m_TemporalFilterWidthSpin, spinHeight, 1, 10,   1, SIGNAL(valueChanged(double)), SLOT(OnTemporalFilterWidthChanged(double)), true, 1,   1, 1);
 	comboVals = TemporalFilterCreator<float>::FilterTypes();
 	SetupCombo(table, this, row, 1, m_TemporalFilterTypeCombo, comboVals, SIGNAL(currentTextChanged(const QString&)), SLOT(OnTemporalFilterTypeComboCurrentIndexChanged(const QString&)));
 	m_TemporalFilterTypeCombo->SetCurrentIndexStealth(static_cast<int>(eTemporalFilterType::BOX_TEMPORAL_FILTER));

@@ -392,6 +392,7 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 	static int commacount = 0;
 	static int periodcount = 0;
 	static int lcount = 0;
+	static int ctrlgcount = 0;
 	const bool shift = QGuiApplication::keyboardModifiers().testFlag(Qt::ShiftModifier);
 	const bool ctrl = QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
 
@@ -448,11 +449,22 @@ bool Fractorium::eventFilter(QObject* o, QEvent* e)
 			const auto focusedctrlDblSpin = dynamic_cast<QDoubleSpinBox*>(this->focusWidget());
 			const auto focusedctrlCombo = dynamic_cast<QComboBox*>(this->focusWidget());
 
-			if (!focusedctrlEdit &&
-					!focusedctrlSpin &&
-					!focusedctrlDblSpin &&
-					!focusedctrlCombo &&
-					!QGuiApplication::keyboardModifiers().testFlag(Qt::AltModifier))//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform. Also exclude alt.
+			if (ctrl && (ke->key() == Qt::Key_G))
+			{
+				ctrlgcount++;
+
+				if (ctrlgcount >= ftimes)
+				{
+					OnSequenceGenerateButtonClicked(true);
+					ctrlgcount = 0;
+					return true;
+				}
+			}
+			else if (!focusedctrlEdit &&
+					 !focusedctrlSpin &&
+					 !focusedctrlDblSpin &&
+					 !focusedctrlCombo &&
+					 !QGuiApplication::keyboardModifiers().testFlag(Qt::AltModifier))//Must exclude these because otherwise, typing a minus key in any of the spinners will switch the xform. Also exclude alt.
 			{
 				size_t index = 0;
 				double vdist = 0.01;

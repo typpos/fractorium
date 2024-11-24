@@ -169,11 +169,7 @@ struct EMBER_API Color : public v4T
 	template <typename U>
 	Color<T>& operator = (const Color<U>& color)
 	{
-#ifdef _WIN32
-		v4T::operator=<U>(color);
-#else
 		v4T::template operator=<U>(color);
-#endif
 		return *this;
 	}
 

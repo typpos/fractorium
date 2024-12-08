@@ -1576,7 +1576,7 @@
                <string>Blend Interpolation</string>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method used to compute the blending distance for each step between keyframes.&lt;/p&gt;&lt;p&gt;Linear: Each step will be a linear interpolation. This option is the equivalend of the --unsmoother flag in EmberGenome.&lt;/p&gt;&lt;p&gt;Log: Steps in the beginning and end of the interpolation between keyframes will be smaller and those in the middle will be larger. This has the effect of slowing down the beginning and end portions, and speeding up the middle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The method used to compute the blending distance for each step between keyframes.&lt;/p&gt;&lt;p&gt;Linear: Each step will be a linear interpolation. This option is the equivalent of the --unsmoother flag in EmberGenome.&lt;/p&gt;&lt;p&gt;Log: Steps in the beginning and end of the interpolation between keyframes will be smaller and those in the middle will be larger. This has the effect of slowing down the beginning and end portions, and speeding up the middle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="9" column="0">

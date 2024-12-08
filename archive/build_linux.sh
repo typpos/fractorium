@@ -208,9 +208,10 @@ cp $DATA_PATH/Bench/* bench
 cd ../
 
 tar -czvf Fractorium-$emberVersion.x86_64.AppImage.tar.gz Fractorium
+mv Fractorium-x86_64.AppImage Fractorium-$emberVersion.x86_64.AppImage
 
 #cleaning
 rm -rf Fractorium
 rm -rf Fractorium.AppDir
 rm -rf rpmbuild
-rm -rf Fractorium-x86_64.AppImage
+rm -rf Fractorium-$emberVersion.x86_64.AppImage

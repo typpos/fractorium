@@ -1,4 +1,4 @@
-VERSION = 23.23.8.1
+VERSION = 24.24.12.1
 win32:CONFIG += skip_target_version_ext
 CONFIG += c++2a
 
@@ -204,7 +204,7 @@ win32 {
 	QMAKE_CXXFLAGS += -fPIC
 	QMAKE_CXXFLAGS += -fpermissive
 	QMAKE_CXXFLAGS += -pedantic
-        QMAKE_CXXFLAGS += -std=c++2a
+    QMAKE_CXXFLAGS += -std=c++2a
 	QMAKE_CXXFLAGS += -Wnon-virtual-dtor
 	QMAKE_CXXFLAGS += -Wshadow
 	QMAKE_CXXFLAGS += -Winit-self

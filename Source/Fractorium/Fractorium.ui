@@ -1526,7 +1526,7 @@
                <string>Seconds/Rotation</string>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of seconds each rotation tales tp complete. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of seconds each rotation takes to complete. Larger values give slower movement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="4" column="0">
@@ -1534,7 +1534,7 @@
                <string>Rotate Xforms Dir</string>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Direction of loop rotation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The direction of loop rotation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="5" column="0">
@@ -1568,7 +1568,7 @@
                <string>Blend Rotate Xforms Dir</string>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Direction of rotation during interpolation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The direction of rotation during interpolation. Clockwise vs. counter clockwise.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </item>
              <item row="8" column="0">

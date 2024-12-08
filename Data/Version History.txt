@@ -1,5 +1,62 @@
-23.23.8.1 8/6/2023
+24.24.12.1 12/8/2024
+--User changes
+ -Clarify the tooltip for the red squares in the Type column of the variations tree.
+ -Remove the Type field from the variations tree and instead just put the type indicator icon next to the variation name.
+ -Double clicking to toggle variation parameter spinners now resets the value to the default if there is one, else it uses zero. If it is already using the default, it is toggled to 0.
+ -Add a new button to toggle xaos on and off.
+ -When duplicating a flame, insert it immediately after the one being duplicated instead of at the end of the file.
+ -When switching between flames in a file, keep the same xform index selected rather than resetting it to the first xform each time.
+ -Create a threaded writer for the final render and EmberAnimate so the rendering process does not get delayed by file saving which may take a long time.
+ -Remove warning which said "Frames per rot cannot be greater than one while Rotations is zero" when generating a sequence.
+ -Add the Circle_Rand variation from Chaotica.
+ -Add and clarify various tooltips.
+ -Add a progress bar for sequence previews.
+ -Add a progress bar for preview renders.
+ -Increase precision of affine and xaos spinners.
+ -Increase precision of fields written in Xml files to 8.
+ -Show image index in the library and sequence trees.
+ -Automatically show animation preview when sequence generation is done.
+ -Add the ability in the final render dialog to start a render within a sequence from a given point, rather than always having to start from the beginning.
+ --Allow using the image index as its name rather than the file name.
+ -No longer automatically set sequence checkbox in the final render dialog when rendering a sequence. It's an outdated option for today's hardware.
+ -Users can now specify animation params on a per flame basis.
+ --These get saved with the flame file.
+ -Allow for rotating xforms around the world origin during animation.
+ -Make the Clear Flame menu item be more comprehensive in how it clears a flame out.
+ -Add Ctrl+g shortcut for generating a sequence.
 
+--Bug fixes
+ -Stop rendering process when a single render or save fails.
+ -Generating sequences using the following variations would be done incorrectly: circletrans1, collideoscope, crob, curlsp, glynnsim1, glynnsim2, hypercrop, julian, julian, mobiusn, nblur, waves2, wavesn.
+ -Adding/removing nodes from the color curve had accidentally been disabled.
+ -The applied xaos weight table was not showing normalized weight values.
+ -Changing the size of a flame was not observing the Apply To All checkbox.
+ -Do not clamp the Rotate field to +/-180, because this causes the rotation to switch from CW to CCW during sequence generation. Instead, leave it exactly as the user entered it so the rotations proceed in the same direction.
+ -Attempt to prevent crash when dragging in a new file while the previews from the current file are still rendering.
+ -When rendering on the CPU, if the number of threads didn't divide evenly into the number of rows, it would leave a blank spot on the last few rows.
+ -Fix numerous parsing bugs when reading .chaos files.
+ -Added Chaotica compatibility fixes and/or optimizations to the following variations:
+	asteria, bcircle, bcollide, bipolar, blob2, btransform, cell, circlecrop, circlecrop2, collideoscope, cpow2,
+	cropn, cross, curl, depth_ngon2, depth_sine2, edisc, eRotate, escher, fan2, hex_rand, hypershift, hypershift2,
+	hypertile1, julia, julian, julian2, juliaq, juliascope, lazyjess, log, loonie2, murl, murl2, npolar,
+	oscilloscope2, perspective, phoenix_julia, sphericaln, squish, starblur, starblur2, truchet, truchet_glyph,
+	waffle, wavesn.
+ -Bug when duplicating a flame in a file and scrolling to it.
+ -Null termination bug when reading Xml strings.
+ -Fix an extremely rare possible memory leak when using motion during animation, which is never used in Fractorium.
+ -Do not skip to the current flame index, or attach a prefix in the Final Render Dialog when rendering an animation sequence.
+ -Fix indendation for variations because of Type icon.
+ -Fix bug when duplicating flame where the new flame wasn't being properly selected.
+ -Fix bug where clearing a flame was changing size and quality when it shouldn't have.
+ -Fix bug where reading an Xml palette was failing on linux.
+
+--Code changes
+ -Fix various linux build issues.
+ -Place all animation params in Ember.
+ -No longer pad string with null terminator in ReadFile() because std::string already does it.
+ -Fix template compiler error that worked in C++17, but not in C++20.
+
+23.23.8.1 8/6/2023
 --User changes
  -Add Clear Sequence button to the Sequence Panel.
  -Add animation preview in the sequence generator output pane.
@@ -47,7 +104,6 @@
  -Small changes to opencl.hpp to get it to build.
 
 22.21.4.2 4/19/2021
-
 --User changes
  -Allow users to set the Exp value when using the Exp temporal filter type.
  -Set the default temporal filter type to be Box, which does not alter the palette values at all during animation. This is done to avoid confusion when using Gaussian or Exp which can produce darkened images.
@@ -62,7 +118,6 @@
  -Modernize some C++ code.
 
 21.21.4.1 4/7/2021
-
 --User changes
  -Sort palette filename combo box.
  -GPU rendering improvement on Mac.

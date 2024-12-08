@@ -9,7 +9,7 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/16D7rvuUc3x0JKYgPAP1iyoNLN_1bXCix/view?usp=sharing)
+Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
 
 ## Mac
 
@@ -21,16 +21,16 @@ Download: [Fractorium_23.23.8.1.dmg](https://drive.google.com/file/d/1M_HSzNMGfz
 
 Install ubuntu 20 or greater.
 
-Download: [Fractorium-23.23.8.1.x86_64.deb](https://drive.google.com/file/d/1kMvTDgQpSsGmee-nUT99sb97m90F5ALd/view?usp=drive_link)
+Download: [Fractorium-24.24.12.1.x86_64.deb](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
 
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-23.23.8.1.x86_64.deb
+sudo dpkg -i Fractorium-24.24.12.1.x86_64.deb
 ```
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-23.23.8.1.x86_64.rpm](https://drive.google.com/file/d/1woZBP8f6qoB53vRfXfrj0XfxEznQD_CD/view?usp=drive_link)
+Download: [Fractorium-23.23.8.1.x86_64.rpm](https://drive.google.com/file/d/1te2UijE3OyR5EayWQT2sE4OIr4U0kUad/view?usp=drive_link)
 
 # Building from git
 

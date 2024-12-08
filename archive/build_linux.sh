@@ -214,4 +214,4 @@ mv Fractorium-x86_64.AppImage Fractorium-$emberVersion.x86_64.AppImage
 rm -rf Fractorium
 rm -rf Fractorium.AppDir
 rm -rf rpmbuild
-rm -rf Fractorium-$emberVersion.x86_64.AppImage
+# rm -rf Fractorium-$emberVersion.x86_64.AppImage

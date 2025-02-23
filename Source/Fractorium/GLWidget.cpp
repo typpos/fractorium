@@ -5,32 +5,32 @@
 #ifdef USE_GLSL
 
 	static const char* vertexShaderSource =
-	"attribute vec4 posattr;\n"
-	"uniform mat4 matrix;\n"
-	"uniform float ps;\n"
+	"attribute mediump vec4 posattr;\n"
+	"uniform mediump mat4 matrix;\n"
+	"uniform mediump float ps;\n"
 	"void main() {\n"
 	"   gl_Position = matrix * posattr;\n"
 	"	gl_PointSize = ps;\n"
 	"}\n";
 
 	static const char* fragmentShaderSource =
-	"uniform vec4 mycolor;\n"
+	"uniform mediump vec4 mycolor;\n"
 	"void main() {\n"
 	"   gl_FragColor = mycolor;\n"
 	"}\n";
 
 	static const char* quadVertexShaderSource =
-	"attribute vec4 posattr;\n"
-	"uniform mat4 matrix;\n"
-	"varying vec4 texcoord;\n"
+	"attribute mediump vec4 posattr;\n"
+	"uniform mediump mat4 matrix;\n"
+	"varying mediump vec4 texcoord;\n"
 	"void main() {\n"
 	"	gl_Position = matrix * posattr;\n"
 	"	texcoord = posattr;\n"
 	"}\n";
 
 	static const char* quadFragmentShaderSource =
-	"uniform sampler2D quadtex;\n"
-	"varying vec4 texcoord;\n"
+	"uniform mediump sampler2D quadtex;\n"
+	"varying mediump vec4 texcoord;\n"
 	"void main() {\n"
 	"	gl_FragColor = texture2D(quadtex, texcoord.st);\n"
 	"}\n";

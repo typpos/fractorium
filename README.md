@@ -9,7 +9,7 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
+Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/16D7rvuUc3x0JKYgPAP1iyoNLN_1bXCix/view?usp=drive_link)
 
 ## Mac
 
@@ -30,7 +30,7 @@ sudo dpkg -i Fractorium-24.24.12.1.x86_64.deb
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-24.24.12.1.x86_64.rpm](https://drive.google.com/file/d/1te2UijE3OyR5EayWQT2sE4OIr4U0kUad/view?usp=drive_link)
+Download: [Fractorium-24.24.12.1.x86_64.rpm](https://drive.google.com/file/d/1JYBckKMcVd9qvRiZN6b7CXMRo8oM_pU8/view?usp=sharing)
 
 ### Install from .deb
 

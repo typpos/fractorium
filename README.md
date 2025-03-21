@@ -13,7 +13,7 @@ Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/16D7rvuUc3
 
 ## Mac
 
-Download: [Fractorium_24.24.12.1.dmg](https://drive.google.com/file/d/1nODGGvB7tqqkfij4ZhcJI38I8WdJAd54/view?usp=drive_link)
+Download: [Fractorium_24.24.12.1.dmg](https://drive.google.com/file/d/1P7tZ_LT_ZYcwIsPE6gSOnofT-sH2jEQB/view?usp=sharing)
 
 ## Linux
 
@@ -21,7 +21,7 @@ Download: [Fractorium_24.24.12.1.dmg](https://drive.google.com/file/d/1nODGGvB7t
 
 Install ubuntu 20 or greater.
 
-Download: [Fractorium-24.24.12.1.x86_64.deb](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
+Download: [Fractorium-24.24.12.1.x86_64.AppImage](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
 
 ```
 cd ~/Downloads

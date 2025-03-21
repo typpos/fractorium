@@ -13,7 +13,7 @@ Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/130ZUkkFsc
 
 ## Mac
 
-Download: [Fractorium_23.23.8.1.dmg](https://drive.google.com/file/d/1M_HSzNMGfzS6NWCVPK-VmkWpMOaLdSuk/view?usp=drive_link)
+Download: [Fractorium_24.24.12.1.dmg](https://drive.google.com/file/d/1nODGGvB7tqqkfij4ZhcJI38I8WdJAd54/view?usp=drive_link)
 
 ## Linux
 
@@ -30,7 +30,13 @@ sudo dpkg -i Fractorium-24.24.12.1.x86_64.deb
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-23.23.8.1.x86_64.rpm](https://drive.google.com/file/d/1te2UijE3OyR5EayWQT2sE4OIr4U0kUad/view?usp=drive_link)
+Download: [Fractorium-24.24.12.1.x86_64.rpm](https://drive.google.com/file/d/1te2UijE3OyR5EayWQT2sE4OIr4U0kUad/view?usp=drive_link)
+
+### Install from .deb
+
+Install ubuntu 20 or greater.
+
+Download: [Fractorium-24.24.12.1.x86_64.deb](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
 
 # Building from git
 

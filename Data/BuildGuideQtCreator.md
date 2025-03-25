@@ -64,30 +64,30 @@ This will download and build `glm libopenexr libpng libxml zlib`. You will have 
 ```
 [fractorium]
 │  
-├─glm
-├─libjpeg
-├─libpng
-├─libxml2
-├─openexr
-└─fractorium
+├─[glm]
+├─[libjpeg]
+├─[libpng]
+├─[libxml2]
+├─[openexr]
+└─[fractorium]
+  │
+  ├─[Deps]
     │
-    ├─Deps
-        │
-	├─Iex-3_1.dll
-        ├─IlmThread-3_1.dll
-        ├─IMath-3_1.dll
-        ├─libxml2.dll
-	├─OpenEXR-3_1.dll
-        ├─Iex-3_1.lib
-        ├─IlmThread-3_1.lib
-        ├─Imath-3_1.lib
-        ├─libjpeg.lib
-        ├─libpng.lib
-        ├─libxml2.lib
-        ├─OpenEXR-3_1.lib
-        ├─OpenEXRCore-3_1.lib
-        ├─OpenEXRUtil-3_1.lib
-        ├─zlib.lib
+    ├─Iex-3_1.dll
+    ├─IlmThread-3_1.dll
+    ├─IMath-3_1.dll
+    ├─libxml2.dll
+    ├─OpenEXR-3_1.dll
+    ├─Iex-3_1.lib
+    ├─IlmThread-3_1.lib
+    ├─Imath-3_1.lib
+    ├─libjpeg.lib
+    ├─libpng.lib
+    ├─libxml2.lib
+    ├─OpenEXR-3_1.lib
+    ├─OpenEXRCore-3_1.lib
+    ├─OpenEXRUtil-3_1.lib
+    ├─zlib.lib
 ```
 
 ## Building with Qt Creator or Visual Studio
@@ -213,61 +213,60 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2022 (
 
 ```
 [YOUR FOLDER]
- │
- ├─Amphibole_Supergroup.ugr
- ├─Apatite_Supergroup.ugr
- ├─boxtail_pack_02.gradient
- ├─boxtail_pack_03_triangle.gradient
- ├─boxtail_pack_04_mineshack.gradient
- ├─dark_windows.qss
- ├─Ember.dll
- ├─EmberAnimate.exe
- ├─EmberCL.dll
- ├─EmberGenome.exe
- ├─EmberRender.exe
- ├─fardareismai_pack_01_variety_number_128.gradient
- ├─fardareismai_pack_02_b_sides.gradient
- ├─fardareismai_pack_03_old_and_new.gradient
- ├─fardareismai_pack_04_hoard.gradient
- ├─Feldspar_Group.ugr
- ├─flam3-palettes.xml
- ├─fractaldesire_pack_01.gradient
- ├─Fractorium.exe
- ├─Iex-3_1.dll
- ├─IlmThread-3_1.dll
- ├─Imath-3_1.dll
- ├─libxml2.dll
- ├─lightdark.qss
- ├─Mica_Group.ugr
- ├─OpenEXR-3_1.dll
- ├─Qt6Core.dll
- ├─Qt6Gui.dll
- ├─Qt6OpenGL.dll
- ├─Qt6OpenGLWidgets.dll
- ├─Qt6Widgets.dll
- ├─Quartz_Varieties.ugr
- ├─rce_ordinary_pack_01_colornation.gradient
- ├─tatasz_pack_01.gradient
- ├─tatasz_pack_02_colder.gradient
- ├─tatasz_pack_02_dark.gradient
- ├─tatasz_pack_02_warmer.gradient
- ├─tatasz_pack_03.gradient
- ├─tatasz_pack_04.gradient
- ├─tatasz_pack_05.gradient
- ├─tatasz_pack_06.gradient
- ├─tatasz_pack_07.gradient
- ├─uranium.qss
- ├─user-palettes.xml
- ├─msvcp140.dll (optional)
- ├─vcruntime140.dll (optional)
- ├─vcruntime140_1.dll (optional)
- ├─vccorlib140.dll (optional)
- ├─concrt140.dll (optional)
- │  
- └─imageformats
-    │
-    ├─qjpeg.dll
- └─platforms
+│
+├─Amphibole_Supergroup.ugr
+├─Apatite_Supergroup.ugr
+├─boxtail_pack_02.gradient
+├─boxtail_pack_03_triangle.gradient
+├─boxtail_pack_04_mineshack.gradient
+├─dark_windows.qss
+├─Ember.dll
+├─EmberAnimate.exe
+├─EmberCL.dll
+├─EmberGenome.exe
+├─EmberRender.exe
+├─fardareismai_pack_01_variety_number_128.gradient
+├─fardareismai_pack_02_b_sides.gradient
+├─fardareismai_pack_03_old_and_new.gradient
+├─fardareismai_pack_04_hoard.gradient
+├─Feldspar_Group.ugr
+├─flam3-palettes.xml
+├─fractaldesire_pack_01.gradient
+├─Fractorium.exe
+├─Iex-3_1.dll
+├─IlmThread-3_1.dll
+├─Imath-3_1.dll
+├─libxml2.dll
+├─lightdark.qss
+├─Mica_Group.ugr
+├─OpenEXR-3_1.dll
+├─Qt6Core.dll
+├─Qt6Gui.dll
+├─Qt6OpenGL.dll
+├─Qt6OpenGLWidgets.dll
+├─Qt6Widgets.dll
+├─Quartz_Varieties.ugr
+├─rce_ordinary_pack_01_colornation.gradient
+├─tatasz_pack_01.gradient
+├─tatasz_pack_02_colder.gradient
+├─tatasz_pack_02_dark.gradient
+├─tatasz_pack_02_warmer.gradient
+├─tatasz_pack_03.gradient
+├─tatasz_pack_04.gradient
+├─tatasz_pack_05.gradient
+├─tatasz_pack_06.gradient
+├─tatasz_pack_07.gradient
+├─uranium.qss
+├─user-palettes.xml
+├─msvcp140.dll (optional)
+├─vcruntime140.dll (optional)
+├─vcruntime140_1.dll (optional)
+├─vccorlib140.dll (optional)
+├─concrt140.dll (optional)  
+└─[imageformats]
+  │
+  ├─qjpeg.dll
+  └─[platforms]
     │
     ├─qwindows.dll
 ```

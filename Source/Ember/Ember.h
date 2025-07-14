@@ -1669,14 +1669,17 @@ public:
 
 	//The range in the x and y directions from the center of the world space from which the initial random point will be selected at the start of each sub batch.
 	//Or when recovering from a bad point.
+	//Xml field: "rand_range".
 	T m_RandPointRange = 1;
 
 	//The iteration depth. This was a rendering parameter in flam3 but has been made a member here
 	//so that it can be adjusted more easily.
+	//Xml field: "sub_batch_size".
 	size_t m_SubBatchSize = DEFAULT_SBS;
 
 	//The number of iterations to disregard for each sub batch. This was a rendering parameter in flam3 but has been made a member here
 	//so that it can be adjusted more easily.
+	//Xml field: "fuse".
 	size_t m_FuseCount = 15;
 
 	//The multiplier in size of the histogram and DE filtering buffers. Must be at least one, preferrably never larger than 4, only useful at 2.
@@ -1772,6 +1775,7 @@ public:
 	T m_HighlightPower = 1;
 
 	//An alternative way to set brightness, ignored when zero.
+	//Xml field: "logscale_k2".
 	T m_K2 = 0;
 
 	//When animating a file full of many embers, this value is used to specify the time in the animation
@@ -1835,6 +1839,7 @@ public:
 	Palette<float> m_Palette;//Final palette that is actually used is a copy of this inside of render, which will be of type bucketT (float).
 
 	//Curves used to adjust the color during final accumulation.
+	//Xml field: "curves".
 	Curves<float> m_Curves;
 
 	//Strings.
@@ -1854,14 +1859,48 @@ public:
 	//The 0-based position of this ember in the file it was contained in.
 	size_t m_Index = 0;
 
-	//The parameters for animating.
+	//Animation.
+
+	//A decimal number between 0 and 1 which governs the xform interpolation behavior like so:
+	//0 (default) : xforms will interpolate all at once.
+	//0.5 : the interpolation of each xform is staggered so that when the first xform is half done, the second one starts, and so on.
+	//1 : each xform interpolates consecutively with no overlap.
+	//Xml field: "stagger".
 	double m_Stagger = 0;
+
+	//The number of times the xforms of a keyframe will do a 360 degree rotation before moving on to the next interpolation step.
+	//Note that only xforms which have the animate flag set to true will be rotated.
+	//Set to 0 to omit rotation before interpolating.
+	//Xml field: "rotations".
 	double m_Rotations = 1;
+
+	//The number of seconds each rotation takes to complete. Larger values give slower movement.
+	//Xml field: "seconds_per_rotation".
 	double m_SecondsPerRotation = 3;
+
+	//The direction of loop rotation. Clockwise vs. counter clockwise.
+	//Xml field: "rotate_xforms_cw".
 	bool m_RotateXformsCw = false;
+
+	//The number of seconds taken to interpolate from one keyframe to the next. Larger values give slower movement.
+	//Xml field: "blend_seconds".
 	double m_BlendSeconds = 3;
+
+	//The number of times the xforms will do a 360 degree rotation while interpolating from one keyframe to the next.
+	//Note that only xforms which have the animate flag set to true will be rotated.
+	//Set to 0 to omit rotation while interpolating.
+	//Xml field: "rotations_per_blend".
 	size_t m_RotationsPerBlend = 0;//Could this ever be double?
+
+	//The direction of rotation during interpolation. Clockwise vs. counter clockwise.
+	//Xml field: "blend_rotate_xforms_cw".
 	bool m_BlendRotateXformsCw = false;
+
+	//The method used to compute the blending distance for each step between keyframes.
+	//Linear: Each step will be a linear interpolation.
+	//Log : Steps in the beginning and end of the interpolation between keyframes will be smaller and those in the middle will be larger.
+	//This has the effect of slowing down the beginning and end portions, and speeding up the middle.
+	//Xml field: "linear_blend".
 	bool m_Linear = false;
 
 	//Temporal Filter.

@@ -9,7 +9,7 @@ Summary:        A fractal flame editor with GPU support
 Group:          Graphics
 BuildArch:      x86_64
 License:        GPL
-URL:            https://mfeemster@bitbucket.org/mfeemster/fractorium.git
+URL:            https://github.com/mfeemster/fractorium
 BuildRoot:      %{buildroot}
 
 %description
@@ -19,9 +19,9 @@ A fractal flame editor with GPU support.
 
 http://fractorium.com/
 
-The project is maintained on Bitbucket:
+The project is maintained on github:
 
-https://bitbucket.org/mfeemster/fractorium
+https://github.com/mfeemster/fractorium
 
 News and updates at the above or on Matt Feemster's DeviantArt page:
 

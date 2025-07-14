@@ -8,8 +8,8 @@ Maintainer: Matt Feemster <matt.feemster@gmail.com>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.5
 Homepage: http://fractorium.com/
-Vcs-Git: https://bitbucket.org/mfeemster/fractorium
-Vcs-Browser: https://bitbucket.org/mfeemster/fractorium
+Vcs-Git: https://github.com/mfeemster/fractorium.git
+Vcs-Browser: https://github.com/mfeemster/fractorium
 Description: A fractal flame editor with GPU support
  Fractorium
  .
@@ -17,9 +17,9 @@ Description: A fractal flame editor with GPU support
  .
  http://fractorium.com/
  .
- The project is maintained on Bitbucket:
+ The project is maintained on github:
  .
- https://bitbucket.org/mfeemster/fractorium
+ https://github.com/mfeemster/fractorium
  .
  News and updates at the above or on Matt Feemster's DeviantArt page:
  .

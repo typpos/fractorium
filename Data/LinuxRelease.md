@@ -5,10 +5,10 @@ These are instructions for publishing a Linux deb package. It can be built local
 ## Summary
 
 
-Starting with a fresh clone from bitbucket.org. It will not work unless it's totally fresh:
+Starting with a fresh clone from github. It will not work unless it's totally fresh:
 
 ```
-$ git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
+$ git clone https://github.com/mfeemster/fractorium.git
 $ cd fractorium
 $ qmake main.pro -r -spec linux-g++-64 CONFIG+=release
 ```

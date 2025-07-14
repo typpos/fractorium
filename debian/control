@@ -5,8 +5,8 @@ Maintainer: Matt Feemster <matt.feemster@gmail.com>
 Build-Depends: debhelper (>= 9), g++ (>= 5.4), libc6-dev, libgl1-mesa-dev, libgl-dev, libglm-dev, libjpeg-dev, libpng-dev, qt6-base-dev, libxml2-dev, ocl-icd-opencl-dev, opencl-headers, qmake6, libopenexr-dev
 Standards-Version: 3.9.5
 Homepage: http://fractorium.com/
-Vcs-Git: https://bitbucket.org/mfeemster/fractorium
-Vcs-Browser: https://bitbucket.org/mfeemster/fractorium
+Vcs-Git: https://github.com/mfeemster/fractorium.git
+Vcs-Browser: https://github.com/mfeemster/fractorium
 
 Package: fractorium
 Architecture: amd64
@@ -18,9 +18,9 @@ Description: fractal flame editor with GPU support
  .
  http://fractorium.com/
  .
- The project is maintained on Bitbucket:
+ The project is maintained on github:
  .
- https://bitbucket.org/mfeemster/fractorium
+ https://github.com/mfeemster/fractorium
  .
  News and updates at the above or on Matt Feemster's DeviantArt page:
  .

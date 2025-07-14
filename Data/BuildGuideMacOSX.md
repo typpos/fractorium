@@ -11,7 +11,7 @@ Install Command Line Tools for Xcode
 Clone the repository:
 
 ```
-git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git
+git clone https://github.com/mfeemster/fractorium.git
 ```
 
 Install the dependencies:

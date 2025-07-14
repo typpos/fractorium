@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: fractorium
-Source: https://bitbucket.org/mfeemster/fractorium
+Source: https://github.com/mfeemster/fractorium
 
 Files: *
 Copyright: 2018 Matt Feemster <matt.feemster@gmail.com>

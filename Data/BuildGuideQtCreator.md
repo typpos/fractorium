@@ -33,11 +33,11 @@ Open up the Visual Studio x64 Native Tools Command Prompt.
 
 Create a new folder in your development area named fractorium:
 
-`mkdir fractorium`
-
-`cd fractorium`
-
-`git clone https://mfeemster@bitbucket.org/mfeemster/fractorium.git`
+```
+mkdir fractorium
+cd fractorium
+git clone https://github.com/mfeemster/fractorium.git
+```
 
 ### Prerequisites
 

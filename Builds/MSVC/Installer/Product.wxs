@@ -72,8 +72,8 @@
 		</Fragment>
 
 	<Fragment>
-    
-    
+		
+		
 		<Component Id="FractoriumStartMenuShortcut" Directory="ProgramMenuDirLevel1" Guid="f1eaf3ba-9b61-48b6-8994-49ebc6b405aa" Condition="1">
 			<Shortcut Id="FractoriumStartMenuShortcut" Directory="ProgramMenuDirLevel1" Name="Fractorium" Target="[INSTALLFOLDER]\Fractorium.exe" WorkingDirectory="INSTALLFOLDER" Icon="AddRemoveProgramsIcon" />
 			
@@ -123,20 +123,20 @@
 			<Component Id="libxml2.dll" Guid="bb3aa687-7a3d-4d16-a27c-28529b472754">
 				<File Id="libxml2.dll" Source="$(var.SolutionDir)..\..\..\Bin\$(var.Platform)\Release\libxml2.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes" />
 			</Component>
-      <Component Id="msvcp140.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
-				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
+			<Component Id="msvcp140.dll" Guid="8f1ffde7-c1bd-45fb-8bc8-26dde552eafd">
+				<File Id="msvcp140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\msvcp140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
 			</Component>
 			<Component Id="vcruntime140.dll" Guid="50c9bc27-c547-4a03-9f6c-cd416f449dd8">
-				<File Id="vcruntime140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
+				<File Id="vcruntime140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\vcruntime140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
 			</Component>
 			<Component Id="vcruntime140_1.dll" Guid="a02507f8-326b-45b2-b734-e5091921559f">
-				<File Id="vcruntime140_1.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\vcruntime140_1.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
+				<File Id="vcruntime140_1.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\vcruntime140_1.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
 			</Component>
 			<Component Id="vccorlib140.dll" Guid="affe33e7-1e64-4bb0-a062-2b56f77459b4">
-				<File Id="vccorlib140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
+				<File Id="vccorlib140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\vccorlib140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
 			</Component>
 			<Component Id="concrt140.dll" Guid="7fb716a1-1b4f-42fb-89c7-4d216ebd6e2e">
-				<File Id="concrt140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.42.34433\x64\Microsoft.VC143.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
+				<File Id="concrt140.dll" Source="$(var.DevEnvDir)..\..\VC\Redist\MSVC\14.44.35112\x64\Microsoft.VC143.CRT\concrt140.dll" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
 			</Component>
 			<Component Id="flam3palettes.xml" Guid="d3adb0bb-14ef-4923-99d9-a5784b7ef04e">
 				<File Id="flam3palettes.xml" Source="$(var.SolutionDir)..\..\..\Data\flam3-palettes.xml" KeyPath="yes" Checksum="yes" ReadOnly="yes" />
@@ -266,14 +266,14 @@
 				<File Id="Qt6Widgets.dll" Source="$(env.QTDIR)\bin\Qt6Widgets.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes" />
 			</Component>
 
-      <Component Id="Qt6OpenGL.dll" Guid="4693556b-5392-4e84-94f8-7a97ef55da87">
-        <File Id="Qt6OpenGL.dll" Source="$(env.QTDIR)\bin\Qt6OpenGL.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes" />
-      </Component>
-      
-      <Component Id="Qt6OpenGLWidgets.dll" Guid="1d8c4733-e0be-4a7b-bf3a-00e2b1b7a4a8">
-        <File Id="Qt6OpenGLWidgets.dll" Source="$(env.QTDIR)\bin\Qt6OpenGLWidgets.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes" />
-      </Component>
-    </ComponentGroup>
+			<Component Id="Qt6OpenGL.dll" Guid="4693556b-5392-4e84-94f8-7a97ef55da87">
+				<File Id="Qt6OpenGL.dll" Source="$(env.QTDIR)\bin\Qt6OpenGL.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes" />
+			</Component>
+			
+			<Component Id="Qt6OpenGLWidgets.dll" Guid="1d8c4733-e0be-4a7b-bf3a-00e2b1b7a4a8">
+				<File Id="Qt6OpenGLWidgets.dll" Source="$(env.QTDIR)\bin\Qt6OpenGLWidgets.dll" KeyPath="yes" Checksum="yes" ProcessorArchitecture="x64" ReadOnly="yes" />
+			</Component>
+		</ComponentGroup>
 	</Fragment>
 	
 	<Fragment>

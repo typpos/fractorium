@@ -2,39 +2,36 @@
 #include "GLWidget.h"
 #include "Fractorium.h"
 
-#ifdef USE_GLSL
+static const char* vertexShaderSource =
+"attribute mediump vec4 posattr;\n"
+"uniform mediump mat4 matrix;\n"
+"uniform mediump float ps;\n"
+"void main() {\n"
+"   gl_Position = matrix * posattr;\n"
+"	gl_PointSize = ps;\n"
+"}\n";
 
-	static const char* vertexShaderSource =
-	"attribute mediump vec4 posattr;\n"
-	"uniform mediump mat4 matrix;\n"
-	"uniform mediump float ps;\n"
-	"void main() {\n"
-	"   gl_Position = matrix * posattr;\n"
-	"	gl_PointSize = ps;\n"
-	"}\n";
+static const char* fragmentShaderSource =
+"uniform mediump vec4 mycolor;\n"
+"void main() {\n"
+"   gl_FragColor = mycolor;\n"
+"}\n";
 
-	static const char* fragmentShaderSource =
-	"uniform mediump vec4 mycolor;\n"
-	"void main() {\n"
-	"   gl_FragColor = mycolor;\n"
-	"}\n";
+static const char* quadVertexShaderSource =
+"attribute mediump vec4 posattr;\n"
+"uniform mediump mat4 matrix;\n"
+"varying mediump vec4 texcoord;\n"
+"void main() {\n"
+"	gl_Position = matrix * posattr;\n"
+"	texcoord = posattr;\n"
+"}\n";
 
-	static const char* quadVertexShaderSource =
-	"attribute mediump vec4 posattr;\n"
-	"uniform mediump mat4 matrix;\n"
-	"varying mediump vec4 texcoord;\n"
-	"void main() {\n"
-	"	gl_Position = matrix * posattr;\n"
-	"	texcoord = posattr;\n"
-	"}\n";
-
-	static const char* quadFragmentShaderSource =
-	"uniform mediump sampler2D quadtex;\n"
-	"varying mediump vec4 texcoord;\n"
-	"void main() {\n"
-	"	gl_FragColor = texture2D(quadtex, texcoord.st);\n"
-	"}\n";
-#endif
+static const char* quadFragmentShaderSource =
+"uniform mediump sampler2D quadtex;\n"
+"varying mediump vec4 texcoord;\n"
+"void main() {\n"
+"	gl_FragColor = texture2D(quadtex, texcoord.st);\n"
+"}\n";
 
 /// <summary>
 /// Constructor which passes parent widget to the base and initializes OpenGL profile.
@@ -44,53 +41,6 @@
 GLWidget::GLWidget(QWidget* p)
 	: QOpenGLWidget(p)
 {
-	/*
-		auto qsf = this->format();
-		qDebug() << "Version: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-		qDebug() << "Profile: " << qsf.profile();
-		qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-		qDebug() << "Swap behavior: " << qsf.swapBehavior();
-		qDebug() << "Swap interval: " << qsf.swapInterval();
-		//QSurfaceFormat qsf;
-		//QSurfaceFormat::FormatOptions fo;
-		//fo.
-		//qsf.setDepthBufferSize(24);
-		//qsf.setSwapInterval(1);//Vsync.
-		//qsf.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-		#ifndef USE_GLSL
-		qsf.setVersion(2, 0);
-		qsf.setProfile(QSurfaceFormat::CompatibilityProfile);
-		#else
-		qsf.setVersion(3, 3);
-		//qsf.setProfile(QSurfaceFormat::CoreProfile);
-		#endif
-		setFormat(qsf);
-	*/
-	/*
-		QSurfaceFormat fmt;
-		fmt.setDepthBufferSize(24);
-
-		// Request OpenGL 3.3 compatibility or OpenGL ES 3.0.
-		if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
-		{
-			qDebug("Requesting 3.3 compatibility context");
-			fmt.setVersion(3, 3);
-			fmt.setProfile(QSurfaceFormat::CoreProfile);
-		}
-		else
-		{
-			qDebug("Requesting 3.0 context");
-			fmt.setVersion(3, 0);
-		}
-
-		setFormat(fmt);
-	*/
-	//auto qsf = this->format();
-	//qDebug() << "Constructor*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
-	//qDebug() << "Profile: " << qsf.profile();
-	//qDebug() << "Depth buffer size: " << qsf.depthBufferSize();
-	//qDebug() << "Swap behavior: " << qsf.swapBehavior();
-	//qDebug() << "Swap interval: " << qsf.swapInterval();
 }
 
 /// <summary>
@@ -217,52 +167,6 @@ void GLWidget::InitGL()
 /// </summary>
 void GLWidget::DrawQuad()
 {
-#ifndef USE_GLSL
-	glEnable(GL_TEXTURE_2D);
-	auto renderer = m_Fractorium->m_Controller->Renderer();
-	auto finalImage = m_Fractorium->m_Controller->FinalImage();
-
-	//Ensure all allocation has taken place first.
-	if (m_OutputTexID != 0 && finalImage && !finalImage->empty())
-	{
-		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);//The texture to draw to.
-		auto scaledW = std::ceil(width() * devicePixelRatioF());
-		auto scaledH = std::ceil(height() * devicePixelRatioF());
-
-		//Only draw if the dimensions match exactly.
-		if (m_TexWidth == m_Fractorium->m_Controller->FinalRasW() &&
-				m_TexHeight == m_Fractorium->m_Controller->FinalRasH() &&
-				((m_TexWidth * m_TexHeight) == static_cast<GLint>(finalImage->size())))
-		{
-			glMatrixMode(GL_PROJECTION);
-			glPushMatrix();
-			glLoadIdentity();
-			glOrtho(0, 1, 1, 0, -1, 1);
-			glMatrixMode(GL_MODELVIEW);
-			glPushMatrix();
-			glLoadIdentity();
-
-			//Copy data from CPU to OpenGL if using a CPU renderer. This is not needed when using OpenCL.
-			if (renderer->RendererType() == eRendererType::CPU_RENDERER)
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_TexWidth, m_TexHeight, GL_RGBA, GL_FLOAT, finalImage->data());
-
-			glBegin(GL_QUADS);//This will need to be converted to a shader at some point in the future.
-			glTexCoord2f(0.0, 0.0); glVertex2f(0.0, 0.0);
-			glTexCoord2f(0.0, 1.0); glVertex2f(0.0, 1.0);
-			glTexCoord2f(1.0, 1.0); glVertex2f(1.0, 1.0);
-			glTexCoord2f(1.0, 0.0); glVertex2f(1.0, 0.0);
-			glEnd();
-			glMatrixMode(GL_PROJECTION);
-			glPopMatrix();
-			glMatrixMode(GL_MODELVIEW);
-			glPopMatrix();
-		}
-
-		glBindTexture(GL_TEXTURE_2D, 0);//Stop using this texture.
-	}
-
-	glDisable(GL_TEXTURE_2D);
-#else
 	this->glEnable(GL_TEXTURE_2D);
 	this->glActiveTexture(GL_TEXTURE0);
 	const auto renderer = m_Fractorium->m_Controller->Renderer();
@@ -300,7 +204,6 @@ void GLWidget::DrawQuad()
 
 	this->glBindTexture(GL_TEXTURE_2D, 0);//Stop using this texture.
 	this->glDisable(GL_TEXTURE_2D);
-#endif
 }
 
 /// <summary>
@@ -391,7 +294,6 @@ GLint GLWidget::TexHeight() const { return m_TexHeight; }
 /// </summary>
 void GLWidget::initializeGL()
 {
-#ifdef USE_GLSL
 	//auto  qsf = this->format();
 	//qDebug() << "initializeGL*****************\nVersion: " << qsf.majorVersion() << ',' << qsf.minorVersion();
 	//qDebug() << "Profile: " << qsf.profile();
@@ -463,11 +365,6 @@ void GLWidget::initializeGL()
 			m_QuadProgram->release();
 		}
 
-#else
-
-	if (!m_Init && initializeOpenGLFunctions() && m_Fractorium)
-	{
-#endif
 		//cout << "GL Version: " << (char *) glGetString(GL_VERSION) << endl;
 		//cout << "GLSL version: " << (char *) glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 		this->glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -533,20 +430,6 @@ void GLWidget::paintGL()
 #else
 		this->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 #endif
-#ifndef USE_GLSL
-		this->glMatrixMode(GL_PROJECTION);
-		this->glPushMatrix();
-		this->glLoadIdentity();
-		this->glOrtho(-unitX, unitX, -unitY, unitY, -1, 1);//Projection matrix: OpenGL camera is always centered, just move the ember internally inside the renderer.
-		this->glMatrixMode(GL_MODELVIEW);
-		this->glPushMatrix();
-		this->glLoadIdentity();
-		controller->GLController()->DrawAffines(pre, post);
-		this->glMatrixMode(GL_PROJECTION);
-		this->glPopMatrix();
-		this->glMatrixMode(GL_MODELVIEW);
-		this->glPopMatrix();
-#else
 		m_Program->bind();
 		m_ProjMatrix.setToIdentity();
 		m_ProjMatrix.ortho(-unitX, unitX, -unitY, unitY, -1, 1);//Projection matrix: OpenGL camera is always centered, just move the ember internally inside the renderer.
@@ -554,7 +437,6 @@ void GLWidget::paintGL()
 		//this->DrawUnitSquare();
 		controller->GLController()->DrawAffines(pre, post);
 		m_Program->release();
-#endif
 		this->glDisable(GL_BLEND);
 		this->glDisable(GL_LINE_SMOOTH);
 		this->glDisable(GL_POINT_SMOOTH);
@@ -706,36 +588,16 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 
 	if (dragging)//Draw large yellow dot on select or drag.
 	{
-#ifndef USE_GLSL
-		m_GL->glBegin(GL_POINTS);
-		m_GL->glColor4f(1.0f, 1.0f, 0.5f, 1.0f);
-		m_GL->glVertex2f(m_DragHandlePos.x, m_DragHandlePos.y);
-		m_GL->glEnd();
-#else
 		const GLfloat vertices[] =//Should these be of type T?//TODO
 		{
 			static_cast<GLfloat>(m_DragHandlePos.x), static_cast<GLfloat>(m_DragHandlePos.y)
 		};
 		const QVector4D col(1.0f, 1.0f, 0.5f, 1.0f);
 		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, false, 6.0f);
-#endif
 	}
 	else if (m_DragState == eDragState::DragSelect)
 	{
 		m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());
-#ifndef USE_GLSL
-		m_GL->glBegin(GL_LINES);
-		m_GL->glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseDownWorldPos.y);//UL->UR
-		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseDownWorldPos.y);
-		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseWorldPos.y);//LL->LR
-		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseWorldPos.y);
-		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseDownWorldPos.y);//UL->LL
-		m_GL->glVertex2f(m_MouseDownWorldPos.x, m_MouseWorldPos.y);
-		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseDownWorldPos.y);//UR->LR
-		m_GL->glVertex2f(m_MouseWorldPos.x, m_MouseWorldPos.y);
-		m_GL->glEnd();
-#else
 		const GLfloat vertices[] =//Should these be of type T?//TODO
 		{
 			static_cast<GLfloat>(m_MouseDownWorldPos.x), static_cast<GLfloat>(m_MouseDownWorldPos.y),//UL->UR
@@ -749,24 +611,16 @@ void GLEmberController<T>::DrawAffines(bool pre, bool post)
 		};
 		const QVector4D col(0.0f, 0.0f, 1.0f, 1.0f);
 		m_GL->DrawPointOrLine(col, vertices, 8, GL_LINES);
-#endif
 		m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());
 	}
 	else if (m_HoverType != eHoverType::HoverNone && m_HoverXform == m_SelectedXform)//Draw large turquoise dot on hover if they are hovering over the selected xform.
 	{
-#ifndef USE_GLSL
-		m_GL->glBegin(GL_POINTS);
-		m_GL->glColor4f(0.5f, 1.0f, 1.0f, 1.0f);
-		m_GL->glVertex2f(m_HoverHandlePos.x, m_HoverHandlePos.y);
-		m_GL->glEnd();
-#else
 		const GLfloat vertices[] =//Should these be of type T?//TODO
 		{
 			static_cast<GLfloat>(m_HoverHandlePos.x), static_cast<GLfloat>(m_HoverHandlePos.y)
 		};
 		const QVector4D col(0.5f, 1.0f, 1.0f, 1.0f);
 		m_GL->DrawPointOrLine(col, vertices, 1, GL_POINTS, false, 6.0f);
-#endif
 	}
 }
 
@@ -1209,8 +1063,6 @@ void GLWidget::DrawPointOrLine(const QVector4D& col, const std::vector<float>& v
 /// <param name="pointSize">The size in pixels of points, which is internally scaled by the device pixel ratio.</param>
 void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, int size, int drawType, bool dashed, GLfloat pointSize)
 {
-#ifdef USE_GLSL
-
 	if (dashed && (drawType == GL_LINES || drawType == GL_LINE_LOOP))
 	{
 		glLineStipple(1, 0XFF00);
@@ -1228,8 +1080,6 @@ void GLWidget::DrawPointOrLine(const QVector4D& col, const GLfloat* vertices, in
 
 	if (dashed && (drawType == GL_LINES || drawType == GL_LINE_LOOP))
 		glDisable(GL_LINE_STIPPLE);
-
-#endif
 }
 
 /// <summary>
@@ -1260,40 +1110,6 @@ bool GLWidget::Allocate(bool force)
 	const auto h = m_Fractorium->m_Controller->FinalRasH();
 	bool const doResize = force || m_TexWidth != w || m_TexHeight != h;
 	bool const doIt = doResize || m_OutputTexID == 0;
-#ifndef USE_GLSL
-
-	if (doIt)
-	{
-		m_TexWidth = static_cast<GLint>(w);
-		m_TexHeight = static_cast<GLint>(h);
-		glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-		if (doResize)
-			Deallocate();
-
-		glGenTextures(1, &m_OutputTexID);
-		glBindTexture(GL_TEXTURE_2D, m_OutputTexID);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//Fractron had this as GL_LINEAR_MIPMAP_LINEAR for OpenCL and Cuda.
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-#if defined (__APPLE__) || defined(MACOSX)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_TexWidth, m_TexHeight, 0, GL_RGB, GL_FLOAT, nullptr);
-#else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_TexWidth, m_TexHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
-#endif
-		alloc = true;
-	}
-
-	if (alloc)
-	{
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glDisable(GL_TEXTURE_2D);
-	}
-
-#else
-
 	if (doIt)
 	{
 		m_TexWidth = static_cast<GLint>(w);
@@ -1324,7 +1140,6 @@ bool GLWidget::Allocate(bool force)
 		this->glDisable(GL_TEXTURE_2D);
 	}
 
-#endif
 	this->glFinish();
 	return m_OutputTexID != 0;
 }
@@ -1357,9 +1172,7 @@ void GLWidget::SetViewport()
 	if (m_Init && (m_ViewWidth != m_TexWidth || m_ViewHeight != m_TexHeight))
 	{
 		this->glViewport(0, 0, GLint{ m_TexWidth }, GLint{ m_TexHeight });
-#ifdef USE_GLSL
 		m_Viewport = glm::ivec4(0, 0, m_TexWidth, m_TexHeight);
-#endif
 		m_ViewWidth = m_TexWidth;
 		m_ViewHeight = m_TexHeight;
 	}
@@ -1391,25 +1204,6 @@ bool GLEmberController<T>::SizesMatch()
 void GLWidget::DrawUnitSquare()
 {
 	glLineWidth(1.0f * devicePixelRatioF());
-#ifndef USE_GLSL
-	glBegin(GL_LINES);
-	glColor4f(1.0f, 1.0f, 1.0f, 0.25f);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f(-1, 1);
-	glVertex2f( 1, 1);
-	glVertex2f(-1, -1);
-	glVertex2f(-1, 1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1, 1);
-	glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-	glVertex2f(-1, 0);
-	glVertex2f( 1, 0);
-	glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
-	glVertex2f( 0, -1);
-	glVertex2f( 0, 1);
-	glEnd();
-#else
 	GLfloat vertices[] =//Should these be of type T?//TODO
 	{
 		-1, -1,
@@ -1437,7 +1231,6 @@ void GLWidget::DrawUnitSquare()
 	};
 	const QVector4D col3(0.0f, 1.0f, 0.0f, 0.5f);
 	DrawPointOrLine(col3, vertices3, 2, GL_LINES);
-#endif
 }
 
 /// <summary>
@@ -1469,42 +1262,6 @@ void GLEmberController<T>::DrawGrid()
 	const int ysteps = std::ceil(std::abs(yHigh - yLow) / GridStep);
 	Affine2D<T> temp;
 	m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());
-#ifndef USE_GLSL
-	m4T mat = (temp * scale).ToMat4RowMajor();
-	m_GL->glPushMatrix();
-	m_GL->glLoadIdentity();
-	MultMatrix(mat);
-	m_GL->glBegin(GL_LINES);
-	m_GL->glColor4f(0.5f, 0.5f, 0.5f, alpha);
-
-	for (float fx = xLow, i = 0; fx <= xHigh && i < xsteps; fx += GridStep, i++)
-	{
-		m_GL->glVertex2f(fx, yLow);
-		m_GL->glVertex2f(fx, yHigh);
-	}
-
-	for (float fy = yLow, i = 0; fy < yHigh && i < ysteps; fy += GridStep, i++)
-	{
-		m_GL->glVertex2f(xLow,  fy);
-		m_GL->glVertex2f(xHigh, fy);
-	}
-
-	m_GL->glColor4f(1.0f,   0.0f, 0.0f, alpha);
-	m_GL->glVertex2f(0.0f,  0.0f);
-	m_GL->glVertex2f(xHigh, 0.0f);
-	m_GL->glColor4f(0.5f,   0.0f, 0.0f, alpha);
-	m_GL->glVertex2f(0.0f,  0.0f);
-	m_GL->glVertex2f(xLow,  0.0f);
-	m_GL->glColor4f(0.0f,   1.0f, 0.0f, alpha);
-	m_GL->glVertex2f(0.0f,  0.0f);
-	m_GL->glVertex2f(0.0f,  yHigh);
-	m_GL->glColor4f(0.0f,   0.5f, 0.0f, alpha);
-	m_GL->glVertex2f(0.0f,  0.0f);
-	m_GL->glVertex2f(0.0f,  yLow);
-	m_GL->glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	m_GL->glEnd();
-	m_GL->glPopMatrix();
-#else
 	const m4T mat = (temp * scale).ToMat4ColMajor();
 	glm::tmat4x4<float, glm::defaultp> tempmat4 = mat;
 	m_GL->m_ModelViewMatrix = QMatrix4x4(glm::value_ptr(tempmat4));
@@ -1557,7 +1314,6 @@ void GLEmberController<T>::DrawGrid()
 	m_Verts.push_back(yLow);
 	col = QVector4D(0.0f, 0.5f, 0.0f, alpha);
 	m_GL->DrawPointOrLine(col, m_Verts, GL_LINES);
-#endif
 }
 
 /// <summary>
@@ -1578,42 +1334,6 @@ void GLEmberController<T>::DrawAffine(const Xform<T>* xform, bool pre, bool sele
 	const auto size = ember->m_Palette.m_Entries.size();
 	const auto color = ember->m_Palette.m_Entries[Clamp<T>(xform->m_ColorX * size, 0, size - 1)];
 	const auto& affine = pre ? xform->m_Affine : xform->m_Post;
-#ifndef USE_GLSL
-	//For some incredibly strange reason, even though glm and OpenGL use matrices with a column-major
-	//data layout, nothing will work here unless they are flipped to row major order. This is how it was
-	//done in Fractron.
-	m4T mat = (affine * m_FractoriumEmberController->AffineScaleCurrentToLocked()).ToMat4RowMajor();
-	m_GL->glPushMatrix();
-	m_GL->glLoadIdentity();
-	MultMatrix(mat);
-	//QueryMatrices(true);
-	m_GL->glLineWidth(3.0f * m_GL->devicePixelRatioF());//One 3px wide, colored black, except green on x axis for post affine.
-	m_GL->DrawAffineHelper(index, selected, hovered, pre, final, true);
-	m_GL->glLineWidth(1.0f * m_GL->devicePixelRatioF());//Again 1px wide, colored white, to give a white middle with black outline effect.
-	m_GL->DrawAffineHelper(index, selected, hovered, pre, final, false);
-	m_GL->glPointSize(5.0f * m_GL->devicePixelRatioF());//Three black points, one in the center and two on the circle. Drawn big 5px first to give a black outline.
-	m_GL->glBegin(GL_POINTS);
-	m_GL->glColor4f(0.0f, 0.0f, 0.0f, selected ? 1.0f : 0.5f);
-	m_GL->glVertex2f(0.0f, 0.0f);
-	m_GL->glVertex2f(1.0f, 0.0f);
-	m_GL->glVertex2f(0.0f, 1.0f);
-	m_GL->glEnd();
-	m_GL->glLineWidth(2.0f * m_GL->devicePixelRatioF());//Draw lines again for y axis only, without drawing the circle, using the color of the selected xform.
-	m_GL->glBegin(GL_LINES);
-	m_GL->glColor4f(color.r, color.g, color.b, 1.0f);
-	m_GL->glVertex2f(0.0f, 0.0f);
-	m_GL->glVertex2f(0.0f, 1.0f);
-	m_GL->glEnd();
-	m_GL->glPointSize(3.0f * m_GL->devicePixelRatioF());//Draw smaller white points, to give a black outline effect.
-	m_GL->glBegin(GL_POINTS);
-	m_GL->glColor4f(1.0f, 1.0f, 1.0f, selected ? 1.0f : 0.5f);
-	m_GL->glVertex2f(0.0f, 0.0f);
-	m_GL->glVertex2f(1.0f, 0.0f);
-	m_GL->glVertex2f(0.0f, 1.0f);
-	m_GL->glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	m_GL->glEnd();
-	m_GL->glPopMatrix();
-#else
 	const m4T mat = (affine * m_FractoriumEmberController->AffineScaleCurrentToLocked()).ToMat4ColMajor();
 	glm::tmat4x4<float, glm::defaultp> tempmat4 = mat;
 	m_GL->m_ModelViewMatrix = QMatrix4x4(glm::value_ptr(tempmat4));
@@ -1664,7 +1384,6 @@ void GLEmberController<T>::DrawAffine(const Xform<T>* xform, bool pre, bool sele
 	col = QVector4D(1.0f, 0.0f, 1.0f, selected ? 1.0f : 0.5f);
 	m_GL->DrawPointOrLine(col, m_Verts, GL_POINTS, false, 5.0f);//Draw smaller purple point, to give a black outline effect.
 	m_GL->m_ModelViewMatrix.setToIdentity();
-#endif
 }
 
 /// <summary>
@@ -1684,57 +1403,6 @@ void GLWidget::DrawAffineHelper(int index, float circleWidth, float lineWidth, b
 	float px = 1.0f;
 	float py = 0.0f;
 	const auto col = final ? m_Fractorium->m_FinalXformComboColor : m_Fractorium->m_XformComboColors[index % XFORM_COLOR_COUNT];
-#ifndef USE_GLSL
-	glBegin(GL_LINES);
-
-	//Circle part.
-	if (!background)
-	{
-		glColor4f(col.redF(), col.greenF(), col.blueF(), 1.0f);//Draw pre affine transform with white.
-	}
-	else
-	{
-		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);//Draw pre affine transform outline with white.
-	}
-
-	if (selected)
-	{
-		for (size_t i = 1; i <= 64; i++)//The circle.
-		{
-			float theta = float(M_PI) * 2.0f * float(i % 64) / 64.0f;
-			float fx = std::cos(theta);
-			float fy = std::sin(theta);
-			glVertex2f(px, py);
-			glVertex2f(fx, fy);
-			px = fx;
-			py = fy;
-		}
-	}
-
-	//Lines from center to circle.
-	if (!background)
-	{
-		glColor4f(col.redF(), col.greenF(), col.blueF(), 1.0f);
-	}
-	else
-	{
-		if (pre)
-			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);//Draw pre affine transform outline with white.
-		else
-			glColor4f(0.0f, 0.75f, 0.0f, 1.0f);//Draw post affine transform outline with green.
-	}
-
-	//The lines from the center to the circle.
-	glVertex2f(0.0f, 0.0f);//X axis.
-	glVertex2f(1.0f, 0.0f);
-
-	if (background)
-		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-
-	glVertex2f(0.0f, 0.0f);//Y axis.
-	glVertex2f(0.0f, 1.0f);
-	glEnd();
-#else
 	QVector4D color;
 
 	//Circle part.
@@ -1796,7 +1464,6 @@ void GLWidget::DrawAffineHelper(int index, float circleWidth, float lineWidth, b
 	m_Verts.push_back(0);
 	m_Verts.push_back(1);
 	DrawPointOrLine(color, m_Verts, GL_LINES, !pre);
-#endif
 }
 
 /// <summary>

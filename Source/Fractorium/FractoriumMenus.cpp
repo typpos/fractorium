@@ -164,6 +164,7 @@ void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 {
 	StopAllPreviewRenderers();
 	auto ember = m_Ember;
+	auto scale = m_LockedScale;
 	auto model = m_Fractorium->ui.LibraryTree->selectionModel();
 	auto sel = model->selectedIndexes();
 	auto insertEmberIndex = sel.size() > 0 ? sel[0].row() + 1 : 0;
@@ -173,6 +174,7 @@ void FractoriumEmberController<T>::CopyFlameInCurrentFile()
 	m_EmberFile.MakeNamesUnique();
 	FillLibraryTree(insertEmberIndex);
 	SetEmber(insertEmberIndex, false);
+	LockedScale(scale);//Need to call this to keep affine scales as they were because SetEmber() resets them.
 }
 
 void Fractorium::OnActionCopyFlameInCurrentFile(bool checked) { m_Controller->CopyFlameInCurrentFile(); }

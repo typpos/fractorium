@@ -1,3 +1,8 @@
+fractorium (25.25.12.1-0ubuntu1) bionic; urgency=low
+
+  * release 25.25.12.1
+ -- Matt Feemster <matt.feemster@gmail.com> Thu, 18 Dec 2025 15:35:12 -0700
+
 fractorium (23.23.8.101-0ubuntu1~pre0) UNRELEASED; urgency=medium
 
   * Non-maintainer upload.

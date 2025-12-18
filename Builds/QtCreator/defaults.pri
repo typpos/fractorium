@@ -1,4 +1,4 @@
-VERSION = 24.24.12.1
+VERSION = 25.25.12.1
 win32:CONFIG += skip_target_version_ext
 CONFIG += c++2a
 
@@ -108,13 +108,13 @@ win32 {
 	LIBS += -lIex
 	
 #For systems with older versions of OpenEXR < 3.0, use this.
-#	LIBS += -lIlmImf
-#	LIBS += -lHalf
+	LIBS += -lIlmImf
+    LIBS += -lHalf
 
 #For systems with OpenEXR >= 3.0, use this.
-   LIBS += -lz
-   LIBS += -lIlmThread
-   LIBS += -lOpenEXR
+#   LIBS += -lz
+#   LIBS += -lIlmThread
+#   LIBS += -lOpenEXR
 }
 
 macx {

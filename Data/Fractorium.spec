@@ -2,7 +2,7 @@
 %define buildroot     %{_topdir}/BUILDROOT
 
 Name:           Fractorium
-Version:        24.24.12.1
+Version:        25.25.12.1
 Release:        1
 Summary:        A fractal flame editor with GPU support
 

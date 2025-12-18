@@ -84,14 +84,16 @@ Make them executable by running this command in the folder they reside in:
 `chmod +x ./*.AppImage`
 
 Once those are installed, ensure the version is correct in the following files:
-`fractorium/Builds/QtCreator/defaults.pri`
-
-`fractorium/Data/Fractorium.spec`
+```
+fractorium/Builds/QtCreator/defaults.pri
+fractorium/Data/Fractorium.spec
+```
 
 Ensure copyright and website links are correct in:
-`fractorium/debian/copyright`
-
-`fractorium/debian/control`
+```
+fractorium/debian/copyright
+fractorium/debian/control
+```
 
 Then run these commands from the root of the fractorium folder:
 
@@ -323,4 +325,5 @@ https://launchpad.net/~fractorium/+archive/ubuntu/ppa/+files/fractorium_w.x.y.za
 Update the README.md link to this.
 
 All done. Commit, push, send Pull Request.
+
 

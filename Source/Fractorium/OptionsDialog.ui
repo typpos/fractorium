@@ -246,7 +246,7 @@
        <item row="6" column="0">
         <widget class="QCheckBox" name="Flam3CompatCheckBox">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The behavior of the asteria, bipolar, circlecrop, cos, cosh, cot, coth, cropn, cross, csc, csch, depth_ngon2, depth_sine2, edisc, escher, fan2, glynnia, hypershift, hypershift2, hypertile1, julia, julian, juliascope, loonie2, npolar, phoenix_julia, sec, sech, sin, sinh, sphericaln, tan, tanh, and truchet variations are different in flam3/Apophysis versus Chaotica.&lt;/p&gt;&lt;p&gt;Checked: use the Apophysis behavior.&lt;/p&gt;&lt;p&gt;Unchecked: use the Chaotica behavior.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The behavior of the asteria, bipolar, circlecrop, cos, cosh, cot, coth, cropn, cross, csc, csch, curve, depth_ngon2, depth_sine2, edisc, escher, fan2, glynnia, hypershift, hypershift2, hypertile1, julia, julian, juliascope, loonie2, npolar, phoenix_julia, sec, sech, sin, sinh, sphericaln, tan, tanh, and truchet variations are different in flam3/Apophysis versus Chaotica.&lt;/p&gt;&lt;p&gt;Checked: use the flam3/Apophysis behavior.&lt;/p&gt;&lt;p&gt;Unchecked: use the Chaotica behavior.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Flam3 Compatibility</string>

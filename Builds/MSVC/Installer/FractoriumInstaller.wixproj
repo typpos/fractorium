@@ -1,7 +1,7 @@
 ﻿<Project Sdk="WixToolset.Sdk/6.0.2">
   <PropertyGroup>
     <ProductVersion>3.7</ProductVersion>
-    <OutputName>Fractorium_24.24.12.1</OutputName>
+    <OutputName>Fractorium_25.25.12.1</OutputName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>$(SolutionDir)..\..\..\Bin\$(Platform)\$(Configuration)\</OutputPath>
@@ -46,5 +46,14 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Solution\Ember.vcxproj" />
+    <ProjectReference Include="..\Solution\EmberAnimate.vcxproj" />
+    <ProjectReference Include="..\Solution\EmberCL.vcxproj" />
+    <ProjectReference Include="..\Solution\EmberGenome.vcxproj" />
+    <ProjectReference Include="..\Solution\EmberRender.vcxproj" />
+    <ProjectReference Include="..\Solution\EmberTester.vcxproj" />
+    <ProjectReference Include="..\Solution\Fractorium.vcxproj" />
   </ItemGroup>
 </Project>

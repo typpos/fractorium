@@ -8099,6 +8099,7 @@
    <addaction name="ActionCL"/>
    <addaction name="ActionSP"/>
    <addaction name="ActionDP"/>
+   <addaction name="ActionCompat"/>
    <addaction name="ActionOptions"/>
    <addaction name="separator"/>
    <addaction name="ActionStyle"/>
@@ -8537,6 +8538,17 @@
    </property>
    <property name="toolTip">
     <string>Use double precision to render</string>
+   </property>
+  </action>
+  <action name="ActionCompat">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Compat</string>
+   </property>
+   <property name="toolTip">
+    <string>Use flam3 compatibility mode</string>
    </property>
   </action>
   <action name="ActionStyle">

@@ -23,6 +23,7 @@ void Fractorium::InitToolbarUI()
 	connect(ui.ActionCL,	              SIGNAL(triggered(bool)), this, SLOT(OnActionCL(bool)),	            Qt::QueuedConnection);
 	connect(ui.ActionSP,	              SIGNAL(triggered(bool)), this, SLOT(OnActionSP(bool)),	            Qt::QueuedConnection);
 	connect(ui.ActionDP,	              SIGNAL(triggered(bool)), this, SLOT(OnActionDP(bool)),	            Qt::QueuedConnection);
+	connect(ui.ActionCompat,	          SIGNAL(triggered(bool)), this, SLOT(OnActionCompat(bool)),            Qt::QueuedConnection);
 	connect(ui.ActionStyle,               SIGNAL(triggered(bool)), this, SLOT(OnActionStyle(bool)),             Qt::QueuedConnection);
 	connect(ui.ActionStartStopRenderer,   SIGNAL(triggered(bool)), this, SLOT(OnActionStartStopRenderer(bool)), Qt::QueuedConnection);
 	connect(ui.ActionDrawImage,           SIGNAL(triggered(bool)), this, SLOT(OnActionDrawImage(bool)),	        Qt::QueuedConnection);
@@ -97,6 +98,17 @@ void Fractorium::OnActionDP(bool checked)
 		m_Settings->Double(true);
 		ShutdownAndRecreateFromOptions(true);//Pass true, but it's not needed because creating a new controller will force a library tree re-render.
 	}
+}
+
+/// <summary>
+/// Called when the flam3 compatibility option on the toolbar is clicked.
+/// </summary>
+/// <param name="checked">Check state, action only taken if true.</param>
+void Fractorium::OnActionCompat(bool checked)
+{
+	m_Settings->Flam3Compat(checked);
+	Compat::m_Compat = checked;
+	ShutdownAndRecreateFromOptions(true);
 }
 
 /// <summary>
@@ -245,6 +257,7 @@ void Fractorium::SyncOptionsToToolbar()
 		ui.ActionDP->setChecked(false);
 	}
 
+    ui.ActionCompat->setChecked(m_Settings->Flam3Compat());
 	ui.ActionDrawGrid->setChecked(m_Settings->ShowGrid());
 	ui.ActionDrawPreAffines->setChecked(m_Settings->ShowXforms());
 	ui.ActionDrawAllPreAffines->setChecked(m_Settings->ShowXforms());

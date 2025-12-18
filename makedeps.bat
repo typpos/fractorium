@@ -7,16 +7,16 @@ REM C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\B
 REM Move to parent of deps folders
 cd ..
 git clone https://github.com/madler/zlib.git
-git clone https://github.com/glennrp/libpng.git
+git clone -b v1.6.53 https://github.com/pnggroup/libpng.git
 git clone https://github.com/GNOME/libxml2.git
 git clone https://github.com/g-truc/glm.git
-git clone -b v3.1.7 https://github.com/AcademySoftwareFoundation/openexr.git
+git clone -b v3.4.4 https://github.com/AcademySoftwareFoundation/openexr.git
 
 REM libjpeg
 REM You need to manually go get libjpeg, because it's not on github or bitbucket.
 copy fractorium\Builds\MSVC\WIN32.MAK libjpeg
 cd libjpeg
-nmake /f makefile.vc setup-v16 CPU=i386
+nmake /f makefile.vc CPU=i386
 nmake nodebug=1 /f makefile.vc libjpeg.lib CPU=i386
 copy libjpeg.lib ..\fractorium\Deps
 cd ..
@@ -52,8 +52,8 @@ SET current=%cd%
 
 if not exist ".\output" mkdir .\output
 
-cmake -G "Visual Studio 17 2022"^
-      -A x64^
+cmake -G "Visual Studio 18 2026"^
+	  -A x64^
       -DCMAKE_PREFIX_PATH="%current%\output"^
       -DCMAKE_INSTALL_PREFIX="%current%\output"^
       -DILMBASE_PACKAGE_PREFIX="%current%\output" ^
@@ -70,10 +70,13 @@ cmake --build . --target install --config Release
 cd %current%
 
 xcopy %current%\output\Include %current%\..\fractorium\Deps\Include\ /S /Y
-xcopy %current%\output\bin\Iex-3_1.dll %current%\..\fractorium\Deps\ /Y
-xcopy %current%\output\bin\IlmThread-3_1.dll %current%\..\fractorium\Deps\ /Y
-xcopy %current%\output\bin\Imath-3_1.dll %current%\..\fractorium\Deps\ /Y
-xcopy %current%\output\bin\OpenEXR-3_1.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\Iex-3_4.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\IlmThread-3_4.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\_deps\imath-build\src\Imath\Release\*.lib %current%\..\fractorium\Deps\ /Y
+xcopy %current%\_deps\imath-build\src\Imath\Release\*.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\OpenEXR-3_4.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\OpenEXRCore-3_4.dll %current%\..\fractorium\Deps\ /Y
+xcopy %current%\output\bin\openjph.0.24.dll %current%\..\fractorium\Deps\ /Y
 xcopy %current%\output\lib\*.lib %current%\..\fractorium\Deps\ /Y
 
 cd ..\fractorium

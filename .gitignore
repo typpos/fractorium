@@ -263,3 +263,7 @@ Builds/include/GL
 /Builds/QtCreator/Fractorium/.qtc_clangd/compile_commands.json
 .DS_Store
 /.vs/VSWorkspaceState.json
+/Source/apoconv/.vs
+/Deps/Include/openjph
+/Deps-orig/Include/Imath
+/Deps-orig/Include/OpenEXR

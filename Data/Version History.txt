@@ -1,3 +1,15 @@
+25.25.12.1 12/14/2025
+--User changes
+ -Use the hex palette format when saving xmls from the final render dialog.
+ -Add a button to the toolbar for toggling flam3 compatibility mode.
+ -Update licenses to refer to GPL v3 in the about dialog.
+
+--Bug fixes
+ -Fix error in the curve variation to make compatible with Chaotica and add flam3 compatibility support.
+  
+--Code changes
+ -Migrate to Visual Studio 2026 and update various dependencies.
+
 24.24.12.1 12/8/2024
 --User changes
  -Clarify the tooltip for the red squares in the Type column of the variations tree.
@@ -44,7 +56,7 @@
  -Bug when duplicating a flame in a file and scrolling to it.
  -Null termination bug when reading Xml strings.
  -Fix an extremely rare possible memory leak when using motion during animation, which is never used in Fractorium.
- -Do not skip to the current flame index, or attach a prefix in the Final Render Dialog when rendering an animation sequence.
+ -Do not skip to the current flame index, or attach a prefix in the final render dialog when rendering an animation sequence.
  -Fix indendation for variations because of Type icon.
  -Fix bug when duplicating flame where the new flame wasn't being properly selected.
  -Fix bug where clearing a flame was changing size and quality when it shouldn't have.

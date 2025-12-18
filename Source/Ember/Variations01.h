@@ -4116,8 +4116,8 @@ public:
 
 	virtual void Func(IteratorHelper<T>& helper, Point<T>& outPoint, QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
 	{
-		helper.Out.x = m_Weight * helper.In.x + m_XAmpV * std::exp(-helper.In.y * helper.In.y * m_XLengthV);
-		helper.Out.y = m_Weight * helper.In.y + m_YAmpV * std::exp(-helper.In.x * helper.In.x * m_YLengthV);
+		helper.Out.x = m_Weight * (helper.In.x + (m_XAmp * std::exp(-helper.In.y * helper.In.y * m_XLengthV)));
+		helper.Out.y = m_Weight * (helper.In.y + (m_YAmp * std::exp(-helper.In.x * helper.In.x * m_YLengthV)));
 		helper.Out.z = DefaultZ(helper);
 	}
 
@@ -4132,13 +4132,11 @@ public:
 		string yAmp     = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string xLength  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string yLength  = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string xAmpV    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
-		string yAmpV    = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string xLengthV = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		string yLengthV = "parVars[" + ToUpper(m_Params[i++].Name()) + index;
 		ss << "\t{\n"
-		   << "\t\tvOut.x = fma(" << weight << ", vIn.x, " << xAmpV << " * exp(-vIn.y * vIn.y * " << xLengthV << "));\n"
-		   << "\t\tvOut.y = fma(" << weight << ", vIn.y, " << yAmpV << " * exp(-vIn.x * vIn.x * " << yLengthV << "));\n"
+		   << "\t\tvOut.x = " << weight << " * fma(" << xAmp << ", exp(-vIn.y * vIn.y * " << xLengthV << "), vIn.x);\n"
+		   << "\t\tvOut.y = " << weight << " * fma(" << yAmp << ", exp(-vIn.x * vIn.x * " << yLengthV << "), vIn.y);\n"
 		   << "\t\tvOut.z = " << DefaultZCl()
 		   << "\t}\n";
 		return ss.str();
@@ -4146,10 +4144,16 @@ public:
 
 	virtual void Precalc() override
 	{
-		m_XAmpV = m_Weight * m_XAmp;
-		m_YAmpV = m_Weight * m_YAmp;
-		m_XLengthV = 1 / std::max(SQR(m_XLength), T(1e-20));
-		m_YLengthV = 1 / std::max(SQR(m_YLength), T(1e-20));
+		if (Compat::m_Compat)
+		{
+			m_XLengthV = 1 / std::max(SQR(m_XLength), T(1e-20));
+			m_YLengthV = 1 / std::max(SQR(m_YLength), T(1e-20));
+		}
+		else
+		{
+			m_XLengthV = 1 / Zeps(m_XLength);
+			m_YLengthV = 1 / Zeps(m_YLength);
+		}
 	}
 
 	virtual void Random(QTIsaac<ISAAC_SIZE, ISAAC_INT>& rand) override
@@ -4169,9 +4173,7 @@ protected:
 		m_Params.push_back(ParamWithName<T>(&m_YAmp, prefix + "curve_yamp"));
 		m_Params.push_back(ParamWithName<T>(&m_XLength, prefix + "curve_xlength", 1));
 		m_Params.push_back(ParamWithName<T>(&m_YLength, prefix + "curve_ylength", 1));
-		m_Params.push_back(ParamWithName<T>(true, &m_XAmpV, prefix + "curve_xampv"));//Precalc.
-		m_Params.push_back(ParamWithName<T>(true, &m_YAmpV, prefix + "curve_yampv"));
-		m_Params.push_back(ParamWithName<T>(true, &m_XLengthV, prefix + "curve_xlenv"));
+		m_Params.push_back(ParamWithName<T>(true, &m_XLengthV, prefix + "curve_xlenv"));//Precalc.
 		m_Params.push_back(ParamWithName<T>(true, &m_YLengthV, prefix + "curve_ylenv"));
 	}
 
@@ -4180,9 +4182,7 @@ private:
 	T m_YAmp;
 	T m_XLength;
 	T m_YLength;
-	T m_XAmpV;//Precalc.
-	T m_YAmpV;
-	T m_XLengthV;
+	T m_XLengthV;//Precalc.
 	T m_YLengthV;
 };
 

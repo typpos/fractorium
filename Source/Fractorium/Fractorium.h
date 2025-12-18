@@ -189,6 +189,7 @@ public slots:
 	void OnActionCL(bool checked);
 	void OnActionSP(bool checked);
 	void OnActionDP(bool checked);
+	void OnActionCompat(bool checked);
 	void OnActionStyle(bool checked);
 	void OnActionStartStopRenderer(bool checked);
 	void OnActionDrawAffines(bool checked);

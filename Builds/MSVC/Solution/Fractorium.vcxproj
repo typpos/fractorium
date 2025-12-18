@@ -19,12 +19,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -62,7 +62,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_HELP_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_XML_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\_deps\imath-build\config;$(ProjectDir)..\..\..\..\openexr\_deps\imath-src\src\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -87,7 +87,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(QTDIR)\lib;$(OCL_ROOT)\lib\x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>Qt6Cored.lib;Qt6EntryPointd.lib;Qt6Guid.lib;Qt6OpenGLd.lib;Qt6OpenGLWidgetsd.lib;Qt6Widgetsd.lib;opengl32.lib;glu32.lib;opencl.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt6Cored.lib;Qt6EntryPointd.lib;Qt6Guid.lib;Qt6OpenGLd.lib;Qt6OpenGLWidgetsd.lib;Qt6Widgetsd.lib;opengl32.lib;glu32.lib;opencl.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_4.lib;Imath-3_2.lib;OpenEXR-3_4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /F /Y /R /D "$(SolutionDir)..\..\..\Deps\*.dll" "$(OutDir)"
@@ -107,7 +107,7 @@ xcopy /F /Y /R /D "$(QTDIR)\plugins\imageformats\qjpegd.dll" "$(OutDir)\imagefor
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_MULTIMEDIA_LIB;QT_HELP_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_XML_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\output\include\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\PaletteEditor;$(QTDIR)\include;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles;$(ProjectDir)..\..\..\Fractorium\GeneratedFiles\ConfigurationName;$(QTDIR)\..\qtmultimedia\include\QtMultimedia;$(QTDIR)\..\qtmultimedia\include;$(QTDIR)\..\qttools\include;$(QTDIR)\..\qttools\include\QtHelp;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtXml;.\GeneratedFiles;$(ProjectDir)..\..\..\Source\Ember;$(ProjectDir)..\..\..\Source\EmberCL;$(ProjectDir)..\..\..\Source\EmberCommon;$(ProjectDir)..\..\..\Source\Fractorium;$(ProjectDir)..\..\..\..\glm;$(ProjectDir)..\..\..\..\libjpeg;$(ProjectDir)..\..\..\..\libpng;$(ProjectDir)..\..\..\..\libxml2\include;$(ProjectDir)..\..\..\..\openexr\_deps\imath-build\config;$(ProjectDir)..\..\..\..\openexr\_deps\imath-src\src\Imath;$(ProjectDir)..\..\..\..\openexr\output\include\OpenEXR;$(ProjectDir)..\..\..\Builds\include\CLs\CL3.0;.\GeneratedFiles\$(ConfigurationName);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -131,7 +131,7 @@ xcopy /F /Y /R /D "$(QTDIR)\plugins\imageformats\qjpegd.dll" "$(OutDir)\imagefor
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\..\Deps;$(QTDIR)\lib;$(OCL_ROOT)\lib\x86_64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>Qt6Core.lib;Qt6EntryPoint.lib;Qt6Gui.lib;Qt6OpenGL.lib;Qt6OpenGLWidgets.lib;Qt6Widgets.lib;opengl32.lib;glu32.lib;opencl.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_1.lib;Imath-3_1.lib;OpenEXR-3_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt6Core.lib;Qt6EntryPoint.lib;Qt6Gui.lib;Qt6OpenGL.lib;Qt6OpenGLWidgets.lib;Qt6Widgets.lib;opengl32.lib;glu32.lib;opencl.lib;Ws2_32.lib;libjpeg.lib;libpng.lib;libxml2.lib;zlib.lib;Iex-3_4.lib;Imath-3_2.lib;OpenEXR-3_4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Version>0.1</Version>
     </Link>
     <PostBuildEvent>

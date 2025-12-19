@@ -1,4 +1,4 @@
-# Build Guide For Visual Studio 2022 or Qt Creator
+# Build Guide For Visual Studio 2026 (or later) or Qt Creator
 ## Tools
 
 ### git
@@ -7,11 +7,11 @@ Install [git](https://git-scm.com/downloads).
 
 ### Visual Studio
 
-Install [Microsoft Visual Studio 2022 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
+Install [Microsoft Visual Studio 2026 or later](https://www.visualstudio.com/downloads/), then install the latest updates.
 
 ### Qt
 
-Install Qt for Windows 64-bit (VS 2019) 6.5.1 or later (http://www.qt.io/download/). 
+Install Qt for Windows 64-bit 6.5.1 or later (http://www.qt.io/download/). 
 
 Add system environment variable named `QTPATH` and point it to the location of the Qt folder. On a default install, this will be something like:
 
@@ -19,7 +19,7 @@ Add system environment variable named `QTPATH` and point it to the location of t
 
 ### Wix
 
-To build the installer, you must have Wix installed. If you are unconcerned with it, you can skip this step and just dismiss the warning that shows when opening the solution later. It's recommended you ignore the installer since official builds are provided on this page.
+To build the installer, you must have Wix installed as well as the Heatwave VS extension. If you are unconcerned with it, you can skip this step and just dismiss the warning that shows when opening the solution later. It's recommended you ignore the installer since official builds are provided on this page.
 
 ### CMake
 
@@ -73,20 +73,23 @@ This will download and build `glm libopenexr libpng libxml zlib`. You will have 
   │
   ├─[Deps]
     │
-    ├─Iex-3_1.dll
-    ├─IlmThread-3_1.dll
-    ├─IMath-3_1.dll
+    ├─Iex-3_4.dll
+    ├─IlmThread-3_4.dll
+    ├─IMath-3_2.dll
     ├─libxml2.dll
-    ├─OpenEXR-3_1.dll
-    ├─Iex-3_1.lib
-    ├─IlmThread-3_1.lib
-    ├─Imath-3_1.lib
+    ├─OpenEXR-3_4.dll
+    ├─OpenEXRCore-3_4.dll
+    ├─openjph.0.24.dll
+    ├─Iex-3_4.lib
+    ├─IlmThread-3_4.lib
+    ├─Imath-3_2.lib
     ├─libjpeg.lib
     ├─libpng.lib
     ├─libxml2.lib
-    ├─OpenEXR-3_1.lib
-    ├─OpenEXRCore-3_1.lib
-    ├─OpenEXRUtil-3_1.lib
+    ├─OpenEXR-3_4.lib
+    ├─OpenEXRCore-3_4.lib
+    ├─OpenEXRUtil-3_4.lib
+    ├─openjph.0.24.lib
     ├─zlib.lib
 ```
 
@@ -147,7 +150,6 @@ Apatite_Supergroup.ugr
 boxtail_pack_02.gradient
 boxtail_pack_03_triangle.gradient
 boxtail_pack_04_mineshack.gradient
-concrt140.dll
 dark_windows.qss
 Ember.dll
 EmberAnimate.exe
@@ -162,14 +164,13 @@ Feldspar_Group.ugr
 flam3-palettes.xml
 fractaldesire_pack_01.gradient
 Fractorium.exe
-Iex-3_1.dll
-IlmThread-3_1.dll
-Imath-3_1.dll
+Iex-3_4.dll
+IlmThread-3_4.dll
+Imath-3_2.dll
 libxml2.dll
 lightdark.qss
 Mica_Group.ugr
-msvcp140.dll
-OpenEXR-3_1.dll
+OpenEXR-3_4.dll
 Qt6Core.dll
 Qt6Gui.dll
 Qt6OpenGL.dll
@@ -188,26 +189,23 @@ tatasz_pack_06.gradient
 tatasz_pack_07.gradient
 uranium.qss
 user-palettes.xml
-vccorlib140.dll
-vcruntime140.dll
-vcruntime140_1.dll
 imageformats\qjpeg.dll
 platforms\qwindows.dll
 ```
 
 Double click fractorium.exe to run it, and use the command line to run the others.
 
-To run on a computer without Visual Studio 2022, these files also need to be in the folder:
+To run on a computer without Visual Studio 2026 (or later), these files also need to be in the folder:
 
 ```
-C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\msvcp140.dll
-C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\vcruntime140.dll
-C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\vcruntime140_1.dll
-C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\vccorlib140.dll
-C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\concrt140.dll
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Redist\MSVC\[LATEST_VERSION]\x64\Microsoft.VC[LATEST_VERSION].CRT\msvcp140.dll
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Redist\MSVC\[LATEST_VERSION]\x64\Microsoft.VC[LATEST_VERSION].CRT\vcruntime140.dll
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Redist\MSVC\[LATEST_VERSION]\x64\Microsoft.VC[LATEST_VERSION].CRT\vcruntime140_1.dll
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Redist\MSVC\[LATEST_VERSION]\x64\Microsoft.VC[LATEST_VERSION].CRT\vccorlib140.dll
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Redist\MSVC\[LATEST_VERSION]\x64\Microsoft.VC[LATEST_VERSION].CRT\concrt140.dll
 ```
 
-or you can install [Visual C++ Redistributable Packages for Visual Studio 2022 (64 bit)](https://www.visualstudio.com/downloads/)
+or you can install [Visual C++ Redistributable Packages for Visual Studio 2026 (or later) (64 bit)](https://www.visualstudio.com/downloads/)
 
 ## Final file structure for distribution
 
@@ -233,13 +231,13 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2022 (
 ├─flam3-palettes.xml
 ├─fractaldesire_pack_01.gradient
 ├─Fractorium.exe
-├─Iex-3_1.dll
-├─IlmThread-3_1.dll
-├─Imath-3_1.dll
+├─Iex-3_4.dll
+├─IlmThread-3_4.dll
+├─Imath-3_2.dll
 ├─libxml2.dll
 ├─lightdark.qss
 ├─Mica_Group.ugr
-├─OpenEXR-3_1.dll
+├─OpenEXR-3_4.dll
 ├─Qt6Core.dll
 ├─Qt6Gui.dll
 ├─Qt6OpenGL.dll
@@ -270,3 +268,4 @@ or you can install [Visual C++ Redistributable Packages for Visual Studio 2022 (
     │
     ├─qwindows.dll
 ```
+

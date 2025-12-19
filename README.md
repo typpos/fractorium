@@ -9,7 +9,7 @@ of the cuburn algorithm in OpenCL.
 
 ## Windows
 
-Download: [Fractorium_24.24.12.1.msi](https://drive.google.com/file/d/16D7rvuUc3x0JKYgPAP1iyoNLN_1bXCix/view?usp=drive_link)
+Download: [Fractorium_25.25.12.1.msi](https://drive.google.com/file/d/1LZHAR2j5I09qf_tBBBb_sxD0uVR_UEwo/view?usp=sharing)
 
 ## Mac
 
@@ -21,20 +21,20 @@ Download: [Fractorium_24.24.12.1.dmg](https://drive.google.com/file/d/1P7tZ_LT_Z
 
 Install ubuntu 20 or greater.
 
-Download: [Fractorium-24.24.12.1.x86_64.AppImage](https://drive.google.com/file/d/1JYBckKMcVd9qvRiZN6b7CXMRo8oM_pU8/view?usp=drive_link)
+Download: [Fractorium-25.25.12.1.x86_64.AppImage](https://drive.google.com/file/d/1vjGxouHRzDkfY6-nRUz4dCmGY9fv1pSP/view?usp=sharing)
 
 ### Install from App Image .rpm
 
-Download: [Fractorium-24.24.12.1.x86_64.rpm](https://drive.google.com/file/d/1te2UijE3OyR5EayWQT2sE4OIr4U0kUad/view?usp=drive_link)
+Download: [Fractorium-25.25.12.1.x86_64.rpm](https://drive.google.com/file/d/1eFynIUYNW-a9BjxWoeRrty0ym0Slzg3m/view?usp=sharing)
 
 ### Install from .deb
 
 Install ubuntu 20 or greater.
 
-Download: [Fractorium-24.24.12.1.x86_64.deb](https://drive.google.com/file/d/130ZUkkFscptPjZSo__WFIwz62YJeUa5j/view?usp=drive_link)
+Download: [Fractorium-25.25.12.1.x86_64.deb](https://drive.google.com/file/d/1GIwCinL6T81J9gq39-zvoMo8vcJwqIly/view?usp=sharing)
 ```
 cd ~/Downloads
-sudo dpkg -i Fractorium-24.24.12.1.x86_64.deb
+sudo dpkg -i Fractorium-25.25.12.1.x86_64.deb
 ```
 
 # Building from git
@@ -43,7 +43,7 @@ All builds are 64-bit.
 
 ## Windows
 
-[Build Guide for Visual Studio 2022 or Qt Creator](Data/BuildGuideQtCreator.md)
+[Build Guide for Visual Studio 2026 or Qt Creator](Data/BuildGuideQtCreator.md)
 
 ## Linux
 

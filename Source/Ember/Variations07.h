@@ -3988,7 +3988,7 @@ public:
 		   << "\t\treal_t weight = " << weight << ";\n";
 
 		if (Compat::m_Compat)
-			ss << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << mulx << ") + Sqr((vIn.y - " << y0 << ") / " << muly << "); \n";
+			ss << "\t\treal_t rad = sqrt(Sqr((vIn.x - " << x0 << ") / " << mulx << ") + Sqr((vIn.y - " << y0 << ") / " << muly << ")); \n";
 		else
 			ss << "\t\treal_t rad = sqrt(Sqr(vIn.x - " << x0 << ") * " << oneovermulsqx << " + Sqr(vIn.y - " << y0 << ") * " << oneovermulsqy << "); \n";
 
